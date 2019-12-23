@@ -1,7 +1,13 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "downlevelIteration": true,
+        "jsx": "react"
     },
     "include": [
         "./src/**/*"

@@ -1,6 +1,6 @@
 import 'phaser';
-import { BootScene } from './scenes/BootScene';
-import { WorldScene } from './scenes/WorldScene';
+import { BootScene } from './phaser/scenes/BootScene';
+import { WorldScene } from './phaser/scenes/WorldScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
