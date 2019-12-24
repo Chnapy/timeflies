@@ -1,9 +1,16 @@
 import { Pathfinder } from '../pathfinder/Pathfinder';
-import { WorldScene } from '../scenes/WorldScene';
+import { BattleScene } from '../scenes/BattleScene';
+
+export interface MapInfos {
+    tilemapKey: string;
+    decorLayerKey: string;
+    obstaclesLayerKey: string;
+}
 
 export class MapComponent {
 
-    private readonly scene: WorldScene;
+    private readonly scene: BattleScene;
+    private readonly mapInfos: MapInfos;
 
     readonly pathfinder: Pathfinder;
 
@@ -11,21 +18,25 @@ export class MapComponent {
     decorLayer!: Phaser.Tilemaps.StaticTilemapLayer;
     obstaclesLayer!: Phaser.Tilemaps.StaticTilemapLayer;
 
-    constructor(scene: WorldScene) {
+    constructor(scene: BattleScene, mapInfos: MapInfos) {
         this.scene = scene;
+        this.mapInfos = mapInfos;
         this.pathfinder = new Pathfinder(this);
     }
 
-    create(): void {
+    create(): this {
+        const { tilemapKey, decorLayerKey, obstaclesLayerKey } = this.mapInfos;
 
         this.tilemap = this.scene.make.tilemap({ key: 'map' });
 
-        const tiles = this.tilemap.addTilesetImage('map', 'tiles');
+        const tiles = this.tilemap.addTilesetImage(tilemapKey, 'tiles');
 
-        this.decorLayer = this.tilemap.createStaticLayer('view', tiles, 0, 0)
-        this.obstaclesLayer = this.tilemap.createStaticLayer('obstacles', tiles, 0, 0)
+        this.decorLayer = this.tilemap.createStaticLayer(decorLayerKey, tiles, 0, 0)
+        this.obstaclesLayer = this.tilemap.createStaticLayer(obstaclesLayerKey, tiles, 0, 0)
             .setVisible(false);
 
         this.pathfinder.setGrid();
+
+        return this;
     }
 }

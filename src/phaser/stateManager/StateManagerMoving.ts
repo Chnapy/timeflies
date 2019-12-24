@@ -4,7 +4,7 @@ export class StateManagerMoving extends StateManager {
     onTileHover(pointer: Phaser.Input.Pointer): void {
     }
 
-    onTileClick(pointer: Phaser.Input.Pointer): void {
+    onTileClick(): void {
     }
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {

@@ -1,20 +1,18 @@
-import { WorldScene } from '../scenes/WorldScene';
+import { BattleScene } from '../scenes/BattleScene';
 
 export type State = 'idle' | 'moving';
 
 export abstract class StateManager {
 
-    protected readonly scene: WorldScene;
-    protected readonly setState: (state: State) => void;
+    protected readonly scene: BattleScene;
 
-    constructor(scene: WorldScene, setState: (state: State) => void) {
+    constructor(scene: BattleScene) {
         this.scene = scene;
-        this.setState = setState;
     }
 
     abstract onTileHover(pointer: Phaser.Input.Pointer): void;
 
-    abstract onTileClick(pointer: Phaser.Input.Pointer): void;
+    abstract onTileClick(): void;
 
     abstract update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void;
 }

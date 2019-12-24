@@ -1,30 +1,20 @@
-import { WorldSceneData } from './WorldScene';
-import mapAsset from '../../_assets/map/map.png';
-import mapJSONAsset from '../../_assets/map/map.sjson';
+import { ConnectedScene } from './ConnectedScene';
+import { LoadScene } from './LoadScene';
+import { SampleData } from './SampleBattleData';
 
-export class BootScene extends Phaser.Scene {
+export class BootScene extends ConnectedScene<'BootScene'> {
 
     constructor() {
-        super({ key: 'BootScene' });
+        super('BootScene');
     }
 
-    preload() {
-        // map tiles
-        this.load.image('tiles', mapAsset);
-
-        // map in json format
-        this.load.tilemapTiledJSON('map', mapJSONAsset);
-
-        // our two characters
-        // this.load.spritesheet('player', 'assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
+    preload(): void {
     }
 
-    create() {
+    create(): void {
+        this.start<LoadScene>('LoadScene', SampleData);
+    }
 
-        const data: WorldSceneData = {
-            toto: 8
-        };
-        
-        this.scene.start('WorldScene', data);
+    update(time: number, delta: number): void {
     }
 }

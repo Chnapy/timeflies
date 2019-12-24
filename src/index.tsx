@@ -1,9 +1,4 @@
 import 'phaser';
-import ReactDOM from 'react-dom';
-import React from 'react';
-import { App } from './App';
+import { Controller } from './Controller';
 
-ReactDOM.render(
-    <App />,
-    document.getElementById('root')
-);
+Controller.start();

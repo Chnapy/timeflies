@@ -1,12 +1,15 @@
 import React from 'react';
-import { Game } from './phaser/Game';
+import { GameEngine } from './phaser/GameEngine';
 import { UI } from './ui/UI';
 
-export class App extends React.PureComponent {
-    private readonly gameWrapperRef: React.RefObject<HTMLDivElement>;
-    private game?: Game;
+export interface AppProps {
+    onMount(gameWrapper: HTMLElement);
+}
 
-    constructor(props: {}) {
+export class App extends React.PureComponent<AppProps> {
+    private readonly gameWrapperRef: React.RefObject<HTMLDivElement>;
+
+    constructor(props: AppProps) {
         super(props);
         this.gameWrapperRef = React.createRef();
     }
@@ -26,6 +29,6 @@ export class App extends React.PureComponent {
     componentDidMount(): void {
         const gameWrapperElement = this.gameWrapperRef.current!;
 
-        this.game = new Game(gameWrapperElement);
+        this.props.onMount(gameWrapperElement);
     }
 }

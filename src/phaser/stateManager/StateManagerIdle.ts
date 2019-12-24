@@ -1,5 +1,6 @@
 import { StateManager, State } from './StateManager';
-import { WorldScene } from '../scenes/WorldScene';
+import { BattleScene, BattleStateAction } from '../scenes/BattleScene';
+import { Controller } from '../../Controller';
 
 export class StateManagerIdle extends StateManager {
 
@@ -7,8 +8,8 @@ export class StateManagerIdle extends StateManager {
     private currentTile: Phaser.Tilemaps.Tile | null;
     private prevTile: Phaser.Tilemaps.Tile | null;
 
-    constructor(scene: WorldScene, setState: (state: State) => void) {
-        super(scene, setState);
+    constructor(scene: BattleScene) {
+        super(scene);
         this.pathPos = [];
         this.currentTile = null;
         this.prevTile = null;
@@ -79,11 +80,17 @@ export class StateManagerIdle extends StateManager {
         this.scene.tweens.timeline({
             tweens,
             onComplete: () => {
-                this.setState('idle');
+                Controller.dispatch<BattleStateAction>({
+                    type: 'battle/state',
+                    state: "idle"
+                });
             }
         });
 
-        this.setState('moving');
+        Controller.dispatch<BattleStateAction>({
+            type: 'battle/state',
+            state: "moving"
+        });
     }
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics) {
