@@ -1,18 +1,21 @@
-import { StateManager, State } from './StateManager';
-import { BattleScene, BattleStateAction } from '../scenes/BattleScene';
 import { Controller } from '../../Controller';
+import { BattleScene, BattleStateAction } from '../scenes/BattleScene';
+import { StateData, StateManager } from './StateManager';
 
-export class StateManagerIdle extends StateManager {
+export class StateManagerIdle extends StateManager<'idle'> {
 
     private pathPos: { x: number; y: number }[];
     private currentTile: Phaser.Tilemaps.Tile | null;
     private prevTile: Phaser.Tilemaps.Tile | null;
 
-    constructor(scene: BattleScene) {
-        super(scene);
+    constructor(scene: BattleScene, stateData: StateData<'idle'>) {
+        super(scene, stateData);
         this.pathPos = [];
         this.currentTile = null;
         this.prevTile = null;
+    }
+
+    init(): void {
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
@@ -33,8 +36,6 @@ export class StateManagerIdle extends StateManager {
 
             const mainPos = currentCharacter.position;
 
-            // console.log('hover', pointer, this.currentTile);
-
             const pathPromise = pathfinder.calculatePath(mainPos.x, mainPos.y, this.currentTile.x, this.currentTile.y);
 
             pathPromise.promise.then(path => {
@@ -50,46 +51,26 @@ export class StateManagerIdle extends StateManager {
         }
     }
 
-    onTileClick(): void {
+    onTileClick(pointer: Phaser.Input.Pointer): void {
+        // Controller.dispatch<BattleMoveAction>({
+        //     type: 'battle/move',
+        //     pointer
+        // });
+
         if (!this.currentTile
             || !this.pathPos.length) {
             return;
         }
 
-        const currentCharacter = this.scene.cycle.getCurrentCharacter();
-
-        const { position } = currentCharacter;
-
-        const { tilemap } = this.scene.map;
-
-        const [ firstPos, ...restPos ] = this.pathPos;
-
-        const tweens = restPos.map(p => {
-
-            return {
-                targets: currentCharacter.sprite,
-                x: { value: p.x, duration: 200 },
-                y: { value: p.y, duration: 200 },
-                onComplete: () => {
-                    position.x = tilemap.worldToTileX(p.x);
-                    position.y = tilemap.worldToTileY(p.y);
-                }
-            };
-        });
-
-        this.scene.tweens.timeline({
-            tweens,
-            onComplete: () => {
-                Controller.dispatch<BattleStateAction>({
-                    type: 'battle/state',
-                    state: "idle"
-                });
-            }
-        });
-
         Controller.dispatch<BattleStateAction>({
             type: 'battle/state',
-            state: "moving"
+            stateObject: {
+                state: "move",
+                data: {
+                    currentTile: this.currentTile,
+                    pathPositions: this.pathPos
+                }
+            }
         });
     }
 

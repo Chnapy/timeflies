@@ -1,5 +1,6 @@
 import EasyStar from 'easystarjs';
 import { MapComponent } from '../map/Map';
+import { BattleScene } from '../scenes/BattleScene';
 
 export interface PathPromise {
     promise: Promise<{ x: number; y: number; }[]>;
@@ -11,15 +12,20 @@ export class Pathfinder {
     private static ACCEPTABLE_TILES: number[] = [ 0 ];
 
     private readonly map: MapComponent;
+    private readonly scene: BattleScene;
     private readonly finder: InstanceType<(typeof EasyStar)[ 'js' ]>;
 
-    constructor(map: MapComponent) {
+    constructor(map: MapComponent, scene: BattleScene) {
         this.map = map;
+        this.scene = scene;
         this.finder = new EasyStar.js();
+        this.finder.disableDiagonals();
     }
 
     private readonly getTileID = (obstaclesLayer: Phaser.Tilemaps.StaticTilemapLayer, x: number, y: number): number => {
-        const obstacle = obstaclesLayer.getTileAt(x, y);
+        const obstacle = obstaclesLayer.getTileAt(x, y)
+        || this.isSomeoneAtXY(x, y);
+        
         return obstacle ? 1 : 0;
     };
 
@@ -67,4 +73,9 @@ export class Pathfinder {
         };
     }
 
+    private isSomeoneAtXY(x: number, y: number): boolean {
+        return this.scene.players && this.scene.players
+            .flatMap(player => player.characters)
+            .some(({ position }) => position.x === x && position.y === y);
+    }
 }

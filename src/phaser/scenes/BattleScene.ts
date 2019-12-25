@@ -1,37 +1,50 @@
-import { Cycle } from '../cycle/Cycle';
-import { Character } from '../entities/Character';
-import { Player } from '../entities/Player';
+import { IGameAction } from '../../action/GameAction';
+import { Cycle, CycleStartTurn, CycleEndTurn } from '../cycle/Cycle';
+import { Player, PlayerInfos, SpriteGenerator } from '../entities/Player';
 import { MapComponent, MapInfos } from '../map/Map';
-import { State as BattleState, StateManager as BattleStateManager } from '../stateManager/StateManager';
+import { State as BattleState, StateManager as BattleStateManager, StateManager, State, StateMap } from '../stateManager/StateManager';
 import { StateManagerIdle } from '../stateManager/StateManagerIdle';
 import { StateManagerMoving } from '../stateManager/StateManagerMoving';
 import { ConnectedScene } from './ConnectedScene';
-import { Action } from 'redux';
+import { StateManagerWatch } from '../stateManager/StateManagerWatch';
+import { Character, Position } from '../entities/Character';
+import { StateManagerSortPrepare } from '../stateManager/StateManagerSortPrepare';
 
-export interface BattleLaunchAction extends Action<'battle/launch'> {
+export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     data: BattleSceneData;
 }
 
-export interface MoveAction extends Action<'move'> {
-    pointer: Phaser.Input.Pointer;
+// export interface BattleMoveAction extends IGameAction<'battle/move'> {
+//     pointer: Phaser.Input.Pointer;
+// }
+
+export interface BattleStateAction extends IGameAction<'battle/state'> {
+    stateObject: StateMap;
 }
 
-export interface BattleStateAction extends Action<'battle/state'> {
-    state: BattleState;
+export interface BattleCharacterPositionAction extends IGameAction<'battle/character/position', true> {
+    character: Character;
+    position: Position;
 }
+
+export type BattleSceneAction =
+    | BattleLaunchAction
+    // | BattleMoveAction
+    | BattleStateAction
+    | BattleCharacterPositionAction;
 
 export interface BattleSceneData {
-    players: Player[];
+    playersInfos: PlayerInfos[];
     mapInfos: MapInfos;
 }
 
 export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> {
 
-    private player!: Player;
+    players!: Player[];
     cycle!: Cycle;
     private graphics!: Phaser.GameObjects.Graphics;
     private state!: BattleState;
-    battleStateManager!: BattleStateManager;
+    battleStateManager!: BattleStateManager<any>;
     map!: MapComponent;
 
     constructor() {
@@ -47,36 +60,21 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     };
 
     create(data: BattleSceneData) {
+        const { playersInfos } = data;
+
         this.map = new MapComponent(this, data.mapInfos)
             .create();
 
-        this.onStateChange({
-            type: 'battle/state',
-            state: "idle"
-        });
+        const spriteGenerator: SpriteGenerator = {
+            tileToWorldPosition: this.map.tileToWorldPosition,
+            spriteGenerate: (...args) => this.add.sprite(...args)
+        };
 
-        const { tileWidth, tileHeight } = this.map.tilemap;
+        this.players = playersInfos.map(playerInfos => new Player(playerInfos, spriteGenerator));
 
-        const mainPos = { x: 4, y: 3 };
+        this.map.initPathfinder();
 
-        const mainCharacter = new Character(
-            'Char1',
-            this.add.sprite(mainPos.x * tileWidth + tileWidth / 2, mainPos.y * tileHeight + tileHeight / 2, 'player', 0),
-            mainPos,
-            100,
-            4000
-        );
-
-        this.player = new Player(
-            'J1',
-            [
-                mainCharacter
-            ]
-        );
-
-        this.cycle = new Cycle(
-            this.player.characters
-        );
+        this.cycle = new Cycle(this);
 
         this.graphics = this.add.graphics();
 
@@ -85,12 +83,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         decorLayer
             .setInteractive()
             .on('pointermove', pointer => this.battleStateManager.onTileHover(pointer))
-            .on('pointerup', (pointer: Phaser.Input.Pointer) => {
-                this.dispatch<MoveAction>({
-                    type: 'move',
-                    pointer
-                });
-            });
+            .on('pointerup', pointer => this.battleStateManager.onTileClick(pointer));
     }
 
     update(time: number, delta: number): void {
@@ -101,24 +94,61 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         this.battleStateManager.update(time, delta, this.graphics);
     }
 
-    private readonly onTileClick = this.reduce<MoveAction>('move', action => this.battleStateManager.onTileClick());
-
     private readonly onStateChange = this.reduce<BattleStateAction>('battle/state', action => {
-        const { state } = action;
-console.log('change state', state);
+        const { stateObject } = action;
+        const { state } = stateObject;
+
+        console.log('change state', state);
+
         if (state === this.state) {
             return;
         }
 
         this.state = state;
 
-        switch (state) {
-            case 'idle':
-                this.battleStateManager = new StateManagerIdle(this);
-                return;
-            case 'moving':
-                this.battleStateManager = new StateManagerMoving(this);
-                return;
+        this.battleStateManager = getFromState(this);
+        this.battleStateManager.init();
+
+        function getFromState(scene: BattleScene): StateManager<any> {
+            switch (stateObject.state) {
+                case 'idle':
+                    return new StateManagerIdle(scene, stateObject.data);
+                case 'move':
+                    return new StateManagerMoving(scene, stateObject.data);
+                case 'watch':
+                    return new StateManagerWatch(scene, stateObject.data);
+                case 'sortPrepare':
+                    return new StateManagerSortPrepare(scene, stateObject.data);
+            }
         }
     });
+
+    private readonly onTurnStart = this.reduce<CycleStartTurn>('turn/start', ({ character }) => {
+
+        this.onStateChange({
+            type: 'battle/state',
+            stateObject: character.isMine
+                ? { state: 'idle' }
+                : { state: 'watch' }
+        });
+
+    });
+
+    private readonly onTurnEnd = this.reduce<CycleEndTurn>('turn/end', ({ character }) => {
+
+        this.onStateChange({
+            type: 'battle/state',
+            stateObject: { state: 'watch' }
+        });
+
+    });
+
+    private readonly onCharacterPosition = this.reduce<BattleCharacterPositionAction>('battle/character/position',
+        ({ character, position }) => {
+
+            // character.position = position;
+
+            // this.map.pathfinder.setGrid();
+
+        });
 }

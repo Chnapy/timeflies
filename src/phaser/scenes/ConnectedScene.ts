@@ -1,7 +1,6 @@
-import { GameAction } from '../../action/GameAction';
-import { GameEngine } from '../GameEngine';
-import { Controller } from '../../Controller';
 import { Action } from 'redux';
+import { GameAction } from '../../action/GameAction';
+import { Controller } from '../../Controller';
 
 export interface ConnectedSceneConfig<K extends string> extends Omit<Phaser.Types.Scenes.SettingsConfig, 'key'> {
     key: K;
@@ -47,7 +46,7 @@ export abstract class ConnectedScene<K extends string, D extends {} | undefined 
         Controller.dispatch(action);
     }
 
-    protected readonly reduce = <A extends GameAction>(type: A[ 'type' ], fn: (action: A) => void) => {
+    readonly reduce = <A extends GameAction>(type: A[ 'type' ], fn: (action: A) => void) => {
 
         if (this.reducerMap[ type ]) {
             console.warn('reducer already exist for type', type,

@@ -1,9 +1,11 @@
-import { AssetManager, IAssetMap } from '../../assetManager/AssetManager';
+import { AssetManager, IAssetMap, IAssetCharacter } from '../../assetManager/AssetManager';
 import { BattleLaunchAction, BattleScene, BattleSceneData } from './BattleScene';
 import { ConnectedScene } from './ConnectedScene';
+import { CharacterType } from '../entities/Character';
 
 export interface LoadSceneData {
     mapKey: keyof IAssetMap;
+    characterTypes: CharacterType[];
     battleData: BattleSceneData;
 }
 
@@ -14,8 +16,7 @@ export class LoadScene extends ConnectedScene<'LoadScene', LoadSceneData> {
     }
 
     preload() {
-        const { mapKey } = this.initData;
-        console.log(mapKey, AssetManager)
+        const { mapKey, characterTypes } = this.initData;
 
         // map tiles
         this.load.image('tiles', AssetManager.map[ mapKey ].image);
@@ -23,8 +24,12 @@ export class LoadScene extends ConnectedScene<'LoadScene', LoadSceneData> {
         // map in json format
         this.load.tilemapTiledJSON('map', AssetManager.map[ mapKey ].schema);
 
-        // our two characters
-        // this.load.spritesheet('player', 'assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
+        // characters
+        characterTypes.forEach(type => this.load.spritesheet(
+            type,
+            AssetManager.character[ type ].idle,
+            { frameWidth: 35, frameHeight: 35 }
+        ));
     }
 
     create() {
@@ -33,7 +38,7 @@ export class LoadScene extends ConnectedScene<'LoadScene', LoadSceneData> {
         this.onBattleLaunch({
             type: 'battle/launch',
             data: battleData
-        })
+        });
     }
 
     update(time: number, delta: number): void {
