@@ -91,7 +91,10 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
     onTileHover(pointer: Phaser.Input.Pointer): void {
         const { map } = this.scene;
 
-        const position = map.worldToTilePosition(pointer.position);
+        const position = map.worldToTilePosition({
+            x: pointer.worldX,
+            y: pointer.worldY
+        });
 
         if (this.lastPositionHovered?.x === position.x
             && this.lastPositionHovered?.y === position.y) {
@@ -117,6 +120,19 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
             });
             return;
         }
+
+        const { sort } = this.stateData;
+
+        Controller.dispatch<BattleStateAction>({
+            type: 'battle/state',
+            stateObject: {
+                state: 'sortLaunch',
+                data: {
+                    sort,
+                    position: this.lastPositionHovered!
+                }
+            }
+        });
     }
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
@@ -124,7 +140,7 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
         graphics.fillStyle(0xFF0000, 0.5);
         graphics.lineStyle(2, 0x0000FF);
 
-        this.rects.map((rect, i) => {
+        this.rects.forEach((rect, i) => {
             if (this.rectHoveredIndex !== i)
                 graphics.fillRectShape(rect);
             graphics.strokeRectShape(rect);
@@ -147,7 +163,7 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
             return 'no';
         }
 
-        const positions = this.characters.flatMap(c => c.position);
+        const positions = this.characters.map(c => c.position);
 
         if (positions.some(p => p.x === position.x && p.y === position.y)) {
             return 'last';

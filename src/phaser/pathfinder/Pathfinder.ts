@@ -24,8 +24,8 @@ export class Pathfinder {
 
     private readonly getTileID = (obstaclesLayer: Phaser.Tilemaps.StaticTilemapLayer, x: number, y: number): number => {
         const obstacle = obstaclesLayer.getTileAt(x, y)
-        || this.isSomeoneAtXY(x, y);
-        
+            || this.isSomeoneAtXY(x, y);
+
         return obstacle ? 1 : 0;
     };
 
@@ -42,7 +42,7 @@ export class Pathfinder {
             }
         }
 
-        console.log(grid);
+        // console.log(grid);
 
         this.finder.setGrid(grid);
 
@@ -74,8 +74,7 @@ export class Pathfinder {
     }
 
     private isSomeoneAtXY(x: number, y: number): boolean {
-        return this.scene.players && this.scene.players
-            .flatMap(player => player.characters)
+        return this.scene.characters && this.scene.characters
             .some(({ position }) => position.x === x && position.y === y);
     }
 }

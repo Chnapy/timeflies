@@ -1,8 +1,9 @@
-import { LoadSceneData } from './LoadScene';
-import { PlayerInfos } from '../entities/Player';
-import { CharacterInfos } from '../entities/Character';
+import { CharacterInfos } from '../phaser/entities/Character';
+import { TeamInfos } from '../phaser/entities/Team';
+import { BattleRoomState } from '../phaser/scenes/BattleScene';
 
 const charJ1Sample1: CharacterInfos = {
+    id: 1,
     isMine: true,
     name: 'C1',
     type: 'sampleChar1',
@@ -31,6 +32,7 @@ const charJ1Sample1: CharacterInfos = {
 };
 
 const charJ1Sample2: CharacterInfos = {
+    id: 2,
     isMine: true,
     name: 'C2',
     type: 'sampleChar2',
@@ -44,6 +46,7 @@ const charJ1Sample2: CharacterInfos = {
 };
 
 const charJ2Sample3: CharacterInfos = {
+    id: 3,
     isMine: false,
     name: 'C3',
     type: 'sampleChar3',
@@ -64,27 +67,49 @@ const charJ2Sample3: CharacterInfos = {
     ]
 };
 
-const playersInfos: PlayerInfos[] = [
+const charactersInfos: CharacterInfos[] = [
+    charJ1Sample1,
+    charJ1Sample2,
+    charJ2Sample3
+];
+
+const teamsInfos: TeamInfos[] = [
     {
-        itsMe: true,
-        name: 'J1',
-        charactersInfos: [
-            charJ1Sample1,
-            charJ1Sample2
+        id: 1,
+        color: 0xFF0000,
+        name: 'Team RED',
+        playersInfos: [
+            {
+                id: 1,
+                itsMe: true,
+                name: 'J1',
+                charactersInfos: [
+                    charJ1Sample1,
+                    charJ1Sample2
+                ]
+            }
         ]
     },
     {
-        itsMe: false,
-        name: 'J2',
-        charactersInfos: [
-            charJ2Sample3
+        id: 2,
+        color: 0x0000FF,
+        name: 'Team BLUE',
+        playersInfos: [
+            {
+                id: 2,
+                itsMe: false,
+                name: 'J2',
+                charactersInfos: [
+                    charJ2Sample3
+                ]
+            }
         ]
     }
 ];
 
-export const SampleData: LoadSceneData = {
+export const SampleData: BattleRoomState = {
     mapKey: 'sampleMap1',
-    characterTypes: ['sampleChar1', 'sampleChar2', 'sampleChar3'],
+    characterTypes: [ 'sampleChar1', 'sampleChar2', 'sampleChar3' ],
     battleData: {
         mapInfos: {
             tilemapKey: 'map',
@@ -92,6 +117,6 @@ export const SampleData: LoadSceneData = {
             obstaclesLayerKey: 'obstacles'
         },
 
-        playersInfos
+        teamsInfos 
     }
 };

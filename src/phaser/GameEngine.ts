@@ -3,11 +3,10 @@ import { LoadScene } from './scenes/LoadScene';
 import { BattleScene } from './scenes/BattleScene';
 import { Controller } from '../Controller';
 import { BootScene } from './scenes/BootScene';
+import * as Colyseus from '../mocks/MockColyseus';
 
-const config: Omit<Phaser.Types.Core.GameConfig, 'parent'> = {
+const config: Omit<Phaser.Types.Core.GameConfig, 'parent' | 'width' | 'height'> = {
     type: Phaser.AUTO,
-    width: 640,
-    height: 480,
     zoom: 1,
     render: {
         pixelArt: true
@@ -25,7 +24,9 @@ export class GameEngine {
     constructor(parent: HTMLElement) {
         this.game = new Phaser.Game({
             ...config,
-            parent
+            parent,
+            width: parent.clientWidth,
+            height: parent.clientHeight
         });
     }
 
@@ -36,5 +37,9 @@ export class GameEngine {
     readonly emit = <A extends GameAction>(action: A): void => {
         this.game.scene.getScenes()
             .forEach(scene => scene.events.emit(action.type, action));
+    }
+
+    resize(width: number, height: number): void {
+        this.game.scale.resize(width, height);
     }
 }

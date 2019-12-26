@@ -1,6 +1,7 @@
 import { Controller } from '../../Controller';
 import { BattleScene, BattleStateAction } from '../scenes/BattleScene';
 import { StateData, StateManager } from './StateManager';
+import { Position } from '../entities/Character';
 
 export class StateManagerIdle extends StateManager<'idle'> {
 
@@ -19,7 +20,10 @@ export class StateManagerIdle extends StateManager<'idle'> {
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
-        const pos = pointer.position;
+        const pos: Position = {
+            x: pointer.worldX,
+            y: pointer.worldY
+        };
 
         const { tilemap, decorLayer, pathfinder } = this.scene.map;
         const { tileWidth, tileHeight } = tilemap;
@@ -52,10 +56,6 @@ export class StateManagerIdle extends StateManager<'idle'> {
     }
 
     onTileClick(pointer: Phaser.Input.Pointer): void {
-        // Controller.dispatch<BattleMoveAction>({
-        //     type: 'battle/move',
-        //     pointer
-        // });
 
         if (!this.currentTile
             || !this.pathPos.length) {

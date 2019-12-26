@@ -1,3 +1,4 @@
+import { Character } from './Character';
 
 export type SortType =
     | 'sampleSort1'
@@ -20,12 +21,16 @@ export class Sort {
     readonly time: number;
     readonly attaque: number;
 
-    constructor({ name, type, zone, time, attaque }: SortInfos) {
+    readonly character: Character;
+
+    constructor({ name, type, zone, time, attaque }: SortInfos, character: Character) {
         this.name = name;
         this.type = type;
         this.zone = zone;
         this.time = time;
         this.attaque = attaque;
+
+        this.character = character;
     }
 
 }

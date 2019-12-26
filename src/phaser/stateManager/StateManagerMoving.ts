@@ -23,7 +23,7 @@ export class StateManagerMoving extends StateManager<'move'> {
         const tweens = restPos.map(p => {
 
             return {
-                targets: currentCharacter.sprite,
+                targets: currentCharacter.graphicContainer,
                 x: { value: p.x, duration: 200 },
                 y: { value: p.y, duration: 200 },
                 onComplete: () => {
@@ -58,7 +58,7 @@ export class StateManagerMoving extends StateManager<'move'> {
     }
 
     onTurnEnd(): void {
-
+        
         if (!this.timeline) {
             return;
         }
@@ -68,9 +68,9 @@ export class StateManagerMoving extends StateManager<'move'> {
 
         const { cycle, map } = this.scene;
         const currentCharacter = cycle.getCurrentCharacter();
-        const { position, sprite } = currentCharacter;
+        const { position, graphicContainer } = currentCharacter;
 
         const worldPosition = map.tileToWorldPosition(position, true);
-        sprite.setPosition(worldPosition.x, worldPosition.y);
+        graphicContainer.setPosition(worldPosition.x, worldPosition.y);
     }
 }

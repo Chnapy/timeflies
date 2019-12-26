@@ -1,18 +1,22 @@
 import { IGameAction } from '../../action/GameAction';
-import { Cycle, CycleStartTurn, CycleEndTurn } from '../cycle/Cycle';
-import { Player, PlayerInfos, SpriteGenerator } from '../entities/Player';
+import { IAssetMap } from '../../assetManager/AssetManager';
+import { Room } from '../../mocks/MockColyseus';
+import { Cycle, CycleEndTurn, CycleStartTurn } from '../cycle/Cycle';
+import { Character, CharacterType, Position } from '../entities/Character';
+import { Player } from '../entities/Player';
+import { Team, TeamInfos } from '../entities/Team';
 import { MapComponent, MapInfos } from '../map/Map';
-import { State as BattleState, StateManager as BattleStateManager, StateManager, State, StateMap } from '../stateManager/StateManager';
+import { State as BattleState, StateManager as BattleStateManager, StateManager, StateMap } from '../stateManager/StateManager';
 import { StateManagerIdle } from '../stateManager/StateManagerIdle';
 import { StateManagerMoving } from '../stateManager/StateManagerMoving';
-import { ConnectedScene } from './ConnectedScene';
-import { StateManagerWatch } from '../stateManager/StateManagerWatch';
-import { Character, Position } from '../entities/Character';
+import { StateManagerSortLaunch } from '../stateManager/StateManagerSortLaunch';
 import { StateManagerSortPrepare } from '../stateManager/StateManagerSortPrepare';
-import { Controller } from '../../Controller';
+import { StateManagerWatch } from '../stateManager/StateManagerWatch';
+import { ConnectedScene } from './ConnectedScene';
+import { BattleRoom, BattleStartMessage } from '../room/BattleRoom';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
-    data: BattleSceneData;
+    data: BattleRoomState;
 }
 
 export interface BattleStateAction extends IGameAction<'battle/state'> {
@@ -29,25 +33,38 @@ export type BattleSceneAction =
     | BattleStateAction
     | BattleCharacterPositionAction;
 
-export interface BattleSceneData {
-    playersInfos: PlayerInfos[];
-    mapInfos: MapInfos;
+// export interface BattleStartMessage
+
+export interface BattleRoomState {
+    mapKey: keyof IAssetMap;
+    characterTypes: CharacterType[];
+    battleData: {
+        teamsInfos: TeamInfos[];
+        mapInfos: MapInfos;
+    };
 }
 
-export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> {
+export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> {
 
+    private room!: BattleRoom;
+
+    teams!: Team[];
     players!: Player[];
+    characters!: Character[];
+
     cycle!: Cycle;
     private graphics!: Phaser.GameObjects.Graphics;
     private state!: BattleState;
     battleStateManager!: BattleStateManager<any>;
     map!: MapComponent;
 
+    private origDragPoint?: Position;
+
     constructor() {
         super({ key: 'BattleScene' });
     }
 
-    init(data: BattleSceneData) {
+    init(data: Room<BattleRoomState>) {
         super.init(data);
     };
 
@@ -55,20 +72,27 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         // load the resources here
     };
 
-    create(data: BattleSceneData) {
-        const { playersInfos } = data;
+    create(data: Room<BattleRoomState>) {
 
-        this.map = new MapComponent(this, data.mapInfos)
+        this.room = new BattleRoom(data, this);
+
+        const { mapInfos, teamsInfos } = this.room.state.battleData;
+
+        this.map = new MapComponent(this, mapInfos)
             .create();
 
-        const spriteGenerator: SpriteGenerator = {
-            tileToWorldPosition: this.map.tileToWorldPosition,
-            spriteGenerate: (...args) => this.add.sprite(...args)
-        };
+        this.teams = teamsInfos.map(infos => new Team(infos, this));
 
-        this.players = playersInfos.map(playerInfos => new Player(playerInfos, spriteGenerator));
+        this.players = this.teams.flatMap(t => t.players);
+
+        this.characters = this.players.flatMap(p => p.characters);
 
         this.map.initPathfinder();
+
+        this.onStateChange({
+            type: 'battle/state',
+            stateObject: { state: 'watch' }
+        });
 
         this.cycle = new Cycle(this);
 
@@ -78,26 +102,52 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
         decorLayer
             .setInteractive()
-            .on('pointermove', pointer => this.battleStateManager.onTileHover(pointer))
-            .on('pointerup', pointer => this.battleStateManager.onTileClick(pointer));
+            .on('pointermove', (pointer: Phaser.Input.Pointer) => this.battleStateManager.onTileHover(pointer))
+            .on('pointerup', (pointer: Phaser.Input.Pointer) => {
+                if (pointer.button === 0) {
+                    this.battleStateManager.onTileClick(pointer);
+                }
+            });
+
+            this.room.mockResponse<BattleStartMessage>(2000, {
+                type: 'start'
+            });
     }
 
     update(time: number, delta: number): void {
-        this.cycle.update(time);
-
         this.graphics.clear();
 
+        this.cycle.update(time, delta);
+
         this.battleStateManager.update(time, delta, this.graphics);
+
+        if (this.game.input.activePointer.isDown && this.game.input.activePointer.button === 1) {
+            if (this.origDragPoint) {
+                // move the camera by the amount the mouse has moved since last update		
+                this.cameras.main.scrollX += this.origDragPoint.x - this.game.input.activePointer.position.x;
+                this.cameras.main.scrollY += this.origDragPoint.y - this.game.input.activePointer.position.y;
+            }
+            // set new drag origin to current position	
+            this.origDragPoint = this.game.input.activePointer.position.clone();
+        }
+        else if (this.origDragPoint) {
+            delete this.origDragPoint;
+        }
+
     }
 
-    resetState(character: Character): void {
+    resetState(character?: Character): void {
         this.dispatch<BattleStateAction>({
             type: 'battle/state',
-            stateObject: character.isMine
+            stateObject: character?.isMine
                 ? { state: 'idle' }
                 : { state: 'watch' }
         });
     }
+
+    private readonly onRoomMessage = (message): void => {
+        console.log('message', message);
+    };
 
     private readonly onStateChange = this.reduce<BattleStateAction>('battle/state', action => {
         const { stateObject } = action;
@@ -118,6 +168,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
                     return new StateManagerWatch(scene, stateObject.data);
                 case 'sortPrepare':
                     return new StateManagerSortPrepare(scene, stateObject.data);
+                case 'sortLaunch':
+                    return new StateManagerSortLaunch(scene, stateObject.data);
             }
         }
     });

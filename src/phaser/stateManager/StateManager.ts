@@ -19,6 +19,12 @@ export type StateMap = {
     data: {
         sort: Sort;
     };
+} | {
+    state: 'sortLaunch';
+    data: {
+        sort: Sort;
+        position: Position;
+    };
 };
 
 export type State = StateMap['state'];

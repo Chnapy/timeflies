@@ -1,6 +1,8 @@
 import { ConnectedScene } from './ConnectedScene';
 import { LoadScene } from './LoadScene';
-import { SampleData } from './SampleBattleData';
+import { SampleData } from '../../mocks/SampleBattleData';
+import { Controller } from '../../Controller';
+import { BattleRoomState } from './BattleScene';
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 
@@ -12,7 +14,12 @@ export class BootScene extends ConnectedScene<'BootScene'> {
     }
 
     create(): void {
-        this.start<LoadScene>('LoadScene', SampleData);
+
+        Controller.client.joinOrCreate<BattleRoomState>('battle')
+            .then(room => {
+                console.log(room);
+                this.start<LoadScene>('LoadScene', room);
+            });
     }
 
     update(time: number, delta: number): void {

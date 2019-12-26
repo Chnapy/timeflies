@@ -1,9 +1,9 @@
 import React from 'react';
-import { Store } from 'redux';
-import { UI } from './ui/UI';
 import { Provider } from 'react-redux';
-import { UIState } from './ui/UIState';
+import { Store } from 'redux';
 import { GameAction } from './action/GameAction';
+import { UI } from './ui/UI';
+import { UIState } from './ui/UIState';
 
 export interface AppProps {
     store: Store<UIState, GameAction>;
@@ -28,7 +28,15 @@ export class App extends React.Component<AppProps> {
         return <Provider store={store}>
             <div>
 
-                <div ref={this.gameWrapperRef} />
+                <div ref={this.gameWrapperRef} style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    height: '100vh',
+                    // minHeight: '400px',
+                    width: '100vw',
+                    // minWidth: '600px'
+                }} />
 
                 <UI />
 

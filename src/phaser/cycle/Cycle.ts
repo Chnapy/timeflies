@@ -22,21 +22,32 @@ export class Cycle {
     readonly players: Player[];
     readonly characters: Character[];
 
+    private running: boolean;
+
     currentIndex: number;
     lastTime?: number;
 
     constructor(scene: BattleScene) {
         this.scene = scene;
         this.players = scene.players;
-        this.characters = this.players.flatMap(player => player.characters);
+        this.characters = scene.characters;
         this.currentIndex = 0;
+        this.running = false;
+    }
+
+    start(): void {
+        this.running = true;
     }
 
     getCurrentCharacter(): Character {
         return this.characters[ this.currentIndex ];
     }
 
-    update(time: number): void {
+    update(time: number, delta: number): void {
+        if(!this.running) {
+            return;
+        }
+
         if (!this.lastTime) {
             this.lastTime = time;
             this.currentIndex = 0;

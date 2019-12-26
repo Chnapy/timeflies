@@ -52,7 +52,7 @@ export class MapComponent {
                 y: position.y + 0.5,
             };
         }
-
+        
         return this.tilemap.tileToWorldXY(position.x, position.y);
     };
 
