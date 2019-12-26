@@ -1,8 +1,10 @@
-import { StateManager } from './StateManager';
 import { Controller } from '../../Controller';
-import { BattleCharacterPositionAction, BattleStateAction } from '../scenes/BattleScene';
+import { BattleCharacterPositionAction } from '../scenes/BattleScene';
+import { StateManager } from './StateManager';
 
 export class StateManagerMoving extends StateManager<'move'> {
+
+    private timeline?: Phaser.Tweens.Timeline;
 
     init(): void {
         const { currentTile, pathPositions } = this.stateData;
@@ -27,7 +29,6 @@ export class StateManagerMoving extends StateManager<'move'> {
                 onComplete: () => {
                     Controller.dispatch<BattleCharacterPositionAction>({
                         type: 'battle/character/position',
-                        onlyGame: false as any,
                         character: currentCharacter,
                         position: {
                             x: tilemap.worldToTileX(p.x),
@@ -38,13 +39,11 @@ export class StateManagerMoving extends StateManager<'move'> {
             };
         });
 
-        this.scene.tweens.timeline({
+        this.timeline = this.scene.tweens.timeline({
             tweens,
             onComplete: () => {
-                Controller.dispatch<BattleStateAction>({
-                    type: 'battle/state',
-                    stateObject: { state: "idle" }
-                });
+                delete this.timeline;
+                this.scene.resetState(currentCharacter);
             }
         });
     }
@@ -56,5 +55,22 @@ export class StateManagerMoving extends StateManager<'move'> {
     }
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
+    }
+
+    onTurnEnd(): void {
+
+        if (!this.timeline) {
+            return;
+        }
+
+        this.timeline.pause();
+        delete this.timeline;
+
+        const { cycle, map } = this.scene;
+        const currentCharacter = cycle.getCurrentCharacter();
+        const { position, sprite } = currentCharacter;
+
+        const worldPosition = map.tileToWorldPosition(position, true);
+        sprite.setPosition(worldPosition.x, worldPosition.y);
     }
 }

@@ -42,4 +42,6 @@ export abstract class StateManager<S extends State> {
     abstract onTileClick(pointer: Phaser.Input.Pointer): void;
 
     abstract update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void;
+
+    abstract onTurnEnd(): void;
 }

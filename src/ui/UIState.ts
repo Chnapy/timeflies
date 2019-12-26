@@ -1,9 +1,9 @@
 import { Character } from '../phaser/entities/Character';
-import { Pathfinder } from '../phaser/pathfinder/Pathfinder';
+import { StateMap } from '../phaser/stateManager/StateManager';
 
 export interface UIState {
 
-    pathfinder: Pathfinder;
+    gameState: StateMap;
 
     currentCharacter: Character | null;
 

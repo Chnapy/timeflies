@@ -9,27 +9,23 @@ import { ConnectedScene } from './ConnectedScene';
 import { StateManagerWatch } from '../stateManager/StateManagerWatch';
 import { Character, Position } from '../entities/Character';
 import { StateManagerSortPrepare } from '../stateManager/StateManagerSortPrepare';
+import { Controller } from '../../Controller';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     data: BattleSceneData;
 }
 
-// export interface BattleMoveAction extends IGameAction<'battle/move'> {
-//     pointer: Phaser.Input.Pointer;
-// }
-
 export interface BattleStateAction extends IGameAction<'battle/state'> {
     stateObject: StateMap;
 }
 
-export interface BattleCharacterPositionAction extends IGameAction<'battle/character/position', true> {
+export interface BattleCharacterPositionAction extends IGameAction<'battle/character/position'> {
     character: Character;
     position: Position;
 }
 
 export type BattleSceneAction =
     | BattleLaunchAction
-    // | BattleMoveAction
     | BattleStateAction
     | BattleCharacterPositionAction;
 
@@ -94,15 +90,18 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         this.battleStateManager.update(time, delta, this.graphics);
     }
 
+    resetState(character: Character): void {
+        this.dispatch<BattleStateAction>({
+            type: 'battle/state',
+            stateObject: character.isMine
+                ? { state: 'idle' }
+                : { state: 'watch' }
+        });
+    }
+
     private readonly onStateChange = this.reduce<BattleStateAction>('battle/state', action => {
         const { stateObject } = action;
         const { state } = stateObject;
-
-        console.log('change state', state);
-
-        if (state === this.state) {
-            return;
-        }
 
         this.state = state;
 
@@ -124,19 +123,14 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     });
 
     private readonly onTurnStart = this.reduce<CycleStartTurn>('turn/start', ({ character }) => {
-
-        this.onStateChange({
-            type: 'battle/state',
-            stateObject: character.isMine
-                ? { state: 'idle' }
-                : { state: 'watch' }
-        });
-
+        this.resetState(character);
     });
 
     private readonly onTurnEnd = this.reduce<CycleEndTurn>('turn/end', ({ character }) => {
 
-        this.onStateChange({
+        this.battleStateManager.onTurnEnd();
+
+        this.dispatch<BattleStateAction>({
             type: 'battle/state',
             stateObject: { state: 'watch' }
         });
@@ -146,9 +140,9 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     private readonly onCharacterPosition = this.reduce<BattleCharacterPositionAction>('battle/character/position',
         ({ character, position }) => {
 
-            // character.position = position;
+            character.position = position;
 
-            // this.map.pathfinder.setGrid();
+            this.map.pathfinder.setGrid();
 
         });
 }

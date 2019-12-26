@@ -11,12 +11,12 @@ const charJ1Sample1: CharacterInfos = {
         y: 3
     },
     life: 100,
-    actionTime: 4000,
+    actionTime: 9000,
     sortsInfos: [
         {
             name: 'S1',
             type: 'sampleSort1',
-            zone: 5,
+            zone: 30,
             time: 1000,
             attaque: 10
         },
@@ -39,7 +39,7 @@ const charJ1Sample2: CharacterInfos = {
         y: 3
     },
     life: 100,
-    actionTime: 3000,
+    actionTime: 7000,
     sortsInfos: []
 };
 

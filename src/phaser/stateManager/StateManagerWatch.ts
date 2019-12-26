@@ -13,4 +13,7 @@ export class StateManagerWatch extends StateManager<'watch'> {
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
     }
+
+    onTurnEnd(): void {
+    }
 }

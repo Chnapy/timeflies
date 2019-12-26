@@ -6,11 +6,6 @@ export const CharacterReducer = (state: UIState[ 'currentCharacter' ] | undefine
     switch (action.type) {
         case 'turn/start':
             return action.character;
-        // case 'battle/character/position':
-        //     return {
-        //         ...action.character,
-        //         position: action.position
-        //     };
         case 'turn/end':
             return null;
     }

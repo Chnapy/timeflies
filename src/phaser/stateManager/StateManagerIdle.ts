@@ -90,4 +90,7 @@ export class StateManagerIdle extends StateManager<'idle'> {
 
         graphics.strokePath();
     }
+
+    onTurnEnd(): void {
+    }
 }
