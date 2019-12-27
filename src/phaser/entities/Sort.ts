@@ -6,6 +6,7 @@ export type SortType =
     | 'sampleSort3';
 
 export interface SortInfos {
+    id: number;
     name: string;
     type: SortType;
     zone: number;
@@ -15,6 +16,7 @@ export interface SortInfos {
 
 export class Sort {
 
+    readonly id: number;
     readonly name: string;
     readonly type: SortType;
     readonly zone: number;
@@ -23,7 +25,8 @@ export class Sort {
 
     readonly character: Character;
 
-    constructor({ name, type, zone, time, attaque }: SortInfos, character: Character) {
+    constructor({ id, name, type, zone, time, attaque }: SortInfos, character: Character) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.zone = zone;

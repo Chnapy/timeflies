@@ -1,22 +1,21 @@
 import { Controller } from '../../Controller';
+import { Position } from '../entities/Character';
 import { BattleScene, BattleStateAction } from '../scenes/BattleScene';
 import { StateData, StateManager } from './StateManager';
-import { Position } from '../entities/Character';
 
 export class StateManagerIdle extends StateManager<'idle'> {
 
-    private pathPos: { x: number; y: number }[];
+    private pathWorld: Position[];
+    private pathTile: Position[];
     private currentTile: Phaser.Tilemaps.Tile | null;
     private prevTile: Phaser.Tilemaps.Tile | null;
 
     constructor(scene: BattleScene, stateData: StateData<'idle'>) {
         super(scene, stateData);
-        this.pathPos = [];
+        this.pathWorld = [];
+        this.pathTile = [];
         this.currentTile = null;
         this.prevTile = null;
-    }
-
-    init(): void {
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
@@ -25,8 +24,8 @@ export class StateManagerIdle extends StateManager<'idle'> {
             y: pointer.worldY
         };
 
-        const { tilemap, decorLayer, pathfinder } = this.scene.map;
-        const { tileWidth, tileHeight } = tilemap;
+        const { map } = this.scene;
+        const { decorLayer, pathfinder } = map;
 
         this.currentTile = decorLayer.getTileAtWorldXY(pos.x, pos.y);
         if (this.currentTile) {
@@ -43,12 +42,8 @@ export class StateManagerIdle extends StateManager<'idle'> {
             const pathPromise = pathfinder.calculatePath(mainPos.x, mainPos.y, this.currentTile.x, this.currentTile.y);
 
             pathPromise.promise.then(path => {
-                this.pathPos = path.map(p => {
-                    const pos = tilemap.tileToWorldXY(p.x, p.y);
-                    pos.x += tileWidth / 2;
-                    pos.y += tileHeight / 2;
-                    return pos;
-                });
+                this.pathTile = path;
+                this.pathWorld = path.map(p => map.tileToWorldPosition(p, true));
             });
 
             this.prevTile = this.currentTile;
@@ -58,7 +53,7 @@ export class StateManagerIdle extends StateManager<'idle'> {
     onTileClick(pointer: Phaser.Input.Pointer): void {
 
         if (!this.currentTile
-            || !this.pathPos.length) {
+            || !this.pathTile.length) {
             return;
         }
 
@@ -68,7 +63,8 @@ export class StateManagerIdle extends StateManager<'idle'> {
                 state: "move",
                 data: {
                     currentTile: this.currentTile,
-                    pathPositions: this.pathPos
+                    pathWorld: this.pathWorld,
+                    pathTile: this.pathTile
                 }
             }
         });
@@ -80,7 +76,7 @@ export class StateManagerIdle extends StateManager<'idle'> {
 
         graphics.lineStyle(2, 0xff0000, 1);
 
-        this.pathPos.forEach((p, i) => {
+        this.pathWorld.forEach((p, i) => {
             if (!i) {
                 graphics.moveTo(p.x, p.y);
             } else {

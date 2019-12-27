@@ -91,7 +91,7 @@ export class Room<S> implements Omit<Colyseus.Room<S>, ''> {
     protected previousCode!: Colyseus.Protocol;
     protected rootSchema!: import("colyseus.js/lib/serializer/SchemaSerializer").SchemaConstructor<any>;
 
-    mockResponse: (time: number, data: any) => void;
+    mockResponse: (delay: number, data: any, time?: number) => void;
 
     constructor() {
         this.state = SampleData;
@@ -100,7 +100,10 @@ export class Room<S> implements Omit<Colyseus.Room<S>, ''> {
         this.onMessage = (cb => {
             buffer = cb;
         }) as any;
-        this.mockResponse = (time,data) => setTimeout(() => buffer(data), time);
+        this.mockResponse = (delay, data, time) => setTimeout(() => buffer({
+            ...data,
+            time: time || Date.now
+        }), delay);
     }
 
     connect(endpoint: string): void {
@@ -110,7 +113,6 @@ export class Room<S> implements Omit<Colyseus.Room<S>, ''> {
         throw new Error('Method not implemented.');
     }
     send(data: any): void {
-        throw new Error('Method not implemented.');
     }
     state: any;
     listen(segments: string, callback: Function, immediate?: boolean | undefined): import("@gamestdio/state-listener").Listener {

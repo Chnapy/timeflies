@@ -1,10 +1,12 @@
 import { StateManager, State } from './StateManager';
 import { Controller } from '../../Controller';
-import { BattleStateAction } from '../scenes/BattleScene';
+import { BattleStateAction, BattleCharacterPositionAction } from '../scenes/BattleScene';
+import { CharAction } from '../entities/CharAction';
+import { BattleRoomManager, ConfirmReceive } from '../room/BattleRoomManager';
 
 export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
 
-    init(): void {
+    init(): this {
         const { sort, position } = this.stateData;
         const { characters } = this.scene.cycle;
 
@@ -12,6 +14,25 @@ export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
         if (target) {
             target.life -= sort.attaque;
         }
+
+        const charAction: CharAction = {
+            type: 'sort',
+            sortId: sort.id,
+            position
+        };
+
+        this.scene.cycle.addCharAction(charAction)
+            .then(confirm => console.log('success', confirm))
+            .catch(confirm => {
+                console.log('fail', confirm);
+
+                // reinit old state
+            });
+
+        BattleRoomManager.mockResponse<ConfirmReceive>(1000, {
+            type: 'confirm',
+            isOk: true
+        }, 'last');
 
         setTimeout(() => {
             Controller.dispatch<BattleStateAction>({
@@ -21,6 +42,8 @@ export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
                 }
             });
         }, 1000);
+
+        return this;
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {

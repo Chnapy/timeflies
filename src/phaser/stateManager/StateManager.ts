@@ -1,6 +1,7 @@
 import { Position } from '../entities/Character';
 import { BattleScene } from '../scenes/BattleScene';
 import { Sort } from '../entities/Sort';
+import { GameManager } from '../GameManager';
 
 export type StateMap = {
     state: 'idle';
@@ -9,7 +10,8 @@ export type StateMap = {
     state: 'move';
     data: {
         currentTile: Phaser.Tilemaps.Tile;
-        pathPositions: Position[];
+        pathTile: Position[];
+        pathWorld: Position[];
     };
 } | {
     state: 'watch';
@@ -31,23 +33,18 @@ export type State = StateMap['state'];
 
 export type StateData<S extends State> = Extract<StateMap, {state: S}>['data'];
 
-export abstract class StateManager<S extends State> {
+export abstract class StateManager<S extends State> extends GameManager {
 
-    protected readonly scene: BattleScene;
     protected readonly stateData: StateData<S>;
 
     constructor(scene: BattleScene, stateData: StateData<S>) {
-        this.scene = scene;
+        super(scene);
         this.stateData = stateData;
     }
-
-    abstract init(): void;
 
     abstract onTileHover(pointer: Phaser.Input.Pointer): void;
 
     abstract onTileClick(pointer: Phaser.Input.Pointer): void;
-
-    abstract update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void;
 
     abstract onTurnEnd(): void;
 }

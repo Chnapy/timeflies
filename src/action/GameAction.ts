@@ -1,6 +1,6 @@
 import { Action } from 'redux';
 import { BattleSceneAction } from '../phaser/scenes/BattleScene';
-import { CycleAction } from '../phaser/cycle/Cycle';
+import { CycleAction } from '../phaser/cycle/CycleManager';
 
 export type IGameAction<T extends string, G extends boolean = false> = Action<T>
     & (G extends true ? {

@@ -26,7 +26,7 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
         this.rectHoveredIndex = -1;
     }
 
-    init(): void {
+    init(): this {
         this.tilePositions.length = 0;
         this.worldPositions.length = 0;
         this.rects.length = 0;
@@ -86,6 +86,8 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
         this.rects.push(...this.worldPositions
             .map(p => new Phaser.Geom.Rectangle(p.x, p.y,
                 map.tilemap.tileWidth, map.tilemap.tileHeight)));
+
+        return this;
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {

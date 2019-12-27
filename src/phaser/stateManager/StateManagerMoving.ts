@@ -1,43 +1,38 @@
 import { Controller } from '../../Controller';
 import { BattleCharacterPositionAction } from '../scenes/BattleScene';
 import { StateManager } from './StateManager';
+import { CharActionSend, ConfirmReceive, BattleRoomManager } from '../room/BattleRoomManager';
+import { CharAction } from '../entities/CharAction';
 
 export class StateManagerMoving extends StateManager<'move'> {
 
     private timeline?: Phaser.Tweens.Timeline;
 
-    init(): void {
-        const { currentTile, pathPositions } = this.stateData;
-
-        if (!currentTile
-            || !pathPositions.length) {
-            return;
-        }
+    init(): this {
+        const { pathTile, pathWorld } = this.stateData;
 
         const currentCharacter = this.scene.cycle.getCurrentCharacter();
 
-        const { tilemap } = this.scene.map;
+        const pathTileSliced = pathTile.slice(1);
 
-        const [ firstPos, ...restPos ] = pathPositions;
+        const tweens = pathTileSliced
+            .map((p, i) => {
+                const pWorld = pathWorld[ i + 1 ];
 
-        const tweens = restPos.map(p => {
-
-            return {
-                targets: currentCharacter.graphicContainer,
-                x: { value: p.x, duration: 200 },
-                y: { value: p.y, duration: 200 },
-                onComplete: () => {
-                    Controller.dispatch<BattleCharacterPositionAction>({
-                        type: 'battle/character/position',
-                        character: currentCharacter,
-                        position: {
-                            x: tilemap.worldToTileX(p.x),
-                            y: tilemap.worldToTileY(p.y)
-                        }
-                    });
-                }
-            };
-        });
+                return {
+                    targets: currentCharacter.graphicContainer,
+                    x: { value: pWorld.x, duration: 200 },
+                    y: { value: pWorld.y, duration: 200 },
+                    onComplete: () => {
+                        Controller.dispatch<BattleCharacterPositionAction>({
+                            type: 'battle/character/position',
+                            character: currentCharacter,
+                            position: p,
+                            updateGraphics: false
+                        });
+                    }
+                };
+            });
 
         this.timeline = this.scene.tweens.timeline({
             tweens,
@@ -46,6 +41,33 @@ export class StateManagerMoving extends StateManager<'move'> {
                 this.scene.resetState(currentCharacter);
             }
         });
+
+        const charAction: CharAction = {
+            type: 'move',
+            path: pathTile
+        };
+
+        this.scene.cycle.addCharAction(charAction)
+            .then(confirm => console.log('success', confirm))
+            .catch(confirm => {
+                console.log('fail', confirm);
+
+                this.deleteTimeline();
+
+                Controller.dispatch<BattleCharacterPositionAction>({
+                    type: 'battle/character/position',
+                    character: currentCharacter,
+                    position: pathTile[ 0 ],
+                    updateGraphics: true
+                });
+            });
+
+        BattleRoomManager.mockResponse<ConfirmReceive>(1000, {
+            type: 'confirm',
+            isOk: true
+        }, 'last');
+
+        return this;
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
@@ -58,19 +80,29 @@ export class StateManagerMoving extends StateManager<'move'> {
     }
 
     onTurnEnd(): void {
-        
+
         if (!this.timeline) {
             return;
         }
 
-        this.timeline.pause();
-        delete this.timeline;
+        this.deleteTimeline();
 
-        const { cycle, map } = this.scene;
-        const currentCharacter = cycle.getCurrentCharacter();
-        const { position, graphicContainer } = currentCharacter;
+        const { cycle } = this.scene;
+        const character = cycle.getCurrentCharacter();
+        const { position } = character;
 
-        const worldPosition = map.tileToWorldPosition(position, true);
-        graphicContainer.setPosition(worldPosition.x, worldPosition.y);
+        Controller.dispatch<BattleCharacterPositionAction>({
+            type: 'battle/character/position',
+            character,
+            position,
+            updateGraphics: true
+        });
+    }
+
+    private deleteTimeline() {
+        if (this.timeline) {
+            this.timeline.pause();
+            delete this.timeline;
+        }
     }
 }

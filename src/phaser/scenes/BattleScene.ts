@@ -1,19 +1,16 @@
 import { IGameAction } from '../../action/GameAction';
 import { IAssetMap } from '../../assetManager/AssetManager';
 import { Room } from '../../mocks/MockColyseus';
-import { Cycle, CycleEndTurn, CycleStartTurn } from '../cycle/Cycle';
+import { CameraManager } from '../camera/CameraManager';
+import { CycleEndTurn, CycleManager, CycleStartTurn } from '../cycle/CycleManager';
 import { Character, CharacterType, Position } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { Team, TeamInfos } from '../entities/Team';
-import { MapComponent, MapInfos } from '../map/Map';
-import { State as BattleState, StateManager as BattleStateManager, StateManager, StateMap } from '../stateManager/StateManager';
-import { StateManagerIdle } from '../stateManager/StateManagerIdle';
-import { StateManagerMoving } from '../stateManager/StateManagerMoving';
-import { StateManagerSortLaunch } from '../stateManager/StateManagerSortLaunch';
-import { StateManagerSortPrepare } from '../stateManager/StateManagerSortPrepare';
-import { StateManagerWatch } from '../stateManager/StateManagerWatch';
+import { MapInfos, MapManager as MapManager } from '../map/MapManager';
+import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
+import { getFromState } from '../stateManager/getFromState';
+import { State as BattleState, StateManager as BattleStateManager, StateMap } from '../stateManager/StateManager';
 import { ConnectedScene } from './ConnectedScene';
-import { BattleRoom, BattleStartMessage } from '../room/BattleRoom';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     data: BattleRoomState;
@@ -26,14 +23,13 @@ export interface BattleStateAction extends IGameAction<'battle/state'> {
 export interface BattleCharacterPositionAction extends IGameAction<'battle/character/position'> {
     character: Character;
     position: Position;
+    updateGraphics: boolean;
 }
 
 export type BattleSceneAction =
     | BattleLaunchAction
     | BattleStateAction
     | BattleCharacterPositionAction;
-
-// export interface BattleStartMessage
 
 export interface BattleRoomState {
     mapKey: keyof IAssetMap;
@@ -46,19 +42,18 @@ export interface BattleRoomState {
 
 export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> {
 
-    private room!: BattleRoom;
+    private room!: BattleRoomManager;
 
     teams!: Team[];
     players!: Player[];
     characters!: Character[];
 
-    cycle!: Cycle;
+    cycle!: CycleManager;
     private graphics!: Phaser.GameObjects.Graphics;
     private state!: BattleState;
     battleStateManager!: BattleStateManager<any>;
-    map!: MapComponent;
-
-    private origDragPoint?: Position;
+    private cameraManager!: CameraManager;
+    map!: MapManager;
 
     constructor() {
         super({ key: 'BattleScene' });
@@ -69,17 +64,16 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     };
 
     preload = () => {
-        // load the resources here
     };
 
     create(data: Room<BattleRoomState>) {
 
-        this.room = new BattleRoom(data, this);
+        this.room = new BattleRoomManager(data, this);
 
         const { mapInfos, teamsInfos } = this.room.state.battleData;
 
-        this.map = new MapComponent(this, mapInfos)
-            .create();
+        this.map = new MapManager(this, mapInfos)
+            .init();
 
         this.teams = teamsInfos.map(infos => new Team(infos, this));
 
@@ -94,7 +88,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             stateObject: { state: 'watch' }
         });
 
-        this.cycle = new Cycle(this);
+        this.cycle = new CycleManager(this, this.room);
 
         this.graphics = this.add.graphics();
 
@@ -109,9 +103,11 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
                 }
             });
 
-            this.room.mockResponse<BattleStartMessage>(2000, {
-                type: 'start'
-            });
+        this.cameraManager = new CameraManager(this);
+
+        BattleRoomManager.mockResponse<StartReceive>(2000, {
+            type: 'start'
+        });
     }
 
     update(time: number, delta: number): void {
@@ -121,19 +117,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.battleStateManager.update(time, delta, this.graphics);
 
-        if (this.game.input.activePointer.isDown && this.game.input.activePointer.button === 1) {
-            if (this.origDragPoint) {
-                // move the camera by the amount the mouse has moved since last update		
-                this.cameras.main.scrollX += this.origDragPoint.x - this.game.input.activePointer.position.x;
-                this.cameras.main.scrollY += this.origDragPoint.y - this.game.input.activePointer.position.y;
-            }
-            // set new drag origin to current position	
-            this.origDragPoint = this.game.input.activePointer.position.clone();
-        }
-        else if (this.origDragPoint) {
-            delete this.origDragPoint;
-        }
-
+        this.cameraManager.update(time, delta);
     }
 
     resetState(character?: Character): void {
@@ -145,33 +129,13 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
         });
     }
 
-    private readonly onRoomMessage = (message): void => {
-        console.log('message', message);
-    };
-
     private readonly onStateChange = this.reduce<BattleStateAction>('battle/state', action => {
         const { stateObject } = action;
-        const { state } = stateObject;
 
-        this.state = state;
+        this.state = stateObject.state;
 
-        this.battleStateManager = getFromState(this);
-        this.battleStateManager.init();
-
-        function getFromState(scene: BattleScene): StateManager<any> {
-            switch (stateObject.state) {
-                case 'idle':
-                    return new StateManagerIdle(scene, stateObject.data);
-                case 'move':
-                    return new StateManagerMoving(scene, stateObject.data);
-                case 'watch':
-                    return new StateManagerWatch(scene, stateObject.data);
-                case 'sortPrepare':
-                    return new StateManagerSortPrepare(scene, stateObject.data);
-                case 'sortLaunch':
-                    return new StateManagerSortLaunch(scene, stateObject.data);
-            }
-        }
+        this.battleStateManager = getFromState(this, stateObject)
+            .init();
     });
 
     private readonly onTurnStart = this.reduce<CycleStartTurn>('turn/start', ({ character }) => {
@@ -186,15 +150,20 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             type: 'battle/state',
             stateObject: { state: 'watch' }
         });
-
     });
 
     private readonly onCharacterPosition = this.reduce<BattleCharacterPositionAction>('battle/character/position',
-        ({ character, position }) => {
+        ({ character, position, updateGraphics }) => {
 
             character.position = position;
 
             this.map.pathfinder.setGrid();
 
+            if (updateGraphics) {
+                const { position, graphicContainer } = character;
+
+                const worldPosition = this.map.tileToWorldPosition(position, true);
+                graphicContainer.setPosition(worldPosition.x, worldPosition.y);
+            }
         });
 }

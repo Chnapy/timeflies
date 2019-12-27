@@ -15,6 +15,7 @@ const charJ1Sample1: CharacterInfos = {
     actionTime: 9000,
     sortsInfos: [
         {
+            id: 1,
             name: 'S1',
             type: 'sampleSort1',
             zone: 30,
@@ -22,6 +23,7 @@ const charJ1Sample1: CharacterInfos = {
             attaque: 10
         },
         {
+            id: 2,
             name: 'S2',
             type: 'sampleSort2',
             zone: 1,
@@ -58,6 +60,7 @@ const charJ2Sample3: CharacterInfos = {
     actionTime: 5000,
     sortsInfos: [
         {
+            id: 3,
             name: 'S3',
             type: 'sampleSort3',
             zone: 8,

@@ -1,8 +1,11 @@
-import { Character } from '../entities/Character';
-import { Player } from '../entities/Player';
 import { IGameAction } from '../../action/GameAction';
-import { BattleScene } from '../scenes/BattleScene';
 import { Controller } from '../../Controller';
+import { Character } from '../entities/Character';
+import { CharAction } from '../entities/CharAction';
+import { Player } from '../entities/Player';
+import { GameManager } from '../GameManager';
+import { CharActionSend, SendPromise, BattleRoomManager } from '../room/BattleRoomManager';
+import { BattleScene } from '../scenes/BattleScene';
 
 export interface CycleStartTurn extends IGameAction<'turn/start'> {
     character: Character;
@@ -16,9 +19,10 @@ export type CycleAction =
     | CycleStartTurn
     | CycleEndTurn;
 
-export class Cycle {
+export class CycleManager extends GameManager {
 
-    readonly scene: BattleScene;
+    private readonly room: BattleRoomManager;
+
     readonly players: Player[];
     readonly characters: Character[];
 
@@ -27,12 +31,16 @@ export class Cycle {
     currentIndex: number;
     lastTime?: number;
 
-    constructor(scene: BattleScene) {
-        this.scene = scene;
+    charActionStack: CharAction[];
+
+    constructor(scene: BattleScene, room: BattleRoomManager) {
+        super(scene);
+        this.room = room;
         this.players = scene.players;
         this.characters = scene.characters;
         this.currentIndex = 0;
         this.running = false;
+        this.charActionStack = [];
     }
 
     start(): void {
@@ -44,7 +52,7 @@ export class Cycle {
     }
 
     update(time: number, delta: number): void {
-        if(!this.running) {
+        if (!this.running) {
             return;
         }
 
@@ -72,7 +80,19 @@ export class Cycle {
         }
     }
 
+    addCharAction(charAction: CharAction): SendPromise<CharActionSend> {
+
+        this.charActionStack.push(charAction);
+
+        return this.room.send<CharActionSend>({
+            type: 'charAction',
+            charAction
+        });
+    }
+
     private startTurn(character: Character): void {
+        this.charActionStack.length = 0;
+
         Controller.dispatch<CycleStartTurn>({
             type: 'turn/start',
             character

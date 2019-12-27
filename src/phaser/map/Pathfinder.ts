@@ -1,9 +1,10 @@
 import EasyStar from 'easystarjs';
-import { MapComponent } from '../map/Map';
+import { MapManager } from './MapManager';
 import { BattleScene } from '../scenes/BattleScene';
+import { Position } from '../entities/Character';
 
 export interface PathPromise {
-    promise: Promise<{ x: number; y: number; }[]>;
+    promise: Promise<Position[]>;
     cancel: () => boolean;
 }
 
@@ -11,11 +12,11 @@ export class Pathfinder {
 
     private static ACCEPTABLE_TILES: number[] = [ 0 ];
 
-    private readonly map: MapComponent;
+    private readonly map: MapManager;
     private readonly scene: BattleScene;
     private readonly finder: InstanceType<(typeof EasyStar)[ 'js' ]>;
 
-    constructor(map: MapComponent, scene: BattleScene) {
+    constructor(map: MapManager, scene: BattleScene) {
         this.map = map;
         this.scene = scene;
         this.finder = new EasyStar.js();
@@ -41,8 +42,6 @@ export class Pathfinder {
                 grid[ y ][ x ] = this.getTileID(obstaclesLayer, x, y);
             }
         }
-
-        // console.log(grid);
 
         this.finder.setGrid(grid);
 

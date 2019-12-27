@@ -1,6 +1,7 @@
-import { Pathfinder } from '../pathfinder/Pathfinder';
+import { Pathfinder } from './Pathfinder';
 import { BattleScene } from '../scenes/BattleScene';
 import { Position } from '../entities/Character';
+import { GameManager } from '../GameManager';
 
 export interface MapInfos {
     tilemapKey: string;
@@ -8,9 +9,8 @@ export interface MapInfos {
     obstaclesLayerKey: string;
 }
 
-export class MapComponent {
+export class MapManager extends GameManager {
 
-    private readonly scene: BattleScene;
     private readonly mapInfos: MapInfos;
 
     readonly pathfinder: Pathfinder;
@@ -20,12 +20,12 @@ export class MapComponent {
     obstaclesLayer!: Phaser.Tilemaps.StaticTilemapLayer;
 
     constructor(scene: BattleScene, mapInfos: MapInfos) {
-        this.scene = scene;
+        super(scene);
         this.mapInfos = mapInfos;
         this.pathfinder = new Pathfinder(this, scene);
     }
 
-    create(): this {
+    init(): this {
         const { tilemapKey, decorLayerKey, obstaclesLayerKey } = this.mapInfos;
 
         this.tilemap = this.scene.make.tilemap({ key: 'map' });
