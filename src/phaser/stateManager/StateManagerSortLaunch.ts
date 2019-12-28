@@ -16,7 +16,6 @@ export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
         }
 
         const charAction: CharAction = {
-            type: 'sort',
             sortId: sort.id,
             position
         };
@@ -26,7 +25,7 @@ export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
             .catch(confirm => {
                 console.log('fail', confirm);
 
-                // reinit old state
+                this.scene.dataStateManager.rollbackLast();
             });
 
         BattleRoomManager.mockResponse<ConfirmReceive>(1000, {

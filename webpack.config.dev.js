@@ -23,7 +23,8 @@ module.exports = {
                 loader: "ts-loader"
             },
             {
-                test: /\.(gif|png|jpe?g|svg|xml|sjson)$/i,
+                test: /\.(gif|png|jpe?g|svg|xml|json)$/i,
+                type: 'javascript/auto',
                 loader: "file-loader",
                 options: { name: './[name].[hash].[ext]' }
             }

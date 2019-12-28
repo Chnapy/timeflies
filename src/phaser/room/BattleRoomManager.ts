@@ -115,7 +115,9 @@ export class BattleRoomManager {
     }
 
     static mockResponse<R extends Receive>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {
-        time = time === 'last' ? mockRoom.sendStack[ mockRoom.sendStack.length - 1 ].time : time;
-        mockRoom.room.mockResponse(delay, data, time);
+        setTimeout(() => {
+            time = time === 'last' ? mockRoom.sendStack[ mockRoom.sendStack.length - 1 ].time : time;
+            mockRoom.room.mockResponse(0, data, time);
+        }, delay);
     }
 }

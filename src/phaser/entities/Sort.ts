@@ -1,6 +1,9 @@
 import { Character } from './Character';
+import { WithInfos } from './WithInfos';
 
 export type SortType =
+    | 'move'
+    | 'orientate'
     | 'sampleSort1'
     | 'sampleSort2'
     | 'sampleSort3';
@@ -14,7 +17,7 @@ export interface SortInfos {
     attaque: number;
 }
 
-export class Sort {
+export class Sort implements WithInfos<SortInfos> {
 
     readonly id: number;
     readonly name: string;
@@ -36,4 +39,17 @@ export class Sort {
         this.character = character;
     }
 
+    getInfos(): SortInfos {
+        return {
+            id: this.id,
+            type: this.type,
+            name: this.name,
+            time: this.time,
+            zone: this.zone,
+            attaque: this.attaque
+        };
+    }
+
+    updateInfos(infos: SortInfos) {
+    }
 }

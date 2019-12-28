@@ -1,16 +1,20 @@
 import { IGameAction } from '../../action/GameAction';
-import { IAssetMap } from '../../assetManager/AssetManager';
+import { AssetManager, IAssetMap } from '../../assetManager/AssetManager';
 import { Room } from '../../mocks/MockColyseus';
 import { CameraManager } from '../camera/CameraManager';
 import { CycleEndTurn, CycleManager, CycleStartTurn } from '../cycle/CycleManager';
-import { Character, CharacterType, Position } from '../entities/Character';
+import { Character, CharacterType, Position, CharacterState, Orientation } from '../entities/Character';
 import { Player } from '../entities/Player';
-import { Team, TeamInfos } from '../entities/Team';
+import { TeamInfos } from '../entities/Team';
+import { Team } from "../entities/Team";
 import { MapInfos, MapManager as MapManager } from '../map/MapManager';
 import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
 import { getFromState } from '../stateManager/getFromState';
 import { State as BattleState, StateManager as BattleStateManager, StateMap } from '../stateManager/StateManager';
 import { ConnectedScene } from './ConnectedScene';
+import { Utils } from '../../Utils';
+import { DataStateManager } from '../../dataStateManager/DataStateManager';
+import { WithInfos } from '../entities/WithInfos';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     data: BattleRoomState;
@@ -23,7 +27,10 @@ export interface BattleStateAction extends IGameAction<'battle/state'> {
 export interface BattleCharacterPositionAction extends IGameAction<'battle/character/position'> {
     character: Character;
     position: Position;
-    updateGraphics: boolean;
+    updateOrientation: boolean;
+    updatePositionGraphic: boolean;
+    updateOrientationGraphic: boolean;
+    commit: boolean;
 }
 
 export type BattleSceneAction =
@@ -31,16 +38,17 @@ export type BattleSceneAction =
     | BattleStateAction
     | BattleCharacterPositionAction;
 
-export interface BattleRoomState {
-    mapKey: keyof IAssetMap;
-    characterTypes: CharacterType[];
-    battleData: {
-        teamsInfos: TeamInfos[];
-        mapInfos: MapInfos;
-    };
+export interface BattleData {
+    teamsInfos: TeamInfos[];
 }
 
-export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> {
+export interface BattleRoomState {
+    mapInfos: MapInfos;
+    characterTypes: CharacterType[];
+    battleData: BattleData;
+}
+
+export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> implements WithInfos<BattleData> {
 
     private room!: BattleRoomManager;
 
@@ -54,6 +62,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     battleStateManager!: BattleStateManager<any>;
     private cameraManager!: CameraManager;
     map!: MapManager;
+    dataStateManager!: DataStateManager;
 
     constructor() {
         super({ key: 'BattleScene' });
@@ -70,7 +79,13 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.room = new BattleRoomManager(data, this);
 
-        const { mapInfos, teamsInfos } = this.room.state.battleData;
+        this.dataStateManager = new DataStateManager(this);
+        this.dataStateManager.init(this.room.state.battleData);
+
+        const { mapInfos, characterTypes, battleData } = this.room.state;
+        const { teamsInfos } = battleData;
+
+        this.createCharactersAnimations(characterTypes);
 
         this.map = new MapManager(this, mapInfos)
             .init();
@@ -82,6 +97,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
         this.characters = this.players.flatMap(p => p.characters);
 
         this.map.initPathfinder();
+
+        this.characters.forEach(c => c.init());
 
         this.onStateChange({
             type: 'battle/state',
@@ -118,6 +135,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
         this.battleStateManager.update(time, delta, this.graphics);
 
         this.cameraManager.update(time, delta);
+
+        this.characters.forEach(c => c.update(time, delta, this.graphics));
     }
 
     resetState(character?: Character): void {
@@ -126,6 +145,44 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             stateObject: character?.isMine
                 ? { state: 'idle' }
                 : { state: 'watch' }
+        });
+    }
+
+    getInfos(): BattleData {
+        return {
+            teamsInfos: this.teams.map(t => t.getInfos())
+        };
+    }
+
+    updateInfos(infos: BattleData): void {
+        infos.teamsInfos.forEach(tInfos => {
+            const team = this.teams.find(t => t.id === tInfos.id);
+
+            team!.updateInfos(tInfos);
+        });
+        this.map.pathfinder.setGrid();
+    }
+
+    private createCharactersAnimations(characterTypes: CharacterType[]): void {
+        characterTypes.forEach((type: CharacterType) => {
+            const { states } = AssetManager.character[ type ];
+
+            Utils.keysTyped(states).forEach(stateKey => {
+                const state = states[ stateKey ];
+
+                Utils.keysTyped(state).forEach((sideKey: Orientation) => {
+                    const side = state[ sideKey ];
+
+                    this.anims.create({
+                        key: Character.getAnimKey(type, stateKey, sideKey),
+                        frames: Array.isArray(side.frameNames)
+                            ? side.frameNames
+                            : this.anims.generateFrameNames(`${type}_sheet`, side.frameNames),
+                        frameRate: side.frameRate,
+                        repeat: side.frameRepeat
+                    });
+                });
+            });
         });
     }
 
@@ -146,6 +203,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.battleStateManager.onTurnEnd();
 
+        this.dataStateManager.commit();
+
         this.dispatch<BattleStateAction>({
             type: 'battle/state',
             stateObject: { state: 'watch' }
@@ -153,17 +212,16 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     });
 
     private readonly onCharacterPosition = this.reduce<BattleCharacterPositionAction>('battle/character/position',
-        ({ character, position, updateGraphics }) => {
+        ({ character, position, updateOrientation,
+            updatePositionGraphic, updateOrientationGraphic,
+            commit }) => {
 
-            character.position = position;
+            character.setPosition(position, updatePositionGraphic, updateOrientation, updateOrientationGraphic);
 
             this.map.pathfinder.setGrid();
 
-            if (updateGraphics) {
-                const { position, graphicContainer } = character;
-
-                const worldPosition = this.map.tileToWorldPosition(position, true);
-                graphicContainer.setPosition(worldPosition.x, worldPosition.y);
+            if (commit) {
+                this.dataStateManager.commit();
             }
         });
 }

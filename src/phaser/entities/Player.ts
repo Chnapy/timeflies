@@ -1,6 +1,7 @@
 import { BattleScene } from '../scenes/BattleScene';
 import { Character, CharacterInfos } from './Character';
-import { Team } from './Team';
+import { Team } from "./Team";
+import { WithInfos } from './WithInfos';
 
 export interface PlayerInfos {
     id: number;
@@ -9,7 +10,7 @@ export interface PlayerInfos {
     charactersInfos: CharacterInfos[];
 }
 
-export class Player {
+export class Player implements WithInfos<PlayerInfos> {
 
     readonly id: number;
     readonly itsMe: boolean;
@@ -28,5 +29,22 @@ export class Player {
         this.name = name;
         this.team = team;
         this.characters = charactersInfos.map(infos => new Character(infos, this, team, scene));
+    }
+
+    getInfos(): PlayerInfos {
+        return {
+            id: this.id,
+            itsMe: this.itsMe,
+            name: this.name,
+            charactersInfos: this.characters.map(c => c.getInfos())
+        };
+    }
+
+    updateInfos(infos: PlayerInfos): void {
+        infos.charactersInfos.forEach(cInfos => {
+            const character = this.characters.find(c => c.id === cInfos.id);
+
+            character!.updateInfos(cInfos);
+        });
     }
 }

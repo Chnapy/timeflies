@@ -23,7 +23,7 @@ export class CameraManager extends GameManager {
                 this.camera.scrollY += this.originDragPoint.y - this.pointer.position.y;
             }
             // set new drag origin to current position	
-            this.originDragPoint = this.pointer.position;
+            this.originDragPoint = this.pointer.position.clone();
         }
         else if (this.originDragPoint) {
             delete this.originDragPoint;

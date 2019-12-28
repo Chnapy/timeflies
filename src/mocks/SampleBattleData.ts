@@ -11,6 +11,8 @@ const charJ1Sample1: CharacterInfos = {
         x: 4,
         y: 3
     },
+    orientation: 'bottom',
+    state: 'idle',
     life: 100,
     actionTime: 9000,
     sortsInfos: [
@@ -29,6 +31,14 @@ const charJ1Sample1: CharacterInfos = {
             zone: 1,
             time: 2000,
             attaque: 0
+        },
+        {
+            id: 4,
+            name: 'MOVE',
+            type: 'move',
+            zone: -1,
+            time: 200,
+            attaque: -1
         }
     ]
 };
@@ -39,12 +49,23 @@ const charJ1Sample2: CharacterInfos = {
     name: 'C2',
     type: 'sampleChar2',
     position: {
-        x: 6,
+        x: 10,
         y: 3
     },
+    orientation: 'right',
+    state: 'idle',
     life: 100,
     actionTime: 7000,
-    sortsInfos: []
+    sortsInfos: [
+        {
+            id: 5,
+            name: 'MOVE',
+            type: 'move',
+            zone: -1,
+            time: 100,
+            attaque: -1
+        }
+    ]
 };
 
 const charJ2Sample3: CharacterInfos = {
@@ -56,6 +77,8 @@ const charJ2Sample3: CharacterInfos = {
         x: 6,
         y: 4
     },
+    orientation: 'left',
+    state: 'idle',
     life: 100,
     actionTime: 5000,
     sortsInfos: [
@@ -66,6 +89,14 @@ const charJ2Sample3: CharacterInfos = {
             zone: 8,
             time: 1500,
             attaque: 15
+        },
+        {
+            id: 6,
+            name: 'MOVE',
+            type: 'move',
+            zone: -1,
+            time: 100,
+            attaque: -1
         }
     ]
 };
@@ -111,15 +142,15 @@ const teamsInfos: TeamInfos[] = [
 ];
 
 export const SampleData: BattleRoomState = {
-    mapKey: 'sampleMap1',
+    mapInfos: {
+        mapKey: 'sampleMap1',
+        tilemapKey: 'map_main',
+        decorLayerKey: 'decors',
+        obstaclesLayerKey: 'obstacles'
+    },
     characterTypes: [ 'sampleChar1', 'sampleChar2', 'sampleChar3' ],
     battleData: {
-        mapInfos: {
-            tilemapKey: 'map',
-            decorLayerKey: 'view',
-            obstaclesLayerKey: 'obstacles'
-        },
 
-        teamsInfos 
+        teamsInfos
     }
 };

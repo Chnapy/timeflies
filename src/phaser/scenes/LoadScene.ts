@@ -1,5 +1,5 @@
-import { Room } from '../../mocks/MockColyseus';
 import { AssetManager } from '../../assetManager/AssetManager';
+import { Room } from '../../mocks/MockColyseus';
 import { BattleRoomState, BattleScene } from './BattleScene';
 import { ConnectedScene } from './ConnectedScene';
 
@@ -11,7 +11,8 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
 
     preload() {
         const room = this.initData;
-        const { mapKey, characterTypes } = room.state;
+        const { mapInfos, characterTypes } = room.state;
+        const { mapKey } = mapInfos;
 
         // map tiles
         this.load.image('tiles', AssetManager.map[ mapKey ].image);
@@ -19,30 +20,19 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
         // map in json format
         this.load.tilemapTiledJSON('map', AssetManager.map[ mapKey ].schema);
 
-        // characters
-        characterTypes.forEach(type => this.load.spritesheet(
-            type,
-            AssetManager.character[ type ].idle,
-            { frameWidth: 35, frameHeight: 35 }
-        ));
+        characterTypes.forEach(type => {
+            const { image, schema } = AssetManager.character[ type ];
+
+            this.load.atlasXML(type + '_sheet', image, schema);
+        });
     }
 
     create() {
         const room = this.initData;
-        // const { battleData } = room.state;
 
         this.start<BattleScene>('BattleScene', room);
-
-        // this.onBattleLaunch({
-        //     type: 'battle/launch',
-        //     data: battleData
-        // });
     }
 
     update(time: number, delta: number): void {
     }
-
-    // private readonly onBattleLaunch = this.reduce<BattleLaunchAction>('battle/launch', action => {
-    //     this.start<BattleScene>('BattleScene', action.data);
-    // });
 }

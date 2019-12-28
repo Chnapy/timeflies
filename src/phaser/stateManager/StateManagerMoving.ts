@@ -13,23 +13,45 @@ export class StateManagerMoving extends StateManager<'move'> {
 
         const currentCharacter = this.scene.cycle.getCurrentCharacter();
 
+        currentCharacter.setCharacterState('move');
+
+        const sort = currentCharacter.sorts.find(s => s.type === 'move')!;
+        const duration = sort.time;
+
         const pathTileSliced = pathTile.slice(1);
 
-        const tweens = pathTileSliced
+        const tweens: Phaser.Types.Tweens.TweenBuilderConfig[] = pathTileSliced
             .map((p, i) => {
                 const pWorld = pathWorld[ i + 1 ];
 
                 return {
                     targets: currentCharacter.graphicContainer,
-                    x: { value: pWorld.x, duration: 200 },
-                    y: { value: pWorld.y, duration: 200 },
-                    onComplete: () => {
+                    x: { value: pWorld.x, duration },
+                    y: { value: pWorld.y, duration },
+                    onStart: () => {
                         Controller.dispatch<BattleCharacterPositionAction>({
                             type: 'battle/character/position',
                             character: currentCharacter,
                             position: p,
-                            updateGraphics: false
+                            updateOrientation: true,
+                            updatePositionGraphic: false,
+                            updateOrientationGraphic: true,
+                            commit: true
                         });
+
+                        const charAction: CharAction = {
+                            sortId: sort.id,
+                            position: p
+                        };
+                
+                        this.scene.cycle.addCharAction(charAction)
+                            .then(confirm => console.log('success', confirm))
+                            .catch(confirm => {
+                                console.log('fail', confirm);
+                
+                                this.onTurnEnd();
+                                this.scene.resetState(currentCharacter);
+                            });
                     }
                 };
             });
@@ -41,26 +63,6 @@ export class StateManagerMoving extends StateManager<'move'> {
                 this.scene.resetState(currentCharacter);
             }
         });
-
-        const charAction: CharAction = {
-            type: 'move',
-            path: pathTile
-        };
-
-        this.scene.cycle.addCharAction(charAction)
-            .then(confirm => console.log('success', confirm))
-            .catch(confirm => {
-                console.log('fail', confirm);
-
-                this.deleteTimeline();
-
-                Controller.dispatch<BattleCharacterPositionAction>({
-                    type: 'battle/character/position',
-                    character: currentCharacter,
-                    position: pathTile[ 0 ],
-                    updateGraphics: true
-                });
-            });
 
         BattleRoomManager.mockResponse<ConfirmReceive>(1000, {
             type: 'confirm',
@@ -87,16 +89,11 @@ export class StateManagerMoving extends StateManager<'move'> {
 
         this.deleteTimeline();
 
-        const { cycle } = this.scene;
+        const { cycle, dataStateManager } = this.scene;
         const character = cycle.getCurrentCharacter();
-        const { position } = character;
 
-        Controller.dispatch<BattleCharacterPositionAction>({
-            type: 'battle/character/position',
-            character,
-            position,
-            updateGraphics: true
-        });
+        dataStateManager.rollbackLast();
+        character.setCharacterState('idle');
     }
 
     private deleteTimeline() {

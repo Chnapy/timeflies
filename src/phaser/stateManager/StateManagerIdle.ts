@@ -18,7 +18,23 @@ export class StateManagerIdle extends StateManager<'idle'> {
         this.prevTile = null;
     }
 
+    init(): this {
+
+        const currentCharacter = this.scene.cycle.getCurrentCharacter();
+
+        currentCharacter.setCharacterState('idle');
+
+        return this;
+    }
+
     onTileHover(pointer: Phaser.Input.Pointer): void {
+
+        const currentCharacter = this.scene.cycle.getCurrentCharacter();
+
+        if(!currentCharacter.canMove()) {
+            return;
+        }
+
         const pos: Position = {
             x: pointer.worldX,
             y: pointer.worldY
@@ -34,8 +50,6 @@ export class StateManagerIdle extends StateManager<'idle'> {
                 && this.currentTile.x === this.prevTile.x && this.currentTile.y === this.prevTile.y) {
                 return;
             }
-
-            const currentCharacter = this.scene.cycle.getCurrentCharacter();
 
             const mainPos = currentCharacter.position;
 

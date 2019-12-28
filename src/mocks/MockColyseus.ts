@@ -41,6 +41,7 @@ export class Client implements Omit<Colyseus.Client, 'endpoint' | 'joinOrCreate'
 }
 
 export class Room<S> implements Omit<Colyseus.Room<S>, ''> {
+    state: S;
     id!: string;
     sessionId!: string;
     name!: string;
@@ -94,7 +95,7 @@ export class Room<S> implements Omit<Colyseus.Room<S>, ''> {
     mockResponse: (delay: number, data: any, time?: number) => void;
 
     constructor() {
-        this.state = SampleData;
+        this.state = SampleData as any;
 
         let buffer;
         this.onMessage = (cb => {
@@ -114,7 +115,6 @@ export class Room<S> implements Omit<Colyseus.Room<S>, ''> {
     }
     send(data: any): void {
     }
-    state: any;
     listen(segments: string, callback: Function, immediate?: boolean | undefined): import("@gamestdio/state-listener").Listener {
         throw new Error('Method not implemented.');
     }

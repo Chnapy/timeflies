@@ -2,8 +2,10 @@ import { Pathfinder } from './Pathfinder';
 import { BattleScene } from '../scenes/BattleScene';
 import { Position } from '../entities/Character';
 import { GameManager } from '../GameManager';
+import { IAssetMap } from '../../assetManager/AssetManager';
 
 export interface MapInfos {
+    mapKey: keyof IAssetMap;
     tilemapKey: string;
     decorLayerKey: string;
     obstaclesLayerKey: string;
