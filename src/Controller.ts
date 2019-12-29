@@ -9,7 +9,6 @@ import { GameEngine } from './phaser/GameEngine';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
 import * as Colyseus from './mocks/MockColyseus';
-// import * as Colyseus from './mocks/MockColyseus';
 
 const CLIENT_ENDPOINT = 'ws://echo.websocket.org';
 

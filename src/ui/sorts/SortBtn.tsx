@@ -1,8 +1,8 @@
 import React from 'react';
 import { Sort } from '../../phaser/entities/Sort';
 import { Controller } from '../../Controller';
-import { BattleStateAction } from '../../phaser/scenes/BattleScene';
-import { StateMap } from '../../phaser/stateManager/StateManager';
+import { BattleStateMap } from '../../phaser/stateManager/BattleStateManager';
+import { BattleStateAction } from '../../phaser/battleReducers/BattleReducerManager';
 
 export interface SortBtnProps {
     sort: Sort;
@@ -25,7 +25,7 @@ export const SortBtn: React.FC<SortBtnProps> = ({ sort, isActive, disabled }) =>
         disabled={disabled || undefined}
         onClick={() => {
 
-            const stateObject: StateMap = isActive
+            const stateObject: BattleStateMap = isActive
                 ? {
                     state: 'idle'
                 }

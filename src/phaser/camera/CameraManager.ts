@@ -1,15 +1,13 @@
 import { Position } from '../entities/Character';
 import { BattleScene } from '../scenes/BattleScene';
-import { GameManager } from '../GameManager';
 
-export class CameraManager extends GameManager {
+export class CameraManager {
 
     private camera: Phaser.Cameras.Scene2D.Camera;
     private pointer: Phaser.Input.Pointer;
     private originDragPoint?: Readonly<Position>;
 
     constructor(scene: BattleScene) {
-        super(scene);
         this.camera = scene.cameras.main;
         this.pointer = scene.game.input.activePointer;
     }

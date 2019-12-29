@@ -1,6 +1,8 @@
+import { Controller } from '../../Controller';
 import { Room } from '../../mocks/MockColyseus';
-import { CharAction } from '../entities/CharAction';
-import { BattleRoomState, BattleScene } from '../scenes/BattleScene';
+import { BattleRollbackAction, BattleStartAction } from '../battleReducers/BattleReducerManager';
+import { BattleRoomState } from '../scenes/BattleScene';
+import { CharAction } from '../cycle/CycleManager';
 
 interface Message<T extends string> {
     time: number;
@@ -41,7 +43,6 @@ interface SendTimed<S extends Send> {
 let mockRoom: BattleRoomManager;
 export class BattleRoomManager {
     private readonly room: Room<BattleRoomState>;
-    private readonly scene: BattleScene;
 
     private readonly sendStack: SendTimed<any>[];
 
@@ -49,26 +50,38 @@ export class BattleRoomManager {
         return this.room.state;
     }
 
-    constructor(room: Room<BattleRoomState>, scene: BattleScene) {
+    constructor(room: Room<BattleRoomState>) {
         this.room = room;
-        this.scene = scene;
         this.sendStack = [];
         room.onMessage(this.onMessage);
         mockRoom = this;
     }
 
-    readonly send = <S extends Send>(partialMessage: Omit<S, 'time'>): SendPromise<S> => {
-        const time = Date.now();
+    readonly send = <S extends Send>(partialMessage: Omit<S, 'time'>, _time?: number): SendPromise<S> => {
+        const time = _time || Date.now();
 
         const message: S = {
             ...partialMessage,
             time
         } as any;
 
+        const getOnReject = (reject: Function) => (reason) => {
+
+            Controller.dispatch<BattleRollbackAction>({
+                type: 'battle/rollback',
+                config: {
+                    by: 'time',
+                    time
+                }
+            });
+
+            return reject(reason);
+        };
+
         let resolvePromise, rejectPromise;
         const promise: SendPromise<S> = new Promise((resolve, reject) => {
             resolvePromise = resolve;
-            rejectPromise = reject;
+            rejectPromise = getOnReject(reject);
         });
 
         const sendTimed: SendTimed<S> = {
@@ -91,7 +104,9 @@ export class BattleRoomManager {
 
         switch (message.type) {
             case 'start':
-                this.scene.cycle.start();
+                Controller.dispatch<BattleStartAction>({
+                    type: 'battle/start'
+                });
                 return;
             case 'confirm':
                 this.onConfirm(message);

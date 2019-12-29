@@ -1,5 +1,6 @@
 import { AssetManager } from '../../assetManager/AssetManager';
 import { Room } from '../../mocks/MockColyseus';
+import { Character } from '../entities/Character';
 import { BattleRoomState, BattleScene } from './BattleScene';
 import { ConnectedScene } from './ConnectedScene';
 
@@ -23,7 +24,7 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
         characterTypes.forEach(type => {
             const { image, schema } = AssetManager.character[ type ];
 
-            this.load.atlasXML(type + '_sheet', image, schema);
+            this.load.atlasXML(Character.getSheetKey(type), image, schema);
         });
     }
 

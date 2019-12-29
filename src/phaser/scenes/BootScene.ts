@@ -1,8 +1,7 @@
-import { ConnectedScene } from './ConnectedScene';
-import { LoadScene } from './LoadScene';
-import { SampleData } from '../../mocks/SampleBattleData';
 import { Controller } from '../../Controller';
 import { BattleRoomState } from './BattleScene';
+import { ConnectedScene } from './ConnectedScene';
+import { LoadScene } from './LoadScene';
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 

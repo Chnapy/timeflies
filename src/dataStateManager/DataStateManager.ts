@@ -10,29 +10,28 @@ export class DataStateManager {
     private readonly scene: BattleScene;
     private readonly dataStateStack: DataState[];
 
-    constructor(scene: BattleScene) {
+    constructor(scene: BattleScene, firstData: BattleData) {
         this.scene = scene;
-        this.dataStateStack = [];
-    }
-
-    init(firstData: BattleData): void {
-        this.dataStateStack.push({
+        this.dataStateStack = [{
             time: 0,
             data: firstData
-        });
+        }];
     }
 
-    commit(): void {
+    commit(): number {
+        const time = Date.now();
         this.dataStateStack.push({
-            time: Date.now(),
+            time,
             data: this.extractDataState()
         });
+        return time;
     }
 
     rollbackByTime(time: number): void {
 
         const fromWhereToDelete = this.dataStateStack.findIndex(ds => ds.time >= time);
         if (fromWhereToDelete === -1) {
+            console.log('-1', time, this.dataStateStack)
             return;
         }
 
@@ -47,6 +46,7 @@ export class DataStateManager {
         this.dataStateStack.splice(fromWhereToDelete);
 
         this.resetFrom(this.dataStateStack[ this.dataStateStack.length - 1 ]);
+        console.log('rollback', fromWhereToDelete, this.dataStateStack);
     }
 
     private extractDataState(): BattleData {

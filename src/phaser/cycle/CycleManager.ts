@@ -1,43 +1,35 @@
-import { IGameAction } from '../../action/GameAction';
 import { Controller } from '../../Controller';
-import { Character } from '../entities/Character';
-import { CharAction } from '../entities/CharAction';
+import { DataStateManager } from '../../dataStateManager/DataStateManager';
+import { BattleTurnEndAction, BattleTurnStartAction } from '../battleReducers/BattleReducerManager';
+import { Character, Position } from '../entities/Character';
 import { Player } from '../entities/Player';
-import { GameManager } from '../GameManager';
-import { CharActionSend, SendPromise, BattleRoomManager } from '../room/BattleRoomManager';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
 
-export interface CycleStartTurn extends IGameAction<'turn/start'> {
-    character: Character;
-}
+export type CharAction = {
+    sortId: number;
+    position: Position;
+};
 
-export interface CycleEndTurn extends IGameAction<'turn/end'> {
-    character: Character;
-}
-
-export type CycleAction =
-    | CycleStartTurn
-    | CycleEndTurn;
-
-export class CycleManager extends GameManager {
+export class CycleManager {
 
     private readonly room: BattleRoomManager;
+    private readonly dataStateManager: DataStateManager;
 
-    readonly players: Player[];
-    readonly characters: Character[];
+    readonly players: readonly Player[];
+    readonly characters: readonly Character[];
 
     private running: boolean;
 
-    currentIndex: number;
-    lastTime?: number;
+    private currentIndex: number;
+    private lastTime?: number;
 
-    charActionStack: CharAction[];
+    private charActionStack: CharAction[];
 
-    constructor(scene: BattleScene, room: BattleRoomManager) {
-        super(scene);
+    constructor(room: BattleRoomManager, dataStateManager: DataStateManager, players: Player[], characters: Character[]) {
         this.room = room;
-        this.players = scene.players;
-        this.characters = scene.characters;
+        this.dataStateManager = dataStateManager;
+        this.players = players;
+        this.characters = characters;
         this.currentIndex = 0;
         this.running = false;
         this.charActionStack = [];
@@ -82,26 +74,28 @@ export class CycleManager extends GameManager {
 
     addCharAction(charAction: CharAction): SendPromise<CharActionSend> {
 
+        const time = this.dataStateManager.commit();
+
         this.charActionStack.push(charAction);
 
         return this.room.send<CharActionSend>({
             type: 'charAction',
             charAction
-        });
+        }, time);
     }
 
     private startTurn(character: Character): void {
         this.charActionStack.length = 0;
 
-        Controller.dispatch<CycleStartTurn>({
-            type: 'turn/start',
+        Controller.dispatch<BattleTurnStartAction>({
+            type: 'battle/turn/start',
             character
         });
     }
 
     private endTurn(character: Character): void {
-        Controller.dispatch<CycleEndTurn>({
-            type: 'turn/end',
+        Controller.dispatch<BattleTurnEndAction>({
+            type: 'battle/turn/end',
             character
         });
     }

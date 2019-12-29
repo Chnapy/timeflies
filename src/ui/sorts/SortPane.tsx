@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { UIState } from '../UIState';
 import { Sort } from '../../phaser/entities/Sort';
 import { SortBtn } from './SortBtn';
-import { State } from '../../phaser/stateManager/StateManager';
+import { BattleState } from '../../phaser/stateManager/BattleStateManager';
 
 export interface SortPaneProps {
     sorts: Sort[];
@@ -11,7 +11,7 @@ export interface SortPaneProps {
     prepareSort?: Sort;
 }
 
-const authorizedState: State[] = ['idle', 'sortPrepare'];
+const authorizedState: BattleState[] = ['idle', 'sortPrepare'];
 
 export const SortPane = connect<SortPaneProps, {}, {}, UIState>(
     ({ currentCharacter, gameState }) => ({

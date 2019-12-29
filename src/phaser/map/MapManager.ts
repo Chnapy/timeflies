@@ -1,8 +1,7 @@
-import { Pathfinder } from './Pathfinder';
-import { BattleScene } from '../scenes/BattleScene';
-import { Position } from '../entities/Character';
-import { GameManager } from '../GameManager';
 import { IAssetMap } from '../../assetManager/AssetManager';
+import { Position } from '../entities/Character';
+import { BattleScene } from '../scenes/BattleScene';
+import { Pathfinder } from './Pathfinder';
 
 export interface MapInfos {
     mapKey: keyof IAssetMap;
@@ -11,8 +10,9 @@ export interface MapInfos {
     obstaclesLayerKey: string;
 }
 
-export class MapManager extends GameManager {
+export class MapManager {
 
+    private readonly scene: BattleScene;
     private readonly mapInfos: MapInfos;
 
     readonly pathfinder: Pathfinder;
@@ -22,12 +22,12 @@ export class MapManager extends GameManager {
     obstaclesLayer!: Phaser.Tilemaps.StaticTilemapLayer;
 
     constructor(scene: BattleScene, mapInfos: MapInfos) {
-        super(scene);
+        this.scene = scene;
         this.mapInfos = mapInfos;
         this.pathfinder = new Pathfinder(this, scene);
     }
 
-    init(): this {
+    init(): void {
         const { tilemapKey, decorLayerKey, obstaclesLayerKey } = this.mapInfos;
 
         this.tilemap = this.scene.make.tilemap({ key: 'map' });
@@ -37,14 +37,10 @@ export class MapManager extends GameManager {
         this.decorLayer = this.tilemap.createStaticLayer(decorLayerKey, tiles, 0, 0)
         this.obstaclesLayer = this.tilemap.createStaticLayer(obstaclesLayerKey, tiles, 0, 0)
             .setVisible(false);
-
-        return this;
     }
 
-    initPathfinder(): this {
+    initPathfinder(): void {
         this.pathfinder.setGrid();
-
-        return this;
     }
 
     tileToWorldPosition = (position: Position, center?: boolean): Position => {
@@ -54,7 +50,7 @@ export class MapManager extends GameManager {
                 y: position.y + 0.5,
             };
         }
-        
+
         return this.tilemap.tileToWorldXY(position.x, position.y);
     };
 

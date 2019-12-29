@@ -1,9 +1,9 @@
 import { Character } from '../phaser/entities/Character';
-import { StateMap } from '../phaser/stateManager/StateManager';
+import { BattleStateMap } from '../phaser/stateManager/BattleStateManager';
 
 export interface UIState {
 
-    gameState: StateMap;
+    gameState: BattleStateMap;
 
     currentCharacter: Character | null;
 

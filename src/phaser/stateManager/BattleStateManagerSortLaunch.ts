@@ -1,14 +1,19 @@
-import { StateManager, State } from './StateManager';
 import { Controller } from '../../Controller';
-import { BattleStateAction, BattleCharacterPositionAction } from '../scenes/BattleScene';
-import { CharAction } from '../entities/CharAction';
 import { BattleRoomManager, ConfirmReceive } from '../room/BattleRoomManager';
+import { BattleScene } from '../scenes/BattleScene';
+import { BattleStateManager, BattleStateData } from './BattleStateManager';
+import { BattleCharAction, BattleStateAction } from '../battleReducers/BattleReducerManager';
+import { CharAction } from '../cycle/CycleManager';
 
-export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
+export class BattleStateManagerSortLaunch extends BattleStateManager<'sortLaunch'> {
 
-    init(): this {
+    constructor(scene: BattleScene, stateData: BattleStateData<'sortLaunch'>) {
+        super('sortLaunch', scene, stateData);
+    }
+
+    init(): void {
         const { sort, position } = this.stateData;
-        const { characters } = this.scene.cycle;
+        const { characters } = this.scene;
 
         const target = characters.find(c => c.position.x === position.x && c.position.y === position.y);
         if (target) {
@@ -20,13 +25,10 @@ export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
             position
         };
 
-        this.scene.cycle.addCharAction(charAction)
-            .then(confirm => console.log('success', confirm))
-            .catch(confirm => {
-                console.log('fail', confirm);
-
-                this.scene.dataStateManager.rollbackLast();
-            });
+        Controller.dispatch<BattleCharAction>({
+            type: 'battle/charAction',
+            charAction
+        });
 
         BattleRoomManager.mockResponse<ConfirmReceive>(1000, {
             type: 'confirm',
@@ -41,8 +43,6 @@ export class StateManagerSortLaunch extends StateManager<'sortLaunch'> {
                 }
             });
         }, 1000);
-
-        return this;
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {

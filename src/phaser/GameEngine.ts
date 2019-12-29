@@ -1,9 +1,8 @@
 import { GameAction } from '../action/GameAction';
-import { LoadScene } from './scenes/LoadScene';
-import { BattleScene } from './scenes/BattleScene';
 import { Controller } from '../Controller';
+import { BattleScene } from './scenes/BattleScene';
 import { BootScene } from './scenes/BootScene';
-import * as Colyseus from '../mocks/MockColyseus';
+import { LoadScene } from './scenes/LoadScene';
 
 const config: Omit<Phaser.Types.Core.GameConfig, 'parent' | 'width' | 'height'> = {
     type: Phaser.AUTO,

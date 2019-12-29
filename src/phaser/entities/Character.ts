@@ -1,4 +1,3 @@
-import { GameManager } from '../GameManager';
 import { BattleScene } from '../scenes/BattleScene';
 import { Player } from './Player';
 import { Sort, SortInfos } from './Sort';
@@ -30,13 +29,19 @@ export interface CharacterInfos {
     sortsInfos: SortInfos[];
 }
 
-export class Character extends GameManager implements WithInfos<CharacterInfos> {
+export class Character implements WithInfos<CharacterInfos> {
+
+    static readonly getSheetKey = (
+        type: CharacterType
+    ): string => `${type}_sheet`;
 
     static readonly getAnimKey = (
         type: CharacterType,
         state: CharacterState,
         orientation: Orientation
     ): string => `${type}_${state}_${orientation}`;
+
+    private readonly scene: BattleScene;
 
     readonly id: number;
     readonly isMine: boolean;
@@ -67,15 +72,15 @@ export class Character extends GameManager implements WithInfos<CharacterInfos> 
     private graphicSprite!: Phaser.GameObjects.Sprite;
 
     constructor({
-        id, isMine, name, type, position, orientation, life, actionTime, sortsInfos
+        id, isMine, name, type, state, position, orientation, life, actionTime, sortsInfos
     }: CharacterInfos, player: Player, team: Team, scene: BattleScene) {
-        super(scene);
+        this.scene = scene;
         this.id = id;
         this.isMine = isMine;
         this.name = name;
         this.type = type;
 
-        this.state = 'idle';
+        this.state = state;
         this._orientation = orientation;
         this._position = position;
         this.life = life;
@@ -96,7 +101,7 @@ export class Character extends GameManager implements WithInfos<CharacterInfos> 
         const graphicSquare = new Phaser.GameObjects.Rectangle(this.scene, 0, 0, tileWidth, tileHeight);
         graphicSquare.setStrokeStyle(1, this.team.color);
 
-        this.graphicSprite = this.scene.add.sprite(0, 0, this.type + '_sheet');
+        this.graphicSprite = this.scene.add.sprite(0, 0, Character.getSheetKey(this.type));
 
         const graphicText = new Phaser.GameObjects.Text(this.scene, 0, 0, name, {
             color: 'black'
@@ -112,9 +117,6 @@ export class Character extends GameManager implements WithInfos<CharacterInfos> 
         this.updateAnimation();
 
         return this;
-    }
-
-    update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
     }
 
     setCharacterState(state: CharacterState): void {

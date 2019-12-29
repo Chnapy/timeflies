@@ -1,9 +1,8 @@
 import { Position } from '../entities/Character';
-import { BattleScene } from '../scenes/BattleScene';
 import { Sort } from '../entities/Sort';
-import { GameManager } from '../GameManager';
+import { BattleScene } from '../scenes/BattleScene';
 
-export type StateMap = {
+export type BattleStateMap = {
     state: 'idle';
     data?: undefined;
 } | {
@@ -29,17 +28,26 @@ export type StateMap = {
     };
 };
 
-export type State = StateMap['state'];
+export type BattleState = BattleStateMap['state'];
 
-export type StateData<S extends State> = Extract<StateMap, {state: S}>['data'];
+export type BattleStateData<S extends BattleState> = Extract<BattleStateMap, {state: S}>['data'];
 
-export abstract class StateManager<S extends State> extends GameManager {
+export abstract class BattleStateManager<S extends BattleState> {
 
-    protected readonly stateData: StateData<S>;
+    protected readonly scene: BattleScene;
+    protected readonly state: S;
+    protected readonly stateData: BattleStateData<S>;
 
-    constructor(scene: BattleScene, stateData: StateData<S>) {
-        super(scene);
+    constructor(state: S, scene: BattleScene, stateData: BattleStateData<S>) {
+        this.state = state;
+        this.scene = scene;
         this.stateData = stateData;
+    }
+
+    init(): void {
+    }
+
+    update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
     }
 
     abstract onTileHover(pointer: Phaser.Input.Pointer): void;

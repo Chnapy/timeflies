@@ -1,9 +1,10 @@
-import { StateManager, StateData } from './StateManager'
+import { BattleStateManager, BattleStateData } from './BattleStateManager'
 import { Position, Character } from '../entities/Character';
-import { BattleScene, BattleStateAction } from '../scenes/BattleScene';
+import { BattleScene } from '../scenes/BattleScene';
 import { Controller } from '../../Controller';
+import { BattleStateAction } from '../battleReducers/BattleReducerManager';
 
-export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
+export class BattleStateManagerSortPrepare extends BattleStateManager<'sortPrepare'> {
 
     private characters: Character[];
 
@@ -16,8 +17,8 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
     private lastPositionHovered?: Position;
     private rectHoveredIndex: number;
 
-    constructor(scene: BattleScene, stateData: StateData<'sortPrepare'>) {
-        super(scene, stateData);
+    constructor(scene: BattleScene, stateData: BattleStateData<'sortPrepare'>) {
+        super('sortPrepare', scene, stateData);
         this.characters = [];
         this.tilePositions = [];
         this.worldPositions = [];
@@ -26,20 +27,20 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
         this.rectHoveredIndex = -1;
     }
 
-    init(): this {
+    init(): void {
         this.tilePositions.length = 0;
         this.worldPositions.length = 0;
         this.rects.length = 0;
 
-        const { map, cycle } = this.scene;
+        const { map } = this.scene;
 
         const { sort } = this.stateData;
         const { zone } = sort;
 
-        const character = cycle.getCurrentCharacter();
+        const character = this.scene.getCurrentCharacter();
         const { position } = character;
 
-        this.characters = cycle.characters.filter(c => c.name !== character.name);
+        this.characters = this.scene.characters.filter(c => c.name !== character.name);
 
         this.line.x1 = position.x;
         this.line.y1 = position.y;
@@ -86,8 +87,6 @@ export class StateManagerSortPrepare extends StateManager<'sortPrepare'> {
         this.rects.push(...this.worldPositions
             .map(p => new Phaser.Geom.Rectangle(p.x, p.y,
                 map.tilemap.tileWidth, map.tilemap.tileHeight)));
-
-        return this;
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
