@@ -1,10 +1,10 @@
 import { BattleStateManager, BattleStateData } from './BattleStateManager'
 import { Position, Character } from '../entities/Character';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleScene, BattleData } from '../scenes/BattleScene';
 import { Controller } from '../../Controller';
 import { BattleStateAction } from '../battleReducers/BattleReducerManager';
 
-export class BattleStateManagerSortPrepare extends BattleStateManager<'sortPrepare'> {
+export class BattleStateManagerSpellPrepare extends BattleStateManager<'spellPrepare'> {
 
     private characters: Character[];
 
@@ -17,8 +17,8 @@ export class BattleStateManagerSortPrepare extends BattleStateManager<'sortPrepa
     private lastPositionHovered?: Position;
     private rectHoveredIndex: number;
 
-    constructor(scene: BattleScene, stateData: BattleStateData<'sortPrepare'>) {
-        super('sortPrepare', scene, stateData);
+    constructor(scene: BattleScene, battleData: BattleData, stateData: BattleStateData<'spellPrepare'>) {
+        super(scene, battleData, stateData);
         this.characters = [];
         this.tilePositions = [];
         this.worldPositions = [];
@@ -34,13 +34,13 @@ export class BattleStateManagerSortPrepare extends BattleStateManager<'sortPrepa
 
         const { map } = this.scene;
 
-        const { sort } = this.stateData;
-        const { zone } = sort;
+        const { spell } = this.stateData;
+        const { zone } = spell;
 
-        const character = this.scene.getCurrentCharacter();
+        const character = this.battleData.currentCharacter!;
         const { position } = character;
 
-        this.characters = this.scene.characters.filter(c => c.name !== character.name);
+        this.characters = this.battleData.characters.filter(c => c.name !== character.name);
 
         this.line.x1 = position.x;
         this.line.y1 = position.y;
@@ -122,14 +122,14 @@ export class BattleStateManagerSortPrepare extends BattleStateManager<'sortPrepa
             return;
         }
 
-        const { sort } = this.stateData;
+        const { spell } = this.stateData;
 
         Controller.dispatch<BattleStateAction>({
             type: 'battle/state',
             stateObject: {
-                state: 'sortLaunch',
+                state: 'spellLaunch',
                 data: {
-                    sort,
+                    spell,
                     position: this.lastPositionHovered!
                 }
             }
@@ -158,7 +158,8 @@ export class BattleStateManagerSortPrepare extends BattleStateManager<'sortPrepa
     }
 
     private isPositionTargetable = (position: Position): 'yes' | 'no' | 'last' => {
-        const { map: { obstaclesLayer }, players } = this.scene;
+        const { map: { obstaclesLayer } } = this.scene;
+        const { players } = this.battleData;
 
         if (obstaclesLayer.hasTileAt(position.x, position.y)) {
             return 'no';

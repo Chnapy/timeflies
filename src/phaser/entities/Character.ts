@@ -1,8 +1,8 @@
 import { BattleScene } from '../scenes/BattleScene';
 import { Player } from './Player';
-import { Sort, SortInfos } from './Sort';
+import { Spell, SpellSnapshot } from './Spell';
 import { Team } from "./Team";
-import { WithInfos } from './WithInfos';
+import { WithSnapshot } from './WithSnapshot';
 
 export type CharacterType =
     | 'sampleChar1'
@@ -16,7 +16,7 @@ export type CharacterState = 'idle' | 'move';
 
 export type Orientation = 'left' | 'right' | 'top' | 'bottom';
 
-export interface CharacterInfos {
+export interface CharacterSnapshot {
     id: number;
     isMine: boolean;
     name: string;
@@ -26,10 +26,10 @@ export interface CharacterInfos {
     state: CharacterState;
     life: number;
     actionTime: number;
-    sortsInfos: SortInfos[];
+    spellsSnapshots: SpellSnapshot[];
 }
 
-export class Character implements WithInfos<CharacterInfos> {
+export class Character implements WithSnapshot<CharacterSnapshot> {
 
     static readonly getSheetKey = (
         type: CharacterType
@@ -61,7 +61,7 @@ export class Character implements WithInfos<CharacterInfos> {
     life: number;
     actionTime: number;
 
-    readonly sorts: Sort[];
+    readonly spells: Spell[];
 
     state: CharacterState;
     graphicContainer!: Phaser.GameObjects.Container;
@@ -72,8 +72,8 @@ export class Character implements WithInfos<CharacterInfos> {
     private graphicSprite!: Phaser.GameObjects.Sprite;
 
     constructor({
-        id, isMine, name, type, state, position, orientation, life, actionTime, sortsInfos
-    }: CharacterInfos, player: Player, team: Team, scene: BattleScene) {
+        id, isMine, name, type, state, position, orientation, life, actionTime, spellsSnapshots
+    }: CharacterSnapshot, player: Player, team: Team, scene: BattleScene) {
         this.scene = scene;
         this.id = id;
         this.isMine = isMine;
@@ -89,7 +89,7 @@ export class Character implements WithInfos<CharacterInfos> {
         this.player = player;
         this.team = team;
 
-        this.sorts = sortsInfos.map(infos => new Sort(infos, this));
+        this.spells = spellsSnapshots.map(snap => new Spell(snap, this, scene));
     }
 
     init(): this {
@@ -103,15 +103,13 @@ export class Character implements WithInfos<CharacterInfos> {
 
         this.graphicSprite = this.scene.add.sprite(0, 0, Character.getSheetKey(this.type));
 
-        const graphicText = new Phaser.GameObjects.Text(this.scene, 0, 0, name, {
-            color: 'black'
-        });
-        graphicText.setOrigin(0.5, 1);
+        // const graphicText = this.scene.add.bitmapText(100, 100, 'Arial', name);
+        // graphicText.setOrigin(0.5, 1);
 
         this.graphicContainer.add([
             graphicSquare,
             this.graphicSprite,
-            graphicText
+            // graphicText
         ]);
 
         this.updateAnimation();
@@ -188,14 +186,14 @@ export class Character implements WithInfos<CharacterInfos> {
     }
 
     canMove(): boolean {
-        return this.sorts.some(s => s.type === 'move');
+        return this.spells.some(s => s.type === 'move');
     }
 
     canOrientate(): boolean {
-        return this.sorts.some(s => s.type === 'orientate');
+        return this.spells.some(s => s.type === 'orientate');
     }
 
-    getInfos(): CharacterInfos {
+    getSnapshot(): CharacterSnapshot {
         return {
             id: this.id,
             isMine: this.isMine,
@@ -206,20 +204,20 @@ export class Character implements WithInfos<CharacterInfos> {
             state: this.state,
             life: this.life,
             actionTime: this.actionTime,
-            sortsInfos: this.sorts.map(s => s.getInfos())
+            spellsSnapshots: this.spells.map(s => s.getSnapshot())
         };
     }
 
-    updateInfos(infos: CharacterInfos): void {
-        this.setPosition(infos.position, true);
-        this.setOrientation(infos.orientation, false);
-        this.setCharacterState(infos.state);
-        this.life = infos.life;
-        this.actionTime = infos.actionTime;
-        infos.sortsInfos.forEach(sInfos => {
-            const sort = this.sorts.find(s => s.id === sInfos.id);
+    updateFromSnapshot(snapshot: CharacterSnapshot): void {
+        this.setPosition(snapshot.position, true);
+        this.setOrientation(snapshot.orientation, false);
+        this.setCharacterState(snapshot.state);
+        this.life = snapshot.life;
+        this.actionTime = snapshot.actionTime;
+        snapshot.spellsSnapshots.forEach(sSnap => {
+            const spell = this.spells.find(s => s.id === sSnap.id);
 
-            sort!.updateInfos(sInfos);
+            spell!.updateFromSnapshot(sSnap);
         });
     }
 

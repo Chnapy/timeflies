@@ -5,23 +5,19 @@ import { BattleStateManager, BattleStateData } from './BattleStateManager';
 import { BattleCharAction, BattleStateAction } from '../battleReducers/BattleReducerManager';
 import { CharAction } from '../cycle/CycleManager';
 
-export class BattleStateManagerSortLaunch extends BattleStateManager<'sortLaunch'> {
-
-    constructor(scene: BattleScene, stateData: BattleStateData<'sortLaunch'>) {
-        super('sortLaunch', scene, stateData);
-    }
+export class BattleStateManagerSpellLaunch extends BattleStateManager<'spellLaunch'> {
 
     init(): void {
-        const { sort, position } = this.stateData;
-        const { characters } = this.scene;
+        const { spell, position } = this.stateData;
+        const { characters } = this.battleData;
 
         const target = characters.find(c => c.position.x === position.x && c.position.y === position.y);
         if (target) {
-            target.life -= sort.attaque;
+            target.life -= spell.attaque;
         }
 
         const charAction: CharAction = {
-            sortId: sort.id,
+            spellId: spell.id,
             position
         };
 

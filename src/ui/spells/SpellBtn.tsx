@@ -1,19 +1,19 @@
 import React from 'react';
-import { Sort } from '../../phaser/entities/Sort';
+import { Spell } from '../../phaser/entities/Spell';
 import { Controller } from '../../Controller';
 import { BattleStateMap } from '../../phaser/stateManager/BattleStateManager';
 import { BattleStateAction } from '../../phaser/battleReducers/BattleReducerManager';
 
-export interface SortBtnProps {
-    sort: Sort;
+export interface SpellBtnProps {
+    spell: Spell;
     isActive: boolean;
     disabled: boolean;
 }
 
-export const SortBtn: React.FC<SortBtnProps> = ({ sort, isActive, disabled }) => {
+export const SpellBtn: React.FC<SpellBtnProps> = ({ spell, isActive, disabled }) => {
     const {
         name, type, zone, time, attaque
-    } = sort;
+    } = spell;
 
     return <button
         title={`${name} - Z:${zone} - T:${time} - A:${attaque}`}
@@ -30,9 +30,9 @@ export const SortBtn: React.FC<SortBtnProps> = ({ sort, isActive, disabled }) =>
                     state: 'idle'
                 }
                 : {
-                    state: 'sortPrepare',
+                    state: 'spellPrepare',
                     data: {
-                        sort
+                        spell
                     }
                 };
 

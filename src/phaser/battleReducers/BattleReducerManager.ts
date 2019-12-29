@@ -9,7 +9,7 @@ import { BattleStateManager, BattleStateMap } from '../stateManager/BattleStateM
 import { getBattleStateManagerFromState } from '../stateManager/getBattleStateManagerFromState';
 import { Controller } from '../../Controller';
 import { Character, Position } from '../entities/Character';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleScene, BattleData } from '../scenes/BattleScene';
 
 type NarrowAction<T, N> = T extends Action<N> ? T : never;
 
@@ -18,6 +18,7 @@ export interface BattleStartAction extends IGameAction<'battle/start'> {
 
 export interface BattleTurnStartAction extends IGameAction<'battle/turn/start'> {
     character: Character;
+    time: number;
 }
 
 export interface BattleTurnEndAction extends IGameAction<'battle/turn/end'> {
@@ -68,6 +69,7 @@ export class BattleReducerManager {
 
     constructor(
         private readonly scene: BattleScene,
+        private readonly battleData: BattleData,
         private readonly room: BattleRoomManager,
         private readonly dataStateManager: DataStateManager,
         private readonly cameraManager: CameraManager,
@@ -107,7 +109,8 @@ export class BattleReducerManager {
     readonly onStateChange = this.reduce<BattleStateAction>('battle/state', ({
         stateObject
     }) => {
-        const battleStateManager = getBattleStateManagerFromState(this.scene, stateObject);
+        this.battleData.battleState = stateObject.state;
+        const battleStateManager = getBattleStateManagerFromState(this.scene, this.battleData, stateObject);
         this.setBattleStateManager(battleStateManager);
         battleStateManager.init();
     });

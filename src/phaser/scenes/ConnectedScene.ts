@@ -30,4 +30,11 @@ export abstract class ConnectedScene<K extends string, D extends {} | undefined 
         return this.scene.start(key, data);
     }
 
+    launch<S extends ConnectedScene<any, any>>(
+        key: S[ 'key' ],
+        data: S[ 'initData' ]
+    ): Phaser.Scenes.ScenePlugin {
+        return this.scene.launch(key, data);
+    }
+
 }

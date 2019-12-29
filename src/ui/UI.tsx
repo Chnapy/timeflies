@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Sort } from '../phaser/entities/Sort';
-import { SortBtn } from './sorts/SortBtn';
-import { UIState } from './UIState';
 import { Character, Position } from '../phaser/entities/Character';
-import { SortPane } from './sorts/SortPane';
+import { SpellPane } from './spells/SpellPane';
+import { UIState } from './UIState';
 
 interface UIProps {
     character: Character | null;
@@ -35,7 +33,7 @@ export const UI = connect<UIProps, {}, {}, UIState>(
                     pointerEvents: 'all'
                 }}>
 
-                    <SortPane/>
+                    <SpellPane/>
 
                     <table>
                         <caption style={character.isMine

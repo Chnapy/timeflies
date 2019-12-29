@@ -1,6 +1,6 @@
 import { Position } from '../entities/Character';
-import { Sort } from '../entities/Sort';
-import { BattleScene } from '../scenes/BattleScene';
+import { Spell } from '../entities/Spell';
+import { BattleScene, BattleData } from '../scenes/BattleScene';
 
 export type BattleStateMap = {
     state: 'idle';
@@ -16,14 +16,14 @@ export type BattleStateMap = {
     state: 'watch';
     data?: undefined;
 } | {
-    state: 'sortPrepare';
+    state: 'spellPrepare';
     data: {
-        sort: Sort;
+        spell: Spell;
     };
 } | {
-    state: 'sortLaunch';
+    state: 'spellLaunch';
     data: {
-        sort: Sort;
+        spell: Spell;
         position: Position;
     };
 };
@@ -35,12 +35,12 @@ export type BattleStateData<S extends BattleState> = Extract<BattleStateMap, {st
 export abstract class BattleStateManager<S extends BattleState> {
 
     protected readonly scene: BattleScene;
-    protected readonly state: S;
+    protected readonly battleData: BattleData;
     protected readonly stateData: BattleStateData<S>;
 
-    constructor(state: S, scene: BattleScene, stateData: BattleStateData<S>) {
-        this.state = state;
+    constructor(scene: BattleScene, battleData: BattleData, stateData: BattleStateData<S>) {
         this.scene = scene;
+        this.battleData = battleData;
         this.stateData = stateData;
     }
 

@@ -9,19 +9,15 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
 
     private timeline?: Phaser.Tweens.Timeline;
 
-    constructor(scene: BattleScene, stateData: BattleStateData<'move'>) {
-        super('move', scene, stateData);
-    }
-
     init(): void {
         const { pathTile, pathWorld } = this.stateData;
 
-        const character = this.scene.getCurrentCharacter();
+        const character = this.battleData.currentCharacter!;
 
         character.setCharacterState('move');
 
-        const sort = character.sorts.find(s => s.type === 'move')!;
-        const duration = sort.time;
+        const spell = character.spells.find(s => s.type === 'move')!;
+        const duration = spell.time;
 
         const pathTileSliced = pathTile.slice(1);
 
@@ -44,7 +40,7 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
                         });
 
                         const charAction: CharAction = {
-                            sortId: sort.id,
+                            spellId: spell.id,
                             position: p
                         };
 
@@ -61,8 +57,7 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
         this.timeline = this.scene.tweens.timeline({
             tweens,
             onComplete: () => {
-                delete this.timeline;
-                this.scene.resetState(character);
+                this.stopMove(character);
             }
         });
 
@@ -87,10 +82,9 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
             return;
         }
 
-        const character = this.scene.getCurrentCharacter();
+        const character = this.battleData.currentCharacter!;
 
         this.stopMove(character);
-
 
         Controller.dispatch<BattleRollbackAction>({
             type: 'battle/rollback',
@@ -107,5 +101,6 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
         }
 
         character.setCharacterState('idle');
+        this.scene.resetState(character);
     }
 }

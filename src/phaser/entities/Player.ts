@@ -1,16 +1,16 @@
 import { BattleScene } from '../scenes/BattleScene';
-import { Character, CharacterInfos } from './Character';
+import { Character, CharacterSnapshot } from './Character';
 import { Team } from "./Team";
-import { WithInfos } from './WithInfos';
+import { WithSnapshot } from './WithSnapshot';
 
-export interface PlayerInfos {
+export interface PlayerSnapshot {
     id: number;
     itsMe: boolean;
     name: string;
-    charactersInfos: CharacterInfos[];
+    charactersSnapshots: CharacterSnapshot[];
 }
 
-export class Player implements WithInfos<PlayerInfos> {
+export class Player implements WithSnapshot<PlayerSnapshot> {
 
     readonly id: number;
     readonly itsMe: boolean;
@@ -22,29 +22,29 @@ export class Player implements WithInfos<PlayerInfos> {
         id,
         itsMe,
         name,
-        charactersInfos
-    }: PlayerInfos, team: Team, scene: BattleScene) {
+        charactersSnapshots
+    }: PlayerSnapshot, team: Team, scene: BattleScene) {
         this.id = id;
         this.itsMe = itsMe;
         this.name = name;
         this.team = team;
-        this.characters = charactersInfos.map(infos => new Character(infos, this, team, scene));
+        this.characters = charactersSnapshots.map(snap => new Character(snap, this, team, scene));
     }
 
-    getInfos(): PlayerInfos {
+    getSnapshot(): PlayerSnapshot {
         return {
             id: this.id,
             itsMe: this.itsMe,
             name: this.name,
-            charactersInfos: this.characters.map(c => c.getInfos())
+            charactersSnapshots: this.characters.map(c => c.getSnapshot())
         };
     }
 
-    updateInfos(infos: PlayerInfos): void {
-        infos.charactersInfos.forEach(cInfos => {
-            const character = this.characters.find(c => c.id === cInfos.id);
+    updateFromSnapshot(snapshot: PlayerSnapshot): void {
+        snapshot.charactersSnapshots.forEach(cSnap => {
+            const character = this.characters.find(c => c.id === cSnap.id);
 
-            character!.updateInfos(cInfos);
+            character!.updateFromSnapshot(cSnap);
         });
     }
 }

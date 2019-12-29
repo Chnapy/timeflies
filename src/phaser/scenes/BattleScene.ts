@@ -5,27 +5,39 @@ import { Room } from '../../mocks/MockColyseus';
 import { Utils } from '../../Utils';
 import { BattleReducerManager, BattleStateAction } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CycleManager } from '../cycle/CycleManager';
+import { CycleManager, CharAction } from '../cycle/CycleManager';
 import { Character, CharacterType, Orientation } from '../entities/Character';
 import { Player } from '../entities/Player';
-import { Team, TeamInfos } from '../entities/Team';
-import { WithInfos } from '../entities/WithInfos';
+import { Team, TeamSnapshot } from '../entities/Team';
+import { WithSnapshot } from '../entities/WithSnapshot';
 import { MapInfos, MapManager as MapManager } from '../map/MapManager';
 import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
-import { BattleStateManager } from '../stateManager/BattleStateManager';
+import { BattleStateManager, BattleState } from '../stateManager/BattleStateManager';
 import { ConnectedScene } from './ConnectedScene';
+import { SpellType } from '../entities/Spell';
+import { HUDScene } from '../../hud/HUDScene';
 
-export interface BattleData {
-    teamsInfos: TeamInfos[];
+export interface BattleSnapshot {
+    teamsSnapshots: TeamSnapshot[];
 }
 
 export interface BattleRoomState {
     mapInfos: MapInfos;
     characterTypes: CharacterType[];
-    battleData: BattleData;
+    spellTypes: SpellType[];
+    battleSnapshot: BattleSnapshot;
 }
 
-export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> implements WithInfos<BattleData> {
+export interface BattleData {
+    teams: Team[];
+    players: Player[];
+    characters: Character[];
+    currentCharacter?: Character;
+    battleState: BattleState;
+    charActionStack: CharAction[];
+}
+
+export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> implements WithSnapshot<BattleSnapshot> {
 
     private room!: BattleRoomManager;
     private dataStateManager!: DataStateManager;
@@ -36,19 +48,22 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     private cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
 
-    readonly teams: Team[];
-    readonly players: Player[];
-    readonly characters: Character[];
+    readonly battleData: BattleData;
 
     constructor() {
         super({ key: 'BattleScene' });
-        this.teams = [];
-        this.players = [];
-        this.characters = [];
+        this.battleData = {
+            teams: [],
+            players: [],
+            characters: [],
+            battleState: 'watch',
+            charActionStack: []
+        };
     }
 
     init(data: Room<BattleRoomState>) {
         super.init(data);
+        // this.start<HUDScene>('HUDScene', this.battleData);
     };
 
     preload = () => {
@@ -58,27 +73,25 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.room = new BattleRoomManager(data);
 
-        this.dataStateManager = new DataStateManager(this, this.room.state.battleData);
+        this.dataStateManager = new DataStateManager(this, this.room.state.battleSnapshot);
 
-        const { mapInfos, characterTypes, battleData } = this.room.state;
-        const { teamsInfos } = battleData;
+        const { mapInfos, characterTypes, battleSnapshot } = this.room.state;
+        const { teamsSnapshots } = battleSnapshot;
 
         this.createCharactersAnimations(characterTypes);
 
         this.map = new MapManager(this, mapInfos);
         this.map.init();
 
-        this.teams.push(...teamsInfos.map(infos => new Team(infos, this)));
-
-        this.players.push(...this.teams.flatMap(t => t.players));
-
-        this.characters.push(...this.players.flatMap(p => p.characters));
+        this.battleData.teams = teamsSnapshots.map(snap => new Team(snap, this));
+        this.battleData.players = this.battleData.teams.flatMap(t => t.players);
+        this.battleData.characters = this.battleData.players.flatMap(p => p.characters);
 
         this.map.initPathfinder();
 
-        this.characters.forEach(c => c.init());
+        this.battleData.characters.forEach(c => c.init());
 
-        this.cycle = new CycleManager(this.room, this.dataStateManager, this.players, this.characters);
+        this.cycle = new CycleManager(this.room, this.dataStateManager, this.battleData);
 
         this.graphics = this.add.graphics();
 
@@ -97,6 +110,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.reducerManager = new BattleReducerManager(
             this,
+            this.battleData,
             this.room,
             this.dataStateManager,
             this.cameraManager,
@@ -137,28 +151,24 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
         });
     }
 
-    getCurrentCharacter(): Character {
-        return this.cycle.getCurrentCharacter();
-    }
-
-    getInfos(): BattleData {
+    getSnapshot(): BattleSnapshot {
         return {
-            teamsInfos: this.teams.map(t => t.getInfos())
+            teamsSnapshots: this.battleData.teams.map(t => t.getSnapshot())
         };
     }
 
-    updateInfos(infos: BattleData): void {
-        infos.teamsInfos.forEach(tInfos => {
-            const team = this.teams.find(t => t.id === tInfos.id);
+    updateFromSnapshot(snapshot: BattleSnapshot): void {
+        snapshot.teamsSnapshots.forEach(tSnap => {
+            const team = this.battleData.teams.find(t => t.id === tSnap.id);
 
-            team!.updateInfos(tInfos);
+            team!.updateFromSnapshot(tSnap);
         });
         this.map.pathfinder.setGrid();
     }
 
     private createCharactersAnimations(characterTypes: CharacterType[]): void {
         characterTypes.forEach((type: CharacterType) => {
-            const { states } = AssetManager.character[ type ];
+            const { states } = AssetManager.characters[ type ];
 
             Utils.keysTyped(states).forEach(stateKey => {
                 const state = states[ stateKey ];

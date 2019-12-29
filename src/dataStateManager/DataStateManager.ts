@@ -1,8 +1,8 @@
-import { BattleScene, BattleData } from '../phaser/scenes/BattleScene';
+import { BattleScene, BattleSnapshot } from '../phaser/scenes/BattleScene';
 
 interface DataState {
     time: number;
-    data: BattleData;
+    snapshot: BattleSnapshot;
 }
 
 export class DataStateManager {
@@ -10,11 +10,11 @@ export class DataStateManager {
     private readonly scene: BattleScene;
     private readonly dataStateStack: DataState[];
 
-    constructor(scene: BattleScene, firstData: BattleData) {
+    constructor(scene: BattleScene, firstSnap: BattleSnapshot) {
         this.scene = scene;
         this.dataStateStack = [{
             time: 0,
-            data: firstData
+            snapshot: firstSnap
         }];
     }
 
@@ -22,7 +22,7 @@ export class DataStateManager {
         const time = Date.now();
         this.dataStateStack.push({
             time,
-            data: this.extractDataState()
+            snapshot: this.extractSnapshot()
         });
         return time;
     }
@@ -49,11 +49,11 @@ export class DataStateManager {
         console.log('rollback', fromWhereToDelete, this.dataStateStack);
     }
 
-    private extractDataState(): BattleData {
-        return this.scene.getInfos();
+    private extractSnapshot(): BattleSnapshot {
+        return this.scene.getSnapshot();
     }
 
     private resetFrom(dataState: DataState): void {
-        this.scene.updateInfos(dataState.data);
+        this.scene.updateFromSnapshot(dataState.snapshot);
     }
 }

@@ -3,6 +3,7 @@ import { Room } from '../../mocks/MockColyseus';
 import { Character } from '../entities/Character';
 import { BattleRoomState, BattleScene } from './BattleScene';
 import { ConnectedScene } from './ConnectedScene';
+import { Spell } from '../entities/Spell';
 
 export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>> {
 
@@ -16,16 +17,18 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
         const { mapKey } = mapInfos;
 
         // map tiles
-        this.load.image('tiles', AssetManager.map[ mapKey ].image);
+        this.load.image('tiles', AssetManager.maps[ mapKey ].image);
 
         // map in json format
-        this.load.tilemapTiledJSON('map', AssetManager.map[ mapKey ].schema);
+        this.load.tilemapTiledJSON('map', AssetManager.maps[ mapKey ].schema);
 
         characterTypes.forEach(type => {
-            const { image, schema } = AssetManager.character[ type ];
+            const { image, schema } = AssetManager.characters[ type ];
 
             this.load.atlasXML(Character.getSheetKey(type), image, schema);
         });
+
+        this.load.atlasXML(Spell.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
     }
 
     create() {

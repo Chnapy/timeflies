@@ -1,6 +1,6 @@
 import EasyStar from 'easystarjs';
 import { MapManager } from './MapManager';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleScene, BattleData } from '../scenes/BattleScene';
 import { Position } from '../entities/Character';
 
 export interface PathPromise {
@@ -13,12 +13,12 @@ export class Pathfinder {
     private static ACCEPTABLE_TILES: number[] = [ 0 ];
 
     private readonly map: MapManager;
-    private readonly scene: BattleScene;
+    private readonly battleData: BattleData;
     private readonly finder: InstanceType<(typeof EasyStar)[ 'js' ]>;
 
-    constructor(map: MapManager, scene: BattleScene) {
+    constructor(map: MapManager, battleData: BattleData) {
         this.map = map;
-        this.scene = scene;
+        this.battleData = battleData;
         this.finder = new EasyStar.js();
         this.finder.disableDiagonals();
     }
@@ -73,7 +73,7 @@ export class Pathfinder {
     }
 
     private isSomeoneAtXY(x: number, y: number): boolean {
-        return this.scene.characters && this.scene.characters
+        return this.battleData.characters && this.battleData.characters
             .some(({ position }) => position.x === x && position.y === y);
     }
 }

@@ -1,42 +1,42 @@
-import { Player, PlayerInfos } from './Player';
+import { Player, PlayerSnapshot } from './Player';
 import { BattleScene } from '../scenes/BattleScene';
-import { WithInfos } from './WithInfos';
+import { WithSnapshot } from './WithSnapshot';
 
-export interface TeamInfos {
+export interface TeamSnapshot {
     id: number;
     name: string;
     color: number;
-    playersInfos: PlayerInfos[];
+    playersSnapshots: PlayerSnapshot[];
 }
 
-export class Team implements WithInfos<TeamInfos> {
+export class Team implements WithSnapshot<TeamSnapshot> {
 
     readonly id: number;
     readonly name: string;
     readonly color: number;
     readonly players: Player[];
 
-    constructor({ id, name, color, playersInfos }: TeamInfos, scene: BattleScene) {
+    constructor({ id, name, color, playersSnapshots }: TeamSnapshot, scene: BattleScene) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.players = playersInfos.map(infos => new Player(infos, this, scene));
+        this.players = playersSnapshots.map(snap => new Player(snap, this, scene));
     }
 
-    getInfos(): TeamInfos {
+    getSnapshot(): TeamSnapshot {
         return {
             id: this.id,
             name: this.name,
             color: this.color,
-            playersInfos: this.players.map(p => p.getInfos())
+            playersSnapshots: this.players.map(p => p.getSnapshot())
         };
     }
 
-    updateInfos(infos: TeamInfos): void {
-        infos.playersInfos.forEach(pInfos => {
-            const player = this.players.find(p => p.id === pInfos.id);
+    updateFromSnapshot(snapshot: TeamSnapshot): void {
+        snapshot.playersSnapshots.forEach(pSnap => {
+            const player = this.players.find(p => p.id === pSnap.id);
 
-            player!.updateInfos(pInfos);
+            player!.updateFromSnapshot(pSnap);
         });
     }
 }

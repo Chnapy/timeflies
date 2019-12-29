@@ -4,9 +4,10 @@ import { BattleTurnEndAction, BattleTurnStartAction } from '../battleReducers/Ba
 import { Character, Position } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
+import { BattleData } from '../scenes/BattleScene';
 
 export type CharAction = {
-    sortId: number;
+    spellId: number;
     position: Position;
 };
 
@@ -14,6 +15,7 @@ export class CycleManager {
 
     private readonly room: BattleRoomManager;
     private readonly dataStateManager: DataStateManager;
+    private readonly battleData: BattleData;
 
     readonly players: readonly Player[];
     readonly characters: readonly Character[];
@@ -25,22 +27,19 @@ export class CycleManager {
 
     private charActionStack: CharAction[];
 
-    constructor(room: BattleRoomManager, dataStateManager: DataStateManager, players: Player[], characters: Character[]) {
+    constructor(room: BattleRoomManager, dataStateManager: DataStateManager, battleData: BattleData) {
         this.room = room;
         this.dataStateManager = dataStateManager;
-        this.players = players;
-        this.characters = characters;
+        this.battleData = battleData;
+        this.players = battleData.players;
+        this.characters = battleData.characters;
         this.currentIndex = 0;
         this.running = false;
-        this.charActionStack = [];
+        this.charActionStack = battleData.charActionStack;
     }
 
     start(): void {
         this.running = true;
-    }
-
-    getCurrentCharacter(): Character {
-        return this.characters[ this.currentIndex ];
     }
 
     update(time: number, delta: number): void {
@@ -51,7 +50,7 @@ export class CycleManager {
         if (!this.lastTime) {
             this.lastTime = time;
             this.currentIndex = 0;
-            this.startTurn(this.getCurrentCharacter());
+            this.startTurn(this.getCurrentCharacter(), time);
             return;
         }
 
@@ -68,7 +67,7 @@ export class CycleManager {
                 this.currentIndex = 0;
             }
 
-            this.startTurn(this.getCurrentCharacter());
+            this.startTurn(this.getCurrentCharacter(), this.lastTime);
         }
     }
 
@@ -84,12 +83,15 @@ export class CycleManager {
         }, time);
     }
 
-    private startTurn(character: Character): void {
+    private startTurn(character: Character, time: number): void {
         this.charActionStack.length = 0;
+
+        this.battleData.currentCharacter = character;
 
         Controller.dispatch<BattleTurnStartAction>({
             type: 'battle/turn/start',
-            character
+            character,
+            time
         });
     }
 
@@ -100,4 +102,7 @@ export class CycleManager {
         });
     }
 
+    private getCurrentCharacter(): Character {
+        return this.characters[ this.currentIndex ];
+    }
 }

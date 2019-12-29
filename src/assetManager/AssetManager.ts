@@ -3,6 +3,9 @@ import sampleMap1Schema from '../_assets/map/map_2.json';
 import sampleMap1Image from '../_assets/map/map_2.png';
 import sampleSpritesheet1Image from '../_assets/spritesheets/sokoban_spritesheet.png';
 import sampleSpritesheet1Schema from '../_assets/spritesheets/sokoban_spritesheet.xml';
+import spellsSpritesheetImage from '../_assets/spritesheets/spells_spritesheet.png';
+import spellsSpritesheetSchema from '../_assets/spritesheets/spells_spritesheet.xml';
+import { SpellType } from '../phaser/entities/Spell';
 
 export type IAssetManager = typeof AssetManager;
 
@@ -16,23 +19,30 @@ type AnimStateMap = {
     };
 };
 
-export type IAssetMap = IAssetManager[ 'map' ];
-export type IAssetCharacter = {
+export type IAssetMap = IAssetManager[ 'maps' ];
+export type IAssetCharacters = {
     [ K in CharacterType ]: {
         image: string;
         schema: string;
         states: AnimStateMap;
     }
 };
-// let a = (window as any).a = []
+
+export type IAssetSpells = {
+    image: string;
+    schema: string;
+    spellsMap: {
+        [ K in SpellType ]: string;
+    };
+};
+
 function getGenerateFrameConfig(start: number, end: number = start): Phaser.Types.Animations.GenerateFrameNames {
     return {
         start,
         end,
         zeroPad: 2,
         prefix: 'player_',
-        suffix: '.png',
-        // outputArray: a
+        suffix: '.png'
     };
 }
 
@@ -90,7 +100,7 @@ const AssetCharacterStateMap: AnimStateMap = {
     }
 };
 
-const AssetCharacter: IAssetCharacter = {
+const AssetCharacters: IAssetCharacters = {
     sampleChar1: {
         image: sampleSpritesheet1Image,
         schema: sampleSpritesheet1Schema,
@@ -108,13 +118,27 @@ const AssetCharacter: IAssetCharacter = {
     }
 };
 
+const AssetSpells: IAssetSpells = {
+    image: spellsSpritesheetImage,
+    schema: spellsSpritesheetSchema,
+    spellsMap: {
+        move: '',
+        orientate: '',
+        sampleSpell1: 'blizzard-1',
+        sampleSpell2: 'sword-cold.png',
+        sampleSpell3: 'thunder-1.png'
+    }
+};
+
 export const AssetManager = {
-    map: {
+    maps: {
         sampleMap1: {
             image: sampleMap1Image,
             schema: sampleMap1Schema
         }
     },
 
-    character: AssetCharacter
+    characters: AssetCharacters,
+
+    spells: AssetSpells
 } as const;

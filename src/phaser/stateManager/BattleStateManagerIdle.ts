@@ -1,6 +1,6 @@
 import { Controller } from '../../Controller';
 import { Position } from '../entities/Character';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleScene, BattleData } from '../scenes/BattleScene';
 import { BattleStateData, BattleStateManager } from './BattleStateManager';
 import { BattleStateAction } from '../battleReducers/BattleReducerManager';
 
@@ -11,8 +11,8 @@ export class BattleStateManagerIdle extends BattleStateManager<'idle'> {
     private currentTile: Phaser.Tilemaps.Tile | null;
     private prevTile: Phaser.Tilemaps.Tile | null;
 
-    constructor(scene: BattleScene, stateData: BattleStateData<'idle'>) {
-        super('idle', scene, stateData);
+    constructor(scene: BattleScene, battleData: BattleData, stateData: BattleStateData<'idle'>) {
+        super(scene, battleData, stateData);
         this.pathWorld = [];
         this.pathTile = [];
         this.currentTile = null;
@@ -20,14 +20,13 @@ export class BattleStateManagerIdle extends BattleStateManager<'idle'> {
     }
 
     init(): void {
-        const currentCharacter = this.scene.getCurrentCharacter();
+        const currentCharacter = this.battleData.currentCharacter!;
 
         currentCharacter.setCharacterState('idle');
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
-
-        const currentCharacter = this.scene.getCurrentCharacter();
+        const currentCharacter = this.battleData.currentCharacter!;
 
         if (!currentCharacter.canMove()) {
             return;

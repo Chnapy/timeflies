@@ -24,7 +24,7 @@ export class MapManager {
     constructor(scene: BattleScene, mapInfos: MapInfos) {
         this.scene = scene;
         this.mapInfos = mapInfos;
-        this.pathfinder = new Pathfinder(this, scene);
+        this.pathfinder = new Pathfinder(this, scene.battleData);
     }
 
     init(): void {

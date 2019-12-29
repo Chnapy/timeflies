@@ -3,10 +3,6 @@ import { BattleScene } from '../scenes/BattleScene';
 
 export class BattleStateManagerWatch extends BattleStateManager<'watch'> {
 
-    constructor(scene: BattleScene, stateData: BattleStateData<'watch'>) {
-        super('watch', scene, stateData);
-    }
-
     onTileHover(pointer: Phaser.Input.Pointer): void {
     }
 
