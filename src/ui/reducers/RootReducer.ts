@@ -6,8 +6,6 @@ import { CharacterReducer } from './CharacterReducer';
 import { GameStateReducer } from './GameStateReducer';
 
 export const RootReducer: Reducer<UIState, GameAction> = (state: any, action) => {
-    console.log('ACTION', action);
-
     return combineReducers<UIState, GameAction>({
         gameState: GameStateReducer,
         currentCharacter: CharacterReducer

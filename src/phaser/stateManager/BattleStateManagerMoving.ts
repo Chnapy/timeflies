@@ -1,9 +1,8 @@
 import { Controller } from '../../Controller';
-import { Character } from '../entities/Character';
-import { BattleScene } from '../scenes/BattleScene';
-import { BattleStateManager, BattleStateData } from './BattleStateManager';
 import { BattleCharacterPositionAction, BattleCharAction, BattleRollbackAction } from '../battleReducers/BattleReducerManager';
 import { CharAction } from '../cycle/CycleManager';
+import { Character } from '../entities/Character';
+import { BattleStateManager } from './BattleStateManager';
 
 export class BattleStateManagerMoving extends BattleStateManager<'move'> {
 
@@ -40,7 +39,8 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
                         });
 
                         const charAction: CharAction = {
-                            spellId: spell.id,
+                            startTime: Date.now(),
+                            spell,
                             position: p
                         };
 
@@ -81,7 +81,7 @@ export class BattleStateManagerMoving extends BattleStateManager<'move'> {
         if (!this.timeline) {
             return;
         }
-
+        
         const character = this.battleData.currentCharacter!;
 
         this.stopMove(character);

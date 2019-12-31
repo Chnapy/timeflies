@@ -1,7 +1,6 @@
+import { BattleScene } from '../scenes/BattleScene';
 import { Character } from './Character';
 import { WithSnapshot } from './WithSnapshot';
-import { BattleScene } from '../scenes/BattleScene';
-import { AssetManager } from '../../assetManager/AssetManager';
 
 export type SpellType =
     | 'move'
@@ -32,10 +31,6 @@ export class Spell implements WithSnapshot<SpellSnapshot> {
 
     readonly character: Character;
 
-    // graphicContainer!: Phaser.GameObjects.Container;
-
-    readonly graphicSprite: Phaser.GameObjects.Sprite;
-
     constructor({ id, name, type, zone, time, attaque }: SpellSnapshot, character: Character, scene: BattleScene) {
         this.id = id;
         this.name = name;
@@ -45,26 +40,6 @@ export class Spell implements WithSnapshot<SpellSnapshot> {
         this.attaque = attaque;
 
         this.character = character;
-
-        // this.graphicContainer = this.scene.add.container(worldPosition.x + 0.5, worldPosition.y + 0.5);
-
-        // const { tileWidth, tileHeight } = this.scene.map.tilemap;
-        // const graphicSquare = new Phaser.GameObjects.Rectangle(this.scene, 0, 0, tileWidth, tileHeight);
-        // graphicSquare.setStrokeStyle(1, this.team.color);
-
-        this.graphicSprite = scene.add.sprite(0, 0, Spell.getSheetKey());
-        this.graphicSprite.setFrame(AssetManager.spells.spellsMap[type]);
-
-        // const graphicText = new Phaser.GameObjects.Text(this.scene, 0, 0, name, {
-        //     color: 'black'
-        // });
-        // graphicText.setOrigin(0.5, 1);
-
-        // this.graphicContainer.add([
-        //     graphicSquare,
-        //     this.graphicSprite,
-        //     graphicText
-        // ]);
     }
 
     getSnapshot(): SpellSnapshot {

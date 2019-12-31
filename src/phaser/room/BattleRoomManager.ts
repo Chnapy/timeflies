@@ -1,8 +1,8 @@
 import { Controller } from '../../Controller';
 import { Room } from '../../mocks/MockColyseus';
 import { BattleRollbackAction, BattleStartAction } from '../battleReducers/BattleReducerManager';
+import { Position } from '../entities/Character';
 import { BattleRoomState } from '../scenes/BattleScene';
-import { CharAction } from '../cycle/CycleManager';
 
 interface Message<T extends string> {
     time: number;
@@ -13,7 +13,10 @@ export interface StartReceive extends Message<'start'> {
 }
 
 export interface CharActionSend extends Message<'charAction'> {
-    charAction: CharAction;
+    charAction: {
+        spellId: number;
+        position: Position;
+    };
 }
 
 export interface ConfirmReceive extends Message<'confirm'> {

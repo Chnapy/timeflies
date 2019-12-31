@@ -1,17 +1,15 @@
-import { Action } from 'redux';
-import { GameAction, IGameAction } from '../../action/GameAction';
+import { IGameAction } from '../../action/GameAction';
+import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
+import { ReducerManager } from '../../ReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CycleManager, CharAction } from '../cycle/CycleManager';
+import { CharAction, CycleManager } from '../cycle/CycleManager';
+import { Character, Position } from '../entities/Character';
 import { MapManager } from '../map/MapManager';
-import { BattleRoomManager, SendPromise, CharActionSend } from '../room/BattleRoomManager';
+import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
+import { BattleData, BattleScene } from '../scenes/BattleScene';
 import { BattleStateManager, BattleStateMap } from '../stateManager/BattleStateManager';
 import { getBattleStateManagerFromState } from '../stateManager/getBattleStateManagerFromState';
-import { Controller } from '../../Controller';
-import { Character, Position } from '../entities/Character';
-import { BattleScene, BattleData } from '../scenes/BattleScene';
-
-type NarrowAction<T, N> = T extends Action<N> ? T : never;
 
 export interface BattleStartAction extends IGameAction<'battle/start'> {
 }
@@ -61,14 +59,10 @@ export type BattleSceneAction =
     | BattleCharAction
     | BattleRollbackAction;
 
-export class BattleReducerManager {
-
-    protected readonly reducerMap: {
-        [ K in GameAction[ 'type' ] ]?: (action?: NarrowAction<GameAction, K>) => void;
-    } = {};
+export class BattleReducerManager extends ReducerManager<BattleScene> {
 
     constructor(
-        private readonly scene: BattleScene,
+        scene: BattleScene,
         private readonly battleData: BattleData,
         private readonly room: BattleRoomManager,
         private readonly dataStateManager: DataStateManager,
@@ -78,28 +72,8 @@ export class BattleReducerManager {
         private readonly graphics: Phaser.GameObjects.Graphics,
         private readonly map: MapManager,
         private readonly cycle: CycleManager
-    ) { }
-
-    private readonly reduce = <A extends GameAction>(type: A[ 'type' ], fn: (action: A) => void) => {
-
-        if (this.reducerMap[ type ]) {
-            console.warn('reducer already exist for type', type,
-                'old reducer:', this.reducerMap[ type ],
-                'new reducer:', fn);
-        }
-
-        this.reducerMap[ type ] = fn as any;
-
-        if (this.scene.events)
-            this.scene.events.on(type, fn, this);
-
-        return fn;
-    }
-
-    init(): void {
-        Object.keys(this.reducerMap).forEach(type => {
-            this.scene.events.on(type, this.reducerMap[ type ], this);
-        });
+    ) {
+        super(scene);
     }
 
     readonly onBattleStart = this.reduce<BattleStartAction>('battle/start', action => {
@@ -109,7 +83,7 @@ export class BattleReducerManager {
     readonly onStateChange = this.reduce<BattleStateAction>('battle/state', ({
         stateObject
     }) => {
-        this.battleData.battleState = stateObject.state;
+        this.battleData.battleState = stateObject;
         const battleStateManager = getBattleStateManagerFromState(this.scene, this.battleData, stateObject);
         this.setBattleStateManager(battleStateManager);
         battleStateManager.init();

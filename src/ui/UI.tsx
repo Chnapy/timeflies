@@ -28,7 +28,7 @@ export const UI = connect<UIProps, {}, {}, UIState>(
             pointerEvents: 'none'
         }}>
 
-            {character
+            {/* {character
                 ? <div style={{
                     pointerEvents: 'all'
                 }}>
@@ -58,7 +58,7 @@ export const UI = connect<UIProps, {}, {}, UIState>(
                 </div>
                 : <div>
                     No character playing
-                </div>}
+                </div>} */}
 
         </div>
     }

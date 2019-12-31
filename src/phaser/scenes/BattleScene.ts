@@ -1,21 +1,21 @@
 import { AssetManager } from '../../assetManager/AssetManager';
 import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
+import { HUDScene } from '../../hud/HUDScene';
 import { Room } from '../../mocks/MockColyseus';
 import { Utils } from '../../Utils';
 import { BattleReducerManager, BattleStateAction } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CycleManager, CharAction } from '../cycle/CycleManager';
+import { CharAction, CycleManager } from '../cycle/CycleManager';
 import { Character, CharacterType, Orientation } from '../entities/Character';
 import { Player } from '../entities/Player';
+import { SpellType } from '../entities/Spell';
 import { Team, TeamSnapshot } from '../entities/Team';
 import { WithSnapshot } from '../entities/WithSnapshot';
 import { MapInfos, MapManager as MapManager } from '../map/MapManager';
 import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
-import { BattleStateManager, BattleState } from '../stateManager/BattleStateManager';
+import { BattleState, BattleStateManager, BattleStateMap } from '../stateManager/BattleStateManager';
 import { ConnectedScene } from './ConnectedScene';
-import { SpellType } from '../entities/Spell';
-import { HUDScene } from '../../hud/HUDScene';
 
 export interface BattleSnapshot {
     teamsSnapshots: TeamSnapshot[];
@@ -28,12 +28,12 @@ export interface BattleRoomState {
     battleSnapshot: BattleSnapshot;
 }
 
-export interface BattleData {
+export interface BattleData<S extends BattleState = BattleState> {
     teams: Team[];
     players: Player[];
     characters: Character[];
     currentCharacter?: Character;
-    battleState: BattleState;
+    battleState: BattleStateMap;
     charActionStack: CharAction[];
 }
 
@@ -56,14 +56,21 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             teams: [],
             players: [],
             characters: [],
-            battleState: 'watch',
+            battleState: {
+                state: 'watch'
+            },
             charActionStack: []
         };
     }
 
     init(data: Room<BattleRoomState>) {
         super.init(data);
-        // this.start<HUDScene>('HUDScene', this.battleData);
+
+        this.addScene<HUDScene>('HUDScene', HUDScene);
+
+        this.launch<HUDScene>('HUDScene', {
+            battleData: this.battleData
+        });
     };
 
     preload = () => {
@@ -120,7 +127,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             this.map,
             this.cycle
         );
-        this.reducerManager.init();
 
         this.reducerManager.onStateChange({
             type: 'battle/state',

@@ -1,9 +1,8 @@
 import { Controller } from '../../Controller';
-import { BattleRoomManager, ConfirmReceive } from '../room/BattleRoomManager';
-import { BattleScene } from '../scenes/BattleScene';
-import { BattleStateManager, BattleStateData } from './BattleStateManager';
 import { BattleCharAction, BattleStateAction } from '../battleReducers/BattleReducerManager';
 import { CharAction } from '../cycle/CycleManager';
+import { BattleRoomManager, ConfirmReceive } from '../room/BattleRoomManager';
+import { BattleStateManager } from './BattleStateManager';
 
 export class BattleStateManagerSpellLaunch extends BattleStateManager<'spellLaunch'> {
 
@@ -17,7 +16,8 @@ export class BattleStateManagerSpellLaunch extends BattleStateManager<'spellLaun
         }
 
         const charAction: CharAction = {
-            spellId: spell.id,
+            startTime: Date.now(),
+            spell,
             position
         };
 
@@ -38,7 +38,7 @@ export class BattleStateManagerSpellLaunch extends BattleStateManager<'spellLaun
                     state: 'idle'
                 }
             });
-        }, 1000);
+        }, spell.time);
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {

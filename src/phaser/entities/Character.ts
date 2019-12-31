@@ -23,7 +23,7 @@ export interface CharacterSnapshot {
     type: CharacterType;
     position: Position;
     orientation: Orientation;
-    state: CharacterState;
+    // state: CharacterState;
     life: number;
     actionTime: number;
     spellsSnapshots: SpellSnapshot[];
@@ -72,7 +72,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     private graphicSprite!: Phaser.GameObjects.Sprite;
 
     constructor({
-        id, isMine, name, type, state, position, orientation, life, actionTime, spellsSnapshots
+        id, isMine, name, type, position, orientation, life, actionTime, spellsSnapshots
     }: CharacterSnapshot, player: Player, team: Team, scene: BattleScene) {
         this.scene = scene;
         this.id = id;
@@ -80,7 +80,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this.name = name;
         this.type = type;
 
-        this.state = state;
+        this.state = 'idle';
         this._orientation = orientation;
         this._position = position;
         this.life = life;
@@ -201,7 +201,6 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
             type: this.type,
             position: this.position,
             orientation: this.orientation,
-            state: this.state,
             life: this.life,
             actionTime: this.actionTime,
             spellsSnapshots: this.spells.map(s => s.getSnapshot())
@@ -211,7 +210,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     updateFromSnapshot(snapshot: CharacterSnapshot): void {
         this.setPosition(snapshot.position, true);
         this.setOrientation(snapshot.orientation, false);
-        this.setCharacterState(snapshot.state);
+        this.setCharacterState('idle');
         this.life = snapshot.life;
         this.actionTime = snapshot.actionTime;
         snapshot.spellsSnapshots.forEach(sSnap => {

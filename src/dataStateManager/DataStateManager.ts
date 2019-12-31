@@ -18,13 +18,11 @@ export class DataStateManager {
         }];
     }
 
-    commit(): number {
-        const time = Date.now();
+    commit(time: number = Date.now()): void {
         this.dataStateStack.push({
             time,
             snapshot: this.extractSnapshot()
         });
-        return time;
     }
 
     rollbackByTime(time: number): void {
@@ -46,7 +44,7 @@ export class DataStateManager {
         this.dataStateStack.splice(fromWhereToDelete);
 
         this.resetFrom(this.dataStateStack[ this.dataStateStack.length - 1 ]);
-        console.log('rollback', fromWhereToDelete, this.dataStateStack);
+        console.warn('rollback', fromWhereToDelete, this.dataStateStack);
     }
 
     private extractSnapshot(): BattleSnapshot {

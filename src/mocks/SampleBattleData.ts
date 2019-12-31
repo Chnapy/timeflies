@@ -12,7 +12,6 @@ const charJ1Sample1: CharacterSnapshot = {
         y: 3
     },
     orientation: 'bottom',
-    state: 'idle',
     life: 100,
     actionTime: 9000,
     spellsSnapshots: [
@@ -53,7 +52,6 @@ const charJ1Sample2: CharacterSnapshot = {
         y: 3
     },
     orientation: 'right',
-    state: 'idle',
     life: 100,
     actionTime: 7000,
     spellsSnapshots: [
@@ -78,7 +76,6 @@ const charJ2Sample3: CharacterSnapshot = {
         y: 4
     },
     orientation: 'left',
-    state: 'idle',
     life: 100,
     actionTime: 5000,
     spellsSnapshots: [

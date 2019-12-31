@@ -124,7 +124,7 @@ const AssetSpells: IAssetSpells = {
     spellsMap: {
         move: '',
         orientate: '',
-        sampleSpell1: 'blizzard-1',
+        sampleSpell1: 'blizzard-1.png',
         sampleSpell2: 'sword-cold.png',
         sampleSpell3: 'thunder-1.png'
     }

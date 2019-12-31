@@ -5,11 +5,13 @@ import { Character, Position } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
 import { BattleData } from '../scenes/BattleScene';
+import { Spell } from '../entities/Spell';
 
-export type CharAction = {
-    spellId: number;
+export interface CharAction {
+    spell: Spell;
     position: Position;
-};
+    startTime: number;
+}
 
 export class CycleManager {
 
@@ -73,14 +75,17 @@ export class CycleManager {
 
     addCharAction(charAction: CharAction): SendPromise<CharActionSend> {
 
-        const time = this.dataStateManager.commit();
+        this.dataStateManager.commit(charAction.startTime);
 
         this.charActionStack.push(charAction);
 
         return this.room.send<CharActionSend>({
             type: 'charAction',
-            charAction
-        }, time);
+            charAction: {
+                spellId: charAction.spell.id,
+                position: charAction.position
+            }
+        }, charAction.startTime);
     }
 
     private startTurn(character: Character, time: number): void {

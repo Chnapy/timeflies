@@ -9,6 +9,7 @@ import { GameEngine } from './phaser/GameEngine';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
 import * as Colyseus from './mocks/MockColyseus';
+import { BattleTurnStartAction } from './phaser/battleReducers/BattleReducerManager';
 
 const CLIENT_ENDPOINT = 'ws://echo.websocket.org';
 
@@ -42,17 +43,33 @@ export class Controller {
     }
 
     static readonly dispatch = <A extends GameAction>(action: A): void => {
+
+        if (action.type === 'battle/turn/start') {
+            console.groupCollapsed(
+                action.type,
+                (action as BattleTurnStartAction).character.name,
+                [action]
+            );
+        } else {
+            console.group(action.type, action);
+            console.groupEnd();
+        }
+
         Controller.game.emit(action);
 
         if (!action.onlyGame) {
             Controller.store.dispatch(action);
         }
+
+        if (action.type === 'battle/turn/end') {
+            console.groupEnd();
+        }
+
     };
 
     private static readonly onAppMount = (gameWrapper: HTMLElement): void => {
 
         const ro = new ResizeObserver((entries, observer) => {
-            console.log(entries, observer);
             if (!entries.length) {
                 return;
             }
