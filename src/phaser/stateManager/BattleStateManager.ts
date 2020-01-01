@@ -2,35 +2,32 @@ import { Position } from '../entities/Character';
 import { Spell } from '../entities/Spell';
 import { BattleScene, BattleData } from '../scenes/BattleScene';
 
-export type BattleStateMap = {
-    state: 'idle';
-    data?: undefined;
-} | {
-    state: 'move';
-    data: {
-        currentTile: Phaser.Tilemaps.Tile;
-        pathTile: Position[];
-        pathWorld: Position[];
+export type BattleStateMap =
+    | {
+        state: 'idle';
+        data?: undefined;
+    }
+    | {
+        state: 'watch';
+        data?: undefined;
+    }
+    | {
+        state: 'spellPrepare';
+        data: {
+            spell: Spell;
+        };
+    }
+    | {
+        state: 'spellLaunch';
+        data: {
+            spell: Spell;
+            positions: Position[];
+        };
     };
-} | {
-    state: 'watch';
-    data?: undefined;
-} | {
-    state: 'spellPrepare';
-    data: {
-        spell: Spell;
-    };
-} | {
-    state: 'spellLaunch';
-    data: {
-        spell: Spell;
-        position: Position;
-    };
-};
 
-export type BattleState = BattleStateMap['state'];
+export type BattleState = BattleStateMap[ 'state' ];
 
-export type BattleStateData<S extends BattleState> = Extract<BattleStateMap, {state: S}>['data'];
+export type BattleStateData<S extends BattleState> = Extract<BattleStateMap, { state: S }>[ 'data' ];
 
 export abstract class BattleStateManager<S extends BattleState> {
 

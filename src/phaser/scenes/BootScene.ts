@@ -16,7 +16,6 @@ export class BootScene extends ConnectedScene<'BootScene'> {
 
         Controller.client.joinOrCreate<BattleRoomState>('battle')
             .then(room => {
-                console.log(room);
                 this.start<LoadScene>('LoadScene', room);
             });
     }

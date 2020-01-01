@@ -1,5 +1,4 @@
-import { BattleStateManager, BattleStateData } from './BattleStateManager';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleStateManager } from './BattleStateManager';
 
 export class BattleStateManagerWatch extends BattleStateManager<'watch'> {
 

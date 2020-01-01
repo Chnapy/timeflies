@@ -103,13 +103,9 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
 
         this.graphicSprite = this.scene.add.sprite(0, 0, Character.getSheetKey(this.type));
 
-        // const graphicText = this.scene.add.bitmapText(100, 100, 'Arial', name);
-        // graphicText.setOrigin(0.5, 1);
-
         this.graphicContainer.add([
             graphicSquare,
-            this.graphicSprite,
-            // graphicText
+            this.graphicSprite
         ]);
 
         this.updateAnimation();
@@ -137,15 +133,14 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
 
     setPosition(position: Position, updatePositionGraphic: boolean,
         updateOrientation?: boolean, updateOrientationGraphic?: boolean): this {
-        if (this.position.x === position.x && this.position.y === position.y) {
-            return this;
-        }
 
-        if (updateOrientation) {
-            this.setOrientation(this.getOrientationTo(position), !!updateOrientationGraphic);
-        }
+        if (this.position.x !== position.x || this.position.y !== position.y) {
+            if (updateOrientation) {
+                this.setOrientation(this.getOrientationTo(position), !!updateOrientationGraphic);
+            }
 
-        this._position = position;
+            this._position = position;
+        }
 
         if (updatePositionGraphic) {
             const worldPosition = this.scene.map.tileToWorldPosition(position, true);

@@ -15,7 +15,7 @@ export interface StartReceive extends Message<'start'> {
 export interface CharActionSend extends Message<'charAction'> {
     charAction: {
         spellId: number;
-        position: Position;
+        positions: Position[];
     };
 }
 
@@ -103,7 +103,6 @@ export class BattleRoomManager {
     }
 
     private readonly onMessage = (message: Receive): void => {
-        console.log('MESSAGE', message);
 
         switch (message.type) {
             case 'start':

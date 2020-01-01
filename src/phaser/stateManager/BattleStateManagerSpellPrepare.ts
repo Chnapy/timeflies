@@ -130,7 +130,7 @@ export class BattleStateManagerSpellPrepare extends BattleStateManager<'spellPre
                 state: 'spellLaunch',
                 data: {
                     spell,
-                    position: this.lastPositionHovered!
+                    positions: [this.lastPositionHovered!]
                 }
             }
         });

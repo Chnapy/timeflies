@@ -29,12 +29,12 @@ export interface BattleRoomState {
 }
 
 export interface BattleData<S extends BattleState = BattleState> {
-    teams: Team[];
-    players: Player[];
-    characters: Character[];
+    readonly teams: Team[];
+    readonly players: Player[];
+    readonly characters: Character[];
     currentCharacter?: Character;
     battleState: BattleStateMap;
-    charActionStack: CharAction[];
+    readonly charActionStack: CharAction[];
 }
 
 export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> implements WithSnapshot<BattleSnapshot> {
@@ -90,9 +90,9 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
         this.map = new MapManager(this, mapInfos);
         this.map.init();
 
-        this.battleData.teams = teamsSnapshots.map(snap => new Team(snap, this));
-        this.battleData.players = this.battleData.teams.flatMap(t => t.players);
-        this.battleData.characters = this.battleData.players.flatMap(p => p.characters);
+        this.battleData.teams.push(...teamsSnapshots.map(snap => new Team(snap, this)));
+        this.battleData.players.push(...this.battleData.teams.flatMap(t => t.players));
+        this.battleData.characters.push(...this.battleData.players.flatMap(p => p.characters));
 
         this.map.initPathfinder();
 

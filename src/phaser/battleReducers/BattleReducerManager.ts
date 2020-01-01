@@ -4,7 +4,7 @@ import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { ReducerManager } from '../../ReducerManager';
 import { CameraManager } from '../camera/CameraManager';
 import { CharAction, CycleManager } from '../cycle/CycleManager';
-import { Character, Position } from '../entities/Character';
+import { Character } from '../entities/Character';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
 import { BattleData, BattleScene } from '../scenes/BattleScene';
@@ -27,14 +27,6 @@ export interface BattleStateAction extends IGameAction<'battle/state'> {
     stateObject: BattleStateMap;
 }
 
-export interface BattleCharacterPositionAction extends IGameAction<'battle/character/position'> {
-    character: Character;
-    position: Position;
-    updateOrientation: boolean;
-    updatePositionGraphic: boolean;
-    updateOrientationGraphic: boolean;
-}
-
 export interface BattleCharAction extends IGameAction<'battle/charAction'> {
     charAction: CharAction;
     callback?: (promise: SendPromise<CharActionSend>) => void;
@@ -55,7 +47,6 @@ export type BattleSceneAction =
     | BattleTurnStartAction
     | BattleTurnEndAction
     | BattleStateAction
-    | BattleCharacterPositionAction
     | BattleCharAction
     | BattleRollbackAction;
 
@@ -105,23 +96,37 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         });
     });
 
-    readonly onCharacterPosition = this.reduce<BattleCharacterPositionAction>('battle/character/position', ({
-        character, position, updateOrientation, updatePositionGraphic, updateOrientationGraphic
-    }) => {
-
-        character.setPosition(position, updatePositionGraphic, updateOrientation, updateOrientationGraphic);
-
-        this.map.pathfinder.setGrid();
-
-    });
-
     readonly onCharAction = this.reduce<BattleCharAction>('battle/charAction', ({
         charAction, callback
     }) => {
-        const promise = this.cycle.addCharAction(charAction);
+
+        const { spell, positions } = charAction;
+        const { spellAct } = spell;
+
+        spellAct.launch(positions)
+            .then(spellResult => {
+
+                if(spellResult.grid) {
+                    this.map.pathfinder.setGrid();
+                }
+
+                if(spellResult.charState) {
+                    spell.character.setCharacterState('idle');
+                }
+
+                if(spellResult.battleState) {
+                    this.scene.resetState(spell.character);
+                }
+            });
+
+        const sendPromise = this.cycle.addCharAction(charAction)
+            .catch(confirm => {
+                spellAct.cancel();
+                return Promise.reject(confirm);
+            });
 
         if (callback) {
-            callback(promise);
+            callback(sendPromise);
         }
     });
 

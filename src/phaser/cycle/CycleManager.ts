@@ -9,7 +9,7 @@ import { Spell } from '../entities/Spell';
 
 export interface CharAction {
     spell: Spell;
-    position: Position;
+    positions: Position[];
     startTime: number;
 }
 
@@ -83,7 +83,7 @@ export class CycleManager {
             type: 'charAction',
             charAction: {
                 spellId: charAction.spell.id,
-                position: charAction.position
+                positions: charAction.positions
             }
         }, charAction.startTime);
     }

@@ -29,7 +29,6 @@ export class DataStateManager {
 
         const fromWhereToDelete = this.dataStateStack.findIndex(ds => ds.time >= time);
         if (fromWhereToDelete === -1) {
-            console.log('-1', time, this.dataStateStack)
             return;
         }
 
@@ -44,7 +43,6 @@ export class DataStateManager {
         this.dataStateStack.splice(fromWhereToDelete);
 
         this.resetFrom(this.dataStateStack[ this.dataStateStack.length - 1 ]);
-        console.warn('rollback', fromWhereToDelete, this.dataStateStack);
     }
 
     private extractSnapshot(): BattleSnapshot {

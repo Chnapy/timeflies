@@ -45,25 +45,21 @@ export class Controller {
     static readonly dispatch = <A extends GameAction>(action: A): void => {
 
         if (action.type === 'battle/turn/start') {
-            console.groupCollapsed(
+            console.group(
                 action.type,
                 (action as BattleTurnStartAction).character.name,
-                [action]
+                [ action ]
             );
-        } else {
-            console.group(action.type, action);
             console.groupEnd();
+        } else {
+            console.log(action.type, action);
         }
 
         Controller.game.emit(action);
 
-        if (!action.onlyGame) {
-            Controller.store.dispatch(action);
-        }
-
-        if (action.type === 'battle/turn/end') {
-            console.groupEnd();
-        }
+        // if (!action.onlyGame) {
+        //     Controller.store.dispatch(action);
+        // }
 
     };
 

@@ -3,6 +3,7 @@ import { Position } from '../entities/Character';
 import { BattleScene, BattleData } from '../scenes/BattleScene';
 import { BattleStateData, BattleStateManager } from './BattleStateManager';
 import { BattleStateAction } from '../battleReducers/BattleReducerManager';
+import { Spell } from '../entities/Spell';
 
 export class BattleStateManagerIdle extends BattleStateManager<'idle'> {
 
@@ -68,14 +69,19 @@ export class BattleStateManagerIdle extends BattleStateManager<'idle'> {
             return;
         }
 
+        const currentCharacter = this.battleData.currentCharacter!;
+
+        const spell = currentCharacter.spells.find(s => s.type === 'move')!;
+
+        const positions = this.pathTile.slice(1);
+
         Controller.dispatch<BattleStateAction>({
             type: 'battle/state',
             stateObject: {
-                state: "move",
+                state: "spellLaunch",
                 data: {
-                    currentTile: this.currentTile,
-                    pathWorld: this.pathWorld,
-                    pathTile: this.pathTile
+                    spell,
+                    positions
                 }
             }
         });
