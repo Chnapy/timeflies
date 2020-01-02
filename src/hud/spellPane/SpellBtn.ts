@@ -1,10 +1,10 @@
-import { Spell } from '../../phaser/entities/Spell';
-import { HUDScene } from '../HUDScene';
 import { AssetManager } from '../../assetManager/AssetManager';
-import { HasGameObject } from '../layout/HasGameObject';
 import { Controller } from '../../Controller';
-import { BattleStateAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { BattleSpellPrepareAction, BattleSpellLaunchAction, BattleWatchAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { Spell } from '../../phaser/entities/Spell';
 import { ReducerManager } from '../../ReducerManager';
+import { HUDScene } from '../HUDScene';
+import { HasGameObject } from '../layout/HasGameObject';
 
 export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject {
 
@@ -26,7 +26,7 @@ export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject 
         super(scene);
         this.spell = spell;
 
-        this.active = false;
+        this.active = spell.type === 'move';
         this.disable = false;
 
         this.graphicSprite = scene.add.image(0, 0, Spell.getSheetKey());
@@ -63,18 +63,11 @@ export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject 
                     return;
                 }
 
-                Controller.dispatch<BattleStateAction>({
-                    type: 'battle/state',
-                    stateObject: this.active
-                        ? {
-                            state: 'idle'
-                        }
-                        : {
-                            state: 'spellPrepare',
-                            data: {
-                                spell
-                            }
-                        }
+                Controller.dispatch<BattleSpellPrepareAction>({
+                    type: 'battle/spell/prepare',
+                    spellType: this.active
+                        ? 'move'
+                        : spell.type
                 });
             });
 
@@ -93,15 +86,26 @@ export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject 
         this.updateGraphics();
     }
 
-    private readonly onStateChange = this.reduce<BattleStateAction>('battle/state', ({
-        stateObject
+    private readonly onSpellPrepare = this.reduce<BattleSpellPrepareAction>('battle/spell/prepare', ({
+        spellType
     }) => {
-        this.active = (stateObject.state === 'spellPrepare'
-            || stateObject.state === 'spellLaunch')
-            && stateObject.data.spell.id === this.spell.id;
+        this.active = spellType === this.spell.type;
+        this.disable = false;
+        this.updateGraphics();
+    });
 
-        this.disable = stateObject.state !== 'idle';
+    private readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
+        charAction
+    }) => {
+        this.active = charAction.spell.type === this.spell.type;
+        this.disable = true;
+        this.updateGraphics();
+    });
 
+    private readonly onWatch = this.reduce<BattleWatchAction>('battle/watch', ({
+    }) => {
+        this.active = false;
+        this.disable = true;
         this.updateGraphics();
     });
 

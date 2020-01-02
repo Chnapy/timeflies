@@ -1,7 +1,7 @@
 import EasyStar from 'easystarjs';
-import { MapManager } from './MapManager';
-import { BattleScene, BattleData } from '../scenes/BattleScene';
 import { Position } from '../entities/Character';
+import { BattleData } from '../scenes/BattleScene';
+import { MapManager } from './MapManager';
 
 export interface PathPromise {
     promise: Promise<Position[]>;

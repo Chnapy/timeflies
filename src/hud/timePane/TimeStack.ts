@@ -1,7 +1,7 @@
 import { ReducerManager } from '../../ReducerManager';
 import { HUDScene } from '../HUDScene';
 import { HasGameObject } from '../layout/HasGameObject';
-import { BattleCharAction, BattleTurnStartAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { BattleSpellLaunchAction, BattleTurnStartAction } from '../../phaser/battleReducers/BattleReducerManager';
 import { CharAction } from '../../phaser/cycle/CycleManager';
 import { Spell } from '../../phaser/entities/Spell';
 import { AssetManager } from '../../assetManager/AssetManager';
@@ -32,7 +32,7 @@ export class TimeStack extends ReducerManager<HUDScene> implements HasGameObject
         this.container.removeAll();
     });
 
-    private readonly onCharAction = this.reduce<BattleCharAction>('battle/charAction', ({
+    private readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
         charAction
     }) => {
         const {spell} = charAction;

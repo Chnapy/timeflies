@@ -3,7 +3,7 @@ import { HUDScene } from '../HUDScene';
 import { Character } from '../../phaser/entities/Character';
 import { CharAction } from '../../phaser/cycle/CycleManager';
 import { ReducerManager } from '../../ReducerManager';
-import { BattleTurnStartAction, BattleStateAction, BattleCharAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { BattleTurnStartAction, BattleSpellPrepareAction, BattleSpellLaunchAction } from '../../phaser/battleReducers/BattleReducerManager';
 import { Spell } from '../../phaser/entities/Spell';
 import { AssetManager } from '../../assetManager/AssetManager';
 
@@ -124,7 +124,7 @@ export class TimeBar extends ReducerManager<HUDScene> implements HasGameObject {
         };
     });
 
-    private readonly onCharAction = this.reduce<BattleCharAction>('battle/charAction', ({
+    private readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
         charAction
     }) => {
         this.currentTurn!.actions.push(charAction);

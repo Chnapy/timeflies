@@ -5,11 +5,11 @@ import { ReducerManager } from '../../ReducerManager';
 import { CameraManager } from '../camera/CameraManager';
 import { CharAction, CycleManager } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
+import { SpellType } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
 import { BattleData, BattleScene } from '../scenes/BattleScene';
-import { BattleStateManager, BattleStateMap } from '../stateManager/BattleStateManager';
-import { getBattleStateManagerFromState } from '../stateManager/getBattleStateManagerFromState';
+import { SpellEngine } from '../spellEngine/SpellEngine';
 
 export interface BattleStartAction extends IGameAction<'battle/start'> {
 }
@@ -23,11 +23,14 @@ export interface BattleTurnEndAction extends IGameAction<'battle/turn/end'> {
     character: Character;
 }
 
-export interface BattleStateAction extends IGameAction<'battle/state'> {
-    stateObject: BattleStateMap;
+export interface BattleWatchAction extends IGameAction<'battle/watch'> {
 }
 
-export interface BattleCharAction extends IGameAction<'battle/charAction'> {
+export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prepare'> {
+    spellType: SpellType;
+}
+
+export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
     charAction: CharAction;
     callback?: (promise: SendPromise<CharActionSend>) => void;
 }
@@ -46,8 +49,9 @@ export type BattleSceneAction =
     | BattleStartAction
     | BattleTurnStartAction
     | BattleTurnEndAction
-    | BattleStateAction
-    | BattleCharAction
+    | BattleWatchAction
+    | BattleSpellPrepareAction
+    | BattleSpellLaunchAction
     | BattleRollbackAction;
 
 export class BattleReducerManager extends ReducerManager<BattleScene> {
@@ -58,8 +62,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         private readonly room: BattleRoomManager,
         private readonly dataStateManager: DataStateManager,
         private readonly cameraManager: CameraManager,
-        private readonly getBattleStateManager: () => BattleStateManager<any>,
-        private readonly setBattleStateManager: (battleStateManager: BattleStateManager<any>) => void,
+        private readonly spellEngine: SpellEngine,
         private readonly graphics: Phaser.GameObjects.Graphics,
         private readonly map: MapManager,
         private readonly cycle: CycleManager
@@ -71,57 +74,61 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         this.cycle.start();
     });
 
-    readonly onStateChange = this.reduce<BattleStateAction>('battle/state', ({
-        stateObject
+    readonly onWatch = this.reduce<BattleWatchAction>('battle/watch', ({
     }) => {
-        this.battleData.battleState = stateObject;
-        const battleStateManager = getBattleStateManagerFromState(this.scene, this.battleData, stateObject);
-        this.setBattleStateManager(battleStateManager);
-        battleStateManager.init();
+        this.spellEngine.watch();
+    });
+
+    readonly onSpellPrepare = this.reduce<BattleSpellPrepareAction>('battle/spell/prepare', ({
+        spellType
+    }) => {
+
+        const spell = this.battleData.currentCharacter!.spells
+            .find(s => s.type === spellType)!;
+
+        this.spellEngine.prepare(spell);
     });
 
     readonly onTurnStart = this.reduce<BattleTurnStartAction>('battle/turn/start', ({ character }) => {
-        this.scene.resetState(character);
+        this.resetState(character);
     });
 
     readonly onTurnEnd = this.reduce<BattleTurnEndAction>('battle/turn/end', ({ character }) => {
 
-        this.getBattleStateManager().onTurnEnd();
+        this.spellEngine.cancel();
 
         this.dataStateManager.commit();
 
-        Controller.dispatch<BattleStateAction>({
-            type: 'battle/state',
-            stateObject: { state: 'watch' }
+        Controller.dispatch<BattleWatchAction>({
+            type: 'battle/watch',
         });
     });
 
-    readonly onCharAction = this.reduce<BattleCharAction>('battle/charAction', ({
+    readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
         charAction, callback
     }) => {
 
         const { spell, positions } = charAction;
-        const { spellAct } = spell;
 
-        spellAct.launch(positions)
+        this.spellEngine.launch(positions)
             .then(spellResult => {
 
-                if(spellResult.grid) {
+                if (spellResult.grid) {
                     this.map.pathfinder.setGrid();
                 }
 
-                if(spellResult.charState) {
+                if (spellResult.charState) {
                     spell.character.setCharacterState('idle');
                 }
 
-                if(spellResult.battleState) {
-                    this.scene.resetState(spell.character);
+                if (spellResult.battleState) {
+                    this.resetState(spell.character);
                 }
             });
 
         const sendPromise = this.cycle.addCharAction(charAction)
             .catch(confirm => {
-                spellAct.cancel();
+                this.spellEngine.cancel();
                 return Promise.reject(confirm);
             });
 
@@ -139,4 +146,15 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
             this.dataStateManager.rollbackLast(config.nb);
         }
     });
+
+    private resetState(character?: Character): void {
+        Controller.dispatch<BattleSpellPrepareAction | BattleWatchAction>(character?.isMine
+            ? {
+                type: 'battle/spell/prepare',
+                spellType: 'move'
+            }
+            : {
+                type: 'battle/watch'
+            });
+    }
 }

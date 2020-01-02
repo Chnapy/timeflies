@@ -3,6 +3,7 @@ import { HUDScene } from '../HUDScene';
 import { Cell } from '../layout/Cell';
 import { SpellBtn } from './SpellBtn';
 import { BattleTurnStartAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { CurrentSpell } from '../../phaser/spellEngine/SpellEngine';
 
 export class SpellPane extends Cell {
 

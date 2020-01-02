@@ -1,6 +1,4 @@
 import { BattleScene } from '../scenes/BattleScene';
-import { SpellAct } from '../spellAct/SpellAct';
-import { getSpellAct } from '../spellAct/getSpellAct';
 import { Character } from './Character';
 import { WithSnapshot } from './WithSnapshot';
 
@@ -33,8 +31,6 @@ export class Spell implements WithSnapshot<SpellSnapshot> {
 
     readonly character: Character;
 
-    readonly spellAct: SpellAct<any>;
-
     constructor({ id, name, type, zone, time, attaque }: SpellSnapshot, character: Character, scene: BattleScene) {
         this.id = id;
         this.name = name;
@@ -44,7 +40,6 @@ export class Spell implements WithSnapshot<SpellSnapshot> {
         this.attaque = attaque;
 
         this.character = character;
-        this.spellAct = getSpellAct(type, this, scene);
     }
 
     getSnapshot(): SpellSnapshot {

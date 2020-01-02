@@ -1,31 +1,21 @@
-import { BattleStateManager, BattleStateData } from './BattleStateManager'
-import { Position, Character } from '../entities/Character';
-import { BattleScene, BattleData } from '../scenes/BattleScene';
-import { Controller } from '../../Controller';
-import { BattleStateAction } from '../battleReducers/BattleReducerManager';
+import { Controller } from '../../../Controller';
+import { BattleSpellLaunchAction, BattleSpellPrepareAction } from '../../battleReducers/BattleReducerManager';
+import { Character, Position } from '../../entities/Character';
+import { SpellType } from '../../entities/Spell';
+import { SpellPrepare } from '../SpellPrepare';
 
-export class BattleStateManagerSpellPrepare extends BattleStateManager<'spellPrepare'> {
+export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' | 'orientate'>> {
 
-    private characters: Character[];
+    private charactersFiltered!: Character[];
 
-    private readonly tilePositions: Position[];
-    private readonly worldPositions: Position[];
-    private readonly rects: Phaser.Geom.Rectangle[];
+    private readonly tilePositions: Position[] = [];
+    private readonly worldPositions: Position[] = [];
+    private readonly rects: Phaser.Geom.Rectangle[] = [];
 
-    private readonly line: Phaser.Geom.Line;
+    private readonly line: Phaser.Geom.Line = new Phaser.Geom.Line();
 
     private lastPositionHovered?: Position;
-    private rectHoveredIndex: number;
-
-    constructor(scene: BattleScene, battleData: BattleData, stateData: BattleStateData<'spellPrepare'>) {
-        super(scene, battleData, stateData);
-        this.characters = [];
-        this.tilePositions = [];
-        this.worldPositions = [];
-        this.rects = [];
-        this.line = new Phaser.Geom.Line();
-        this.rectHoveredIndex = -1;
-    }
+    private rectHoveredIndex: number = -1;
 
     init(): void {
         this.tilePositions.length = 0;
@@ -34,13 +24,11 @@ export class BattleStateManagerSpellPrepare extends BattleStateManager<'spellPre
 
         const { map } = this.scene;
 
-        const { spell } = this.stateData;
-        const { zone } = spell;
+        const { zone } = this.spell;
 
-        const character = this.battleData.currentCharacter!;
-        const { position } = character;
+        const { position } = this.character;
 
-        this.characters = this.battleData.characters.filter(c => c.name !== character.name);
+        this.charactersFiltered = this.characters.filter(c => c.id !== this.character.id);
 
         this.line.x1 = position.x;
         this.line.y1 = position.y;
@@ -113,25 +101,19 @@ export class BattleStateManagerSpellPrepare extends BattleStateManager<'spellPre
 
     onTileClick(pointer: Phaser.Input.Pointer): void {
         if (this.rectHoveredIndex === -1) {
-            Controller.dispatch<BattleStateAction>({
-                type: 'battle/state',
-                stateObject: {
-                    state: 'idle'
-                }
+            Controller.dispatch<BattleSpellPrepareAction>({
+                type: 'battle/spell/prepare',
+                spellType: 'move'
             });
             return;
         }
 
-        const { spell } = this.stateData;
-
-        Controller.dispatch<BattleStateAction>({
-            type: 'battle/state',
-            stateObject: {
-                state: 'spellLaunch',
-                data: {
-                    spell,
-                    positions: [this.lastPositionHovered!]
-                }
+        Controller.dispatch<BattleSpellLaunchAction>({
+            type: 'battle/spell/launch',
+            charAction: {
+                startTime: Date.now(),
+                spell: this.spell,
+                positions: [ this.lastPositionHovered! ]
             }
         });
     }
@@ -154,18 +136,17 @@ export class BattleStateManagerSpellPrepare extends BattleStateManager<'spellPre
 
     }
 
-    onTurnEnd(): void {
+    cancel(): void {
     }
 
     private isPositionTargetable = (position: Position): 'yes' | 'no' | 'last' => {
         const { map: { obstaclesLayer } } = this.scene;
-        const { players } = this.battleData;
 
         if (obstaclesLayer.hasTileAt(position.x, position.y)) {
             return 'no';
         }
 
-        const positions = this.characters.map(c => c.position);
+        const positions = this.charactersFiltered.map(c => c.position);
 
         if (positions.some(p => p.x === position.x && p.y === position.y)) {
             return 'last';

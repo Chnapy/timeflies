@@ -1,16 +1,13 @@
+import { BattleScene } from '../scenes/BattleScene';
 import { Spell, SpellType } from '../entities/Spell';
-import { Position, Character } from '../entities/Character';
+import { Character } from '../entities/Character';
 import { MapManager } from '../map/MapManager';
-import { BattleData, BattleScene } from '../scenes/BattleScene';
+import { CurrentSpellState } from './SpellEngine';
 
-export type SpellResultEnum = 'grid' | 'battleState' | 'charState';
-
-export type SpellResult = Partial<Record<SpellResultEnum, boolean>>;
-
-export abstract class SpellAct<T extends SpellType> {
+export abstract class SpellEngineAbstract<S extends Exclude<CurrentSpellState, 'none'>, T extends SpellType> {
 
     protected readonly scene: BattleScene;
-    protected readonly spell: Spell;
+    readonly spell: Spell;
     protected readonly character: Character;
     protected readonly map: MapManager;
     protected readonly characters: Character[];
@@ -23,7 +20,14 @@ export abstract class SpellAct<T extends SpellType> {
         this.characters = scene.battleData.characters;
     }
 
-    abstract async launch(targetPositions: Position[]): Promise<SpellResult>;
+    update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
+    }
+
+    onTileHover(pointer: Phaser.Input.Pointer): void {
+    }
+
+    onTileClick(pointer: Phaser.Input.Pointer): void {
+    }
 
     abstract cancel(): void;
 }

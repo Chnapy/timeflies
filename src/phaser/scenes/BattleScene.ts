@@ -1,10 +1,9 @@
 import { AssetManager } from '../../assetManager/AssetManager';
-import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { HUDScene } from '../../hud/HUDScene';
 import { Room } from '../../mocks/MockColyseus';
 import { Utils } from '../../Utils';
-import { BattleReducerManager, BattleStateAction } from '../battleReducers/BattleReducerManager';
+import { BattleReducerManager } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
 import { CharAction, CycleManager } from '../cycle/CycleManager';
 import { Character, CharacterType, Orientation } from '../entities/Character';
@@ -14,7 +13,7 @@ import { Team, TeamSnapshot } from '../entities/Team';
 import { WithSnapshot } from '../entities/WithSnapshot';
 import { MapInfos, MapManager as MapManager } from '../map/MapManager';
 import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
-import { BattleState, BattleStateManager, BattleStateMap } from '../stateManager/BattleStateManager';
+import { CurrentSpell, SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
 
 export interface BattleSnapshot {
@@ -28,12 +27,12 @@ export interface BattleRoomState {
     battleSnapshot: BattleSnapshot;
 }
 
-export interface BattleData<S extends BattleState = BattleState> {
+export interface BattleData {
     readonly teams: Team[];
     readonly players: Player[];
     readonly characters: Character[];
     currentCharacter?: Character;
-    battleState: BattleStateMap;
+    currentSpell?: CurrentSpell;
     readonly charActionStack: CharAction[];
 }
 
@@ -42,7 +41,9 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     private room!: BattleRoomManager;
     private dataStateManager!: DataStateManager;
     private cameraManager!: CameraManager;
-    private battleStateManager!: BattleStateManager<any>;
+
+    private spellEngine!: SpellEngine;
+
     private graphics!: Phaser.GameObjects.Graphics;
     map!: MapManager;
     private cycle!: CycleManager;
@@ -56,9 +57,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             teams: [],
             players: [],
             characters: [],
-            battleState: {
-                state: 'watch'
-            },
             charActionStack: []
         };
     }
@@ -98,6 +96,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.battleData.characters.forEach(c => c.init());
 
+        this.spellEngine = new SpellEngine(this, this.battleData);
+
         this.cycle = new CycleManager(this.room, this.dataStateManager, this.battleData);
 
         this.graphics = this.add.graphics();
@@ -106,10 +106,12 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         decorLayer
             .setInteractive()
-            .on('pointermove', (pointer: Phaser.Input.Pointer) => this.battleStateManager.onTileHover(pointer))
+            .on('pointermove', (pointer: Phaser.Input.Pointer) => {
+                this.spellEngine.onTileHover(pointer);
+            })
             .on('pointerup', (pointer: Phaser.Input.Pointer) => {
                 if (pointer.button === 0) {
-                    this.battleStateManager.onTileClick(pointer);
+                    this.spellEngine.onTileClick(pointer);
                 }
             });
 
@@ -121,16 +123,14 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
             this.room,
             this.dataStateManager,
             this.cameraManager,
-            () => this.battleStateManager,
-            battleStateManager => this.battleStateManager = battleStateManager,
+            this.spellEngine,
             this.graphics,
             this.map,
             this.cycle
         );
 
-        this.reducerManager.onStateChange({
-            type: 'battle/state',
-            stateObject: { state: 'watch' }
+        this.reducerManager.onWatch({
+            type: 'battle/watch'
         });
 
         BattleRoomManager.mockResponse<StartReceive>(2000, {
@@ -143,18 +143,9 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
 
         this.cycle.update(time, delta);
 
-        this.battleStateManager.update(time, delta, this.graphics);
+        this.spellEngine.update(time, delta, this.graphics);
 
         this.cameraManager.update(time, delta);
-    }
-
-    resetState(character?: Character): void {
-        Controller.dispatch<BattleStateAction>({
-            type: 'battle/state',
-            stateObject: character?.isMine
-                ? { state: 'idle' }
-                : { state: 'watch' }
-        });
     }
 
     getSnapshot(): BattleSnapshot {

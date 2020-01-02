@@ -1,9 +1,8 @@
-import { Position } from '../entities/Character';
-import { SpellAct, SpellResult } from './SpellAct';
+import { Position } from '../../entities/Character';
+import { SpellLaunch, SpellResult } from '../SpellLaunch';
+import { SpellType } from '../../entities/Spell';
 
-export class SpellActSample1 extends SpellAct<'sampleSpell1'
-    | 'sampleSpell2'
-    | 'sampleSpell3'> {
+export class SpellLaunchDefault extends SpellLaunch<Exclude<SpellType, 'move' | 'orientate'>> {
 
     private timeout?: NodeJS.Timeout;
 
@@ -24,7 +23,7 @@ export class SpellActSample1 extends SpellAct<'sampleSpell1'
         });
     }
 
-    cancel(): void {
+    protected beforeCancel(): void {
         if (this.timeout)
             clearTimeout(this.timeout);
     }

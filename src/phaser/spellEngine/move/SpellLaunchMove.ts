@@ -1,9 +1,9 @@
-import { SpellAct, SpellResult } from './SpellAct';
-import { Position } from '../entities/Character';
-import { Controller } from '../../Controller';
-import { BattleCharAction } from '../battleReducers/BattleReducerManager';
+import { SpellLaunch, SpellResult } from '../SpellLaunch';
+import { Position } from '../../entities/Character';
+import { Controller } from '../../../Controller';
+import { BattleSpellLaunchAction, BattleRollbackAction } from '../../battleReducers/BattleReducerManager';
 
-export class SpellActMove extends SpellAct<'move'> {
+export class SpellLaunchMove extends SpellLaunch<'move'> {
 
     private timeline?: Phaser.Tweens.Timeline;
 
@@ -27,7 +27,7 @@ export class SpellActMove extends SpellAct<'move'> {
         });
     }
 
-    cancel(): void {
+    protected beforeCancel(): void {
         this.onEnd();
     }
 
@@ -47,8 +47,8 @@ export class SpellActMove extends SpellAct<'move'> {
                 onStart: () => {
                     const nextPos = targetPositions.slice(i);
 
-                    Controller.dispatch<BattleCharAction>({
-                        type: 'battle/charAction',
+                    Controller.dispatch<BattleSpellLaunchAction>({
+                        type: 'battle/spell/launch',
                         charAction: {
                             startTime: Date.now(),
                             spell: this.spell,

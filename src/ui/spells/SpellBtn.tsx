@@ -2,7 +2,7 @@ import React from 'react';
 import { Spell } from '../../phaser/entities/Spell';
 import { Controller } from '../../Controller';
 import { BattleStateMap } from '../../phaser/stateManager/BattleStateManager';
-import { BattleStateAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { BattleSpellPrepareAction } from '../../phaser/battleReducers/BattleReducerManager';
 
 export interface SpellBtnProps {
     spell: Spell;
@@ -36,10 +36,10 @@ export const SpellBtn: React.FC<SpellBtnProps> = ({ spell, isActive, disabled })
                     }
                 };
 
-            Controller.dispatch<BattleStateAction>({
-                type: 'battle/state',
-                stateObject
-            });
+            // Controller.dispatch<BattleSpellPrepareAction>({
+            //     type: 'battle/state',
+            //     stateObject
+            // });
         }}
     >
         {name}
