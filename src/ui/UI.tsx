@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Character, Position } from '../phaser/entities/Character';
-import { SpellPane } from './spells/SpellPane';
 import { UIState } from './UIState';
 
 interface UIProps {
