@@ -1,13 +1,10 @@
-import { Reducer } from 'redux';
-import { UIState } from '../UIState';
+import { combineReducers, Reducer } from 'redux';
 import { GameAction } from '../../action/GameAction';
-import { combineReducers } from 'redux';
+import { UIState } from '../UIState';
 import { CharacterReducer } from './CharacterReducer';
-import { GameStateReducer } from './GameStateReducer';
 
 export const RootReducer: Reducer<UIState, GameAction> = (state: any, action) => {
     return combineReducers<UIState, GameAction>({
-        gameState: GameStateReducer,
         currentCharacter: CharacterReducer
     })(state, action);
 };

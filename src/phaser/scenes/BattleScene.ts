@@ -11,7 +11,7 @@ import { Player } from '../entities/Player';
 import { SpellType } from '../entities/Spell';
 import { Team, TeamSnapshot } from '../entities/Team';
 import { WithSnapshot } from '../entities/WithSnapshot';
-import { MapInfos, MapManager as MapManager } from '../map/MapManager';
+import { MapInfos, MapManager } from '../map/MapManager';
 import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
 import { CurrentSpell, SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
