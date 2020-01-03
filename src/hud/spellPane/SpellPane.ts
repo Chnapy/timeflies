@@ -1,42 +1,27 @@
-import { Spell } from '../../phaser/entities/Spell';
-import { HUDScene } from '../HUDScene';
-import { Cell } from '../layout/Cell';
-import { SpellBtn } from './SpellBtn';
 import { BattleTurnStartAction } from '../../phaser/battleReducers/BattleReducerManager';
-import { CurrentSpell } from '../../phaser/spellEngine/SpellEngine';
+import { Spell } from '../../phaser/entities/Spell';
+import { RectStyled, RectStyleProperties } from '../generics/RectStyled';
+import { HUDScene } from '../HUDScene';
+import { SpellBtn } from './SpellBtn';
 
-export class SpellPane extends Cell {
-
-    readonly container: Phaser.GameObjects.Container;
-    private readonly spellBtns: SpellBtn[];
+export class SpellPane extends RectStyled<SpellBtn> {
 
     constructor(scene: HUDScene) {
         super(scene);
-        this.container = scene.add.container(0, 0);
-        this.spellBtns = [];
     }
 
-    getRootGameObject(): Phaser.GameObjects.GameObject {
-        return this.container;
-    }
+    protected updateChild(child: SpellBtn, index: number, size: number): void {
 
-    protected updateSizes(): void {
-        this.container.setPosition(this.x, this.y);
+        const spellWidth = this.style.width / size;
+        const spellHeight = this.style.height;
 
-        const spellWidth = this.width / this.spellBtns.length;
-
-        this.spellBtns.forEach((btn, i) => btn.resize(i * spellWidth, 0, spellWidth, this.height));
+        child.resize(index * spellWidth, 0, spellWidth, spellHeight);
     }
 
     private setSpells(spells: Spell[]): void {
-        this.spellBtns.forEach(btn => btn.removeAllReducers());
-        this.spellBtns.length = 0;
-        this.container.removeAll(true);
+        this.clearChildren();
 
-        this.spellBtns.push(...spells.map(s => new SpellBtn(this.scene, s)));
-        this.container.add(this.spellBtns.map(s => s.getRootGameObject()));
-
-        this.updateSizes();
+        this.addChildren(...spells.map(s => new SpellBtn(this.scene, s)));
     }
 
     private readonly onTurnStart = this.reduce<BattleTurnStartAction>('battle/turn/start', ({
@@ -44,4 +29,16 @@ export class SpellPane extends Cell {
     }) => {
         this.setSpells(isMine ? spells : []);
     });
+
+    protected getDefaultStyle(): RectStyleProperties {
+        return {
+            ...super.getDefaultStyle(),
+
+            fillColor: 0x888888,
+
+            strokeWidth: 1,
+
+            strokeColor: 0xFFFFFF
+        };
+    }
 }

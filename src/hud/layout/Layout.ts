@@ -1,5 +1,4 @@
 import { HUDScene } from '../HUDScene';
-import { Cell } from './Cell';
 import { HasGameObject } from './HasGameObject';
 
 interface CellWrapper {
@@ -7,7 +6,7 @@ interface CellWrapper {
     cellY: number;
     cellWidth: number;
     cellHeight: number;
-    cell: Cell;
+    cell: HasGameObject;
 }
 
 export class Layout implements HasGameObject {
@@ -31,8 +30,8 @@ export class Layout implements HasGameObject {
 
     private readonly graphic: Phaser.GameObjects.Container;
 
-    constructor(scene: HUDScene, 
-        nbCellX: number, nbCellY: number, 
+    constructor(scene: HUDScene,
+        nbCellX: number, nbCellY: number,
         x: number, y: number,
         width: number, height: number) {
         this.scene = scene;
@@ -54,7 +53,7 @@ export class Layout implements HasGameObject {
 
     addCell(cellX: number, cellY: number,
         cellWidth: number, cellHeight: number,
-        cell: Cell): void {
+        cell: HasGameObject): void {
 
         const cellWrapper: CellWrapper = {
             cellX,
@@ -87,7 +86,11 @@ export class Layout implements HasGameObject {
     }
 
     update(time: number, delta: number): void {
-        this.cellWrappers.forEach(c => c.cell.update(time, delta));
+        this.cellWrappers.forEach(c => {
+            if (c.cell.update) {
+                c.cell.update(time, delta)
+            }
+        });
     }
 
     getRootGameObject() {
@@ -107,7 +110,7 @@ export class Layout implements HasGameObject {
     }
 
     private _debug(): void {
-        if(!HUDScene.DEBUG) {
+        if (!HUDScene.DEBUG) {
             return;
         }
 
@@ -120,8 +123,8 @@ export class Layout implements HasGameObject {
             this.width,
             this.height
         )
-        .setOrigin(0, 0)
-        .setStrokeStyle(2, 0xFF0000);
+            .setOrigin(0, 0)
+            .setStrokeStyle(2, 0xFF0000);
         this.debugRects.push(rootRect);
 
         for (let x = 0; x < this.nbCellX; x++) {
@@ -132,8 +135,8 @@ export class Layout implements HasGameObject {
                     this.cellWidth,
                     this.cellHeight
                 )
-                .setOrigin(0, 0)
-                .setStrokeStyle(1, 0x000, 0.1);
+                    .setOrigin(0, 0)
+                    .setStrokeStyle(1, 0x000, 0.1);
 
                 this.debugRects.push(rect);
             }

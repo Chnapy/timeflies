@@ -1,14 +1,17 @@
 import { AssetManager } from '../../assetManager/AssetManager';
 import { Controller } from '../../Controller';
-import { BattleSpellPrepareAction, BattleSpellLaunchAction, BattleWatchAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { BattleSpellLaunchAction, BattleSpellPrepareAction, BattleWatchAction } from '../../phaser/battleReducers/BattleReducerManager';
 import { Spell } from '../../phaser/entities/Spell';
-import { ReducerManager } from '../../ReducerManager';
+import { BasicStyleProperties, DefaultStyleEngine, Styled, StyleEngine } from '../generics/Styled';
 import { HUDScene } from '../HUDScene';
-import { HasGameObject } from '../layout/HasGameObject';
 
-export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject {
+export interface SpellBtnStyleProperties extends BasicStyleProperties {
 
-    static SIZE = 42;
+}
+
+export class SpellBtn extends Styled<SpellBtnStyleProperties> {
+
+    static readonly SIZE = 42;
 
     readonly spell: Spell;
 
@@ -19,8 +22,6 @@ export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject 
     private readonly graphicTimeText: Phaser.GameObjects.Text;
     private readonly graphicZoneText: Phaser.GameObjects.Text;
     private readonly graphicAttacText: Phaser.GameObjects.Text;
-
-    private readonly container: Phaser.GameObjects.Container;
 
     constructor(scene: HUDScene, spell: Spell) {
         super(scene);
@@ -46,13 +47,13 @@ export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject 
             'fontSize': '12px'
         });
 
-        this.container = scene.add.container(0, 0, [
+        this.container.add([
             this.graphicSprite,
             this.graphicTimeText,
             this.graphicZoneText,
             this.graphicAttacText
         ]);
-
+        
         this.graphicSprite
             .setFrame(AssetManager.spells.spellsMap[ spell.type ])
             .setDisplaySize(SpellBtn.SIZE, SpellBtn.SIZE)
@@ -119,6 +120,24 @@ export class SpellBtn extends ReducerManager<HUDScene> implements HasGameObject 
 
     getRootGameObject() {
         return this.container;
+    }
+
+    protected getDefaultStyle(): SpellBtnStyleProperties {
+        return {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        };
+    }
+    protected getStyleEngine(defaultStyleEngine: DefaultStyleEngine): StyleEngine<SpellBtnStyleProperties> {
+        return {
+            ...defaultStyleEngine,
+
+            width: v => {},
+
+            height: v => {},
+        }
     }
 
     private updateGraphics(): void {

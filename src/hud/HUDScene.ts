@@ -41,7 +41,7 @@ export class HUDScene extends ConnectedScene<'HUDScene', HUDSceneData> {
         this.timePane = new TimePane(this);
         this.timeline = new Timeline(this, battleData);
 
-        this.layout.addCell(3, 7, 4, 1, this.spellPane);
+        this.layout.addCell(3, 7, 4, 1, this.spellPane.init());
         this.layout.addCell(8, 4, 2, 4, this.timePane);
         this.layout.addCell(0, 0, 3, 8, this.timeline);
 

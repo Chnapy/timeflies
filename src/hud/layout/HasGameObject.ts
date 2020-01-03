@@ -1,6 +1,8 @@
 
 export interface HasGameObject extends Resizable {
 
+    update?(time: number, delta: number): void;
+
     getRootGameObject(): Phaser.GameObjects.GameObject;
 }
 
