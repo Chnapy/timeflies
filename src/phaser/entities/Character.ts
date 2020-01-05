@@ -16,6 +16,11 @@ export type CharacterState = 'idle' | 'move';
 
 export type Orientation = 'left' | 'right' | 'top' | 'bottom';
 
+export interface CharacterFeatures {
+    life: number;
+    actionTime: number;
+}
+
 export interface CharacterSnapshot {
     id: number;
     isMine: boolean;
@@ -23,9 +28,8 @@ export interface CharacterSnapshot {
     type: CharacterType;
     position: Position;
     orientation: Orientation;
-    // state: CharacterState;
-    life: number;
-    actionTime: number;
+    features: CharacterFeatures;
+    initialFeatures: CharacterFeatures;
     spellsSnapshots: SpellSnapshot[];
 }
 
@@ -58,8 +62,8 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         return this._orientation;
     }
 
-    life: number;
-    actionTime: number;
+    readonly initialFeatures: Readonly<CharacterFeatures>;
+    features: CharacterFeatures;
 
     readonly spells: Spell[];
 
@@ -72,7 +76,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     private graphicSprite!: Phaser.GameObjects.Sprite;
 
     constructor({
-        id, isMine, name, type, position, orientation, life, actionTime, spellsSnapshots
+        id, isMine, name, type, position, orientation, initialFeatures, features, spellsSnapshots
     }: CharacterSnapshot, player: Player, team: Team, scene: BattleScene) {
         this.scene = scene;
         this.id = id;
@@ -83,8 +87,8 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this.state = 'idle';
         this._orientation = orientation;
         this._position = position;
-        this.life = life;
-        this.actionTime = actionTime;
+        this.initialFeatures = initialFeatures;
+        this.features = features;
 
         this.player = player;
         this.team = team;
@@ -196,8 +200,8 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
             type: this.type,
             position: this.position,
             orientation: this.orientation,
-            life: this.life,
-            actionTime: this.actionTime,
+            initialFeatures: this.initialFeatures,
+            features: this.features,
             spellsSnapshots: this.spells.map(s => s.getSnapshot())
         };
     }
@@ -206,8 +210,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this.setPosition(snapshot.position, true);
         this.setOrientation(snapshot.orientation, false);
         this.setCharacterState('idle');
-        this.life = snapshot.life;
-        this.actionTime = snapshot.actionTime;
+        this.features = snapshot.features;
         snapshot.spellsSnapshots.forEach(sSnap => {
             const spell = this.spells.find(s => s.id === sSnap.id);
 

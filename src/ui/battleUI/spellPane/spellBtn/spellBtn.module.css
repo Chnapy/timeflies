@@ -1,0 +1,65 @@
+:root {
+  --spellBtn-border-width: var(--btn-border-width);
+
+  --spellBtn-size: 38px;
+  --spellBtn-inner-size: calc(36px - var(--spellBtn-border-width) * 2);
+}
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  height: var(--spellBtn-size);
+  margin: 4px;
+  background-color: var(--bg-color-2);
+}
+
+.root:not(:last-child) {
+  margin-right: 0;
+}
+
+.btnWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  height: 100%;
+  width: var(--spellBtn-size);
+}
+
+.btn {
+  vertical-align: middle;
+  width: var(--spellBtn-inner-size);
+  height: var(--spellBtn-inner-size);
+  border: var(--btn-border-color) solid var(--btn-border-width);
+  padding: 0;
+  overflow: hidden;
+}
+
+.btn > div {
+  --innerScale: calc(32 / 56);
+  --borderScale: calc(2 * 2 / 56);
+  transform: scale(calc(var(--innerScale) - var(--borderScale)));
+  transform-origin: 0 0;
+}
+
+.root:not(.active) .btn:hover {
+  width: var(--spellBtn-size);
+  height: var(--spellBtn-size);
+}
+
+.root:not(.active) .btn:hover > div {
+  --innerScale: calc(38 / 56);
+  --borderScale: calc(2 * 2 / 56);
+  transform: scale(calc(var(--innerScale) - var(--borderScale)));
+}
+
+.root.active > .btnWrapper {
+  border: var(--btn-border-color) solid var(--btn-border-width);
+}
+
+.root.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}

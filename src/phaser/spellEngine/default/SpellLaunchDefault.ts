@@ -13,7 +13,7 @@ export class SpellLaunchDefault extends SpellLaunch<Exclude<SpellType, 'move' | 
                 .some(tp => p.x === tp.x && p.y === tp.y));
 
         targets.forEach(target => {
-            target.life -= this.spell.attaque;
+            target.features.life -= this.spell.attaque;
         });
 
         return new Promise<SpellResult>(resolve => {

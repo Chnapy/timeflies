@@ -25,7 +25,7 @@ export class TimelineItem extends ReducerManager<HUDScene> implements HasGameObj
         this.faceImage = scene.add.image(0, 0, Character.getSheetKey(character.type), 'player_23.png')
             .setOrigin(0, 0.5);
 
-        this.nameText = scene.add.text(0, 0, `${character.name} ${character.life}`);
+        this.nameText = scene.add.text(0, 0, `${character.name} ${character.features.life}`);
         
         this.container = new Phaser.GameObjects.Container(scene, undefined, undefined, [
             this.faceImage,
@@ -35,7 +35,7 @@ export class TimelineItem extends ReducerManager<HUDScene> implements HasGameObj
     }
 
     update(time: number, delta: number): void {
-        this.nameText.setText(`${this.character.name} ${this.character.life}`);
+        this.nameText.setText(`${this.character.name} ${this.character.features.life}`);
         this.itemContent?.update();
     }
 

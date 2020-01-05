@@ -123,7 +123,7 @@ const AssetSpells: IAssetSpells = {
     image: spellsSpritesheetImage,
     schema: spellsSpritesheetSchema,
     spellsMap: {
-        move: '',
+        move: 'attack_mask',
         orientate: '',
         sampleSpell1: 'blizzard-1',
         sampleSpell2: 'sword-cold',

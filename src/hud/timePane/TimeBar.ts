@@ -63,7 +63,7 @@ export class TimeBar extends ReducerManager<HUDScene> implements HasGameObject {
             this.graphic.fillStyle(0x00FF00, 0.5);
             actions.forEach(({ startTime, spell: { time: spellTime } }, i) => {
                 const actionHeight = this.computeFrontHeight(
-                    this.currentTurn!.startTime + this.currentTurn!.character.actionTime - spellTime
+                    this.currentTurn!.startTime + this.currentTurn!.character.features.actionTime - spellTime
                 );
                 const actionY = this.computeFrontHeight(
                     startTime - Date.now() + time
@@ -103,7 +103,7 @@ export class TimeBar extends ReducerManager<HUDScene> implements HasGameObject {
             return 0;
         }
 
-        const { startTime, character: { actionTime } } = this.currentTurn;
+        const { startTime, character: { features:{actionTime} } } = this.currentTurn;
 
         const elapsedTime = time - startTime;
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from "react-redux";
 import { UIState } from "../../UIState";
-import { SpellBtn } from './SpellBtn';
+import { SpellBtn } from './spellBtn/SpellBtn';
 import css from './spellPane.module.css';
 import { SpellType } from '../../../phaser/entities/Spell';
 

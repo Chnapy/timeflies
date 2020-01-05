@@ -12,8 +12,14 @@ const charJ1Sample1: CharacterSnapshot = {
         y: 3
     },
     orientation: 'bottom',
-    life: 100,
-    actionTime: 9000,
+    initialFeatures: {
+        life: 100,
+        actionTime: 9000
+    },
+    features: {
+        life: 100,
+        actionTime: 9000
+    },
     spellsSnapshots: [
         {
             id: 1,
@@ -52,8 +58,14 @@ const charJ1Sample2: CharacterSnapshot = {
         y: 3
     },
     orientation: 'right',
-    life: 100,
-    actionTime: 7000,
+    initialFeatures: {
+        life: 100,
+        actionTime: 7000
+    },
+    features: {
+        life: 100,
+        actionTime: 7000
+    },
     spellsSnapshots: [
         {
             id: 5,
@@ -76,8 +88,14 @@ const charJ2Sample3: CharacterSnapshot = {
         y: 4
     },
     orientation: 'left',
-    life: 100,
-    actionTime: 5000,
+    initialFeatures: {
+        life: 100,
+        actionTime: 5000
+    },
+    features: {
+        life: 100,
+        actionTime: 5000
+    },
     spellsSnapshots: [
         {
             id: 3,
@@ -139,7 +157,7 @@ export const SampleData: BattleRoomState = {
         decorLayerKey: 'decors',
         obstaclesLayerKey: 'obstacles'
     },
-    characterTypes: [ 'sampleChar1', 'sampleChar2', 'sampleChar3' ],
+    characterTypes: ['sampleChar1', 'sampleChar2', 'sampleChar3'],
     spellTypes: [
         'move',
         'orientate',
