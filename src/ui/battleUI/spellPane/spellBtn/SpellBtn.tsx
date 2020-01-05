@@ -50,7 +50,6 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
     const typeName = AssetManager.spells.spellsMap[spellType];
 
     const onBtnClick = (e: React.MouseEvent): void => {
-        e.preventDefault();
         if (disabled || activeState === 'launch') {
             return;
         }
@@ -68,7 +67,7 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
 
         <div className={css.btnWrapper}>
 
-            <button className={classNames(css.btn)} onMouseUp={onBtnClick}>
+            <button className={classNames(css.btn)} onClick={onBtnClick}>
                 <div className={classNames(spriteCss.sprite, spriteCss[typeName])} />
             </button>
 
