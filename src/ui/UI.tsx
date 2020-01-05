@@ -1,22 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Character, Position } from '../phaser/entities/Character';
-import { UIState } from './UIState';
+import { UIState, UIStateData } from './UIState';
+import { BattleUI } from './battleUI/BattleUI';
 
 interface UIProps {
-    character: Character | null;
-    position?: Position;
+    dataState: UIStateData['state'];
 }
+
+const stateComponentMap: Record<UIStateData['state'], React.ComponentType> = {
+    'boot': () => null,
+    'load': () => null,
+    'battle': BattleUI
+};
 
 export const UI = connect<UIProps, {}, {}, UIState>(
     state => ({
-        character: state.currentCharacter,
-        position: state.currentCharacter?.position
+        dataState: state.data.state
     })
-)(class PUI extends React.Component<UIProps> {
+)(class PUI extends React.PureComponent<UIProps> {
 
     render() {
-        const { character, position } = this.props;
+        const { dataState } = this.props;
+
+        const Component = stateComponentMap[dataState];
 
         return <div style={{
             position: 'absolute',
@@ -27,37 +33,7 @@ export const UI = connect<UIProps, {}, {}, UIState>(
             pointerEvents: 'none'
         }}>
 
-            {/* {character
-                ? <div style={{
-                    pointerEvents: 'all'
-                }}>
-
-                    <SpellPane/>
-
-                    <table>
-                        <caption style={character.isMine
-                            ? { fontWeight: 600 }
-                            : undefined}>{character.name} - {character.type}</caption>
-                        <thead>
-                            <tr>
-                                <th>life</th>
-                                <th>position</th>
-                                <th>actionTime</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{character.life}</td>
-                                <td>{position!.x} - {position!.y}</td>
-                                <td>{character.actionTime}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </div>
-                : <div>
-                    No character playing
-                </div>} */}
+            <Component />
 
         </div>
     }

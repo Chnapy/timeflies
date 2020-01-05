@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 
 module.exports = {
     mode: "development",
@@ -9,7 +10,7 @@ module.exports = {
     entry: "./src/index.tsx",
     devtool: "source-map",
     resolve: {
-        extensions: [ ".ts", ".tsx", ".js", ".json" ]
+        extensions: [".ts", ".tsx", ".js", ".json"]
     },
     output: {
         path: path.join(__dirname, "/dist"),
@@ -21,6 +22,30 @@ module.exports = {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 loader: "ts-loader"
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 1,
+                            modules: {
+                                getLocalIdent: getCSSModuleLocalIdent,
+                            }
+                        }
+                    }
+                ],
+                include: /\.module\.css$/
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ],
+                exclude: /\.module\.css$/
             },
             {
                 test: /\.(gif|png|jpe?g|svg|xml|json)$/i,

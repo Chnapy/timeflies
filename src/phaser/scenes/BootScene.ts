@@ -1,9 +1,12 @@
 import { Controller } from '../../Controller';
+import { ReducerManager } from '../../ReducerManager';
 import { BattleRoomState } from './BattleScene';
 import { ConnectedScene } from './ConnectedScene';
-import { LoadScene } from './LoadScene';
+import { LoadScene, LoadLaunchAction } from './LoadScene';
 
 export class BootScene extends ConnectedScene<'BootScene'> {
+
+    private reducerManager!: ReducerManager<BootScene>;
 
     constructor() {
         super('BootScene');
@@ -13,10 +16,18 @@ export class BootScene extends ConnectedScene<'BootScene'> {
     }
 
     create(): void {
+        this.reducerManager = new class extends ReducerManager<BootScene> {
+            private readonly onLoadStartAction = this.reduce<LoadLaunchAction>('load/launch', ({ room }) => {
+                this.scene.start<LoadScene>('LoadScene', room);
+            });
+        }(this);
 
         Controller.client.joinOrCreate<BattleRoomState>('battle')
             .then(room => {
-                this.start<LoadScene>('LoadScene', room);
+                Controller.dispatch<LoadLaunchAction>({
+                    type: 'load/launch',
+                    room
+                });
             });
     }
 

@@ -16,6 +16,11 @@ import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
 import { CurrentSpell, SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
 
+export interface BattleSceneData {
+    room: Room<BattleRoomState>;
+    battleData: BattleData;
+}
+
 export interface BattleSnapshot {
     teamsSnapshots: TeamSnapshot[];
 }
@@ -36,7 +41,7 @@ export interface BattleData {
     readonly charActionStack: CharAction[];
 }
 
-export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomState>> implements WithSnapshot<BattleSnapshot> {
+export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> implements WithSnapshot<BattleSnapshot> {
 
     private room!: BattleRoomManager;
     private dataStateManager!: DataStateManager;
@@ -49,20 +54,16 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     private cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
 
-    readonly battleData: BattleData;
+    battleData!: BattleData;
 
     constructor() {
         super({ key: 'BattleScene' });
-        this.battleData = {
-            teams: [],
-            players: [],
-            characters: [],
-            charActionStack: []
-        };
     }
 
-    init(data: Room<BattleRoomState>) {
+    init(data: BattleSceneData) {
         super.init(data);
+
+        this.battleData = data.battleData;
 
         this.addScene<HUDScene>('HUDScene', HUDScene);
 
@@ -74,9 +75,9 @@ export class BattleScene extends ConnectedScene<'BattleScene', Room<BattleRoomSt
     preload = () => {
     };
 
-    create(data: Room<BattleRoomState>) {
+    create(data: BattleSceneData) {
 
-        this.room = new BattleRoomManager(data);
+        this.room = new BattleRoomManager(data.room);
 
         this.dataStateManager = new DataStateManager(this, this.room.state.battleSnapshot);
 

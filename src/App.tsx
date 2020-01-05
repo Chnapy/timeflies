@@ -4,6 +4,7 @@ import { Store } from 'redux';
 import { GameAction } from './action/GameAction';
 import { UI } from './ui/UI';
 import { UIState } from './ui/UIState';
+import './app.css';
 
 export interface AppProps {
     store: Store<UIState, GameAction>;

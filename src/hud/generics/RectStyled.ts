@@ -38,8 +38,6 @@ export class RectStyled<C extends Styled<any>> extends StyledParent<RectStylePro
         };
     }
 
-    addChildren(...args) {}
-
     protected getStyleEngine(defaultEngine: DefaultStyleEngine): StyleEngine<RectStyleProperties> {
 
         return {
@@ -47,16 +45,20 @@ export class RectStyled<C extends Styled<any>> extends StyledParent<RectStylePro
             
             width: v => {
                 if(v !== undefined) {
-                    // this.rectangle.width = v;
-                    // this.rectangle.geom
-                    this.rectangle.displayWidth = v;
+                    this.rectangle.setStrokeStyle(
+                        1,
+                        0xFFFFFF,
+                        this.rectangle.strokeAlpha
+                    )
+                    this.rectangle.width = v;
                 }
             },
 
             height: v => {
                 if(v !== undefined) {
-                    // this.rectangle.height = v;
-                    this.rectangle.displayHeight = v;
+                    this.rectangle.height = v;
+                    this.rectangle['geom'].setSize(this.rectangle.width, v);
+                    this.rectangle.updateDisplayOrigin()['updateData']();
                 }
             },
 

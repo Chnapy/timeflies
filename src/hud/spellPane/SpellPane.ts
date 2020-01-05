@@ -34,11 +34,9 @@ export class SpellPane extends RectStyled<SpellBtn> {
         return {
             ...super.getDefaultStyle(),
 
-            fillColor: 0x888888,
+            fillColor: Phaser.Display.Color.HexStringToColor('#34495e').color,
 
-            strokeWidth: 1,
-
-            strokeColor: 0xFFFFFF
+            fillAlpha: 0.5
         };
     }
 }

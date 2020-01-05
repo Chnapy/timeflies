@@ -1,0 +1,19 @@
+
+:root {
+
+    --bg-color-1: #232C3D;
+    --bg-color-2: #2F3A4F;
+    --bg-color-3: #525F78;
+
+    --font-color-1: #FFF;
+
+    --border-color-1: #FFF;
+    --border-width-1: 2px;
+
+    --pane-bg-color: var(--bg-color-1);
+    --pane-border-color: var(--border-color-1);
+    --pane-border-width: var(--border-width-1);
+
+    --btn-border-color: var(--border-color-1);
+    --btn-border-width: var(--border-width-1);
+}

@@ -8,8 +8,14 @@ import { Character } from '../entities/Character';
 import { SpellType } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
-import { BattleData, BattleScene } from '../scenes/BattleScene';
+import { BattleData, BattleScene, BattleRoomState } from '../scenes/BattleScene';
 import { SpellEngine } from '../spellEngine/SpellEngine';
+import { Room } from '../../mocks/MockColyseus';
+
+export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
+    room: Room<BattleRoomState>;
+    battleData: BattleData;
+}
 
 export interface BattleStartAction extends IGameAction<'battle/start'> {
 }
@@ -46,6 +52,7 @@ export interface BattleRollbackAction extends IGameAction<'battle/rollback'> {
 }
 
 export type BattleSceneAction =
+    | BattleLaunchAction
     | BattleStartAction
     | BattleTurnStartAction
     | BattleTurnEndAction
@@ -82,6 +89,11 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     readonly onSpellPrepare = this.reduce<BattleSpellPrepareAction>('battle/spell/prepare', ({
         spellType
     }) => {
+
+        if(this.battleData.currentSpell?.spell.type === spellType
+            && this.battleData.currentSpell.state === 'prepare') {
+                spellType = 'move';
+        }
 
         const spell = this.battleData.currentCharacter!.spells
             .find(s => s.type === spellType)!;

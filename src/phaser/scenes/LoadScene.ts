@@ -1,9 +1,19 @@
+import { IGameAction } from '../../action/GameAction';
 import { AssetManager } from '../../assetManager/AssetManager';
+import { Controller } from '../../Controller';
 import { Room } from '../../mocks/MockColyseus';
+import { BattleLaunchAction } from '../battleReducers/BattleReducerManager';
 import { Character } from '../entities/Character';
-import { BattleRoomState, BattleScene } from './BattleScene';
-import { ConnectedScene } from './ConnectedScene';
 import { Spell } from '../entities/Spell';
+import { BattleRoomState, BattleScene, BattleSceneData } from './BattleScene';
+import { ConnectedScene } from './ConnectedScene';
+
+export interface LoadLaunchAction extends IGameAction<'load/launch'> {
+    room: Room<BattleRoomState>;
+}
+
+export type LoadAction =
+    | LoadLaunchAction;
 
 export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>> {
 
@@ -17,13 +27,13 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
         const { mapKey } = mapInfos;
 
         // map tiles
-        this.load.image('tiles', AssetManager.maps[ mapKey ].image);
+        this.load.image('tiles', AssetManager.maps[mapKey].image);
 
         // map in json format
-        this.load.tilemapTiledJSON('map', AssetManager.maps[ mapKey ].schema);
+        this.load.tilemapTiledJSON('map', AssetManager.maps[mapKey].schema);
 
         characterTypes.forEach(type => {
-            const { image, schema } = AssetManager.characters[ type ];
+            const { image, schema } = AssetManager.characters[type];
 
             this.load.atlasXML(Character.getSheetKey(type), image, schema);
         });
@@ -34,7 +44,22 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
     create() {
         const room = this.initData;
 
-        this.start<BattleScene>('BattleScene', room);
+        const battleSceneData: BattleSceneData = {
+            room,
+            battleData: {
+                teams: [],
+                players: [],
+                characters: [],
+                charActionStack: []
+            }
+        }
+
+        Controller.dispatch<BattleLaunchAction>({
+            type: 'battle/launch',
+            ...battleSceneData
+        });
+
+        this.start<BattleScene>('BattleScene', battleSceneData);
     }
 
     update(time: number, delta: number): void {

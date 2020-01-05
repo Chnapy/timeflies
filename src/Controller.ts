@@ -57,9 +57,9 @@ export class Controller {
 
         Controller.game.emit(action);
 
-        // if (!action.onlyGame) {
-        //     Controller.store.dispatch(action);
-        // }
+        if (!action.onlyGame) {
+            Controller.store.dispatch(action);
+        }
 
     };
 

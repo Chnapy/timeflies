@@ -23,8 +23,11 @@ export abstract class ReducerManager<S extends Phaser.Scene> {
 
         this.reducerMap[ type ] = fn as any;
 
-        if (this.scene.events)
+        if (this.scene.events) {
             this.scene.events.on(type, fn, this);
+        } else {
+            throw new Error('Scene EventEmitter doesn\'t exist yet');
+        }
 
         return fn;
     }
