@@ -108,14 +108,14 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         decorLayer
             .setInteractive()
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
-                if(pointer.upElement?.localName !== 'canvas') {
+                if((pointer.event.target as any).localName !== 'canvas') {
                     return;
                 }
 
                 this.spellEngine.onTileHover(pointer);
             })
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, (pointer: Phaser.Input.Pointer) => {
-                if(pointer.upElement?.localName !== 'canvas') {
+                if((pointer.event.target as any).localName !== 'canvas') {
                     return;
                 }
                 
