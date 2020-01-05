@@ -32,7 +32,7 @@ export class TimelineItemContent extends ReducerManager<HUDScene> implements Has
     }
 
     update(): void {
-        const { isMine, actionTime, orientation, player, position, type, team } = this.character;
+        const { isMine, actionTime, orientation, position, type, team } = this.character;
         this.text.setText(`
         ${isMine ? 'IsMine\n' : ''}
         ${type} ${team.name}\n

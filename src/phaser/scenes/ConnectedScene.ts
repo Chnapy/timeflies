@@ -24,22 +24,22 @@ export abstract class ConnectedScene<K extends string, D extends {} | undefined 
     abstract update(time: number, delta: number): void;
 
     addScene<S extends ConnectedScene<any, any>>(
-        key: S[ 'key' ],
+        key: S['key'],
         sceneConfig: S | Phaser.Types.Scenes.SettingsConfig | Phaser.Types.Scenes.CreateSceneFromObjectConfig | Function
     ): S {
         return this.scene.add(key, sceneConfig, false) as S;
     }
 
     start<S extends ConnectedScene<any, any>>(
-        key: S[ 'key' ],
-        data: S[ 'initData' ]
+        key: S['key'],
+        data: S['initData']
     ): Phaser.Scenes.ScenePlugin {
         return this.scene.start(key, data);
     }
 
     launch<S extends ConnectedScene<any, any>>(
-        key: S[ 'key' ],
-        data: S[ 'initData' ]
+        key: S['key'],
+        data: S['initData']
     ): Phaser.Scenes.ScenePlugin {
         return this.scene.launch(key, data);
     }

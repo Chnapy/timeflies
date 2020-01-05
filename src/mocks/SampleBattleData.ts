@@ -98,12 +98,6 @@ const charJ2Sample3: CharacterSnapshot = {
     ]
 };
 
-const charactersSnapshots: CharacterSnapshot[] = [
-    charJ1Sample1,
-    charJ1Sample2,
-    charJ2Sample3
-];
-
 const teamsSnapshots: TeamSnapshot[] = [
     {
         id: 1,

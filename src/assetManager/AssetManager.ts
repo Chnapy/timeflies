@@ -1,11 +1,12 @@
 import { CharacterType, CharacterState, Orientation } from '../phaser/entities/Character';
-import sampleMap1Schema from '../_assets/map/map_2.json';
 import sampleMap1Image from '../_assets/map/map_2.png';
 import sampleSpritesheet1Image from '../_assets/spritesheets/sokoban_spritesheet.png';
 import sampleSpritesheet1Schema from '../_assets/spritesheets/sokoban_spritesheet.xml';
 import spellsSpritesheetImage from '../_assets/spritesheets/spells_spritesheet.png';
 import spellsSpritesheetSchema from '../_assets/spritesheets/spells_spritesheet.xml';
 import { SpellType } from '../phaser/entities/Spell';
+
+const sampleMap1Schema = require('../_assets/map/map_2.json');
 
 export type IAssetManager = typeof AssetManager;
 

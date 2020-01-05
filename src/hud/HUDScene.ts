@@ -2,9 +2,8 @@ import { BattleData } from '../phaser/scenes/BattleScene';
 import { ConnectedScene } from '../phaser/scenes/ConnectedScene';
 import { Layout } from './layout/Layout';
 import { HUDReducerManager } from './reducers/HUDReducerManager';
-import { SpellPane } from './spellPane/SpellPane';
-import { TimePane } from './timePane/TimePane';
 import { Timeline } from './timeline/Timeline';
+import { TimePane } from './timePane/TimePane';
 
 export interface HUDSceneData {
     battleData: BattleData;

@@ -1,7 +1,7 @@
-import { SpellLaunch, SpellResult } from '../SpellLaunch';
-import { Position } from '../../entities/Character';
 import { Controller } from '../../../Controller';
-import { BattleSpellLaunchAction, BattleRollbackAction } from '../../battleReducers/BattleReducerManager';
+import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
+import { Position } from '../../entities/Character';
+import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
 export class SpellLaunchMove extends SpellLaunch<'move'> {
 
@@ -10,7 +10,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
     async launch(targetPositions: Position[]): Promise<SpellResult> {
         const state = this.getLaunchState(targetPositions);
 
-        const [ firstPos, ...nextPos ] = targetPositions;
+        const [ firstPos ] = targetPositions;
 
         this.character.setPosition(firstPos, false, true, true);
 

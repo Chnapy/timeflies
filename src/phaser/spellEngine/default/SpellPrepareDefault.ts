@@ -53,7 +53,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
                 for (let i = 0; i < points.length; i++) {
                     const check = this.isPositionTargetable(points[ i ]);
                     if (check === 'no'
-                        || check === 'last' && i < points.length - 1) {
+                        || (check === 'last' && i < points.length - 1)) {
                         isTargetable = false;
                         break;
                     }

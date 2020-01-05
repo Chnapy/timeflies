@@ -81,8 +81,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         this.cycle.start();
     });
 
-    readonly onWatch = this.reduce<BattleWatchAction>('battle/watch', ({
-    }) => {
+    readonly onWatch = this.reduce<BattleWatchAction>('battle/watch', () => {
         this.spellEngine.watch();
     });
 

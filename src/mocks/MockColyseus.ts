@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as Colyseus from 'colyseus.js';
 import { SampleData } from './SampleBattleData';
 

@@ -39,6 +39,7 @@ export class GameEngine {
     }
 
     resize(width: number, height: number): void {
-        this.game.scale.resize(width, height);
+        if (this.game.canvas)
+            this.game.scale.resize(width, height);
     }
 }

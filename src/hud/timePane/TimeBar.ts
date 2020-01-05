@@ -1,11 +1,11 @@
-import { HasGameObject } from '../layout/HasGameObject';
-import { HUDScene } from '../HUDScene';
-import { Character } from '../../phaser/entities/Character';
-import { CharAction } from '../../phaser/cycle/CycleManager';
-import { ReducerManager } from '../../ReducerManager';
-import { BattleTurnStartAction, BattleSpellPrepareAction, BattleSpellLaunchAction } from '../../phaser/battleReducers/BattleReducerManager';
-import { Spell } from '../../phaser/entities/Spell';
 import { AssetManager } from '../../assetManager/AssetManager';
+import { BattleSpellLaunchAction, BattleTurnStartAction } from '../../phaser/battleReducers/BattleReducerManager';
+import { CharAction } from '../../phaser/cycle/CycleManager';
+import { Character } from '../../phaser/entities/Character';
+import { Spell } from '../../phaser/entities/Spell';
+import { ReducerManager } from '../../ReducerManager';
+import { HUDScene } from '../HUDScene';
+import { HasGameObject } from '../layout/HasGameObject';
 
 export class TimeBar extends ReducerManager<HUDScene> implements HasGameObject {
 
