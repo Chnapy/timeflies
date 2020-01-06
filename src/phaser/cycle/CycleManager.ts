@@ -17,7 +17,7 @@ export interface Turn {
     readonly startTime: Readonly<GameTime>;
     readonly turnDuration: number;
     readonly currentCharacter: Character;
-    currentSpell: CurrentSpell;
+    currentSpell?: CurrentSpell;
     readonly charActionStack: CharAction[];
 }
 
@@ -114,10 +114,6 @@ export class CycleManager {
             startTime,
             turnDuration: character.features.actionTime,
             currentCharacter: character,
-            currentSpell: {
-                state: 'prepare',
-                spell: character.spells.find(s => s.type === 'move')!
-            },
             charActionStack: []
         };
 

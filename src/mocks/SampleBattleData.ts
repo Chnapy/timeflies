@@ -45,7 +45,8 @@ const charJ1Sample1: CharacterSnapshot = {
             time: 200,
             attaque: -1
         }
-    ]
+    ],
+    defaultSpellId: 4
 };
 
 const charJ1Sample2: CharacterSnapshot = {
@@ -75,7 +76,8 @@ const charJ1Sample2: CharacterSnapshot = {
             time: 100,
             attaque: -1
         }
-    ]
+    ],
+    defaultSpellId: 5
 };
 
 const charJ2Sample3: CharacterSnapshot = {
@@ -113,7 +115,8 @@ const charJ2Sample3: CharacterSnapshot = {
             time: 100,
             attaque: -1
         }
-    ]
+    ],
+    defaultSpellId: 6
 };
 
 const teamsSnapshots: TeamSnapshot[] = [

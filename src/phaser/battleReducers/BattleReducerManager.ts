@@ -90,13 +90,13 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     }) => {
         const { currentTurn } = this.battleData;
 
-        if (currentTurn?.currentSpell.spell.type === spellType
-            && currentTurn.currentSpell.state === 'prepare') {
-            spellType = 'move';
-        }
+        const spell = currentTurn?.currentSpell?.spell.type === spellType
+            && currentTurn.currentSpell.state === 'prepare'
 
-        const spell = currentTurn?.currentCharacter.spells
-            .find(s => s.type === spellType)!;
+            ? currentTurn.currentCharacter.defaultSpell
+
+            : currentTurn?.currentCharacter.spells
+                .find(s => s.type === spellType)!;
 
         this.spellEngine.prepare(spell);
     });
@@ -165,7 +165,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         Controller.dispatch<BattleSpellPrepareAction | BattleWatchAction>(character?.isMine
             ? {
                 type: 'battle/spell/prepare',
-                spellType: 'move'
+                spellType: character.defaultSpell.type
             }
             : {
                 type: 'battle/watch'

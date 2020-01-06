@@ -15,9 +15,6 @@ export class SpellPrepareMove extends SpellPrepare<'move'> {
     }
 
     onTileHover(pointer: Phaser.Input.Pointer): void {
-        if (!this.character.canMove()) {
-            return;
-        }
 
         const pos: Position = {
             x: pointer.worldX,

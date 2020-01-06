@@ -103,7 +103,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
         if (this.rectHoveredIndex === -1) {
             Controller.dispatch<BattleSpellPrepareAction>({
                 type: 'battle/spell/prepare',
-                spellType: 'move'
+                spellType: this.character.defaultSpell.type
             });
             return;
         }

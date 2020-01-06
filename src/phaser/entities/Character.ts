@@ -31,6 +31,7 @@ export interface CharacterSnapshot {
     features: CharacterFeatures;
     initialFeatures: CharacterFeatures;
     spellsSnapshots: SpellSnapshot[];
+    defaultSpellId: number;
 }
 
 export class Character implements WithSnapshot<CharacterSnapshot> {
@@ -66,6 +67,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     features: CharacterFeatures;
 
     readonly spells: Spell[];
+    readonly defaultSpell: Spell;
 
     state: CharacterState;
     graphicContainer!: Phaser.GameObjects.Container;
@@ -76,7 +78,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     private graphicSprite!: Phaser.GameObjects.Sprite;
 
     constructor({
-        id, isMine, name, type, position, orientation, initialFeatures, features, spellsSnapshots
+        id, isMine, name, type, position, orientation, initialFeatures, features, defaultSpellId, spellsSnapshots
     }: CharacterSnapshot, player: Player, team: Team, scene: BattleScene) {
         this.scene = scene;
         this.id = id;
@@ -94,6 +96,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this.team = team;
 
         this.spells = spellsSnapshots.map(snap => new Spell(snap, this, scene));
+        this.defaultSpell = this.spells.find(s => s.id === defaultSpellId)!;
     }
 
     init(): this {
@@ -202,7 +205,8 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
             orientation: this.orientation,
             initialFeatures: this.initialFeatures,
             features: this.features,
-            spellsSnapshots: this.spells.map(s => s.getSnapshot())
+            spellsSnapshots: this.spells.map(s => s.getSnapshot()),
+            defaultSpellId: this.defaultSpell.id
         };
     }
 
