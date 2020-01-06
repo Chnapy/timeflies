@@ -13,11 +13,11 @@ interface SpellPaneInnerProps {
 const sideSpellTypes: SpellType[] = ['move', 'orientate'];
 
 export const SpellPane = connect<SpellPaneInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { currentCharacter } } }) => ({
-        mainSpellIds: currentCharacter?.spells
+    ({ data: { battleData: { currentTurn } } }) => ({
+        mainSpellIds: currentTurn?.currentCharacter.spells
             .filter(s => !sideSpellTypes.includes(s.type))
             .map(s => s.id) || [],
-        sideSpellIds: currentCharacter?.spells
+        sideSpellIds: currentTurn?.currentCharacter.spells
             .filter(s => sideSpellTypes.includes(s.type))
             .map(s => s.id) || []
     })

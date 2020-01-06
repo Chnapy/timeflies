@@ -26,7 +26,7 @@ export class TimeStack extends ReducerManager<HUDScene> implements HasGameObject
     }
 
     private readonly onTurnStart = this.reduce<BattleTurnStartAction>('battle/turn/start', ({
-        character, time
+        character
     }) => {
         this.charActions.clear();
         this.container.removeAll();

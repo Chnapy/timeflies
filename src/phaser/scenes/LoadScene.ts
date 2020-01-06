@@ -49,8 +49,7 @@ export class LoadScene extends ConnectedScene<'LoadScene', Room<BattleRoomState>
             battleData: {
                 teams: [],
                 players: [],
-                characters: [],
-                charActionStack: []
+                characters: []
             }
         }
 

@@ -25,7 +25,7 @@ export class SpellPane extends RectStyled<SpellBtn> {
     }
 
     private readonly onTurnStart = this.reduce<BattleTurnStartAction>('battle/turn/start', ({
-        character: {isMine, spells}, time
+        character: {isMine, spells}
     }) => {
         this.setSpells(isMine ? spells : []);
     });

@@ -5,7 +5,7 @@ import { Room } from '../../mocks/MockColyseus';
 import { Utils } from '../../Utils';
 import { BattleReducerManager } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CharAction, CycleManager } from '../cycle/CycleManager';
+import { CycleManager, Turn } from '../cycle/CycleManager';
 import { Character, CharacterType, Orientation } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { SpellType } from '../entities/Spell';
@@ -13,7 +13,7 @@ import { Team, TeamSnapshot } from '../entities/Team';
 import { WithSnapshot } from '../entities/WithSnapshot';
 import { MapInfos, MapManager } from '../map/MapManager';
 import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
-import { CurrentSpell, SpellEngine } from '../spellEngine/SpellEngine';
+import { SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
 
 export interface BattleSceneData {
@@ -36,9 +36,7 @@ export interface BattleData {
     readonly teams: Team[];
     readonly players: Player[];
     readonly characters: Character[];
-    currentCharacter?: Character;
-    currentSpell?: CurrentSpell;
-    readonly charActionStack: CharAction[];
+    currentTurn?: Turn;
 }
 
 export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> implements WithSnapshot<BattleSnapshot> {

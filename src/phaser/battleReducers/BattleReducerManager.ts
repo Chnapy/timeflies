@@ -3,7 +3,7 @@ import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { ReducerManager } from '../../ReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CharAction, CycleManager } from '../cycle/CycleManager';
+import { CharAction, CycleManager, GameTime } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
 import { SpellType } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
@@ -22,7 +22,7 @@ export interface BattleStartAction extends IGameAction<'battle/start'> {
 
 export interface BattleTurnStartAction extends IGameAction<'battle/turn/start'> {
     character: Character;
-    time: number;
+    startTime: GameTime;
 }
 
 export interface BattleTurnEndAction extends IGameAction<'battle/turn/end'> {
@@ -88,13 +88,14 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     readonly onSpellPrepare = this.reduce<BattleSpellPrepareAction>('battle/spell/prepare', ({
         spellType
     }) => {
+        const { currentTurn } = this.battleData;
 
-        if(this.battleData.currentSpell?.spell.type === spellType
-            && this.battleData.currentSpell.state === 'prepare') {
-                spellType = 'move';
+        if (currentTurn?.currentSpell.spell.type === spellType
+            && currentTurn.currentSpell.state === 'prepare') {
+            spellType = 'move';
         }
 
-        const spell = this.battleData.currentCharacter!.spells
+        const spell = currentTurn?.currentCharacter.spells
             .find(s => s.type === spellType)!;
 
         this.spellEngine.prepare(spell);
@@ -109,6 +110,8 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         this.spellEngine.cancel();
 
         this.dataStateManager.commit();
+
+        delete this.battleData.currentTurn;
 
         Controller.dispatch<BattleWatchAction>({
             type: 'battle/watch',

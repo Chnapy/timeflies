@@ -6,6 +6,20 @@ import { Player } from '../entities/Player';
 import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
 import { BattleData } from '../scenes/BattleScene';
 import { Spell } from '../entities/Spell';
+import { CurrentSpell } from '../spellEngine/SpellEngine';
+
+export interface GameTime {
+    phaserTime: number;
+    dateTime: number;
+}
+
+export interface Turn {
+    readonly startTime: Readonly<GameTime>;
+    readonly turnDuration: number;
+    readonly currentCharacter: Character;
+    currentSpell: CurrentSpell;
+    readonly charActionStack: CharAction[];
+}
 
 export interface CharAction {
     spell: Spell;
@@ -27,7 +41,9 @@ export class CycleManager {
     private currentIndex: number;
     private lastTime?: number;
 
-    private charActionStack: CharAction[];
+    private get charActionStack(): CharAction[] {
+        return this.battleData.currentTurn!.charActionStack;
+    }
 
     constructor(room: BattleRoomManager, dataStateManager: DataStateManager, battleData: BattleData) {
         this.room = room;
@@ -37,7 +53,6 @@ export class CycleManager {
         this.characters = battleData.characters;
         this.currentIndex = 0;
         this.running = false;
-        this.charActionStack = battleData.charActionStack;
     }
 
     start(): void {
@@ -52,13 +67,13 @@ export class CycleManager {
         if (!this.lastTime) {
             this.lastTime = time;
             this.currentIndex = 0;
-            this.startTurn(this.getCurrentCharacter(), time);
+            this.startTurn(this.getCurrentCharacter(), time, Date.now());
             return;
         }
 
         const currentCharacter = this.getCurrentCharacter();
         const elapsedTime = time - this.lastTime;
-        const { actionTime } = currentCharacter;
+        const { actionTime } = currentCharacter.features;
 
         if (elapsedTime > actionTime) {
             this.endTurn(currentCharacter);
@@ -69,7 +84,7 @@ export class CycleManager {
                 this.currentIndex = 0;
             }
 
-            this.startTurn(this.getCurrentCharacter(), this.lastTime);
+            this.startTurn(this.getCurrentCharacter(), this.lastTime, Date.now());
         }
     }
 
@@ -88,15 +103,28 @@ export class CycleManager {
         }, charAction.startTime);
     }
 
-    private startTurn(character: Character, time: number): void {
-        this.charActionStack.length = 0;
+    private startTurn(character: Character, phaserTime: number, dateTime: number): void {
 
-        this.battleData.currentCharacter = character;
+        const startTime: GameTime = {
+            phaserTime,
+            dateTime
+        };
+
+        this.battleData.currentTurn = {
+            startTime,
+            turnDuration: character.features.actionTime,
+            currentCharacter: character,
+            currentSpell: {
+                state: 'prepare',
+                spell: character.spells.find(s => s.type === 'move')!
+            },
+            charActionStack: []
+        };
 
         Controller.dispatch<BattleTurnStartAction>({
             type: 'battle/turn/start',
             character,
-            time
+            startTime
         });
     }
 
@@ -108,6 +136,6 @@ export class CycleManager {
     }
 
     private getCurrentCharacter(): Character {
-        return this.characters[ this.currentIndex ];
+        return this.characters[this.currentIndex];
     }
 }

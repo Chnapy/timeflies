@@ -71,10 +71,11 @@ export class SpellEngine {
 
     private setState(currentSpell: CurrentSpell | undefined): void {
 
-        this.battleData.currentSpell = currentSpell;
         if (!currentSpell) {
+            delete this.battleData.currentTurn?.currentSpell;
             delete this.engine;
         } else {
+            this.battleData.currentTurn!.currentSpell = currentSpell;
             this.engine = this.getSpellEngine(currentSpell, this.scene);
         }
     }

@@ -24,15 +24,15 @@ interface SpellBtnInnerProps {
 
 export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIState<'battle'>>(
     ({
-        data: { battleData: { currentCharacter, currentSpell } }
+        data: { battleData: { currentTurn } }
     }, {
         spellId
     }) => {
-        const spell = currentCharacter!.spells.find(s => s.id === spellId)!;
-        const activeState = currentSpell?.spell.id === spellId ? currentSpell.state : 'none';
+        const spell = currentTurn!.currentCharacter.spells.find(s => s.id === spellId)!;
+        const activeState = currentTurn!.currentSpell.spell.id === spellId ? currentTurn!.currentSpell.state : 'none';
         return {
             activeState,
-            disabled: activeState === 'none' && currentSpell?.state === 'launch',
+            disabled: activeState === 'none' && currentTurn!.currentSpell.state === 'launch',
             spellType: spell.type,
             spellInfos: {
                 time: spell.time,
@@ -49,7 +49,7 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
 
     const typeName = AssetManager.spells.spellsMap[spellType];
 
-    const onBtnClick = (e: React.MouseEvent): void => {
+    const onBtnClick = (): void => {
         if (disabled || activeState === 'launch') {
             return;
         }

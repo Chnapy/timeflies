@@ -113,7 +113,7 @@ export class TimeBar extends ReducerManager<HUDScene> implements HasGameObject {
     }
 
     private readonly onTurnStart = this.reduce<BattleTurnStartAction>('battle/turn/start', ({
-        character, time
+        character, startTime: {phaserTime: time}
     }) => {
         this.currentTurn?.images.forEach(child => this.container.remove(child));
         this.currentTurn = {

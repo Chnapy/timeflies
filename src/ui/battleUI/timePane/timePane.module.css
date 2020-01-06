@@ -1,0 +1,8 @@
+.root {
+  background-color: var(--pane-bg-color);
+  border-top: var(--pane-border-width) solid var(--pane-border-color);
+}
+
+.main_content {
+    height: 200px;
+}
