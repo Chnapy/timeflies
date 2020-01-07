@@ -50,8 +50,10 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                     Controller.dispatch<BattleSpellLaunchAction>({
                         type: 'battle/spell/launch',
                         charAction: {
+                            state: 'running',
                             startTime: Date.now(),
                             spell: this.spell,
+                            duration: this.spell.time,
                             positions: nextPos
                         }
                     });

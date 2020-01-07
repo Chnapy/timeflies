@@ -2,10 +2,12 @@ import React, { useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import { UIState } from "../../../UIState";
 import css from './timeGauge.module.css';
+import classNames from "classnames";
 
 interface TimeGaugeInnerProps {
     startDateTime: number;
     turnDuration: number;
+    disabled: boolean;
 }
 
 export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>(
@@ -14,11 +16,13 @@ export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>
         return {
             startDateTime: currentTurn?.startTime.dateTime || 0,
             turnDuration: currentTurn?.turnDuration || 0,
+            disabled: !currentTurn || !currentTurn.currentCharacter.isMine
         };
     }
 )(({
     startDateTime,
-    turnDuration
+    turnDuration,
+    disabled
 }: TimeGaugeInnerProps) => {
 
     const now = Date.now();
@@ -50,7 +54,9 @@ export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>
 
     });
 
-    return <div className={css.root}>
+    return <div className={classNames(css.root, {
+        [css.disabled]: disabled
+    })}>
             <div ref={frontRef} className={css.gauge_front} />
     </div>;
 });

@@ -6,12 +6,12 @@
   padding: 20px;
 }
 
-.root > * {
-  pointer-events: all;
-}
-
 .row_bottom {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+}
+
+.row_bottom > * {
+  pointer-events: all;
 }

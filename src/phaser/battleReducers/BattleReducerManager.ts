@@ -37,7 +37,7 @@ export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prep
 }
 
 export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
-    charAction: CharAction;
+    charAction: CharAction<'running'>;
     callback?: (promise: SendPromise<CharActionSend>) => void;
 }
 
@@ -155,8 +155,10 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         config
     }) => {
         if (config.by === 'time') {
+            this.cycle.cancelCharActionByTime(config.time, Date.now());
             this.dataStateManager.rollbackByTime(config.time);
         } else {
+            this.cycle.cancelCharActionLast(Date.now());
             this.dataStateManager.rollbackLast(config.nb);
         }
     });

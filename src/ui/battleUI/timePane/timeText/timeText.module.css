@@ -1,0 +1,13 @@
+
+.root {
+    width: 28px;
+    background-color: var(--bg-color-2);
+    color: #fff;
+    text-align: center;
+    font-size: 0.8em;
+    padding: 4px;
+}
+
+.root.disabled {
+  opacity: 0.5;
+}

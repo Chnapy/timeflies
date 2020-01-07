@@ -21,11 +21,20 @@ export interface Turn {
     readonly charActionStack: CharAction[];
 }
 
-export interface CharAction {
+//TODO handle state
+export type CharActionState = 'running' | 'complete' | 'canceled';
+
+export type CharAction<S extends CharActionState = CharActionState> = {
+    state: S;
     spell: Spell;
     positions: Position[];
     startTime: number;
-}
+    duration: number;
+} & (S extends 'canceled'
+    ? {
+        cancelTime: number;
+    }
+    : {});
 
 export class CycleManager {
 
@@ -57,6 +66,7 @@ export class CycleManager {
 
     start(): void {
         this.running = true;
+        // setTimeout(() => this.running = false, 500);
     }
 
     update(time: number, delta: number): void {
@@ -70,6 +80,13 @@ export class CycleManager {
             this.startTurn(this.getCurrentCharacter(), time, Date.now());
             return;
         }
+
+        // const lastCharAction = this.charActionStack[this.charActionStack.length - 1];
+        // if (lastCharAction && lastCharAction.state === 'running') {
+        //     if (Date.now() > lastCharAction.startTime + lastCharAction.duration) {
+        //         lastCharAction.state = 'complete';
+        //     }
+        // }
 
         const currentCharacter = this.getCurrentCharacter();
         const elapsedTime = time - this.lastTime;
@@ -101,6 +118,18 @@ export class CycleManager {
                 positions: charAction.positions
             }
         }, charAction.startTime);
+    }
+
+    cancelCharActionByTime(startTime: number, cancelTime: number): void {
+        const charAction = this.charActionStack.find(ca => ca.startTime === startTime)!;
+        charAction.state = 'canceled';
+        (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
+    }
+
+    cancelCharActionLast(cancelTime: number): void {
+        const charAction = this.charActionStack[this.charActionStack.length - 1];
+        charAction.state = 'canceled';
+        (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
     }
 
     private startTurn(character: Character, phaserTime: number, dateTime: number): void {

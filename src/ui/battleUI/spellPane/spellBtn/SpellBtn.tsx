@@ -28,11 +28,17 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
     }, {
         spellId
     }) => {
-        const spell = currentTurn!.currentCharacter.spells.find(s => s.id === spellId)!;
-        const activeState = currentTurn!.currentSpell?.spell.id === spellId ? currentTurn!.currentSpell.state : 'none';
+        const { currentCharacter, currentSpell } = currentTurn!;
+
+        const spell = currentCharacter.spells.find(s => s.id === spellId)!;
+        const activeState = currentSpell?.spell.id === spellId ? currentSpell.state : 'none';
+        const disabled = currentCharacter.isMine
+            ? activeState === 'none' && currentSpell?.state === 'launch'
+            : true;
+
         return {
             activeState,
-            disabled: activeState === 'none' && currentTurn!.currentSpell?.state === 'launch',
+            disabled,
             spellType: spell.type,
             spellInfos: {
                 time: spell.time,
@@ -73,7 +79,7 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
 
         </div>
 
-        <SpellBtnInfos {...spellInfos}/>
+        <SpellBtnInfos {...spellInfos} />
 
     </div>;
 });

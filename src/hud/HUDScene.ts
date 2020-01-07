@@ -3,7 +3,6 @@ import { ConnectedScene } from '../phaser/scenes/ConnectedScene';
 import { Layout } from './layout/Layout';
 import { HUDReducerManager } from './reducers/HUDReducerManager';
 import { Timeline } from './timeline/Timeline';
-import { TimePane } from './timePane/TimePane';
 
 export interface HUDSceneData {
     battleData: BattleData;
@@ -17,7 +16,7 @@ export class HUDScene extends ConnectedScene<'HUDScene', HUDSceneData> {
 
     private layout!: Layout;
     // private spellPane!: SpellPane;
-    private timePane!: TimePane;
+    // private timePane!: TimePane;
     private timeline!: Timeline;
 
     constructor() {
@@ -37,11 +36,11 @@ export class HUDScene extends ConnectedScene<'HUDScene', HUDSceneData> {
         );
 
         // this.spellPane = new SpellPane(this);
-        this.timePane = new TimePane(this);
+        // this.timePane = new TimePane(this);
         this.timeline = new Timeline(this, battleData);
 
         // this.layout.addCell(3, 7, 4, 1, this.spellPane.init());
-        this.layout.addCell(8, 4, 2, 4, this.timePane);
+        // this.layout.addCell(8, 4, 2, 4, this.timePane);
         this.layout.addCell(0, 0, 3, 8, this.timeline);
 
         this.reducerManager = new HUDReducerManager(this);

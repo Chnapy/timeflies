@@ -111,8 +111,10 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
         Controller.dispatch<BattleSpellLaunchAction>({
             type: 'battle/spell/launch',
             charAction: {
+                state: 'running',
                 startTime: Date.now(),
                 spell: this.spell,
+                duration: this.spell.time,
                 positions: [ this.lastPositionHovered! ]
             }
         });
