@@ -1,8 +1,7 @@
-import { HUDScene } from '../HUDScene';
 import { HasGameObject } from './HasGameObject';
 import { ReducerManager } from '../../ReducerManager';
 
-export abstract class Cell extends ReducerManager<HUDScene> implements HasGameObject {
+export abstract class Cell extends ReducerManager<Phaser.Scene> implements HasGameObject {
 
     protected debugRect?: Phaser.GameObjects.Rectangle;
 
@@ -11,7 +10,7 @@ export abstract class Cell extends ReducerManager<HUDScene> implements HasGameOb
     protected width: number;
     protected height: number;
 
-    constructor(scene: HUDScene) {
+    constructor(scene: Phaser.Scene) {
         super(scene);
         this.x = 0;
         this.y = 0;
@@ -36,9 +35,6 @@ export abstract class Cell extends ReducerManager<HUDScene> implements HasGameOb
     protected abstract updateSizes(): void;
 
     protected _debug() {
-        if (!HUDScene.DEBUG) {
-            return;
-        }
 
         if (!this.debugRect) {
             this.debugRect = this.scene.add.rectangle()

@@ -1,4 +1,3 @@
-import { HUDScene } from '../HUDScene';
 import { HasGameObject } from './HasGameObject';
 
 interface CellWrapper {
@@ -13,7 +12,7 @@ export class Layout implements HasGameObject {
 
     private debugRects: Phaser.GameObjects.Rectangle[];
 
-    private readonly scene: HUDScene;
+    private readonly scene: Phaser.Scene;
 
     private x: number;
     private y: number;
@@ -25,12 +24,12 @@ export class Layout implements HasGameObject {
 
     private readonly nbCellX: number;
     private readonly nbCellY: number;
-
+ 
     private readonly cellWrappers: CellWrapper[];
 
     private readonly graphic: Phaser.GameObjects.Container;
 
-    constructor(scene: HUDScene,
+    constructor(scene: Phaser.Scene,
         nbCellX: number, nbCellY: number,
         x: number, y: number,
         width: number, height: number) {
@@ -110,9 +109,6 @@ export class Layout implements HasGameObject {
     }
 
     private _debug(): void {
-        if (!HUDScene.DEBUG) {
-            return;
-        }
 
         this.debugRects.forEach(r => r.destroy());
         this.debugRects.length = 0;

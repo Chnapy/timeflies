@@ -1,6 +1,5 @@
 import { AssetManager } from '../../assetManager/AssetManager';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
-import { HUDScene } from '../../hud/HUDScene';
 import { Room } from '../../mocks/MockColyseus';
 import { Utils } from '../../Utils';
 import { BattleReducerManager } from '../battleReducers/BattleReducerManager';
@@ -62,12 +61,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         super.init(data);
 
         this.battleData = data.battleData;
-
-        this.addScene<HUDScene>('HUDScene', HUDScene);
-
-        this.launch<HUDScene>('HUDScene', {
-            battleData: this.battleData
-        });
     };
 
     preload = () => {
