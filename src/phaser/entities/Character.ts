@@ -3,6 +3,7 @@ import { Player } from './Player';
 import { Spell, SpellSnapshot } from './Spell';
 import { Team } from "./Team";
 import { WithSnapshot } from './WithSnapshot';
+import { CharacterGraphic } from './CharacterGraphic';
 
 export type CharacterType =
     | 'sampleChar1'
@@ -70,12 +71,11 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     readonly defaultSpell: Spell;
 
     state: CharacterState;
-    graphicContainer!: Phaser.GameObjects.Container;
 
     readonly player: Player;
     readonly team: Team;
 
-    private graphicSprite!: Phaser.GameObjects.Sprite;
+    private readonly characterGraphic: CharacterGraphic;
 
     constructor({
         id, isMine, name, type, position, orientation, initialFeatures, features, defaultSpellId, spellsSnapshots
@@ -97,27 +97,20 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
 
         this.spells = spellsSnapshots.map(snap => new Spell(snap, this, scene));
         this.defaultSpell = this.spells.find(s => s.id === defaultSpellId)!;
+
+        this.characterGraphic = new CharacterGraphic(scene, this);
     }
 
     init(): this {
-        const worldPosition = this.scene.map.tileToWorldPosition(this.position, true);
+        this.characterGraphic.init();
 
-        this.graphicContainer = this.scene.add.container(worldPosition.x + 0.5, worldPosition.y + 0.5);
-
-        const { tileWidth, tileHeight } = this.scene.map.tilemap;
-        const graphicSquare = new Phaser.GameObjects.Rectangle(this.scene, 0, 0, tileWidth, tileHeight);
-        graphicSquare.setStrokeStyle(1, this.team.color);
-
-        this.graphicSprite = this.scene.add.sprite(0, 0, Character.getSheetKey(this.type));
-
-        this.graphicContainer.add([
-            graphicSquare,
-            this.graphicSprite
-        ]);
-
-        this.updateAnimation();
+        this.characterGraphic.updateAnimation();
 
         return this;
+    }
+
+    initHUD(): void {
+        this.characterGraphic.initHUD();
     }
 
     setCharacterState(state: CharacterState): void {
@@ -126,7 +119,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         }
         this.state = state;
 
-        this.updateAnimation();
+        this.characterGraphic.updateAnimation();
     }
 
     setCharacterOrientation(orientation: Orientation): void {
@@ -135,7 +128,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         }
         this._orientation = orientation;
 
-        this.updateAnimation();
+        this.characterGraphic.updateAnimation();
     }
 
     setPosition(position: Position, updatePositionGraphic: boolean,
@@ -150,8 +143,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         }
 
         if (updatePositionGraphic) {
-            const worldPosition = this.scene.map.tileToWorldPosition(position, true);
-            this.graphicContainer.setPosition(worldPosition.x, worldPosition.y);
+            this.characterGraphic.updatePosition();
         }
 
         return this;
@@ -164,7 +156,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this._orientation = orientation;
 
         if (updateOrientationGraphic) {
-            this.updateAnimation();
+            this.characterGraphic.updateAnimation();
         }
 
         return this;
@@ -185,6 +177,18 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
                 ? 'bottom'
                 : 'top';
         }
+    }
+
+    receiveSpell(spell: Spell): void {
+        if(spell.attaque) {
+            this.features.life -= spell.attaque;
+            this.characterGraphic.updateLife();
+        }
+        this.characterGraphic.receiveSpell(spell);
+    }
+    
+    removeSpell(): void {
+        this.characterGraphic.removeSpell();
     }
 
     canMove(): boolean {
@@ -222,10 +226,10 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         });
     }
 
-    private updateAnimation(): void {
-        this.graphicSprite.anims.play(
-            Character.getAnimKey(this.type, this.state, this.orientation),
-            true
-        );
+    getGraphics(): Phaser.GameObjects.Container[] {
+        return [
+            this.characterGraphic.containerSprite,
+            this.characterGraphic.containerHUD
+        ];
     }
 }

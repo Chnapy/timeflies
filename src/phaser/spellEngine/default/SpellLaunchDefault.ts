@@ -13,13 +13,17 @@ export class SpellLaunchDefault extends SpellLaunch<Exclude<SpellType, 'move' | 
                 .some(tp => p.x === tp.x && p.y === tp.y));
 
         targets.forEach(target => {
-            target.features.life -= this.spell.attaque;
+            target.receiveSpell(this.spell);
         });
 
         return new Promise<SpellResult>(resolve => {
-            this.timeout = global.setTimeout(() => resolve({
-                battleState: true
-            }), this.spell.time);
+            this.timeout = global.setTimeout(() => {
+                targets.forEach(target => target.removeSpell());
+
+                resolve({
+                    battleState: true
+                });
+            }, this.spell.time);
         });
     }
 

@@ -2,7 +2,6 @@
   background-color: var(--bg-color-2);
   border-left: 2px solid;
   padding: 8px;
-  color: #fff;
 }
 
 .root:not(:first-child) {
@@ -72,7 +71,7 @@
 
 .lifeBarFront {
   height: 100%;
-  background-color: #a64c4b;
+  background-color: var(--life-color);
   border-right: 1px solid #bd7979;
 }
 

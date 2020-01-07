@@ -15,5 +15,5 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: #F2CF3F;
+    background-color: var(--time-color);
 }

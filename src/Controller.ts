@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { applyMiddleware, createStore, Store } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { createStore, Store } from 'redux';
 import ResizeObserver from 'resize-observer-polyfill';
 import { GameAction } from './action/GameAction';
 import { App } from './App';
+import * as Colyseus from './mocks/MockColyseus';
+import { BattleTurnStartAction } from './phaser/battleReducers/BattleReducerManager';
 import { GameEngine } from './phaser/GameEngine';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
-import * as Colyseus from './mocks/MockColyseus';
-import { BattleTurnStartAction } from './phaser/battleReducers/BattleReducerManager';
 
 const CLIENT_ENDPOINT = 'ws://echo.websocket.org';
 
@@ -24,9 +23,7 @@ export class Controller {
     static start(): Controller {
 
         Controller.store = createStore<UIState, GameAction, any, any>(
-            RootReducer,
-            composeWithDevTools(applyMiddleware(
-            ))
+            RootReducer
         );
 
         Controller.client = new Colyseus.Client(CLIENT_ENDPOINT);
@@ -48,7 +45,7 @@ export class Controller {
             console.group(
                 action.type,
                 (action as BattleTurnStartAction).character.name,
-                [ action ]
+                [action]
             );
             console.groupEnd();
         } else {
@@ -69,7 +66,7 @@ export class Controller {
             if (!entries.length) {
                 return;
             }
-            const { width, height } = entries[ 0 ].contentRect;
+            const { width, height } = entries[0].contentRect;
             Controller.game.resize(width, height);
         });
 

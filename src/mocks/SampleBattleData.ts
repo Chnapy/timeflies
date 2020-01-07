@@ -5,7 +5,7 @@ import { BattleRoomState } from '../phaser/scenes/BattleScene';
 const charJ1Sample1: CharacterSnapshot = {
     id: 1,
     isMine: true,
-    name: 'C1',
+    name: 'Ramio',
     type: 'sampleChar1',
     position: {
         x: 4,
@@ -52,7 +52,7 @@ const charJ1Sample1: CharacterSnapshot = {
 const charJ1Sample2: CharacterSnapshot = {
     id: 2,
     isMine: true,
-    name: 'C2',
+    name: 'Guili',
     type: 'sampleChar2',
     position: {
         x: 10,
@@ -83,7 +83,7 @@ const charJ1Sample2: CharacterSnapshot = {
 const charJ2Sample3: CharacterSnapshot = {
     id: 3,
     isMine: false,
-    name: 'C3',
+    name: 'Shoyi',
     type: 'sampleChar3',
     position: {
         x: 6,
@@ -122,8 +122,8 @@ const charJ2Sample3: CharacterSnapshot = {
 const teamsSnapshots: TeamSnapshot[] = [
     {
         id: 1,
-        color: 0xFF0000,
-        name: 'Team RED',
+        color: 0xF8C291,
+        name: 'Team Rocket',
         playersSnapshots: [
             {
                 id: 1,
@@ -138,8 +138,8 @@ const teamsSnapshots: TeamSnapshot[] = [
     },
     {
         id: 2,
-        color: 0x0000FF,
-        name: 'Team BLUE',
+        color: 0x60A3BC,
+        name: 'Team Azure',
         playersSnapshots: [
             {
                 id: 2,

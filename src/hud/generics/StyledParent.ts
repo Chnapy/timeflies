@@ -1,5 +1,4 @@
-import { Styled, BasicStyleProperties } from './Styled';
-import { HUDScene } from '../HUDScene';
+import { BasicStyleProperties, Styled } from './Styled';
 
 export abstract class StyledParent<S extends BasicStyleProperties, C extends Styled<any>> extends Styled<S> {
 
@@ -8,7 +7,7 @@ export abstract class StyledParent<S extends BasicStyleProperties, C extends Sty
         return this._children;
     }
 
-    constructor(scene: HUDScene) {
+    constructor(scene: Phaser.Scene) {
         super(scene);
 
         this._children = [];

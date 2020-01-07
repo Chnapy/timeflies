@@ -10,7 +10,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
     async launch(targetPositions: Position[]): Promise<SpellResult> {
         const state = this.getLaunchState(targetPositions);
 
-        const [ firstPos ] = targetPositions;
+        const [firstPos] = targetPositions;
 
         this.character.setPosition(firstPos, false, true, true);
 
@@ -37,11 +37,11 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
 
         const duration = this.spell.time;
 
-        const tweens: Phaser.Types.Tweens.TweenBuilderConfig[] = targetPositions.map((p, i) => {
-            const pWorld = this.map.tileToWorldPosition(p, true);
+        const tweens = targetPositions.map<Phaser.Types.Tweens.TweenBuilderConfig>((p, i) => {
+            const pWorld = this.map.tileToWorldPosition(p);
 
             return {
-                targets: this.character.graphicContainer,
+                targets: this.character.getGraphics(),
                 x: { value: pWorld.x, duration },
                 y: { value: pWorld.y, duration },
                 onStart: () => {

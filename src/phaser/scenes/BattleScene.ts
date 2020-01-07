@@ -101,6 +101,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
         this.graphics = this.add.graphics();
 
+        this.battleData.characters.forEach(c => c.initHUD());
+
         const { decorLayer } = this.map;
 
         decorLayer

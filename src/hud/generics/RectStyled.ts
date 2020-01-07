@@ -1,4 +1,3 @@
-import { HUDScene } from '../HUDScene';
 import { BasicStyleProperties, DefaultStyleEngine, Styled, StyleEngine } from './Styled';
 import { StyledParent } from './StyledParent';
 
@@ -10,13 +9,14 @@ export interface RectStyleProperties extends BasicStyleProperties {
     strokeWidth?: number;
     originX?: number;
     originY?: number;
+    visible?: boolean;
 }
 
 export class RectStyled<C extends Styled<any>> extends StyledParent<RectStyleProperties, C> {
 
     private readonly rectangle: Phaser.GameObjects.Rectangle;
 
-    constructor(scene: HUDScene) {
+    constructor(scene: Phaser.Scene) {
         super(scene);
 
         this.rectangle = scene.add.rectangle(0, 0)
@@ -42,20 +42,17 @@ export class RectStyled<C extends Styled<any>> extends StyledParent<RectStylePro
 
         return {
             ...defaultEngine,
-            
+
             width: v => {
-                if(v !== undefined) {
-                    this.rectangle.setStrokeStyle(
-                        1,
-                        0xFFFFFF,
-                        this.rectangle.strokeAlpha
-                    )
+                if (v !== undefined) {
                     this.rectangle.width = v;
+                    this.rectangle['geom'].setSize(v, this.rectangle.height);
+                    this.rectangle.updateDisplayOrigin()['updateData']();
                 }
             },
 
             height: v => {
-                if(v !== undefined) {
+                if (v !== undefined) {
                     this.rectangle.height = v;
                     this.rectangle['geom'].setSize(this.rectangle.width, v);
                     this.rectangle.updateDisplayOrigin()['updateData']();
@@ -96,7 +93,17 @@ export class RectStyled<C extends Styled<any>> extends StyledParent<RectStylePro
                 v,
                 this.rectangle.strokeColor,
                 this.rectangle.strokeAlpha
-            )
+            ),
+
+            visible: v => {
+                if (v !== undefined) {
+                    this.container.getAll().forEach(c => {
+                        if (typeof (c as any).visible === 'boolean') {
+                            (c as any).visible = v;
+                        }
+                    });
+                }
+            }
         };
     }
 }

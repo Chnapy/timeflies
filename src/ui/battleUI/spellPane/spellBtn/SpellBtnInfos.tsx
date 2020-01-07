@@ -9,7 +9,7 @@ export interface SpellBtnInfosProps {
 export const SpellBtnInfos: React.FC<SpellBtnInfosProps> = ({ time, attack }) => {
 
     return <div className={css.root}>
-        <div className={css.timeLine}>{Math.fround(time)}</div>
+        <div className={css.timeLine}>{(time / 1000).toFixed(1)}</div>
         {attack > 0 && <div className={css.attackLine}>{attack}</div>}
     </div>;
 };

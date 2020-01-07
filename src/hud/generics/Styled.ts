@@ -1,7 +1,6 @@
-import { HUDScene } from '../HUDScene';
+import { ReducerManager } from '../../ReducerManager';
 import { Utils } from '../../Utils';
 import { HasGameObject } from '../layout/HasGameObject';
-import { ReducerManager } from '../../ReducerManager';
 
 export interface BasicStyleProperties {
     x: number;
@@ -11,12 +10,12 @@ export interface BasicStyleProperties {
 }
 
 export type StyleEngine<S extends Record<string, any>> = {
-    [ K in keyof S ]-?: (value?: S[ K ]) => void;
+    [K in keyof S]-?: (value?: S[K]) => void;
 };
 
 export type DefaultStyleEngine = Readonly<StyleEngine<Pick<BasicStyleProperties, 'x' | 'y'>>>;
 
-export abstract class Styled<S extends BasicStyleProperties> extends ReducerManager<HUDScene> implements HasGameObject {
+export abstract class Styled<S extends BasicStyleProperties> extends ReducerManager<Phaser.Scene> implements HasGameObject {
 
     private readonly defaultStyleEngine: DefaultStyleEngine = {
         x: v => this.container.setX(v),
@@ -26,14 +25,17 @@ export abstract class Styled<S extends BasicStyleProperties> extends ReducerMana
     protected readonly container: Phaser.GameObjects.Container;
 
     private readonly styleEngine: StyleEngine<S>;
-    protected style: Readonly<S>;
+    protected _style: Readonly<S>;
+    get style(): Readonly<S> {
+        return this._style;
+    }
 
-    constructor(scene: HUDScene) {
+    constructor(scene: Phaser.Scene) {
         super(scene);
 
         this.styleEngine = this.getStyleEngine(this.defaultStyleEngine);
 
-        this.style = this.getDefaultStyle();
+        this._style = this.getDefaultStyle();
 
         this.container = scene.add.container(0, 0);
     }
@@ -46,7 +48,7 @@ export abstract class Styled<S extends BasicStyleProperties> extends ReducerMana
     update?(time: number, delta: number): void;
 
     setStyle(style: Partial<S>): this {
-        this.style = {
+        this._style = {
             ...this.style,
             ...style
         };
@@ -63,13 +65,13 @@ export abstract class Styled<S extends BasicStyleProperties> extends ReducerMana
         } as S);
     }
 
-    getRootGameObject(): Phaser.GameObjects.GameObject {
+    getRootGameObject(): Phaser.GameObjects.Container {
         return this.container;
     }
 
     private computeStyle(style: Partial<S>): void {
         Utils.entriesTyped(style).forEach((a) => {
-            this.styleEngine[ a[ 0 ] ](a[ 1 ]);
+            this.styleEngine[a[0]](a[1]);
         });
     }
 

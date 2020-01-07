@@ -16,4 +16,7 @@
 
     --btn-border-color: var(--border-color-1);
     --btn-border-width: var(--border-width-1);
+
+    --life-color: #a64c4b;
+    --time-color: #F2CF3F;
 }
