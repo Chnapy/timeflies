@@ -56,7 +56,13 @@ export class WSSocket {
                 throw new Error(`typeof message not handled: ${typeof message}`);
             }
 
-            const action = JSON.parse(message);
+            let action;
+            try {
+                action = JSON.parse(message);
+            } catch (e) {
+                action = message;
+            }
+
             if (typeof action !== 'object' || typeof action.type !== 'string') {
                 throw new Error(`message is not an Action: ${action}`);
             }

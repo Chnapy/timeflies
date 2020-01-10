@@ -56,7 +56,7 @@ export class BattleRunRoom {
     }
 
     init(): void {
-
+        this.computeMap();
     }
 
     start(): void {
@@ -76,4 +76,11 @@ export class BattleRunRoom {
         this.players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
     }
 
+    private computeMap(): void {
+        const {urls: {schema}, obstaclesLayerKey} = this.mapInfos;
+
+        import('./' + schema).then(data => {
+            console.log('data', data);
+        });
+    }
 }
