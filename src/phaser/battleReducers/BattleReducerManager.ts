@@ -5,12 +5,13 @@ import { ReducerManager } from '../../ReducerManager';
 import { CameraManager } from '../camera/CameraManager';
 import { CharAction, CycleManager, GameTime } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
-import { SpellType } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
-import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
+import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
 import { BattleData, BattleScene, BattleRoomState } from '../scenes/BattleScene';
 import { SpellEngine } from '../spellEngine/SpellEngine';
-import { Room } from '../../mocks/MockColyseus';
+import { Room } from 'colyseus.js';
+import { CharActionCAction } from '@shared/action/BattleRunAction';
+import { SpellType } from '@shared/Spell';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     room: Room<BattleRoomState>;
@@ -38,7 +39,7 @@ export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prep
 
 export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
     charAction: CharAction<'running'>;
-    callback?: (promise: SendPromise<CharActionSend>) => void;
+    callback?: (promise: SendPromise<CharActionCAction>) => void;
 }
 
 export interface BattleRollbackAction extends IGameAction<'battle/rollback'> {
@@ -90,13 +91,13 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     }) => {
         const { currentTurn } = this.battleData;
 
-        const spell = currentTurn?.currentSpell?.spell.type === spellType
+        const spell = currentTurn?.currentSpell?.spell.staticData.type === spellType
             && currentTurn.currentSpell.state === 'prepare'
 
             ? currentTurn.currentCharacter.defaultSpell
 
             : currentTurn?.currentCharacter.spells
-                .find(s => s.type === spellType)!;
+                .find(s => s.staticData.type === spellType)!;
 
         this.spellEngine.prepare(spell);
     });
@@ -167,7 +168,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         Controller.dispatch<BattleSpellPrepareAction | BattleWatchAction>(character?.isMine
             ? {
                 type: 'battle/spell/prepare',
-                spellType: character.defaultSpell.type
+                spellType: character.defaultSpell.staticData.type
             }
             : {
                 type: 'battle/watch'

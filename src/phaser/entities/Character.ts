@@ -1,39 +1,12 @@
 import { BattleScene } from '../scenes/BattleScene';
+import { CharacterGraphic } from './CharacterGraphic';
 import { Player } from './Player';
-import { Spell, SpellSnapshot } from './Spell';
+import { Spell } from './Spell';
 import { Team } from "./Team";
 import { WithSnapshot } from './WithSnapshot';
-import { CharacterGraphic } from './CharacterGraphic';
-
-export type CharacterType =
-    | 'sampleChar1'
-    | 'sampleChar2'
-    | 'sampleChar3';
-
-export interface Position extends Required<Phaser.Types.Math.Vector2Like> {
-}
+import { CharacterSnapshot, CharacterType, Orientation, CharacterFeatures, StaticCharacter, Position } from '@shared/Character';
 
 export type CharacterState = 'idle' | 'move';
-
-export type Orientation = 'left' | 'right' | 'top' | 'bottom';
-
-export interface CharacterFeatures {
-    life: number;
-    actionTime: number;
-}
-
-export interface CharacterSnapshot {
-    id: number;
-    isMine: boolean;
-    name: string;
-    type: CharacterType;
-    position: Position;
-    orientation: Orientation;
-    features: CharacterFeatures;
-    initialFeatures: CharacterFeatures;
-    spellsSnapshots: SpellSnapshot[];
-    defaultSpellId: number;
-}
 
 export class Character implements WithSnapshot<CharacterSnapshot> {
 
@@ -49,10 +22,11 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
 
     private readonly scene: BattleScene;
 
-    readonly id: number;
+    readonly staticData: Readonly<StaticCharacter>;
+    get id(): string {
+        return this.staticData.id;
+    }
     readonly isMine: boolean;
-    readonly type: CharacterType;
-    readonly name: string;
 
     private _position: Position;
     public get position(): Position {
@@ -64,8 +38,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         return this._orientation;
     }
 
-    readonly initialFeatures: Readonly<CharacterFeatures>;
-    features: CharacterFeatures;
+    readonly features: CharacterFeatures;
 
     readonly spells: Spell[];
     readonly defaultSpell: Spell;
@@ -78,25 +51,24 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     private readonly characterGraphic: CharacterGraphic;
 
     constructor({
-        id, isMine, name, type, position, orientation, initialFeatures, features, defaultSpellId, spellsSnapshots
+        staticData, orientation, position, features, spellsSnapshots
     }: CharacterSnapshot, player: Player, team: Team, scene: BattleScene) {
         this.scene = scene;
-        this.id = id;
-        this.isMine = isMine;
-        this.name = name;
-        this.type = type;
+        this.staticData = staticData;
+        this._orientation = orientation;
+        this._position = position;
+        this.isMine = true; // TODO
 
         this.state = 'idle';
         this._orientation = orientation;
         this._position = position;
-        this.initialFeatures = initialFeatures;
-        this.features = features;
+        this.features = { ...features };
 
         this.player = player;
         this.team = team;
 
         this.spells = spellsSnapshots.map(snap => new Spell(snap, this, scene));
-        this.defaultSpell = this.spells.find(s => s.id === defaultSpellId)!;
+        this.defaultSpell = this.spells.find(s => s.id === staticData.defaultSpellId)!;
 
         this.characterGraphic = new CharacterGraphic(scene, this);
     }
@@ -180,37 +152,32 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     }
 
     receiveSpell(spell: Spell): void {
-        if(spell.attaque) {
-            this.features.life -= spell.attaque;
+        if (spell.feature.attack) {
+            this.features.life -= spell.feature.attack;
             this.characterGraphic.updateLife();
         }
         this.characterGraphic.receiveSpell(spell);
     }
-    
+
     removeSpell(): void {
         this.characterGraphic.removeSpell();
     }
 
     canMove(): boolean {
-        return this.spells.some(s => s.type === 'move');
+        return this.spells.some(s => s.staticData.type === 'move');
     }
 
     canOrientate(): boolean {
-        return this.spells.some(s => s.type === 'orientate');
+        return this.spells.some(s => s.staticData.type === 'orientate');
     }
 
     getSnapshot(): CharacterSnapshot {
         return {
-            id: this.id,
-            isMine: this.isMine,
-            name: this.name,
-            type: this.type,
-            position: this.position,
-            orientation: this.orientation,
-            initialFeatures: this.initialFeatures,
+            staticData: this.staticData,
             features: this.features,
-            spellsSnapshots: this.spells.map(s => s.getSnapshot()),
-            defaultSpellId: this.defaultSpell.id
+            orientation: this.orientation,
+            position: this.position,
+            spellsSnapshots: this.spells.map(s => s.getSnapshot())
         };
     }
 
@@ -218,9 +185,10 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this.setPosition(snapshot.position, true);
         this.setOrientation(snapshot.orientation, false);
         this.setCharacterState('idle');
-        this.features = snapshot.features;
+        Object.keys(this.features).forEach(k => delete this.features[k]);
+        Object.assign(this.features, snapshot.features);
         snapshot.spellsSnapshots.forEach(sSnap => {
-            const spell = this.spells.find(s => s.id === sSnap.id);
+            const spell = this.spells.find(s => s.id === sSnap.staticData.id);
 
             spell!.updateFromSnapshot(sSnap);
         });

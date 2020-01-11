@@ -8,11 +8,11 @@ import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.modul
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { Controller } from '../../../../Controller';
 import { BattleSpellPrepareAction } from '../../../../phaser/battleReducers/BattleReducerManager';
-import { SpellType } from '../../../../phaser/entities/Spell';
 import { SpellBtnInfos, SpellBtnInfosProps } from './SpellBtnInfos';
+import { SpellType } from '@shared/Spell';
 
 export interface SpellBtnExternProps {
-    spellId: number;
+    spellId: string;
 }
 
 interface SpellBtnInnerProps {
@@ -39,10 +39,10 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
         return {
             activeState,
             disabled,
-            spellType: spell.type,
+            spellType: spell.staticData.type,
             spellInfos: {
-                time: spell.time,
-                attack: spell.attaque
+                time: spell.feature.duration,
+                attack: spell.feature.attack
             }
         }
     }

@@ -22,13 +22,22 @@ export class BootScene extends ConnectedScene<'BootScene'> {
             });
         }(this);
 
+        // TODO
         Controller.client.joinOrCreate<BattleRoomState>('battle')
             .then(room => {
-                Controller.dispatch<LoadLaunchAction>({
-                    type: 'load/launch',
-                    room
+
+                room.onMessage(message => {
+                    if(message.type === 'battle_load') {
+
+                        Controller.dispatch<LoadLaunchAction>({
+                            type: 'load/launch',
+                            room
+                        });
+
+                    }
                 });
-            });
+            })
+            .catch(e => console.error(e));
     }
 
     update(time: number, delta: number): void {

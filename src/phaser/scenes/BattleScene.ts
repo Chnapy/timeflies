@@ -1,17 +1,19 @@
+import { CharacterType, Orientation } from '@shared/Character';
+import { SpellType } from '@shared/Spell';
+import { TeamSnapshot } from '@shared/Team';
+import { Room } from 'colyseus.js';
 import { AssetManager } from '../../assetManager/AssetManager';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
-import { Room } from '../../mocks/MockColyseus';
 import { Utils } from '../../Utils';
 import { BattleReducerManager } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
 import { CycleManager, Turn } from '../cycle/CycleManager';
-import { Character, CharacterType, Orientation } from '../entities/Character';
+import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
-import { SpellType } from '../entities/Spell';
-import { Team, TeamSnapshot } from '../entities/Team';
+import { Team } from '../entities/Team';
 import { WithSnapshot } from '../entities/WithSnapshot';
 import { MapInfos, MapManager } from '../map/MapManager';
-import { BattleRoomManager, StartReceive } from '../room/BattleRoomManager';
+import { BattleRoomManager } from '../room/BattleRoomManager';
 import { SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
 
@@ -135,9 +137,11 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
             type: 'battle/watch'
         });
 
-        BattleRoomManager.mockResponse<StartReceive>(2000, {
-            type: 'start'
-        });
+        // BattleRoomManager.mockResponse<BRunLaunchSAction>(2000, {
+        //     type: 'battle-run/launch',
+        //     sendTime: Date.now(),
+        //     battleSnapshot: 
+        // });
     }
 
     update(time: number, delta: number): void {

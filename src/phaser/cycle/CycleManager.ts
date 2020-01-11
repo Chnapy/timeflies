@@ -1,12 +1,14 @@
+import { CharActionCAction } from '@shared/action/BattleRunAction';
 import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleTurnEndAction, BattleTurnStartAction } from '../battleReducers/BattleReducerManager';
-import { Character, Position } from '../entities/Character';
+import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
-import { BattleRoomManager, CharActionSend, SendPromise } from '../room/BattleRoomManager';
-import { BattleData } from '../scenes/BattleScene';
 import { Spell } from '../entities/Spell';
+import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
+import { BattleData } from '../scenes/BattleScene';
 import { CurrentSpell } from '../spellEngine/SpellEngine';
+import { Position } from '@shared/Character';
 
 export interface GameTime {
     phaserTime: number;
@@ -66,7 +68,7 @@ export class CycleManager {
 
     start(): void {
         this.running = true;
-        // setTimeout(() => this.running = false, 500);
+        setTimeout(() => this.running = false, 500);
     }
 
     update(time: number, delta: number): void {
@@ -105,13 +107,13 @@ export class CycleManager {
         }
     }
 
-    addCharAction(charAction: CharAction): SendPromise<CharActionSend> {
+    addCharAction(charAction: CharAction): SendPromise<CharActionCAction> {
 
         this.dataStateManager.commit(charAction.startTime);
 
         this.charActionStack.push(charAction);
 
-        return this.room.send<CharActionSend>({
+        return this.room.send<CharActionCAction>({
             type: 'charAction',
             charAction: {
                 spellId: charAction.spell.id,

@@ -1,19 +1,13 @@
-import { Player, PlayerSnapshot } from './Player';
+import { Player } from './Player';
 import { BattleScene } from '../scenes/BattleScene';
 import { WithSnapshot } from './WithSnapshot';
-
-export interface TeamSnapshot {
-    id: number;
-    name: string;
-    color: number;
-    playersSnapshots: PlayerSnapshot[];
-}
+import { TeamSnapshot } from '@shared/Team';
 
 export class Team implements WithSnapshot<TeamSnapshot> {
 
-    readonly id: number;
+    readonly id: string;
     readonly name: string;
-    readonly color: number;
+    readonly color: string;
     readonly players: Player[];
 
     constructor({ id, name, color, playersSnapshots }: TeamSnapshot, scene: BattleScene) {

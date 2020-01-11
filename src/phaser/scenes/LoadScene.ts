@@ -1,7 +1,7 @@
 import { IGameAction } from '../../action/GameAction';
 import { AssetManager } from '../../assetManager/AssetManager';
 import { Controller } from '../../Controller';
-import { Room } from '../../mocks/MockColyseus';
+import { Room } from 'colyseus.js';
 import { BattleLaunchAction } from '../battleReducers/BattleReducerManager';
 import { Character } from '../entities/Character';
 import { Spell } from '../entities/Spell';

@@ -1,46 +1,22 @@
+import { ConfirmSAction } from '@shared/action/BattleRunAction';
+import { ClientAction, ServerAction } from '@shared/action/TAction';
+import { Room } from 'colyseus.js';
 import { Controller } from '../../Controller';
-import { Room } from '../../mocks/MockColyseus';
 import { BattleRollbackAction, BattleStartAction } from '../battleReducers/BattleReducerManager';
-import { Position } from '../entities/Character';
 import { BattleRoomState } from '../scenes/BattleScene';
 
-interface Message<T extends string> {
-    time: number;
-    type: T;
-}
 
-export interface StartReceive extends Message<'start'> {
-}
-
-export interface CharActionSend extends Message<'charAction'> {
-    charAction: {
-        spellId: number;
-        positions: Position[];
-    };
-}
-
-export interface ConfirmReceive extends Message<'confirm'> {
-    isOk: boolean;
-}
-
-type Send =
-    | CharActionSend;
-
-type Receive =
-    | StartReceive
-    | ConfirmReceive;
-
-export interface SendPromise<S extends Send> extends Promise<{
+export interface SendPromise<S extends ClientAction> extends Promise<{
     send: S;
-    receive: ConfirmReceive;
+    receive: ConfirmSAction;
 }> { }
 
-interface SendTimed<S extends Send> {
+interface SendTimed<S extends ClientAction> {
     time: number;
     message: S;
     promise: SendPromise<S>;
-    resolvePromise: (receive: ConfirmReceive) => void;
-    rejectPromise: (receive: ConfirmReceive) => void;
+    resolvePromise: (receive: ConfirmSAction) => void;
+    rejectPromise: (receive: ConfirmSAction) => void;
 }
 
 let mockRoom: BattleRoomManager;
@@ -60,12 +36,12 @@ export class BattleRoomManager {
         mockRoom = this;
     }
 
-    readonly send = <S extends Send>(partialMessage: Omit<S, 'time'>, _time?: number): SendPromise<S> => {
-        const time = _time || Date.now();
+    readonly send = <S extends ClientAction>(partialMessage: Omit<S, 'sendTime'>, _sendTime?: number): SendPromise<S> => {
+        const sendTime = _sendTime || Date.now();
 
         const message: S = {
             ...partialMessage,
-            time
+            sendTime
         } as any;
 
         const getOnReject = (reject: Function) => (reason) => {
@@ -74,7 +50,7 @@ export class BattleRoomManager {
                 type: 'battle/rollback',
                 config: {
                     by: 'time',
-                    time
+                    time: sendTime
                 }
             });
 
@@ -88,7 +64,7 @@ export class BattleRoomManager {
         });
 
         const sendTimed: SendTimed<S> = {
-            time,
+            time: sendTime,
             message,
             promise,
             resolvePromise,
@@ -102,10 +78,10 @@ export class BattleRoomManager {
         return promise;
     }
 
-    private readonly onMessage = (message: Receive): void => {
+    private readonly onMessage = (message: ServerAction): void => {
 
         switch (message.type) {
-            case 'start':
+            case 'battle-run/launch':
                 Controller.dispatch<BattleStartAction>({
                     type: 'battle/start'
                 });
@@ -116,10 +92,10 @@ export class BattleRoomManager {
         }
     };
 
-    private readonly onConfirm = (receive: ConfirmReceive): void => {
-        const { time, isOk } = receive;
-
-        while (this.sendStack.length && this.sendStack[ this.sendStack.length - 1 ].time >= time) {
+    private readonly onConfirm = (receive: ConfirmSAction): void => {
+        const { sendTime, isOk } = receive;
+        // TODO check time, may be wrong
+        while (this.sendStack.length && this.sendStack[ this.sendStack.length - 1 ].time >= sendTime) {
 
             const send = this.sendStack.pop()!;
 
@@ -131,10 +107,10 @@ export class BattleRoomManager {
         }
     }
 
-    static mockResponse<R extends Receive>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {
-        setTimeout(() => {
-            time = time === 'last' ? mockRoom.sendStack[ mockRoom.sendStack.length - 1 ].time : time;
-            mockRoom.room.mockResponse(0, data, time);
-        }, delay);
+    static mockResponse<R extends ServerAction>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {
+        // setTimeout(() => {
+        //     time = time === 'last' ? mockRoom.sendStack[ mockRoom.sendStack.length - 1 ].time : time;
+        //     mockRoom.room.mockResponse(0, data, time);
+        // }, delay);
     }
 }

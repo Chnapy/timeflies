@@ -1,10 +1,10 @@
-import { CharacterType, CharacterState, Orientation } from '../phaser/entities/Character';
-import sampleMap1Image from '../_assets/map/map_2.png';
+import { CharacterType, Orientation } from '@shared/Character';
+import { SpellType } from '@shared/Spell';
+import { CharacterState } from '../phaser/entities/Character';
 import sampleSpritesheet1Image from '../_assets/spritesheets/sokoban_spritesheet.png';
 import sampleSpritesheet1Schema from '../_assets/spritesheets/sokoban_spritesheet.xml';
 import spellsSpritesheetImage from '../_assets/spritesheets/spells_spritesheet.png';
 import spellsSpritesheetSchema from '../_assets/spritesheets/spells_spritesheet.xml';
-import { SpellType } from '../phaser/entities/Spell';
 
 const sampleMap1Schema = require('../_assets/map/map_2.json');
 
@@ -20,7 +20,6 @@ type AnimStateMap = {
     };
 };
 
-export type IAssetMap = IAssetManager[ 'maps' ];
 export type IAssetCharacters = {
     [ K in CharacterType ]: {
         image: string;
@@ -132,13 +131,6 @@ const AssetSpells: IAssetSpells = {
 };
 
 export const AssetManager = {
-    maps: {
-        sampleMap1: {
-            image: sampleMap1Image,
-            schema: sampleMap1Schema
-        }
-    },
-
     characters: AssetCharacters,
 
     spells: AssetSpells

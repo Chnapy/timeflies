@@ -1,22 +1,25 @@
+import { CharacterType } from "@shared/Character";
+import { SpellType } from "@shared/Spell";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
-import { Character } from "../../../../phaser/entities/Character";
-import { SpellType } from "../../../../phaser/entities/Spell";
+import { AssetManager } from "../../../../assetManager/AssetManager";
+import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
 import { UIState } from "../../../UIState";
 import css from './characterItem.module.css';
-import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
-import { AssetManager } from "../../../../assetManager/AssetManager";
 
 export interface CharacterItemExternProps {
-    characterId: number;
+    characterId: string;
 }
 
-interface CharacterItemInnerProps extends Pick<Character, 'isMine' | 'name' | 'type'> {
+interface CharacterItemInnerProps {
     isCurrent: boolean;
+    isMine: boolean;
+    name: string;
+    type: CharacterType;
     playerName: string;
     teamName: string;
-    teamColor: number;
+    teamColor: string;
     lifePresent: number;
     lifeMax: number;
     actionTime: number;
@@ -30,15 +33,15 @@ export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemE
         return {
             isCurrent: character.id === currentTurn?.currentCharacter.id,
             isMine: character.isMine,
-            name: character.name,
-            type: character.type,
+            name: character.staticData.name,
+            type: character.staticData.type,
             playerName: character.player.name,
             teamName: character.team.name,
             teamColor: character.team.color,
             lifePresent: character.features.life,
-            lifeMax: character.initialFeatures.life,
+            lifeMax: character.staticData.initialFeatures.life,
             actionTime: character.features.actionTime,
-            spells: character.spells.map(s => s.type)
+            spells: character.spells.map(s => s.staticData.type)
         };
     }
 )(({
@@ -48,18 +51,12 @@ export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemE
     type,
     playerName,
     teamName,
-    teamColor: _teamColor,
+    teamColor,
     lifePresent,
     lifeMax,
     actionTime,
     spells
 }: CharacterItemInnerProps & CharacterItemExternProps) => {
-
-    let tempTeamColor = `${Phaser.Display.Color.ComponentToHex(_teamColor)}`;
-    while (tempTeamColor.length < 6) {
-        tempTeamColor = `0${tempTeamColor}`;
-    }
-    const teamColor = `#${tempTeamColor}`;
 
     const lifeBarFrontWidth = `${lifePresent / lifeMax * 100}%`;
 
