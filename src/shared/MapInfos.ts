@@ -14,6 +14,6 @@ export interface MapInfos {
     tilemapKey: string;
 
     decorLayerKey: string;
-
     obstaclesLayerKey: string;
+    initLayerKey: string;
 }

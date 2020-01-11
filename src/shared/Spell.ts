@@ -1,4 +1,5 @@
 import { BCharacter } from "./Character";
+import { OmitFn } from "../types/global";
 
 export type SpellType =
     | 'move'
@@ -23,7 +24,7 @@ export interface StaticSpell {
 
 export class BSpell {
 
-    readonly staticData: StaticSpell;
+    readonly staticData: Readonly<StaticSpell>;
 
     readonly character: BCharacter;
 
@@ -36,7 +37,14 @@ export class BSpell {
             ...staticData.initialFeatures
         };
     }
+
+    toSnapshot(): SpellSnapshot {
+        return {
+            staticData: this.staticData,
+            features: this.features
+        };
+    }
 }
 
-export interface SpellSnapshot extends Omit<BSpell, 'character'> {
+export interface SpellSnapshot extends OmitFn<BSpell, 'character'> {
 }

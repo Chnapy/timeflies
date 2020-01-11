@@ -31,6 +31,15 @@ export class BPlayer implements Omit<Player, 'staticCharacters'> {
         this.team = team;
         this.characters = player.staticCharacters.map(sc => new BCharacter(sc, this));
     }
+    
+    toSnapshot(): PlayerSnapshot {
+        return {
+            id: this.id,
+            name: this.name,
+            state: this.state,
+            charactersSnapshots: this.characters.map(c => c.toSnapshot())
+        };
+    }
 }
 
 export interface PlayerSnapshot {
@@ -38,6 +47,8 @@ export interface PlayerSnapshot {
     id: string;
 
     name: string;
+    
+    state: PlayerState;
 
     charactersSnapshots: CharacterSnapshot[];
 }

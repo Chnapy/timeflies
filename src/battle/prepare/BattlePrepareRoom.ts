@@ -1,18 +1,18 @@
 import path from 'path';
-import { StaticCharacter, CharacterType, CharacterSnapshot } from "../../shared/Character";
-import { Player, PlayerSnapshot } from "../../shared/Player";
-import { Team, TeamSnapshot } from "../../shared/Team";
-import { Util } from "../../Util";
-import { TAction } from "../../transport/ws/WSSocket";
-import { BattleRoomState, BattleSnapshot } from "../../shared/BattleRoomState";
-import { SpellType, SpellSnapshot } from '../../shared/Spell';
+import { BattleLoadPayload } from '../../shared/BattleLoadPayload';
+import { CharacterType, StaticCharacter } from "../../shared/Character";
 import { MapInfos } from '../../shared/MapInfos';
+import { Player } from "../../shared/Player";
+import { SpellType } from '../../shared/Spell';
+import { Team } from "../../shared/Team";
+import { TAction } from "../../transport/ws/WSSocket";
+import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
 
 // StoC
 
 export interface BattleLoadSAction extends TAction<'battle-load'> {
-    battleState: BattleRoomState;
+    payload: BattleLoadPayload;
 }
 
 export type BattlePrepareServerAction =
@@ -33,6 +33,7 @@ export class BattlePrepareRoom {
     readonly minPlayer: number = 2;
     readonly maxPlayer: number = 10;
 
+    private mapInfos?: MapInfos;
     readonly players: Player[];
     readonly teams: Team[];
     readonly characters: StaticCharacter[];
@@ -65,66 +66,22 @@ export class BattlePrepareRoom {
     launchBattle(): void {
         this.battleLaunched = true;
 
-        const mapInfos: MapInfos = {
-            urls: {
-                schema: path.join('map', 'sample1', 'map_2.json'),
-                sheet: path.join('map', 'sample1', 'map_2.png')
-            },
-            mapKey: 'sampleMap1',
-            tilemapKey: 'map_main',
-            decorLayerKey: 'decors',
-            obstaclesLayerKey: 'obstacles'
-        };
+        const mapInfos: MapInfos = this.mapInfos!;
 
         const characterTypes: Set<CharacterType> = new Set(this.characters.map(c => c.type));
 
         const spellTypes: Set<SpellType> = new Set(this.characters.flatMap(c => c.staticSpells.map(s => s.type)));
 
-        const battleSnapshot: BattleSnapshot = {
-            teamsSnapshots: this.teams.map<TeamSnapshot>(t => {
-
-                return {
-                    id: t.id,
-                    color: t.color,
-                    name: t.name,
-                    playersSnapshots: t.players.map<PlayerSnapshot>(p => {
-
-                        return {
-                            id: p.id,
-                            name: p.name,
-                            charactersSnapshots: p.staticCharacters.map<CharacterSnapshot>(c => {
-
-                                return {
-                                    staticData: c,
-                                    features: c.initialFeatures,
-                                    orientation: 'bottom',
-                                    position: { x: 5, y: 4 }, // TODO
-                                    spellsSnapshots: c.staticSpells.map<SpellSnapshot>(s => {
-
-                                        return {
-                                            staticData: s,
-                                            features: s.initialFeatures
-                                        };
-                                    })
-                                }
-                            })
-                        };
-                    })
-                };
-            })
-        };
-
-        const battleState: BattleRoomState = {
+        const payload: BattleLoadPayload = {
             mapInfos,
             characterTypes: [...characterTypes],
-            spellTypes: [...spellTypes],
-            battleSnapshot
-        }
+            spellTypes: [...spellTypes]
+        };
 
         this.players.forEach(p => {
             p.socket.send<BattleLoadSAction>({
                 type: 'battle-load',
-                battleState
+                payload
             });
 
             p.state = 'battle-loading';
@@ -161,6 +118,18 @@ export class BattlePrepareRoom {
     }
 
     private mock(): void {
+        
+        this.mapInfos = {
+            urls: {
+                schema: path.join('map', 'sample1', 'map_2.json'),
+                sheet: path.join('map', 'sample1', 'map_2.png')
+            },
+            mapKey: 'sampleMap1',
+            tilemapKey: 'map_main',
+            decorLayerKey: 'decors',
+            obstaclesLayerKey: 'obstacles',
+            initLayerKey: 'init'
+        };
 
         this.characters.length = 0;
         this.characters.push(

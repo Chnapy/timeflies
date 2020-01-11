@@ -1,29 +1,17 @@
-import { BCharacter, Orientation, Position } from "../../shared/Character";
+import { BattleSnapshot, GlobalTurnState } from "../../shared/BattleSnapshot";
+import { BCharacter } from "../../shared/Character";
+import { MapInfos } from "../../shared/MapInfos";
 import { BPlayer } from "../../shared/Player";
 import { BTeam, Team } from "../../shared/Team";
 import { TAction } from "../../transport/ws/WSSocket";
-import { MapInfos } from "../../shared/MapInfos";
-
+import { BRMap } from "./BRMap";
 
 export interface BRunLaunchSAction extends TAction<'battle-run/launch'> {
-    launchTime: number;
-    turnState: {
-        charactersPositions: {
-            [k: string]: { // char ID
-                position: Position;
-                orientation: Orientation;
-            };
-        };
-        order: string[]; // char IDs
-
-    }
+    battleSnapshot: BattleSnapshot;
 }
 
 export interface BRunGlobalTurnStartSAction extends TAction<'battle-run/global-turn-start'> {
-    startTime: number;
-    turnState: {
-        order: string[]; // char IDs
-    };
+    globalTurnState: GlobalTurnState;
 }
 
 export type BattleRunSAction =
@@ -32,7 +20,7 @@ export type BattleRunSAction =
 
 export type BattleRunCAction = never;
 
-const LAUNCH_DELAY = 5000;
+const LAUNCH_DELAY = 5000; // TODO use config system
 
 export class BattleRunRoom {
 
@@ -43,7 +31,11 @@ export class BattleRunRoom {
     private readonly teams: BTeam[];
     private readonly characters: BCharacter[];
 
+    private map!: BRMap;
+
     private launchTime!: number;
+
+    private globalTurnState!: GlobalTurnState;
 
     constructor(
         mapInfos: MapInfos,
@@ -56,31 +48,37 @@ export class BattleRunRoom {
     }
 
     init(): void {
-        this.computeMap();
+        this.map = new BRMap(this.mapInfos);
+        const { initPositions } = this.map;
+        this.teams.forEach((team, i) => {
+            team.placeCharacters(initPositions[i]);
+        });
     }
 
     start(): void {
         this.launchTime = Date.now() + LAUNCH_DELAY;
 
+        this.globalTurnState = {
+            startTime: this.launchTime,
+            order: this.characters.map(c => c.staticData.id)
+        };
+
+        const battleSnapshot = this.generateSnapshot();
+
         const launchAction: Omit<BRunLaunchSAction, 'sendTime'> = {
             type: 'battle-run/launch',
-            launchTime: this.launchTime,
-            turnState: {
-                charactersPositions: {
-                    // TODO
-                },
-                order: this.characters.map(c => c.staticData.id)
-            }
+            battleSnapshot
         };
 
         this.players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
     }
 
-    private computeMap(): void {
-        const {urls: {schema}, obstaclesLayerKey} = this.mapInfos;
+    private generateSnapshot(): BattleSnapshot {
 
-        import('./' + schema).then(data => {
-            console.log('data', data);
-        });
+        return {
+            launchTime: this.launchTime,
+            globalTurnState: this.globalTurnState,
+            teamsSnapshots: this.teams.map(team => team.toSnapshot())
+        };
     }
 }
