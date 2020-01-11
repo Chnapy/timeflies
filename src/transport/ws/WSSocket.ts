@@ -1,26 +1,8 @@
 import WebSocket from 'ws';
-import { BattlePrepareServerAction, BattlePrepareClientAction } from '../../battle/prepare/BattlePrepareRoom';
-import { BattleRunSAction, BattleRunCAction } from '../../battle/run/BattleRunRoom';
+import { TAction, ClientAction, SetIDCAction, ServerAction } from '../../shared/action/TAction';
 
 type NarrowAction<T, N extends string> = T extends TAction<N> ? T : never;
 
-export interface TAction<T extends string> {
-    type: T;
-    sendTime: number;
-}
-
-export interface SetIDTAction extends TAction<'set-id'> {
-    id: string;
-}
-
-export type ServerAction =
-    | BattlePrepareServerAction
-    | BattleRunSAction;
-
-export type ClientAction =
-    | SetIDTAction
-    | BattlePrepareClientAction
-    | BattleRunCAction;
 
 export type SocketState = 'init' | 'hasID';
 
@@ -70,7 +52,7 @@ export class WSSocket {
             this.onMessage(action);
         });
 
-        this.on<SetIDTAction>(
+        this.on<SetIDCAction>(
             'set-id',
             action => {
                 this._id = action.id;

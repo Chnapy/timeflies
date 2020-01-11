@@ -1,24 +1,10 @@
+import { BRunLaunchSAction } from "../../shared/action/BattleRunAction";
 import { BattleSnapshot, GlobalTurnState } from "../../shared/BattleSnapshot";
 import { BCharacter } from "../../shared/Character";
 import { MapInfos } from "../../shared/MapInfos";
 import { BPlayer } from "../../shared/Player";
 import { BTeam, Team } from "../../shared/Team";
-import { TAction } from "../../transport/ws/WSSocket";
 import { BRMap } from "./BRMap";
-
-export interface BRunLaunchSAction extends TAction<'battle-run/launch'> {
-    battleSnapshot: BattleSnapshot;
-}
-
-export interface BRunGlobalTurnStartSAction extends TAction<'battle-run/global-turn-start'> {
-    globalTurnState: GlobalTurnState;
-}
-
-export type BattleRunSAction =
-    | BRunLaunchSAction
-    | BRunGlobalTurnStartSAction;
-
-export type BattleRunCAction = never;
 
 const LAUNCH_DELAY = 5000; // TODO use config system
 

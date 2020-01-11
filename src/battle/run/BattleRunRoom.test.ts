@@ -4,7 +4,8 @@ import { Server, WebSocket } from 'mock-socket';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { PlayerService } from '../../PlayerService';
 import { Team } from '../../shared/Team';
-import { BattleRunRoom, BRunLaunchSAction } from './BattleRunRoom';
+import { BattleRunRoom } from './BattleRunRoom';
+import { BRunLaunchSAction } from '../../shared/action/BattleRunAction';
 
 describe('BattleRunRoom', () => {
     const URL = `ws://localhost:1234`;

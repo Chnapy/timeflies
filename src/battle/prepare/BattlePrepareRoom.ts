@@ -5,26 +5,10 @@ import { MapInfos } from '../../shared/MapInfos';
 import { Player } from "../../shared/Player";
 import { SpellType } from '../../shared/Spell';
 import { Team } from "../../shared/Team";
-import { TAction } from "../../transport/ws/WSSocket";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
+import { BattleLoadSAction, BattleLoadEndedCAction } from '../../shared/action/BattlePrepareAction';
 
-// StoC
-
-export interface BattleLoadSAction extends TAction<'battle-load'> {
-    payload: BattleLoadPayload;
-}
-
-export type BattlePrepareServerAction =
-    | BattleLoadSAction;
-
-// CtoS
-
-export interface BattleLoadEndedCAction extends TAction<'battle-load-end'> {
-}
-
-export type BattlePrepareClientAction =
-    | BattleLoadEndedCAction;
 
 export class BattlePrepareRoom {
 
