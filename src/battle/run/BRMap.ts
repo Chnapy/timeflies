@@ -1,8 +1,9 @@
 import fs from 'fs';
-import path from 'path';
-import { MapInfos } from "../../shared/MapInfos";
-import { TiledMapOrthogonal, TiledLayerTilelayer } from 'tiled-types';
+import { TiledLayerTilelayer, TiledMapOrthogonal } from 'tiled-types';
+import urlJoin from 'url-join';
+import { staticURL } from '../..';
 import { Position } from '../../shared/Character';
+import { MapInfos } from "../../shared/MapInfos";
 
 export class BRMap {
 
@@ -20,7 +21,7 @@ export class BRMap {
 
         const { urls: { schema: schemaURL }, initLayerKey, obstaclesLayerKey } = mapInfos;
 
-        const data = fs.readFileSync(path.join('./public', schemaURL), 'utf8');
+        const data = fs.readFileSync(urlJoin('public', schemaURL), 'utf8');
 
         this.schema = JSON.parse(data);
 

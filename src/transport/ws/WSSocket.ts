@@ -1,8 +1,5 @@
 import WebSocket from 'ws';
-import { TAction, ClientAction, SetIDCAction, ServerAction } from '../../shared/action/TAction';
-
-type NarrowAction<T, N extends string> = T extends TAction<N> ? T : never;
-
+import { NarrowAction, ClientAction, SetIDCAction, ServerAction } from '../../shared/action/TAction';
 
 export type SocketState = 'init' | 'hasID';
 

@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { Matchmaker } from "./battle/Matchmaker";
 import { WSSocket } from './transport/ws/WSSocket';
+import { MatchmakerEnterCAction } from './shared/action/MatchmakerAction';
 
 export class App {
 
@@ -16,7 +17,10 @@ export class App {
         this.ws.on('connection', _socket => {
             // TODO wait id before going further
             const socket = new WSSocket(_socket);
-            this.matchmaker.connection(socket);
+            socket.on<MatchmakerEnterCAction>('matchmaker/enter', action => {
+
+                this.matchmaker.connection(socket);
+            });
         });
     }
 }

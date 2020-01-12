@@ -16,7 +16,11 @@ export class PlayerService {
             name: 'P-' + id,
             state: 'init',
             socket,
-            staticCharacters: this.getCharacters(id)
+            staticCharacters: this.getCharacters(id).map(c => ({
+                ...c,
+                // mock
+                id: Util.getUnique()
+            }))
         };
     }
 
@@ -27,8 +31,6 @@ export class PlayerService {
         } else {
             return [MOCK_CHAR[2]];
         }
-
-        return [];
     }
 }
 

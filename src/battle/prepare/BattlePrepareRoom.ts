@@ -1,4 +1,6 @@
-import path from 'path';
+import urlJoin from 'url-join';
+import { staticURL } from '../..';
+import { BattleLoadEndedCAction, BattleLoadSAction } from '../../shared/action/BattlePrepareAction';
 import { BattleLoadPayload } from '../../shared/BattleLoadPayload';
 import { CharacterType, StaticCharacter } from "../../shared/Character";
 import { MapInfos } from '../../shared/MapInfos';
@@ -7,8 +9,6 @@ import { SpellType } from '../../shared/Spell';
 import { Team } from "../../shared/Team";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
-import { BattleLoadSAction, BattleLoadEndedCAction } from '../../shared/action/BattlePrepareAction';
-
 
 export class BattlePrepareRoom {
 
@@ -57,9 +57,15 @@ export class BattlePrepareRoom {
         const spellTypes: Set<SpellType> = new Set(this.characters.flatMap(c => c.staticSpells.map(s => s.type)));
 
         const payload: BattleLoadPayload = {
-            mapInfos,
-            characterTypes: [...characterTypes],
-            spellTypes: [...spellTypes]
+            mapInfos: {
+                ...mapInfos,
+                urls: {
+                    schema: urlJoin(staticURL, mapInfos.urls.schema),
+                    sheet: urlJoin(staticURL, mapInfos.urls.sheet)
+                }
+            },
+            characterTypes: [ ...characterTypes ],
+            spellTypes: [ ...spellTypes ]
         };
 
         this.players.forEach(p => {
@@ -73,7 +79,7 @@ export class BattlePrepareRoom {
             p.socket.on<BattleLoadEndedCAction>('battle-load-end', action => {
                 p.state = 'battle-ready';
 
-                if(this.players.every(p => p.state === 'battle-ready')) {
+                if (this.players.every(p => p.state === 'battle-ready')) {
 
                     // move everybody to battlerunroom
                     console.log('lets go dudes')
@@ -102,11 +108,11 @@ export class BattlePrepareRoom {
     }
 
     private mock(): void {
-        
+
         this.mapInfos = {
             urls: {
-                schema: path.join('map', 'sample1', 'map_2.json'),
-                sheet: path.join('map', 'sample1', 'map_2.png')
+                schema: 'map/sample1/map_2.json',
+                sheet: 'map/sample1/map_2.png'
             },
             mapKey: 'sampleMap1',
             tilemapKey: 'map_main',
@@ -125,13 +131,13 @@ export class BattlePrepareRoom {
                 id: '1',
                 color: '#FF0000',
                 name: 'Team Rocket',
-                players: [this.players[0]]
+                players: [ this.players[ 0 ] ]
             },
             {
                 id: '2',
                 color: '#FF00FF',
                 name: 'Team Azure',
-                players: [this.players[1]]
+                players: [ this.players[ 1 ] ]
             }
         );
 
