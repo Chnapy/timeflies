@@ -9,9 +9,7 @@
     "test": "react-app-rewired test --env=jsdom"
   },
   "dependencies": {
-    "@types/socket.io-client": "^1.4.32",
-    "easystarjs": "0.4.3",
-    "socket.io-client": "^2.3.0"
+    "easystarjs": "0.4.3"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "6.1.0",
@@ -21,7 +19,6 @@
     "@types/react-dom": "16.9.4",
     "@types/react-redux": "7.1.5",
     "classnames": "2.2.6",
-    "colyseus.js": "0.11.7",
     "file-loader": "5.0.2",
     "phaser": "3.21.0",
     "react": "16.12.0",

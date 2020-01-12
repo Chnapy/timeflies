@@ -1,8 +1,8 @@
-import { Position } from '../entities/Character';
-import { SpellType } from '../entities/Spell';
-import { SpellEngineAbstract } from './SpellEngineAbstract';
+import { Position } from '@shared/Character';
+import { SpellType } from '@shared/Spell';
 import { Controller } from '../../Controller';
 import { BattleRollbackAction } from '../battleReducers/BattleReducerManager';
+import { SpellEngineAbstract } from './SpellEngineAbstract';
 
 export type SpellResultEnum = 'grid' | 'battleState' | 'charState';
 

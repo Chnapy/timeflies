@@ -68,7 +68,7 @@ export class CycleManager {
 
     start(): void {
         this.running = true;
-        setTimeout(() => this.running = false, 500);
+        // setTimeout(() => this.running = false, 500);
     }
 
     update(time: number, delta: number): void {

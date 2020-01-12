@@ -1,7 +1,8 @@
-import { BattleScene } from '../scenes/BattleScene';
-import { Spell, SpellType } from '../entities/Spell';
+import { SpellType } from '@shared/Spell';
 import { Character } from '../entities/Character';
+import { Spell } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
+import { BattleScene } from '../scenes/BattleScene';
 import { CurrentSpellState } from './SpellEngine';
 
 export abstract class SpellEngineAbstract<S extends Exclude<CurrentSpellState, 'none'>, T extends SpellType> {

@@ -1,5 +1,5 @@
+import { Position } from '@shared/Character';
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
-import { Position } from '../../entities/Character';
 
 export class SpellLaunchOrientate extends SpellLaunch<'orientate'> {
 

@@ -1,24 +1,26 @@
+import { SpellType } from '@shared/Spell';
 import React from 'react';
 import { connect } from "react-redux";
 import { UIState } from "../../UIState";
 import { SpellBtn } from './spellBtn/SpellBtn';
 import css from './spellPane.module.css';
-import { SpellType } from '../../../phaser/entities/Spell';
 
 interface SpellPaneInnerProps {
-    mainSpellIds: number[];
-    sideSpellIds: number[];
+    mainSpellIds: string[];
+    sideSpellIds: string[];
 }
 
-const sideSpellTypes: SpellType[] = ['move', 'orientate'];
+const sideSpellTypes: SpellType[] = [ 'move', 'orientate' ];
 
 export const SpellPane = connect<SpellPaneInnerProps, {}, {}, UIState<'battle'>>(
     ({ data: { battleData: { currentTurn } } }) => ({
+        
         mainSpellIds: currentTurn?.currentCharacter.spells
-            .filter(s => !sideSpellTypes.includes(s.type))
+            .filter(s => !sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || [],
+
         sideSpellIds: currentTurn?.currentCharacter.spells
-            .filter(s => sideSpellTypes.includes(s.type))
+            .filter(s => sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || []
     })
 )(({ mainSpellIds, sideSpellIds }: SpellPaneInnerProps) => {

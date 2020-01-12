@@ -6,8 +6,6 @@ import sampleSpritesheet1Schema from '../_assets/spritesheets/sokoban_spriteshee
 import spellsSpritesheetImage from '../_assets/spritesheets/spells_spritesheet.png';
 import spellsSpritesheetSchema from '../_assets/spritesheets/spells_spritesheet.xml';
 
-const sampleMap1Schema = require('../_assets/map/map_2.json');
-
 export type IAssetManager = typeof AssetManager;
 
 type AnimStateMap = {

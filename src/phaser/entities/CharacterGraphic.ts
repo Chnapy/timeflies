@@ -32,7 +32,7 @@ export class CharacterGraphic {
 
         const { tileWidth, tileHeight } = this.scene.map.tilemap;
 
-        this.sprite = this.scene.add.sprite(tileWidth / 2, tileHeight / 2, Character.getSheetKey(this.character.type));
+        this.sprite = this.scene.add.sprite(tileWidth / 2, tileHeight / 2, Character.getSheetKey(this.character.staticData.type));
 
         this.containerSprite.add([
             this.sprite
@@ -72,6 +72,8 @@ export class CharacterGraphic {
 
         this.caContainer = new RectStyled(this.scene);
 
+        const { color: teamColor } = Phaser.Display.Color.HexStringToColor(this.character.team.color);
+
         this.teamRect.setStyle({
             originX: 0,
             originY: 1,
@@ -79,7 +81,7 @@ export class CharacterGraphic {
             y: top,
             width: teamRectSize,
             height: teamRectSize,
-            fillColor: this.character.team.color
+            fillColor: teamColor
         });
 
         this.lifeBarBorder.setStyle({
@@ -120,7 +122,7 @@ export class CharacterGraphic {
         })
             .setOrigin(0, 0);
 
-        this.caContainer.getRootGameObject().add([this.caIcon, this.caText]);
+        this.caContainer.getRootGameObject().add([ this.caIcon, this.caText ]);
 
         this.caContainer.setStyle({
             originX: 0,
@@ -146,9 +148,9 @@ export class CharacterGraphic {
     }
 
     receiveSpell(spell: Spell): void {
-        const { type, attaque } = spell;
-        this.caText.setText(attaque ? `-${attaque}` : '');
-        this.caIcon.setFrame(AssetManager.spells.spellsMap[type])
+        const { staticData: { type }, feature: { attack } } = spell;
+        this.caText.setText(attack ? `-${attack}` : '');
+        this.caIcon.setFrame(AssetManager.spells.spellsMap[ type ])
         this.caContainer.setStyle({ visible: true });
     }
 
@@ -163,7 +165,7 @@ export class CharacterGraphic {
     }
 
     updateLife(): void {
-        const maxLife = this.character.initialFeatures.life;
+        const maxLife = this.character.staticData.initialFeatures.life;
         const presentLife = this.character.features.life;
 
         const ratio = presentLife / maxLife;
@@ -179,7 +181,7 @@ export class CharacterGraphic {
     }
 
     updateAnimation(): void {
-        const { type, state, orientation } = this.character;
+        const { staticData: { type }, state, orientation } = this.character;
 
         this.sprite.anims.play(
             Character.getAnimKey(type, state, orientation),

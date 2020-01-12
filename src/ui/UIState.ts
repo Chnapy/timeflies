@@ -1,4 +1,5 @@
-import { BattleData, BattleRoomState } from "../phaser/scenes/BattleScene";
+import { BattleData } from "../phaser/scenes/BattleScene";
+import { BattleLoadPayload } from '@shared/BattleLoadPayload';
 
 type NarrowState<T, N> = T extends { state: N } ? T : never;
 
@@ -8,7 +9,7 @@ export interface UIStateBoot {
 
 export interface UIStateLoad {
     state: 'load';
-    battleRoomState: BattleRoomState;
+    payload: BattleLoadPayload;
 }
 
 export interface UIStateBattle {

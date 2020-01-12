@@ -1,5 +1,5 @@
-import { Position } from '../entities/Character';
 import { BattleScene } from '../scenes/BattleScene';
+import { Position } from '@shared/Character';
 
 export class CameraManager {
 

@@ -1,6 +1,6 @@
+import { Position } from '@shared/Character';
 import { Controller } from '../../../Controller';
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
-import { Position } from '../../entities/Character';
 import { SpellPrepare } from '../SpellPrepare';
 
 export class SpellPrepareMove extends SpellPrepare<'move'> {
@@ -59,7 +59,7 @@ export class SpellPrepareMove extends SpellPrepare<'move'> {
                 state: 'running',
                 startTime: Date.now(),
                 spell: this.spell,
-                duration: this.spell.time,
+                duration: this.spell.feature.duration,
                 positions
             }
         });

@@ -1,5 +1,5 @@
 import EasyStar from 'easystarjs';
-import { Position } from '../entities/Character';
+import { Position } from '@shared/Character';
 import { BattleData } from '../scenes/BattleScene';
 import { MapManager } from './MapManager';
 

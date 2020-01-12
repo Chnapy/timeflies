@@ -1,6 +1,6 @@
-import { Position } from '../../entities/Character';
+import { Position } from '@shared/Character';
+import { SpellType } from '@shared/Spell';
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
-import { SpellType } from '../../entities/Spell';
 
 export class SpellLaunchDefault extends SpellLaunch<Exclude<SpellType, 'move' | 'orientate'>> {
 
@@ -23,7 +23,7 @@ export class SpellLaunchDefault extends SpellLaunch<Exclude<SpellType, 'move' | 
                 resolve({
                     battleState: true
                 });
-            }, this.spell.time);
+            }, this.spell.feature.duration);
         });
     }
 

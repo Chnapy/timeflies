@@ -1,6 +1,6 @@
+import { Position } from '@shared/Character';
 import { Controller } from '../../../Controller';
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
-import { Position } from '../../entities/Character';
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
 export class SpellLaunchMove extends SpellLaunch<'move'> {
@@ -23,7 +23,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                 battleState: state === 'last',
                 charState: state === 'last',
                 grid: state === 'last'
-            }), this.spell.time);
+            }), this.spell.feature.duration);
         });
     }
 
@@ -35,7 +35,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
 
         this.character.setCharacterState('move');
 
-        const duration = this.spell.time;
+        const duration = this.spell.feature.duration;
 
         const tweens = targetPositions.map<Phaser.Types.Tweens.TweenBuilderConfig>((p, i) => {
             const pWorld = this.map.tileToWorldPosition(p);
@@ -53,7 +53,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                             state: 'running',
                             startTime: Date.now(),
                             spell: this.spell,
-                            duration: this.spell.time,
+                            duration: this.spell.feature.duration,
                             positions: nextPos
                         }
                     });

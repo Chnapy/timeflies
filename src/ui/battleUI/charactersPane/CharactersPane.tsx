@@ -5,7 +5,7 @@ import { CharacterItem } from './characterItem/CharacterItem';
 import { UIState } from '../../UIState';
 
 interface CharactersPaneInnerProps {
-    charactersIds: number[];
+    charactersIds: string[];
 }
 
 export const CharactersPane = connect<CharactersPaneInnerProps, {}, {}, UIState<'battle'>>(

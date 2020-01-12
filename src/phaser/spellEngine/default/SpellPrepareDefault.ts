@@ -1,7 +1,8 @@
+import { Position } from '@shared/Character';
+import { SpellType } from '@shared/Spell';
 import { Controller } from '../../../Controller';
 import { BattleSpellLaunchAction, BattleSpellPrepareAction } from '../../battleReducers/BattleReducerManager';
-import { Character, Position } from '../../entities/Character';
-import { SpellType } from '../../entities/Spell';
+import { Character } from '../../entities/Character';
 import { SpellPrepare } from '../SpellPrepare';
 
 export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' | 'orientate'>> {
@@ -24,7 +25,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
 
         const { map } = this.scene;
 
-        const { zone } = this.spell;
+        const { feature: { area } } = this.spell;
 
         const { position } = this.character;
 
@@ -36,12 +37,12 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
         const tiles: Position[] = [];
 
         let sum = 0;
-        for (let i = 0; i <= zone * 2; i++) {
+        for (let i = 0; i <= area * 2; i++) {
             for (let k = 0; k <= (i - sum) * 2; k++) {
 
                 const newPosition: Position = {
                     x: position.x - i + sum + k,
-                    y: position.y - zone + i
+                    y: position.y - area + i
                 };
 
                 this.line.x2 = newPosition.x;
@@ -63,7 +64,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
                     tiles.push(newPosition);
                 }
             }
-            if (i >= zone) {
+            if (i >= area) {
                 sum += 2;
             }
         }
@@ -103,7 +104,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
         if (this.rectHoveredIndex === -1) {
             Controller.dispatch<BattleSpellPrepareAction>({
                 type: 'battle/spell/prepare',
-                spellType: this.character.defaultSpell.type
+                spellType: this.character.defaultSpell.staticData.type
             });
             return;
         }
@@ -114,7 +115,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
                 state: 'running',
                 startTime: Date.now(),
                 spell: this.spell,
-                duration: this.spell.time,
+                duration: this.spell.feature.duration,
                 positions: [ this.lastPositionHovered! ]
             }
         });

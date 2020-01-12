@@ -8,7 +8,7 @@ export const DataBattleReducer: Reducer<UIStateBattle, GameAction> = (state, act
         case 'battle/launch':
             return {
                 state: 'battle',
-                battleData: action.battleData
+                battleData: action.battleSceneData.battleData
             };
     }
 

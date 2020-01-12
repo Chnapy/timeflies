@@ -2,21 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, Store } from 'redux';
 import ResizeObserver from 'resize-observer-polyfill';
-import io from 'socket.io-client';
 import { GameAction } from './action/GameAction';
 import { App } from './App';
 import { BattleTurnStartAction } from './phaser/battleReducers/BattleReducerManager';
 import { GameEngine } from './phaser/GameEngine';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
-
-const CLIENT_ENDPOINT = 'http://localhost:2567';
+import { WSClient } from './WSClient';
 
 export class Controller {
 
     private static app: App;
     private static game: GameEngine;
-    static client: SocketIOClient.Socket;
+    static client: WSClient;
 
     private static store: Store<UIState, GameAction>;
 
@@ -26,7 +24,7 @@ export class Controller {
             RootReducer
         );
 
-        Controller.client = io(CLIENT_ENDPOINT);
+        Controller.client = new WSClient();
 
         Controller.app = ReactDOM.render(
             React.createElement(App, {

@@ -1,14 +1,7 @@
-import { IAssetMap } from '../../assetManager/AssetManager';
-import { Position } from '../entities/Character';
+import { Position } from '@shared/Character';
 import { BattleScene } from '../scenes/BattleScene';
 import { Pathfinder } from './Pathfinder';
-
-export interface MapInfos {
-    mapKey: keyof IAssetMap;
-    tilemapKey: string;
-    decorLayerKey: string;
-    obstaclesLayerKey: string;
-}
+import { MapInfos } from '@shared/MapInfos';
 
 export class MapManager {
 

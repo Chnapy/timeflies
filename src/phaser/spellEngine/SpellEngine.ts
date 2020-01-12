@@ -1,15 +1,15 @@
-import { Position } from '../entities/Character';
+import { Position } from '@shared/Character';
 import { Spell } from '../entities/Spell';
 import { BattleData, BattleScene } from '../scenes/BattleScene';
-import { SpellLaunch, SpellResult } from './SpellLaunch';
-import { SpellLaunchMove } from './move/SpellLaunchMove';
-import { SpellLaunchOrientate } from './orientate/SpellLaunchOrientate';
 import { SpellLaunchDefault } from './default/SpellLaunchDefault';
-import { SpellEngineAbstract } from './SpellEngineAbstract';
-import { SpellPrepare } from './SpellPrepare';
 import { SpellPrepareDefault } from './default/SpellPrepareDefault';
+import { SpellLaunchMove } from './move/SpellLaunchMove';
 import { SpellPrepareMove } from './move/SpellPrepareMove';
+import { SpellLaunchOrientate } from './orientate/SpellLaunchOrientate';
 import { SpellPrepareOrientate } from './orientate/SpellPrepareOrientate';
+import { SpellEngineAbstract } from './SpellEngineAbstract';
+import { SpellLaunch, SpellResult } from './SpellLaunch';
+import { SpellPrepare } from './SpellPrepare';
 
 export type CurrentSpellState = 'prepare' | 'launch';
 
@@ -89,7 +89,7 @@ export class SpellEngine {
         switch (currentSpell.state) {
 
             case 'prepare':
-                switch (currentSpell.spell.type) {
+                switch (currentSpell.spell.staticData.type) {
                     case 'move':
                         return new SpellPrepareMove(...args);
                     case 'orientate':
@@ -99,7 +99,7 @@ export class SpellEngine {
                 }
 
             case 'launch':
-                switch (currentSpell.spell.type) {
+                switch (currentSpell.spell.staticData.type) {
                     case 'move':
                         return new SpellLaunchMove(...args);
                     case 'orientate':

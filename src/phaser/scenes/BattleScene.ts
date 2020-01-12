@@ -1,42 +1,37 @@
+import { BattleSnapshot, GlobalTurnState } from '@shared/BattleSnapshot';
 import { CharacterType, Orientation } from '@shared/Character';
+import { MapInfos } from '@shared/MapInfos';
 import { SpellType } from '@shared/Spell';
-import { TeamSnapshot } from '@shared/Team';
-import { Room } from 'colyseus.js';
 import { AssetManager } from '../../assetManager/AssetManager';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { Utils } from '../../Utils';
-import { BattleReducerManager } from '../battleReducers/BattleReducerManager';
+import { BattleReducerManager, BattleStartAction } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
 import { CycleManager, Turn } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { Team } from '../entities/Team';
 import { WithSnapshot } from '../entities/WithSnapshot';
-import { MapInfos, MapManager } from '../map/MapManager';
+import { MapManager } from '../map/MapManager';
 import { BattleRoomManager } from '../room/BattleRoomManager';
 import { SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
+import { Controller } from '../../Controller';
 
 export interface BattleSceneData {
-    room: Room<BattleRoomState>;
-    battleData: BattleData;
-}
-
-export interface BattleSnapshot {
-    teamsSnapshots: TeamSnapshot[];
-}
-
-export interface BattleRoomState {
     mapInfos: MapInfos;
     characterTypes: CharacterType[];
     spellTypes: SpellType[];
     battleSnapshot: BattleSnapshot;
+    battleData: BattleData;
 }
 
 export interface BattleData {
+    readonly launchTime: number;
     readonly teams: Team[];
     readonly players: Player[];
     readonly characters: Character[];
+    globalTurnState: GlobalTurnState;
     currentTurn?: Turn;
 }
 
@@ -61,7 +56,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     init(data: BattleSceneData) {
         super.init(data);
-
         this.battleData = data.battleData;
     };
 
@@ -70,7 +64,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     create(data: BattleSceneData) {
 
-        this.room = new BattleRoomManager(data.room);
+        this.room = new BattleRoomManager(data);
 
         this.dataStateManager = new DataStateManager(this, this.room.state.battleSnapshot);
 
@@ -137,6 +131,19 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
             type: 'battle/watch'
         });
 
+        const start = () => Controller.dispatch<BattleStartAction>({
+            type: 'battle/start'
+        });
+
+        const timeBeforeStart = this.battleData.launchTime - Date.now();
+
+
+        if(timeBeforeStart <= 0) {
+            start();
+        } else {
+            setTimeout(start, timeBeforeStart);
+        }
+
         // BattleRoomManager.mockResponse<BRunLaunchSAction>(2000, {
         //     type: 'battle-run/launch',
         //     sendTime: Date.now(),
@@ -156,6 +163,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     getSnapshot(): BattleSnapshot {
         return {
+            launchTime: this.battleData.launchTime,
+            globalTurnState: this.battleData.globalTurnState,
             teamsSnapshots: this.battleData.teams.map(t => t.getSnapshot())
         };
     }

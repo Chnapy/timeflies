@@ -14,6 +14,7 @@ export abstract class ConnectedScene<K extends string, D extends {} | undefined 
     }
 
     init(data: D): void {
+        console.log(`Init scene [${this.key}]`, this);
         this.initData = data;
     }
 

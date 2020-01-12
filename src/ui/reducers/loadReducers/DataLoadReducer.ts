@@ -8,7 +8,7 @@ export const DataLoadReducer: Reducer<UIStateLoad, GameAction> = (state, action)
         case 'load/launch':
             return {
                 state: 'load',
-                battleRoomState: action.room.state
+                payload: action.payload
             };
     }
 

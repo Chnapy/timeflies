@@ -1,12 +1,12 @@
-import { connect } from "react-redux";
-import { UIState } from "../../../UIState";
-import React from "react";
-import css from './timeOverlay.module.css';
-import { SpellType } from "../../../../phaser/entities/Spell";
-import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
-import { AssetManager } from "../../../../assetManager/AssetManager";
+import { SpellType } from "@shared/Spell";
 import classNames from "classnames";
+import React from "react";
+import { connect } from "react-redux";
+import { AssetManager } from "../../../../assetManager/AssetManager";
 import { CharActionState } from "../../../../phaser/cycle/CycleManager";
+import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
+import { UIState } from "../../../UIState";
+import css from './timeOverlay.module.css';
 
 interface TimeAction {
     spellType: SpellType;
@@ -37,20 +37,20 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
 
         const timeActions = charActionStack.reduce<TimeAction[]>((acc, ca) => {
 
-            const previousCa = acc[acc.length - 1];
+            const previousCa = acc[ acc.length - 1 ];
             if (
                 previousCa
                 && previousCa.spellType === 'move'
-                && previousCa.spellType === ca.spell.type
+                && previousCa.spellType === ca.spell.staticData.type
                 && ca.startTime - previousCa.startDateTime - previousCa.duration < 50
             ) {
-                previousCa.duration += ca.spell.time;
+                previousCa.duration += ca.spell.feature.duration;
 
             } else {
                 acc.push({
-                    spellType: ca.spell.type,
+                    spellType: ca.spell.staticData.type,
                     startDateTime: ca.startTime,
-                    duration: ca.spell.time,
+                    duration: ca.spell.feature.duration,
                     state: ca.state
                 });
 
@@ -90,7 +90,7 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
 
 
     return <div className={classNames(css.root, {
-        [css.disabled]: disabled
+        [ css.disabled ]: disabled
     })}>
 
         {itemsProps.map(props => <TimeOverlayItem key={props.top} {...props} />)}
@@ -109,9 +109,9 @@ const TimeOverlayItem: React.FC<TimeOverlayItemProps> = ({
     top, height, spellType, state
 }) => {
 
-    const typeName = AssetManager.spells.spellsMap[spellType];
+    const typeName = AssetManager.spells.spellsMap[ spellType ];
 
-    return <div className={classNames(css.item, css[state])} style={{
+    return <div className={classNames(css.item, css[ state ])} style={{
         top: `${top}%`,
         height: `${height}%`,
 
@@ -119,7 +119,7 @@ const TimeOverlayItem: React.FC<TimeOverlayItemProps> = ({
 
         <div className={css.itemLines} />
 
-        <div className={classNames(spriteCss.sprite, spriteCss[typeName], css.spellSprite)} />
+        <div className={classNames(spriteCss.sprite, spriteCss[ typeName ], css.spellSprite)} />
 
     </div>;
 };

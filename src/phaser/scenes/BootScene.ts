@@ -1,8 +1,9 @@
+import { BattleLoadSAction } from '@shared/action/BattlePrepareAction';
 import { Controller } from '../../Controller';
 import { ReducerManager } from '../../ReducerManager';
-import { BattleRoomState } from './BattleScene';
 import { ConnectedScene } from './ConnectedScene';
-import { LoadScene, LoadLaunchAction } from './LoadScene';
+import { LoadLaunchAction, LoadScene } from './LoadScene';
+import { MatchmakerEnterCAction } from '@shared/action/MatchmakerAction';
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 
@@ -17,27 +18,27 @@ export class BootScene extends ConnectedScene<'BootScene'> {
 
     create(): void {
         this.reducerManager = new class extends ReducerManager<BootScene> {
-            private readonly onLoadStartAction = this.reduce<LoadLaunchAction>('load/launch', ({ room }) => {
-                this.scene.start<LoadScene>('LoadScene', room);
+            private readonly onLoadStartAction = this.reduce<LoadLaunchAction>('load/launch', ({
+                payload
+            }) => {
+                this.scene.start<LoadScene>('LoadScene', payload);
             });
         }(this);
 
-        // TODO
-        Controller.client.joinOrCreate<BattleRoomState>('battle')
-            .then(room => {
+        Controller.client.on<BattleLoadSAction>('battle-load', ({
+            payload
+        }) => {
 
-                room.onMessage(message => {
-                    if(message.type === 'battle_load') {
+            Controller.dispatch<LoadLaunchAction>({
+                type: 'load/launch',
+                payload
+            });
 
-                        Controller.dispatch<LoadLaunchAction>({
-                            type: 'load/launch',
-                            room
-                        });
+        });
 
-                    }
-                });
-            })
-            .catch(e => console.error(e));
+        Controller.client.send<MatchmakerEnterCAction>({
+            type: 'matchmaker/enter'
+        });
     }
 
     update(time: number, delta: number): void {

@@ -1,9 +1,8 @@
 import { ConfirmSAction } from '@shared/action/BattleRunAction';
-import { ClientAction, ServerAction } from '@shared/action/TAction';
-import { Room } from 'colyseus.js';
+import { ClientAction } from '@shared/action/TAction';
+import { BattleSceneData } from 'src/phaser/scenes/BattleScene';
 import { Controller } from '../../Controller';
-import { BattleRollbackAction, BattleStartAction } from '../battleReducers/BattleReducerManager';
-import { BattleRoomState } from '../scenes/BattleScene';
+import { BattleRollbackAction } from '../battleReducers/BattleReducerManager';
 
 
 export interface SendPromise<S extends ClientAction> extends Promise<{
@@ -19,21 +18,20 @@ interface SendTimed<S extends ClientAction> {
     rejectPromise: (receive: ConfirmSAction) => void;
 }
 
-let mockRoom: BattleRoomManager;
+// let mockRoom: BattleRoomManager;
 export class BattleRoomManager {
-    private readonly room: Room<BattleRoomState>;
+    private _state: BattleSceneData;
+    get state(): BattleSceneData {
+        return this._state;
+    }
 
     private readonly sendStack: SendTimed<any>[];
 
-    get state(): BattleRoomState {
-        return this.room.state;
-    }
-
-    constructor(room: Room<BattleRoomState>) {
-        this.room = room;
+    constructor(state: BattleSceneData) {
+        this._state = state;
         this.sendStack = [];
-        room.onMessage(this.onMessage);
-        mockRoom = this;
+        this.setupOnMessage();
+        // mockRoom = this;
     }
 
     readonly send = <S extends ClientAction>(partialMessage: Omit<S, 'sendTime'>, _sendTime?: number): SendPromise<S> => {
@@ -42,7 +40,7 @@ export class BattleRoomManager {
         const message: S = {
             ...partialMessage,
             sendTime
-        } as any;
+        } as S;
 
         const getOnReject = (reject: Function) => (reason) => {
 
@@ -73,23 +71,14 @@ export class BattleRoomManager {
 
         this.sendStack.push(sendTimed);
 
-        this.room.send(message);
+        Controller.client.send<S>(message);
 
         return promise;
     }
 
-    private readonly onMessage = (message: ServerAction): void => {
+    private setupOnMessage(): void {
 
-        switch (message.type) {
-            case 'battle-run/launch':
-                Controller.dispatch<BattleStartAction>({
-                    type: 'battle/start'
-                });
-                return;
-            case 'confirm':
-                this.onConfirm(message);
-                return;
-        }
+        Controller.client.on<ConfirmSAction>('confirm', this.onConfirm);
     };
 
     private readonly onConfirm = (receive: ConfirmSAction): void => {
@@ -107,10 +96,10 @@ export class BattleRoomManager {
         }
     }
 
-    static mockResponse<R extends ServerAction>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {
-        // setTimeout(() => {
-        //     time = time === 'last' ? mockRoom.sendStack[ mockRoom.sendStack.length - 1 ].time : time;
-        //     mockRoom.room.mockResponse(0, data, time);
-        // }, delay);
-    }
+    // static mockResponse<R extends ServerAction>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {
+    //     setTimeout(() => {
+    //         time = time === 'last' ? mockRoom.sendStack[ mockRoom.sendStack.length - 1 ].time : time;
+    //         mockRoom.room.mockResponse(0, data, time);
+    //     }, delay);
+    // }
 }

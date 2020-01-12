@@ -1,3 +1,5 @@
+import { CharActionCAction } from '@shared/action/BattleRunAction';
+import { SpellType } from '@shared/Spell';
 import { IGameAction } from '../../action/GameAction';
 import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
@@ -7,15 +9,11 @@ import { CharAction, CycleManager, GameTime } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
-import { BattleData, BattleScene, BattleRoomState } from '../scenes/BattleScene';
+import { BattleData, BattleScene, BattleSceneData } from '../scenes/BattleScene';
 import { SpellEngine } from '../spellEngine/SpellEngine';
-import { Room } from 'colyseus.js';
-import { CharActionCAction } from '@shared/action/BattleRunAction';
-import { SpellType } from '@shared/Spell';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
-    room: Room<BattleRoomState>;
-    battleData: BattleData;
+    battleSceneData: BattleSceneData;
 }
 
 export interface BattleStartAction extends IGameAction<'battle/start'> {

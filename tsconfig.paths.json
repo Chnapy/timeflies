@@ -4,6 +4,9 @@
         "paths": {
             "@shared/*": [
                 "../timeflies-back/src/shared/*"
+            ],
+            "*": [
+                "*"
             ]
         }
     }
