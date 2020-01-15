@@ -48,7 +48,7 @@ const getGenerateFrameArray = (...frames: number[]): Phaser.Types.Animations.Gen
     zeroPad: 2,
     prefix: 'player_',
     suffix: '.png',
-    frames: frames as any
+    frames
 });
 
 const AssetCharacterStateMap: AnimStateMap = {
