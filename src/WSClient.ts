@@ -6,7 +6,7 @@ export class WSClient {
 
     private readonly socket: WebSocket;
     private readonly listeners: {
-        [ K in ServerAction[ 'type' ] ]?: {
+        [K in ServerAction['type']]?: {
             condition?: (socket: WSClient) => boolean;
             fn: (action: NarrowAction<ServerAction, K>) => void;
         };
@@ -16,11 +16,13 @@ export class WSClient {
         return this.socket.readyState === WebSocket.OPEN;
     }
 
+    private readonly openPromise: Promise<void>;
+
     constructor() {
         this.socket = new WebSocket(ENDPOINT);
         this.listeners = {};
 
-        this.socket.onmessage = ({data}) => {
+        this.socket.onmessage = ({ data }) => {
 
             if (typeof data !== 'string') {
                 throw new Error(`typeof message not handled: ${typeof data}`);
@@ -40,10 +42,19 @@ export class WSClient {
 
             this.onMessage(action);
         };
+
+        this.openPromise = new Promise((resolve, reject) => {
+            this.socket.onopen = () => resolve();
+            this.socket.onerror = () => reject();
+        });
     }
 
-    on<A extends ServerAction>(type: A[ 'type' ], fn: (action: A) => void, condition?: (() => boolean)): void {
-        this.listeners[ type ] = {
+    async waitConnect(): Promise<void> {
+        return this.openPromise;
+    }
+
+    on<A extends ServerAction>(type: A['type'], fn: (action: A) => void, condition?: (() => boolean)): void {
+        this.listeners[type] = {
             condition,
             fn: fn as any
         };
@@ -60,7 +71,7 @@ export class WSClient {
     private onMessage(action: ServerAction): void {
         console.log(action);
 
-        const listener = this.listeners[ action.type ];
+        const listener = this.listeners[action.type];
         if (listener) {
 
             const { condition, fn } = listener;

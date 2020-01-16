@@ -25,19 +25,23 @@ export class BootScene extends ConnectedScene<'BootScene'> {
             });
         }(this);
 
-        Controller.client.on<BattleLoadSAction>('battle-load', ({
-            payload
-        }) => {
+        Controller.client.waitConnect().then(() => {
 
-            Controller.dispatch<LoadLaunchAction>({
-                type: 'load/launch',
+            Controller.client.on<BattleLoadSAction>('battle-load', ({
                 payload
+            }) => {
+
+                Controller.dispatch<LoadLaunchAction>({
+                    type: 'load/launch',
+                    payload
+                });
+
             });
 
-        });
+            Controller.client.send<MatchmakerEnterCAction>({
+                type: 'matchmaker/enter'
+            });
 
-        Controller.client.send<MatchmakerEnterCAction>({
-            type: 'matchmaker/enter'
         });
     }
 
