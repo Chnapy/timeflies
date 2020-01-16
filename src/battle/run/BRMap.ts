@@ -56,8 +56,8 @@ export class BRMap {
             if (!data[i])
                 continue;
 
-            x = Math.floor(i / width);
-            y = i % width;
+            y = Math.floor(i / width);
+            x = i % width;
 
             if (!mapPos[data[i]])
                 mapPos[data[i]] = [];
