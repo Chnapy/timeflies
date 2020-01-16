@@ -3,6 +3,8 @@ import { Controller } from '../../../Controller';
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
+type LaunchState = 'first' | 'middle' | 'last';
+
 export class SpellLaunchMove extends SpellLaunch<'move'> {
 
     private timeline?: Phaser.Tweens.Timeline;
@@ -14,15 +16,17 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
 
         this.character.setPosition(firstPos, false, true, true);
 
-        if (state === 'first') {
+        if (state.includes('first')) {
             this.onStart(targetPositions);
         }
 
+        const isLast = state.includes('last');
+
         return new Promise<SpellResult>(resolve => {
             setTimeout(() => resolve({
-                battleState: state === 'last',
-                charState: state === 'last',
-                grid: state === 'last'
+                battleState: isLast,
+                charState: isLast,
+                grid: isLast
             }), this.spell.feature.duration);
         });
     }
@@ -44,20 +48,22 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                 targets: this.character.getGraphics(),
                 x: { value: pWorld.x, duration },
                 y: { value: pWorld.y, duration },
-                onStart: () => {
-                    const nextPos = targetPositions.slice(i);
+                onStart: i
+                    ? () => {
+                        const nextPos = targetPositions.slice(i);
 
-                    Controller.dispatch<BattleSpellLaunchAction>({
-                        type: 'battle/spell/launch',
-                        charAction: {
-                            state: 'running',
-                            startTime: Date.now(),
-                            spell: this.spell,
-                            duration: this.spell.feature.duration,
-                            positions: nextPos
-                        }
-                    });
-                }
+                        Controller.dispatch<BattleSpellLaunchAction>({
+                            type: 'battle/spell/launch',
+                            charAction: {
+                                state: 'running',
+                                startTime: Date.now(),
+                                spell: this.spell,
+                                duration: this.spell.feature.duration,
+                                positions: nextPos
+                            }
+                        });
+                    }
+                    : undefined
             };
         });
 
@@ -72,15 +78,20 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
         delete this.timeline;
     }
 
-    private getLaunchState(targetPositions: Position[]): 'first' | 'middle' | 'last' {
+    private getLaunchState(targetPositions: Position[]): LaunchState[] {
+        const val: LaunchState[] = [];
         if (!this.timeline) {
-            return 'first';
+            val.push('first');
         }
 
         if (targetPositions.length === 1) {
-            return 'last';
+            val.push('last');
         }
 
-        return 'middle';
+        if (!val.length) {
+            val.push('middle');
+        }
+
+        return val;
     }
 }
