@@ -1,4 +1,4 @@
-import { BRunLaunchSAction, CharActionCAction, ConfirmSAction } from "../../shared/action/BattleRunAction";
+import { BRunLaunchSAction, CharActionCAction, ConfirmSAction, NotifySAction } from "../../shared/action/BattleRunAction";
 import { BattleSnapshot, GlobalTurnState } from "../../shared/BattleSnapshot";
 import { BCharacter } from "../../shared/Character";
 import { MapInfos } from "../../shared/MapInfos";
@@ -37,7 +37,7 @@ export class BattleRunRoom {
         this.map = new BRMap(this.mapInfos);
         const { initPositions } = this.map;
         this.teams.forEach((team, i) => {
-            team.placeCharacters(initPositions[i]);
+            team.placeCharacters(initPositions[ i ]);
         });
     }
 
@@ -70,6 +70,16 @@ export class BattleRunRoom {
         };
 
         player.socket.send<ConfirmSAction>(confirmAction);
+
+        if (confirmAction.isOk) {
+            this.players
+                .filter(p => p.id !== player.id)
+                .forEach(p => p.socket.send<NotifySAction>({
+                    type: 'notify',
+                    charAction: action.charAction,
+                    startTime: action.sendTime
+                }));
+        }
     };
 
     private isCharActionReceivable(action: CharActionCAction, player: BPlayer): boolean {

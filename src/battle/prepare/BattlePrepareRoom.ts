@@ -14,7 +14,7 @@ export class BattlePrepareRoom {
 
     readonly id: string;
 
-    readonly minPlayer: number = 1;
+    readonly minPlayer: number = 2;
     readonly maxPlayer: number = 10;
 
     private mapInfos?: MapInfos;

@@ -14,6 +14,11 @@ export interface ConfirmSAction extends TAction<'confirm'> {
     isOk: boolean;
 }
 
+export interface NotifySAction extends TAction<'notify'> {
+    charAction: CharActionCAction['charAction'];
+    startTime: number;
+}
+
 export interface CharActionCAction extends TAction<'charAction'> {
     charAction: {
         spellId: string;
@@ -24,7 +29,8 @@ export interface CharActionCAction extends TAction<'charAction'> {
 export type BattleRunSAction =
     | BRunLaunchSAction
     | BRunGlobalTurnStartSAction
-    | ConfirmSAction;
+    | ConfirmSAction
+    | NotifySAction;
 
 export type BattleRunCAction =
     | CharActionCAction;
