@@ -3,14 +3,13 @@ import { Controller } from '../../../Controller';
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
-type LaunchState = 'first' | 'middle' | 'last';
+export type LaunchState = 'first' | 'middle' | 'last';
 
 export class SpellLaunchMove extends SpellLaunch<'move'> {
 
     private timeline?: Phaser.Tweens.Timeline;
 
-    async launch(targetPositions: Position[]): Promise<SpellResult> {
-        const state = this.getLaunchState(targetPositions);
+    async launch(targetPositions: Position[], state: LaunchState[]): Promise<SpellResult> {
 
         const [firstPos] = targetPositions;
 
@@ -50,7 +49,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                 y: { value: pWorld.y, duration },
                 onStart: i
                     ? () => {
-                        const nextPos = targetPositions.slice(i);
+                        const nextPos = [p];
 
                         Controller.dispatch<BattleSpellLaunchAction>({
                             type: 'battle/spell/launch',
@@ -60,7 +59,8 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                                 spell: this.spell,
                                 duration: this.spell.feature.duration,
                                 positions: nextPos
-                            }
+                            },
+                            launchState: i < targetPositions.length - 1 ? ['last'] : ['middle']
                         });
                     }
                     : undefined
@@ -74,24 +74,9 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
     }
 
     private onEnd(): void {
-        this.timeline?.pause();
+        this.timeline?.stop();
         delete this.timeline;
-    }
 
-    private getLaunchState(targetPositions: Position[]): LaunchState[] {
-        const val: LaunchState[] = [];
-        if (!this.timeline) {
-            val.push('first');
-        }
-
-        if (targetPositions.length === 1) {
-            val.push('last');
-        }
-
-        if (!val.length) {
-            val.push('middle');
-        }
-
-        return val;
+        this.character.characterGraphic.updatePosition();
     }
 }

@@ -3,7 +3,7 @@ import { Spell } from '../entities/Spell';
 import { BattleData, BattleScene } from '../scenes/BattleScene';
 import { SpellLaunchDefault } from './default/SpellLaunchDefault';
 import { SpellPrepareDefault } from './default/SpellPrepareDefault';
-import { SpellLaunchMove } from './move/SpellLaunchMove';
+import { SpellLaunchMove, LaunchState } from './move/SpellLaunchMove';
 import { SpellPrepareMove } from './move/SpellPrepareMove';
 import { SpellLaunchOrientate } from './orientate/SpellLaunchOrientate';
 import { SpellPrepareOrientate } from './orientate/SpellPrepareOrientate';
@@ -30,14 +30,14 @@ export class SpellEngine {
         this.battleData = battleData;
     }
 
-    async launch(targetPositions: Position[]): Promise<SpellResult> {
+    async launch(targetPositions: Position[], spell: Spell, state: LaunchState[]): Promise<SpellResult> {
         if (!(this.engine instanceof SpellLaunch)) {
             this.setState({
                 state: 'launch',
-                spell: this.engine!.spell
+                spell
             });
         }
-        return (this.engine as SpellLaunch<any>).launch(targetPositions);
+        return (this.engine as SpellLaunch<any>).launch(targetPositions, state);
     }
 
     prepare(spell: Spell): void {
@@ -84,7 +84,7 @@ export class SpellEngine {
         currentSpell: CurrentSpell,
         scene: BattleScene
     ): SpellEngineAbstract<S, any> {
-        const args = [ currentSpell.spell, scene ] as const;
+        const args = [currentSpell.spell, scene] as const;
 
         switch (currentSpell.state) {
 

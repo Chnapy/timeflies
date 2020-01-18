@@ -48,7 +48,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     readonly player: Player;
     readonly team: Team;
 
-    private readonly characterGraphic: CharacterGraphic;
+    readonly characterGraphic: CharacterGraphic;
 
     constructor({
         staticData, orientation, position, features, spellsSnapshots

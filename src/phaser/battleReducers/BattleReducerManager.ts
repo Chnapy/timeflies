@@ -1,4 +1,3 @@
-import { CharActionCAction } from '@shared/action/BattleRunAction';
 import { SpellType } from '@shared/Spell';
 import { IGameAction } from '../../action/GameAction';
 import { Controller } from '../../Controller';
@@ -8,9 +7,10 @@ import { CameraManager } from '../camera/CameraManager';
 import { CharAction, CycleManager, GameTime } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
 import { MapManager } from '../map/MapManager';
-import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
+import { BattleRoomManager } from '../room/BattleRoomManager';
 import { BattleData, BattleScene, BattleSceneData } from '../scenes/BattleScene';
 import { SpellEngine } from '../spellEngine/SpellEngine';
+import { LaunchState } from '../spellEngine/move/SpellLaunchMove';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     battleSceneData: BattleSceneData;
@@ -37,7 +37,7 @@ export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prep
 
 export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
     charAction: CharAction<'running'>;
-    callback?: (promise: SendPromise<CharActionCAction>) => void;
+    launchState?: LaunchState[];  // TODO remove after stack action done
 }
 
 export interface BattleRollbackAction extends IGameAction<'battle/rollback'> {
@@ -118,12 +118,12 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     });
 
     readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
-        charAction, callback
+        charAction, launchState
     }) => {
 
         const { spell, positions } = charAction;
 
-        this.spellEngine.launch(positions)
+        this.spellEngine.launch(positions, spell, launchState || ['first'])
             .then(spellResult => {
 
                 if (spellResult.grid) {
@@ -139,15 +139,11 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
                 }
             });
 
-        const sendPromise = this.cycle.addCharAction(charAction)
+        this.cycle.addCharAction(charAction)
             .catch(confirm => {
                 this.spellEngine.cancel();
-                return Promise.reject(confirm);
+                this.resetState(this.battleData.currentTurn?.currentCharacter);
             });
-
-        if (callback) {
-            callback(sendPromise);
-        }
     });
 
     readonly onRollback = this.reduce<BattleRollbackAction>('battle/rollback', ({

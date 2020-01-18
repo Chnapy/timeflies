@@ -61,7 +61,8 @@ export class SpellPrepareMove extends SpellPrepare<'move'> {
                 spell: this.spell,
                 duration: this.spell.feature.duration,
                 positions
-            }
+            },
+            launchState: positions.length > 1 ? ['first'] : ['first', 'last']
         });
     }
 

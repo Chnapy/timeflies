@@ -4,6 +4,7 @@ import { ReducerManager } from '../../ReducerManager';
 import { ConnectedScene } from './ConnectedScene';
 import { LoadLaunchAction, LoadScene } from './LoadScene';
 import { MatchmakerEnterCAction } from '@shared/action/MatchmakerAction';
+import { SetIDCAction } from '@shared/action/TAction';
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 
@@ -26,6 +27,11 @@ export class BootScene extends ConnectedScene<'BootScene'> {
         }(this);
 
         Controller.client.waitConnect().then(() => {
+
+            Controller.client.send<SetIDCAction>({
+                type: 'set-id',
+                id: Math.random() + ''
+            });
 
             Controller.client.on<BattleLoadSAction>('battle-load', ({
                 payload
