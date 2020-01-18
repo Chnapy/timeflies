@@ -1,4 +1,4 @@
-import { BRunLaunchSAction } from "../../shared/action/BattleRunAction";
+import { BRunLaunchSAction, CharActionCAction, ConfirmSAction } from "../../shared/action/BattleRunAction";
 import { BattleSnapshot, GlobalTurnState } from "../../shared/BattleSnapshot";
 import { BCharacter } from "../../shared/Character";
 import { MapInfos } from "../../shared/MapInfos";
@@ -57,6 +57,26 @@ export class BattleRunRoom {
         };
 
         this.players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
+        this.players.forEach(p => {
+            p.socket.on<CharActionCAction>('charAction', action => this.onCharActionReceive(action, p));
+        });
+    }
+
+    private readonly onCharActionReceive = (action: CharActionCAction, player: BPlayer): void => {
+        const confirmAction: ConfirmSAction = {
+            type: 'confirm',
+            sendTime: action.sendTime,
+            isOk: this.isCharActionReceivable(action, player)
+        };
+
+        player.socket.send<ConfirmSAction>(confirmAction);
+    };
+
+    private isCharActionReceivable(action: CharActionCAction, player: BPlayer): boolean {
+
+        // TODO
+
+        return true;
     }
 
     private generateSnapshot(): BattleSnapshot {

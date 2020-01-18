@@ -5,7 +5,8 @@ import { WSSocket } from '../../transport/ws/WSSocket';
 import { PlayerService } from '../../PlayerService';
 import { Team } from '../../shared/Team';
 import { BattleRunRoom } from './BattleRunRoom';
-import { BRunLaunchSAction } from '../../shared/action/BattleRunAction';
+import { BRunLaunchSAction, BattleRunCAction, BattleRunSAction } from '../../shared/action/BattleRunAction';
+import { CharacterSnapshot } from '../../shared/Character';
 
 describe('BattleRunRoom', () => {
     const URL = `ws://localhost:1234`;
@@ -25,7 +26,7 @@ describe('BattleRunRoom', () => {
     };
 
 
-    const teams: Team[] = [
+    const getTeams: () => Team[] = () => [
         {
             id: '1',
             color: '#FF0000',
@@ -39,25 +40,23 @@ describe('BattleRunRoom', () => {
             players: []
         }
     ];
+    let teams: Team[];
 
     let server: Server;
 
-    let c1: WebSocket;
-    let c2: WebSocket;
+    let c1: WebSocket[];
 
     let battleRunRoom: BattleRunRoom;
 
     jest.useFakeTimers();
 
     beforeEach(() => {
-        if (server) server.close();
-        if (c1) c1.close();
-        if (c2) c2.close();
 
         server = new Server(URL);
         server.on('connection', socket => {
             const wss = new WSSocket(socket as any);
             const player = playerService.getPlayer(wss);
+            teams = getTeams();
             if (teams[0].players.length) {
                 teams[1].players.push(player);
             } else {
@@ -65,10 +64,17 @@ describe('BattleRunRoom', () => {
             }
         });
 
-        c1 = new WebSocket(URL);
-        c2 = new WebSocket(URL);
+        c1 = [1].map(_ => new WebSocket(URL));
 
         jest.runOnlyPendingTimers();
+    });
+
+    afterEach(() => {
+        if (server) server.close();
+        c1.forEach(c => c.close());
+
+        c1 = [];
+        teams = [];
     });
 
     test('should correctly init & start: parsing map, place characters, send first action', () => {
@@ -80,7 +86,7 @@ describe('BattleRunRoom', () => {
 
         const jestFn = jest.fn();
 
-        c1.onmessage = (message: any) => {
+        c1[0].onmessage = (message: any) => {
             if (message.type !== 'message') return;
 
             jestFn();
@@ -92,11 +98,11 @@ describe('BattleRunRoom', () => {
             expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
 
             const positions = action.battleSnapshot.teamsSnapshots
-            .flatMap(t => t.playersSnapshots
-                .flatMap(p => p.charactersSnapshots
-                    .flatMap(c => c.position)
-                )
-            );
+                .flatMap(t => t.playersSnapshots
+                    .flatMap(p => p.charactersSnapshots
+                        .flatMap(c => c.position)
+                    )
+                );
             expect(positions).not.toContain(undefined);
             expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
         };
@@ -108,6 +114,64 @@ describe('BattleRunRoom', () => {
         expect(jestFn).toHaveBeenCalled();
     });
 
+    test('should play a turn with a valid char action', async () => {
+        battleRunRoom = new BattleRunRoom(mapInfos, teams);
+
+        battleRunRoom.init();
+
+        const startFn = jest.fn();
+
+        const onStart = (char: CharacterSnapshot) => {
+            const action: BattleRunCAction = {
+                type: 'charAction',
+                sendTime: Date.now(),
+                charAction: {
+                    spellId: char.spellsSnapshots.find(s => s.staticData.type === 'move')!.staticData.id,
+                    positions: [{
+                        ...char.position,
+                        x: char.position.x + 1
+                    }]
+                }
+            };
+
+            c1[0].send(JSON.stringify(action));
+
+            startFn();
+        };
+
+        c1[0].onmessage = (message: any) => {
+            if (message.type !== 'message') return;
+
+            const action: BattleRunSAction = JSON.parse(message.data);
+
+            switch (action.type) {
+                case 'battle-run/launch':
+                    const { teamsSnapshots } = action.battleSnapshot;
+                    const players = teamsSnapshots.flatMap(t => t.playersSnapshots);
+                    const characters = players.flatMap(p => p.charactersSnapshots);
+                    const positions = characters.flatMap(c => c.position);
+
+                    const char = characters[0];
+
+                    setTimeout(() => onStart(char), action.battleSnapshot.launchTime - Date.now());
+
+                    jest.runOnlyPendingTimers();
+                    break;
+
+                case 'confirm':
+                    console.log(action);
+                    expect(action.isOk).toBe(true);
+                    break;
+            }
+
+        };
+
+        battleRunRoom.start();
+
+        jest.runOnlyPendingTimers();
+
+        expect(startFn).toBeCalled();
+    });
     // ON: CHAR-ACTION
     //  Do checks: character is playing its turn etc
     //  Apply changes

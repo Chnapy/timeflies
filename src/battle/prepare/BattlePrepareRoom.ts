@@ -14,7 +14,7 @@ export class BattlePrepareRoom {
 
     readonly id: string;
 
-    readonly minPlayer: number = 2;
+    readonly minPlayer: number = 1;
     readonly maxPlayer: number = 10;
 
     private mapInfos?: MapInfos;
@@ -41,7 +41,7 @@ export class BattlePrepareRoom {
 
         console.log('player', player.name, ' => room', this.id, this.players.length);
 
-        if (this.players.length >= 2) {
+        if (this.players.length >= this.minPlayer) {
             this.mock();
             this.launchBattle();
         }
@@ -126,20 +126,20 @@ export class BattlePrepareRoom {
             ...this.players.flatMap(p => p.staticCharacters)
         );
 
-        this.teams.push(
+        this.teams.push(...[
             {
                 id: '1',
                 color: '#FF0000',
                 name: 'Team Rocket',
                 players: [ this.players[ 0 ] ]
             },
-            {
+            this.players[ 1 ] && {
                 id: '2',
                 color: '#FF00FF',
                 name: 'Team Azure',
                 players: [ this.players[ 1 ] ]
             }
-        );
+        ].filter(Boolean));
 
     }
 }
