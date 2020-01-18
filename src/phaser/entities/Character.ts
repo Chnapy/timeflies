@@ -26,7 +26,9 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     get id(): string {
         return this.staticData.id;
     }
-    readonly isMine: boolean;
+    get isMine(): boolean {
+        return this.player.itsMe;
+    }
 
     private _position: Position;
     public get position(): Position {
@@ -57,7 +59,6 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
         this.staticData = staticData;
         this._orientation = orientation;
         this._position = position;
-        this.isMine = true; // TODO
 
         this.state = 'idle';
         this._orientation = orientation;

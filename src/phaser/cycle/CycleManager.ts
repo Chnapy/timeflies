@@ -107,11 +107,9 @@ export class CycleManager {
         }
     }
 
-    addCharAction(charAction: CharAction): SendPromise<CharActionCAction> {
+    addCharActionAndSend(charAction: CharAction): SendPromise<CharActionCAction> {
 
-        this.dataStateManager.commit(charAction.startTime);
-
-        this.charActionStack.push(charAction);
+        this.addCharAction(charAction);
 
         return this.room.send<CharActionCAction>({
             type: 'charAction',
@@ -120,6 +118,13 @@ export class CycleManager {
                 positions: charAction.positions
             }
         }, charAction.startTime);
+    }
+
+    addCharAction(charAction: CharAction): void {
+
+        this.dataStateManager.commit(charAction.startTime);
+
+        this.charActionStack.push(charAction);
     }
 
     cancelCharActionByTime(startTime: number, cancelTime: number): void {

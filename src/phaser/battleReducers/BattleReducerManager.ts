@@ -37,6 +37,7 @@ export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prep
 
 export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
     charAction: CharAction<'running'>;
+    fromServer?: boolean;
     launchState?: LaunchState[];  // TODO remove after stack action done
 }
 
@@ -118,12 +119,12 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     });
 
     readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
-        charAction, launchState
+        charAction, launchState, fromServer
     }) => {
 
         const { spell, positions } = charAction;
 
-        this.spellEngine.launch(positions, spell, launchState || ['first'])
+        this.spellEngine.launch(positions, spell, launchState || [ 'first' ])
             .then(spellResult => {
 
                 if (spellResult.grid) {
@@ -139,7 +140,12 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
                 }
             });
 
-        this.cycle.addCharAction(charAction)
+        if (fromServer) {
+            this.cycle.addCharAction(charAction);
+            return;
+        }
+
+        this.cycle.addCharActionAndSend(charAction)
             .catch(confirm => {
                 this.spellEngine.cancel();
                 this.resetState(this.battleData.currentTurn?.currentCharacter);

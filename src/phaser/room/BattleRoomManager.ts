@@ -1,8 +1,8 @@
-import { ConfirmSAction } from '@shared/action/BattleRunAction';
+import { ConfirmSAction, NotifySAction } from '@shared/action/BattleRunAction';
 import { ClientAction } from '@shared/action/TAction';
 import { BattleSceneData } from 'src/phaser/scenes/BattleScene';
 import { Controller } from '../../Controller';
-import { BattleRollbackAction } from '../battleReducers/BattleReducerManager';
+import { BattleRollbackAction, BattleSpellLaunchAction } from '../battleReducers/BattleReducerManager';
 
 
 export interface SendPromise<S extends ClientAction> extends Promise<{
@@ -79,6 +79,8 @@ export class BattleRoomManager {
     private setupOnMessage(): void {
 
         Controller.client.on<ConfirmSAction>('confirm', this.onConfirm);
+
+        Controller.client.on<NotifySAction>('notify', this.onNotify);
     };
 
     private readonly onConfirm = (receive: ConfirmSAction): void => {
@@ -94,7 +96,35 @@ export class BattleRoomManager {
                 send.rejectPromise(receive);
             }
         }
-    }
+    };
+
+    private readonly onNotify = (receive: NotifySAction): void => {
+        const { startTime, charAction } = receive;
+
+        const spell = this.state.battleData.currentTurn?.currentCharacter.spells
+            .find(s => s.id === charAction.spellId);
+
+        if (!spell) {
+            console.error(
+                'notify spell issue',
+                charAction.spellId,
+                this.state.battleData.currentTurn?.currentCharacter.spells.map(s => s.id)
+            );
+            return;
+        }
+
+        Controller.dispatch<BattleSpellLaunchAction>({
+            type: 'battle/spell/launch',
+            charAction: {
+                positions: charAction.positions,
+                state: 'running',
+                spell,
+                startTime,
+                duration: spell.feature.duration
+            },
+            fromServer: true
+        });
+    };
 
     // static mockResponse<R extends ServerAction>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {
     //     setTimeout(() => {
