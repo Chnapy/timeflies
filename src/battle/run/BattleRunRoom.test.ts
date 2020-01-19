@@ -1,12 +1,12 @@
-import path from 'path';
-import { MapInfos } from "../../shared/MapInfos";
 import { Server, WebSocket } from 'mock-socket';
-import { WSSocket } from '../../transport/ws/WSSocket';
+import path from 'path';
 import { PlayerService } from '../../PlayerService';
-import { Team } from '../../shared/Team';
-import { BattleRunRoom } from './BattleRunRoom';
-import { BRunLaunchSAction, BattleRunCAction, BattleRunSAction } from '../../shared/action/BattleRunAction';
+import { BattleRunSAction, CharActionCAction, ConfirmSAction, NotifySAction } from '../../shared/action/BattleRunAction';
 import { CharacterSnapshot } from '../../shared/Character';
+import { MapInfos } from "../../shared/MapInfos";
+import { Team } from '../../shared/Team';
+import { WSSocket } from '../../transport/ws/WSSocket';
+import { BattleRunRoom } from './BattleRunRoom';
 
 describe('BattleRunRoom', () => {
     const URL = `ws://localhost:1234`;
@@ -50,6 +50,78 @@ describe('BattleRunRoom', () => {
 
     jest.useFakeTimers();
 
+    const generateBattleRunRoom = ({
+        c0OnStart, c0OnConfirm, c1OnNotify,
+        c0GetCharActionCAction
+    }: {
+        c0GetCharActionCAction?: (initialAction: CharActionCAction) => CharActionCAction,
+        c0OnStart?: () => void,
+        c0OnConfirm?: (action: ConfirmSAction) => void,
+        c1OnNotify?: (action: NotifySAction) => void
+    }) => {
+        battleRunRoom = new BattleRunRoom(mapInfos, teams);
+
+        battleRunRoom.init();
+
+        const onStart = (char: CharacterSnapshot) => {
+            const initialAction: CharActionCAction = {
+                type: 'charAction',
+                sendTime: Date.now() + 5000,
+                charAction: {
+                    spellId: char.spellsSnapshots.find(s => s.staticData.type === 'move')!.staticData.id,
+                    positions: [ {
+                        ...char.position,
+                        x: char.position.x + 1
+                    } ]
+                }
+            };
+            const action: CharActionCAction = c0GetCharActionCAction
+                ? c0GetCharActionCAction(initialAction)
+                : initialAction;
+
+            clients[ 0 ].send(JSON.stringify(action));
+        };
+
+        clients[ 0 ].onmessage = (message: any) => {
+            if (message.type !== 'message') return;
+
+            const action: BattleRunSAction = JSON.parse(message.data);
+
+            switch (action.type) {
+                case 'battle-run/launch':
+                    const { teamsSnapshots } = action.battleSnapshot;
+                    const players = teamsSnapshots.flatMap(t => t.playersSnapshots);
+                    const characters = players.flatMap(p => p.charactersSnapshots);
+
+                    const char = characters[ 0 ];
+
+                    c0OnStart ? c0OnStart() : null;
+
+                    onStart(char);
+                    break;
+
+                case 'confirm':
+                    c0OnConfirm ? c0OnConfirm(action) : null;
+                    break;
+            }
+
+        };
+
+        clients[ 1 ].onmessage = (message: any) => {
+            if (message.type !== 'message') return;
+
+            const action: BattleRunSAction = JSON.parse(message.data);
+
+            if (action.type === 'notify') {
+                c1OnNotify ? c1OnNotify(action) : null;
+            }
+        };
+
+        battleRunRoom.start();
+
+        jest.runOnlyPendingTimers();
+    };
+
     beforeEach(() => {
         teams = getTeams();
 
@@ -78,38 +150,40 @@ describe('BattleRunRoom', () => {
         teams = [];
     });
 
-    test('should correctly init & start: parsing map, place characters, send first action', () => {
+    test('should correctly init & start: parsing map, place characters, receive first actions', () => {
         battleRunRoom = new BattleRunRoom(mapInfos, teams);
 
         battleRunRoom.init();
 
-        const type: BRunLaunchSAction[ 'type' ] = 'battle-run/launch';
+        const encounteredTypes: BattleRunSAction[ 'type' ][] = [];
 
         const jestFn = jest.fn();
         clients[ 1 ].onmessage = (m: any) => {
-            console.log('M2', m);
-            jestFn()
+            if (m.type !== 'message') return;
+
+            jestFn();
         }
 
         clients[ 0 ].onmessage = (message: any) => {
             if (message.type !== 'message') return;
-            console.log('M1', message);
-            jestFn();
 
-            const action: BRunLaunchSAction = JSON.parse(message.data);
+            const action: BattleRunSAction = JSON.parse(message.data);
 
-            expect(action.type === type).toBeTruthy();
+            encounteredTypes.push(action.type);
 
-            expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
+            if (action.type === 'battle-run/launch') {
 
-            const positions = action.battleSnapshot.teamsSnapshots
-                .flatMap(t => t.playersSnapshots
-                    .flatMap(p => p.charactersSnapshots
-                        .flatMap(c => c.position)
-                    )
-                );
-            expect(positions).not.toContain(undefined);
-            expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
+                expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
+
+                const positions = action.battleSnapshot.teamsSnapshots
+                    .flatMap(t => t.playersSnapshots
+                        .flatMap(p => p.charactersSnapshots
+                            .flatMap(c => c.position)
+                        )
+                    );
+                expect(positions).not.toContain(undefined);
+                expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
+            }
         };
 
         battleRunRoom.start();
@@ -117,82 +191,52 @@ describe('BattleRunRoom', () => {
         jest.runOnlyPendingTimers();
 
         expect(jestFn).toHaveBeenCalled();
+
+        expect(encounteredTypes).toEqual(expect.arrayContaining<BattleRunSAction[ 'type' ]>([
+            "battle-run/launch",
+            "battle-run/global-turn-start",
+            "battle-run/turn-start"
+        ]));
     });
 
     test('should play a turn with a valid char action', async () => {
-        battleRunRoom = new BattleRunRoom(mapInfos, teams);
-
-        battleRunRoom.init();
-
         const startFn = jest.fn();
         const notifyFn = jest.fn();
 
-        const onStart = (char: CharacterSnapshot) => {
-            const action: BattleRunCAction = {
-                type: 'charAction',
-                sendTime: Date.now(),
-                charAction: {
-                    spellId: char.spellsSnapshots.find(s => s.staticData.type === 'move')!.staticData.id,
-                    positions: [ {
-                        ...char.position,
-                        x: char.position.x + 1
-                    } ]
-                }
-            };
+        let charActionSendTime: number;
 
-            clients[ 0 ].send(JSON.stringify(action));
-
-            startFn();
-        };
-
-        clients[ 0 ].onmessage = (message: any) => {
-            if (message.type !== 'message') return;
-
-            const action: BattleRunSAction = JSON.parse(message.data);
-
-            switch (action.type) {
-                case 'battle-run/launch':
-                    const { teamsSnapshots } = action.battleSnapshot;
-                    const players = teamsSnapshots.flatMap(t => t.playersSnapshots);
-                    const characters = players.flatMap(p => p.charactersSnapshots);
-                    const positions = characters.flatMap(c => c.position);
-
-                    const char = characters[ 0 ];
-
-                    setTimeout(() => onStart(char), action.battleSnapshot.launchTime - Date.now());
-
-                    jest.runOnlyPendingTimers();
-                    break;
-
-                case 'confirm':
-                    console.log(action);
-                    expect(action.isOk).toBe(true);
-                    break;
-            }
-
-        };
-
-        clients[ 1 ].onmessage = (message: any) => {
-            if (message.type !== 'message') return;
-
-            const action: BattleRunSAction = JSON.parse(message.data);
-
-            if (action.type === 'notify') {
+        generateBattleRunRoom({
+            c0OnStart: startFn,
+            c0OnConfirm: action => expect(action.isOk).toBe(true),
+            c1OnNotify: action => {
                 notifyFn();
+                expect(action.startTime).toBe(charActionSendTime);
+            },
+            c0GetCharActionCAction: initialAction => {
+                charActionSendTime = initialAction.sendTime;
+                return initialAction;
             }
-        };
-
-        battleRunRoom.start();
-
-        jest.runOnlyPendingTimers();
+        });
 
         expect(startFn).toBeCalled();
         expect(notifyFn).toBeCalled();
     });
-    // ON: CHAR-ACTION
-    //  Do checks: character is playing its turn etc
-    //  Apply changes
-    //  Send confirm to sender
-    //  Send changes to others
+
+    test('should send an invalid charAction and be notified on that', async () => {
+        const notifyFn = jest.fn();
+
+        generateBattleRunRoom({
+            c0OnConfirm: action => expect(action.isOk).toBe(false),
+            c1OnNotify: action => {
+                notifyFn();
+            },
+            c0GetCharActionCAction: initialAction => {
+                initialAction.sendTime -= 10000;
+                return initialAction;
+            }
+        });
+
+        expect(notifyFn).not.toBeCalled();
+    });
 
 });

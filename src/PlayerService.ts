@@ -52,7 +52,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 color: '#FF0000',
                 initialFeatures: {
                     duration: 200,
-                    area: -1,
+                    area: 1,
                     attack: -1
                 }
             },
@@ -98,7 +98,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 color: '#FF0000',
                 initialFeatures: {
                     duration: 100,
-                    area: -1,
+                    area: 1,
                     attack: -1
                 }
             }
@@ -121,7 +121,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 type: 'move',
                 color: '#449955',
                 initialFeatures: {
-                    area: -1,
+                    area: 1,
                     duration: 100,
                     attack: -1
                 }

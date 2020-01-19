@@ -1,7 +1,7 @@
+import bresenham from 'bresenham';
 import fs from 'fs';
 import { TiledLayerTilelayer, TiledMapOrthogonal } from 'tiled-types';
 import urlJoin from 'url-join';
-import { staticURL } from '../..';
 import { Position } from '../../shared/Character';
 import { MapInfos } from "../../shared/MapInfos";
 
@@ -40,6 +40,15 @@ export class BRMap {
         this.initPositions = this.getInitPositions();
     }
 
+    getBresenhamLine(start: Position, end: Position): (Position & { d: number })[] {
+        const path: Position[] = bresenham(start.x, start.y, end.x, end.y);
+
+        return path.map(p => ({
+            ...p,
+            d: this.getLayerTile(this.obstaclesLayer, p)
+        }));
+    }
+
     private getInitPositions(): Position[][] {
 
         const { width, data } = this.initLayer;
@@ -48,23 +57,31 @@ export class BRMap {
             throw new Error('init layer must have data');
         }
 
-        const mapPos: { [k: number]: Position[]; } = {};
+        const mapPos: { [ k: number ]: Position[]; } = {};
 
         let x, y;
         for (let i = 0; i < data.length; i++) {
 
-            if (!data[i])
+            if (!data[ i ])
                 continue;
 
             y = Math.floor(i / width);
             x = i % width;
 
-            if (!mapPos[data[i]])
-                mapPos[data[i]] = [];
+            if (!mapPos[ data[ i ] ])
+                mapPos[ data[ i ] ] = [];
 
-            mapPos[data[i]].push({ x, y });
+            mapPos[ data[ i ] ].push({ x, y });
         }
 
         return Object.values(mapPos);
+    }
+
+    private getLayerTile({ data, width }: TiledLayerTilelayer, { x, y }: Position): number {
+        if (!data) {
+            throw new Error('layer must have data');
+        }
+
+        return data[ y * width + x ];
     }
 }

@@ -49,6 +49,10 @@ export class BCharacter {
 
     readonly spells: readonly BSpell[];
 
+    get isAlive(): boolean {
+        return this.features.life > 0;
+    }
+
     constructor(staticData: StaticCharacter, player: BPlayer) {
         this.staticData = staticData;
         this.player = player;
@@ -73,6 +77,6 @@ export class BCharacter {
     }
 }
 
-export interface CharacterSnapshot extends OmitFn<BCharacter, 'player' | 'spells'> {
+export interface CharacterSnapshot extends OmitFn<BCharacter, 'player' | 'spells' | 'isAlive'> {
     spellsSnapshots: SpellSnapshot[];
 }
