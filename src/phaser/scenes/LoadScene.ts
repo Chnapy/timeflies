@@ -60,7 +60,7 @@ export class LoadScene extends ConnectedScene<'LoadScene', BattleLoadPayload> {
         });
 
         Controller.client.on<BRunLaunchSAction>('battle-run/launch', ({
-            battleSnapshot
+            battleSnapshot, globalTurnState
         }) => {
 
             Controller.dispatch<BattleLaunchAction>({
@@ -70,11 +70,11 @@ export class LoadScene extends ConnectedScene<'LoadScene', BattleLoadPayload> {
                     battleSnapshot,
                     battleData: {
                         launchTime: battleSnapshot.launchTime,
-                        globalTurnState: battleSnapshot.globalTurnState,
                         teams: [],
                         players: [],
                         characters: []
-                    }
+                    },
+                    globalTurnState
                 }
             });
         });

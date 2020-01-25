@@ -27,11 +27,11 @@ interface CharacterItemInnerProps {
 }
 
 export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemExternProps, UIState<'battle'>>(
-    ({ data: { battleData: { characters, currentTurn } } }, { characterId }) => {
+    ({ data: { battleData: { characters, globalTurn } } }, { characterId }) => {
         const character = characters.find(c => c.id === characterId)!;
 
         return {
-            isCurrent: character.id === currentTurn?.currentCharacter.id,
+            isCurrent: character.id === globalTurn?.currentTurn?.currentCharacter.id,
             isMine: character.isMine,
             name: character.staticData.name,
             type: character.staticData.type,

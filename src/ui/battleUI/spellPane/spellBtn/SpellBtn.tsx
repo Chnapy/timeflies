@@ -24,11 +24,11 @@ interface SpellBtnInnerProps {
 
 export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIState<'battle'>>(
     ({
-        data: { battleData: { currentTurn } }
+        data: { battleData: { globalTurn } }
     }, {
         spellId
     }) => {
-        const { currentCharacter, currentSpell } = currentTurn!;
+        const { currentCharacter, currentSpell } = globalTurn!.currentTurn!;
 
         const spell = currentCharacter.spells.find(s => s.id === spellId)!;
         const activeState = currentSpell?.spell.id === spellId ? currentSpell.state : 'none';

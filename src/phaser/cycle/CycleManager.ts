@@ -1,26 +1,18 @@
 import { CharActionCAction } from '@shared/action/BattleRunAction';
-import { Controller } from '../../Controller';
+import { Position } from '@shared/Character';
+import { GlobalTurnSnapshot } from '@shared/GlobalTurn';
+import { TurnSnapshot } from '@shared/Turn';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
-import { BattleTurnEndAction, BattleTurnStartAction } from '../battleReducers/BattleReducerManager';
 import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { Spell } from '../entities/Spell';
 import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
 import { BattleData } from '../scenes/BattleScene';
-import { CurrentSpell } from '../spellEngine/SpellEngine';
-import { Position } from '@shared/Character';
+import { GlobalTurn } from './GlobalTurn';
 
 export interface GameTime {
     phaserTime: number;
     dateTime: number;
-}
-
-export interface Turn {
-    readonly startTime: Readonly<GameTime>;
-    readonly turnDuration: number;
-    readonly currentCharacter: Character;
-    currentSpell?: CurrentSpell;
-    readonly charActionStack: CharAction[];
 }
 
 //TODO handle state
@@ -47,13 +39,12 @@ export class CycleManager {
     readonly players: readonly Player[];
     readonly characters: readonly Character[];
 
-    private running: boolean;
-
-    private currentIndex: number;
-    private lastTime?: number;
+    get running(): boolean {
+        return this.battleData.globalTurn?.currentTurn.state === 'running';
+    }
 
     private get charActionStack(): CharAction[] {
-        return this.battleData.currentTurn!.charActionStack;
+        return this.battleData.globalTurn?.currentTurn.charActionStack || [];
     }
 
     constructor(room: BattleRoomManager, dataStateManager: DataStateManager, battleData: BattleData) {
@@ -62,49 +53,9 @@ export class CycleManager {
         this.battleData = battleData;
         this.players = battleData.players;
         this.characters = battleData.characters;
-        this.currentIndex = 0;
-        this.running = false;
-    }
-
-    start(): void {
-        this.running = true;
-        // setTimeout(() => this.running = false, 500);
     }
 
     update(time: number, delta: number): void {
-        if (!this.running) {
-            return;
-        }
-
-        if (!this.lastTime) {
-            this.lastTime = time;
-            this.currentIndex = 0;
-            this.startTurn(this.getCurrentCharacter(), time, Date.now());
-            return;
-        }
-
-        // const lastCharAction = this.charActionStack[this.charActionStack.length - 1];
-        // if (lastCharAction && lastCharAction.state === 'running') {
-        //     if (Date.now() > lastCharAction.startTime + lastCharAction.duration) {
-        //         lastCharAction.state = 'complete';
-        //     }
-        // }
-
-        const currentCharacter = this.getCurrentCharacter();
-        const elapsedTime = time - this.lastTime;
-        const { actionTime } = currentCharacter.features;
-
-        if (elapsedTime > actionTime) {
-            this.endTurn(currentCharacter);
-
-            this.lastTime += actionTime;
-            this.currentIndex++;
-            if (this.currentIndex >= this.characters.length) {
-                this.currentIndex = 0;
-            }
-
-            this.startTurn(this.getCurrentCharacter(), this.lastTime, Date.now());
-        }
     }
 
     addCharActionAndSend(charAction: CharAction): SendPromise<CharActionCAction> {
@@ -139,35 +90,22 @@ export class CycleManager {
         (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
     }
 
-    private startTurn(character: Character, phaserTime: number, dateTime: number): void {
+    synchronizeGlobalTurn(globalTurnSnapshot: GlobalTurnSnapshot): void {
 
-        const startTime: GameTime = {
-            phaserTime,
-            dateTime
-        };
-
-        this.battleData.currentTurn = {
-            startTime,
-            turnDuration: character.features.actionTime,
-            currentCharacter: character,
-            charActionStack: []
-        };
-
-        Controller.dispatch<BattleTurnStartAction>({
-            type: 'battle/turn/start',
-            character,
-            startTime
-        });
+        if(this.battleData.globalTurn?.id === globalTurnSnapshot.id) {
+            this.battleData.globalTurn.synchronize(globalTurnSnapshot);
+        } else {
+            this.battleData.globalTurn = new GlobalTurn(globalTurnSnapshot, this.characters, this.onGlobalTurnEnd);
+        }
     }
 
-    private endTurn(character: Character): void {
-        Controller.dispatch<BattleTurnEndAction>({
-            type: 'battle/turn/end',
-            character
-        });
+    synchronizeTurn(turnSnapshot: TurnSnapshot): void {
+        const globalTurn = this.battleData.globalTurn!;
+
+        globalTurn.synchronizeTurn(turnSnapshot);
     }
 
-    private getCurrentCharacter(): Character {
-        return this.characters[this.currentIndex];
-    }
+    private onGlobalTurnEnd = (): void => {
+        delete this.battleData.globalTurn;
+    };
 }

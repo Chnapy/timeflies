@@ -11,12 +11,20 @@ interface TimeTextInnerProps {
 }
 
 export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { currentTurn } } }) => {
+    ({ data: { battleData: { globalTurn } } }) => {
+        if (!globalTurn) {
+            return {
+                startDateTime: 0,
+                disabled: true
+            };
+        }
+
+        const { startTime, currentCharacter } = globalTurn.currentTurn;
 
         return {
-            startDateTime: currentTurn?.startTime.dateTime || 0,
-            timeAction: currentTurn?.currentCharacter.features.actionTime,
-            disabled: !currentTurn || !currentTurn.currentCharacter.isMine
+            startDateTime: startTime,
+            timeAction: currentCharacter.features.actionTime,
+            disabled: !currentCharacter.isMine
         };
     }
 )(({
@@ -37,7 +45,7 @@ export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
 
             const now = Date.now();
 
-            const elapsed = now - startDateTime;
+            const elapsed = Math.max(now - startDateTime, 0);
 
             const staying = Math.max(timeAction - elapsed, 0) / 1000;
 

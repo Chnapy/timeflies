@@ -9,10 +9,10 @@ interface CharactersPaneInnerProps {
 }
 
 export const CharactersPane = connect<CharactersPaneInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { characters, currentTurn } } }) => {
+    ({ data: { battleData: { characters, globalTurn } } }) => {
         const charactersIds = characters
             .map(c => c.id)
-            .sort((a, b) => currentTurn?.currentCharacter.id === a ? -1 : 1);
+            .sort((a, b) => globalTurn?.currentTurn?.currentCharacter.id === a ? -1 : 1);
 
         return {
             charactersIds

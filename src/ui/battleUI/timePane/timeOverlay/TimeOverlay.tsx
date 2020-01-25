@@ -23,8 +23,8 @@ interface TimeOverlayInnerProps {
 }
 
 export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { currentTurn } } }) => {
-        if (!currentTurn) {
+    ({ data: { battleData: { globalTurn } } }) => {
+        if (!globalTurn) {
             return {
                 startDateTime: 0,
                 turnDuration: 0,
@@ -32,12 +32,14 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
                 disabled: true
             };
         }
+        
+        const { currentTurn } = globalTurn;
 
         const { charActionStack } = currentTurn;
 
         const timeActions = charActionStack.reduce<TimeAction[]>((acc, ca) => {
 
-            const previousCa = acc[ acc.length - 1 ];
+            const previousCa = acc[acc.length - 1];
             if (
                 previousCa
                 && previousCa.spellType === 'move'
@@ -60,7 +62,7 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
         }, []);
 
         return {
-            startDateTime: currentTurn.startTime.dateTime,
+            startDateTime: currentTurn.startTime,
             turnDuration: currentTurn.turnDuration,
             timeActions,
             disabled: !currentTurn.currentCharacter.isMine
@@ -90,7 +92,7 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
 
 
     return <div className={classNames(css.root, {
-        [ css.disabled ]: disabled
+        [css.disabled]: disabled
     })}>
 
         {itemsProps.map(props => <TimeOverlayItem key={props.top} {...props} />)}
@@ -109,9 +111,9 @@ const TimeOverlayItem: React.FC<TimeOverlayItemProps> = ({
     top, height, spellType, state
 }) => {
 
-    const typeName = AssetManager.spells.spellsMap[ spellType ];
+    const typeName = AssetManager.spells.spellsMap[spellType];
 
-    return <div className={classNames(css.item, css[ state ])} style={{
+    return <div className={classNames(css.item, css[state])} style={{
         top: `${top}%`,
         height: `${height}%`,
 
@@ -119,7 +121,7 @@ const TimeOverlayItem: React.FC<TimeOverlayItemProps> = ({
 
         <div className={css.itemLines} />
 
-        <div className={classNames(spriteCss.sprite, spriteCss[ typeName ], css.spellSprite)} />
+        <div className={classNames(spriteCss.sprite, spriteCss[typeName], css.spellSprite)} />
 
     </div>;
 };

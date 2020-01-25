@@ -7,27 +7,39 @@ import classNames from "classnames";
 interface TimeGaugeInnerProps {
     startDateTime: number;
     turnDuration: number;
+    animate: boolean;
     disabled: boolean;
 }
 
 export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { currentTurn } } }) => {
+    ({ data: { battleData: { globalTurn } } }) => {
+        if (!globalTurn) {
+            return {
+                startDateTime: 0,
+                turnDuration: 0,
+                animate: false,
+                disabled: true
+            };
+        }
+        const { startTime, turnDuration, state, currentCharacter } = globalTurn.currentTurn;
 
         return {
-            startDateTime: currentTurn?.startTime.dateTime || 0,
-            turnDuration: currentTurn?.turnDuration || 0,
-            disabled: !currentTurn || !currentTurn.currentCharacter.isMine
+            startDateTime: startTime,
+            turnDuration,
+            animate: state === 'running',
+            disabled: state !== 'running' || !currentCharacter.isMine
         };
     }
 )(({
     startDateTime,
     turnDuration,
+    animate,
     disabled
 }: TimeGaugeInnerProps) => {
 
     const now = Date.now();
 
-    const delta = now - startDateTime;
+    const delta = Math.max(now - startDateTime, 0);
 
     const timeToEmpty = Math.max(turnDuration - delta, 0);
 
@@ -43,20 +55,31 @@ export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>
             return;
         }
 
-        const keyFrames: Keyframe[] = [
-            { height: `${heightPercent}%` },
-            { height: 0 }
-        ]
+        const update = () => {
+            const now = Date.now();
 
-        current.animate(keyFrames, {
-            duration: timeToEmpty
-        });
+            const delta = Math.max(now - startDateTime, 0);
+
+            const timeToEmpty = Math.max(turnDuration - delta, 0);
+
+            const heightPercent = timeToEmpty
+                ? timeToEmpty * 100 / turnDuration
+                : 0;
+
+            current.style.height = `${heightPercent}%`;
+
+            if (heightPercent > 0) {
+                requestAnimationFrame(update);
+            }
+        };
+
+        requestAnimationFrame(update);
 
     });
 
     return <div className={classNames(css.root, {
         [css.disabled]: disabled
     })}>
-            <div ref={frontRef} className={css.gauge_front} />
+        <div ref={frontRef} className={css.gauge_front} />
     </div>;
 });

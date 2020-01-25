@@ -1,13 +1,14 @@
-import { BattleSnapshot, GlobalTurnState } from '@shared/BattleSnapshot';
+import { BattleSnapshot } from '@shared/BattleSnapshot';
+import { GlobalTurnSnapshot } from '@shared/GlobalTurn';
 import { CharacterType, Orientation } from '@shared/Character';
 import { MapInfos } from '@shared/MapInfos';
 import { SpellType } from '@shared/Spell';
 import { AssetManager } from '../../assetManager/AssetManager';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { Utils } from '../../Utils';
-import { BattleReducerManager, BattleStartAction } from '../battleReducers/BattleReducerManager';
+import { BattleReducerManager } from '../battleReducers/BattleReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CycleManager, Turn } from '../cycle/CycleManager';
+import { CycleManager } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
 import { Team } from '../entities/Team';
@@ -16,7 +17,7 @@ import { MapManager } from '../map/MapManager';
 import { BattleRoomManager } from '../room/BattleRoomManager';
 import { SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
-import { Controller } from '../../Controller';
+import { GlobalTurn } from '../cycle/GlobalTurn';
 
 export interface BattleSceneData {
     mapInfos: MapInfos;
@@ -24,6 +25,7 @@ export interface BattleSceneData {
     spellTypes: SpellType[];
     battleSnapshot: BattleSnapshot;
     battleData: BattleData;
+    globalTurnState: GlobalTurnSnapshot;
 }
 
 export interface BattleData {
@@ -31,8 +33,7 @@ export interface BattleData {
     readonly teams: Team[];
     readonly players: Player[];
     readonly characters: Character[];
-    globalTurnState: GlobalTurnState;
-    currentTurn?: Turn;
+    globalTurn?: GlobalTurn;
 }
 
 export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> implements WithSnapshot<BattleSnapshot> {
@@ -45,7 +46,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     private graphics!: Phaser.GameObjects.Graphics;
     map!: MapManager;
-    private cycle!: CycleManager;
+    cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
 
     battleData!: BattleData;
@@ -64,7 +65,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     create(data: BattleSceneData) {
 
-        this.room = new BattleRoomManager(data);
+        this.room = new BattleRoomManager(this, data);
 
         this.dataStateManager = new DataStateManager(this, this.room.state.battleSnapshot);
 
@@ -87,6 +88,8 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         this.spellEngine = new SpellEngine(this, this.battleData);
 
         this.cycle = new CycleManager(this.room, this.dataStateManager, this.battleData);
+
+        this.cycle.synchronizeGlobalTurn(data.globalTurnState);
 
         this.graphics = this.add.graphics();
 
@@ -130,25 +133,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         this.reducerManager.onWatch({
             type: 'battle/watch'
         });
-
-        const start = () => Controller.dispatch<BattleStartAction>({
-            type: 'battle/start'
-        });
-
-        const timeBeforeStart = this.battleData.launchTime - Date.now();
-
-
-        if(timeBeforeStart <= 0) {
-            start();
-        } else {
-            setTimeout(start, timeBeforeStart);
-        }
-
-        // BattleRoomManager.mockResponse<BRunLaunchSAction>(2000, {
-        //     type: 'battle-run/launch',
-        //     sendTime: Date.now(),
-        //     battleSnapshot: 
-        // });
     }
 
     update(time: number, delta: number): void {
@@ -164,7 +148,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     getSnapshot(): BattleSnapshot {
         return {
             launchTime: this.battleData.launchTime,
-            globalTurnState: this.battleData.globalTurnState,
             teamsSnapshots: this.battleData.teams.map(t => t.getSnapshot())
         };
     }

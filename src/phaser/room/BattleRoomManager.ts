@@ -1,6 +1,6 @@
-import { ConfirmSAction, NotifySAction } from '@shared/action/BattleRunAction';
+import { ConfirmSAction, NotifySAction, BRunGlobalTurnStartSAction, BRunTurnStartSAction } from '@shared/action/BattleRunAction';
 import { ClientAction } from '@shared/action/TAction';
-import { BattleSceneData } from 'src/phaser/scenes/BattleScene';
+import { BattleSceneData, BattleScene } from 'src/phaser/scenes/BattleScene';
 import { Controller } from '../../Controller';
 import { BattleRollbackAction, BattleSpellLaunchAction } from '../battleReducers/BattleReducerManager';
 
@@ -20,6 +20,9 @@ interface SendTimed<S extends ClientAction> {
 
 // let mockRoom: BattleRoomManager;
 export class BattleRoomManager {
+
+    private readonly scene: BattleScene;
+
     private _state: BattleSceneData;
     get state(): BattleSceneData {
         return this._state;
@@ -27,7 +30,8 @@ export class BattleRoomManager {
 
     private readonly sendStack: SendTimed<any>[];
 
-    constructor(state: BattleSceneData) {
+    constructor(scene: BattleScene, state: BattleSceneData) {
+        this.scene = scene;
         this._state = state;
         this.sendStack = [];
         this.setupOnMessage();
@@ -78,15 +82,31 @@ export class BattleRoomManager {
 
     private setupOnMessage(): void {
 
+        Controller.client.on<BRunGlobalTurnStartSAction>('battle-run/global-turn-start', this.onGlobalTurnStart);
+
+        Controller.client.on<BRunTurnStartSAction>('battle-run/turn-start', this.onTurnStart);
+
         Controller.client.on<ConfirmSAction>('confirm', this.onConfirm);
 
         Controller.client.on<NotifySAction>('notify', this.onNotify);
     };
 
+    private readonly onGlobalTurnStart = (action: BRunGlobalTurnStartSAction): void => {
+        const {cycle} = this.scene;
+        
+        cycle.synchronizeGlobalTurn(action.globalTurnState);
+    };
+
+    private readonly onTurnStart = (action: BRunTurnStartSAction): void => {
+        const {cycle} = this.scene;
+        
+        cycle.synchronizeTurn(action.turnState);
+    };
+
     private readonly onConfirm = (receive: ConfirmSAction): void => {
         const { sendTime, isOk } = receive;
         // TODO check time, may be wrong
-        while (this.sendStack.length && this.sendStack[ this.sendStack.length - 1 ].time >= sendTime) {
+        while (this.sendStack.length && this.sendStack[this.sendStack.length - 1].time >= sendTime) {
 
             const send = this.sendStack.pop()!;
 
@@ -101,14 +121,14 @@ export class BattleRoomManager {
     private readonly onNotify = (receive: NotifySAction): void => {
         const { startTime, charAction } = receive;
 
-        const spell = this.state.battleData.currentTurn?.currentCharacter.spells
+        const spell = this.state.battleData.globalTurn?.currentTurn?.currentCharacter.spells
             .find(s => s.id === charAction.spellId);
 
         if (!spell) {
             console.error(
                 'notify spell issue',
                 charAction.spellId,
-                this.state.battleData.currentTurn?.currentCharacter.spells.map(s => s.id)
+                this.state.battleData.globalTurn?.currentTurn?.currentCharacter.spells.map(s => s.id)
             );
             return;
         }

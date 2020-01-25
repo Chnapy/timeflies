@@ -21,7 +21,7 @@ export interface BattleStartAction extends IGameAction<'battle/start'> {
 
 export interface BattleTurnStartAction extends IGameAction<'battle/turn/start'> {
     character: Character;
-    startTime: GameTime;
+    startTime: number;
 }
 
 export interface BattleTurnEndAction extends IGameAction<'battle/turn/end'> {
@@ -77,10 +77,6 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         super(scene);
     }
 
-    readonly onBattleStart = this.reduce<BattleStartAction>('battle/start', action => {
-        this.cycle.start();
-    });
-
     readonly onWatch = this.reduce<BattleWatchAction>('battle/watch', () => {
         this.spellEngine.watch();
     });
@@ -88,8 +84,12 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     readonly onSpellPrepare = this.reduce<BattleSpellPrepareAction>('battle/spell/prepare', ({
         spellType
     }) => {
-        const { currentTurn } = this.battleData;
+        const { currentTurn } = this.battleData.globalTurn!;
 
+        /**
+         * If currentSpell if alread selected, reset to default spell,
+         * else, prepare the new spell
+         */
         const spell = currentTurn?.currentSpell?.spell.staticData.type === spellType
             && currentTurn.currentSpell.state === 'prepare'
 
@@ -111,8 +111,6 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
 
         this.dataStateManager.commit();
 
-        delete this.battleData.currentTurn;
-
         Controller.dispatch<BattleWatchAction>({
             type: 'battle/watch',
         });
@@ -124,7 +122,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
 
         const { spell, positions } = charAction;
 
-        this.spellEngine.launch(positions, spell, launchState || [ 'first' ])
+        this.spellEngine.launch(positions, spell, launchState || ['first'])
             .then(spellResult => {
 
                 if (spellResult.grid) {
@@ -148,7 +146,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         this.cycle.addCharActionAndSend(charAction)
             .catch(confirm => {
                 this.spellEngine.cancel();
-                this.resetState(this.battleData.currentTurn?.currentCharacter);
+                this.resetState(this.battleData.globalTurn?.currentTurn?.currentCharacter);
             });
     });
 
