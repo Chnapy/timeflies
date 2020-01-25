@@ -193,9 +193,7 @@ describe('BattleRunRoom', () => {
         expect(jestFn).toHaveBeenCalled();
 
         expect(encounteredTypes).toEqual(expect.arrayContaining<BattleRunSAction[ 'type' ]>([
-            "battle-run/launch",
-            "battle-run/global-turn-start",
-            "battle-run/turn-start"
+            "battle-run/launch"
         ]));
     });
 

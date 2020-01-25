@@ -1,16 +1,19 @@
 import { CharActionCAction } from '../../shared/action/BattleRunAction';
-import { BPlayer } from '../../shared/Player';
-import { BattleRunRoom } from './BattleRunRoom';
 import { Position } from '../../shared/Character';
+import { BPlayer } from '../../shared/Player';
+import { BRCycle } from './BRCycle';
+import { BRMap } from './BRMap';
 
 export class BRCharActionChecker {
 
     private readonly checkList: readonly ((action: CharActionCAction, player: BPlayer) => boolean)[];
 
-    private readonly room: BattleRunRoom;
+    private readonly cycle: BRCycle;
+    private readonly map: BRMap;
 
-    constructor(room: BattleRunRoom) {
-        this.room = room;
+    constructor(cycle: BRCycle, map: BRMap) {
+        this.cycle = cycle;
+        this.map = map;
         this.checkList = [
             this.checkPlayer,
             this.checkCharacter,
@@ -24,9 +27,10 @@ export class BRCharActionChecker {
     }
 
     private checkPlayer(action: CharActionCAction, player: BPlayer): boolean {
-        const { currentTurn } = this.room.globalTurnState;
+        const { currentTurn } = this.cycle.globalTurn;
 
         if (currentTurn.character.player.id !== player.id) {
+            console.log('check player');
             return false;
         }
 
@@ -36,15 +40,17 @@ export class BRCharActionChecker {
     private checkCharacter({ charAction }: CharActionCAction, player: BPlayer): boolean {
         const { currentTurn: {
             character
-        } } = this.room.globalTurnState;
+        } } = this.cycle.globalTurn;
 
         if (!character.isAlive) {
+            console.log('check isAlive');
             return false;
         }
 
         const spell = character.spells.find(s => s.staticData.id === charAction.spellId);
 
         if (!spell) {
+            console.log('check spell');
             return false;
         }
 
@@ -52,17 +58,19 @@ export class BRCharActionChecker {
     }
 
     private checkTime({ sendTime, charAction }: CharActionCAction): boolean {
-        const { currentTurn } = this.room.globalTurnState;
+        const { currentTurn } = this.cycle.globalTurn;
 
         if (sendTime < currentTurn.startTime) {
+            console.log('check startTime');
             return false;
         }
 
-        const { character, estimatedDuration } = currentTurn;
+        const { character, turnDuration } = currentTurn;
 
         const spell = character.spells.find(s => s.staticData.id === charAction.spellId)!;
 
-        if (sendTime - currentTurn.startTime + spell.features.duration > estimatedDuration) {
+        if (sendTime - currentTurn.startTime + spell.features.duration > turnDuration) {
+            console.log('check duration');
             return false;
         }
 
@@ -72,7 +80,7 @@ export class BRCharActionChecker {
     private checkPositions({ charAction }: CharActionCAction): boolean {
         const { spellId, positions } = charAction;
 
-        const { map, globalTurnState } = this.room;
+        const { globalTurn: globalTurnState } = this.cycle;
 
         const { currentTurn: { character }, charactersOrdered } = globalTurnState;
 
@@ -82,7 +90,7 @@ export class BRCharActionChecker {
 
         const { features: { area } } = spell;
 
-        const [ endPos ] = positions;
+        const [endPos] = positions;
 
         // Check if in spell area
 
@@ -112,15 +120,17 @@ export class BRCharActionChecker {
         }
 
         if (!isInArea) {
+            console.log('check isInArea');
             return false;
         }
 
         // Check obstacles
 
-        const line = map.getBresenhamLine(startPos, endPos)
+        const line = this.map.getBresenhamLine(startPos, endPos)
             .slice(1);
 
         if (line.some(({ d }) => d !== 0)) {
+            console.log('check bresenham');
             return false;
         }
 
@@ -132,6 +142,7 @@ export class BRCharActionChecker {
         switch (spell.staticData.type) {
             case 'move':
                 if (occupiedPath.some(v => v)) {
+                    console.log('check move');
                     return false;
                 }
                 break;
@@ -139,6 +150,7 @@ export class BRCharActionChecker {
                 if (occupiedPath
                     .slice(0, occupiedPath.length - 1)
                     .some(v => v)) {
+                        console.log('check default');
                     return false;
                 }
                 break;

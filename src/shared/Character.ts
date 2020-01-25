@@ -1,6 +1,5 @@
 import { BPlayer } from "./Player";
 import { BSpell, SpellSnapshot, StaticSpell } from "./Spell";
-import { OmitFn } from "../types/global";
 
 export type Orientation = 'left' | 'right' | 'top' | 'bottom';
 
@@ -36,6 +35,10 @@ export interface StaticCharacter {
 }
 
 export class BCharacter {
+
+    get id(): string {
+        return this.staticData.id;
+    }
 
     readonly staticData: Readonly<StaticCharacter>;
 
@@ -77,6 +80,10 @@ export class BCharacter {
     }
 }
 
-export interface CharacterSnapshot extends OmitFn<BCharacter, 'player' | 'spells' | 'isAlive'> {
+export interface CharacterSnapshot {
+    readonly staticData: Readonly<StaticCharacter>;
+    position: Position;
+    orientation: Orientation;
+    readonly features: CharacterFeatures;
     spellsSnapshots: SpellSnapshot[];
 }
