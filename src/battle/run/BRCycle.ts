@@ -1,6 +1,7 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction } from "../../shared/action/BattleRunAction";
 import { BCharacter } from "../../shared/Character";
-import { BGlobalTurn, GLOBALTURN_DELAY } from "../../shared/GlobalTurn";
+import { GLOBALTURN_DELAY } from "../../shared/GlobalTurnSnapshot";
+import { BGlobalTurn } from "../../entities/BGlobalTurn";
 import { BPlayer } from "../../shared/Player";
 import { TurnIDGenerator, getTurnIdGenerator } from "../../shared/getTurnIdGenerator";
 

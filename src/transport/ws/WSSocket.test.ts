@@ -1,5 +1,6 @@
 import { Server, WebSocket } from "mock-socket";
-import { WSSocket, SetIDTAction } from "./WSSocket";
+import { WSSocket } from "./WSSocket";
+import { SetIDCAction } from "../../shared/action/TAction";
 
 describe('WSSocket', () => {
     const URL = `ws://localhost:1234`;
@@ -34,7 +35,7 @@ describe('WSSocket', () => {
 
     test('action set-id should set the socket ID', () => {
 
-        const action: SetIDTAction = {
+        const action: SetIDCAction = {
             type: 'set-id',
             sendTime: Date.now(),
             id: 'hummus'

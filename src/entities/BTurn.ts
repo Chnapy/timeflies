@@ -1,4 +1,5 @@
-import { BCharacter } from "./Character";
+import { BCharacter } from "../shared/Character";
+import { TurnSnapshot } from "../shared/TurnSnapshot";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
@@ -57,12 +58,12 @@ export class BTurn {
             clearTimeout(this.timedActionTimeout);
             delete this.timedActionTimeout;
         }
-
         const now = Date.now();
         if (this.state === 'idle') {
             const diff = this.startTime - now;
             this.timedActionTimeout = setTimeout(this.start, diff);
-        } else if (this.state === 'running') {
+        }
+        else if (this.state === 'running') {
             const diff = this.endTime - now;
             this.timedActionTimeout = setTimeout(this.end, diff);
         }
@@ -72,19 +73,11 @@ export class BTurn {
         console.log('TURN-START', this.id);
         this.onTurnStart();
         this.refreshTimedActions();
-    }
+    };
 
     private end = (): void => {
         console.log('TURN-END', this.id);
         this.onTurnEnd();
         this.refreshTimedActions();
-    }
+    };
 }
-
-export interface TurnSnapshot {
-    id: number;
-    startTime: number;
-    characterId: string;
-}
-
-export const TURN_DELAY = 1000;

@@ -1,8 +1,8 @@
 import { TAction } from "./TAction";
 import { BattleSnapshot } from "../BattleSnapshot";
 import { Position } from "../Character";
-import { GlobalTurnSnapshot } from "../GlobalTurn";
-import { TurnSnapshot } from "../Turn";
+import { GlobalTurnSnapshot } from "../GlobalTurnSnapshot";
+import { TurnSnapshot } from "../TurnSnapshot";
 
 export interface BRunLaunchSAction extends TAction<'battle-run/launch'> {
     battleSnapshot: BattleSnapshot;

@@ -1,6 +1,8 @@
-import { BCharacter } from "./Character";
-import { TurnIDGenerator } from "./getTurnIdGenerator";
-import { BTurn, TurnSnapshot, TURN_DELAY } from "./Turn";
+import { BCharacter } from "../shared/Character";
+import { TurnIDGenerator } from "../shared/getTurnIdGenerator";
+import { TURN_DELAY } from "../shared/TurnSnapshot";
+import { BTurn } from "./BTurn";
+import { GlobalTurnSnapshot } from "../shared/GlobalTurnSnapshot";
 
 export type GlobalState = 'idle' | 'running';
 
@@ -39,22 +41,17 @@ export class BGlobalTurn {
         this.generateTurnId = generateTurnId;
         this.onGlobalTurnEnd = onGlobalTurnEnd;
         this.onTurnStart = onTurnStart;
-        this.setCurrentTurn(
-            new BTurn(generateTurnId(), startTime, this.charactersOrdered[0], () => null, this.onTurnEnd)
-        );
+        this.setCurrentTurn(new BTurn(generateTurnId(), startTime, this.charactersOrdered[0], () => null, this.onTurnEnd));
     }
 
     private onTurnEnd = (): void => {
         console.log('GT-TURN-ONEND', this.id, this.currentCharacterIndex);
-
         if (this.currentCharacterIndex === this.charactersOrdered.length - 1) {
             this.onGlobalTurnEnd(this.currentTurn.endTime);
-        } else {
+        }
+        else {
             const currentCharacter = this.charactersOrdered[this.currentCharacterIndex + 1];
-
-            this.setCurrentTurn(
-                new BTurn(this.generateTurnId(), this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd)
-            );
+            this.setCurrentTurn(new BTurn(this.generateTurnId(), this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd));
         }
     };
 
@@ -67,12 +64,3 @@ export class BGlobalTurn {
         };
     }
 }
-
-export interface GlobalTurnSnapshot {
-    id: number;
-    startTime: number;
-    order: string[];
-    currentTurn: TurnSnapshot;
-}
-
-export const GLOBALTURN_DELAY = 2000;
