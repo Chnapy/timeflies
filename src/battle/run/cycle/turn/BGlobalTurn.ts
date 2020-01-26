@@ -12,7 +12,6 @@ export class BGlobalTurn {
     startTime: number;
     charactersOrdered: readonly BCharacter[];
     private _currentTurn!: BTurn;
-    private currentCharacterIndex!: number;
     private readonly generateTurnId: TurnIDGenerator;
     private readonly onGlobalTurnEnd: (endTime: number) => void;
     private readonly onTurnStart: () => void;
@@ -31,29 +30,50 @@ export class BGlobalTurn {
 
     private setCurrentTurn(turn: BTurn) {
         this._currentTurn = turn;
-        this.currentCharacterIndex = this.charactersOrdered.findIndex(c => c.id === turn.character.id);
     }
 
     constructor(id: number, startTime: number, charactersOrdered: readonly BCharacter[], generateTurnId: TurnIDGenerator, onGlobalTurnEnd: (endTime: number) => void, onTurnStart: () => void) {
         this.id = id;
         this.startTime = startTime;
-        this.charactersOrdered = charactersOrdered;
+        this.charactersOrdered = [ ...charactersOrdered ];
         this.generateTurnId = generateTurnId;
         this.onGlobalTurnEnd = onGlobalTurnEnd;
         this.onTurnStart = onTurnStart;
-        this.setCurrentTurn(new BTurn(generateTurnId(), startTime, this.charactersOrdered[0], () => null, this.onTurnEnd));
+        this.setCurrentTurn(new BTurn(generateTurnId(), startTime, this.charactersOrdered[ 0 ], () => null, this.onTurnEnd));
+    }
+
+    notifyDeaths(): void {
+        if(!this.currentTurn.character.isAlive) {
+            this.onTurnEnd();
+        }
     }
 
     private onTurnEnd = (): void => {
-        console.log('GT-TURN-ONEND', this.id, this.currentCharacterIndex);
-        if (this.currentCharacterIndex === this.charactersOrdered.length - 1) {
+        this.currentTurn.clearTimedActions();
+
+        const currentCharacterIndex = this.getCurrentCharacterIndex();
+
+        this.runNextTurn(currentCharacterIndex + 1);
+    };
+
+    private runNextTurn(nextCharacterIndex: number): void {
+
+        if (nextCharacterIndex >= this.charactersOrdered.length) {
             this.onGlobalTurnEnd(this.currentTurn.endTime);
         }
         else {
-            const currentCharacter = this.charactersOrdered[this.currentCharacterIndex + 1];
-            this.setCurrentTurn(new BTurn(this.generateTurnId(), this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd));
+            const currentCharacter = this.charactersOrdered[ nextCharacterIndex ];
+            if (currentCharacter.isAlive) {
+                this.setCurrentTurn(new BTurn(this.generateTurnId(), this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd));
+            } else {
+                this.runNextTurn(nextCharacterIndex + 1);
+            }
         }
-    };
+    }
+
+    private getCurrentCharacterIndex(): number {
+        return this.charactersOrdered.findIndex(c => c.id === this.currentTurn.character.id);
+    }
 
     toSnapshot(): GlobalTurnSnapshot {
         return {

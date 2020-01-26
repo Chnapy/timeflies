@@ -1,13 +1,14 @@
 import { BRunLaunchSAction, CharActionCAction, ConfirmSAction, NotifySAction } from "../../shared/action/BattleRunAction";
 import { BattleSnapshot } from "../../shared/BattleSnapshot";
-import { BCharacter } from "./entities/BCharacter";
 import { MapInfos } from "../../shared/MapInfos";
-import { BPlayer } from "./entities/BPlayer";
 import { Team } from "../../shared/Team";
-import { BTeam } from "./entities/BTeam";
 import { BRCharActionChecker } from './BRCharActionChecker';
-import { BRCycle } from "./cycle/BRCycle";
 import { BRMap } from "./BRMap";
+import { BRState } from './BRState';
+import { BRCycle } from "./cycle/BRCycle";
+import { BCharacter } from "./entities/BCharacter";
+import { BPlayer } from "./entities/BPlayer";
+import { BTeam } from "./entities/BTeam";
 
 const LAUNCH_DELAY = 5000; // TODO use config system
 
@@ -26,6 +27,7 @@ export class BattleRunRoom {
 
     private charActionChecker!: BRCharActionChecker;
     private cycle!: BRCycle;
+    private state!: BRState;
 
     constructor(
         mapInfos: MapInfos,
@@ -50,6 +52,7 @@ export class BattleRunRoom {
 
         this.cycle = new BRCycle(this.players, this.characters, this.launchTime);
         this.charActionChecker = new BRCharActionChecker(this.cycle, this.map);
+        this.state = new BRState(this.cycle, this.characters);
 
         const battleSnapshot = this.generateSnapshot();
 
@@ -78,6 +81,7 @@ export class BattleRunRoom {
         player.socket.send<ConfirmSAction>(confirmAction);
 
         if (confirmAction.isOk) {
+            this.state.applyCharAction(action.charAction);
             this.players
                 .filter(p => p.id !== player.id)
                 .forEach(p => p.socket.send<NotifySAction>({

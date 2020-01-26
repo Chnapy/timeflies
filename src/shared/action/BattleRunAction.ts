@@ -21,16 +21,18 @@ export interface ConfirmSAction extends TAction<'confirm'> {
     isOk: boolean;
 }
 
+export interface CharAction {
+    spellId: string;
+    positions: Position[];
+}
+
 export interface NotifySAction extends TAction<'notify'> {
-    charAction: CharActionCAction['charAction'];
+    charAction: CharAction;
     startTime: number;
 }
 
 export interface CharActionCAction extends TAction<'charAction'> {
-    charAction: {
-        spellId: string;
-        positions: Position[];
-    };
+    charAction: CharAction;
 }
 
 export type BattleRunSAction =

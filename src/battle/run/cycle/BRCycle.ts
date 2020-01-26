@@ -23,9 +23,11 @@ export class BRCycle {
 
     private newGlobalTurn(startTime: number, send: boolean = true): BGlobalTurn {
 
-        const globalTurn: BGlobalTurn = new BGlobalTurn(this.generateGlobalTurnId(), startTime, [...this.characters], this.generateTurnId, this.onGlobalTurnEnd, this.onTurnStart);
-
-        // console.log('globalTurn', globalTurn);
+        const globalTurn: BGlobalTurn = new BGlobalTurn(
+            this.generateGlobalTurnId(), startTime,
+            this.characters, this.generateTurnId,
+            this.onGlobalTurnEnd, this.onTurnStart
+        );
 
         if (send) {
             const snapshot = globalTurn.toSnapshot();

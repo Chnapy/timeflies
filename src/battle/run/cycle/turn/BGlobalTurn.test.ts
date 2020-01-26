@@ -1,7 +1,7 @@
 import { getTurnIdGenerator } from '../../../../shared/getTurnIdGenerator';
+import { seedBCharacter } from '../../../../__seeds__/seedBCharacter';
 import { TimerTester } from '../../../../__testUtils__/TimerTester';
 import { BGlobalTurn, GlobalTurnState } from './BGlobalTurn';
-import { seedBCharacter } from '../../../../__seeds__/seedBCharacter';
 
 describe('#BGlobalTurn', () => {
 
@@ -83,6 +83,50 @@ describe('#BGlobalTurn', () => {
         timerTester.advanceBy(200);
 
         expect(onGTurnEnd).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not run dead character turn', () => {
+
+        const characters = seedBCharacter({
+            alterFn: char => char.initialFeatures.actionTime = 2000
+        });
+
+        const turnIdGenerator = getTurnIdGenerator();
+
+        const startTime = timerTester.now;
+
+        const globalTurn = new BGlobalTurn(1, startTime,
+            characters, turnIdGenerator,
+            () => null, () => null);
+
+        const secondChar = globalTurn.charactersOrdered[ 1 ];
+
+        secondChar.features.life = 0;
+
+        timerTester.advanceBy(3000);
+
+        expect(globalTurn.currentTurn.character).not.toBe(secondChar);
+    });
+
+    it('should stop turn if current character dies', () => {
+
+        const characters = seedBCharacter();
+
+        const turnIdGenerator = getTurnIdGenerator();
+
+        const startTime = timerTester.now;
+
+        const globalTurn = new BGlobalTurn(1, startTime,
+            characters, turnIdGenerator,
+            () => null, () => null);
+
+        const firstChar = globalTurn.charactersOrdered[ 0 ];
+
+        firstChar.features.life = 0;
+        
+        globalTurn.notifyDeaths();
+
+        expect(globalTurn.currentTurn.character).not.toBe(firstChar);
     });
 
 });

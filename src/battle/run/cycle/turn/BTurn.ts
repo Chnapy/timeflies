@@ -45,6 +45,13 @@ export class BTurn {
         this.refreshTimedActions();
     }
 
+    clearTimedActions(): void {
+        if (this.timedActionTimeout) {
+            clearTimeout(this.timedActionTimeout);
+            delete this.timedActionTimeout;
+        }
+    }
+
     toSnapshot(): TurnSnapshot {
         return {
             id: this.id,
@@ -54,10 +61,8 @@ export class BTurn {
     }
 
     private refreshTimedActions(): void {
-        if (this.timedActionTimeout) {
-            clearTimeout(this.timedActionTimeout);
-            delete this.timedActionTimeout;
-        }
+        this.clearTimedActions();
+        
         const now = Date.now();
         if (this.state === 'idle') {
             const diff = this.startTime - now;

@@ -137,7 +137,7 @@ export class BRCharActionChecker {
         // Check occupation
 
         const occupiedPath = line.map(({ x, y }) => charactersOrdered
-            .some(({ position: p }) => p.x === x && p.y === y));
+            .some(({ isAlive, position: p }) => isAlive && p.x === x && p.y === y));
 
         switch (spell.staticData.type) {
             case 'move':

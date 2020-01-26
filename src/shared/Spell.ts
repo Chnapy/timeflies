@@ -22,5 +22,7 @@ export interface StaticSpell {
     initialFeatures: SpellFeatures;
 }
 
-export interface SpellSnapshot extends OmitFn<BSpell, 'character'> {
+export interface SpellSnapshot {
+    readonly staticData: Readonly<StaticSpell>;
+    readonly features: SpellFeatures;
 }

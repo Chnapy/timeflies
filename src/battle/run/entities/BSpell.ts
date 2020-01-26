@@ -3,6 +3,10 @@ import { StaticSpell, SpellFeatures, SpellSnapshot } from '../../../shared/Spell
 
 export class BSpell {
 
+    get id(): string {
+        return this.staticData.id;
+    }
+
     readonly staticData: Readonly<StaticSpell>;
     readonly character: BCharacter;
     readonly features: SpellFeatures;
