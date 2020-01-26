@@ -1,11 +1,12 @@
 import { BRunLaunchSAction, CharActionCAction, ConfirmSAction, NotifySAction } from "../../shared/action/BattleRunAction";
 import { BattleSnapshot } from "../../shared/BattleSnapshot";
-import { BCharacter } from "../../shared/Character";
+import { BCharacter } from "./entities/BCharacter";
 import { MapInfos } from "../../shared/MapInfos";
-import { BPlayer } from "../../shared/Player";
-import { BTeam, Team } from "../../shared/Team";
+import { BPlayer } from "./entities/BPlayer";
+import { Team } from "../../shared/Team";
+import { BTeam } from "./entities/BTeam";
 import { BRCharActionChecker } from './BRCharActionChecker';
-import { BRCycle } from "./BRCycle";
+import { BRCycle } from "./cycle/BRCycle";
 import { BRMap } from "./BRMap";
 
 const LAUNCH_DELAY = 5000; // TODO use config system

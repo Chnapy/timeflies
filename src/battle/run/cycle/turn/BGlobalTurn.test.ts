@@ -1,7 +1,7 @@
-import { getTurnIdGenerator } from '../../shared/getTurnIdGenerator';
-import { TimerTester } from '../../__testUtils__/TimerTester';
+import { getTurnIdGenerator } from '../../../../shared/getTurnIdGenerator';
+import { TimerTester } from '../../../../__testUtils__/TimerTester';
 import { BGlobalTurn, GlobalTurnState } from './BGlobalTurn';
-import { seedBCharacter } from '../../__seeds__/seedBCharacter';
+import { seedBCharacter } from '../../../../__seeds__/seedBCharacter';
 
 describe('#BGlobalTurn', () => {
 

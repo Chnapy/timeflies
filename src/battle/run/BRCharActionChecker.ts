@@ -1,7 +1,7 @@
 import { CharActionCAction } from '../../shared/action/BattleRunAction';
 import { Position } from '../../shared/Character';
-import { BPlayer } from '../../shared/Player';
-import { BRCycle } from './BRCycle';
+import { BPlayer } from "./entities/BPlayer";
+import { BRCycle } from './cycle/BRCycle';
 import { BRMap } from './BRMap';
 
 export class BRCharActionChecker {

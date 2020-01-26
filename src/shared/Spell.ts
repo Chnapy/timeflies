@@ -1,5 +1,5 @@
-import { BCharacter } from "./Character";
 import { OmitFn } from "../types/global";
+import { BSpell } from '../battle/run/entities/BSpell';
 
 export type SpellType =
     | 'move'
@@ -20,30 +20,6 @@ export interface StaticSpell {
     type: SpellType;
     color: string;
     initialFeatures: SpellFeatures;
-}
-
-export class BSpell {
-
-    readonly staticData: Readonly<StaticSpell>;
-
-    readonly character: BCharacter;
-
-    readonly features: SpellFeatures;
-
-    constructor(staticData: StaticSpell, character: BCharacter) {
-        this.staticData = staticData;
-        this.character = character;
-        this.features = {
-            ...staticData.initialFeatures
-        };
-    }
-
-    toSnapshot(): SpellSnapshot {
-        return {
-            staticData: this.staticData,
-            features: this.features
-        };
-    }
 }
 
 export interface SpellSnapshot extends OmitFn<BSpell, 'character'> {

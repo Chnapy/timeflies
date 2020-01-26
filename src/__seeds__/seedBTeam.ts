@@ -1,4 +1,5 @@
-import { Team, BTeam } from "../shared/Team";
+import { Team } from "../shared/Team";
+import { BTeam } from "../battle/run/entities/BTeam";
 
 let id = 0;
 const SEED_TEAM = (): Team => {

@@ -1,6 +1,6 @@
-import { BCharacter } from "../shared/Character";
+import { BCharacter } from "../battle/run/entities/BCharacter";
 import { seedStaticCharacter } from "./seedStaticCharacter";
-import { BPlayer } from "../shared/Player";
+import { BPlayer } from "../battle/run/entities/BPlayer";
 import { seedBPlayer } from "./seedBPlayer";
 
 export const seedBCharacter = (charArgs?: Parameters<typeof seedStaticCharacter>[0], player?: BPlayer): BCharacter[] => {
