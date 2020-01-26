@@ -39,7 +39,7 @@ export class BGlobalTurn {
         this.generateTurnId = generateTurnId;
         this.onGlobalTurnEnd = onGlobalTurnEnd;
         this.onTurnStart = onTurnStart;
-        this.setCurrentTurn(new BTurn(generateTurnId(), startTime, this.charactersOrdered[ 0 ], () => null, this.onTurnEnd));
+        this.setCurrentTurn(new BTurn(generateTurnId.next().value, startTime, this.charactersOrdered[ 0 ], () => null, this.onTurnEnd));
     }
 
     notifyDeaths(): void {
@@ -64,7 +64,7 @@ export class BGlobalTurn {
         else {
             const currentCharacter = this.charactersOrdered[ nextCharacterIndex ];
             if (currentCharacter.isAlive) {
-                this.setCurrentTurn(new BTurn(this.generateTurnId(), this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd));
+                this.setCurrentTurn(new BTurn(this.generateTurnId.next().value, this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd));
             } else {
                 this.runNextTurn(nextCharacterIndex + 1);
             }

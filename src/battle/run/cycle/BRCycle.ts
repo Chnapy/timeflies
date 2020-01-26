@@ -24,7 +24,7 @@ export class BRCycle {
     private newGlobalTurn(startTime: number, send: boolean = true): BGlobalTurn {
 
         const globalTurn: BGlobalTurn = new BGlobalTurn(
-            this.generateGlobalTurnId(), startTime,
+            this.generateGlobalTurnId.next().value, startTime,
             this.characters, this.generateTurnId,
             this.onGlobalTurnEnd, this.onTurnStart
         );
