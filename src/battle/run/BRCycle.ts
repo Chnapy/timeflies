@@ -1,7 +1,7 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction } from "../../shared/action/BattleRunAction";
 import { BCharacter } from "../../shared/Character";
 import { GLOBALTURN_DELAY } from "../../shared/GlobalTurnSnapshot";
-import { BGlobalTurn } from "../../entities/BGlobalTurn";
+import { BGlobalTurn } from "../../entities/turn/BGlobalTurn";
 import { BPlayer } from "../../shared/Player";
 import { TurnIDGenerator, getTurnIdGenerator } from "../../shared/getTurnIdGenerator";
 
@@ -25,7 +25,7 @@ export class BRCycle {
 
         const globalTurn: BGlobalTurn = new BGlobalTurn(this.generateGlobalTurnId(), startTime, [...this.characters], this.generateTurnId, this.onGlobalTurnEnd, this.onTurnStart);
 
-        console.log('globalTurn', globalTurn);
+        // console.log('globalTurn', globalTurn);
 
         if (send) {
             const snapshot = globalTurn.toSnapshot();

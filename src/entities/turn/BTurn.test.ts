@@ -1,22 +1,24 @@
 import { BTurn, TurnState } from "./BTurn";
-import { seedBCharacter } from "./seed/seedBCharacter";
-import { BCharacter } from "../shared/Character";
+import { seedBCharacter } from "../../__seeds__/seedBCharacter";
+import { BCharacter } from "../../shared/Character";
+import { TimerTester } from '../../__testUtils__/TimerTester';
 
 describe('#BTurn', () => {
 
-    jest.useFakeTimers();
-    
+    const timerTester = new TimerTester();
+
     let character: BCharacter;
 
     beforeEach(() => {
-        character = seedBCharacter([{
+        timerTester.beforeTest();
+        character = seedBCharacter({
             length: 1,
             alterFn: (char) => char.initialFeatures.actionTime = 2000
-        }])[0];
+        })[ 0 ];
     });
 
     afterEach(() => {
-        jest.runOnlyPendingTimers();
+        timerTester.afterTest();
     });
 
     it('should always have coherent state', async () => {
@@ -31,53 +33,41 @@ describe('#BTurn', () => {
         const turnRunning = new BTurn(1, startTimes.past, character, () => null, () => null);
         const turnEnded = new BTurn(1, startTimes.wayBefore, character, () => null, () => null);
 
-        const states: TurnState[] = ['idle', 'running', 'ended'];
+        const states: TurnState[] = [ 'idle', 'running', 'ended' ];
 
-        expect(turnIdle.state).toBe(states[0]);
-        expect(turnRunning.state).toBe(states[1]);
-        expect(turnEnded.state).toBe(states[2]);
+        expect(turnIdle.state).toBe(states[ 0 ]);
+        expect(turnRunning.state).toBe(states[ 1 ]);
+        expect(turnEnded.state).toBe(states[ 2 ]);
     });
 
-    it('should run callbacks at expected time', async () => {
+    it('should run callbacks at expected time', () => {
 
         const now = Date.now();
-        let timePassed = 0;
 
         const startTime = now + 1000;
 
         const startFn = jest.fn();
         const endFn = jest.fn();
 
-        const mockAdvanceTimersByTime = jest.advanceTimersByTime;
-        jest.advanceTimersByTime = (msToRun: number) => {
-            timePassed += msToRun;
-            return mockAdvanceTimersByTime(msToRun);
-        };
-
-        jest.spyOn(Date, 'now')
-            .mockImplementation(() => {
-                return now + timePassed;
-            });
-
         const turnIdle = new BTurn(1, startTime, character, startFn, endFn);
 
-        jest.advanceTimersByTime(900);
+        timerTester.advanceBy(900);
 
         expect(startFn).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(200);
+        timerTester.advanceBy(200);
 
         // 1100
 
         expect(startFn).toHaveBeenCalled();
 
-        jest.advanceTimersByTime(1700);
+        timerTester.advanceBy(1700);
 
         // 2800
 
         expect(endFn).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(500);
+        timerTester.advanceBy(500);
 
         // 3300
 

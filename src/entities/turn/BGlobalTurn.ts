@@ -1,10 +1,10 @@
-import { BCharacter } from "../shared/Character";
-import { TurnIDGenerator } from "../shared/getTurnIdGenerator";
-import { TURN_DELAY } from "../shared/TurnSnapshot";
+import { BCharacter } from "../../shared/Character";
+import { TurnIDGenerator } from "../../shared/getTurnIdGenerator";
+import { TURN_DELAY } from "../../shared/TurnSnapshot";
 import { BTurn } from "./BTurn";
-import { GlobalTurnSnapshot } from "../shared/GlobalTurnSnapshot";
+import { GlobalTurnSnapshot } from "../../shared/GlobalTurnSnapshot";
 
-export type GlobalState = 'idle' | 'running';
+export type GlobalTurnState = 'idle' | 'running';
 
 export class BGlobalTurn {
 
@@ -17,7 +17,7 @@ export class BGlobalTurn {
     private readonly onGlobalTurnEnd: (endTime: number) => void;
     private readonly onTurnStart: () => void;
 
-    get state(): GlobalState {
+    get state(): GlobalTurnState {
         const now = Date.now();
         if (now > this.startTime) {
             return 'running';

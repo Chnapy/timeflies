@@ -1,5 +1,5 @@
-import { BCharacter } from "../shared/Character";
-import { TurnSnapshot } from "../shared/TurnSnapshot";
+import { BCharacter } from "../../shared/Character";
+import { TurnSnapshot } from "../../shared/TurnSnapshot";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 

@@ -1,4 +1,4 @@
-import { StaticCharacter } from "../../shared/Character";
+import { StaticCharacter } from "../shared/Character";
 
 const MOCK_CHAR: StaticCharacter[] = [
     {
