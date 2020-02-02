@@ -1,9 +1,9 @@
 import { Character } from "../entities/Character";
 import { CurrentSpell } from "../spellEngine/SpellEngine";
 import { CharAction } from "./CycleManager";
-import { TurnSnapshot } from "@shared/Turn";
 import { Controller } from "../../Controller";
 import { BattleTurnStartAction, BattleTurnEndAction } from "../battleReducers/BattleReducerManager";
+import { TurnSnapshot } from "@shared/TurnSnapshot";
 
 // TODO monorepo
 export interface TurnIDGenerator {

@@ -1,5 +1,4 @@
 import { BattleSnapshot } from '@shared/BattleSnapshot';
-import { GlobalTurnSnapshot } from '@shared/GlobalTurn';
 import { CharacterType, Orientation } from '@shared/Character';
 import { MapInfos } from '@shared/MapInfos';
 import { SpellType } from '@shared/Spell';
@@ -18,6 +17,7 @@ import { BattleRoomManager } from '../room/BattleRoomManager';
 import { SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
 import { GlobalTurn } from '../cycle/GlobalTurn';
+import { GlobalTurnSnapshot } from '@shared/GlobalTurnSnapshot';
 
 export interface BattleSceneData {
     mapInfos: MapInfos;

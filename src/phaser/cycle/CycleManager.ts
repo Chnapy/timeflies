@@ -1,7 +1,5 @@
 import { CharActionCAction } from '@shared/action/BattleRunAction';
 import { Position } from '@shared/Character';
-import { GlobalTurnSnapshot } from '@shared/GlobalTurn';
-import { TurnSnapshot } from '@shared/Turn';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
@@ -9,6 +7,8 @@ import { Spell } from '../entities/Spell';
 import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
 import { BattleData } from '../scenes/BattleScene';
 import { GlobalTurn } from './GlobalTurn';
+import { GlobalTurnSnapshot } from '@shared/GlobalTurnSnapshot';
+import { TurnSnapshot } from '@shared/TurnSnapshot';
 
 export interface GameTime {
     phaserTime: number;
@@ -95,6 +95,9 @@ export class CycleManager {
         if(this.battleData.globalTurn?.id === globalTurnSnapshot.id) {
             this.battleData.globalTurn.synchronize(globalTurnSnapshot);
         } else {
+            if(this.battleData.globalTurn?.currentTurn.state !== 'ended') {
+                console.error('global state not ended', globalTurnSnapshot);
+            }
             this.battleData.globalTurn = new GlobalTurn(globalTurnSnapshot, this.characters, this.onGlobalTurnEnd);
         }
     }

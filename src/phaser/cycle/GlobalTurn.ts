@@ -1,7 +1,7 @@
-import { GlobalTurnSnapshot } from "@shared/GlobalTurn";
-import { TurnSnapshot } from "@shared/Turn";
 import { Character } from "../entities/Character";
 import { Turn } from "./Turn";
+import { TurnSnapshot } from "@shared/TurnSnapshot";
+import { GlobalTurnSnapshot } from "@shared/GlobalTurnSnapshot";
 
 export type GlobalState = 'idle' | 'running';
 

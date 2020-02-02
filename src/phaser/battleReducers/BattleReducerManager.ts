@@ -4,7 +4,7 @@ import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { ReducerManager } from '../../ReducerManager';
 import { CameraManager } from '../camera/CameraManager';
-import { CharAction, CycleManager, GameTime } from '../cycle/CycleManager';
+import { CharAction, CycleManager } from '../cycle/CycleManager';
 import { Character } from '../entities/Character';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager } from '../room/BattleRoomManager';
