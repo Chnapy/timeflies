@@ -40,6 +40,17 @@ describe('#BTurn', () => {
         expect(turnEnded.state).toBe(states[ 2 ]);
     });
 
+    it('should run start callback at creation', () => {
+
+        const startTime = timerTester.now;
+
+        const startFn = jest.fn();
+
+        const turnIdle = new BTurn(1, startTime, character, startFn, () => {});
+
+        expect(startFn).toHaveBeenCalled();
+    });
+
     it('should run callbacks at expected time', () => {
 
         const now = Date.now();

@@ -1,9 +1,8 @@
 import { Player } from "../shared/Player";
 import { BPlayer } from "../battle/run/entities/BPlayer";
-import { WSSocket } from "../transport/ws/WSSocket";
 import { seedBTeam } from "./seedBTeam";
-import WebSocket from 'ws';
-jest.mock('ws');
+import { seedWebSocket } from './seedWSSocket';
+import { WSSocket } from '../transport/ws/WSSocket';
 
 let id = 0;
 const SEED_PLAYER: () => Player = () => {
@@ -13,7 +12,7 @@ const SEED_PLAYER: () => Player = () => {
         name: 'sample_player_' + id,
         state: 'init',
         staticCharacters: [],
-        socket: new WSSocket(new WebSocket(''))
+        socket: new WSSocket(seedWebSocket())
     };
 };
 

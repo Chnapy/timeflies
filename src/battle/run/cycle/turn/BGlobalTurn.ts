@@ -18,7 +18,7 @@ export class BGlobalTurn {
 
     get state(): GlobalTurnState {
         const now = Date.now();
-        if (now > this.startTime) {
+        if (now >= this.startTime) {
             return 'running';
         }
         return 'idle';

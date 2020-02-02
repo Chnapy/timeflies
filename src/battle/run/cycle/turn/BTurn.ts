@@ -33,6 +33,7 @@ export class BTurn {
     }
 
     private timedActionTimeout?: NodeJS.Timeout;
+    private lastCallback?: 'start' | 'end';
     private readonly onTurnStart: () => void;
     private readonly onTurnEnd: () => void;
 
@@ -62,26 +63,33 @@ export class BTurn {
 
     private refreshTimedActions(): void {
         this.clearTimedActions();
-        
+
         const now = Date.now();
         if (this.state === 'idle') {
             const diff = this.startTime - now;
             this.timedActionTimeout = setTimeout(this.start, diff);
         }
         else if (this.state === 'running') {
-            const diff = this.endTime - now;
-            this.timedActionTimeout = setTimeout(this.end, diff);
+            if (!this.lastCallback) {
+                this.start();
+            }
+            if (this.lastCallback === 'start') {
+                const diff = this.endTime - now;
+                this.timedActionTimeout = setTimeout(this.end, diff);
+            }
         }
     }
 
     private start = (): void => {
-        console.log('TURN-START', this.id);
+        console.log('TURN-START', this.id, this.turnDuration);
+        this.lastCallback = 'start';
         this.onTurnStart();
         this.refreshTimedActions();
     };
 
     private end = (): void => {
         console.log('TURN-END', this.id);
+        this.lastCallback = 'end';
         this.onTurnEnd();
         this.refreshTimedActions();
     };
