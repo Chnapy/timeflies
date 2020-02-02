@@ -8,8 +8,10 @@ import { TimerTester } from '../../../__testUtils__/TimerTester';
 import { BCharacter } from '../entities/BCharacter';
 import { BPlayer } from '../entities/BPlayer';
 import { BRCycle } from './BRCycle';
-import { BGlobalTurn } from './turn/BGlobalTurn';
+import { BGlobalTurn, GlobalTurnState } from './turn/BGlobalTurn';
 import WebSocket = require('ws');
+import { TURN_DELAY } from '../../../shared/TurnSnapshot';
+import { GLOBALTURN_DELAY } from '../../../shared/GlobalTurnSnapshot';
 
 describe('#BRCycle', () => {
 
@@ -71,7 +73,6 @@ describe('#BRCycle', () => {
 
         const on = jest.fn((action: ServerAction) => {
             actions.push(action);
-            console.log('a', action);
         });
         onSendFn1 = onSendFn2 = on;
 
@@ -96,4 +97,39 @@ describe('#BRCycle', () => {
         ).not.toContain<BRunGlobalTurnStartSAction[ 'type' ]>('battle-run/global-turn-start')
     });
 
+    it('should run a complete global turn, then run the next one', () => {
+
+        const actions: ServerAction[] = [];
+
+        const on = jest.fn((action: ServerAction) => {
+            actions.push(action);
+        });
+        onSendFn1 = on;
+
+        const launchTime = timerTester.now;
+
+        cycle = new BRCycle(players, characters, launchTime);
+
+        characters.forEach((c, i) => {
+            const delay = i && TURN_DELAY;
+            timerTester.advanceBy(cycle.globalTurn.currentTurn.turnDuration + delay);
+        });
+
+        expect(cycle.globalTurn.id).toBe(1);
+        expect(cycle.globalTurn.currentTurn.id).toBe(characters.length);
+        expect(cycle.globalTurn.state).toBe<GlobalTurnState>('idle');
+
+        timerTester.advanceBy(GLOBALTURN_DELAY);
+
+        expect(cycle.globalTurn.state).toBe<GlobalTurnState>('running');
+
+        const actionTypes = actions.map(a => a.type);
+
+        expect(actionTypes
+            .filter(t => t === 'battle-run/global-turn-start')
+        ).toHaveLength(1);
+        expect(actionTypes
+            .filter(t => t === 'battle-run/turn-start')
+        ).toHaveLength(characters.length + 1);
+    });
 });

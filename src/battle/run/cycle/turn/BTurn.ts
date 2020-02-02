@@ -77,6 +77,10 @@ export class BTurn {
                 const diff = this.endTime - now;
                 this.timedActionTimeout = setTimeout(this.end, diff);
             }
+        } else {
+            if(this.lastCallback === 'start') {
+                this.end();
+            }
         }
     }
 
