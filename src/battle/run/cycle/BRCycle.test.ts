@@ -33,7 +33,7 @@ describe('#BRCycle', () => {
 
     const characters: BCharacter[] = seedBCharacter(
         { length: 3 },
-        i => i < 2 ? players[ 0 ] : players[ 1 ]
+        i => i < 2 ? players[0] : players[1]
     );
 
     let cycle: BRCycle;
@@ -74,6 +74,8 @@ describe('#BRCycle', () => {
         const on = jest.fn((action: ServerAction) => {
             actions.push(action);
         });
+
+        // test for the TWO players
         onSendFn1 = onSendFn2 = on;
 
         const launchTime = timerTester.now;
@@ -94,7 +96,7 @@ describe('#BRCycle', () => {
 
         expect(actions
             .map(a => a.type)
-        ).not.toContain<BRunGlobalTurnStartSAction[ 'type' ]>('battle-run/global-turn-start')
+        ).not.toContain<BRunGlobalTurnStartSAction['type']>('battle-run/global-turn-start')
     });
 
     it('should run a complete global turn, then run the next one', () => {
@@ -104,16 +106,20 @@ describe('#BRCycle', () => {
         const on = jest.fn((action: ServerAction) => {
             actions.push(action);
         });
+
+        // test for only ONE player
         onSendFn1 = on;
 
         const launchTime = timerTester.now;
 
         cycle = new BRCycle(players, characters, launchTime);
 
+        let advance = 0;
         characters.forEach((c, i) => {
             const delay = i && TURN_DELAY;
-            timerTester.advanceBy(cycle.globalTurn.currentTurn.turnDuration + delay);
+            advance += cycle.globalTurn.currentTurn.turnDuration + delay;
         });
+        timerTester.advanceBy(advance);
 
         expect(cycle.globalTurn.id).toBe(1);
         expect(cycle.globalTurn.currentTurn.id).toBe(characters.length);
@@ -125,11 +131,14 @@ describe('#BRCycle', () => {
 
         const actionTypes = actions.map(a => a.type);
 
+        // note that the first global turn does not send any action
         expect(actionTypes
             .filter(t => t === 'battle-run/global-turn-start')
         ).toHaveLength(1);
+
+        // note that the first turn of a global turn does not send any action
         expect(actionTypes
             .filter(t => t === 'battle-run/turn-start')
-        ).toHaveLength(characters.length + 1);
+        ).toHaveLength(characters.length - 1);
     });
 });

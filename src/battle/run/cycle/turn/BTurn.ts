@@ -43,7 +43,6 @@ export class BTurn {
         this.character = character;
         this.onTurnStart = onTurnStart;
         this.onTurnEnd = onTurnEnd;
-        this.refreshTimedActions();
     }
 
     clearTimedActions(): void {
@@ -61,26 +60,30 @@ export class BTurn {
         };
     }
 
-    private refreshTimedActions(): void {
+    readonly refreshTimedActions = (): void => {
         this.clearTimedActions();
 
         const now = Date.now();
+
         if (this.state === 'idle') {
-            const diff = this.startTime - now;
-            this.timedActionTimeout = setTimeout(this.start, diff);
+            if (!this.lastCallback) {
+                const diff = this.startTime - now;
+                this.timedActionTimeout = setTimeout(this.start, diff);
+            }
         }
-        else if (this.state === 'running') {
+
+        else {
+
             if (!this.lastCallback) {
                 this.start();
+                return;
             }
+
             if (this.lastCallback === 'start') {
                 const diff = this.endTime - now;
                 this.timedActionTimeout = setTimeout(this.end, diff);
             }
-        } else {
-            if(this.lastCallback === 'start') {
-                this.end();
-            }
+
         }
     }
 
@@ -95,6 +98,5 @@ export class BTurn {
         console.log('TURN-END', this.id);
         this.lastCallback = 'end';
         this.onTurnEnd();
-        this.refreshTimedActions();
     };
 }

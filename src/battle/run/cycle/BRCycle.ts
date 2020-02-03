@@ -23,8 +23,9 @@ export class BRCycle {
 
     private newGlobalTurn(startTime: number, send: boolean = true): BGlobalTurn {
 
+        const globalTurnId = this.generateGlobalTurnId.next().value;
         const globalTurn: BGlobalTurn = new BGlobalTurn(
-            this.generateGlobalTurnId.next().value, startTime,
+            globalTurnId, startTime,
             this.characters, this.generateTurnId,
             this.onGlobalTurnEnd, this.onTurnStart
         );
@@ -43,7 +44,7 @@ export class BRCycle {
     }
 
     private onTurnStart = (): void => {
-
+        
         const snapshot = this.globalTurn.currentTurn.toSnapshot();
         this.players.forEach(p => {
             p.socket.send<BRunTurnStartSAction>({

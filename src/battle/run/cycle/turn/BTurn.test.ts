@@ -21,12 +21,20 @@ describe('#BTurn', () => {
         timerTester.afterTest();
     });
 
-    it('should always have coherent state', async () => {
+    it('should not have timed actions on init', () => {
+        const callback = jest.fn();
+
+        const turnIdle = new BTurn(1, timerTester.now - 100000, character, callback, callback);
+
+        expect(callback).not.toHaveBeenCalled();
+    });
+
+    it('should always have coherent state', () => {
 
         const startTimes = {
-            past: Date.now() - 1000,
-            future: Date.now() + 1000,
-            wayBefore: Date.now() - 5000
+            past: timerTester.now - 1000,
+            future: timerTester.now + 1000,
+            wayBefore: timerTester.now - 5000
         };
 
         const turnIdle = new BTurn(1, startTimes.future, character, () => null, () => null);
@@ -47,13 +55,14 @@ describe('#BTurn', () => {
         const startFn = jest.fn();
 
         const turnIdle = new BTurn(1, startTime, character, startFn, () => {});
+        turnIdle.refreshTimedActions();
 
         expect(startFn).toHaveBeenCalled();
     });
 
     it('should run callbacks at expected time', () => {
 
-        const now = Date.now();
+        const now = timerTester.now;
 
         const startTime = now + 1000;
 
@@ -61,6 +70,7 @@ describe('#BTurn', () => {
         const endFn = jest.fn();
 
         const turnIdle = new BTurn(1, startTime, character, startFn, endFn);
+        turnIdle.refreshTimedActions();
 
         timerTester.advanceBy(900);
 
