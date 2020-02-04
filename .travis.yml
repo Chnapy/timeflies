@@ -17,4 +17,5 @@ install:
   - yarn install
 
 script:
+  - yarn workspace @timeflies/shared build
   - yarn workspaces run test-ci --ci
