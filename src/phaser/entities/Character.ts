@@ -175,7 +175,7 @@ export class Character implements WithSnapshot<CharacterSnapshot> {
     getSnapshot(): CharacterSnapshot {
         return {
             staticData: this.staticData,
-            features: this.features,
+            features: { ...this.features },
             orientation: this.orientation,
             position: this.position,
             spellsSnapshots: this.spells.map(s => s.getSnapshot())

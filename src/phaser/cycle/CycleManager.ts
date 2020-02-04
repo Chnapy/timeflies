@@ -47,12 +47,15 @@ export class CycleManager {
         return this.battleData.globalTurn?.currentTurn.charActionStack || [];
     }
 
+    private waitingSnapshots: GlobalTurnSnapshot[];
+
     constructor(room: BattleRoomManager, dataStateManager: DataStateManager, battleData: BattleData) {
         this.room = room;
         this.dataStateManager = dataStateManager;
         this.battleData = battleData;
         this.players = battleData.players;
         this.characters = battleData.characters;
+        this.waitingSnapshots = [];
     }
 
     update(time: number, delta: number): void {
@@ -92,13 +95,14 @@ export class CycleManager {
 
     synchronizeGlobalTurn(globalTurnSnapshot: GlobalTurnSnapshot): void {
 
-        if(this.battleData.globalTurn?.id === globalTurnSnapshot.id) {
+        if (this.battleData.globalTurn?.id === globalTurnSnapshot.id) {
             this.battleData.globalTurn.synchronize(globalTurnSnapshot);
         } else {
-            if(this.battleData.globalTurn?.currentTurn.state !== 'ended') {
-                console.error('global state not ended', globalTurnSnapshot);
+            this.waitingSnapshots.push(globalTurnSnapshot);
+
+            if(!this.battleData.globalTurn) {
+                this.onGlobalTurnEnd();
             }
-            this.battleData.globalTurn = new GlobalTurn(globalTurnSnapshot, this.characters, this.onGlobalTurnEnd);
         }
     }
 
@@ -110,5 +114,9 @@ export class CycleManager {
 
     private onGlobalTurnEnd = (): void => {
         delete this.battleData.globalTurn;
+
+        const snapshot = this.waitingSnapshots.pop();
+        if (snapshot)
+            this.battleData.globalTurn = new GlobalTurn(snapshot, this.characters, this.onGlobalTurnEnd);
     };
 }

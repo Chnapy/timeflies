@@ -4,7 +4,10 @@ import { ReducerManager } from '../../ReducerManager';
 import { ConnectedScene } from './ConnectedScene';
 import { LoadLaunchAction, LoadScene } from './LoadScene';
 import { MatchmakerEnterCAction } from '@shared/action/MatchmakerAction';
+import { PlayerInfos } from '@shared/PlayerInfos';
 import { SetIDCAction } from '@shared/action/TAction';
+
+export let playerInfos: PlayerInfos;
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 
@@ -22,6 +25,7 @@ export class BootScene extends ConnectedScene<'BootScene'> {
             private readonly onLoadStartAction = this.reduce<LoadLaunchAction>('load/launch', ({
                 payload
             }) => {
+                playerInfos = payload.playerInfos;
                 this.scene.start<LoadScene>('LoadScene', payload);
             });
         }(this);

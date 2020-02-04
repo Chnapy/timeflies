@@ -3,6 +3,7 @@ import { Character } from './Character';
 import { Team } from "./Team";
 import { WithSnapshot } from './WithSnapshot';
 import { PlayerSnapshot, PlayerState } from '@shared/Player';
+import { playerInfos } from '../scenes/BootScene';
 
 export class Player implements WithSnapshot<PlayerSnapshot> {
 
@@ -20,7 +21,7 @@ export class Player implements WithSnapshot<PlayerSnapshot> {
         charactersSnapshots
     }: PlayerSnapshot, team: Team, scene: BattleScene) {
         this.id = id;
-        this.itsMe = true; // TODO
+        this.itsMe = id === playerInfos.id; // TODO
         this.name = name;
         this.state = state;
         this.team = team;

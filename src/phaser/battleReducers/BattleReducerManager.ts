@@ -90,12 +90,12 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
          * If currentSpell if alread selected, reset to default spell,
          * else, prepare the new spell
          */
-        const spell = currentTurn?.currentSpell?.spell.staticData.type === spellType
+        const spell = currentTurn.currentSpell?.spell.staticData.type === spellType
             && currentTurn.currentSpell.state === 'prepare'
 
             ? currentTurn.currentCharacter.defaultSpell
 
-            : currentTurn?.currentCharacter.spells
+            : currentTurn.currentCharacter.spells
                 .find(s => s.staticData.type === spellType)!;
 
         this.spellEngine.prepare(spell);
