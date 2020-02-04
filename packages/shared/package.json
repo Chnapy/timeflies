@@ -8,6 +8,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "tsc -w",
+    "test-ci": "echo \"@timeflies/shared cannot be tested\"",
     "build": "tsc"
   }
 }

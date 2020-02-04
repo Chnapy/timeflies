@@ -1,2 +1,19 @@
-node_modules
-coverage
+# System and IDE files
+Thumbs.db
+.DS_Store
+.idea
+*.suo
+*.sublime-project
+*.sublime-workspace
+
+# Vendors
+node_modules/
+coverage/
+lib/
+
+# Build
+npm-debug.log
+yarn-error.log
+
+# Yarn-only
+package-lock.json
