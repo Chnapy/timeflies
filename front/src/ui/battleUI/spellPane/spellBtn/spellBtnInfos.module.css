@@ -1,0 +1,29 @@
+
+.root {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 3px 4px;
+    font-size: 0.8em;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.timeLine::before,
+.attackLine::before {
+    content: '';
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: top;
+    margin-right: 4px;
+}
+
+.timeLine::before {
+    background-image: url('../../../../_assets/icons/time_icon.png');
+}
+
+.attackLine::before {
+    background-image: url('../../../../_assets/icons/attack_icon.png');
+}

@@ -1,0 +1,19 @@
+.root {
+  background-color: var(--pane-bg-color);
+  border-right: var(--pane-border-width) solid var(--pane-border-color);
+}
+
+.sideSpells,
+.mainSpells {
+  display: inline-block;
+  padding: 3px;
+}
+
+.sideSpells {
+  background-color: var(--bg-color-2);
+  border-right: 1px solid var(--bg-color-3);
+}
+
+.mainSpells {
+}
+ 

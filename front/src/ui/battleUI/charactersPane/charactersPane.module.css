@@ -1,0 +1,8 @@
+.root {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 210px;
+  padding: 8px;
+  background-color: var(--pane-bg-color);
+  border-top: 2px solid #fff;
+}

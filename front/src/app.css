@@ -1,0 +1,17 @@
+@import './color.css';
+
+html {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
