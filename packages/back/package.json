@@ -1,5 +1,6 @@
 {
   "name": "@timeflies/back",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -21,8 +22,7 @@
     "mock-socket": "^9.0.3",
     "tiled-types": "^1.0.0",
     "ts-jest": "^24.3.0",
-    "ts-node": "8.5.4",
-    "typescript": "3.7.4"
+    "ts-node": "8.5.4"
   },
   "dependencies": {
     "bresenham": "0.0.4",

@@ -1,5 +1,6 @@
 {
   "name": "@timeflies/front",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "src/game.ts",
@@ -35,8 +36,7 @@
     "rollup-plugin-serve": "1.0.1",
     "rollup-plugin-typescript2": "0.25.3",
     "rollup-plugin-uglify": "6.0.4",
-    "ts-loader": "6.2.1",
-    "typescript": "3.7.4"
+    "ts-loader": "6.2.1"
   },
   "browserslist": {
     "production": [

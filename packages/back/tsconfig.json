@@ -1,17 +1,9 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "lib",
-    "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "lib": [
-      "ES2020"
-    ],
-    "strict": true,
-    "esModuleInterop": true,
     "typeRoots": [
-      "node_modules/@types",
+      "../../node_modules/@types",
       "src/types"
     ]
   }

@@ -1,20 +1,13 @@
 {
   "name": "@timeflies/shared",
+  "private": true,
   "version": "0.0.1",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "",
   "license": "UNLICENSED",
-  "private": true,
   "scripts": {
     "start": "tsc -w",
     "build": "tsc"
-  },
-  "devDependencies": {
-    "typescript": "3.7.5"
-  },
-  "engineStrict": true,
-  "engines": {
-    "node": ">=12"
   }
 }

@@ -1,8 +1,11 @@
 {
   "name": "timeflies",
+  "private": true,
   "repository": "https://github.com/Chnapy/timeflies.git",
   "author": "Chnapy <richardhaddad@hotmail.fr>",
-  "private": true,
+  "devDependencies": {
+    "typescript": "3.7.5"
+  },
   "workspaces": [
     "packages/*"
   ]
