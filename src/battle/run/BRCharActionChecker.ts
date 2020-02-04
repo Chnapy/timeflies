@@ -4,9 +4,20 @@ import { BPlayer } from "./entities/BPlayer";
 import { BRCycle } from './cycle/BRCycle';
 import { BRMap } from './BRMap';
 
+export type CharActionCheckerReason = 'player' | 'isAlive' | 'spell' | 'startTime' | 'duration' | 'isInArea' | 'bresenham' | 'specificType';
+
+export type CharActionCheckerResult =
+    | {
+        success: true;
+    }
+    | {
+        success: false;
+        reason: CharActionCheckerReason;
+    };
+
 export class BRCharActionChecker {
 
-    private readonly checkList: readonly ((action: CharActionCAction, player: BPlayer) => boolean)[];
+    private readonly checkList: readonly ((action: CharActionCAction, player: BPlayer) => CharActionCheckerResult)[];
 
     private readonly cycle: BRCycle;
     private readonly map: BRMap;
@@ -22,47 +33,71 @@ export class BRCharActionChecker {
         ].map(c => c.bind(this));
     }
 
-    check(action: CharActionCAction, player: BPlayer): boolean {
-        return this.checkList.every(c => c(action, player));
+    check(action: CharActionCAction, player: BPlayer): CharActionCheckerResult {
+
+        for (const c of this.checkList) {
+            const result = c(action, player);
+            if (!result.success) {
+                return result;
+            }
+        }
+
+        return { success: true };
     }
 
-    private checkPlayer(action: CharActionCAction, player: BPlayer): boolean {
+    private checkPlayer(action: CharActionCAction, player: BPlayer): CharActionCheckerResult {
         const { currentTurn } = this.cycle.globalTurn;
 
         if (currentTurn.character.player.id !== player.id) {
             console.log('check player');
-            return false;
+            return {
+                success: false,
+                reason: 'player'
+            };
         }
 
-        return true;
+        return {
+            success: true
+        };
     }
 
-    private checkCharacter({ charAction }: CharActionCAction, player: BPlayer): boolean {
+    private checkCharacter({ charAction }: CharActionCAction, player: BPlayer): CharActionCheckerResult {
         const { currentTurn: {
             character
         } } = this.cycle.globalTurn;
 
         if (!character.isAlive) {
             console.log('check isAlive');
-            return false;
+            return {
+                success: false,
+                reason: 'isAlive'
+            };
         }
 
         const spell = character.spells.find(s => s.staticData.id === charAction.spellId);
 
         if (!spell) {
             console.log('check spell');
-            return false;
+            return {
+                success: false,
+                reason: 'spell'
+            };
         }
 
-        return true;
+        return {
+            success: true
+        };
     }
 
-    private checkTime({ sendTime, charAction }: CharActionCAction): boolean {
+    private checkTime({ sendTime, charAction }: CharActionCAction): CharActionCheckerResult {
         const { currentTurn } = this.cycle.globalTurn;
 
         if (sendTime < currentTurn.startTime) {
             console.log('check startTime');
-            return false;
+            return {
+                success: false,
+                reason: 'startTime'
+            };
         }
 
         const { character, turnDuration } = currentTurn;
@@ -71,13 +106,18 @@ export class BRCharActionChecker {
 
         if (sendTime - currentTurn.startTime + spell.features.duration > turnDuration) {
             console.log('check duration');
-            return false;
+            return {
+                success: false,
+                reason: 'duration'
+            };
         }
 
-        return true;
+        return {
+            success: true
+        };
     }
 
-    private checkPositions({ charAction }: CharActionCAction): boolean {
+    private checkPositions({ charAction }: CharActionCAction): CharActionCheckerResult {
         const { spellId, positions } = charAction;
 
         const { globalTurn: globalTurnState } = this.cycle;
@@ -121,7 +161,10 @@ export class BRCharActionChecker {
 
         if (!isInArea) {
             console.log('check isInArea');
-            return false;
+            return {
+                success: false,
+                reason: 'isInArea'
+            };
         }
 
         // Check obstacles
@@ -131,7 +174,10 @@ export class BRCharActionChecker {
 
         if (line.some(({ d }) => d !== 0)) {
             console.log('check bresenham');
-            return false;
+            return {
+                success: false,
+                reason: 'bresenham'
+            };
         }
 
         // Check occupation
@@ -143,19 +189,27 @@ export class BRCharActionChecker {
             case 'move':
                 if (occupiedPath.some(v => v)) {
                     console.log('check move');
-                    return false;
+                    return {
+                        success: false,
+                        reason: 'specificType'
+                    };
                 }
                 break;
             default:
                 if (occupiedPath
                     .slice(0, occupiedPath.length - 1)
                     .some(v => v)) {
-                        console.log('check default');
-                    return false;
+                    console.log('check default');
+                    return {
+                        success: false,
+                        reason: 'specificType'
+                    };
                 }
                 break;
         }
 
-        return true;
+        return {
+            success: true
+        };
     }
 }

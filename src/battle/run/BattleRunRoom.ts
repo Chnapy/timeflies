@@ -70,7 +70,7 @@ export class BattleRunRoom {
 
     private readonly onCharActionReceive = (action: CharActionCAction, player: BPlayer): void => {
 
-        const isOk = this.charActionChecker.check(action, player);
+        const isOk = this.charActionChecker.check(action, player).success;
 
         const confirmAction: ConfirmSAction = {
             type: 'confirm',
