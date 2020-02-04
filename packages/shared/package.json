@@ -1,0 +1,19 @@
+{
+  "name": "@timeflies/shared",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "nodemon"
+  },
+  "devDependencies": {
+    "typescript": "3.7.5",
+    "nodemon": "2.0.2"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  }
+}

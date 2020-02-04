@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { Matchmaker } from "./battle/Matchmaker";
 import { WSSocket } from './transport/ws/WSSocket';
-import { MatchmakerEnterCAction } from './shared/action/MatchmakerAction';
+import { MatchmakerEnterCAction } from '@timeflies/shared';
 
 export class App {
 

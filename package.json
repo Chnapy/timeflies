@@ -1,0 +1,9 @@
+{
+  "name": "timeflies",
+  "repository": "https://github.com/Chnapy/timeflies.git",
+  "author": "Chnapy <richardhaddad@hotmail.fr>",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
