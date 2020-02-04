@@ -1,11 +1,11 @@
-import { BattleLoadSAction } from '@shared/action/BattlePrepareAction';
+import { BattleLoadSAction } from '@timeflies/shared'
 import { Controller } from '../../Controller';
 import { ReducerManager } from '../../ReducerManager';
 import { ConnectedScene } from './ConnectedScene';
 import { LoadLaunchAction, LoadScene } from './LoadScene';
-import { MatchmakerEnterCAction } from '@shared/action/MatchmakerAction';
-import { PlayerInfos } from '@shared/PlayerInfos';
-import { SetIDCAction } from '@shared/action/TAction';
+import { MatchmakerEnterCAction } from '@timeflies/shared'
+import { PlayerInfos } from '@timeflies/shared'
+import { SetIDCAction } from '@timeflies/shared'
 
 export let playerInfos: PlayerInfos;
 

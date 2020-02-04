@@ -1,5 +1,5 @@
+import { SpellFeatures, SpellSnapshot, StaticSpell } from '@timeflies/shared';
 import { BCharacter } from "./BCharacter";
-import { StaticSpell, SpellFeatures, SpellSnapshot } from '../../../shared/Spell';
 
 export class BSpell {
 

@@ -1,5 +1,5 @@
-import { CharacterType, Orientation } from '@shared/Character';
-import { SpellType } from '@shared/Spell';
+import { CharacterType, Orientation } from '@timeflies/shared'
+import { SpellType } from '@timeflies/shared'
 import { CharacterState } from '../phaser/entities/Character';
 import sampleSpritesheet1Image from '../_assets/spritesheets/sokoban_spritesheet.png';
 import sampleSpritesheet1Schema from '../_assets/spritesheets/sokoban_spritesheet.xml';

@@ -1,7 +1,8 @@
+import { PlayerSnapshot, PlayerState } from "@timeflies/shared";
+import { Player } from "../../../Player";
 import { WSSocket } from "../../../transport/ws/WSSocket";
 import { BCharacter } from "./BCharacter";
 import { BTeam } from "./BTeam";
-import { Player, PlayerState, PlayerSnapshot } from '../../../shared/Player';
 
 export class BPlayer implements Omit<Player, 'staticCharacters'> {
 

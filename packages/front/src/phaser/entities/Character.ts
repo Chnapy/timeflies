@@ -4,7 +4,7 @@ import { Player } from './Player';
 import { Spell } from './Spell';
 import { Team } from "./Team";
 import { WithSnapshot } from './WithSnapshot';
-import { CharacterSnapshot, CharacterType, Orientation, CharacterFeatures, StaticCharacter, Position } from '@shared/Character';
+import { CharacterSnapshot, CharacterType, Orientation, CharacterFeatures, StaticCharacter, Position } from '@timeflies/shared'
 
 export type CharacterState = 'idle' | 'move';
 

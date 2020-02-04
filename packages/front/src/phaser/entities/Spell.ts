@@ -1,4 +1,4 @@
-import { SpellFeatures, SpellSnapshot, StaticSpell } from '@shared/Spell';
+import { SpellFeatures, SpellSnapshot, StaticSpell } from '@timeflies/shared'
 import { BattleScene } from '../scenes/BattleScene';
 import { Character } from './Character';
 import { WithSnapshot } from './WithSnapshot';

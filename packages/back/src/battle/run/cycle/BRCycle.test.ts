@@ -1,5 +1,4 @@
-import { BRunGlobalTurnStartSAction } from '../../../shared/action/BattleRunAction';
-import { ServerAction } from '../../../shared/action/TAction';
+import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TURN_DELAY } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedBCharacter } from '../../../__seeds__/seedBCharacter';
 import { seedBPlayer } from '../../../__seeds__/seedBPlayer';
@@ -10,8 +9,6 @@ import { BPlayer } from '../entities/BPlayer';
 import { BRCycle } from './BRCycle';
 import { BGlobalTurn, GlobalTurnState } from './turn/BGlobalTurn';
 import WebSocket = require('ws');
-import { TURN_DELAY } from '../../../shared/TurnSnapshot';
-import { GLOBALTURN_DELAY } from '../../../shared/GlobalTurnSnapshot';
 
 describe('#BRCycle', () => {
 

@@ -1,6 +1,6 @@
-import { BattleLoadEndedCAction } from '@shared/action/BattlePrepareAction';
-import { BRunLaunchSAction } from '@shared/action/BattleRunAction';
-import { BattleLoadPayload } from '@shared/BattleLoadPayload';
+import { BattleLoadEndedCAction } from '@timeflies/shared'
+import { BRunLaunchSAction } from '@timeflies/shared'
+import { BattleLoadPayload } from '@timeflies/shared'
 import { ReducerManager } from '../../ReducerManager';
 import { IGameAction } from '../../action/GameAction';
 import { AssetManager } from '../../assetManager/AssetManager';

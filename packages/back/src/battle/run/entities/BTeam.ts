@@ -1,7 +1,7 @@
-import { BPlayer } from "./BPlayer";
-import { Position } from "../../../shared/Character";
+import { Position, TeamSnapshot } from "@timeflies/shared";
+import { Team } from "../../../Team";
 import { BCharacter } from "./BCharacter";
-import { Team, TeamSnapshot } from '../../../shared/Team';
+import { BPlayer } from "./BPlayer";
 
 export class BTeam implements Omit<Team, 'players'> {
 

@@ -1,8 +1,7 @@
-import { ConfirmSAction, NotifySAction, BRunGlobalTurnStartSAction, BRunTurnStartSAction } from '@shared/action/BattleRunAction';
-import { ClientAction } from '@shared/action/TAction';
-import { BattleSceneData, BattleScene } from 'src/phaser/scenes/BattleScene';
+import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, ClientAction, ConfirmSAction, NotifySAction } from '@timeflies/shared';
 import { Controller } from '../../Controller';
 import { BattleRollbackAction, BattleSpellLaunchAction } from '../battleReducers/BattleReducerManager';
+import { BattleScene, BattleSceneData } from '../scenes/BattleScene';
 
 
 export interface SendPromise<S extends ClientAction> extends Promise<{

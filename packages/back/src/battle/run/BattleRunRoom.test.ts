@@ -1,10 +1,8 @@
+import { BattleRunSAction, CharacterSnapshot, CharActionCAction, ConfirmSAction, MapInfos, NotifySAction } from '@timeflies/shared';
 import { Server, WebSocket } from 'mock-socket';
 import path from 'path';
 import { PlayerService } from '../../PlayerService';
-import { BattleRunSAction, CharActionCAction, ConfirmSAction, NotifySAction } from '../../shared/action/BattleRunAction';
-import { CharacterSnapshot } from '../../shared/Character';
-import { MapInfos } from "../../shared/MapInfos";
-import { Team } from '../../shared/Team';
+import { Team } from '../../Team';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { BattleRunRoom } from './BattleRunRoom';
 

@@ -1,4 +1,4 @@
-import { Position } from '@shared/Character';
+import { Position } from '@timeflies/shared'
 import { Spell } from '../entities/Spell';
 import { BattleData, BattleScene } from '../scenes/BattleScene';
 import { SpellLaunchDefault } from './default/SpellLaunchDefault';

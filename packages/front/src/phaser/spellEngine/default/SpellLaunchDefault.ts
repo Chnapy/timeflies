@@ -1,5 +1,5 @@
-import { Position } from '@shared/Character';
-import { SpellType } from '@shared/Spell';
+import { Position } from '@timeflies/shared'
+import { SpellType } from '@timeflies/shared'
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
 export class SpellLaunchDefault extends SpellLaunch<Exclude<SpellType, 'move' | 'orientate'>> {

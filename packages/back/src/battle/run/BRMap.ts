@@ -1,9 +1,8 @@
+import { MapInfos, Position } from '@timeflies/shared';
 import bresenham from 'bresenham';
 import fs from 'fs';
 import { TiledLayerTilelayer, TiledMapOrthogonal } from 'tiled-types';
 import urlJoin from 'url-join';
-import { Position } from '../../shared/Character';
-import { MapInfos } from "../../shared/MapInfos";
 
 export class BRMap {
 

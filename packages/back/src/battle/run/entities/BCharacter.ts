@@ -1,6 +1,6 @@
+import { CharacterFeatures, CharacterSnapshot, Orientation, Position, StaticCharacter } from '@timeflies/shared';
 import { BPlayer } from "./BPlayer";
 import { BSpell } from "./BSpell";
-import { StaticCharacter, Position, Orientation, CharacterFeatures, CharacterSnapshot, CharacterType } from '../../../shared/Character';
 
 export class BCharacter {
 

@@ -1,29 +1,9 @@
+import { getTurnIdGenerator, TurnIDGenerator, TurnSnapshot } from "@timeflies/shared";
+import { Controller } from "../../Controller";
+import { BattleTurnEndAction, BattleTurnStartAction } from "../battleReducers/BattleReducerManager";
 import { Character } from "../entities/Character";
 import { CurrentSpell } from "../spellEngine/SpellEngine";
 import { CharAction } from "./CycleManager";
-import { Controller } from "../../Controller";
-import { BattleTurnStartAction, BattleTurnEndAction } from "../battleReducers/BattleReducerManager";
-import { TurnSnapshot } from "@shared/TurnSnapshot";
-
-// TODO monorepo
-export interface TurnIDGenerator {
-    (): number;
-    nbTurns: number;
-    increment(): void;
-}
-
-export function getTurnIdGenerator(): TurnIDGenerator {
-    let nbTurns = 0;
-
-    const fn = (): number => nbTurns++;
-
-    return Object.assign(fn, {
-        get nbTurns(): number {
-            return nbTurns;
-        },
-        increment: () => { nbTurns++; }
-    });
-}
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
@@ -32,11 +12,11 @@ export class Turn {
     private static generateId: TurnIDGenerator = getTurnIdGenerator();
 
     static create(startTime: number, currentCharacter: Character, onTurnEnd: () => void) {
-        return new Turn(Turn.generateId(), startTime, currentCharacter, onTurnEnd);
+        return new Turn(Turn.generateId.next().value, startTime, currentCharacter, onTurnEnd);
     }
 
     static fromSnapshot(snapshot: TurnSnapshot, characters: readonly Character[], onTurnEnd: () => void): Turn {
-        Turn.generateId.increment();
+        Turn.generateId.next();
         return new Turn(snapshot.id, snapshot.startTime, characters.find(c => c.id === snapshot.characterId)!, onTurnEnd);
     }
 

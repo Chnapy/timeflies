@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { ServerAction } from '../shared/action/TAction';
+import { ServerAction } from '@timeflies/shared';
 jest.mock('ws');
 
 export const seedWebSocket = ({ onSendFn }: {

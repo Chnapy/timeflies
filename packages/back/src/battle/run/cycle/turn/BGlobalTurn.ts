@@ -1,8 +1,6 @@
+import { GlobalTurnSnapshot, TurnIDGenerator, TURN_DELAY } from "@timeflies/shared";
 import { BCharacter } from "../../entities/BCharacter";
-import { TurnIDGenerator } from "../../../../shared/getTurnIdGenerator";
-import { TURN_DELAY } from "../../../../shared/TurnSnapshot";
 import { BTurn } from "./BTurn";
-import { GlobalTurnSnapshot } from "../../../../shared/GlobalTurnSnapshot";
 
 export type GlobalTurnState = 'idle' | 'running';
 

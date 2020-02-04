@@ -1,4 +1,4 @@
-import { SpellType } from '@shared/Spell';
+import { SpellType } from '@timeflies/shared'
 import { Character } from '../entities/Character';
 import { Spell } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';

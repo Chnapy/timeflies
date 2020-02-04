@@ -1,5 +1,5 @@
 import { BattleScene } from '../scenes/BattleScene';
-import { Position } from '@shared/Character';
+import { Position } from '@timeflies/shared'
 
 export class CameraManager {
 

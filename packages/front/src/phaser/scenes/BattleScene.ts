@@ -1,7 +1,7 @@
-import { BattleSnapshot } from '@shared/BattleSnapshot';
-import { CharacterType, Orientation } from '@shared/Character';
-import { MapInfos } from '@shared/MapInfos';
-import { SpellType } from '@shared/Spell';
+import { BattleSnapshot } from '@timeflies/shared'
+import { CharacterType, Orientation } from '@timeflies/shared'
+import { MapInfos } from '@timeflies/shared'
+import { SpellType } from '@timeflies/shared'
 import { AssetManager } from '../../assetManager/AssetManager';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { Utils } from '../../Utils';
@@ -17,7 +17,7 @@ import { BattleRoomManager } from '../room/BattleRoomManager';
 import { SpellEngine } from '../spellEngine/SpellEngine';
 import { ConnectedScene } from './ConnectedScene';
 import { GlobalTurn } from '../cycle/GlobalTurn';
-import { GlobalTurnSnapshot } from '@shared/GlobalTurnSnapshot';
+import { GlobalTurnSnapshot } from '@timeflies/shared'
 
 export interface BattleSceneData {
     mapInfos: MapInfos;

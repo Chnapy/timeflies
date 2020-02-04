@@ -1,5 +1,5 @@
 import { BattleScene } from '../phaser/scenes/BattleScene';
-import { BattleSnapshot } from '@shared/BattleSnapshot';
+import { BattleSnapshot } from '@timeflies/shared'
 
 interface DataState {
     time: number;

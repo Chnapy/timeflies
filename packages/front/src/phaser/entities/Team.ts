@@ -1,7 +1,7 @@
 import { Player } from './Player';
 import { BattleScene } from '../scenes/BattleScene';
 import { WithSnapshot } from './WithSnapshot';
-import { TeamSnapshot } from '@shared/Team';
+import { TeamSnapshot } from '@timeflies/shared'
 
 export class Team implements WithSnapshot<TeamSnapshot> {
 

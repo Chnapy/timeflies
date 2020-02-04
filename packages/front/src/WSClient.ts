@@ -1,4 +1,4 @@
-import { ServerAction, NarrowAction, ClientAction } from '@shared/action/TAction';
+import { ClientAction, NarrowAction, ServerAction } from '@timeflies/shared';
 
 const ENDPOINT = 'ws://localhost:4275';
 

@@ -1,4 +1,4 @@
-import { getTurnIdGenerator } from '../../../../shared/getTurnIdGenerator';
+import { getTurnIdGenerator } from '@timeflies/shared';
 import { seedBCharacter } from '../../../../__seeds__/seedBCharacter';
 import { TimerTester } from '../../../../__testUtils__/TimerTester';
 import { BGlobalTurn, GlobalTurnState } from './BGlobalTurn';

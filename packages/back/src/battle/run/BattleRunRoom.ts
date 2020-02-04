@@ -1,7 +1,5 @@
-import { BRunLaunchSAction, CharActionCAction, ConfirmSAction, NotifySAction } from "../../shared/action/BattleRunAction";
-import { BattleSnapshot } from "../../shared/BattleSnapshot";
-import { MapInfos } from "../../shared/MapInfos";
-import { Team } from "../../shared/Team";
+import { BattleSnapshot, BRunLaunchSAction, CharActionCAction, ConfirmSAction, MapInfos, NotifySAction } from '@timeflies/shared';
+import { Team } from '../../Team';
 import { BRCharActionChecker } from './BRCharActionChecker';
 import { BRMap } from "./BRMap";
 import { BRState } from './BRState';

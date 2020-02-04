@@ -1,9 +1,7 @@
-import { BRunGlobalTurnStartSAction, BRunTurnStartSAction } from "../../../shared/action/BattleRunAction";
+import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getTurnIdGenerator, GLOBALTURN_DELAY, TurnIDGenerator } from "@timeflies/shared";
 import { BCharacter } from "../entities/BCharacter";
-import { GLOBALTURN_DELAY } from "../../../shared/GlobalTurnSnapshot";
-import { BGlobalTurn } from "./turn/BGlobalTurn";
 import { BPlayer } from "../entities/BPlayer";
-import { TurnIDGenerator, getTurnIdGenerator } from "../../../shared/getTurnIdGenerator";
+import { BGlobalTurn } from "./turn/BGlobalTurn";
 
 export class BRCycle {
 

@@ -1,5 +1,5 @@
 import { BattleData } from "../phaser/scenes/BattleScene";
-import { BattleLoadPayload } from '@shared/BattleLoadPayload';
+import { BattleLoadPayload } from '@timeflies/shared'
 
 type NarrowState<T, N> = T extends { state: N } ? T : never;
 

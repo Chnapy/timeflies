@@ -1,5 +1,4 @@
-import { CharacterType } from "@shared/Character";
-import { SpellType } from "@shared/Spell";
+import { CharacterType, SpellType } from "@timeflies/shared";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";

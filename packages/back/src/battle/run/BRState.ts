@@ -1,8 +1,7 @@
-import { BSpell } from './entities/BSpell';
-import { Position } from '../../shared/Character';
-import { CharAction } from '../../shared/action/BattleRunAction';
-import { BCharacter } from './entities/BCharacter';
+import { CharAction, Position } from '@timeflies/shared';
 import { BRCycle } from './cycle/BRCycle';
+import { BCharacter } from './entities/BCharacter';
+import { BSpell } from './entities/BSpell';
 
 export class BRState {
 

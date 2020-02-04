@@ -1,4 +1,4 @@
-import { Player } from "../shared/Player";
+import { Player } from "../Player";
 import { BPlayer } from "../battle/run/entities/BPlayer";
 import { seedBTeam } from "./seedBTeam";
 import { seedWebSocket } from './seedWSSocket';

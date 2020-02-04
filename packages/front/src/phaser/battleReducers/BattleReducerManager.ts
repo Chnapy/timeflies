@@ -1,4 +1,4 @@
-import { SpellType } from '@shared/Spell';
+import { SpellType } from '@timeflies/shared'
 import { IGameAction } from '../../action/GameAction';
 import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';

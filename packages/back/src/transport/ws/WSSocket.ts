@@ -1,5 +1,5 @@
+import { ClientAction, NarrowAction, ServerAction, SetIDCAction } from '@timeflies/shared';
 import WebSocket from 'ws';
-import { NarrowAction, ClientAction, SetIDCAction, ServerAction } from '../../shared/action/TAction';
 
 export type SocketState = 'init' | 'hasID';
 

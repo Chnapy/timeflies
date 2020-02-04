@@ -1,6 +1,6 @@
+import { SetIDCAction } from "@timeflies/shared";
 import { Server, WebSocket } from "mock-socket";
 import { WSSocket } from "./WSSocket";
-import { SetIDCAction } from "../../shared/action/TAction";
 
 describe('WSSocket', () => {
     const URL = `ws://localhost:1234`;

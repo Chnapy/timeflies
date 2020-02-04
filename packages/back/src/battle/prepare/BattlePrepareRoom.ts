@@ -1,15 +1,10 @@
+import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, CharacterType, MapInfos, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
 import urlJoin from 'url-join';
 import { staticURL } from '../..';
-import { BattleLoadEndedCAction, BattleLoadSAction } from '../../shared/action/BattlePrepareAction';
-import { BattleLoadPayload } from '../../shared/BattleLoadPayload';
-import { CharacterType, StaticCharacter } from "../../shared/Character";
-import { MapInfos } from '../../shared/MapInfos';
-import { Player } from "../../shared/Player";
-import { SpellType } from '../../shared/Spell';
-import { Team } from "../../shared/Team";
+import { Player } from "../../Player";
+import { Team } from "../../Team";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
-import { PlayerInfos } from '../../shared/PlayerInfos';
 
 export class BattlePrepareRoom {
 

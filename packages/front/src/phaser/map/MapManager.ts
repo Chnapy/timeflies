@@ -1,7 +1,7 @@
-import { Position } from '@shared/Character';
+import { Position } from '@timeflies/shared'
 import { BattleScene } from '../scenes/BattleScene';
 import { Pathfinder } from './Pathfinder';
-import { MapInfos } from '@shared/MapInfos';
+import { MapInfos } from '@timeflies/shared'
 
 export class MapManager {
 

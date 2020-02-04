@@ -1,15 +1,13 @@
-import { BRCharActionChecker, CharActionCheckerResult } from "./BRCharActionChecker";
-import { BRCycle } from "./cycle/BRCycle";
-import { seedBPlayer } from "../../__seeds__/seedBPlayer";
-import { seedBCharacter } from "../../__seeds__/seedBCharacter";
-import { BRMap } from "./BRMap";
-import { MapInfos } from "../../shared/MapInfos";
+import { CharActionCAction, MapInfos, Position } from "@timeflies/shared";
 import fs from 'fs';
 import { TiledMapOrthogonal } from "tiled-types/types";
-import { CharActionCAction } from "../../shared/action/BattleRunAction";
+import { seedBCharacter } from "../../__seeds__/seedBCharacter";
+import { seedBPlayer } from "../../__seeds__/seedBPlayer";
+import { BRCharActionChecker, CharActionCheckerResult } from "./BRCharActionChecker";
+import { BRMap } from "./BRMap";
+import { BRCycle } from "./cycle/BRCycle";
 import { BCharacter } from "./entities/BCharacter";
 import { BSpell } from "./entities/BSpell";
-import { Position } from "../../shared/Character";
 jest.mock('fs');
 
 describe('#BRCharActionChecker', () => {

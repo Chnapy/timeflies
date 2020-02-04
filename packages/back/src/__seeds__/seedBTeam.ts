@@ -1,4 +1,4 @@
-import { Team } from "../shared/Team";
+import { Team } from "../Team";
 import { BTeam } from "../battle/run/entities/BTeam";
 
 let id = 0;

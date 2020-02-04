@@ -1,5 +1,5 @@
+import { TurnSnapshot } from "@timeflies/shared";
 import { BCharacter } from "../../entities/BCharacter";
-import { TurnSnapshot } from "../../../../shared/TurnSnapshot";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 

@@ -1,4 +1,4 @@
-import { Position } from '@shared/Character';
+import { Position } from '@timeflies/shared'
 import { Controller } from '../../../Controller';
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
 import { SpellPrepare } from '../SpellPrepare';

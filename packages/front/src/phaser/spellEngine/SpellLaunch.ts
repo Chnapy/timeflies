@@ -1,5 +1,5 @@
-import { Position } from '@shared/Character';
-import { SpellType } from '@shared/Spell';
+import { Position } from '@timeflies/shared'
+import { SpellType } from '@timeflies/shared'
 import { LaunchState } from './move/SpellLaunchMove';
 import { SpellEngineAbstract } from './SpellEngineAbstract';
 

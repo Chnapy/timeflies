@@ -1,5 +1,5 @@
-import { StaticCharacter } from "./shared/Character";
-import { Player } from "./shared/Player";
+import { StaticCharacter } from "@timeflies/shared";
+import { Player } from "./Player";
 import { WSSocket } from "./transport/ws/WSSocket";
 import { Util } from "./Util";
 import { seedStaticCharacter } from "./__seeds__/seedStaticCharacter";

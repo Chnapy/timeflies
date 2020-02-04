@@ -1,7 +1,6 @@
+import { GlobalTurnSnapshot, TurnSnapshot } from "@timeflies/shared";
 import { Character } from "../entities/Character";
 import { Turn } from "./Turn";
-import { TurnSnapshot } from "@shared/TurnSnapshot";
-import { GlobalTurnSnapshot } from "@shared/GlobalTurnSnapshot";
 
 export type GlobalState = 'idle' | 'running';
 

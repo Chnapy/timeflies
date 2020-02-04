@@ -1,8 +1,7 @@
-import { CharActionCAction } from '../../shared/action/BattleRunAction';
-import { Position } from '../../shared/Character';
-import { BPlayer } from "./entities/BPlayer";
-import { BRCycle } from './cycle/BRCycle';
+import { CharActionCAction, Position } from "@timeflies/shared";
 import { BRMap } from './BRMap';
+import { BRCycle } from './cycle/BRCycle';
+import { BPlayer } from "./entities/BPlayer";
 
 export type CharActionCheckerReason = 'player' | 'isAlive' | 'spell' | 'startTime' | 'duration' | 'isInArea' | 'bresenham' | 'specificType';
 

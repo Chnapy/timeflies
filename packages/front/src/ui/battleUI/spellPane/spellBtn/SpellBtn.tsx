@@ -9,7 +9,7 @@ import { AssetManager } from '../../../../assetManager/AssetManager';
 import { Controller } from '../../../../Controller';
 import { BattleSpellPrepareAction } from '../../../../phaser/battleReducers/BattleReducerManager';
 import { SpellBtnInfos, SpellBtnInfosProps } from './SpellBtnInfos';
-import { SpellType } from '@shared/Spell';
+import { SpellType } from '@timeflies/shared'
 
 export interface SpellBtnExternProps {
     spellId: string;

@@ -1,4 +1,4 @@
-import { Position } from '@shared/Character';
+import { Position } from '@timeflies/shared'
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
 export class SpellLaunchOrientate extends SpellLaunch<'orientate'> {

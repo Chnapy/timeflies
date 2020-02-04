@@ -1,16 +1,17 @@
 {
   "name": "@timeflies/shared",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "nodemon"
+    "start": "tsc -w",
+    "build": "tsc"
   },
   "devDependencies": {
-    "typescript": "3.7.5",
-    "nodemon": "2.0.2"
+    "typescript": "3.7.5"
   },
   "engineStrict": true,
   "engines": {
