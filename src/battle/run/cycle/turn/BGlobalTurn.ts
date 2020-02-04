@@ -70,6 +70,7 @@ export class BGlobalTurn {
         else {
             const currentCharacter = this.charactersOrdered[nextCharacterIndex];
             if (currentCharacter.isAlive) {
+                console.log(`Wait ${TURN_DELAY}ms`);
                 const turnId = this.generateTurnId.next().value;
                 this.setCurrentTurn(new BTurn(turnId, this.currentTurn.endTime + TURN_DELAY, currentCharacter, this.onTurnStart, this.onTurnEnd));
             } else {

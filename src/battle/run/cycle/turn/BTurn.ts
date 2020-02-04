@@ -88,7 +88,7 @@ export class BTurn {
     }
 
     private start = (): void => {
-        console.log('TURN-START', this.id, this.turnDuration);
+        console.log('TURN-START', this.id, `${this.turnDuration}ms`, this.character.player.id);
         this.lastCallback = 'start';
         this.onTurnStart();
         this.refreshTimedActions();

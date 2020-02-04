@@ -9,6 +9,7 @@ import { SpellType } from '../../shared/Spell';
 import { Team } from "../../shared/Team";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
+import { PlayerInfos } from '../../shared/PlayerInfos';
 
 export class BattlePrepareRoom {
 
@@ -56,7 +57,7 @@ export class BattlePrepareRoom {
 
         const spellTypes: Set<SpellType> = new Set(this.characters.flatMap(c => c.staticSpells.map(s => s.type)));
 
-        const payload: BattleLoadPayload = {
+        const payload: Omit<BattleLoadPayload, 'playerInfos'> = {
             mapInfos: {
                 ...mapInfos,
                 urls: {
@@ -64,14 +65,23 @@ export class BattlePrepareRoom {
                     sheet: urlJoin(staticURL, mapInfos.urls.sheet)
                 }
             },
-            characterTypes: [ ...characterTypes ],
-            spellTypes: [ ...spellTypes ]
+            characterTypes: [...characterTypes],
+            spellTypes: [...spellTypes]
         };
 
         this.players.forEach(p => {
+
+            const playerInfos: PlayerInfos = {
+                id: p.id,
+                name: p.name
+            };
+
             p.socket.send<BattleLoadSAction>({
                 type: 'battle-load',
-                payload
+                payload: {
+                    ...payload,
+                    playerInfos
+                }
             });
 
             p.state = 'battle-loading';
@@ -131,13 +141,13 @@ export class BattlePrepareRoom {
                 id: '1',
                 color: '#FF0000',
                 name: 'Team Rocket',
-                players: [ this.players[ 0 ] ]
+                players: [this.players[0]]
             },
-            this.players[ 1 ] && {
+            this.players[1] && {
                 id: '2',
                 color: '#FF00FF',
                 name: 'Team Azure',
-                players: [ this.players[ 1 ] ]
+                players: [this.players[1]]
             }
         ].filter(Boolean));
 

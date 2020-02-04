@@ -44,7 +44,7 @@ export class BRCycle {
     }
 
     private onTurnStart = (): void => {
-        
+
         const snapshot = this.globalTurn.currentTurn.toSnapshot();
         this.players.forEach(p => {
             p.socket.send<BRunTurnStartSAction>({
@@ -56,6 +56,7 @@ export class BRCycle {
 
     private onGlobalTurnEnd = (): void => {
         console.log('C-GT-ONEND', this.globalTurn.currentTurn.endTime);
+        console.log(`Wait ${GLOBALTURN_DELAY}ms`);
         this.globalTurn = this.newGlobalTurn(this.globalTurn.currentTurn.endTime + GLOBALTURN_DELAY);
     };
 }
