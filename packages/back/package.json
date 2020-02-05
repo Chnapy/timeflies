@@ -8,7 +8,7 @@
     "start": "ts-node src/index.ts",
     "test": "jest --watch",
     "test-ci": "jest",
-    "build": "tsc"
+    "build": "rm -R lib && tsc"
   },
   "author": "",
   "license": "UNLICENSED",
