@@ -9,6 +9,6 @@
   "scripts": {
     "start": "tsc -w",
     "test-ci": "echo \"@timeflies/shared cannot be tested\"",
-    "build": "rm -R lib && tsc"
+    "build": "rm -rf lib && tsc"
   }
 }
