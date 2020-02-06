@@ -61,34 +61,38 @@ export class BattleRunRoom {
         };
 
         this.players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
+
         this.players.forEach(p => {
-            p.socket.on<CharActionCAction>('charAction', action => this.onCharActionReceive(action, p));
+            const onReceive = this.onCharActionReceive(p);
+            p.socket.on<CharActionCAction>('charAction', onReceive);
         });
     }
 
-    private readonly onCharActionReceive = (action: CharActionCAction, player: BPlayer): void => {
+    private onCharActionReceive(player: BPlayer) {
+        return (action: CharActionCAction): void => {
 
-        const isOk = this.charActionChecker.check(action, player).success;
+            const isOk = this.charActionChecker.check(action, player).success;
 
-        const confirmAction: ConfirmSAction = {
-            type: 'confirm',
-            sendTime: action.sendTime,
-            isOk
+            const confirmAction: ConfirmSAction = {
+                type: 'confirm',
+                sendTime: action.sendTime,
+                isOk
+            };
+
+            player.socket.send<ConfirmSAction>(confirmAction);
+
+            if (confirmAction.isOk) {
+                this.state.applyCharAction(action.charAction);
+                this.players
+                    .filter(p => p.id !== player.id)
+                    .forEach(p => p.socket.send<NotifySAction>({
+                        type: 'notify',
+                        charAction: action.charAction,
+                        startTime: action.sendTime
+                    }));
+            }
         };
-
-        player.socket.send<ConfirmSAction>(confirmAction);
-
-        if (confirmAction.isOk) {
-            this.state.applyCharAction(action.charAction);
-            this.players
-                .filter(p => p.id !== player.id)
-                .forEach(p => p.socket.send<NotifySAction>({
-                    type: 'notify',
-                    charAction: action.charAction,
-                    startTime: action.sendTime
-                }));
-        }
-    };
+    }
 
     private generateSnapshot(): BattleSnapshot {
 

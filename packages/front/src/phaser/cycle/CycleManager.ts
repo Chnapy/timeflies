@@ -1,5 +1,4 @@
-import { CharActionCAction } from '@timeflies/shared'
-import { Position } from '@timeflies/shared'
+import { CharActionCAction, GlobalTurnSnapshot, Position, TurnSnapshot } from '@timeflies/shared';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { Character } from '../entities/Character';
 import { Player } from '../entities/Player';
@@ -7,8 +6,6 @@ import { Spell } from '../entities/Spell';
 import { BattleRoomManager, SendPromise } from '../room/BattleRoomManager';
 import { BattleData } from '../scenes/BattleScene';
 import { GlobalTurn } from './GlobalTurn';
-import { GlobalTurnSnapshot } from '@timeflies/shared'
-import { TurnSnapshot } from '@timeflies/shared'
 
 export interface GameTime {
     phaserTime: number;

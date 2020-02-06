@@ -4,7 +4,7 @@ import { PlayerService } from "../PlayerService";
 import WebSocket  from "ws";
 import { WSSocket } from "../transport/ws/WSSocket";
 
-const namespaceStr = 'battle';
+// const namespaceStr = 'battle';
 
 export class Matchmaker {
 

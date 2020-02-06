@@ -48,7 +48,7 @@ export class BRCharActionChecker {
         const { currentTurn } = this.cycle.globalTurn;
 
         if (currentTurn.character.player.id !== player.id) {
-            console.log('check player');
+            console.log('check player', currentTurn.character.player.id, player.id);
             return {
                 success: false,
                 reason: 'player'

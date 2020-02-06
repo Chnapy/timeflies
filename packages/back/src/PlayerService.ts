@@ -17,11 +17,15 @@ export class PlayerService {
             name: 'P-' + id,
             state: 'init',
             socket,
-            staticCharacters: this.getCharacters(id).map(c => ({
-                ...c,
-                // mock
-                id: Util.getUnique()
-            }))
+            staticCharacters: this.getCharacters(id).map(c => {
+                const charId = Util.getUnique();
+                return {
+                    ...c,
+                    // mock
+                    id: charId,
+                    name: c.name + '-' + charId
+                };
+            })
         };
     }
 

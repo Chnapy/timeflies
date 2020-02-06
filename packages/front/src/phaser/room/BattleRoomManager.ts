@@ -120,7 +120,7 @@ export class BattleRoomManager {
     private readonly onNotify = (receive: NotifySAction): void => {
         const { startTime, charAction } = receive;
 
-        const spell = this.state.battleData.globalTurn?.currentTurn?.currentCharacter.spells
+        const spell = this.state.battleData.globalTurn?.currentTurn.currentCharacter.spells
             .find(s => s.id === charAction.spellId);
 
         if (!spell) {
@@ -140,8 +140,7 @@ export class BattleRoomManager {
                 spell,
                 startTime,
                 duration: spell.feature.duration
-            },
-            fromServer: true
+            }
         });
     };
 

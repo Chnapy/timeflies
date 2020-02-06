@@ -37,7 +37,6 @@ export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prep
 
 export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
     charAction: CharAction<'running'>;
-    fromServer?: boolean;
     launchState?: LaunchState[];  // TODO remove after stack action done
 }
 
@@ -117,8 +116,10 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
     });
 
     readonly onSpellLaunch = this.reduce<BattleSpellLaunchAction>('battle/spell/launch', ({
-        charAction, launchState, fromServer
+        charAction, launchState
     }) => {
+
+        const fromServer = !this.battleData.globalTurn?.currentTurn.currentCharacter.player.itsMe;
 
         const { spell, positions } = charAction;
 
