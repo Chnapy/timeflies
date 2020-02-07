@@ -1,17 +1,21 @@
 import { SetIDCAction } from "@timeflies/shared";
 import { Server, WebSocket } from "mock-socket";
 import { WSSocket } from "./WSSocket";
+import { TimerTester } from "../../__testUtils__/TimerTester";
 
 describe('WSSocket', () => {
-    const URL = `ws://localhost:1234`;
 
-    jest.useFakeTimers();
+    const timerTester = new TimerTester();
+
+    const URL = `ws://localhost:1234`;
 
     let server: Server;
 
     let client: WebSocket;
 
     beforeEach(() => {
+        timerTester.beforeTest();
+
         if (client) {
             client.close();
         }
@@ -19,6 +23,10 @@ describe('WSSocket', () => {
             server.close();
         }
         server = new Server(URL);
+    });
+
+    afterAll(() => {
+        timerTester.afterTest();
     });
 
     test('client socket should connect to server', () => {
@@ -48,7 +56,7 @@ describe('WSSocket', () => {
         });
 
         client = new WebSocket(URL);
-        
+
         jest.runOnlyPendingTimers();
 
         client.send(JSON.stringify(action));

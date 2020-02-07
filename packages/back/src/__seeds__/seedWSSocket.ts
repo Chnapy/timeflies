@@ -9,9 +9,14 @@ export const seedWebSocket = ({ onSendFn }: {
 
     const _send = s.send.bind(s);
     s.send = (...args: any[]) => {
-        (_send as any)(...args);
+
+        // mock can fail...
+        try {
+            (_send as any)(...args);
+        } catch (e) { }
+        
         if (onSendFn)
-            onSendFn()(JSON.parse(args[ 0 ] as string));
+            onSendFn()(JSON.parse(args[0] as string));
     };
 
     return s;

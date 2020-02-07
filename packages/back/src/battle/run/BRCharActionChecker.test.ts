@@ -8,9 +8,12 @@ import { BRMap } from "./BRMap";
 import { BRCycle } from "./cycle/BRCycle";
 import { BCharacter } from "./entities/BCharacter";
 import { BSpell } from "./entities/BSpell";
+import { TimerTester } from "../../__testUtils__/TimerTester";
 jest.mock('fs');
 
 describe('#BRCharActionChecker', () => {
+
+    const timerTester = new TimerTester();
 
     let cycle: BRCycle;
     let character: BCharacter;
@@ -91,6 +94,8 @@ describe('#BRCharActionChecker', () => {
     };
 
     beforeEach(() => {
+        timerTester.beforeTest();
+
         cycle = getCycle();
         const map = getMap();
 
@@ -102,6 +107,10 @@ describe('#BRCharActionChecker', () => {
         spellDefault = character.spells.find(s => s.staticData.type !== 'move' && s.staticData.type !== 'orientate')!;
         charPos = character.position;
         checker = new BRCharActionChecker(cycle, map);
+    });
+
+    afterEach(() => {
+        timerTester.afterTest();
     });
 
     it('should fail on dead character', () => {

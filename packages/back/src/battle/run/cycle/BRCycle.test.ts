@@ -17,32 +17,46 @@ describe('#BRCycle', () => {
     let onSendFn1: (action: ServerAction) => void;
     let onSendFn2: (action: ServerAction) => void;
 
-    const sockets: WebSocket[] = [
-        seedWebSocket({
-            onSendFn: () => onSendFn1
-        }),
-        seedWebSocket({
-            onSendFn: () => onSendFn2
-        })
-    ];
+    let sockets: WebSocket[];
 
-    const players: BPlayer[] = sockets.map(s => seedBPlayer({ socket: new WSSocket(s) }));
+    let players: BPlayer[];
 
-    const characters: BCharacter[] = seedBCharacter(
-        { length: 3 },
-        i => i < 2 ? players[0] : players[1]
-    );
+    let characters: BCharacter[];
 
     let cycle: BRCycle;
 
     beforeEach(() => {
         timerTester.beforeTest();
 
+        sockets = [
+            seedWebSocket({
+                onSendFn: () => onSendFn1
+            }),
+            seedWebSocket({
+                onSendFn: () => onSendFn2
+            })
+        ];
+
+        players = sockets.map(s => seedBPlayer({ socket: new WSSocket(s) }));
+
+        characters = seedBCharacter(
+            { length: 3 },
+            i => i < 2 ? players[0] : players[1]
+        );
+
         onSendFn1 = () => { };
         onSendFn2 = () => { };
     });
 
     afterEach(() => {
+        cycle = undefined as any;
+
+        sockets.forEach(c => c.close());
+
+        characters.length = 0;
+        players.length = 0;
+        sockets.length = 0;
+
         timerTester.afterTest();
     });
 
@@ -83,7 +97,7 @@ describe('#BRCycle', () => {
 
         const { turnDuration } = cycle.globalTurn.currentTurn;
 
-        timerTester.advanceBy(turnDuration + 10);
+        timerTester.advanceBy(turnDuration + TURN_DELAY + 10);
 
         expect(on).toHaveBeenCalledTimes(players.length);
 

@@ -27,7 +27,7 @@ export class TimerTester {
     }
 
     afterTest(): void {
-        jest.runOnlyPendingTimers();
+        jest.clearAllTimers();
         jest.useRealTimers();
         this.spyInstance?.mockRestore();
         delete this.spyInstance;
