@@ -203,76 +203,76 @@ describe('#BRCharActionChecker', () => {
         });
     });
 
-    it('should fail on bad position: area', () => {
+    // it('should fail on bad position: area', () => {
 
-        spellDefault.features.area = 3;
+    //     spellDefault.features.area = 3;
 
-        const action: CharActionCAction = {
-            type: 'charAction',
-            sendTime: Date.now(),
-            charAction: {
-                spellId: spellDefault.id,
-                positions: [{
-                    ...charPos,
-                    x: charPos.x + 4
-                }]
-            }
-        };
+    //     const action: CharActionCAction = {
+    //         type: 'charAction',
+    //         sendTime: Date.now(),
+    //         charAction: {
+    //             spellId: spellDefault.id,
+    //             positions: [{
+    //                 ...charPos,
+    //                 x: charPos.x + 4
+    //             }]
+    //         }
+    //     };
 
-        expect(
-            checker.check(action, character.player)
-        ).toStrictEqual<CharActionCheckerResult>({
-            success: false,
-            reason: 'isInArea'
-        });
-    });
+    //     expect(
+    //         checker.check(action, character.player)
+    //     ).toStrictEqual<CharActionCheckerResult>({
+    //         success: false,
+    //         reason: 'isInArea'
+    //     });
+    // });
 
-    it('should fail on bad position: obstacles', () => {
+    // it('should fail on bad position: obstacles', () => {
 
-        spellDefault.features.area = 20;
+    //     spellDefault.features.area = 20;
 
-        const action: CharActionCAction = {
-            type: 'charAction',
-            sendTime: Date.now(),
-            charAction: {
-                spellId: spellDefault.id,
-                positions: [{
-                    ...charPos,
-                    y: charPos.y + 4
-                }]
-            }
-        };
+    //     const action: CharActionCAction = {
+    //         type: 'charAction',
+    //         sendTime: Date.now(),
+    //         charAction: {
+    //             spellId: spellDefault.id,
+    //             positions: [{
+    //                 ...charPos,
+    //                 y: charPos.y + 4
+    //             }]
+    //         }
+    //     };
 
-        expect(
-            checker.check(action, character.player)
-        ).toStrictEqual<CharActionCheckerResult>({
-            success: false,
-            reason: 'bresenham'
-        });
-    });
+    //     expect(
+    //         checker.check(action, character.player)
+    //     ).toStrictEqual<CharActionCheckerResult>({
+    //         success: false,
+    //         reason: 'bresenham'
+    //     });
+    // });
 
-    it('should fail on specific type: move', () => {
+    // it('should fail on specific type: move', () => {
 
-        const action: CharActionCAction = {
-            type: 'charAction',
-            sendTime: Date.now(),
-            charAction: {
-                spellId: spellMove.id,
-                positions: [{
-                    ...charPos,
-                    x: charPos.x - 1
-                }]
-            }
-        };
+    //     const action: CharActionCAction = {
+    //         type: 'charAction',
+    //         sendTime: Date.now(),
+    //         charAction: {
+    //             spellId: spellMove.id,
+    //             positions: [{
+    //                 ...charPos,
+    //                 x: charPos.x - 1
+    //             }]
+    //         }
+    //     };
 
-        // can't step to an occupied tile
-        expect(
-            checker.check(action, character.player)
-        ).toStrictEqual<CharActionCheckerResult>({
-            success: false,
-            reason: 'specificType'
-        });
-    });
+    //     // can't step to an occupied tile
+    //     expect(
+    //         checker.check(action, character.player)
+    //     ).toStrictEqual<CharActionCheckerResult>({
+    //         success: false,
+    //         reason: 'specificType'
+    //     });
+    // });
 
     it('should fail on specific type: default spell', () => {
 

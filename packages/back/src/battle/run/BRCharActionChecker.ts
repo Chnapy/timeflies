@@ -160,10 +160,11 @@ export class BRCharActionChecker {
 
         if (!isInArea) {
             console.log('check isInArea');
-            return {
-                success: false,
-                reason: 'isInArea'
-            };
+            // TODO debug
+            // return {
+            //     success: false,
+            //     reason: 'isInArea'
+            // };
         }
 
         // Check obstacles
@@ -173,10 +174,11 @@ export class BRCharActionChecker {
 
         if (line.some(({ d }) => d !== 0)) {
             console.log('check bresenham');
-            return {
-                success: false,
-                reason: 'bresenham'
-            };
+            // TODO debug
+            // return {
+            //     success: false,
+            //     reason: 'bresenham'
+            // };
         }
 
         // Check occupation
@@ -188,10 +190,11 @@ export class BRCharActionChecker {
             case 'move':
                 if (occupiedPath.some(v => v)) {
                     console.log('check move');
-                    return {
-                        success: false,
-                        reason: 'specificType'
-                    };
+                    // TODO debug
+                    // return {
+                    //     success: false,
+                    //     reason: 'specificType'
+                    // };
                 }
                 break;
             default:

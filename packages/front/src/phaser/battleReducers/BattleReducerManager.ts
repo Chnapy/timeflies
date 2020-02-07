@@ -119,7 +119,9 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         charAction, launchState
     }) => {
 
-        const fromServer = !this.battleData.globalTurn?.currentTurn.currentCharacter.player.itsMe;
+        const { currentCharacter } = this.battleData.globalTurn!.currentTurn;
+
+        const fromServer = !currentCharacter.player.itsMe;
 
         const { spell, positions } = charAction;
 
@@ -147,7 +149,9 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         this.cycle.addCharActionAndSend(charAction)
             .catch(confirm => {
                 this.spellEngine.cancel();
-                this.resetState(this.battleData.globalTurn?.currentTurn?.currentCharacter);
+                if (currentCharacter.id === this.battleData.globalTurn?.currentTurn.currentCharacter.id) {
+                    this.resetState(currentCharacter);
+                }
             });
     });
 

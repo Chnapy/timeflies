@@ -60,7 +60,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                                 duration: this.spell.feature.duration,
                                 positions: nextPos
                             },
-                            launchState: i < targetPositions.length - 1 ? ['last'] : ['middle']
+                            launchState: i < targetPositions.length - 1 ? ['middle'] : ['last']
                         });
                     }
                     : undefined

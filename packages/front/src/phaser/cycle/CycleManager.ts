@@ -79,15 +79,21 @@ export class CycleManager {
     }
 
     cancelCharActionByTime(startTime: number, cancelTime: number): void {
-        const charAction = this.charActionStack.find(ca => ca.startTime === startTime)!;
-        charAction.state = 'canceled';
-        (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
+        const charAction = this.charActionStack.find(ca => ca.startTime === startTime);
+
+        if (charAction) {
+            charAction.state = 'canceled';
+            (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
+        }
     }
 
     cancelCharActionLast(cancelTime: number): void {
         const charAction = this.charActionStack[this.charActionStack.length - 1];
-        charAction.state = 'canceled';
-        (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
+
+        if (charAction) {
+            charAction.state = 'canceled';
+            (charAction as CharAction<'canceled'>).cancelTime = cancelTime;
+        }
     }
 
     synchronizeGlobalTurn(globalTurnSnapshot: GlobalTurnSnapshot): void {
@@ -97,7 +103,7 @@ export class CycleManager {
         } else {
             this.waitingSnapshots.push(globalTurnSnapshot);
 
-            if(!this.battleData.globalTurn) {
+            if (!this.battleData.globalTurn) {
                 this.onGlobalTurnEnd();
             }
         }
