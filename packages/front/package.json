@@ -8,7 +8,7 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
-    "test-ci": "test"
+    "test-ci": "yarn test"
   },
   "dependencies": {
     "easystarjs": "0.4.3"
