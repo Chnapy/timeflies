@@ -7,7 +7,7 @@ import { MatchmakerEnterCAction } from '@timeflies/shared'
 import { PlayerInfos } from '@timeflies/shared'
 import { SetIDCAction } from '@timeflies/shared'
 
-export let playerInfos: PlayerInfos;
+export let playerInfos: PlayerInfos = {} as any;
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 
