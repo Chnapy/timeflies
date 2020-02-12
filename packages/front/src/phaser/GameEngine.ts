@@ -38,6 +38,11 @@ export class GameEngine {
             .forEach(scene => scene.events.emit(action.type, action));
     }
 
+    forEachScene = (fn: (scene: Phaser.Scene) => void): void => {
+        this.game.scene.getScenes()
+            .forEach(fn);
+    }
+
     resize(width: number, height: number): void {
         if (this.game.canvas)
             this.game.scale.resize(width, height);

@@ -8,12 +8,12 @@ import { BattleTurnStartAction } from './phaser/battleReducers/BattleReducerMana
 import { GameEngine } from './phaser/GameEngine';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
-import { WSClient } from './WSClient';
+import { WSClient } from './socket/WSClient';
 
 export class Controller {
 
     private static app: App;
-    private static game: GameEngine;
+    static game: GameEngine;
     static client: WSClient;
 
     private static store: Store<UIState, GameAction>;
