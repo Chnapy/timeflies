@@ -1,29 +1,37 @@
+import { Position } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
-import { Position } from '@timeflies/shared'
 import { BattleData } from '../scenes/BattleScene';
-import { MapManager } from './MapManager';
 
 export interface PathPromise {
     promise: Promise<Position[]>;
     cancel: () => boolean;
 }
 
+export interface PathfinderDeps {
+    battleData: Pick<BattleData, 'characters'>
+}
+
+export interface PathfinderMapUtils {
+    tilemap: Pick<Phaser.Tilemaps.Tilemap, 'width' | 'height'>;
+    obstaclesLayer: Pick<Phaser.Tilemaps.StaticTilemapLayer, 'getTileAt'>;
+}
+
 export class Pathfinder {
 
-    private static ACCEPTABLE_TILES: number[] = [ 0 ];
+    private static ACCEPTABLE_TILES: number[] = [0];
 
-    private readonly map: MapManager;
-    private readonly battleData: BattleData;
-    private readonly finder: InstanceType<(typeof EasyStar)[ 'js' ]>;
+    private readonly map: PathfinderMapUtils;
+    private readonly battleData: Pick<BattleData, 'characters'>;
+    private readonly finder: InstanceType<(typeof EasyStar)['js']>;
 
-    constructor(map: MapManager, battleData: BattleData) {
+    constructor(map: PathfinderMapUtils, { battleData }: PathfinderDeps) {
         this.map = map;
         this.battleData = battleData;
         this.finder = new EasyStar.js();
         this.finder.disableDiagonals();
     }
 
-    private readonly getTileID = (obstaclesLayer: Phaser.Tilemaps.StaticTilemapLayer, x: number, y: number): number => {
+    private readonly getTileID = (obstaclesLayer: PathfinderMapUtils['obstaclesLayer'], x: number, y: number): number => {
         const obstacle = obstaclesLayer.getTileAt(x, y)
             || this.isSomeoneAtXY(x, y);
 
@@ -37,9 +45,9 @@ export class Pathfinder {
 
         const grid: number[][] = [];
         for (let y = 0; y < height; y++) {
-            grid[ y ] = [];
+            grid[y] = [];
             for (let x = 0; x < width; x++) {
-                grid[ y ][ x ] = this.getTileID(obstaclesLayer, x, y);
+                grid[y][x] = this.getTileID(obstaclesLayer, x, y);
             }
         }
 
@@ -55,7 +63,7 @@ export class Pathfinder {
         endX: number, endY: number
     ): PathPromise {
         let instanceId;
-        const promise: PathPromise[ 'promise' ] = new Promise(r => {
+        const promise: PathPromise['promise'] = new Promise(r => {
 
             instanceId = this.finder.findPath(startX, startY, endX, endY, path => {
                 r(path || []);

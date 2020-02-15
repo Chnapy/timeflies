@@ -17,6 +17,7 @@ export class MapManager {
     constructor(scene: BattleScene, mapInfos: MapInfos) {
         this.scene = scene;
         this.mapInfos = mapInfos;
+        //@ts-ignore
         this.pathfinder = new Pathfinder(this, scene.battleData);
     }
 
