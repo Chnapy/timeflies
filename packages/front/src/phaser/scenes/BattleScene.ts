@@ -158,7 +158,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
             team!.updateFromSnapshot(tSnap);
         });
-        this.map.pathfinder.setGrid();
+        this.map.pathfinder.refreshGrid();
     }
 
     private createCharactersAnimations(characterTypes: CharacterType[]): void {

@@ -129,7 +129,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
             .then(spellResult => {
 
                 if (spellResult.grid) {
-                    this.map.pathfinder.setGrid();
+                    this.map.pathfinder.refreshGrid();
                 }
 
                 if (spellResult.charState) {

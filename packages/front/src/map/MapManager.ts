@@ -1,28 +1,32 @@
-import { MapInfos } from '@timeflies/shared';
-import { MapGraphics, MapGraphicsDeps } from '../graphics/MapGraphics';
-import { Pathfinder } from '../phaser/map/Pathfinder';
+import { MapGraphics } from '../graphics/MapGraphics';
 import { BattleData } from '../phaser/scenes/BattleScene';
+import { Pathfinder } from './Pathfinder';
 
 export interface MapManager extends Pick<MapGraphics, 'tileToWorld' | 'worldToTile'> {
     refreshPathfinder(): void;
 }
 
-export interface MapManagerDeps extends MapGraphicsDeps {
+export interface MapManagerDeps {
     battleData: Pick<BattleData, 'characters'>;
+    getGraphics: () => MapGraphics;
+    getPathfinder: typeof Pathfinder;
 }
 
-export const MapManager = (mapInfos: MapInfos, deps: MapManagerDeps): MapManager => {
+export const MapManager = ({ getGraphics, getPathfinder, battleData }: MapManagerDeps): MapManager => {
 
-    const graphics = MapGraphics(mapInfos, deps);
+    const graphics = getGraphics();
 
-    const { tilemap, obstaclesLayer, tileToWorld, worldToTile } = graphics;
+    const { tilemap, hasObstacleAt, tileToWorld, worldToTile } = graphics;
 
-    const pathfinder = new Pathfinder({ tilemap, obstaclesLayer: obstaclesLayer as any }, deps);
+    const pathfinder = getPathfinder(
+        { tilemap, hasObstacleAt },
+        () => battleData.characters.map(c => c.position)
+    );
 
     return {
 
         refreshPathfinder() {
-            pathfinder.setGrid();
+            pathfinder.refreshGrid();
         },
 
         tileToWorld,

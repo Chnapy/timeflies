@@ -1,6 +1,6 @@
 import { Position } from '@timeflies/shared'
 import { BattleScene } from '../scenes/BattleScene';
-import { Pathfinder } from './Pathfinder';
+import { Pathfinder } from '../../map/Pathfinder';
 import { MapInfos } from '@timeflies/shared'
 
 export class MapManager {
@@ -34,7 +34,7 @@ export class MapManager {
     }
 
     initPathfinder(): void {
-        this.pathfinder.setGrid();
+        this.pathfinder.refreshGrid();
     }
 
     tileToWorldPosition = (position: Position, center?: boolean): Position => {

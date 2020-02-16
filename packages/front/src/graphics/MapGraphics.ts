@@ -5,19 +5,19 @@ export interface MapGraphics extends Readonly<{
         width: number;
         height: number;
     }>;
-    obstaclesLayer: Readonly<{
-        getTileAt(x: number, y: number): unknown;
-    }>;
+    hasObstacleAt(position: Position): boolean;
     tileToWorld(position: Position, center?: boolean): Position;
     worldToTile(position: Position): Position;
 }> { }
 
 export interface MapGraphicsDeps {
-    scene: { make: Pick<Phaser.Scene['make'], 'tilemap'> };
+    scene: { make: Pick<Phaser.Scene[ 'make' ], 'tilemap'> };
 }
 
+export type MapInfosGraphics = Pick<MapInfos, 'tilemapKey' | 'decorLayerKey' | 'obstaclesLayerKey'>;
+
 export const MapGraphics = (
-    { tilemapKey, decorLayerKey, obstaclesLayerKey }: Pick<MapInfos, 'tilemapKey' | 'decorLayerKey' | 'obstaclesLayerKey'>,
+    { tilemapKey, decorLayerKey, obstaclesLayerKey }: MapInfosGraphics,
     {
         scene
     }: MapGraphicsDeps
@@ -33,7 +33,10 @@ export const MapGraphics = (
 
     return {
         tilemap,
-        obstaclesLayer,
+
+        hasObstacleAt({ x, y }: Position): boolean {
+            return obstaclesLayer.hasTileAt(x, y);
+        },
 
         tileToWorld(position: Position, center?: boolean): Position {
             if (center) {
