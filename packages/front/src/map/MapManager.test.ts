@@ -1,7 +1,7 @@
 import { MapManager } from './MapManager';
 import { Position } from '@timeflies/shared';
 
-describe('#MapManager', () => {
+describe('# MapManager', () => {
 
     let manager: MapManager;
 
@@ -24,18 +24,19 @@ describe('#MapManager', () => {
                     height: -1,
                 },
                 hasObstacleAt: () => true,
-                tileToWorld: tileToWorld ?? ((...args) => ({
+                tileToWorld: tileToWorld ?? (() => ({
                     x: -1,
                     y: -1
                 })),
-                worldToTile: worldToTile ?? ((...args) => ({
+                worldToTile: worldToTile ?? (() => ({
                     x: -1,
                     y: -1
                 })),
             }),
             getPathfinder: () => ({
                 refreshGrid: refreshGrid ?? (() => { }),
-            } as any)
+                calculatePath: () => ({ promise: Promise.resolve([]), cancel: () => true })
+            })
         }
     );
 
@@ -52,13 +53,9 @@ describe('#MapManager', () => {
 
     it('should call graphic#tileToWorld on tileToWorld()', () => {
 
-        const tileToWorld = jest.fn((arg: Position, center?: boolean) => ({
+        const tileToWorld = jest.fn(() => ({
             x: -1,
             y: -1
-        }));
-        const worldToTile = jest.fn((arg: Position) => ({
-            x: -2,
-            y: -2
         }));
 
         manager = getManager({ tileToWorld });
@@ -76,7 +73,7 @@ describe('#MapManager', () => {
 
     it('should call graphic#worldToTile on worldToTile()', () => {
 
-        const worldToTile = jest.fn((arg: Position) => ({
+        const worldToTile = jest.fn(() => ({
             x: -2,
             y: -2
         }));

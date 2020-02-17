@@ -25,7 +25,6 @@ export const Pathfinder = (
 ) => {
 
     const finder = new EasyStar.js();
-    finder.disableDiagonals();
 
     let charactersPositions: Position[];
 
@@ -65,11 +64,12 @@ export const Pathfinder = (
             { x: startX, y: startY }: Position,
             { x: endX, y: endY }: Position
         ): PathPromise {
+            
             let instanceId;
-            const promise: PathPromise[ 'promise' ] = new Promise(r => {
+            const promise: PathPromise[ 'promise' ] = new Promise(resolve => {
 
                 instanceId = finder.findPath(startX, startY, endX, endY, path => {
-                    r(path || []);
+                    resolve(path || []);
                 });
                 finder.calculate();
 
