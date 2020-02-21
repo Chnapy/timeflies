@@ -21,7 +21,7 @@ export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>
                 disabled: true
             };
         }
-        const { startTime, turnDuration, state, currentCharacter } = globalTurn.currentTurn;
+        const { startTime, turnDuration, state, character: currentCharacter } = globalTurn.currentTurn;
 
         return {
             startDateTime: startTime,

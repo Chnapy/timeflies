@@ -1,8 +1,8 @@
 import { SpellType } from '@timeflies/shared'
-import { Character } from '../entities/Character';
-import { Spell } from '../entities/Spell';
+import { Character } from '../../stages/battle/entities/Character';
+import { Spell } from '../../stages/battle/entities/Spell';
 import { MapManager } from '../map/MapManager';
-import { BattleScene } from '../scenes/BattleScene';
+import { BattleScene } from '../../stages/battle/BattleScene';
 import { CurrentSpellState } from './SpellEngine';
 
 export abstract class SpellEngineAbstract<S extends Exclude<CurrentSpellState, 'none'>, T extends SpellType> {

@@ -19,7 +19,7 @@ export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
             };
         }
 
-        const { startTime, currentCharacter } = globalTurn.currentTurn;
+        const { startTime, character: currentCharacter } = globalTurn.currentTurn;
 
         return {
             startDateTime: startTime,

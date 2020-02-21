@@ -3,12 +3,13 @@ import { IGameAction } from '../../action/GameAction';
 import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { ReducerManager } from '../../ReducerManager';
-import { CameraManager } from '../camera/CameraManager';
-import { CharAction, CycleManager } from '../cycle/CycleManager';
-import { Character } from '../entities/Character';
+import { CameraManager } from '../../stages/battle/camera/CameraManager';
+import { CharAction, CycleManager } from '../../stages/battle/cycle/CycleManager';
+import { Character } from '../../stages/battle/entities/Character';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager } from '../room/BattleRoomManager';
-import { BattleData, BattleScene, BattleSceneData } from '../scenes/BattleScene';
+import { BattleScene, BattleSceneData } from '../../stages/battle/BattleScene';
+import { BattleData } from "../../BattleData";
 import { SpellEngine } from '../spellEngine/SpellEngine';
 import { LaunchState } from '../spellEngine/move/SpellLaunchMove';
 
@@ -92,9 +93,9 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         const spell = currentTurn.currentSpell?.spell.staticData.type === spellType
             && currentTurn.currentSpell.state === 'prepare'
 
-            ? currentTurn.currentCharacter.defaultSpell
+            ? currentTurn.character.defaultSpell
 
-            : currentTurn.currentCharacter.spells
+            : currentTurn.character.spells
                 .find(s => s.staticData.type === spellType)!;
 
         this.spellEngine.prepare(spell);
@@ -119,7 +120,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         charAction, launchState
     }) => {
 
-        const { currentCharacter } = this.battleData.globalTurn!.currentTurn;
+        const { character: currentCharacter } = this.battleData.globalTurn!.currentTurn;
 
         const fromServer = !currentCharacter.player.itsMe;
 
@@ -133,7 +134,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
                 }
 
                 if (spellResult.charState) {
-                    spell.character.setCharacterState('idle');
+                    spell.character.set({ state: 'idle' });
                 }
 
                 if (spellResult.battleState) {
@@ -149,7 +150,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
         this.cycle.addCharActionAndSend(charAction)
             .catch(confirm => {
                 this.spellEngine.cancel();
-                if (currentCharacter.id === this.battleData.globalTurn?.currentTurn.currentCharacter.id) {
+                if (currentCharacter.id === this.battleData.globalTurn?.currentTurn.character.id) {
                     this.resetState(currentCharacter);
                 }
             });

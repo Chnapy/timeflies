@@ -1,5 +1,6 @@
-import { BattleData } from "../phaser/scenes/BattleScene";
+import { BattleData } from "../BattleData";
 import { BattleLoadPayload } from '@timeflies/shared'
+import { CurrentPlayer } from "../CurrentPlayer";
 
 type NarrowState<T, N> = T extends { state: N } ? T : never;
 
@@ -20,6 +21,8 @@ export interface UIStateBattle {
 export type UIStateData = UIStateBoot | UIStateLoad | UIStateBattle;
 
 export interface UIState<D extends UIStateData['state'] = UIStateData['state']> {
+
+    currentPlayer?: CurrentPlayer;
 
     data: NarrowState<UIStateData, D>;
 

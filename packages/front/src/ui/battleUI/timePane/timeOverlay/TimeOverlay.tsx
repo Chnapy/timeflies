@@ -3,7 +3,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { AssetManager } from "../../../../assetManager/AssetManager";
-import { CharActionState } from "../../../../phaser/cycle/CycleManager";
+import { CharActionState } from "../../../../stages/battle/cycle/CycleManager";
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
 import { UIState } from "../../../UIState";
 import css from './timeOverlay.module.css';
@@ -65,7 +65,7 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
             startDateTime: currentTurn.startTime,
             turnDuration: currentTurn.turnDuration,
             timeActions,
-            disabled: !currentTurn.currentCharacter.isMine
+            disabled: !currentTurn.character.isMine
         };
     }
 )(({

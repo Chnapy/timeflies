@@ -1,6 +1,7 @@
 import { Position } from '@timeflies/shared'
-import { Spell } from '../entities/Spell';
-import { BattleData, BattleScene } from '../scenes/BattleScene';
+import { Spell } from '../../stages/battle/entities/Spell';
+import { BattleScene } from '../../stages/battle/BattleScene';
+import { BattleData } from "../../BattleData";
 import { SpellLaunchDefault } from './default/SpellLaunchDefault';
 import { SpellPrepareDefault } from './default/SpellPrepareDefault';
 import { SpellLaunchMove, LaunchState } from './move/SpellLaunchMove';

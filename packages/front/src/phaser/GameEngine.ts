@@ -1,8 +1,7 @@
 import { GameAction } from '../action/GameAction';
-import { Controller } from '../Controller';
-import { BattleScene } from './scenes/BattleScene';
-import { BootScene } from './scenes/BootScene';
-import { LoadScene } from './scenes/LoadScene';
+import { BattleScene } from '../stages/battle/BattleScene';
+import { BootScene } from '../stages/boot/BootScene';
+import { LoadScene } from '../stages/load/LoadScene';
 
 const config: Omit<Phaser.Types.Core.GameConfig, 'parent' | 'width' | 'height'> = {
     type: Phaser.AUTO,
@@ -27,10 +26,6 @@ export class GameEngine {
             width: parent.clientWidth,
             height: parent.clientHeight
         });
-    }
-
-    readonly dispatch = <A extends GameAction>(action: A): void => {
-        Controller.dispatch(action);
     }
 
     readonly emit = <A extends GameAction>(action: A): void => {

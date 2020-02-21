@@ -1,6 +1,6 @@
 import { Position } from '@timeflies/shared'
-import { BattleScene } from '../scenes/BattleScene';
-import { Pathfinder } from '../../map/Pathfinder';
+import { BattleScene } from '../../stages/battle/BattleScene';
+import { Pathfinder } from '../../stages/battle/map/Pathfinder';
 import { MapInfos } from '@timeflies/shared'
 
 export class MapManager {

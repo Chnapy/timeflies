@@ -1,4 +1,5 @@
-import { BattleScene, BattleData } from '../phaser/scenes/BattleScene';
+import { BattleScene } from '../stages/battle/BattleScene';
+import { BattleData } from "../BattleData";
 import { seedCharacters } from './seedCharacter';
 import { seedPlayer } from './seedPlayer';
 import { seedTeam } from './seedTeam';

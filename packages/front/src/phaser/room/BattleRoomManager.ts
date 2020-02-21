@@ -1,7 +1,7 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, ClientAction, ConfirmSAction, NotifySAction } from '@timeflies/shared';
 import { Controller } from '../../Controller';
 import { BattleRollbackAction, BattleSpellLaunchAction } from '../battleReducers/BattleReducerManager';
-import { BattleScene, BattleSceneData } from '../scenes/BattleScene';
+import { BattleScene, BattleSceneData } from '../../stages/battle/BattleScene';
 
 
 export interface SendPromise<S extends ClientAction> extends Promise<{
@@ -120,14 +120,14 @@ export class BattleRoomManager {
     private readonly onNotify = (receive: NotifySAction): void => {
         const { startTime, charAction } = receive;
 
-        const spell = this.state.battleData.globalTurn?.currentTurn.currentCharacter.spells
+        const spell = this.state.battleData.globalTurn?.currentTurn.character.spells
             .find(s => s.id === charAction.spellId);
 
         if (!spell) {
             console.error(
                 'notify spell issue',
                 charAction.spellId,
-                this.state.battleData.globalTurn?.currentTurn?.currentCharacter.spells.map(s => s.id)
+                this.state.battleData.globalTurn?.currentTurn?.character.spells.map(s => s.id)
             );
             return;
         }

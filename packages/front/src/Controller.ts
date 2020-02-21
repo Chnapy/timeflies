@@ -18,7 +18,7 @@ export class Controller {
 
     private static store: Store<UIState, GameAction>;
 
-    static start(): Controller {
+    static start(): void {
 
         Controller.store = createStore<UIState, GameAction, any, any>(
             RootReducer
@@ -33,8 +33,6 @@ export class Controller {
             }),
             document.getElementById('root')
         );
-
-        return Controller;
     }
 
     static readonly dispatch = <A extends GameAction>(action: A): void => {

@@ -1,14 +1,17 @@
 import { ClientAction, ServerAction } from '@timeflies/shared';
 import { IGameAction } from '../action/GameAction';
-import { useDispatch } from '../useDispatch';
-import { OnAction, useEvent } from '../useEvent';
+import { serviceDispatch } from '../services/serviceDispatch';
+import { OnAction, serviceEvent } from '../services/serviceEvent';
 
-export interface ReceiveMessageAction extends IGameAction<'message/receive'> {
-    message: ServerAction;
+export interface ReceiveMessageAction<A extends ServerAction = ServerAction> extends IGameAction<'message/receive'> {
+    message: A;
 }
+type DistributiveOmit<T, K extends keyof any> = T extends any
+  ? Omit<T, K>
+  : never;
 
-export interface SendMessageAction extends IGameAction<'message/send'> {
-    message: Omit<ClientAction, 'sendTime'>;
+export interface SendMessageAction<A extends ClientAction = ClientAction> extends IGameAction<'message/send'> {
+    message: DistributiveOmit<A, 'sendTime'>;
 }
 
 export type MessageAction = ReceiveMessageAction | SendMessageAction;
@@ -19,7 +22,7 @@ export class WSClient {
 
     private readonly socket: WebSocket;
     private readonly dispatchMessage: (message: ServerAction) => void;
-    private readonly onAction: OnAction;
+    private readonly onAction: OnAction<SendMessageAction>;
 
     get isOpen(): boolean {
         return this.socket.readyState === WebSocket.OPEN;
@@ -30,14 +33,14 @@ export class WSClient {
     constructor() {
         this.socket = new WebSocket(ENDPOINT);
 
-        this.dispatchMessage = useDispatch({
+        this.dispatchMessage = serviceDispatch({
             dispatch: (message: ServerAction) => ({
                 type: 'message/receive',
                 message
             })
         }).dispatch;
 
-        this.onAction = useEvent().onAction;
+        this.onAction = serviceEvent().onAction;
 
         this.socket.onmessage = this.onMessage.bind(this);
 

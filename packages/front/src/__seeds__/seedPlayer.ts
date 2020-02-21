@@ -1,9 +1,9 @@
 import 'phaser';
 import { PlayerSnapshot } from '@timeflies/shared';
-import { Player } from '../phaser/entities/Player';
-import { Team } from '../phaser/entities/Team';
-import { BattleScene } from '../phaser/scenes/BattleScene';
-import { playerInfos } from '../phaser/scenes/BootScene';
+import { Player } from '../stages/battle/entities/Player';
+import { Team } from '../stages/battle/entities/Team';
+import { BattleScene } from '../stages/battle/BattleScene';
+import { playerInfos } from '../stages/boot/BootScene';
 
 const snap: PlayerSnapshot = {
     id: '1',

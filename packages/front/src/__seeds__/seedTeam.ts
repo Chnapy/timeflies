@@ -1,6 +1,6 @@
 import { TeamSnapshot } from '@timeflies/shared';
-import { Team } from '../phaser/entities/Team';
-import { BattleScene } from '../phaser/scenes/BattleScene';
+import { Team } from '../stages/battle/entities/Team';
+import { BattleScene } from '../stages/battle/BattleScene';
 
 const snap: TeamSnapshot = {
     id: 't-1',

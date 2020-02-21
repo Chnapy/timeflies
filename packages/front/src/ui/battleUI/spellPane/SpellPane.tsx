@@ -15,11 +15,11 @@ const sideSpellTypes: SpellType[] = [ 'move', 'orientate' ];
 export const SpellPane = connect<SpellPaneInnerProps, {}, {}, UIState<'battle'>>(
     ({ data: { battleData: { globalTurn } } }) => ({
         
-        mainSpellIds: globalTurn?.currentTurn?.currentCharacter.spells
+        mainSpellIds: globalTurn?.currentTurn?.character.spells
             .filter(s => !sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || [],
 
-        sideSpellIds: globalTurn?.currentTurn?.currentCharacter.spells
+        sideSpellIds: globalTurn?.currentTurn?.character.spells
             .filter(s => sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || []
     })

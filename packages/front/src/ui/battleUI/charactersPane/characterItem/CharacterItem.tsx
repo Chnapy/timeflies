@@ -30,13 +30,13 @@ export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemE
         const character = characters.find(c => c.id === characterId)!;
 
         return {
-            isCurrent: character.id === globalTurn?.currentTurn?.currentCharacter.id,
+            isCurrent: character.id === globalTurn?.currentTurn?.character.id,
             isMine: character.isMine,
             name: character.staticData.name,
             type: character.staticData.type,
             playerName: character.player.name,
-            teamName: character.team.name,
-            teamColor: character.team.color,
+            teamName: character.player.team.name,
+            teamColor: character.player.team.color,
             lifePresent: character.features.life,
             lifeMax: character.staticData.initialFeatures.life,
             actionTime: character.features.actionTime,

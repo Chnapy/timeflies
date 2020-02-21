@@ -1,6 +1,6 @@
 import { CharacterType, Orientation } from '@timeflies/shared'
 import { SpellType } from '@timeflies/shared'
-import { CharacterState } from '../phaser/entities/Character';
+import { CharacterState } from '../stages/battle/entities/Character';
 import sampleSpritesheet1Image from '../_assets/spritesheets/sokoban_spritesheet.png';
 import sampleSpritesheet1Schema from '../_assets/spritesheets/sokoban_spritesheet.xml';
 import spellsSpritesheetImage from '../_assets/spritesheets/spells_spritesheet.png';
