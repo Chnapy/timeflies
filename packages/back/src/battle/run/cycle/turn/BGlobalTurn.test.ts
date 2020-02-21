@@ -1,6 +1,5 @@
-import { getTurnIdGenerator } from '@timeflies/shared';
+import { getIndexGenerator, TimerTester } from '@timeflies/shared';
 import { seedBCharacter } from '../../../../__seeds__/seedBCharacter';
-import { TimerTester } from '../../../../__testUtils__/TimerTester';
 import { BGlobalTurn, GlobalTurnState } from './BGlobalTurn';
 
 describe('#BGlobalTurn', () => {
@@ -19,7 +18,7 @@ describe('#BGlobalTurn', () => {
 
         const characters = seedBCharacter();
 
-        const idGenerator = getTurnIdGenerator();
+        const idGenerator = getIndexGenerator();
 
         const startTime = {
             past: timerTester.now - 1000,
@@ -43,7 +42,7 @@ describe('#BGlobalTurn', () => {
             alterFn: char => char.initialFeatures.actionTime = 2000
         });
 
-        const turnIdGenerator = getTurnIdGenerator();
+        const turnIdGenerator = getIndexGenerator();
 
         const startTime = timerTester.now;
 
@@ -66,7 +65,7 @@ describe('#BGlobalTurn', () => {
             alterFn: char => char.initialFeatures.actionTime = 2000
         });
 
-        const turnIdGenerator = getTurnIdGenerator();
+        const turnIdGenerator = getIndexGenerator();
 
         const startTime = timerTester.now;
 
@@ -91,7 +90,7 @@ describe('#BGlobalTurn', () => {
             alterFn: char => char.initialFeatures.actionTime = 2000
         });
 
-        const turnIdGenerator = getTurnIdGenerator();
+        const turnIdGenerator = getIndexGenerator();
 
         const startTime = timerTester.now;
 
@@ -112,7 +111,7 @@ describe('#BGlobalTurn', () => {
 
         const characters = seedBCharacter();
 
-        const turnIdGenerator = getTurnIdGenerator();
+        const turnIdGenerator = getIndexGenerator();
 
         const startTime = timerTester.now;
 

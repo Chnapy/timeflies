@@ -1,4 +1,4 @@
-import { ClientAction, ServerAction } from '@timeflies/shared';
+import { ClientAction, ServerAction, DistributiveOmit } from '@timeflies/shared';
 import { IGameAction } from '../action/GameAction';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { OnAction, serviceEvent } from '../services/serviceEvent';
@@ -6,9 +6,6 @@ import { OnAction, serviceEvent } from '../services/serviceEvent';
 export interface ReceiveMessageAction<A extends ServerAction = ServerAction> extends IGameAction<'message/receive'> {
     message: A;
 }
-type DistributiveOmit<T, K extends keyof any> = T extends any
-  ? Omit<T, K>
-  : never;
 
 export interface SendMessageAction<A extends ClientAction = ClientAction> extends IGameAction<'message/send'> {
     message: DistributiveOmit<A, 'sendTime'>;

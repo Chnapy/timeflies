@@ -1,4 +1,4 @@
-import { GlobalTurnSnapshot, TurnIDGenerator, TURN_DELAY } from "@timeflies/shared";
+import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY } from "@timeflies/shared";
 import { BCharacter } from "../../entities/BCharacter";
 import { BTurn } from "./BTurn";
 
@@ -10,7 +10,7 @@ export class BGlobalTurn {
     startTime: number;
     charactersOrdered: readonly BCharacter[];
     private _currentTurn!: BTurn;
-    private readonly generateTurnId: TurnIDGenerator;
+    private readonly generateTurnId: IndexGenerator;
     private readonly onGlobalTurnEnd: (endTime: number) => void;
     private readonly onTurnStart: () => void;
 
@@ -34,7 +34,7 @@ export class BGlobalTurn {
         turn.refreshTimedActions();
     }
 
-    constructor(id: number, startTime: number, charactersOrdered: readonly BCharacter[], generateTurnId: TurnIDGenerator, onGlobalTurnEnd: (endTime: number) => void, onTurnStart: () => void) {
+    constructor(id: number, startTime: number, charactersOrdered: readonly BCharacter[], generateTurnId: IndexGenerator, onGlobalTurnEnd: (endTime: number) => void, onTurnStart: () => void) {
         this.id = id;
         this.startTime = startTime;
         this.charactersOrdered = [...charactersOrdered];

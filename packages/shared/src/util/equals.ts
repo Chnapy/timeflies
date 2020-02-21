@@ -16,7 +16,7 @@ export const equals = <T>(
         throw new Error('equals() does not handle arrays');
     }
 
-    const keys = _keys ?? Object.keys(v1) as any;
+    const keys: (keyof T)[] = _keys ?? Object.keys(v1) as any;
 
     return v2 => keys.every(k => equals(v1[k])(v2[k]));
 }

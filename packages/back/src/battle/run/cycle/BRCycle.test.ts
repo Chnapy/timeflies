@@ -1,9 +1,8 @@
-import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TURN_DELAY } from '@timeflies/shared';
+import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TURN_DELAY, TimerTester } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedBCharacter } from '../../../__seeds__/seedBCharacter';
 import { seedBPlayer } from '../../../__seeds__/seedBPlayer';
 import { seedWebSocket } from '../../../__seeds__/seedWSSocket';
-import { TimerTester } from '../../../__testUtils__/TimerTester';
 import { BCharacter } from '../entities/BCharacter';
 import { BPlayer } from '../entities/BPlayer';
 import { BRCycle } from './BRCycle';
@@ -12,7 +11,7 @@ import WebSocket = require('ws');
 
 describe('#BRCycle', () => {
 
-    const timerTester: TimerTester = new TimerTester();
+    const timerTester = new TimerTester();
 
     let onSendFn1: (action: ServerAction) => void;
     let onSendFn2: (action: ServerAction) => void;

@@ -1,6 +1,5 @@
-import { Position } from '@timeflies/shared';
+import { equals, Position } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
-import { equals } from '../../../utils/equals';
 
 export interface PathPromise {
     promise: Promise<Position[]>;

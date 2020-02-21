@@ -1,8 +1,9 @@
 import { GameAction } from "../action/GameAction";
 import { Controller } from "../Controller";
+import { SendMessageAction } from "../socket/WSClient";
 
 type Params = {
-    [K in string]: (...args) => GameAction;
+    [K in string]: (...args) => Exclude<GameAction, SendMessageAction>;
 };
 
 export const serviceDispatch = <P extends Params>(map: P): P => {

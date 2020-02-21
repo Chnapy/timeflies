@@ -1,102 +1,130 @@
-import { getTurnIdGenerator, TurnIDGenerator, TurnSnapshot } from "@timeflies/shared";
-import { Controller } from "../../../Controller";
+import { TurnSnapshot } from "@timeflies/shared";
 import { BattleTurnEndAction, BattleTurnStartAction } from "../../../phaser/battleReducers/BattleReducerManager";
+import { serviceDispatch } from "../../../services/serviceDispatch";
 import { Character } from "../entities/Character";
-import { CurrentSpell } from "../../../phaser/spellEngine/SpellEngine";
-import { CharAction } from "./CycleManager";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
-export class Turn {
-
-    private static generateId: TurnIDGenerator = getTurnIdGenerator();
-
-    static create(startTime: number, currentCharacter: Character, onTurnEnd: () => void) {
-        return new Turn(Turn.generateId.next().value, startTime, currentCharacter, onTurnEnd);
-    }
-
-    static fromSnapshot(snapshot: TurnSnapshot, characters: readonly Character[], onTurnEnd: () => void): Turn {
-        Turn.generateId.next();
-        return new Turn(snapshot.id, snapshot.startTime, characters.find(c => c.id === snapshot.characterId)!, onTurnEnd);
-    }
-
+export interface Turn {
     readonly id: number;
-    private _startTime: number;
-    readonly character: Character;
+    readonly character: Readonly<Character>;
+    readonly state: TurnState;
+    readonly startTime: number;
+    readonly turnDuration: number;
+    readonly endTime: number;
 
-    get state(): TurnState {
-        const now = Date.now();
-        if (now < this.startTime) {
-            return 'idle';
-        }
-        if (now < this.endTime) {
-            return 'running';
-        }
-        return 'ended';
-    }
-
-    get startTime(): number {
-        return this._startTime;
-    }
-
-    get turnDuration(): number {
-        return this.character.features.actionTime;
-    }
-
-    get endTime(): number {
-        return this.startTime + this.turnDuration;
-    }
-
-    private timedActionTimeout?: NodeJS.Timeout;
-    currentSpell?: CurrentSpell;
-    readonly charActionStack: CharAction[];
-
-    private readonly onTurnEnd: () => void;
-
-    private constructor(id: number, startTime: number, character: Character, onTurnEnd: () => void) {
-        this.id = id;
-        this._startTime = startTime;
-        this.character = character;
-        this.charActionStack = [];
-        this.onTurnEnd = onTurnEnd;
-    }
-
-    synchronize(snapshot: TurnSnapshot): void {
-        this._startTime = snapshot.startTime;
-        this.refreshTimedActions();
-    }
-
-    refreshTimedActions(): void {
-        if (this.timedActionTimeout) {
-            clearTimeout(this.timedActionTimeout);
-            delete this.timedActionTimeout;
-        }
-
-        const now = Date.now();
-        if (this.state === 'idle') {
-            const diff = this.startTime - now;
-            this.timedActionTimeout = setTimeout(this.start, diff);
-        } else if (this.state === 'running') {
-            const diff = this.endTime - now;
-            this.timedActionTimeout = setTimeout(this.end, diff);
-        }
-    }
-
-    private start = (): void => {
-        Controller.dispatch<BattleTurnStartAction>({
-            type: 'battle/turn/start',
-            character: this.character,
-            startTime: this.startTime
-        });
-        this.refreshTimedActions();
-    };
-
-    private end = (): void => {
-        this.onTurnEnd();
-        Controller.dispatch<BattleTurnEndAction>({
-            type: 'battle/turn/end',
-            character: this.character
-        });
-        this.refreshTimedActions();
-    };
+    synchronize(snapshot: TurnSnapshot): void;
+    refreshTimedActions(): void;
 }
+
+export const Turn = (id: number, startTime: number, character: Character, onTurnEnd: () => void): Turn => {
+    
+    const { dispatchStart, dispatchEnd } = serviceDispatch({
+        dispatchStart: (): BattleTurnStartAction => ({
+            type: 'battle/turn/start',
+            character,
+            startTime
+        }),
+        dispatchEnd: (): BattleTurnEndAction => ({
+            type: 'battle/turn/end',
+            character
+        })
+    });
+
+    let timedActionTimeout: NodeJS.Timeout | undefined;
+    let lastCallback: 'start' | 'end' | undefined;
+
+    const this_: Turn = {
+        id,
+        character,
+
+        get state(): TurnState {
+            const now = Date.now();
+            if (now < startTime) {
+                return 'idle';
+            }
+            if (now < this_.endTime) {
+                return 'running';
+            }
+            return 'ended';
+        },
+
+        get startTime(): number {
+            return startTime;
+        },
+
+        get turnDuration(): number {
+            return character.features.actionTime;
+        },
+
+        get endTime(): number {
+            return startTime + this_.turnDuration;
+        },
+
+        synchronize,
+
+        refreshTimedActions
+    };
+
+    const start = (): void => {
+        lastCallback = 'start';
+        dispatchStart();
+        refreshTimedActions();
+    };
+
+    const end = (): void => {
+        clearTimedActions();
+        lastCallback = 'end';
+        onTurnEnd();
+        dispatchEnd();
+    };
+
+    function clearTimedActions(): void {
+        if (timedActionTimeout) {
+            clearTimeout(timedActionTimeout);
+            timedActionTimeout = undefined;
+        }
+    }
+
+    function synchronize(snapshot: TurnSnapshot): void {
+        startTime = snapshot.startTime;
+        refreshTimedActions();
+    }
+
+    function refreshTimedActions(): void {
+        clearTimedActions();
+
+        const now = Date.now();
+
+        if (this_.state === 'idle') {
+            if (!lastCallback) {
+                const diff = this_.startTime - now;
+                timedActionTimeout = setTimeout(start, diff);
+            }
+        }
+
+        else {
+
+            if (!lastCallback) {
+                start();
+                return;
+            }
+
+            if (lastCallback === 'start') {
+                const diff = this_.endTime - now;
+                timedActionTimeout = setTimeout(end, diff);
+            }
+
+        }
+
+        if (this_.state === 'idle') {
+            const diff = startTime - now;
+            timedActionTimeout = setTimeout(start, diff);
+        } else if (this_.state === 'running') {
+            const diff = this_.endTime - now;
+            timedActionTimeout = setTimeout(end, diff);
+        }
+    }
+
+    return this_;
+};

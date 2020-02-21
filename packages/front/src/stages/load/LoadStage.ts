@@ -1,17 +1,17 @@
-import { BattleLoadEndedCAction, BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
+import { BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
 import { AssetManager } from "../../assetManager/AssetManager";
 import { BattleLaunchAction } from "../../phaser/battleReducers/BattleReducerManager";
-import { CharacterGraphic } from "../battle/graphics/CharacterGraphic";
-import { SpellGraphic } from "../battle/graphics/SpellGraphic";
 import { serviceDispatch } from "../../services/serviceDispatch";
 import { serviceEvent } from "../../services/serviceEvent";
-import { SendMessageAction } from "../../socket/WSClient";
+import { serviceNetwork } from "../../services/serviceNetwork";
 import { BattleScene } from "../battle/BattleScene";
+import { CharacterGraphic } from "../battle/graphics/CharacterGraphic";
+import { SpellGraphic } from "../battle/graphics/SpellGraphic";
 import { LoadScene } from "./LoadScene";
 
 export interface LoadStage {
     onPreload(): void;
-    onCreate(): void;
+    onCreate(): Promise<void>;
 }
 
 type Scene = Pick<LoadScene, 'initData' | 'start'> & {
@@ -40,17 +40,11 @@ export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
 
             load.atlasXML(SpellGraphic.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
         },
-        onCreate() {
+        async onCreate() {
 
             const { onAction, onMessageAction } = serviceEvent();
 
-            const { sendBattleLoadEnded, sendBattleLaunch } = serviceDispatch({
-                sendBattleLoadEnded: (): SendMessageAction<BattleLoadEndedCAction> => ({
-                    type: 'message/send',
-                    message: {
-                        type: 'battle-load-end'
-                    }
-                }),
+            const { sendBattleLaunch } = serviceDispatch({
                 sendBattleLaunch: (battleSnapshot: BattleSnapshot, globalTurnState: GlobalTurnSnapshot): BattleLaunchAction => ({
                     type: 'battle/launch',
                     battleSceneData: {
@@ -71,6 +65,12 @@ export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
                 battleSceneData
             }) => {
                 start<BattleScene>('BattleScene', battleSceneData);
+            });
+
+            const { sendBattleLoadEnded } = await serviceNetwork({
+                sendBattleLoadEnded: () => ({
+                    type: 'battle-load-end'
+                })
             });
 
             sendBattleLoadEnded();

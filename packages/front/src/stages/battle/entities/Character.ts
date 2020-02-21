@@ -1,8 +1,4 @@
-import { CharacterFeatures, CharacterSnapshot, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
-import { assertIsDefined, assertThenGet } from '../../../utils/asserts';
-import { compare, equals } from '../../../utils/equals';
-import { getId } from '../../../utils/getters';
-import { mergeAfterClean } from '../../../utils/object';
+import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, compare, equals, getId, mergeAfterClean, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
 import { Player } from './Player';
 import { Spell } from './Spell';
 import { WithSnapshot } from './WithSnapshot';

@@ -9,33 +9,54 @@ import { GameEngine } from './phaser/GameEngine';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
 import { WSClient } from './socket/WSClient';
+import { IController } from './IController';
 
-export class Controller {
+export interface Controller extends IController {
 
-    private static app: App;
-    static game: GameEngine;
-    static client: WSClient;
+}
 
-    private static store: Store<UIState, GameAction>;
+let store: Store<UIState, GameAction>;
+let client: WSClient;
+let game: GameEngine;
+let app: App;
 
-    static start(): void {
+const onAppMount = (gameWrapper: HTMLElement): void => {
 
-        Controller.store = createStore<UIState, GameAction, any, any>(
+    const ro = new ResizeObserver((entries) => {
+        if (!entries.length) {
+            return;
+        }
+        const { width, height } = entries[0].contentRect;
+        game.resize(width, height);
+    });
+
+    ro.observe(gameWrapper);
+
+    game = new GameEngine(
+        gameWrapper
+    );
+};
+
+export const Controller: Controller = {
+
+    start() {
+
+        store = createStore<UIState, GameAction, any, any>(
             RootReducer
         );
 
-        Controller.client = new WSClient();
+        client = new WSClient();
 
-        Controller.app = ReactDOM.render(
+        app = ReactDOM.render(
             React.createElement(App, {
-                store: Controller.store,
-                onMount: Controller.onAppMount
+                store,
+                onMount: onAppMount
             }),
             document.getElementById('root')
         );
-    }
+    },
 
-    static readonly dispatch = <A extends GameAction>(action: A): void => {
+    dispatch<A extends GameAction>(action: A): void {
 
         if (action.type === 'battle/turn/start') {
             console.group(
@@ -48,28 +69,14 @@ export class Controller {
             console.log(action.type, action);
         }
 
-        Controller.game.emit(action);
+        game.emit(action);
 
         if (!action.onlyGame) {
-            Controller.store.dispatch(action);
+            store.dispatch(action);
         }
+    },
 
-    };
-
-    private static readonly onAppMount = (gameWrapper: HTMLElement): void => {
-
-        const ro = new ResizeObserver((entries, observer) => {
-            if (!entries.length) {
-                return;
-            }
-            const { width, height } = entries[0].contentRect;
-            Controller.game.resize(width, height);
-        });
-
-        ro.observe(gameWrapper);
-
-        Controller.game = new GameEngine(
-            gameWrapper
-        );
-    };
-}
+    waitConnect() {
+        return client.waitConnect();
+    }
+};

@@ -1,7 +1,7 @@
 import { BTurn, TurnState } from "./BTurn";
 import { seedBCharacter } from "../../../../__seeds__/seedBCharacter";
 import { BCharacter } from "../../entities/BCharacter";
-import { TimerTester } from '../../../../__testUtils__/TimerTester';
+import { TimerTester } from "@timeflies/shared";
 
 describe('#BTurn', () => {
 

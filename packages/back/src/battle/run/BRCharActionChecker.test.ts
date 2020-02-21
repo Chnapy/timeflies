@@ -1,4 +1,4 @@
-import { CharActionCAction, MapInfos, Position } from "@timeflies/shared";
+import { CharActionCAction, MapInfos, Position, TimerTester } from "@timeflies/shared";
 import fs from 'fs';
 import { TiledMapOrthogonal } from "tiled-types/types";
 import { seedBCharacter } from "../../__seeds__/seedBCharacter";
@@ -8,7 +8,6 @@ import { BRMap } from "./BRMap";
 import { BRCycle } from "./cycle/BRCycle";
 import { BCharacter } from "./entities/BCharacter";
 import { BSpell } from "./entities/BSpell";
-import { TimerTester } from "../../__testUtils__/TimerTester";
 jest.mock('fs');
 
 describe('#BRCharActionChecker', () => {

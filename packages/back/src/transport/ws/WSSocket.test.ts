@@ -1,7 +1,6 @@
-import { SetIDCAction } from "@timeflies/shared";
+import { SetIDCAction, TimerTester } from "@timeflies/shared";
 import { Server, WebSocket } from "mock-socket";
 import { WSSocket } from "./WSSocket";
-import { TimerTester } from "../../__testUtils__/TimerTester";
 
 describe('WSSocket', () => {
 

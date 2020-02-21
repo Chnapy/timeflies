@@ -1,11 +1,10 @@
-import { BattleRunSAction, CharacterSnapshot, CharActionCAction, ConfirmSAction, MapInfos, NotifySAction } from '@timeflies/shared';
+import { BattleRunSAction, CharacterSnapshot, CharActionCAction, ConfirmSAction, MapInfos, NotifySAction, TimerTester } from '@timeflies/shared';
 import { Server, WebSocket } from 'mock-socket';
 import path from 'path';
 import { PlayerService } from '../../PlayerService';
 import { Team } from '../../Team';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { BattleRunRoom } from './BattleRunRoom';
-import { TimerTester } from '../../__testUtils__/TimerTester';
 
 describe('BattleRunRoom', () => {
 
