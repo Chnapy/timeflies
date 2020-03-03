@@ -16,6 +16,8 @@ export interface Character extends WithSnapshot<CharacterSnapshot> {
     readonly spells: readonly Spell[];
     readonly defaultSpell: Spell;
 
+    readonly isAlive: boolean;
+
     readonly state: CharacterState;
 
     readonly player: Player;
@@ -63,6 +65,9 @@ export const Character = ({
         get defaultSpell(): Spell {
             return defaultSpell;
         },
+        get isAlive(): boolean {
+            return features.life > 0;
+        },
         player,
         // team,
 
@@ -85,7 +90,7 @@ export const Character = ({
             snapshot.spellsSnapshots.forEach(sSnap => {
 
                 const spell = assertThenGet(
-                    this.spells.find(compare(sSnap, getId)),
+                    spells.find(compare(sSnap, getId)),
                     assertIsDefined
                 );
 
@@ -114,14 +119,10 @@ export const Character = ({
         }
     };
 
-    const spells = _spellsSnapshots.map(snap => Spell(snap, _this as any));
+    const spells = _spellsSnapshots.map(snap => Spell(snap, _this));
     const defaultSpell = assertThenGet(spells.find(s => s.id === staticData.defaultSpellId), assertIsDefined);
 
-    return {
-        ..._this,
-        spells,
-        defaultSpell
-    };
+    return _this;
 };
 
 // export class Character2 implements WithSnapshot<CharacterSnapshot> {
