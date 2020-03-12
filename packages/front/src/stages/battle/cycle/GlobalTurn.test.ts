@@ -2,6 +2,7 @@ import { CharacterFeatures, getId, getIndexGenerator, TimerTester } from "@timef
 import { StoreTest } from "../../../StoreTest";
 import { seedCharacter } from "../../../__seeds__/seedCharacter";
 import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
+import { Turn, TurnState } from "./Turn";
 
 describe('# GlobalTurn', () => {
 
@@ -25,15 +26,21 @@ describe('# GlobalTurn', () => {
 
     it('should keep coherent state', () => {
 
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            return {
+                id: 1,
+                character: characters[0],
+                startTime: timerTester.now,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize() { }
+            }
+        };
+
         const characters = [
-            seedCharacter({
-                staticData: {
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
-                }
-            })
+            seedCharacter()
         ];
 
         const idGenerator = getIndexGenerator();
@@ -47,10 +54,12 @@ describe('# GlobalTurn', () => {
 
         const globalTurnIdle = GlobalTurn(getSnapshot(startTime.future, order),
             characters, idGenerator,
-            () => null);
+            () => null,
+            { turnCreator });
         const globalTurnRunning = GlobalTurn(getSnapshot(startTime.past, order),
             characters, idGenerator,
-            () => null);
+            () => null,
+            { turnCreator });
 
         expect(globalTurnIdle.state).toBe<GlobalTurnState>('idle');
         expect(globalTurnRunning.state).toBe<GlobalTurnState>('running');
@@ -58,23 +67,31 @@ describe('# GlobalTurn', () => {
 
     it('should change current turn when previous one ends', () => {
 
+        let onTurnEndFn = () => { };
+
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            onTurnEndFn = onTurnEnd;
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize() { }
+            }
+        };
+
         const characters = [
             seedCharacter({
                 staticData: {
                     id: '1',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             }),
             seedCharacter({
                 staticData: {
                     id: '2',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             })
         ];
@@ -87,27 +104,93 @@ describe('# GlobalTurn', () => {
 
         const globalTurn = GlobalTurn(getSnapshot(startTime, order),
             characters, turnIdGenerator,
-            () => null);
+            () => null,
+            { turnCreator });
 
         const firstTurnId = globalTurn.currentTurn.id;
 
-        timerTester.advanceBy(globalTurn.currentTurn.turnDuration + 300);
+        onTurnEndFn();
 
         expect(globalTurn.currentTurn.id).toBe(firstTurnId + 1);
         expect(globalTurn.currentTurn.character).toBe(characters[1]);
     });
 
-    it('should run callback when last turn ends', () => {
+    it('should load waiting turn when previous one ends', () => {
+
+        let onTurnEndFn = () => { };
+        let turnState: TurnState = 'running';
+
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            onTurnEndFn = onTurnEnd;
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                get state() { return turnState; },
+                synchronize() { }
+            }
+        };
 
         const characters = [
             seedCharacter({
                 staticData: {
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
+                    id: '1',
                 }
             }),
+            seedCharacter({
+                staticData: {
+                    id: '2',
+                }
+            })
+        ];
+
+        const turnIdGenerator = getIndexGenerator();
+
+        const order = characters.map(getId);
+
+        const startTime = timerTester.now;
+
+        const globalTurn = GlobalTurn(getSnapshot(startTime, order),
+            characters, turnIdGenerator,
+            () => null,
+            { turnCreator });
+
+        globalTurn.synchronizeTurn({
+            id: 5,
+            startTime: timerTester.now,
+            characterId: characters[1].id
+        });
+
+        turnState = 'ended';
+        onTurnEndFn();
+
+        expect(globalTurn.currentTurn.id).toBe(5);
+        expect(globalTurn.currentTurn.character).toBe(characters[1]);
+    });
+
+    it('should run callback when last turn ends', () => {
+
+        let onTurnEndFn = () => { };
+
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            onTurnEndFn = onTurnEnd;
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize() { }
+            }
+        };
+
+        const characters = [
+            seedCharacter(),
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -120,45 +203,46 @@ describe('# GlobalTurn', () => {
 
         const globalTurn = GlobalTurn(getSnapshot(startTime, order),
             characters, turnIdGenerator,
-            onGTurnEnd);
+            onGTurnEnd,
+            { turnCreator });
 
-        timerTester.advanceBy(1900);
-
-        expect(onGTurnEnd).not.toHaveBeenCalled();
-
-        timerTester.advanceBy(200);
+        onTurnEndFn();
 
         expect(onGTurnEnd).toHaveBeenCalledTimes(1);
     });
 
     it('should not run dead character turn', () => {
 
+        let onTurnEndFn = () => { };
+
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            onTurnEndFn = onTurnEnd;
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize() { }
+            }
+        };
+
         const characters = [
             seedCharacter({
                 staticData: {
                     id: '1',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             }),
             seedCharacter({
                 staticData: {
                     id: '2',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             }),
             seedCharacter({
                 staticData: {
                     id: '3',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             })
         ];
@@ -171,36 +255,42 @@ describe('# GlobalTurn', () => {
 
         const globalTurn = GlobalTurn(getSnapshot(startTime, order),
             characters, turnIdGenerator,
-            () => null);
+            () => null,
+            { turnCreator });
 
         const secondChar = characters[1];
 
         (secondChar.features as CharacterFeatures).life = 0;
 
-        timerTester.advanceBy(3000);
+        onTurnEndFn();
 
         expect(globalTurn.currentTurn.character).not.toBe(secondChar);
     });
 
     it('should stop turn if current character dies', () => {
 
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize() { }
+            }
+        };
+
         const characters = [
             seedCharacter({
                 staticData: {
                     id: '1',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             }),
             seedCharacter({
                 staticData: {
                     id: '2',
-                    initialFeatures: {
-                        actionTime: 2000,
-                        life: 100
-                    }
                 }
             })
         ];
@@ -213,7 +303,8 @@ describe('# GlobalTurn', () => {
 
         const globalTurn = GlobalTurn(getSnapshot(startTime, order),
             characters, turnIdGenerator,
-            () => null);
+            () => null,
+            { turnCreator });
 
         const firstChar = characters[0];
 
@@ -222,6 +313,53 @@ describe('# GlobalTurn', () => {
         globalTurn.notifyDeaths();
 
         expect(globalTurn.currentTurn.character).not.toBe(firstChar);
+    });
+
+    it('should synchronize correctly', () => {
+
+        let synchronize = jest.fn();
+
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize
+            }
+        };
+
+        const characters = [
+            seedCharacter()
+        ];
+
+        const turnIdGenerator = getIndexGenerator();
+
+        const order = characters.map(getId);
+
+        const startTime = timerTester.now;
+
+        const globalTurn = GlobalTurn(getSnapshot(startTime, order),
+            characters, turnIdGenerator,
+            () => null,
+            { turnCreator });
+
+        globalTurn.synchronize({
+            id: 1,
+            startTime: timerTester.now + 200,
+            order,
+            currentTurn: {
+                id: 1,
+                startTime: timerTester.now + 200,
+                characterId: order[0]
+            }
+        });
+
+        expect(globalTurn.state).toBe<GlobalTurnState>('idle');
+        expect(synchronize).toHaveBeenCalledTimes(1);
     });
 
 });

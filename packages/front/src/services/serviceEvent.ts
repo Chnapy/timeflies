@@ -16,9 +16,7 @@ export interface EventManager {
 export const serviceEvent = (): EventManager => {
 
     const onAction: OnAction<GameAction> = (type, fn) => {
-        Controller.game.forEachScene(scene => {
-            scene.events.on(type, fn);
-        });
+        Controller.addEventListener(type, fn);
         return fn;
     };
 
@@ -28,7 +26,11 @@ export const serviceEvent = (): EventManager => {
 
         onMessageAction<A extends ServerAction>(type, fn) {
 
-            onAction<ReceiveMessageAction<A>>('message/receive', ({ message }) => fn(message));
+            onAction<ReceiveMessageAction<A>>('message/receive', ({ message }) => {
+                if (type === message.type) {
+                    fn(message);
+                }
+            });
 
             return fn;
         }

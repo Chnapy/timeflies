@@ -12,7 +12,6 @@ import { WSClient } from './socket/WSClient';
 import { IController } from './IController';
 
 export interface Controller extends IController {
-
 }
 
 let store: Store<UIState, GameAction>;
@@ -74,6 +73,10 @@ export const Controller: Controller = {
         if (!action.onlyGame) {
             store.dispatch(action);
         }
+    },
+
+    addEventListener<A extends GameAction>(type: A['type'], fn: (action: A) => void): void {
+        game.forEachScene(scene => scene.events.on(type, fn));
     },
 
     waitConnect() {

@@ -15,5 +15,8 @@ export const StoreTest = {
     },
     getActions(): GameAction[] {
         return store.getActions();
+    },
+    dispatch<A extends GameAction>(action: A): void {
+        store.dispatch(action);
     }
 } as const;

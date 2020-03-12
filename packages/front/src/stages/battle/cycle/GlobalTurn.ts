@@ -13,7 +13,14 @@ export interface GlobalTurn {
     synchronizeTurn(turnSnapshot: TurnSnapshot): void;
 }
 
-export const GlobalTurn = (snapshot: GlobalTurnSnapshot, characters: readonly Character[], generateTurnId: IndexGenerator, onGlobalTurnEnd: (endTime: number) => void): GlobalTurn => {
+interface Dependencies {
+    turnCreator: typeof Turn;
+}
+
+export const GlobalTurn = (
+    snapshot: GlobalTurnSnapshot, characters: readonly Character[], generateTurnId: IndexGenerator, onGlobalTurnEnd: (endTime: number) => void,
+    { turnCreator }: Dependencies = { turnCreator: Turn }
+): GlobalTurn => {
 
     const id = snapshot.id;
     let startTime = snapshot.startTime;
@@ -49,16 +56,16 @@ export const GlobalTurn = (snapshot: GlobalTurnSnapshot, characters: readonly Ch
     };
 
     const runNextTurn = (nextCharacterIndex: number): void => {
-        
+
         if (nextCharacterIndex >= charactersOrdered.length) {
             onGlobalTurnEnd(currentTurn.endTime);
         }
         else {
             const currentCharacter = charactersOrdered[nextCharacterIndex];
-            
+
             if (currentCharacter.isAlive) {
                 const turnId = generateTurnId.next().value;
-                setCurrentTurn(Turn(turnId, currentTurn.endTime + TURN_DELAY, currentCharacter, onTurnEnd));
+                setCurrentTurn(turnCreator(turnId, currentTurn.endTime + TURN_DELAY, currentCharacter, onTurnEnd));
             } else {
                 runNextTurn(nextCharacterIndex + 1);
             }
@@ -83,7 +90,7 @@ export const GlobalTurn = (snapshot: GlobalTurnSnapshot, characters: readonly Ch
             assertIsDefined
         );
 
-        return Turn(id, startTime, character, onTurnEnd);
+        return turnCreator(id, startTime, character, onTurnEnd);
     };
 
     generateTurnId.next();  // To start from 1
