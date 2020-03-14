@@ -3,27 +3,27 @@ import { Action } from "redux";
 import { Position } from "@timeflies/shared";
 
 
-export type BState = 'watch' | 'idle' | 'spellPrepare' | 'spellLaunch';
+export type BState = 'watch' | 'spellPrepare' | 'spellLaunch';
 
 interface BStateEventAbstract<S extends string, P = {}> extends Action<S> {
     payload: P;
 }
 
-interface BStateResetEvent extends BStateEventAbstract<'RESET', {
+export interface BStateResetEvent extends BStateEventAbstract<'RESET', {
     characterId: string
 }> { }
-interface BStateTurnStartEvent extends BStateEventAbstract<'TURN-START', {
+export interface BStateTurnStartEvent extends BStateEventAbstract<'TURN-START', {
     characterId: string;
 }> { }
-interface BStateTurnEndEvent extends BStateEventAbstract<'TURN-END'> { }
-interface BStateSpellPrepareEvent extends BStateEventAbstract<'SPELL-PREPARE', {
+export interface BStateTurnEndEvent extends BStateEventAbstract<'TURN-END'> { }
+export interface BStateSpellPrepareEvent extends BStateEventAbstract<'SPELL-PREPARE', {
     spellId: string;
 }> { }
-interface BStateSpellLaunchEvent extends BStateEventAbstract<'SPELL-LAUNCH', {
+export interface BStateSpellLaunchEvent extends BStateEventAbstract<'SPELL-LAUNCH', {
     spellId: string;
     positions: Position[];
 }> { }
-interface BStateSpellNotifyEvent extends BStateEventAbstract<'SPELL-NOTIFY', {
+export interface BStateSpellNotifyEvent extends BStateEventAbstract<'SPELL-NOTIFY', {
     spellId: string;
     positions: Position[];
 }> { }
@@ -59,7 +59,7 @@ export interface BStateSchema<S extends BState> {
     };
 }
 
-export interface BStateSchema {
+export interface BStateSchemaRoot {
     initialState: PickBStateFromEvent<never>;
     states: {
         [S in BState]: BStateSchema<S>;
@@ -67,9 +67,9 @@ export interface BStateSchema {
 }
 
 type BStateEngineCreator<S extends BState> = {
-    watch: (e?: BStateResetEvent | BStateTurnEndEvent) => {};
-    idle: (e: BStateResetEvent | BStateTurnStartEvent) => {};
-    spellPrepare: (e: BStateSpellPrepareEvent) => {};
+    watch: () => {};
+    // idle: (e: BStateResetEvent | BStateTurnStartEvent) => {};
+    spellPrepare: (e: BStateSpellPrepareEvent | BStateResetEvent | BStateTurnStartEvent) => {};
     spellLaunch: (e: BStateSpellLaunchEvent | BStateSpellNotifyEvent) => {};
 }[S];
 
@@ -79,20 +79,20 @@ type Dependencies = {
     [S in BState]: BStateEngineCreator<S>;
 };
 
-export const BStateSchema = (
+export const BStateSchemaRoot = (
     battleData: BattleData,
     {
-        idle: idleCreator,
+        // idle: idleCreator,
         spellPrepare: spellPrepareCreator,
         spellLaunch: spellLaunchCreator,
         watch: watchCreator
     }: Dependencies = {
-            idle: () => ({}),
+            // idle: () => ({}),
             spellPrepare: () => ({}),
             spellLaunch: () => ({}),
             watch: () => ({})
         }
-): BStateSchema => {
+): BStateSchemaRoot => {
 
     const shouldBeOwnTurn = (): boolean => !!battleData.globalTurn?.currentTurn.character.isMine;
     const shouldNotBeOwnTurn = (): boolean => !shouldBeOwnTurn();
@@ -102,7 +102,7 @@ export const BStateSchema = (
         target: 'watch',
         cond: shouldNotBeOwnTurn
     }, {
-        target: 'idle',
+        target: 'spellPrepare',
         cond: shouldBeOwnTurn
     }];
 
@@ -110,7 +110,7 @@ export const BStateSchema = (
         engineCreator: watchCreator,
         on: {
             'TURN-START': [{
-                target: 'idle',
+                target: 'spellPrepare',
                 cond: shouldBeOwnTurn
             }],
             'SPELL-NOTIFY': [{
@@ -120,17 +120,17 @@ export const BStateSchema = (
         }
     };
 
-    const idle: BStateSchema<'idle'> = {
-        engineCreator: idleCreator,
-        on: {
-            'SPELL-PREPARE': [{
-                target: 'spellPrepare'
-            }],
-            'TURN-END': [{
-                target: 'watch'
-            }]
-        }
-    };
+    // const idle: BStateSchema<'idle'> = {
+    //     engineCreator: idleCreator,
+    //     on: {
+    //         'SPELL-PREPARE': [{
+    //             target: 'spellPrepare'
+    //         }],
+    //         'TURN-END': [{
+    //             target: 'watch'
+    //         }]
+    //     }
+    // };
 
     const spellPrepare: BStateSchema<'spellPrepare'> = {
         engineCreator: spellPrepareCreator,
@@ -153,7 +153,7 @@ export const BStateSchema = (
         initialState: 'watch',
         states: {
             watch,
-            idle,
+            // idle,
             spellPrepare,
             spellLaunch
         }

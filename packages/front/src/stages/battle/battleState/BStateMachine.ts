@@ -1,5 +1,5 @@
 import { BattleData } from "../../../BattleData";
-import { BStateSchema, BState, BStateEvent, BStateSchemaTrigger, BStateEngine } from './BattleStateSchema';
+import { BStateSchemaRoot, BState, BStateEvent, BStateSchemaTrigger, BStateEngine } from './BattleStateSchema';
 
 export interface BStateMachine {
     state: BState;
@@ -7,12 +7,12 @@ export interface BStateMachine {
 }
 
 interface Dependencies {
-    battleStateSchemaCreator: typeof BStateSchema;
+    battleStateSchemaCreator: typeof BStateSchemaRoot;
 }
 
 export const BStateMachine = (
     battleData: BattleData,
-    { battleStateSchemaCreator }: Dependencies = { battleStateSchemaCreator: BStateSchema }
+    { battleStateSchemaCreator }: Dependencies = { battleStateSchemaCreator: BStateSchemaRoot }
 ): BStateMachine => {
 
     const schema = battleStateSchemaCreator(battleData);
