@@ -1,5 +1,5 @@
 import { assertIsDefined, assertThenGet, BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GlobalTurnSnapshot, TurnSnapshot } from '@timeflies/shared';
-import { BattleData } from "../../../BattleData";
+import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { GlobalTurn } from './GlobalTurn';
 
@@ -20,6 +20,7 @@ import { GlobalTurn } from './GlobalTurn';
 
 export interface CycleManager {
     readonly isRunning: boolean;
+    start(globalTurnSnap: GlobalTurnSnapshot): void;
 }
 
 interface Dependencies {
@@ -27,9 +28,12 @@ interface Dependencies {
 }
 
 export const CycleManager = (
-    battleData: Pick<BattleData, 'globalTurn' | 'characters'>,
     { globalTurnCreator }: Dependencies = { globalTurnCreator: GlobalTurn }
 ): CycleManager => {
+
+    const cycleData = serviceBattleData('cycle');
+
+    const battleData = serviceBattleData('future');
 
     const { characters } = battleData;
 
@@ -38,28 +42,28 @@ export const CycleManager = (
     const globalTurnIdGenerator = getIndexGenerator();
 
     const onGlobalTurnEnd = (): void => {
-        delete battleData.globalTurn;
+        delete cycleData.globalTurn;
 
         const snapshot = waitingSnapshots.pop();
         if (snapshot)
-            battleData.globalTurn = globalTurnCreator(snapshot, characters, globalTurnIdGenerator, onGlobalTurnEnd);
+            cycleData.globalTurn = globalTurnCreator(snapshot, characters, globalTurnIdGenerator, onGlobalTurnEnd);
     };
 
     const synchronizeGlobalTurn = (globalTurnSnapshot: GlobalTurnSnapshot): void => {
 
-        if (battleData.globalTurn?.id === globalTurnSnapshot.id) {
-            battleData.globalTurn.synchronize(globalTurnSnapshot);
+        if (cycleData.globalTurn?.id === globalTurnSnapshot.id) {
+            cycleData.globalTurn.synchronize(globalTurnSnapshot);
         } else {
             waitingSnapshots.push(globalTurnSnapshot);
 
-            if (!battleData.globalTurn) {
+            if (!cycleData.globalTurn) {
                 onGlobalTurnEnd();
             }
         }
     };
 
     const synchronizeTurn = (turnSnapshot: TurnSnapshot): void => {
-        const globalTurn = assertThenGet(battleData.globalTurn, assertIsDefined);
+        const globalTurn = assertThenGet(cycleData.globalTurn, assertIsDefined);
 
         globalTurn.synchronizeTurn(turnSnapshot);
     };
@@ -78,8 +82,11 @@ export const CycleManager = (
 
     return {
         get isRunning(): boolean {
-            return battleData.globalTurn?.currentTurn.state === 'running';
+            return cycleData.globalTurn?.currentTurn.state === 'running';
         },
+        start(globalTurnSnap) {
+            synchronizeGlobalTurn(globalTurnSnap);
+        }
     };
 };
 

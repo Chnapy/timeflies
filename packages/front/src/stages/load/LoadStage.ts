@@ -15,7 +15,7 @@ export interface LoadStage {
 }
 
 type Scene = Pick<LoadScene, 'initData' | 'start'> & {
-    load: Pick<LoadScene['load'], 'image' | 'tilemapTiledJSON' | 'atlasXML'>;
+    load: Pick<LoadScene[ 'load' ], 'image' | 'tilemapTiledJSON' | 'atlasXML'>;
 };
 
 export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
@@ -33,7 +33,7 @@ export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
             load.tilemapTiledJSON('map', urls.schema);
 
             characterTypes.forEach(type => {
-                const { image, schema } = AssetManager.characters[type];
+                const { image, schema } = AssetManager.characters[ type ];
 
                 load.atlasXML(CharacterGraphic.getSheetKey(type), image, schema);
             });
@@ -51,10 +51,19 @@ export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
                         ...initData,
                         battleSnapshot,
                         battleData: {
-                            launchTime: battleSnapshot.launchTime,
-                            teams: [],
-                            players: [],
-                            characters: []
+                            cycle: {
+                                launchTime: battleSnapshot.launchTime
+                            },
+                            current: {
+                                teams: [],
+                                players: [],
+                                characters: []
+                            },
+                            future: {
+                                teams: [],
+                                players: [],
+                                characters: []
+                            }
                         },
                         globalTurnState
                     }

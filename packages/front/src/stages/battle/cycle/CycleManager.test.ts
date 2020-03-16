@@ -1,14 +1,30 @@
-import { TimerTester, BRunGlobalTurnStartSAction, getId, BRunTurnStartSAction } from "@timeflies/shared";
-import { StoreTest } from "../../../StoreTest";
-import { CycleManager } from "./CycleManager";
-import { seedCharacter } from "../../../__seeds__/seedCharacter";
+import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester } from "@timeflies/shared";
 import { ReceiveMessageAction } from "../../../socket/WSClient";
+import { StoreTest } from "../../../StoreTest";
+import { UIState } from '../../../ui/UIState';
+import { seedCharacter } from "../../../__seeds__/seedCharacter";
+import { CycleManager } from "./CycleManager";
 import { GlobalTurn } from "./GlobalTurn";
 import { TurnState } from "./Turn";
+import { Character } from '../entities/Character';
 
 describe('# CycleManager', () => {
 
     const timerTester = new TimerTester();
+
+    const initStore = (characters: Character[]) => {
+        StoreTest.initStore({
+            data: {
+                state: 'battle',
+                battleData: {
+                    future: {
+                        characters
+                    },
+                    cycle: {}
+                } as any
+            }
+        });
+    };
 
     beforeEach(() => {
         StoreTest.beforeTest();
@@ -27,6 +43,8 @@ describe('# CycleManager', () => {
             seedCharacter(),
         ];
 
+        initStore(characters);
+
         const globalTurnCreator: typeof GlobalTurn = jest.fn(() => {
 
             return {
@@ -34,7 +52,7 @@ describe('# CycleManager', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character: characters[0],
+                    character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -48,9 +66,7 @@ describe('# CycleManager', () => {
             };
         });
 
-        const cycle = CycleManager({
-            characters
-        }, { globalTurnCreator });
+        const cycle = CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -65,7 +81,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }
@@ -83,6 +99,8 @@ describe('# CycleManager', () => {
             seedCharacter(),
         ];
 
+        initStore(characters);
+
         const synchronize = jest.fn();
 
         const globalTurnCreator: typeof GlobalTurn = () => {
@@ -92,7 +110,7 @@ describe('# CycleManager', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character: characters[0],
+                    character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -106,9 +124,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({
-            characters
-        }, { globalTurnCreator });
+        const cycle = CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -123,7 +139,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }
@@ -141,7 +157,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now + 200,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }
@@ -158,6 +174,8 @@ describe('# CycleManager', () => {
             seedCharacter(),
         ];
 
+        initStore(characters);
+
         const synchronizeTurn = jest.fn();
 
         const globalTurnCreator: typeof GlobalTurn = () => {
@@ -167,7 +185,7 @@ describe('# CycleManager', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character: characters[0],
+                    character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -181,9 +199,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({
-            characters
-        }, { globalTurnCreator });
+        const cycle = CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -198,7 +214,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }
@@ -213,7 +229,7 @@ describe('# CycleManager', () => {
                 turnState: {
                     id: 1,
                     startTime: timerTester.now + 200,
-                    characterId: order[0]
+                    characterId: order[ 0 ]
                 }
             }
         });
@@ -227,6 +243,8 @@ describe('# CycleManager', () => {
             seedCharacter(),
             seedCharacter(),
         ];
+
+        initStore(characters);
 
         let endGlobalTurn = (endTime: number) => { };
 
@@ -243,7 +261,7 @@ describe('# CycleManager', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character: characters[0],
+                    character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -257,9 +275,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({
-            characters
-        }, { globalTurnCreator });
+        const cycle = CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -274,7 +290,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }
@@ -292,7 +308,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now + 200,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }
@@ -313,6 +329,8 @@ describe('# CycleManager', () => {
             seedCharacter(),
         ];
 
+        initStore(characters);
+
         let currentTurnState: TurnState;
 
         const globalTurnCreator: typeof GlobalTurn = () => {
@@ -322,7 +340,7 @@ describe('# CycleManager', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character: characters[0],
+                    character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -336,9 +354,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({
-            characters
-        }, { globalTurnCreator });
+        const cycle = CycleManager({ globalTurnCreator });
 
         expect(cycle.isRunning).toBe(false);
 
@@ -357,7 +373,7 @@ describe('# CycleManager', () => {
                     startTime: timerTester.now,
                     currentTurn: {
                         id: 1,
-                        characterId: order[0],
+                        characterId: order[ 0 ],
                         startTime: timerTester.now
                     }
                 }

@@ -1,17 +1,30 @@
-import { Controller } from "./Controller";
-import { MockStoreEnhanced } from "redux-mock-store";
+import configureStore from 'redux-mock-store';
 import { GameAction } from "./action/GameAction";
 import { UIState } from "./ui/UIState";
 jest.mock('./Controller');
 
-const { store } = Controller as unknown as { store: MockStoreEnhanced<UIState, GameAction>; };
+const mockStore = configureStore<UIState, GameAction>();
+
+let store;
+
+const initStore = <S extends UIState>(state?: S) => {
+    store = mockStore(state);
+}
+
+initStore();
 
 export const StoreTest = {
     beforeTest(): void {
         store.clearActions();
+        initStore();
     },
     afterTest(): void {
         store.clearActions();
+        initStore();
+    },
+    initStore,
+    getStore() {
+        return store;
     },
     getActions(): GameAction[] {
         return store.getActions();

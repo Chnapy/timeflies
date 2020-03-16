@@ -36,10 +36,10 @@ export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prep
     spellType: SpellType;
 }
 
-export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
-    charAction: CharAction<'running'>;
-    launchState?: LaunchState[];  // TODO remove after stack action done
-}
+// export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
+//     charAction: CharAction<'running'>;
+//     launchState?: LaunchState[];  // TODO remove after stack action done
+// }
 
 export interface BattleRollbackAction extends IGameAction<'battle/rollback'> {
     config: {
@@ -58,7 +58,7 @@ export type BattleSceneAction =
     | BattleTurnEndAction
     | BattleWatchAction
     | BattleSpellPrepareAction
-    | BattleSpellLaunchAction
+    // | BattleSpellLaunchAction
     | BattleRollbackAction;
 
 export class BattleReducerManager extends ReducerManager<BattleScene> {

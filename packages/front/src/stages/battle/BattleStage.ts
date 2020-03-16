@@ -1,9 +1,11 @@
 import { BattleScene } from "./BattleScene";
-import { Pathfinder } from "./map/Pathfinder";
-import { MapGraphics } from "./graphics/MapGraphics";
-import { MapManager } from "./map/MapManager";
 import { BStateMachine } from "./battleState/BStateMachine";
 import { CameraManager } from "./camera/CameraManager";
+import { CycleManager } from './cycle/CycleManager';
+import { MapGraphics } from "./graphics/MapGraphics";
+import { MapManager } from "./map/MapManager";
+import { SnapshotManager } from './snapshot/SnapshotManager';
+import { SpellActionManager } from './spellAction/SpellActionManager';
 
 export interface BattleStage {
     onInit(): void;
@@ -23,18 +25,23 @@ export const BattleStage = (scene: BattleScene): BattleStage => {
         },
 
         onCreate() {
-            const { battleData, mapInfos } = scene.initData;
+            const { mapInfos, globalTurnState } = scene.initData;
 
-            const mapManager = MapManager({
-                battleData,
-                getPathfinder: Pathfinder,
-                getGraphics: () => MapGraphics(mapInfos, { scene })
-            });
+            const snapshotManager = SnapshotManager();
 
-            const bStateMachine = BStateMachine(battleData);
+            const spellActionManager = SpellActionManager(snapshotManager);
+
+            const mapManager = MapManager(
+                () => MapGraphics(mapInfos, { scene })
+            );
+
+            const bStateMachine = BStateMachine(mapManager);
+
+            const cycleManager = CycleManager();
 
             const cameraManager = new CameraManager(scene);
 
+            cycleManager.start(globalTurnState);
         }
     };
 };

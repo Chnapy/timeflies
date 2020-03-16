@@ -3,12 +3,6 @@ import { Position } from '@timeflies/shared';
 
 describe('# Pathfinder', () => {
 
-    let finder: Pathfinder;
-
-    beforeEach(() => {
-        finder = undefined as any;
-    });
-
     it.each<[
         string,
         {
@@ -112,7 +106,7 @@ describe('# Pathfinder', () => {
 
         const hasObstacleAt = ({ x, y }: Position): boolean => !!map[y][x];
 
-        finder = Pathfinder(
+        const finder = Pathfinder(
             {
                 tilemap: {
                     width,

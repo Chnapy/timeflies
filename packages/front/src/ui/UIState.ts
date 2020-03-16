@@ -1,5 +1,5 @@
-import { BattleData } from "../BattleData";
-import { BattleLoadPayload } from '@timeflies/shared'
+import { BattleLoadPayload } from '@timeflies/shared';
+import { BattleDataMap } from "../BattleData";
 import { CurrentPlayer } from "../CurrentPlayer";
 
 type NarrowState<T, N> = T extends { state: N } ? T : never;
@@ -15,7 +15,7 @@ export interface UIStateLoad {
 
 export interface UIStateBattle {
     state: 'battle';
-    battleData: BattleData;
+    battleData: BattleDataMap;
 }
 
 export type UIStateData = UIStateBoot | UIStateLoad | UIStateBattle;

@@ -1,3 +1,4 @@
+import { StoreTest } from '../../../StoreTest';
 import { MapManager } from './MapManager';
 import { Position } from '@timeflies/shared';
 
@@ -13,12 +14,21 @@ describe('# MapManager', () => {
         refreshGrid?: () => void;
         tileToWorld?: (arg: Position, center?: boolean) => Position;
         worldToTile?: (arg: Position) => Position;
-    }): MapManager => MapManager(
-        {
-            battleData: {
-                characters: []
-            },
-            getGraphics: () => ({
+    }): MapManager => {
+
+        StoreTest.initStore({
+            data: {
+                state: 'battle',
+                battleData: {
+                    future: {
+                        characters: []
+                    }
+                } as any
+            }
+        });
+
+        return MapManager(
+            () => ({
                 tilemap: {
                     width: -1,
                     height: -1,
@@ -33,12 +43,14 @@ describe('# MapManager', () => {
                     y: -1
                 })),
             }),
-            getPathfinder: () => ({
-                refreshGrid: refreshGrid ?? (() => { }),
-                calculatePath: () => ({ promise: Promise.resolve([]), cancel: () => true })
-            })
-        }
-    );
+            {
+                pathfinderCreator: () => ({
+                    refreshGrid: refreshGrid ?? (() => { }),
+                    calculatePath: () => ({ promise: Promise.resolve([]), cancel: () => true })
+                })
+            }
+        );
+    };
 
     it('should call pathfinder#refreshGrid on refreshPathfinder()', () => {
 

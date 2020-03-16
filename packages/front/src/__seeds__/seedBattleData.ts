@@ -1,6 +1,6 @@
 import { BattleScene } from '../stages/battle/BattleScene';
 import { BattleData } from "../BattleData";
-import { seedCharacters } from './seedCharacter';
+import { seedCharacter } from './seedCharacter';
 import { seedPlayer } from './seedPlayer';
 import { seedTeam } from './seedTeam';
 jest.mock('../phaser/scenes/BattleScene');
@@ -31,7 +31,20 @@ export const seedBattleData = (data: Partial<BattleData> = {}): BattleData => {
         }, teams[ 1 ], battleScene)
     ];
 
-    const characters = seedCharacters({}, i => players[ i % 2 ], battleScene);
+    const characters = [
+        seedCharacter({
+            staticData: {
+                id: 'char-1'
+            },
+            player: players[0]
+        }),
+        seedCharacter({
+            staticData: {
+                id: 'char-2'
+            },
+            player: players[1]
+        })
+    ];
 
     return {
         launchTime: Date.now(),

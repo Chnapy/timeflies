@@ -26,13 +26,20 @@ export interface CharAction {
     positions: Position[];
 }
 
+export interface SpellActionSnapshot {
+    startTime: number;
+    spellId: string;
+    position: Position;
+    battleHash: string;
+}
+
 export interface NotifySAction extends TAction<'notify'> {
     charAction: CharAction;
     startTime: number;
 }
 
-export interface CharActionCAction extends TAction<'charAction'> {
-    charAction: CharAction;
+export interface SpellActionCAction extends TAction<'battle/spellAction'> {
+    spellAction: SpellActionSnapshot;
 }
 
 export type BattleRunSAction =
@@ -43,4 +50,4 @@ export type BattleRunSAction =
     | NotifySAction;
 
 export type BattleRunCAction =
-    | CharActionCAction;
+    | SpellActionCAction;

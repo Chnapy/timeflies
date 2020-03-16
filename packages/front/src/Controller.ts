@@ -55,6 +55,10 @@ export const Controller: Controller = {
         );
     },
 
+    getStore() {
+        return store;
+    },
+
     dispatch<A extends GameAction>(action: A): void {
 
         if (action.type === 'battle/turn/start') {

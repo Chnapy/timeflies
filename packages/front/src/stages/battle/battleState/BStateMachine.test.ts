@@ -1,146 +1,284 @@
-import { GlobalTurn } from '../cycle/GlobalTurn';
-import { BattleData } from "../../../BattleData";
-import { seedBattleData } from '../../../__seeds__/seedBattleData';
-import { BStateMachine } from './BStateMachine';
-import { BState, BStateEvents } from './battleStateSchema';
+import { StoreTest } from '../../../StoreTest';
+import { seedMapManager } from '../map/MapManager.seed';
+import { BState } from './BattleStateSchema';
+import { BStateEventAction, BStateMachine } from './BStateMachine';
 
 
-describe('#BStateMachine', () => {
-
-    let battleData: BattleData;
-    let stateMachine: BStateMachine;
-
-    const fillBattleData = (isMineFirst: boolean, getStartTime?: (now, actionTime) => number) => {
-
-        const characters = isMineFirst
-            ? battleData.characters
-                .sort((a, b) => a.player.itsMe ? -1 : 1)
-            : battleData.characters
-                .sort((a, b) => a.player.itsMe ? 1 : -1);
-
-        const startTime = getStartTime
-            ? getStartTime(Date.now(), characters[ 0 ].features.actionTime)
-            : Date.now();
-
-        battleData.globalTurn = new GlobalTurn({
-            id: 1,
-            startTime,
-            order: characters.map(c => c.id),
-            currentTurn: {
-                id: 1,
-                startTime,
-                characterId: characters[ 0 ].id
-            }
-        }, characters, () => { });
-    };
+describe('# BStateMachine', () => {
 
     beforeEach(() => {
-        battleData = seedBattleData();
+        StoreTest.beforeTest();
     });
 
-    it('should initialize with "watch" state', () => {
-
-        stateMachine = BStateMachine(battleData);
-
-        expect(stateMachine.state).toBe<BState>('watch');
+    afterEach(() => {
+        StoreTest.afterTest();
     });
 
-    describe('from "watch"', () => {
+    it('should initialize with the initial state', () => {
 
-        it('should not pass to "idle" on TURN-START when not own turn', () => {
-
-            fillBattleData(false);
-
-            stateMachine = BStateMachine(battleData);
-
-            stateMachine.send('TURN-START');
-
-            expect(stateMachine.state).not.toBe<BState>('idle');
+        const machine = BStateMachine(seedMapManager(), {
+            battleStateSchemaCreator: () => ({
+                initialState: 'watch',
+                states: {
+                    watch: {
+                        engineCreator: () => ({})
+                    },
+                    spellPrepare: {
+                        engineCreator: () => ({})
+                    },
+                    spellLaunch: {
+                        engineCreator: () => ({})
+                    },
+                }
+            })
         });
 
-        it('should pass to "idle" on TURN-START', () => {
-
-            fillBattleData(true);
-
-            stateMachine = BStateMachine(battleData);
-
-            stateMachine.send('TURN-START');
-
-            expect(stateMachine.state).toBe<BState>('idle');
-        });
-
-        it('should not pass to "spellLaunch" on SPELL-NOTIFY if no one plays', () => {
-
-            fillBattleData(false, (now, actionTime) => now - actionTime);
-
-            stateMachine = BStateMachine(battleData);
-
-            stateMachine.send('SPELL-NOTIFY');
-
-            expect(stateMachine.state).not.toBe<BState>('spellLaunch');
-        });
-
-        it('should pass to "spellLaunch" on SPELL-NOTIFY', () => {
-
-            fillBattleData(false);
-
-            stateMachine = BStateMachine(battleData);
-
-            stateMachine.send('SPELL-NOTIFY');
-
-            expect(stateMachine.state).toBe<BState>('spellLaunch');
-        });
-
-        it.each<BStateEvents>(
-            [ 'RESET', 'SPELL-LAUNCH', 'SPELL-PREPARE', 'TURN-END' ]
-        )('should not handle %s event', event => {
-
-            stateMachine = BStateMachine(battleData);
-
-            stateMachine.send(event);
-
-            expect(stateMachine.state).toBe<BState>('watch');
-        });
-
+        expect(machine.state).toBe<BState>('watch');
     });
 
-    describe('from "idle"', () => {
+    it('should change state on correct event', () => {
 
-        beforeEach(() => {
-            fillBattleData(true);
+        const machine = BStateMachine(seedMapManager(), {
+            battleStateSchemaCreator: () => ({
+                initialState: 'watch',
+                states: {
+                    watch: {
+                        engineCreator: () => ({}),
+                        on: {
+                            "SPELL-PREPARE": [ {
+                                target: 'spellPrepare',
+                            } ]
+                        }
+                    },
+                    spellPrepare: {
+                        engineCreator: () => ({})
+                    },
+                    spellLaunch: {
+                        engineCreator: () => ({})
+                    },
+                }
+            })
         });
 
-        it('should pass to "spellPrepare" on SPELL-PREPARE', () => {
-
-            stateMachine = BStateMachine(battleData);
-            stateMachine.send('TURN-START');
-
-            stateMachine.send('SPELL-PREPARE');
-
-            expect(stateMachine.state).toBe<BState>('spellPrepare');
+        StoreTest.dispatch<BStateEventAction>({
+            type: 'battle/state/event',
+            event: {
+                type: 'SPELL-PREPARE',
+                payload: {
+                    spellId: '1'
+                }
+            }
         });
 
-        it('should pass to "watch" on TURN-END', () => {
-
-            stateMachine = BStateMachine(battleData);
-            stateMachine.send('TURN-START');
-
-            stateMachine.send('TURN-END');
-
-            expect(stateMachine.state).toBe<BState>('watch');
-        });
-
-        it.each<BStateEvents>(
-            [ 'RESET', 'SPELL-LAUNCH', 'SPELL-NOTIFY', 'TURN-START' ]
-        )('should not handle %s event', event => {
-
-            stateMachine = BStateMachine(battleData);
-            stateMachine.send('TURN-START');
-
-            stateMachine.send(event);
-
-            expect(stateMachine.state).toBe<BState>('idle');
-        });
+        expect(machine.state).toBe<BState>('spellPrepare');
     });
+
+    it('should change state with correct condition', () => {
+
+        const machine = BStateMachine(seedMapManager(), {
+            battleStateSchemaCreator: () => ({
+                initialState: 'watch',
+                states: {
+                    watch: {
+                        engineCreator: () => ({}),
+                        on: {
+                            "SPELL-PREPARE": [ {
+                                target: 'spellPrepare',
+                                cond: () => true
+                            } ]
+                        }
+                    },
+                    spellPrepare: {
+                        engineCreator: () => ({})
+                    },
+                    spellLaunch: {
+                        engineCreator: () => ({})
+                    },
+                }
+            })
+        });
+
+        StoreTest.dispatch<BStateEventAction>({
+            type: 'battle/state/event',
+            event: {
+                type: 'SPELL-PREPARE',
+                payload: {
+                    spellId: '1'
+                }
+            }
+        });
+
+        expect(machine.state).toBe<BState>('spellPrepare');
+    });
+
+    it('should not change state with incorrect condition', () => {
+
+        const machine = BStateMachine(seedMapManager(), {
+            battleStateSchemaCreator: () => ({
+                initialState: 'watch',
+                states: {
+                    watch: {
+                        engineCreator: () => ({}),
+                        on: {
+                            "SPELL-PREPARE": [ {
+                                target: 'spellPrepare',
+                                cond: () => false
+                            } ]
+                        }
+                    },
+                    spellPrepare: {
+                        engineCreator: () => ({})
+                    },
+                    spellLaunch: {
+                        engineCreator: () => ({})
+                    },
+                }
+            })
+        });
+
+        StoreTest.dispatch<BStateEventAction>({
+            type: 'battle/state/event',
+            event: {
+                type: 'SPELL-PREPARE',
+                payload: {
+                    spellId: '1'
+                }
+            }
+        });
+
+        expect(machine.state).toBe<BState>('watch');
+    });
+
+    it('should not change state without corresponding trigger', () => {
+
+        const machine = BStateMachine(seedMapManager(), {
+            battleStateSchemaCreator: () => ({
+                initialState: 'watch',
+                states: {
+                    watch: {
+                        engineCreator: () => ({}),
+                        on: {
+                        }
+                    },
+                    spellPrepare: {
+                        engineCreator: () => ({})
+                    },
+                    spellLaunch: {
+                        engineCreator: () => ({})
+                    },
+                }
+            })
+        });
+
+        StoreTest.dispatch<BStateEventAction>({
+            type: 'battle/state/event',
+            event: {
+                type: 'SPELL-PREPARE',
+                payload: {
+                    spellId: '1'
+                }
+            }
+        });
+
+        expect(machine.state).toBe<BState>('watch');
+    });
+
+    // describe('from "watch"', () => {
+
+    //     it('should not pass to "idle" on TURN-START when not own turn', () => {
+
+    //         fillBattleData(false);
+
+    //         stateMachine = BStateMachine(battleData);
+
+    //         stateMachine.send('TURN-START');
+
+    //         expect(stateMachine.state).not.toBe<BState>('idle');
+    //     });
+
+    //     it('should pass to "idle" on TURN-START', () => {
+
+    //         fillBattleData(true);
+
+    //         stateMachine = BStateMachine(battleData);
+
+    //         stateMachine.send('TURN-START');
+
+    //         expect(stateMachine.state).toBe<BState>('idle');
+    //     });
+
+    //     it('should not pass to "spellLaunch" on SPELL-NOTIFY if no one plays', () => {
+
+    //         fillBattleData(false, (now, actionTime) => now - actionTime);
+
+    //         stateMachine = BStateMachine(battleData);
+
+    //         stateMachine.send('SPELL-NOTIFY');
+
+    //         expect(stateMachine.state).not.toBe<BState>('spellLaunch');
+    //     });
+
+    //     it('should pass to "spellLaunch" on SPELL-NOTIFY', () => {
+
+    //         fillBattleData(false);
+
+    //         stateMachine = BStateMachine(battleData);
+
+    //         stateMachine.send('SPELL-NOTIFY');
+
+    //         expect(stateMachine.state).toBe<BState>('spellLaunch');
+    //     });
+
+    //     it.each<BStateEvents>(
+    //         [ 'RESET', 'SPELL-LAUNCH', 'SPELL-PREPARE', 'TURN-END' ]
+    //     )('should not handle %s event', event => {
+
+    //         stateMachine = BStateMachine(battleData);
+
+    //         stateMachine.send(event);
+
+    //         expect(stateMachine.state).toBe<BState>('watch');
+    //     });
+
+    // });
+
+    // describe('from "idle"', () => {
+
+    //     beforeEach(() => {
+    //         fillBattleData(true);
+    //     });
+
+    //     it('should pass to "spellPrepare" on SPELL-PREPARE', () => {
+
+    //         stateMachine = BStateMachine(battleData);
+    //         stateMachine.send('TURN-START');
+
+    //         stateMachine.send('SPELL-PREPARE');
+
+    //         expect(stateMachine.state).toBe<BState>('spellPrepare');
+    //     });
+
+    //     it('should pass to "watch" on TURN-END', () => {
+
+    //         stateMachine = BStateMachine(battleData);
+    //         stateMachine.send('TURN-START');
+
+    //         stateMachine.send('TURN-END');
+
+    //         expect(stateMachine.state).toBe<BState>('watch');
+    //     });
+
+    //     it.each<BStateEvents>(
+    //         [ 'RESET', 'SPELL-LAUNCH', 'SPELL-NOTIFY', 'TURN-START' ]
+    //     )('should not handle %s event', event => {
+
+    //         stateMachine = BStateMachine(battleData);
+    //         stateMachine.send('TURN-START');
+
+    //         stateMachine.send(event);
+
+    //         expect(stateMachine.state).toBe<BState>('idle');
+    //     });
+    // });
 
 });

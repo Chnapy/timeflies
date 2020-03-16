@@ -1,35 +1,90 @@
-import { BStateResetEvent, BStateTurnStartEvent } from "../battleState/BattleStateSchema";
-import { SpellType } from "@timeflies/shared";
+import { assertIsDefined, assertThenGet, Position, SpellType } from "@timeflies/shared";
+import { serviceBattleData } from '../../../services/serviceBattleData';
+import { serviceDispatch } from '../../../services/serviceDispatch';
+import { BStateResetEvent, BStateSpellPrepareEvent, BStateTurnStartEvent } from '../battleState/BattleStateSchema';
+import { Character } from '../entities/Character';
+import { Spell } from '../entities/Spell';
+import { MapManager } from '../map/MapManager';
+import { EngineCreator, SpellEngineBindAction } from './Engine';
 import { SpellPrepareMove } from "./spellEngine/move/SpellPrepareMove";
 
-export interface SpellPrepareEngine {
-
+export interface SpellPrepareSubEngine {
+    onTileHover(pointerPos: Position): void;
+    onTileClick(pointerPos: Position): void;
 }
 
-const spellPrepareMap: Partial<Record<SpellType, any>> = {
-    'move': SpellPrepareMove
+export interface SpellPrepareSubEngineCreator {
+    (spell: Spell, mapManager: MapManager): SpellPrepareSubEngine;
+}
+
+type Event =
+    | BStateSpellPrepareEvent
+    | BStateResetEvent
+    | BStateTurnStartEvent;
+
+const SpellPrepareMap: Record<SpellType, SpellPrepareSubEngineCreator> = {
+    move: SpellPrepareMove,
+    orientate: SpellPrepareMove,
+    sampleSpell1: SpellPrepareMove,
+    sampleSpell2: SpellPrepareMove,
+    sampleSpell3: SpellPrepareMove,
 };
 
-type Param = {
-    payload: {
-        characterId: string;
-        spellId: string;
-    };
+const extractDataFromEvent = (event: Event): { character: Character; spell: Spell } => {
+    const { globalTurn } = serviceBattleData('cycle');
+    const { characters } = serviceBattleData('future');
+
+    let character: Character, spell: Spell;
+    switch (event.type) {
+        case 'TURN-START':
+        case 'RESET':
+
+            character = assertThenGet(
+                characters.find(c => c.id === event.payload.characterId),
+                assertIsDefined
+            );
+
+            spell = character.defaultSpell;
+
+            break;
+        case 'SPELL-PREPARE':
+
+            character = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+
+            spell = assertThenGet(
+                character.spells.find(s => s.id === event.payload.spellId),
+                assertIsDefined
+            );
+
+            break;
+    }
+    return { character, spell };
 };
 
-export const SpellPrepareEngine = ({ payload: { characterId, spellId } }: Param): SpellPrepareEngine => {
+export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]> = (
+    {
+        event,
 
-    const { characters } = serviceBattleData('characters');
+        deps: {
+            mapManager
+        }
+    },
 
-    const character = characters.find(...);
+    spellPrepareMap = SpellPrepareMap
+) => {
+    const { character, spell } = extractDataFromEvent(event);
 
-    const spell = ...;
+    const engine = spellPrepareMap[ spell.staticData.type ]!(spell, mapManager);
 
-    const engine = spellPrepareMap[spell.type](spell);
+    const { dispatchBind } = serviceDispatch({
+        dispatchBind: (): SpellEngineBindAction => ({
+            type: 'battle/spell-engine/bind',
+            onTileHover: engine.onTileHover,
+            onTileClick: engine.onTileClick,
+        })
+    });
 
-    const onTileHover = engine.onTileHover;
-
-    // dispatch action to bind onTileHover
+    dispatchBind();
 
     return {};
 };

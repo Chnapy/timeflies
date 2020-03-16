@@ -1,27 +1,37 @@
 import { MapGraphics } from '../graphics/MapGraphics';
 import { BattleData } from "../../../BattleData";
 import { Pathfinder } from './Pathfinder';
+import { Position, MapInfos } from '@timeflies/shared';
+import { serviceBattleData } from '../../../services/serviceBattleData';
 
-export interface MapManager extends Pick<MapGraphics, 'tileToWorld' | 'worldToTile'> {
+export interface MapManager extends
+    Pick<MapGraphics, 'tileToWorld' | 'worldToTile'>,
+    Pick<Pathfinder, 'calculatePath'> {
     refreshPathfinder(): void;
+    worldToTileIfExist(position: Position): Position | null;
 }
 
-export interface MapManagerDeps {
-    battleData: Pick<BattleData, 'characters'>;
-    getGraphics: () => MapGraphics;
-    getPathfinder: typeof Pathfinder;
+interface Dependencies {
+    pathfinderCreator: typeof Pathfinder;
 }
 
-export const MapManager = ({ getGraphics, getPathfinder, battleData }: MapManagerDeps): MapManager => {
+export const MapManager = (
+    getGraphics: () => MapGraphics,
+    { pathfinderCreator }: Dependencies = { pathfinderCreator: Pathfinder }
+): MapManager => {
+
+    const { characters } = serviceBattleData('future');
 
     const graphics = getGraphics();
 
     const { tilemap, hasObstacleAt, tileToWorld, worldToTile } = graphics;
 
-    const pathfinder = getPathfinder(
+    const pathfinder = pathfinderCreator(
         { tilemap, hasObstacleAt },
-        () => battleData.characters.map(c => c.position)
+        () => characters.map(c => c.position)
     );
+
+    const { calculatePath } = pathfinder;
 
     return {
 
@@ -29,7 +39,12 @@ export const MapManager = ({ getGraphics, getPathfinder, battleData }: MapManage
             pathfinder.refreshGrid();
         },
 
+        calculatePath,
+
         tileToWorld,
-        worldToTile
+        worldToTile,
+        worldToTileIfExist(position: Position): Position | null {
+            // TODO
+        }
     };
 };

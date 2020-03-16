@@ -1,34 +1,26 @@
-import configureStore from 'redux-mock-store';
 import { GameAction } from "../action/GameAction";
 import { IController } from "../IController";
-import { UIState } from "../ui/UIState";
+import { StoreTest } from '../StoreTest';
 
-const mockStore = configureStore<UIState, GameAction>();
-
-const store = mockStore();
-
-export interface Controller extends IController {
-    store: typeof store;
-}
-
-export const Controller: Controller = {
-
-    store,
+export const Controller: IController = {
 
     start() { },
+
+    getStore() {
+        return StoreTest.getStore();
+    },
 
     waitConnect() {
         return Promise.resolve();
     },
 
     dispatch<A extends GameAction>(action: A): void {
-        store.dispatch(action);
-        // throw new Error(action.type + ' ' + store.getActions().length);
+        StoreTest.getStore().dispatch(action);
     },
 
     addEventListener<A extends GameAction>(type, fn) {
-        store.subscribe(() => {
-            const actions = store.getActions();
+        StoreTest.getStore().subscribe(() => {
+            const actions = StoreTest.getStore().getActions();
             const lastAction: GameAction | A | undefined = actions[actions.length - 1];
             if (lastAction?.type === type) {
                 fn(lastAction);

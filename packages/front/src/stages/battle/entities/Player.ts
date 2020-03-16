@@ -1,46 +1,72 @@
-import { PlayerSnapshot, PlayerState } from '@timeflies/shared';
+import { PlayerSnapshot, PlayerState, assertThenGet, assertIsDefined } from '@timeflies/shared';
 import { serviceCurrentPlayer } from '../../../services/serviceCurrentPlayer';
 import { Character } from './Character';
 import { Team } from "./Team";
 import { WithSnapshot } from './WithSnapshot';
 
-export class Player implements WithSnapshot<PlayerSnapshot> {
-
+export interface Player extends WithSnapshot<PlayerSnapshot> {
     readonly id: string;
     readonly itsMe: boolean;
     readonly name: string;
-    state: PlayerState;
+    readonly state: PlayerState;
     readonly team: Team;
     readonly characters: Character[];
+}
 
-    constructor({
+interface Dependencies {
+    characterCreator: typeof Character;
+}
+
+export const Player = (
+    {
         id,
         name,
         state,
         charactersSnapshots
-    }: PlayerSnapshot, team: Team) {
-        this.id = id;
-        this.itsMe = id === serviceCurrentPlayer()?.id;
-        this.name = name;
-        this.state = state;
-        this.team = team;
-        this.characters = charactersSnapshots.map(snap => Character(snap, this));
-    }
+    }: PlayerSnapshot,
+    team: Team,
+    { characterCreator }: Dependencies = { characterCreator: Character }
+): Player => {
+    const itsMe = id === assertThenGet(
+        serviceCurrentPlayer(),
+        assertIsDefined
+    ).id;
 
-    getSnapshot(): PlayerSnapshot {
-        return {
-            id: this.id,
-            name: this.name,
-            state: this.state,
-            charactersSnapshots: this.characters.map(c => c.getSnapshot())
-        };
-    }
+    const this_: Player = {
+        id,
+        name,
+        itsMe,
+        get state() {
+            return state;
+        },
+        team,
+        get characters() {
+            return characters;
+        },
 
-    updateFromSnapshot(snapshot: PlayerSnapshot): void {
-        snapshot.charactersSnapshots.forEach(cSnap => {
-            const character = this.characters.find(c => c.id === cSnap.staticData.id);
+        getSnapshot(): PlayerSnapshot {
+            return {
+                id,
+                name,
+                state,
+                charactersSnapshots: characters.map(c => c.getSnapshot())
+            };
+        },
 
-            character!.updateFromSnapshot(cSnap);
-        });
-    }
-}
+        updateFromSnapshot(snapshot: PlayerSnapshot): void {
+            state = snapshot.state;
+            snapshot.charactersSnapshots.forEach(cSnap => {
+                const character = assertThenGet(
+                    characters.find(c => c.id === cSnap.staticData.id),
+                    assertIsDefined
+                );
+
+                character.updateFromSnapshot(cSnap);
+            });
+        }
+    };
+
+    const characters = charactersSnapshots.map(snap => characterCreator(snap, this_));
+
+    return this_;
+};

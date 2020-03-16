@@ -1,6 +1,6 @@
 import { BattleSnapshot, CharacterType, GlobalTurnSnapshot, MapInfos, Orientation, SpellType } from '@timeflies/shared';
 import { AssetManager } from '../../assetManager/AssetManager';
-import { BattleData } from '../../BattleData';
+import { BattleData, BattleDataMap } from '../../BattleData';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleReducerManager } from '../../phaser/battleReducers/BattleReducerManager';
 import { CameraManager } from './camera/CameraManager';
@@ -20,7 +20,7 @@ export interface BattleSceneData {
     characterTypes: CharacterType[];
     spellTypes: SpellType[];
     battleSnapshot: BattleSnapshot;
-    battleData: BattleData;
+    battleData: BattleDataMap;
     globalTurnState: GlobalTurnSnapshot;
 }
 
@@ -39,7 +39,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
 
-    battleData!: BattleData;
+    battleData!: BattleDataMap;
 
     constructor() {
         super({ key: 'BattleScene' });
