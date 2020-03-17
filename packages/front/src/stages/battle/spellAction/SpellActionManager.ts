@@ -1,14 +1,10 @@
 import { Position, SpellActionSnapshot } from '@timeflies/shared';
-import { IGameAction } from '../../../action/GameAction';
-import { serviceEvent } from '../../../services/serviceEvent';
-import { Spell } from '../entities/Spell';
 import { serviceDispatch } from '../../../services/serviceDispatch';
-import { BattleCommitAction, SnapshotManager } from '../snapshot/SnapshotManager';
+import { serviceEvent } from '../../../services/serviceEvent';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-
-export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
-    spellActions: SpellAction[];
-}
+import { Spell } from '../entities/Spell';
+import { BattleCommitAction, SnapshotManager } from '../snapshot/SnapshotManager';
+import { BStateAction } from '../battleState/BattleStateSchema';
 
 export interface SpellAction {
     spell: Spell;
@@ -44,7 +40,6 @@ export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActio
     ) => {
         const { spell, position, beforeCommit } = action;
 
-
         beforeCommit(action);
 
         dispatchCommit();
@@ -63,7 +58,14 @@ export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActio
         snapshots.push(snap);
     };
 
-    onAction<BattleSpellLaunchAction>('battle/spell/launch', ({ spellActions }) => {
+    onAction<BStateAction>('battle/state/event', action => {
+
+        if (action.eventType !== 'SPELL-LAUNCH') {
+            return;
+        }
+
+        const { spellActions } = action.payload;
+
         let nextStartTime = Date.now();
 
         network.then(({ sendSpellAction }) => {
@@ -72,7 +74,7 @@ export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActio
                 onSpellAction(spellAction, nextStartTime, sendSpellAction);
                 nextStartTime += spellAction.spell.feature.duration;
             });
-            
+
         })
 
     });

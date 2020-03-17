@@ -8,6 +8,7 @@ export interface GlobalTurn {
     readonly id: number;
     readonly state: GlobalTurnState;
     readonly currentTurn: Turn;
+    start(): void;
     notifyDeaths(): void;
     synchronize(snapshot: GlobalTurnSnapshot): void;
     synchronizeTurn(turnSnapshot: TurnSnapshot): void;
@@ -61,7 +62,7 @@ export const GlobalTurn = (
             onGlobalTurnEnd(currentTurn.endTime);
         }
         else {
-            const currentCharacter = charactersOrdered[nextCharacterIndex];
+            const currentCharacter = charactersOrdered[ nextCharacterIndex ];
 
             if (currentCharacter.isAlive) {
                 const turnId = generateTurnId.next().value;
@@ -95,9 +96,7 @@ export const GlobalTurn = (
 
     generateTurnId.next();  // To start from 1
 
-    setCurrentTurn(
-        createTurnFromSnapshot(snapshot.currentTurn)
-    );
+    currentTurn = createTurnFromSnapshot(snapshot.currentTurn);
 
     const synchronizeTurn = (turnSnapshot: TurnSnapshot): void => {
         if (turnSnapshot.id === currentTurn.id) {
@@ -119,6 +118,9 @@ export const GlobalTurn = (
                 return 'running';
             }
             return 'idle';
+        },
+        start(): void {
+            currentTurn.refreshTimedActions();
         },
         notifyDeaths(): void {
             if (!currentTurn.character.isAlive) {

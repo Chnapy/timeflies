@@ -33,7 +33,7 @@ export const CycleManager = (
 
     const cycleData = serviceBattleData('cycle');
 
-    const battleData = serviceBattleData('future');
+    const battleData = serviceBattleData('current');
 
     const { characters } = battleData;
 
@@ -42,11 +42,13 @@ export const CycleManager = (
     const globalTurnIdGenerator = getIndexGenerator();
 
     const onGlobalTurnEnd = (): void => {
-        delete cycleData.globalTurn;
 
         const snapshot = waitingSnapshots.pop();
-        if (snapshot)
+        if (snapshot) {
+            delete cycleData.globalTurn;
             cycleData.globalTurn = globalTurnCreator(snapshot, characters, globalTurnIdGenerator, onGlobalTurnEnd);
+            cycleData.globalTurn.start();
+        }
     };
 
     const synchronizeGlobalTurn = (globalTurnSnapshot: GlobalTurnSnapshot): void => {

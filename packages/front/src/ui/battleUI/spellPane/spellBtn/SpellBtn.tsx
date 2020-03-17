@@ -1,15 +1,15 @@
+import { SpellType } from '@timeflies/shared';
 import classNames from 'classnames';
 import React from 'react';
 import { connect } from "react-redux";
-import { CurrentSpellState } from "../../../../phaser/spellEngine/SpellEngine";
-import { UIState } from "../../../UIState";
-import css from './spellBtn.module.css';
-import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { Controller } from '../../../../Controller';
-import { BattleSpellPrepareAction } from '../../../../phaser/battleReducers/BattleReducerManager';
+import { CurrentSpellState } from "../../../../phaser/spellEngine/SpellEngine";
+import { BStateSpellPrepareAction } from '../../../../stages/battle/battleState/BattleStateSchema';
+import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
+import { UIState } from "../../../UIState";
+import css from './spellBtn.module.css';
 import { SpellBtnInfos, SpellBtnInfosProps } from './SpellBtnInfos';
-import { SpellType } from '@timeflies/shared'
 
 export interface SpellBtnExternProps {
     spellId: string;
@@ -53,28 +53,31 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
     spellInfos
 }: SpellBtnExternProps & SpellBtnInnerProps) => {
 
-    const typeName = AssetManager.spells.spellsMap[spellType];
+    const typeName = AssetManager.spells.spellsMap[ spellType ];
 
     const onBtnClick = (): void => {
         if (disabled || activeState === 'launch') {
             return;
         }
 
-        Controller.dispatch<BattleSpellPrepareAction>({
-            type: 'battle/spell/prepare',
-            spellType
+        Controller.dispatch<BStateSpellPrepareAction>({
+            type: 'battle/state/event',
+            eventType: 'SPELL-PREPARE',
+            payload: {
+                spellType
+            }
         });
     };
 
     return <div className={classNames(css.root, {
-        [css.active]: activeState !== 'none',
-        [css.disabled]: disabled
+        [ css.active ]: activeState !== 'none',
+        [ css.disabled ]: disabled
     })}>
 
         <div className={css.btnWrapper}>
 
             <button className={classNames(css.btn)} onClick={onBtnClick}>
-                <div className={classNames(spriteCss.sprite, spriteCss[typeName])} />
+                <div className={classNames(spriteCss.sprite, spriteCss[ typeName ])} />
             </button>
 
         </div>

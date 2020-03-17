@@ -1,6 +1,6 @@
 import { Position } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
-import { BStateEvent } from '../battleState/BattleStateSchema';
+import { BStateAction } from '../battleState/BattleStateSchema';
 import { MapManager } from '../map/MapManager';
 
 export interface SpellEngineBindAction extends IGameAction<'battle/spell-engine/bind'> {
@@ -13,14 +13,14 @@ interface Dependencies {
 }
 
 export interface EngineCreatorParam<
-    E extends BStateEvent | undefined
+    E extends BStateAction | undefined
     > {
     event: E;
     deps: Dependencies;
 }
 
 export interface EngineCreator<
-    E extends BStateEvent | undefined,
+    E extends BStateAction | undefined,
     O extends any[] = []
     > {
     (param: EngineCreatorParam<E>, ...O): {};

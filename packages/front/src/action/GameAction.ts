@@ -1,12 +1,11 @@
 import { Action } from 'redux';
 import { BattleSceneAction } from '../phaser/battleReducers/BattleReducerManager';
-import { LoadAction } from '../stages/load/LoadScene';
 import { MessageAction } from '../socket/WSClient';
-import { LoginSuccess } from '../ui/reducers/CurrentPlayerReducer';
+import { BStateAction } from '../stages/battle/battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../stages/battle/engine/Engine';
-import { BStateEventAction } from '../stages/battle/battleState/BStateMachine';
-import { BattleSpellLaunchAction } from '../stages/battle/spellAction/SpellActionManager';
 import { BattleCommitAction } from '../stages/battle/snapshot/SnapshotManager';
+import { LoadAction } from '../stages/load/LoadScene';
+import { LoginSuccess } from '../ui/reducers/CurrentPlayerReducer';
 
 export type IGameAction<T extends string, G extends boolean = false> = Action<T>
     & (G extends true ? {
@@ -21,6 +20,5 @@ export type GameAction =
     | BattleSceneAction
     | LoginSuccess
     | SpellEngineBindAction
-    | BStateEventAction
-    | BattleSpellLaunchAction
+    | BStateAction
     | BattleCommitAction;

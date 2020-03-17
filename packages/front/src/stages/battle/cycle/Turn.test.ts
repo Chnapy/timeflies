@@ -1,7 +1,7 @@
 import { TimerTester } from '@timeflies/shared';
-import { BattleTurnStartAction, BattleTurnEndAction } from '../../../phaser/battleReducers/BattleReducerManager';
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter } from "../../../__seeds__/seedCharacter";
+import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { Character } from "../entities/Character";
 import { Turn, TurnState } from "./Turn";
 
@@ -49,11 +49,11 @@ describe('#BTurn', () => {
         const turnRunning = Turn(1, startTimes.past, character, () => null);
         const turnEnded = Turn(1, startTimes.wayBefore, character, () => null);
 
-        const states: TurnState[] = ['idle', 'running', 'ended'];
+        const states: TurnState[] = [ 'idle', 'running', 'ended' ];
 
-        expect(turnIdle.state).toBe(states[0]);
-        expect(turnRunning.state).toBe(states[1]);
-        expect(turnEnded.state).toBe(states[2]);
+        expect(turnIdle.state).toBe(states[ 0 ]);
+        expect(turnRunning.state).toBe(states[ 1 ]);
+        expect(turnEnded.state).toBe(states[ 2 ]);
     });
 
     it('should dispatch start action at creation', () => {
@@ -64,11 +64,11 @@ describe('#BTurn', () => {
         turnIdle.refreshTimedActions();
 
         expect(StoreTest.getActions()).toHaveLength(1);
-        expect(StoreTest.getActions()).toEqual<[BattleTurnStartAction]>([{
-            type: 'battle/turn/start',
-            startTime,
-            character
-        }]);
+        expect(StoreTest.getActions()).toEqual<[ BStateTurnStartAction ]>([ {
+            type: 'battle/state/event',
+            eventType: 'TURN-START',
+            payload: { characterId: character.id }
+        } ]);
     });
 
     it('should run callbacks at expected time', () => {
@@ -90,11 +90,11 @@ describe('#BTurn', () => {
 
         // 1100
 
-        expect(StoreTest.getActions()).toEqual<[BattleTurnStartAction]>([{
-            type: 'battle/turn/start',
-            startTime,
-            character
-        }]);
+        expect(StoreTest.getActions()).toEqual<[ BStateTurnStartAction ]>([ {
+            type: 'battle/state/event',
+            eventType: 'TURN-START',
+            payload: { characterId: character.id }
+        } ]);
 
         timerTester.advanceBy(1700);
 
@@ -110,17 +110,20 @@ describe('#BTurn', () => {
 
         expect(endFn).toHaveBeenCalledTimes(1);
 
-        expect(StoreTest.getActions()).toEqual<[BattleTurnStartAction, BattleTurnEndAction]>([
-            {
-                type: 'battle/turn/start',
-                startTime,
-                character
-            },
-            {
-                type: 'battle/turn/end',
-                character
-            }
-        ]);
+        expect(StoreTest.getActions()).toEqual<[
+            BStateTurnStartAction,
+            BStateTurnEndAction ]>([
+                {
+                    type: 'battle/state/event',
+                    eventType: 'TURN-START',
+                    payload: { characterId: character.id }
+                },
+                {
+                    type: 'battle/state/event',
+                    eventType: 'TURN-END',
+                    payload: {}
+                }
+            ]);
 
     });
 

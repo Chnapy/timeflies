@@ -1,7 +1,7 @@
 import { StoreTest } from '../../../StoreTest';
 import { seedMapManager } from '../map/MapManager.seed';
-import { BState } from './BattleStateSchema';
-import { BStateEventAction, BStateMachine } from './BStateMachine';
+import { BState, BStateAction, BStateSpellPrepareAction } from './BattleStateSchema';
+import { BStateMachine } from './BStateMachine';
 
 
 describe('# BStateMachine', () => {
@@ -60,13 +60,11 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateEventAction>({
+        StoreTest.dispatch<BStateSpellPrepareAction>({
             type: 'battle/state/event',
-            event: {
-                type: 'SPELL-PREPARE',
-                payload: {
-                    spellId: '1'
-                }
+            eventType: 'SPELL-PREPARE',
+            payload: {
+                spellType: 'move'
             }
         });
 
@@ -98,13 +96,11 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateEventAction>({
+        StoreTest.dispatch<BStateSpellPrepareAction>({
             type: 'battle/state/event',
-            event: {
-                type: 'SPELL-PREPARE',
-                payload: {
-                    spellId: '1'
-                }
+            eventType: 'SPELL-PREPARE',
+            payload: {
+                spellType: 'move'
             }
         });
 
@@ -136,13 +132,11 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateEventAction>({
+        StoreTest.dispatch<BStateSpellPrepareAction>({
             type: 'battle/state/event',
-            event: {
-                type: 'SPELL-PREPARE',
-                payload: {
-                    spellId: '1'
-                }
+            eventType: 'SPELL-PREPARE',
+            payload: {
+                spellType: 'move'
             }
         });
 
@@ -170,13 +164,11 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateEventAction>({
+        StoreTest.dispatch<BStateSpellPrepareAction>({
             type: 'battle/state/event',
-            event: {
-                type: 'SPELL-PREPARE',
-                payload: {
-                    spellId: '1'
-                }
+            eventType: 'SPELL-PREPARE',
+            payload: {
+                spellType: 'move'
             }
         });
 

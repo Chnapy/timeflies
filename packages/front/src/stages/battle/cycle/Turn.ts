@@ -1,6 +1,6 @@
 import { TurnSnapshot } from "@timeflies/shared";
-import { BattleTurnEndAction, BattleTurnStartAction } from "../../../phaser/battleReducers/BattleReducerManager";
 import { serviceDispatch } from "../../../services/serviceDispatch";
+import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { Character } from "../entities/Character";
 
 export type TurnState = 'idle' | 'running' | 'ended';
@@ -18,16 +18,19 @@ export interface Turn {
 }
 
 export const Turn = (id: number, startTime: number, character: Character, onTurnEnd: () => void): Turn => {
-    
+
     const { dispatchStart, dispatchEnd } = serviceDispatch({
-        dispatchStart: (): BattleTurnStartAction => ({
-            type: 'battle/turn/start',
-            character,
-            startTime
+        dispatchStart: (): BStateTurnStartAction => ({
+            type: 'battle/state/event',
+            eventType: 'TURN-START',
+            payload: {
+                characterId: character.id
+            }
         }),
-        dispatchEnd: (): BattleTurnEndAction => ({
-            type: 'battle/turn/end',
-            character
+        dispatchEnd: (): BStateTurnEndAction => ({
+            type: 'battle/state/event',
+            eventType: 'TURN-END',
+            payload: {}
         })
     });
 

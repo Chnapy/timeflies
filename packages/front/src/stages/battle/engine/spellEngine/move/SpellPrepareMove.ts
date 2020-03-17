@@ -1,9 +1,10 @@
 import { Position } from '@timeflies/shared'
 import { serviceDispatch } from '../../../../../services/serviceDispatch'
+import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
 import { Spell } from '../../../entities/Spell'
 import { SpellGraphicMove } from '../../../graphics/spellGraphics/move/SpellGraphicMove'
 import { MapManager } from '../../../map/MapManager'
-import { BattleSpellLaunchAction, SpellAction } from '../../../spellAction/SpellActionManager'
+import { SpellAction } from '../../../spellAction/SpellActionManager'
 import { SpellPrepareSubEngineCreator } from '../../SpellPrepareEngine'
 
 interface Dependencies {
@@ -29,9 +30,12 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
     let previousTile: { x: number; y: number; } | null = null;
 
     const { dispatchSpellLaunch } = serviceDispatch({
-        dispatchSpellLaunch: (spellActions: SpellAction[]): BattleSpellLaunchAction => ({
-            type: 'battle/spell/launch',
-            spellActions
+        dispatchSpellLaunch: (spellActions: SpellAction[]): BStateSpellLaunchAction => ({
+            type: 'battle/state/event',
+            eventType: 'SPELL-LAUNCH',
+            payload: {
+                spellActions
+            }
         })
     });
 

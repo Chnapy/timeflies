@@ -1,7 +1,7 @@
 import { assertIsDefined, assertThenGet, Position, SpellType } from "@timeflies/shared";
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
-import { BStateResetEvent, BStateSpellPrepareEvent, BStateTurnStartEvent } from '../battleState/BattleStateSchema';
+import { BStateResetAction, BStateSpellPrepareAction, BStateTurnStartAction, BStateSpellLaunchAction } from '../battleState/BattleStateSchema';
 import { Character } from '../entities/Character';
 import { Spell } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
@@ -18,9 +18,10 @@ export interface SpellPrepareSubEngineCreator {
 }
 
 type Event =
-    | BStateSpellPrepareEvent
-    | BStateResetEvent
-    | BStateTurnStartEvent;
+    | BStateSpellPrepareAction
+    | BStateSpellLaunchAction
+    | BStateResetAction
+    | BStateTurnStartAction;
 
 const SpellPrepareMap: Record<SpellType, SpellPrepareSubEngineCreator> = {
     move: SpellPrepareMove,
@@ -34,31 +35,45 @@ const extractDataFromEvent = (event: Event): { character: Character; spell: Spel
     const { globalTurn } = serviceBattleData('cycle');
     const { characters } = serviceBattleData('future');
 
-    let character: Character, spell: Spell;
-    switch (event.type) {
+    switch (event.eventType) {
         case 'TURN-START':
         case 'RESET':
 
-            character = assertThenGet(
+            const character1 = assertThenGet(
                 characters.find(c => c.id === event.payload.characterId),
                 assertIsDefined
             );
 
-            spell = character.defaultSpell;
+            const spell1 = character1.defaultSpell;
 
-            break;
+            return {
+                character: character1,
+                spell: spell1
+            };
         case 'SPELL-PREPARE':
 
-            character = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const character2 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
 
-            spell = assertThenGet(
-                character.spells.find(s => s.id === event.payload.spellId),
+            const spell2 = assertThenGet(
+                character2.spells.find(s => s.staticData.type === event.payload.spellType),
                 assertIsDefined
             );
 
-            break;
+            return {
+                character: character2,
+                spell: spell2
+            };
+        case 'SPELL-LAUNCH':
+
+            const character3 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+
+            const spell3 = character3.defaultSpell;
+
+            return {
+                character: character3,
+                spell: spell3
+            };
     }
-    return { character, spell };
 };
 
 export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]> = (

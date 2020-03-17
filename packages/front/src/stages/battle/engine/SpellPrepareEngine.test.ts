@@ -64,6 +64,7 @@ describe('# SpellPrepareEngine', () => {
                     state: 'running',
                     synchronize() { }
                 },
+                start() {},
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
@@ -95,9 +96,10 @@ describe('# SpellPrepareEngine', () => {
         const engine = SpellPrepareEngine(
             {
                 event: {
-                    type: 'SPELL-PREPARE',
+                    type: 'battle/state/event',
+                    eventType: 'SPELL-PREPARE',
                     payload: {
-                        spellId: spell.id
+                        spellType: spell.staticData.type
                     }
                 },
                 deps: {

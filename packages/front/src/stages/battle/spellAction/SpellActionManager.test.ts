@@ -1,10 +1,11 @@
 import { StoreTest } from '../../../StoreTest';
-import { SpellActionManager, BattleSpellLaunchAction } from './SpellActionManager';
-import { BattleCommitAction } from '../snapshot/SnapshotManager';
-import { SendMessageAction } from '../../../socket/WSClient';
 import { TimerTester } from '@timeflies/shared';
-import { Spell } from '../entities/Spell';
 import { serviceNetwork } from '../../../services/serviceNetwork';
+import { SendMessageAction } from '../../../socket/WSClient';
+import { BStateSpellLaunchAction } from '../battleState/BattleStateSchema';
+import { Spell } from '../entities/Spell';
+import { BattleCommitAction } from '../snapshot/SnapshotManager';
+import { SpellActionManager } from './SpellActionManager';
 
 describe('# SpellActionManager', () => {
 
@@ -20,7 +21,7 @@ describe('# SpellActionManager', () => {
         timerTester.afterTest();
     });
 
-    it('should catch spell action, then commit & send',async () => {
+    it('should catch spell action, then commit & send', async () => {
 
         const startTime = timerTester.now;
 
@@ -32,25 +33,28 @@ describe('# SpellActionManager', () => {
 
         const beforeCommit = jest.fn();
 
-        StoreTest.dispatch<BattleSpellLaunchAction>({
-            type: 'battle/spell/launch',
-            spellActions: [
-                {
-                    spell: {
-                        id: 's1',
-                        staticData: {
+        StoreTest.dispatch<BStateSpellLaunchAction>({
+            type: 'battle/state/event',
+            eventType: 'SPELL-LAUNCH',
+            payload: {
+                spellActions: [
+                    {
+                        spell: {
                             id: 's1',
-                        },
-                        feature: {
-                            duration: 200
-                        }
-                    } as Spell,
-                    position: { x: -1, y: -1 },
-                    beforeCommit
-                }
-            ]
+                            staticData: {
+                                id: 's1',
+                            },
+                            feature: {
+                                duration: 200
+                            }
+                        } as Spell,
+                        position: { x: -1, y: -1 },
+                        beforeCommit
+                    }
+                ]
+            }
         });
-        
+
         await serviceNetwork({});
 
         expect(beforeCommit).toHaveBeenCalledTimes(1);

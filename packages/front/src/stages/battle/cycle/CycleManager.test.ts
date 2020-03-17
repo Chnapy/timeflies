@@ -17,7 +17,7 @@ describe('# CycleManager', () => {
             data: {
                 state: 'battle',
                 battleData: {
-                    future: {
+                    current: {
                         characters
                     },
                     cycle: {}
@@ -60,6 +60,7 @@ describe('# CycleManager', () => {
                     state: 'running',
                     synchronize() { }
                 },
+                start() {},
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
@@ -118,6 +119,7 @@ describe('# CycleManager', () => {
                     state: 'running',
                     synchronize() { }
                 },
+                start() {},
                 notifyDeaths() { },
                 synchronize,
                 synchronizeTurn() { },
@@ -193,6 +195,7 @@ describe('# CycleManager', () => {
                     state: 'running',
                     synchronize() { }
                 },
+                start() {},
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn,
@@ -269,6 +272,7 @@ describe('# CycleManager', () => {
                     state: 'running',
                     synchronize() { }
                 },
+                start() {},
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
@@ -348,6 +352,7 @@ describe('# CycleManager', () => {
                     state: currentTurnState,
                     synchronize() { }
                 },
+                start() {},
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },

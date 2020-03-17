@@ -1,17 +1,15 @@
-import { SpellType } from '@timeflies/shared'
 import { IGameAction } from '../../action/GameAction';
+import { BattleData } from "../../BattleData";
 import { Controller } from '../../Controller';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { ReducerManager } from '../../ReducerManager';
+import { BattleScene, BattleSceneData } from '../../stages/battle/BattleScene';
 import { CameraManager } from '../../stages/battle/camera/CameraManager';
-import { CharAction, CycleManager } from '../../stages/battle/cycle/CycleManager';
+import { CycleManager } from '../../stages/battle/cycle/CycleManager';
 import { Character } from '../../stages/battle/entities/Character';
 import { MapManager } from '../map/MapManager';
 import { BattleRoomManager } from '../room/BattleRoomManager';
-import { BattleScene, BattleSceneData } from '../../stages/battle/BattleScene';
-import { BattleData } from "../../BattleData";
 import { SpellEngine } from '../spellEngine/SpellEngine';
-import { LaunchState } from '../spellEngine/move/SpellLaunchMove';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     battleSceneData: BattleSceneData;
@@ -20,21 +18,21 @@ export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
 export interface BattleStartAction extends IGameAction<'battle/start'> {
 }
 
-export interface BattleTurnStartAction extends IGameAction<'battle/turn/start'> {
-    character: Character;
-    startTime: number;
-}
+// export interface BattleTurnStartAction extends IGameAction<'battle/turn/start'> {
+//     character: Character;
+//     startTime: number;
+// }
 
-export interface BattleTurnEndAction extends IGameAction<'battle/turn/end'> {
-    character: Character;
-}
+// export interface BattleTurnEndAction extends IGameAction<'battle/turn/end'> {
+//     character: Character;
+// }
 
-export interface BattleWatchAction extends IGameAction<'battle/watch'> {
-}
+// export interface BattleWatchAction extends IGameAction<'battle/watch'> {
+// }
 
-export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prepare'> {
-    spellType: SpellType;
-}
+// export interface BattleSpellPrepareAction extends IGameAction<'battle/spell/prepare'> {
+//     spellType: SpellType;
+// }
 
 // export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
 //     charAction: CharAction<'running'>;
@@ -54,12 +52,12 @@ export interface BattleRollbackAction extends IGameAction<'battle/rollback'> {
 export type BattleSceneAction =
     | BattleLaunchAction
     | BattleStartAction
-    | BattleTurnStartAction
-    | BattleTurnEndAction
-    | BattleWatchAction
-    | BattleSpellPrepareAction
+    // | BattleTurnStartAction
+    // | BattleTurnEndAction
+    // | BattleWatchAction
+    // | BattleSpellPrepareAction
     // | BattleSpellLaunchAction
-    | BattleRollbackAction;
+    // | BattleRollbackAction;
 
 export class BattleReducerManager extends ReducerManager<BattleScene> {
 
