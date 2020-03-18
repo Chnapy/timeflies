@@ -1,7 +1,9 @@
-import { TurnSnapshot } from "@timeflies/shared";
+import { TurnSnapshot, switchUtil } from "@timeflies/shared";
 import { serviceDispatch } from "../../../services/serviceDispatch";
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { Character } from "../entities/Character";
+import { BattleDataMap } from '../../../BattleData';
+import { serviceBattleData } from '../../../services/serviceBattleData';
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
@@ -15,6 +17,7 @@ export interface Turn {
 
     synchronize(snapshot: TurnSnapshot): void;
     refreshTimedActions(): void;
+    getRemainingTime(period: keyof Omit<BattleDataMap, 'cycle'>): number;
 }
 
 export const Turn = (id: number, startTime: number, character: Character, onTurnEnd: () => void): Turn => {
@@ -66,7 +69,29 @@ export const Turn = (id: number, startTime: number, character: Character, onTurn
 
         synchronize,
 
-        refreshTimedActions
+        refreshTimedActions,
+
+        getRemainingTime(period) {
+            return switchUtil(period, {
+                current: (): number => Math.max(this_.endTime - Date.now(), 0),
+
+                future: (): number => {
+                    const { spellActionSnapshotList } = serviceBattleData('future');
+
+                    const lastSnapshot = spellActionSnapshotList[spellActionSnapshotList.length - 1];
+
+                    const currentRemainingTime = this_.getRemainingTime('current');
+
+                    if(!lastSnapshot) {
+                        return currentRemainingTime;
+                    }
+
+                    const futureRemainingTime = this_.endTime - lastSnapshot.startTime - lastSnapshot.duration;
+
+                    return Math.min(futureRemainingTime, currentRemainingTime);
+                }
+            })();
+        }
     };
 
     const start = (): void => {

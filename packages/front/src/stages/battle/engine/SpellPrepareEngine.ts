@@ -1,7 +1,7 @@
 import { assertIsDefined, assertThenGet, Position, SpellType } from "@timeflies/shared";
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
-import { BStateResetAction, BStateSpellPrepareAction, BStateTurnStartAction, BStateSpellLaunchAction } from '../battleState/BattleStateSchema';
+import { BStateResetAction, BStateSpellLaunchAction, BStateSpellPrepareAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { Character } from '../entities/Character';
 import { Spell } from '../entities/Spell';
 import { MapManager } from '../map/MapManager';
@@ -85,17 +85,31 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
         }
     },
 
-    spellPrepareMap = SpellPrepareMap
+    spellPrepareMap: Record<SpellType, SpellPrepareSubEngineCreator> = SpellPrepareMap
 ) => {
-    const { character, spell } = extractDataFromEvent(event);
+    const { spell } = extractDataFromEvent(event);
+
+    const { globalTurn } = serviceBattleData('cycle');
+
+    assertIsDefined(globalTurn);
 
     const engine = spellPrepareMap[ spell.staticData.type ]!(spell, mapManager);
+
+    const ifCanSpellBeUsed = <
+        F extends (...args: P) => void,
+        P extends unknown[]
+    >(fct: F) => (...args: P) => {
+        const remainingTime = globalTurn.currentTurn.getRemainingTime('future');
+        if (remainingTime >= spell.feature.duration) {
+            fct(...args);
+        }
+    };
 
     const { dispatchBind } = serviceDispatch({
         dispatchBind: (): SpellEngineBindAction => ({
             type: 'battle/spell-engine/bind',
-            onTileHover: engine.onTileHover,
-            onTileClick: engine.onTileClick,
+            onTileHover: ifCanSpellBeUsed(engine.onTileHover),
+            onTileClick: ifCanSpellBeUsed(engine.onTileClick),
         })
     });
 

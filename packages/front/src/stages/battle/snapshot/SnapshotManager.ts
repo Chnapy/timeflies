@@ -1,4 +1,4 @@
-import { assertIsDefined, assertThenGet, BattleSnapshot, generateObjectHash } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, BattleSnapshot, generateObjectHash, ConfirmSAction } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
@@ -11,28 +11,48 @@ export interface SnapshotManager {
     getLastHash(): string;
 }
 
+export const assertHashIsInSnapshotList = (
+    hash: string,
+    snapshotList: { battleHash: string }[]
+): void | never => {
+    if (!snapshotList.some(snap => snap.battleHash === hash)) {
+        throw new Error(`Hash <${hash}> not found in snapshot list.
+        There is an inconsistence front<->back.`);
+    }
+};
+
 export const SnapshotManager = (): SnapshotManager => {
 
     // TODO add time
-    const snapshots: BattleSnapshot[] = [];
+    const snapshotList: BattleSnapshot[] = [];
 
     const commit = () => {
         const { launchTime } = serviceBattleData('cycle');
         const { teams } = serviceBattleData('future');
 
-        const partialSnap: Omit<BattleSnapshot, 'hash'> = {
+        const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
             launchTime,
             teamsSnapshots: teams.map(t => t.getSnapshot())
         };
 
-        const hash = generateObjectHash(partialSnap);
+        const battleHash = generateObjectHash(partialSnap);
 
-        const snap: BattleSnapshot = { hash, ...partialSnap };
+        const snap: BattleSnapshot = { battleHash, ...partialSnap };
 
-        snapshots.push(snap);
+        snapshotList.push(snap);
     };
 
-    const { onAction } = serviceEvent();
+    const rollback = (correctHash: string) => {
+
+        assertHashIsInSnapshotList(correctHash, snapshotList);
+
+        while (snapshotList[ snapshotList.length - 1 ].battleHash !== correctHash) {
+            snapshotList.pop();
+        }
+
+    };
+
+    const { onAction, onMessageAction } = serviceEvent();
 
     onAction<BattleCommitAction>('battle/commit', commit);
     onAction<BStateAction>('battle/state/event', ({ eventType }) => {
@@ -41,12 +61,18 @@ export const SnapshotManager = (): SnapshotManager => {
         }
     });
 
+    onMessageAction<ConfirmSAction>('confirm', ({ isOk, lastCorrectHash }) => {
+        if (!isOk) {
+            rollback(lastCorrectHash);
+        }
+    });
+
     return {
         getLastHash() {
             return assertThenGet(
-                snapshots[ snapshots.length - 1 ],
+                snapshotList[ snapshotList.length - 1 ],
                 assertIsDefined
-            ).hash;
+            ).battleHash;
         }
     };
 };

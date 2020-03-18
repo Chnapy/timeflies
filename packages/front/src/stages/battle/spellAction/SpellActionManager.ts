@@ -1,10 +1,11 @@
-import { Position, SpellActionSnapshot } from '@timeflies/shared';
+import { ConfirmSAction, Position, SpellActionSnapshot } from '@timeflies/shared';
+import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-import { Spell } from '../entities/Spell';
-import { BattleCommitAction, SnapshotManager } from '../snapshot/SnapshotManager';
 import { BStateAction } from '../battleState/BattleStateSchema';
+import { Spell } from '../entities/Spell';
+import { BattleCommitAction, SnapshotManager, assertHashIsInSnapshotList } from '../snapshot/SnapshotManager';
 
 export interface SpellAction {
     spell: Spell;
@@ -17,9 +18,9 @@ export interface SpellActionManager {
 
 export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActionManager => {
 
-    const snapshots: SpellActionSnapshot[] = [];
+    const { spellActionSnapshotList } = serviceBattleData('future');
 
-    const { onAction } = serviceEvent();
+    const { onAction, onMessageAction } = serviceEvent();
     const { dispatchCommit } = serviceDispatch({
         dispatchCommit: (): BattleCommitAction => ({
             type: 'battle/commit'
@@ -48,6 +49,7 @@ export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActio
 
         const snap: SpellActionSnapshot = {
             startTime,
+            duration: spell.feature.duration,
             spellId: spell.id,
             position,
             battleHash
@@ -55,7 +57,18 @@ export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActio
 
         sendSpellAction(snap);
 
-        snapshots.push(snap);
+        spellActionSnapshotList.push(snap);
+    };
+
+    const onRollback = (correctHash: string): void => {
+
+        assertHashIsInSnapshotList(correctHash, spellActionSnapshotList);
+
+        while (
+            spellActionSnapshotList[ spellActionSnapshotList.length - 1 ].battleHash !== correctHash
+        ) {
+            spellActionSnapshotList.pop();
+        }
     };
 
     onAction<BStateAction>('battle/state/event', action => {
@@ -77,6 +90,12 @@ export const SpellActionManager = (snapshotManager: SnapshotManager): SpellActio
 
         })
 
+    });
+
+    onMessageAction<ConfirmSAction>('confirm', ({ isOk, lastCorrectHash }) => {
+        if (!isOk) {
+            onRollback(lastCorrectHash);
+        }
     });
 
     return {};

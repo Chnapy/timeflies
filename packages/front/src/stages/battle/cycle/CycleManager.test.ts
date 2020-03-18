@@ -1,7 +1,6 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester } from "@timeflies/shared";
 import { ReceiveMessageAction } from "../../../socket/WSClient";
 import { StoreTest } from "../../../StoreTest";
-import { UIState } from '../../../ui/UIState';
 import { seedCharacter } from "../../../__seeds__/seedCharacter";
 import { CycleManager } from "./CycleManager";
 import { GlobalTurn } from "./GlobalTurn";
@@ -58,7 +57,8 @@ describe('# CycleManager', () => {
                     endTime: timerTester.now + 1000,
                     refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { }
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
                 },
                 start() {},
                 notifyDeaths() { },
@@ -117,7 +117,8 @@ describe('# CycleManager', () => {
                     endTime: timerTester.now + 1000,
                     refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { }
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
                 },
                 start() {},
                 notifyDeaths() { },
@@ -193,7 +194,8 @@ describe('# CycleManager', () => {
                     endTime: timerTester.now + 1000,
                     refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { }
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
                 },
                 start() {},
                 notifyDeaths() { },
@@ -270,7 +272,8 @@ describe('# CycleManager', () => {
                     endTime: timerTester.now + 1000,
                     refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { }
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
                 },
                 start() {},
                 notifyDeaths() { },
@@ -350,7 +353,8 @@ describe('# CycleManager', () => {
                     endTime: timerTester.now + 1000,
                     refreshTimedActions() { },
                     state: currentTurnState,
-                    synchronize() { }
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
                 },
                 start() {},
                 notifyDeaths() { },

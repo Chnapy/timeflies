@@ -1,4 +1,4 @@
-import { TimerTester } from '@timeflies/shared';
+import { TimerTester, SpellActionSnapshot } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter } from "../../../__seeds__/seedCharacter";
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
@@ -127,4 +127,112 @@ describe('#BTurn', () => {
 
     });
 
+    it('should give correct present remaining time', () => {
+
+        const now = timerTester.now;
+
+        const turn = Turn(1, now, character, () => { });
+        turn.refreshTimedActions();
+
+        timerTester.advanceBy(50);
+
+        expect(turn.getRemainingTime('current')).toBe(character.features.actionTime - 50);
+    });
+
+    it('should give correct future remaining time with NO spell action snapshots', () => {
+
+        const now = timerTester.now;
+
+        StoreTest.initStore({
+            data: {
+                state: 'battle',
+                battleData: {
+                    future: {
+                        spellActionSnapshotList: []
+                    }
+                } as any
+            }
+        })
+
+        const turn = Turn(1, now, character, () => { });
+        turn.refreshTimedActions();
+
+        timerTester.advanceBy(50);
+
+        expect(turn.getRemainingTime('future')).toBe(
+            character.features.actionTime - 50
+        );
+    });
+
+    it('should give correct future remaining time with spell action snapshots', () => {
+
+        const now = timerTester.now;
+
+        const spellActionSnapshotList: SpellActionSnapshot[] = [
+            {
+                startTime: now + 50,
+                duration: 300
+            } as any,
+            {
+                startTime: now + 500,
+                duration: 400
+            } as any,
+            {
+                startTime: now + 1000,
+                duration: 100
+            } as any,
+        ];
+
+        StoreTest.initStore({
+            data: {
+                state: 'battle',
+                battleData: {
+                    future: {
+                        spellActionSnapshotList
+                    }
+                } as any
+            }
+        })
+
+        const turn = Turn(1, now, character, () => { });
+        turn.refreshTimedActions();
+
+        timerTester.advanceBy(50);
+
+        expect(turn.getRemainingTime('future')).toBe(
+            character.features.actionTime - 1000 - 100
+        );
+    });
+
+    it('should give correct future remaining time with OLD spell action snapshots', () => {
+
+        const now = timerTester.now;
+
+        const spellActionSnapshotList: SpellActionSnapshot[] = [
+            {
+                startTime: now + 50,
+                duration: 300
+            } as any,
+        ];
+
+        StoreTest.initStore({
+            data: {
+                state: 'battle',
+                battleData: {
+                    future: {
+                        spellActionSnapshotList
+                    }
+                } as any
+            }
+        })
+
+        const turn = Turn(1, now, character, () => { });
+        turn.refreshTimedActions();
+
+        timerTester.advanceBy(1000);
+
+        expect(turn.getRemainingTime('future')).toBe(
+            character.features.actionTime - 1000
+        );
+    });
 });

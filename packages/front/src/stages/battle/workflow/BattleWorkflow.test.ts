@@ -1,21 +1,43 @@
-import { TimerTester } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
+import { Position, TimerTester } from '@timeflies/shared';
+import { serviceNetwork } from '../../../services/serviceNetwork';
+import { SendMessageAction } from '../../../socket/WSClient';
+import { UIStateBattle } from '../../../ui/UIState';
 import { seedCharacter } from '../../../__seeds__/seedCharacter';
-import { BState, BStateAction } from '../battleState/BattleStateSchema';
+import { BState } from '../battleState/BattleStateSchema';
 import { BStateMachine } from '../battleState/BStateMachine';
 import { CycleManager } from '../cycle/CycleManager';
+import { SpellEngineBindAction } from '../engine/Engine';
+import { MapManager } from '../map/MapManager';
 import { seedMapManager } from '../map/MapManager.seed';
 import { SnapshotManager } from '../snapshot/SnapshotManager';
-import { serviceNetwork } from '../../../services/serviceNetwork';
 import { SpellActionManager } from '../spellAction/SpellActionManager';
-import { SendMessageAction } from '../../../socket/WSClient';
 
 describe('Battle workflow', () => {
 
     const timerTester = new TimerTester();
 
-    const init = () => {
-        const character = seedCharacter();
+    const init = (mapManager?: MapManager) => {
+
+        let pathPromise;
+
+        mapManager = mapManager || {
+            ...seedMapManager(),
+            worldToTileIfExist() { return {x: 5, y: 5}; },
+            calculatePath() {
+                pathPromise = new Promise<Position[]>(r => r([
+                    { x: -1, y: -1 },
+                    {x: 5, y: 5},
+                ]));
+                return {
+                    cancel: () => true,
+                    promise: pathPromise
+                };
+            }
+        };
+
+        const characterCurrent = seedCharacter();
+        const characterFuture = seedCharacter();
 
         StoreTest.initStore({
             data: {
@@ -25,11 +47,12 @@ describe('Battle workflow', () => {
                         launchTime: timerTester.now
                     },
                     current: {
-                        characters: [ character ]
+                        characters: [ characterCurrent ]
                     },
                     future: {
-                        characters: [ character ],
-                        teams: []
+                        characters: [ characterFuture ],
+                        teams: [],
+                        spellActionSnapshotList: []
                     }
                 } as any
             }
@@ -41,15 +64,15 @@ describe('Battle workflow', () => {
 
         const spellActionManager = SpellActionManager(snapshotManager);
 
-        const bState = BStateMachine(seedMapManager());
+        const bState = BStateMachine(mapManager);
 
         cycle.start({
             id: 1,
-            order: [ character.id ],
+            order: [ characterCurrent.id ],
             startTime: timerTester.now,
             currentTurn: {
                 id: 1,
-                characterId: character.id,
+                characterId: characterCurrent.id,
                 startTime: timerTester.now
             }
         });
@@ -62,13 +85,20 @@ describe('Battle workflow', () => {
             }
         })();
 
+        const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
+            a.type === 'battle/spell-engine/bind'
+        )!;
+
         return {
-            character,
+            characterCurrent,
+            characterFuture,
             cycle,
             snapshotManager,
             spellActionManager,
             bState,
-            battleHash
+            battleHash,
+            bindAction,
+            pathPromise
         };
     };
 
@@ -91,39 +121,35 @@ describe('Battle workflow', () => {
 
     it('should change battle state to "watch" on turn end', () => {
 
-        const { bState, character } = init();
+        const { bState, characterCurrent } = init();
 
         expect(bState.state).toBe<BState>('spellPrepare');
 
-        timerTester.advanceBy(character.features.actionTime);
+        timerTester.advanceBy(characterCurrent.features.actionTime);
 
         expect(bState.state).toBe<BState>('watch');
     });
 
     it('should commit on turn end', () => {
 
-        const { snapshotManager, character, battleHash } = init();
+        const { snapshotManager, characterCurrent, battleHash } = init();
 
-        timerTester.advanceBy(character.features.actionTime);
+        timerTester.advanceBy(characterCurrent.features.actionTime);
 
         expect(snapshotManager.getLastHash()).not.toBe(battleHash);
     });
 
     it('should commit after spell action', async () => {
 
-        const { snapshotManager, character, battleHash } = init();
+        const { snapshotManager, bindAction, pathPromise, battleHash } = init();
 
-        StoreTest.dispatch<BStateAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-LAUNCH',
-            payload: {
-                spellActions: [ {
-                    spell: character.defaultSpell,
-                    position: { x: -1, y: -1 },
-                    beforeCommit: jest.fn()
-                } ]
-            }
-        });
+        const { onTileHover, onTileClick } = bindAction;
+
+        onTileHover({ x: -1, y: -1 });
+
+        await pathPromise;
+
+        onTileClick({ x: -1, y: -1 });
 
         await serviceNetwork({});
 
@@ -132,21 +158,17 @@ describe('Battle workflow', () => {
 
     it('should send message after spell action', async () => {
 
-        const { character } = init();
+        const { bindAction, pathPromise } = init();
+
+        const { onTileHover, onTileClick } = bindAction;
+
+        onTileHover({ x: -1, y: -1 });
+
+        await pathPromise;
 
         StoreTest.clearActions();
 
-        StoreTest.dispatch<BStateAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-LAUNCH',
-            payload: {
-                spellActions: [ {
-                    spell: character.defaultSpell,
-                    position: { x: -1, y: -1 },
-                    beforeCommit: jest.fn()
-                } ]
-            }
-        });
+        onTileClick({ x: -1, y: -1 });
 
         await serviceNetwork({});
 
@@ -161,5 +183,62 @@ describe('Battle workflow', () => {
                 })
             ])
         );
+    });
+
+    it('should change future battle data against current one after two spell actions', async () => {
+
+        let getPos: () => Position;
+
+        let pathPromise;
+
+        const { characterCurrent, bindAction } = init({
+            ...seedMapManager(),
+            worldToTileIfExist() { return getPos(); },
+            calculatePath() {
+                pathPromise = new Promise<Position[]>(r => r([
+                    { x: -1, y: -1 },
+                    getPos(),
+                ]));
+                return {
+                    cancel: () => true,
+                    promise: pathPromise
+                };
+            }
+        });
+
+        const firstPos = characterCurrent.position;
+
+        const { onTileHover, onTileClick } = bindAction;
+
+        // first spell action
+
+        getPos = () => ({ x: 5, y: 5 });
+
+        onTileHover({ x: -1, y: -1 });
+
+        await pathPromise;
+
+        onTileClick({ x: -1, y: -1 });
+
+        await serviceNetwork({});
+
+        const { battleData } = StoreTest.getStore().getState().data as UIStateBattle;
+
+        expect(battleData.future.characters[ 0 ].position).toEqual({ x: 5, y: 5 });
+
+        // second spell action
+
+        getPos = () => ({ x: 6, y: 5 });
+
+        onTileHover({ x: -1, y: -1 });
+
+        await pathPromise;
+
+        onTileClick({ x: -1, y: -1 });
+
+        await serviceNetwork({});
+
+        expect(battleData.future.characters[ 0 ].position).toEqual({ x: 6, y: 5 });
+        expect(battleData.current.characters[ 0 ].position).toEqual(firstPos);
     });
 });

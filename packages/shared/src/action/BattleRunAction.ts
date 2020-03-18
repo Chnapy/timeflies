@@ -19,6 +19,7 @@ export interface BRunTurnStartSAction extends TAction<'battle-run/turn-start'> {
 
 export interface ConfirmSAction extends TAction<'confirm'> {
     isOk: boolean;
+    lastCorrectHash: string;
 }
 
 export interface CharAction {
@@ -28,6 +29,7 @@ export interface CharAction {
 
 export interface SpellActionSnapshot {
     startTime: number;
+    duration: number;
     spellId: string;
     position: Position;
     battleHash: string;

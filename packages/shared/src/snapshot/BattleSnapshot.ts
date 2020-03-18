@@ -2,7 +2,7 @@ import { TeamSnapshot } from "./TeamSnapshot";
 import objectHash from 'object-hash';
 
 export interface BattleSnapshot {
-    hash: string;
+    battleHash: string;
     launchTime: number;
     teamsSnapshots: TeamSnapshot[];
 }
