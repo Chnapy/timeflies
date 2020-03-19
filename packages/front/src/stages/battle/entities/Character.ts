@@ -2,6 +2,7 @@ import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, c
 import { Player } from './Player';
 import { Spell } from './Spell';
 import { WithSnapshot } from './WithSnapshot';
+import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
 
 export type CharacterState = 'idle' | 'move';
 
@@ -24,7 +25,7 @@ export interface Character extends WithSnapshot<CharacterSnapshot> {
 
     // readonly characterGraphic: CharacterGraphic;
 
-    set(o: { [K in keyof Pick<Character, 'state' | 'position' | 'orientation'>]?: Character[K] }): void;
+    set(o: { [ K in keyof Pick<Character, 'state' | 'position' | 'orientation'> ]?: Character[ K ] }): void;
 
     hasSpell(spellType: SpellType): boolean;
 }
@@ -73,6 +74,7 @@ export const Character = ({
 
         getSnapshot() {
             return {
+                id: staticData.id,
                 staticData,
                 features,
                 position,
@@ -87,14 +89,10 @@ export const Character = ({
 
             mergeAfterClean(features, snapshot.features);
 
+            assertEntitySnapshotConsistency(spells, snapshot.spellsSnapshots);
+
             snapshot.spellsSnapshots.forEach(sSnap => {
-
-                const spell = assertThenGet(
-                    spells.find(compare(sSnap, getId)),
-                    assertIsDefined
-                );
-
-                spell.updateFromSnapshot(sSnap);
+                spells.find(s => s.id === sSnap.id)!.updateFromSnapshot(sSnap);
             });
         },
 

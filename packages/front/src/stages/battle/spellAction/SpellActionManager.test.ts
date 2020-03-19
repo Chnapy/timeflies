@@ -24,7 +24,7 @@ describe('# SpellActionManager', () => {
                     future: {
                         spellActionSnapshotList
                     }
-                } as any
+                } as unknown as any
             }
         });
 

@@ -1,10 +1,16 @@
 import { CharacterFeatures, CharacterSnapshot, Orientation, Position, SpellSnapshot, StaticCharacter } from "@timeflies/shared";
-import { Character } from "./Character";
+import { StoreTest } from '../../../StoreTest';
 import { seedCharacter, seedCharacterData } from "../../../__seeds__/seedCharacter";
 
 describe('# Character', () => {
 
-    let character: Character;
+    beforeEach(() => {
+        StoreTest.beforeTest();
+    });
+
+    afterEach(() => {
+        StoreTest.afterTest();
+    });
 
     it('should return correct snapshot', () => {
 
@@ -40,6 +46,7 @@ describe('# Character', () => {
         const position: Position = { x: 4, y: 3 };
 
         const spellsSnapshots: SpellSnapshot[] = [{
+            id: '2',
             staticData: {
                 id: '2',
                 name: 'toto',
@@ -58,7 +65,7 @@ describe('# Character', () => {
             }
         }];
 
-        character = seedCharacter({
+        const character = seedCharacter({
             staticData,
             features,
             orientation,
@@ -68,6 +75,7 @@ describe('# Character', () => {
 
         const snapshot = character.getSnapshot();
         expect(snapshot).toMatchObject<Omit<CharacterSnapshot, 'spellsSnapshots'>>({
+            id: staticData.id,
             staticData,
             features,
             orientation,
@@ -79,7 +87,7 @@ describe('# Character', () => {
 
     it('should update from snapshot correctly', () => {
 
-        character = seedCharacter();
+        const character = seedCharacter();
 
         const firstSnapshot = character.getSnapshot();
 
@@ -97,6 +105,7 @@ describe('# Character', () => {
         });
 
         character.updateFromSnapshot({
+            id: character.id,
             ...newData
         });
 

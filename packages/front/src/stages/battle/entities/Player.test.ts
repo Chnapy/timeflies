@@ -92,6 +92,7 @@ describe('# Player', () => {
             name: 'p-1',
             state: 'battle-ready',
             charactersSnapshots: [ {
+                id: 'c-1',
                 staticData: {
                     id: 'c-1'
                 }

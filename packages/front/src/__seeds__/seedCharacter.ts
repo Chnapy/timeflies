@@ -4,6 +4,7 @@ import { Player } from '../stages/battle/entities/Player';
 // jest.mock('../phaser/entities/CharacterGraphic');
 
 interface CharacterData {
+    id: string;
     staticData: StaticCharacter;
     features: CharacterFeatures;
     orientation: Orientation;
@@ -55,6 +56,7 @@ export const seedCharacterData = (
     const position: Position = { x: 4, y: 3, ...(_position ?? {}) };
 
     const spellsSnapshots: SpellSnapshot[] = (_spellsSnapshots as any) ?? [{
+        id: '2',
         staticData: {
             id: '2',
             name: 'toto',
@@ -84,6 +86,7 @@ export const seedCharacterData = (
     };
 
     return {
+        id: staticData.id,
         staticData,
         features,
         orientation,

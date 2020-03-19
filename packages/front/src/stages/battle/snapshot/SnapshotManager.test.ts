@@ -63,16 +63,22 @@ describe('# SnapshotManager', () => {
 
     it('should rollback on action from given hash', () => {
 
+        const updateFromSnapshot = jest.fn();
+
+        let teamColor = 'red';
+
         const teams: Team[] = [
             {
+                id: 't1',
                 getSnapshot() {
                     return {
                         id: 't1',
-                        color: 'red',
+                        color: teamColor,
                         name: '',
                         playersSnapshots: []
                     }
-                }
+                },
+                updateFromSnapshot
             } as unknown as Team
         ];
 
@@ -100,17 +106,7 @@ describe('# SnapshotManager', () => {
 
         const firstHash = manager.getLastHash();
 
-        teams.push(
-            {
-                getSnapshot() {
-                    return {
-                        id: 't2',
-                        color: 'blue',
-                        name: '',
-                        playersSnapshots: []
-                    }
-                }
-            } as unknown as Team);
+        teamColor = 'blue';
 
         StoreTest.dispatch<BattleCommitAction>({ type: 'battle/commit' });
 
@@ -123,6 +119,8 @@ describe('# SnapshotManager', () => {
                 lastCorrectHash: firstHash
             }
         });
+
+        expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
 
         expect(manager.getLastHash()).toBe(firstHash);
     });

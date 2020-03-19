@@ -25,6 +25,7 @@ export const Spell = ({ staticData, features: _features }: SpellSnapshot, charac
 
         getSnapshot(): SpellSnapshot {
             return {
+                id: staticData.id,
                 staticData,
                 features: { ...features }
             };

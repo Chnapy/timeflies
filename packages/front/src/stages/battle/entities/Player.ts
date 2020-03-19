@@ -1,5 +1,6 @@
-import { PlayerSnapshot, PlayerState, assertThenGet, assertIsDefined } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, PlayerSnapshot, PlayerState } from '@timeflies/shared';
 import { serviceCurrentPlayer } from '../../../services/serviceCurrentPlayer';
+import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
 import { Character } from './Character';
 import { Team } from "./Team";
 import { WithSnapshot } from './WithSnapshot';
@@ -55,13 +56,11 @@ export const Player = (
 
         updateFromSnapshot(snapshot: PlayerSnapshot): void {
             state = snapshot.state;
-            snapshot.charactersSnapshots.forEach(cSnap => {
-                const character = assertThenGet(
-                    characters.find(c => c.id === cSnap.staticData.id),
-                    assertIsDefined
-                );
 
-                character.updateFromSnapshot(cSnap);
+            assertEntitySnapshotConsistency(characters, snapshot.charactersSnapshots);
+
+            snapshot.charactersSnapshots.forEach(cSnap => {
+                characters.find(c => c.id === cSnap.id)!.updateFromSnapshot(cSnap);
             });
         }
     };

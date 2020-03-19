@@ -8,12 +8,8 @@ export interface PlayerInfos {
 }
 
 export interface PlayerSnapshot {
-
     id: string;
-
     name: string;
-    
     state: PlayerState;
-
     charactersSnapshots: CharacterSnapshot[];
 }

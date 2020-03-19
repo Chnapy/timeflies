@@ -21,6 +21,7 @@ export interface StaticSpell {
 }
 
 export interface SpellSnapshot {
+    readonly id: string;
     readonly staticData: Readonly<StaticSpell>;
     readonly features: SpellFeatures;
 }

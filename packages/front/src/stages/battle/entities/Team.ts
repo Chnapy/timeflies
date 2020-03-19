@@ -1,6 +1,7 @@
 import { TeamSnapshot } from '@timeflies/shared';
 import { Player } from './Player';
 import { WithSnapshot } from './WithSnapshot';
+import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
 
 export class Team implements WithSnapshot<TeamSnapshot> {
 
@@ -13,7 +14,7 @@ export class Team implements WithSnapshot<TeamSnapshot> {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.players = playersSnapshots.map(snap => new Player(snap, this));
+        this.players = playersSnapshots.map(snap => Player(snap, this));
     }
 
     getSnapshot(): TeamSnapshot {
@@ -26,10 +27,11 @@ export class Team implements WithSnapshot<TeamSnapshot> {
     }
 
     updateFromSnapshot(snapshot: TeamSnapshot): void {
-        snapshot.playersSnapshots.forEach(pSnap => {
-            const player = this.players.find(p => p.id === pSnap.id);
 
-            player!.updateFromSnapshot(pSnap);
+        assertEntitySnapshotConsistency(this.players, snapshot.playersSnapshots);
+
+        snapshot.playersSnapshots.forEach(pSnap => {
+            this.players.find(p => p.id === pSnap.id)!.updateFromSnapshot(pSnap);
         });
     }
 }

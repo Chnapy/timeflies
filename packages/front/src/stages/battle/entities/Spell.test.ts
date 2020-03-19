@@ -6,6 +6,7 @@ describe('# Spell', () => {
     it('should return correct snapshot', () => {
 
         const snap: SpellSnapshot = {
+            id: 's1',
             staticData: {
                 id: 's1',
                 color: 'red',

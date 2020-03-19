@@ -40,6 +40,7 @@ describe('# SpellPrepareEngine', () => {
                 defaultSpellId: staticData.id
             },
             spellsSnapshots: [ {
+                id: staticData.id,
                 staticData,
                 features: {
                     area: 1,
@@ -147,6 +148,7 @@ describe('# SpellPrepareEngine', () => {
                 defaultSpellId: staticData.id
             },
             spellsSnapshots: [ {
+                id: staticData.id,
                 staticData,
                 features: {
                     area: 1,
