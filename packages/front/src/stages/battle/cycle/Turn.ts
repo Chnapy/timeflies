@@ -1,9 +1,9 @@
-import { TurnSnapshot, switchUtil } from "@timeflies/shared";
+import { switchUtil, TurnSnapshot } from "@timeflies/shared";
+import { BattleDataPeriod } from '../../../BattleData';
+import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from "../../../services/serviceDispatch";
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { Character } from "../entities/Character";
-import { BattleDataMap } from '../../../BattleData';
-import { serviceBattleData } from '../../../services/serviceBattleData';
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
@@ -17,7 +17,7 @@ export interface Turn {
 
     synchronize(snapshot: TurnSnapshot): void;
     refreshTimedActions(): void;
-    getRemainingTime(period: keyof Omit<BattleDataMap, 'cycle'>): number;
+    getRemainingTime(period: BattleDataPeriod): number;
 }
 
 export const Turn = (id: number, startTime: number, character: Character, onTurnEnd: () => void): Turn => {
@@ -78,11 +78,11 @@ export const Turn = (id: number, startTime: number, character: Character, onTurn
                 future: (): number => {
                     const { spellActionSnapshotList } = serviceBattleData('future');
 
-                    const lastSnapshot = spellActionSnapshotList[spellActionSnapshotList.length - 1];
+                    const lastSnapshot = spellActionSnapshotList[ spellActionSnapshotList.length - 1 ];
 
                     const currentRemainingTime = this_.getRemainingTime('current');
 
-                    if(!lastSnapshot) {
+                    if (!lastSnapshot) {
                         return currentRemainingTime;
                     }
 

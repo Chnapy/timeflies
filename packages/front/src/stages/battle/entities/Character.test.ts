@@ -12,6 +12,28 @@ describe('# Character', () => {
         StoreTest.afterTest();
     });
 
+    it('should be alive with life more than 0', () => {
+
+        const character = seedCharacter({
+            features: {
+                life: 1
+            }
+        });
+
+        expect(character.isAlive).toBe(true);
+    });
+
+    it('should not be alive with life to 0', () => {
+
+        const character = seedCharacter({
+            features: {
+                life: 0
+            }
+        });
+
+        expect(character.isAlive).toBe(false);
+    });
+
     it('should return correct snapshot', () => {
 
 

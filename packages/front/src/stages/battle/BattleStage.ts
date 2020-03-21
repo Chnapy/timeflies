@@ -29,7 +29,7 @@ export const BattleStage = (scene: BattleScene): BattleStage => {
 
             const snapshotManager = SnapshotManager();
 
-            const spellActionManager = SpellActionManager(snapshotManager);
+            const spellActionManager = SpellActionManager();
 
             const mapManager = MapManager(
                 () => MapGraphics(mapInfos, { scene })

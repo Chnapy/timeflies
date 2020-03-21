@@ -3,7 +3,7 @@ import { SpellPrepareEngine, SpellPrepareSubEngine } from './SpellPrepareEngine'
 import { seedCharacter } from '../../../__seeds__/seedCharacter';
 import { StaticSpell, TimerTester } from '@timeflies/shared';
 import { SpellEngineBindAction } from './Engine';
-import { BattleData, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
+import { BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { seedMapManager } from '../map/MapManager.seed';
 
 describe('# SpellPrepareEngine', () => {
@@ -73,7 +73,7 @@ describe('# SpellPrepareEngine', () => {
             }
         }
 
-        const future: Pick<BattleData, 'characters'> = {
+        const future: Pick<BattleDataFuture, 'characters'> = {
             characters: [ character ],
         };
 
@@ -181,7 +181,7 @@ describe('# SpellPrepareEngine', () => {
             }
         }
 
-        const future: Pick<BattleData, 'characters'> = {
+        const future: Pick<BattleDataFuture, 'characters'> = {
             characters: [ character ],
         };
 

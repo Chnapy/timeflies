@@ -4,6 +4,7 @@ import { MessageAction } from '../socket/WSClient';
 import { BStateAction } from '../stages/battle/battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../stages/battle/engine/Engine';
 import { BattleCommitAction } from '../stages/battle/snapshot/SnapshotManager';
+import { SpellActionTimerAction } from '../stages/battle/spellAction/SpellActionTimer';
 import { LoadAction } from '../stages/load/LoadScene';
 import { LoginSuccess } from '../ui/reducers/CurrentPlayerReducer';
 
@@ -21,4 +22,5 @@ export type GameAction =
     | LoginSuccess
     | SpellEngineBindAction
     | BStateAction
+    | SpellActionTimerAction
     | BattleCommitAction;

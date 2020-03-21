@@ -1,7 +1,6 @@
 import { MapGraphics } from '../graphics/MapGraphics';
-import { BattleData } from "../../../BattleData";
 import { Pathfinder } from './Pathfinder';
-import { Position, MapInfos } from '@timeflies/shared';
+import { Position } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 
 export interface MapManager extends

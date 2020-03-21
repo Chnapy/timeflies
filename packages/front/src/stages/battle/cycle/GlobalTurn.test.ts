@@ -10,7 +10,7 @@ describe('# GlobalTurn', () => {
 
     const getSnapshot = (startTime: number, order: string[]) => ({
         id: 1, startTime, order, currentTurn: {
-            id: 1, characterId: order[0], startTime
+            id: 1, characterId: order[ 0 ], startTime
         }
     });
 
@@ -29,13 +29,14 @@ describe('# GlobalTurn', () => {
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
             return {
                 id: 1,
-                character: characters[0],
+                character: characters[ 0 ],
                 startTime: timerTester.now,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 state: 'running',
-                synchronize() { }
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -79,7 +80,8 @@ describe('# GlobalTurn', () => {
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 state: 'running',
-                synchronize() { }
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -112,7 +114,7 @@ describe('# GlobalTurn', () => {
         onTurnEndFn();
 
         expect(globalTurn.currentTurn.id).toBe(firstTurnId + 1);
-        expect(globalTurn.currentTurn.character).toBe(characters[1]);
+        expect(globalTurn.currentTurn.character).toBe(characters[ 1 ]);
     });
 
     it('should load waiting turn when previous one ends', () => {
@@ -130,7 +132,8 @@ describe('# GlobalTurn', () => {
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 get state() { return turnState; },
-                synchronize() { }
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -161,14 +164,14 @@ describe('# GlobalTurn', () => {
         globalTurn.synchronizeTurn({
             id: 5,
             startTime: timerTester.now,
-            characterId: characters[1].id
+            characterId: characters[ 1 ].id
         });
 
         turnState = 'ended';
         onTurnEndFn();
 
         expect(globalTurn.currentTurn.id).toBe(5);
-        expect(globalTurn.currentTurn.character).toBe(characters[1]);
+        expect(globalTurn.currentTurn.character).toBe(characters[ 1 ]);
     });
 
     it('should run callback when last turn ends', () => {
@@ -185,7 +188,8 @@ describe('# GlobalTurn', () => {
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 state: 'running',
-                synchronize() { }
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -225,7 +229,8 @@ describe('# GlobalTurn', () => {
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 state: 'running',
-                synchronize() { }
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -258,7 +263,7 @@ describe('# GlobalTurn', () => {
             () => null,
             { turnCreator });
 
-        const secondChar = characters[1];
+        const secondChar = characters[ 1 ];
 
         (secondChar.features as CharacterFeatures).life = 0;
 
@@ -278,7 +283,8 @@ describe('# GlobalTurn', () => {
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 state: 'running',
-                synchronize() { }
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -306,7 +312,7 @@ describe('# GlobalTurn', () => {
             () => null,
             { turnCreator });
 
-        const firstChar = characters[0];
+        const firstChar = characters[ 0 ];
 
         (firstChar.features as CharacterFeatures).life = 0;
 
@@ -328,7 +334,8 @@ describe('# GlobalTurn', () => {
                 endTime: timerTester.now + 1000,
                 refreshTimedActions() { },
                 state: 'running',
-                synchronize
+                synchronize,
+                getRemainingTime(period) { return -1 }
             }
         };
 
@@ -354,7 +361,7 @@ describe('# GlobalTurn', () => {
             currentTurn: {
                 id: 1,
                 startTime: timerTester.now + 200,
-                characterId: order[0]
+                characterId: order[ 0 ]
             }
         });
 

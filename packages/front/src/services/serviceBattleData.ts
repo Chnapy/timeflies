@@ -1,5 +1,5 @@
-import { BattleData, BattleDataMap } from '../BattleData';
-import { UIState, UIStateBattle, UIStateData } from "../ui/UIState";
+import { BattleDataKey, BattleDataMap } from '../BattleData';
+import { UIStateBattle, UIStateData } from "../ui/UIState";
 import { serviceSelector } from './serviceSelector';
 
 function assertIsStateBattle(data: UIStateData): asserts data is UIStateBattle {
@@ -8,7 +8,7 @@ function assertIsStateBattle(data: UIStateData): asserts data is UIStateBattle {
     }
 };
 
-export const serviceBattleData = <B extends keyof BattleDataMap, K extends keyof BattleDataMap[ B ]>(battleKey: B) => serviceSelector<Pick<BattleDataMap[ B ], K>>(({ data }) => {
+export const serviceBattleData = <B extends BattleDataKey, K extends keyof BattleDataMap[ B ]>(battleKey: B) => serviceSelector<Pick<BattleDataMap[ B ], K>>(({ data }) => {
     assertIsStateBattle(data);
     return data.battleData[ battleKey ];
 });

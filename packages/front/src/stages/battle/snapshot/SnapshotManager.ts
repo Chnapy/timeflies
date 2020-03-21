@@ -1,15 +1,17 @@
-import { assertIsDefined, assertThenGet, BattleSnapshot, generateObjectHash, ConfirmSAction, getId } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, BattleSnapshot, generateObjectHash, getId } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { WithSnapshot } from '../entities/WithSnapshot';
+import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { BattleDataPeriod } from '../../../BattleData';
 
 export interface BattleCommitAction extends IGameAction<'battle/commit'> {
+    time: number;
 }
 
 export interface SnapshotManager {
-    getLastHash(): string;
 }
 
 export const assertHashIsInSnapshotList = (
@@ -27,7 +29,7 @@ export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
     snapshotList: S[]
 ): void | never => {
     const serialize = (list: { id: string; }[]) => list.map(getId).sort().join('.');
-    
+
     if (serialize(entityList) !== serialize(snapshotList)) {
         throw new Error(`Ids of entities differs from these snapshots [${serialize(entityList)}]<->[${serialize(snapshotList)}].
         There is an inconsistence front<->back.`);
@@ -36,22 +38,36 @@ export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
 
 export const SnapshotManager = (): SnapshotManager => {
 
-    // TODO add time
     const snapshotList: BattleSnapshot[] = [];
 
-    const updateBattleDataFromSnapshot = ({ teamsSnapshots }: BattleSnapshot) => {
-        const { teams } = serviceBattleData('future');
+    const getLastSnapshot = (): BattleSnapshot | undefined => snapshotList[ snapshotList.length - 1 ];
 
-        assertEntitySnapshotConsistency(teams, teamsSnapshots);
+    const updateBattleDataFromSnapshot = (period: BattleDataPeriod, { battleHash, teamsSnapshots }: BattleSnapshot) => {
+        const battleData = serviceBattleData(period);
 
-        teamsSnapshots.forEach(snap => teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap));
+        battleData.battleHash = battleHash;
+
+        assertEntitySnapshotConsistency(battleData.teams, teamsSnapshots);
+
+        teamsSnapshots.forEach(snap => battleData.teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap));
     };
 
-    const commit = () => {
+    const updateBattleDataFromHash = (period: BattleDataPeriod, hash: string) => {
+        const snapshot = snapshotList.find(s => s.battleHash === hash);
+
+        assertIsDefined(snapshot);
+
+        updateBattleDataFromSnapshot(period, snapshot);
+    };
+
+    const commit = (time: number) => {
         const { launchTime } = serviceBattleData('cycle');
         const { teams } = serviceBattleData('future');
 
+        const isFirstSnapshot = !snapshotList.length;
+
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
+            time,
             launchTime,
             teamsSnapshots: teams.map(t => t.getSnapshot())
         };
@@ -61,41 +77,69 @@ export const SnapshotManager = (): SnapshotManager => {
         const snap: BattleSnapshot = { battleHash, ...partialSnap };
 
         snapshotList.push(snap);
+
+        const futureBattleData = serviceBattleData('future');
+        futureBattleData.battleHash = battleHash;
+
+        if (isFirstSnapshot) {
+            const currentBattleData = serviceBattleData('current');
+            currentBattleData.battleHash = battleHash;
+        }
     };
 
     const rollback = (correctHash: string) => {
 
         assertHashIsInSnapshotList(correctHash, snapshotList);
 
-        while (snapshotList[ snapshotList.length - 1 ].battleHash !== correctHash) {
+        while (getLastSnapshot()!.battleHash !== correctHash) {
             snapshotList.pop();
         }
 
-        const currentSnapshot = snapshotList[ snapshotList.length - 1 ];
-        updateBattleDataFromSnapshot(currentSnapshot);
+        const currentSnapshot = getLastSnapshot()!;
+        updateBattleDataFromSnapshot('future', currentSnapshot);
+
+        if (currentSnapshot.time < Date.now()) {
+            updateBattleDataFromSnapshot('current', currentSnapshot);
+        }
     };
 
-    const { onAction, onMessageAction } = serviceEvent();
+    const rollbackBeforeNow = () => {
 
-    onAction<BattleCommitAction>('battle/commit', commit);
+        const now = Date.now();
+
+        while (assertThenGet(
+            getLastSnapshot(),
+            assertIsDefined
+        ).time >= now) {
+            snapshotList.pop();
+        }
+
+        const currentSnapshot = assertThenGet(
+            getLastSnapshot(),
+            assertIsDefined
+        );
+        updateBattleDataFromSnapshot('future', currentSnapshot);
+        updateBattleDataFromSnapshot('current', currentSnapshot);
+    };
+
+    const { onAction } = serviceEvent();
+
+    onAction<BattleCommitAction>('battle/commit', ({ time }) => commit(time));
     onAction<BStateAction>('battle/state/event', ({ eventType }) => {
         if (eventType === 'TURN-END') {
-            commit();
+            rollbackBeforeNow();
+        } else if (eventType === 'TURN-START') {
+            commit(Date.now());
+        }
+    });
+    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({ removed, correctHash }) => {
+
+        if (removed) {
+            rollback(correctHash);
+        } else {
+            updateBattleDataFromHash('current', correctHash);
         }
     });
 
-    onMessageAction<ConfirmSAction>('confirm', ({ isOk, lastCorrectHash }) => {
-        if (!isOk) {
-            rollback(lastCorrectHash);
-        }
-    });
-
-    return {
-        getLastHash() {
-            return assertThenGet(
-                snapshotList[ snapshotList.length - 1 ],
-                assertIsDefined
-            ).battleHash;
-        }
-    };
+    return {};
 };

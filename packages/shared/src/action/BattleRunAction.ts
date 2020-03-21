@@ -33,6 +33,7 @@ export interface SpellActionSnapshot {
     spellId: string;
     position: Position;
     battleHash: string;
+    validated: boolean;
 }
 
 export interface NotifySAction extends TAction<'notify'> {

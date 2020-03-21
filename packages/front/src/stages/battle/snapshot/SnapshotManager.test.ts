@@ -1,20 +1,26 @@
 import { StoreTest } from '../../../StoreTest';
 import { SnapshotManager, BattleCommitAction } from './SnapshotManager';
 import { Team } from '../entities/Team';
-import { BattleSnapshot, generateObjectHash, ConfirmSAction } from '@timeflies/shared';
-import { ReceiveMessageAction } from '../../../socket/WSClient';
+import { BattleSnapshot, generateObjectHash, TimerTester } from '@timeflies/shared';
+import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { BattleDataCurrent, BattleDataFuture } from '../../../BattleData';
+import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 
 describe('# SnapshotManager', () => {
 
+    const timerTester = new TimerTester();
+
     beforeEach(() => {
+        timerTester.beforeTest();
         StoreTest.beforeTest();
     });
 
     afterEach(() => {
+        timerTester.afterTest();
         StoreTest.afterTest();
     });
 
-    it('should commit battle data (future) on action, then get the correct hash', () => {
+    it('should commit battle data future on commit action, then get the correct hash', () => {
 
         const teams: Team[] = [
             {
@@ -29,6 +35,21 @@ describe('# SnapshotManager', () => {
             } as unknown as Team
         ];
 
+        const currentBattleData: BattleDataCurrent = {
+            battleHash: 'not-matter',
+            teams,
+            characters: null as any,
+            players: null as any,
+        };
+
+        const futureBattleData: BattleDataFuture = {
+            battleHash: 'not-matter',
+            teams,
+            characters: null as any,
+            players: null as any,
+            spellActionSnapshotList: []
+        };
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
@@ -36,92 +57,412 @@ describe('# SnapshotManager', () => {
                     cycle: {
                         launchTime: -1
                     },
-                    current: null as any,
-                    future: {
-                        teams,
-                        characters: null as any,
-                        players: null as any,
-                        spellActionSnapshotList: []
-                    }
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             }
         });
 
         const manager = SnapshotManager();
 
-        StoreTest.dispatch<BattleCommitAction>({ type: 'battle/commit' });
+        StoreTest.dispatch<BattleCommitAction>({
+            type: 'battle/commit',
+            time: timerTester.now
+        });
 
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
+            time: timerTester.now,
             launchTime: -1,
             teamsSnapshots: teams.map(t => t.getSnapshot())
         };
 
         const battleHash = generateObjectHash(partialSnap);
 
-        expect(manager.getLastHash()).toBe(battleHash);
+        expect(futureBattleData.battleHash).toBe(battleHash);
+        expect(currentBattleData.battleHash).toBe(battleHash);
     });
 
-    it('should rollback on action from given hash', () => {
+    describe('spell action actions:', () => {
 
-        const updateFromSnapshot = jest.fn();
+        it('should rollback on spell action removed', () => {
 
-        let teamColor = 'red';
+            const updateFromSnapshot = jest.fn();
 
-        const teams: Team[] = [
-            {
-                id: 't1',
-                getSnapshot() {
-                    return {
-                        id: 't1',
-                        color: teamColor,
-                        name: '',
-                        playersSnapshots: []
-                    }
-                },
-                updateFromSnapshot
-            } as unknown as Team
-        ];
+            let teamColor = 'red';
 
-        StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    cycle: {
-                        launchTime: -1
+            const teams: Team[] = [
+                {
+                    id: 't1',
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: teamColor,
+                            name: '',
+                            playersSnapshots: []
+                        }
                     },
-                    current: null as any,
-                    future: {
-                        teams,
-                        characters: null as any,
-                        players: null as any,
-                        spellActionSnapshotList: []
+                    updateFromSnapshot
+                } as unknown as Team
+            ];
+
+            const currentBattleData: BattleDataCurrent = {
+                battleHash: 'not-matter',
+                teams,
+                characters: null as any,
+                players: null as any,
+            };
+
+            const futureBattleData: BattleDataFuture = {
+                battleHash: 'not-matter',
+                teams,
+                characters: null as any,
+                players: null as any,
+                spellActionSnapshotList: []
+            };
+
+            StoreTest.initStore({
+                data: {
+                    state: 'battle',
+                    battleData: {
+                        cycle: {
+                            launchTime: -1
+                        },
+                        current: currentBattleData,
+                        future: futureBattleData
                     }
                 }
-            }
+            });
+
+            const manager = SnapshotManager();
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now
+            });
+
+            const firstHash = futureBattleData.battleHash;
+
+            teamColor = 'blue';
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now + 100
+            });
+
+            StoreTest.dispatch<SpellActionTimerEndAction>({
+                type: 'battle/spell-action/end',
+                removed: true,
+                correctHash: firstHash
+            });
+
+            expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
+
+            expect(futureBattleData.battleHash).toBe(firstHash);
         });
 
-        const manager = SnapshotManager();
+        it('should rollback on previous spell action removed and update current battle data', () => {
 
-        StoreTest.dispatch<BattleCommitAction>({ type: 'battle/commit' });
+            const updateFromSnapshot = jest.fn();
 
-        const firstHash = manager.getLastHash();
+            let teamColor = 'red';
 
-        teamColor = 'blue';
+            const teams: Team[] = [
+                {
+                    id: 't1',
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: teamColor,
+                            name: '',
+                            playersSnapshots: []
+                        }
+                    },
+                    updateFromSnapshot
+                } as unknown as Team
+            ];
 
-        StoreTest.dispatch<BattleCommitAction>({ type: 'battle/commit' });
+            const currentBattleData: BattleDataCurrent = {
+                battleHash: 'not-matter',
+                teams,
+                characters: null as any,
+                players: null as any
+            };
 
-        StoreTest.dispatch<ReceiveMessageAction<ConfirmSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'confirm',
-                sendTime: Date.now(),
-                isOk: false,
-                lastCorrectHash: firstHash
-            }
+            const futureBattleData: BattleDataFuture = {
+                battleHash: 'not-matter',
+                teams,
+                characters: null as any,
+                players: null as any,
+                spellActionSnapshotList: []
+            };
+
+            StoreTest.initStore({
+                data: {
+                    state: 'battle',
+                    battleData: {
+                        cycle: {
+                            launchTime: -1
+                        },
+                        current: currentBattleData,
+                        future: futureBattleData
+                    }
+                }
+            });
+
+            const manager = SnapshotManager();
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now
+            });
+
+            const firstHash = futureBattleData.battleHash;
+
+            timerTester.advanceBy(100);
+
+            teamColor = 'blue';
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now
+            });
+
+            StoreTest.dispatch<SpellActionTimerEndAction>({
+                type: 'battle/spell-action/end',
+                removed: true,
+                correctHash: firstHash
+            });
+
+            expect(futureBattleData.battleHash).toBe(firstHash);
+            expect(currentBattleData.battleHash).toBe(firstHash);
         });
 
-        expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
+        it('should update current battle data from future on spell action end action', () => {
 
-        expect(manager.getLastHash()).toBe(firstHash);
+            const currentTeams: Team[] = [
+                {
+                    id: 't1',
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: 'red',
+                            name: '',
+                            playersSnapshots: []
+                        }
+                    },
+                    updateFromSnapshot() { }
+                } as unknown as Team
+            ];
+
+            const futureTeams: Team[] = [
+                {
+                    id: 't1',
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: 'red',
+                            name: '',
+                            playersSnapshots: []
+                        }
+                    },
+                    updateFromSnapshot() { }
+                } as unknown as Team
+            ];
+
+            const currentBattleData: BattleDataCurrent = {
+                battleHash: 'not-matter',
+                teams: currentTeams,
+                characters: null as any,
+                players: null as any,
+            };
+
+            const futureBattleData: BattleDataFuture = {
+                battleHash: 'not-matter',
+                teams: futureTeams,
+                characters: null as any,
+                players: null as any,
+                spellActionSnapshotList: []
+            };
+
+            StoreTest.initStore({
+                data: {
+                    state: 'battle',
+                    battleData: {
+                        cycle: {
+                            launchTime: -1
+                        },
+                        current: currentBattleData,
+                        future: futureBattleData
+                    }
+                }
+            });
+
+            const manager = SnapshotManager();
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now
+            });
+
+            const lastHash = futureBattleData.battleHash;
+
+            StoreTest.dispatch<SpellActionTimerEndAction>({
+                type: 'battle/spell-action/end',
+                removed: false,
+                correctHash: lastHash
+            });
+
+            expect(currentBattleData.battleHash).toBe(lastHash);
+        });
+    });
+
+    describe('turn actions:', () => {
+
+        it('should commit on turn start with date now', () => {
+
+            const teams: Team[] = [
+                {
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: 'red',
+                            name: '',
+                            playersSnapshots: []
+                        }
+                    }
+                } as unknown as Team
+            ];
+
+            const currentBattleData: BattleDataCurrent = {
+                battleHash: 'not-defined',
+                teams,
+                characters: null as any,
+                players: null as any,
+            };
+
+            const futureBattleData: BattleDataFuture = {
+                battleHash: 'not-defined',
+                teams,
+                characters: null as any,
+                players: null as any,
+                spellActionSnapshotList: []
+            };
+
+            StoreTest.initStore({
+                data: {
+                    state: 'battle',
+                    battleData: {
+                        cycle: {
+                            launchTime: -1
+                        },
+                        current: currentBattleData,
+                        future: futureBattleData
+                    }
+                }
+            });
+
+            const manager = SnapshotManager();
+
+            expect(futureBattleData.battleHash).toBe('not-defined');
+
+            StoreTest.dispatch<BStateTurnStartAction>({
+                type: 'battle/state/event',
+                eventType: 'TURN-START',
+                payload: {
+                    characterId: 'not-matter'
+                }
+            });
+
+            expect(futureBattleData.battleHash).not.toBe('not-defined');
+            expect(currentBattleData.battleHash).not.toBe('not-defined');
+        });
+
+        it('should rollback to before now on turn end', () => {
+
+            const currentTeams: Team[] = [
+                {
+                    id: 't1',
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: 'red',
+                            name: '',
+                            playersSnapshots: []
+                        }
+                    },
+                    updateFromSnapshot() { }
+                } as unknown as Team
+            ];
+
+            const futureTeams: Team[] = [
+                {
+                    id: 't1',
+                    getSnapshot() {
+                        return {
+                            id: 't1',
+                            color: 'red',
+                            name: '',
+                            playersSnapshots: []
+                        }
+                    },
+                    updateFromSnapshot() { }
+                } as unknown as Team
+            ];
+
+            const currentBattleData: BattleDataCurrent = {
+                battleHash: 'not-defined',
+                teams: currentTeams,
+                characters: null as any,
+                players: null as any,
+            };
+
+            const futureBattleData: BattleDataFuture = {
+                battleHash: 'not-defined',
+                teams: futureTeams,
+                characters: null as any,
+                players: null as any,
+                spellActionSnapshotList: []
+            };
+
+            StoreTest.initStore({
+                data: {
+                    state: 'battle',
+                    battleData: {
+                        cycle: {
+                            launchTime: -1
+                        },
+                        current: currentBattleData,
+                        future: futureBattleData
+                    }
+                }
+            });
+
+            const manager = SnapshotManager();
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now - 100
+            });
+
+            const pastHash = futureBattleData.battleHash;
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now + 100
+            });
+
+            StoreTest.dispatch<BattleCommitAction>({
+                type: 'battle/commit',
+                time: timerTester.now + 200
+            });
+
+            StoreTest.dispatch<BStateTurnEndAction>({
+                type: 'battle/state/event',
+                eventType: 'TURN-END',
+                payload: {}
+            });
+
+            expect(futureBattleData.battleHash).toBe(pastHash);
+        });
     });
 });

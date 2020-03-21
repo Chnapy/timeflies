@@ -9,10 +9,14 @@ export interface BattleDataCycle {
     globalTurn?: GlobalTurn;
 }
 
-export interface BattleData {
+interface BattleData {
+    battleHash: string;
     readonly teams: Team[];
     readonly players: Player[];
     readonly characters: Character[];
+}
+
+export interface BattleDataCurrent extends BattleData {
 }
 
 export interface BattleDataFuture extends BattleData {
@@ -21,6 +25,9 @@ export interface BattleDataFuture extends BattleData {
 
 export interface BattleDataMap {
     cycle: BattleDataCycle;
-    current: BattleData;
+    current: BattleDataCurrent;
     future: BattleDataFuture;
 }
+
+export type BattleDataKey = keyof BattleDataMap;
+export type BattleDataPeriod = Extract<BattleDataKey, 'current' | 'future'>;
