@@ -2,6 +2,10 @@ import { assertIsDefined, assertThenGet, BRunGlobalTurnStartSAction, BRunTurnSta
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { GlobalTurn } from './GlobalTurn';
+import { IGameAction } from '../../../action/GameAction';
+
+export interface NotifyDeathsAction extends IGameAction<'battle/notify-deaths'> {
+}
 
 export interface CycleManager {
     readonly isRunning: boolean;
@@ -55,7 +59,12 @@ export const CycleManager = (
         globalTurn.synchronizeTurn(turnSnapshot);
     };
 
-    const { onMessageAction } = serviceEvent();
+    const { onAction, onMessageAction } = serviceEvent();
+
+    onAction<NotifyDeathsAction>(
+        'battle/notify-deaths',
+        () => cycleData.globalTurn?.notifyDeaths()
+    );
 
     onMessageAction<BRunGlobalTurnStartSAction>(
         'battle-run/global-turn-start',

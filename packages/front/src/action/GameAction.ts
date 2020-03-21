@@ -2,6 +2,7 @@ import { Action } from 'redux';
 import { BattleSceneAction } from '../phaser/battleReducers/BattleReducerManager';
 import { MessageAction } from '../socket/WSClient';
 import { BStateAction } from '../stages/battle/battleState/BattleStateSchema';
+import { NotifyDeathsAction } from '../stages/battle/cycle/CycleManager';
 import { SpellEngineBindAction } from '../stages/battle/engine/Engine';
 import { BattleCommitAction } from '../stages/battle/snapshot/SnapshotManager';
 import { SpellActionTimerAction } from '../stages/battle/spellAction/SpellActionTimer';
@@ -23,4 +24,5 @@ export type GameAction =
     | SpellEngineBindAction
     | BStateAction
     | SpellActionTimerAction
-    | BattleCommitAction;
+    | BattleCommitAction
+    | NotifyDeathsAction;

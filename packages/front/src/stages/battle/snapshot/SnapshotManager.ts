@@ -1,11 +1,13 @@
 import { assertIsDefined, assertThenGet, BattleSnapshot, generateObjectHash, getId } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
+import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
+import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { BStateAction } from '../battleState/BattleStateSchema';
+import { NotifyDeathsAction } from '../cycle/CycleManager';
 import { WithSnapshot } from '../entities/WithSnapshot';
 import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
-import { BattleDataPeriod } from '../../../BattleData';
 
 export interface BattleCommitAction extends IGameAction<'battle/commit'> {
     time: number;
@@ -13,16 +15,6 @@ export interface BattleCommitAction extends IGameAction<'battle/commit'> {
 
 export interface SnapshotManager {
 }
-
-export const assertHashIsInSnapshotList = (
-    hash: string,
-    snapshotList: { battleHash: string }[]
-): void | never => {
-    if (!snapshotList.some(snap => snap.battleHash === hash)) {
-        throw new Error(`Hash <${hash}> not found in snapshot list.
-        There is an inconsistence front<->back.`);
-    }
-};
 
 export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
     entityList: WithSnapshot<S>[],
@@ -36,11 +28,27 @@ export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
     }
 }
 
+const assertHashIsInSnapshotList = (
+    hash: string,
+    snapshotList: { battleHash: string }[]
+): void | never => {
+    if (!snapshotList.some(snap => snap.battleHash === hash)) {
+        throw new Error(`Hash <${hash}> not found in snapshot list.
+        There is an inconsistence front<->back.`);
+    }
+};
+
 export const SnapshotManager = (): SnapshotManager => {
 
     const snapshotList: BattleSnapshot[] = [];
 
     const getLastSnapshot = (): BattleSnapshot | undefined => snapshotList[ snapshotList.length - 1 ];
+
+    const { dispatchNotifyDeaths } = serviceDispatch({
+        dispatchNotifyDeaths: (): NotifyDeathsAction => ({
+            type: 'battle/notify-deaths'
+        })
+    });
 
     const updateBattleDataFromSnapshot = (period: BattleDataPeriod, { battleHash, teamsSnapshots }: BattleSnapshot) => {
         const battleData = serviceBattleData(period);
@@ -49,15 +57,29 @@ export const SnapshotManager = (): SnapshotManager => {
 
         assertEntitySnapshotConsistency(battleData.teams, teamsSnapshots);
 
-        teamsSnapshots.forEach(snap => battleData.teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap));
+        teamsSnapshots.forEach(snap =>
+            battleData.teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap)
+        );
     };
 
-    const updateBattleDataFromHash = (period: BattleDataPeriod, hash: string) => {
+    const updateCurrentBattleDataFromHash = (hash: string) => {
         const snapshot = snapshotList.find(s => s.battleHash === hash);
 
         assertIsDefined(snapshot);
 
-        updateBattleDataFromSnapshot(period, snapshot);
+        const { characters } = serviceBattleData('current');
+
+        const serializeDeaths = () => characters.filter(c => !c.isAlive).map(getId).join('.');
+
+        const serializedDeathsBefore = serializeDeaths();
+
+        updateBattleDataFromSnapshot('current', snapshot);
+
+        const serializedDeathsAfter = serializeDeaths();
+
+        if (serializedDeathsBefore !== serializedDeathsAfter) {
+            dispatchNotifyDeaths();
+        }
     };
 
     const commit = (time: number) => {
@@ -103,7 +125,7 @@ export const SnapshotManager = (): SnapshotManager => {
         }
     };
 
-    const rollbackBeforeNow = () => {
+    const rollbackFuture = () => {
 
         const now = Date.now();
 
@@ -127,7 +149,7 @@ export const SnapshotManager = (): SnapshotManager => {
     onAction<BattleCommitAction>('battle/commit', ({ time }) => commit(time));
     onAction<BStateAction>('battle/state/event', ({ eventType }) => {
         if (eventType === 'TURN-END') {
-            rollbackBeforeNow();
+            rollbackFuture();
         } else if (eventType === 'TURN-START') {
             commit(Date.now());
         }
@@ -137,7 +159,7 @@ export const SnapshotManager = (): SnapshotManager => {
         if (removed) {
             rollback(correctHash);
         } else {
-            updateBattleDataFromHash('current', correctHash);
+            updateCurrentBattleDataFromHash(correctHash);
         }
     });
 

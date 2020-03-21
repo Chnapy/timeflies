@@ -2,7 +2,7 @@ import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester } 
 import { ReceiveMessageAction } from "../../../socket/WSClient";
 import { StoreTest } from "../../../StoreTest";
 import { seedCharacter } from "../../../__seeds__/seedCharacter";
-import { CycleManager } from "./CycleManager";
+import { CycleManager, NotifyDeathsAction } from "./CycleManager";
 import { GlobalTurn } from "./GlobalTurn";
 import { TurnState } from "./Turn";
 import { Character } from '../entities/Character';
@@ -60,7 +60,7 @@ describe('# CycleManager', () => {
                     synchronize() { },
                     getRemainingTime() { return -1; }
                 },
-                start() {},
+                start() { },
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
@@ -120,7 +120,7 @@ describe('# CycleManager', () => {
                     synchronize() { },
                     getRemainingTime() { return -1; }
                 },
-                start() {},
+                start() { },
                 notifyDeaths() { },
                 synchronize,
                 synchronizeTurn() { },
@@ -197,7 +197,7 @@ describe('# CycleManager', () => {
                     synchronize() { },
                     getRemainingTime() { return -1; }
                 },
-                start() {},
+                start() { },
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn,
@@ -275,7 +275,7 @@ describe('# CycleManager', () => {
                     synchronize() { },
                     getRemainingTime() { return -1; }
                 },
-                start() {},
+                start() { },
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
@@ -329,6 +329,66 @@ describe('# CycleManager', () => {
         expect(onGlobalTurnCreate).toHaveBeenLastCalledWith(2);
     });
 
+    it('should check if current character died on notify deaths action', () => {
+
+        const characters = [ seedCharacter() ];
+
+        initStore(characters);
+
+        const notifyDeaths = jest.fn();
+
+        const globalTurnCreator: typeof GlobalTurn = (_snapshot, _characters, _generateTurnId) => {
+
+            return {
+                id: 1,
+                state: 'running',
+                currentTurn: {
+                    id: 1,
+                    character: characters[ 0 ],
+                    startTime: timerTester.now,
+                    turnDuration: 1000,
+                    endTime: timerTester.now + 1000,
+                    refreshTimedActions() { },
+                    state: 'running',
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
+                },
+                start() { },
+                notifyDeaths,
+                synchronize() { },
+                synchronizeTurn() { },
+            };
+        };
+
+        const cycle = CycleManager({ globalTurnCreator });
+
+        const order = characters.map(getId);
+
+        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
+            type: 'message/receive',
+            message: {
+                type: 'battle-run/global-turn-start',
+                sendTime: timerTester.now,
+                globalTurnState: {
+                    id: 1,
+                    order,
+                    startTime: timerTester.now,
+                    currentTurn: {
+                        id: 1,
+                        characterId: order[ 0 ],
+                        startTime: timerTester.now
+                    }
+                }
+            }
+        });
+
+        StoreTest.dispatch<NotifyDeathsAction>({
+            type: 'battle/notify-deaths'
+        });
+
+        expect(notifyDeaths).toHaveBeenCalledTimes(1);
+    });
+
     it('should give coherent running state', () => {
 
         const characters = [
@@ -356,7 +416,7 @@ describe('# CycleManager', () => {
                     synchronize() { },
                     getRemainingTime() { return -1; }
                 },
-                start() {},
+                start() { },
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },

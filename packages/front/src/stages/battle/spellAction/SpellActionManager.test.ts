@@ -218,23 +218,6 @@ describe('# SpellActionManager', () => {
             expect(spellActionSnapshotList).toEqual(beforeRollbackList);
         });
 
-        it('should throw assert error on confirm action KO with unknown hash', async () => {
-
-            const { startTime } = await rollbackInit();
-
-            expect(() => {
-                StoreTest.dispatch<ReceiveMessageAction<ConfirmSAction>>({
-                    type: 'message/receive',
-                    message: {
-                        type: 'confirm',
-                        sendTime: startTime,
-                        isOk: false,
-                        lastCorrectHash: 'unknown-hash'
-                    }
-                });
-            }).toThrowError();
-        });
-
         it('should rollback on confirm action KO', async () => {
 
             const { startTime, spellActionSnapshotList, firstHash } = await rollbackInit();

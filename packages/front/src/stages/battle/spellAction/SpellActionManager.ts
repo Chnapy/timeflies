@@ -5,7 +5,7 @@ import { serviceEvent } from '../../../services/serviceEvent';
 import { serviceNetwork } from '../../../services/serviceNetwork';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { Spell } from '../entities/Spell';
-import { assertHashIsInSnapshotList, BattleCommitAction } from '../snapshot/SnapshotManager';
+import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { SpellActionTimer } from './SpellActionTimer';
 
 export interface SpellAction {
@@ -81,12 +81,11 @@ export const SpellActionManager = (
 
     const onRollback = (correctHash: string): void => {
 
-        assertHashIsInSnapshotList(correctHash, spellActionSnapshotList);
-
         const deletedList: SpellActionSnapshot[] = [];
 
         while (
-            getLastSnapshot()!.battleHash !== correctHash
+            spellActionSnapshotList.length
+            && getLastSnapshot()!.battleHash !== correctHash
         ) {
             const deleted = spellActionSnapshotList.pop()!;
             deletedList.push(deleted);
@@ -95,51 +94,64 @@ export const SpellActionManager = (
         spellActionTimer.onRemove(deletedList, correctHash);
     };
 
+    const clearSnapshotList = () => {
+        spellActionSnapshotList.splice(0, Infinity);
+    };
+
+    const spellActionLaunch = (spellActionList: SpellAction[]) => {
+
+        const lastSnapshot = getLastSnapshot();
+        const now = Date.now();
+
+        let nextStartTime = lastSnapshot
+            ? Math.max(getSnapshotEndTime(lastSnapshot), now)
+            : now;
+
+        network.then(({ sendSpellAction }) => {
+
+            spellActionList.forEach(spellAction => {
+                onSpellAction(spellAction, nextStartTime, sendSpellAction);
+                nextStartTime += spellAction.spell.feature.duration;
+            });
+        });
+    };
+
+    const rollbackCurrentAndFuture = () => {
+
+        const deletedList: SpellActionSnapshot[] = [];
+
+        const now = Date.now();
+
+        const willEndInFuture = (snapshot: SpellActionSnapshot | undefined) =>
+            !!snapshot && getSnapshotEndTime(snapshot) > now;
+
+        while (
+            willEndInFuture(getLastSnapshot())
+        ) {
+            const deleted = spellActionSnapshotList.pop()!;
+            deletedList.push(deleted);
+        }
+
+        const { battleHash } = serviceBattleData('current');
+
+        spellActionTimer.onRemove(deletedList, battleHash);
+    };
+
     onAction<BStateAction>('battle/state/event', action => {
 
         if (action.eventType === 'SPELL-LAUNCH') {
 
             const { spellActions } = action.payload;
 
-            const lastSnapshot = getLastSnapshot();
-            const now = Date.now();
-
-            let nextStartTime = lastSnapshot
-                ? Math.max(getSnapshotEndTime(lastSnapshot), now)
-                : now;
-
-            network.then(({ sendSpellAction }) => {
-
-                spellActions.forEach(spellAction => {
-                    onSpellAction(spellAction, nextStartTime, sendSpellAction);
-                    nextStartTime += spellAction.spell.feature.duration;
-                });
-
-            });
+            spellActionLaunch(spellActions);
 
         } else if (action.eventType === 'TURN-START') {
 
-            spellActionSnapshotList.splice(0, Infinity);
+            clearSnapshotList();
 
         } else if (action.eventType === 'TURN-END') {
 
-            const deletedList: SpellActionSnapshot[] = [];
-
-            const now = Date.now();
-
-            const willEndInFuture = (snapshot: SpellActionSnapshot | undefined) =>
-                !!snapshot && getSnapshotEndTime(snapshot) > now;
-
-            while (
-                willEndInFuture(getLastSnapshot())
-            ) {
-                const deleted = spellActionSnapshotList.pop()!;
-                deletedList.push(deleted);
-            }
-
-            const { battleHash } = serviceBattleData('current');
-
-            spellActionTimer.onRemove(deletedList, battleHash);
+            rollbackCurrentAndFuture();
         }
 
     });
@@ -148,13 +160,6 @@ export const SpellActionManager = (
         if (!isOk) {
             onRollback(lastCorrectHash);
         }
-        // else {
-        //     assertThenGet(
-        //         spellActionSnapshotList.find(({ validated, battleHash }) =>
-        //             !validated && battleHash === lastCorrectHash
-        //         ), assertIsDefined
-        //     ).validated = true;
-        // }
     });
 
     return {};

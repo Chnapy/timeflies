@@ -93,7 +93,7 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
 
     assertIsDefined(globalTurn);
 
-    const engine = spellPrepareMap[ spell.staticData.type ]!(spell, mapManager);
+    const engine = spellPrepareMap[ spell.staticData.type ](spell, mapManager);
 
     const ifCanSpellBeUsed = <
         F extends (...args: P) => void,

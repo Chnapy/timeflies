@@ -25,7 +25,10 @@ export const GlobalTurn = (
 
     const id = snapshot.id;
     let startTime = snapshot.startTime;
-    const charactersOrdered = snapshot.order.map(id => characters.find(c => c.id === id)!);
+    const charactersOrdered = snapshot.order.map(id => assertThenGet(
+        characters.find(c => c.id === id),
+        assertIsDefined
+    ));
 
     const waitingTurns: TurnSnapshot[] = [];
 
