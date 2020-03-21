@@ -54,7 +54,7 @@ describe('# SpellActionManager', () => {
         };
     };
 
-    const rollbackInit = async () => {
+    const rollbackInit = () => {
 
         const { startTime, spellActionSnapshotList, currentBattleData, futureBattleData } = init();
 
@@ -83,8 +83,6 @@ describe('# SpellActionManager', () => {
             }
         });
 
-        await serviceNetwork({});
-
         const secondHash = 'secondHash';
         futureBattleData.battleHash = secondHash;
 
@@ -110,8 +108,6 @@ describe('# SpellActionManager', () => {
             }
         });
 
-        await serviceNetwork({});
-
         return {
             startTime,
             spellActionSnapshotList,
@@ -132,7 +128,7 @@ describe('# SpellActionManager', () => {
         timerTester.afterTest();
     });
 
-    it('should catch spell action, then commit & send', async () => {
+    it('should catch spell action, then commit', () => {
 
         const { startTime, spellActionSnapshotList, futureBattleData } = init();
 
@@ -162,8 +158,6 @@ describe('# SpellActionManager', () => {
             }
         });
 
-        await serviceNetwork({});
-
         expect(beforeCommit).toHaveBeenCalledTimes(1);
 
         expect(spellActionSnapshotList).toEqual<SpellActionSnapshot[]>([ {
@@ -175,33 +169,19 @@ describe('# SpellActionManager', () => {
             validated: false
         } ]);
 
-        expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction, SendMessageAction ]>([
+        expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction ]>([
             {
                 type: 'battle/commit',
                 time: timerTester.now + 200
-            },
-            {
-                type: 'message/send',
-                message: {
-                    type: 'battle/spellAction' as const,
-                    spellAction: {
-                        spellId: 's1',
-                        battleHash: '-hash-',
-                        startTime,
-                        duration: 200,
-                        position: { x: -1, y: -1 },
-                        validated: false
-                    }
-                }
             }
         ]);
     });
 
     describe('on confirm action', () => {
 
-        it('should not rollback on confirm action OK', async () => {
+        it('should not rollback on confirm action OK', () => {
 
-            const { startTime, spellActionSnapshotList } = await rollbackInit();
+            const { startTime, spellActionSnapshotList } = rollbackInit();
 
             const beforeRollbackList = [ ...spellActionSnapshotList ];
 
@@ -218,9 +198,9 @@ describe('# SpellActionManager', () => {
             expect(spellActionSnapshotList).toEqual(beforeRollbackList);
         });
 
-        it('should rollback on confirm action KO', async () => {
+        it('should rollback on confirm action KO', () => {
 
-            const { startTime, spellActionSnapshotList, firstHash } = await rollbackInit();
+            const { startTime, spellActionSnapshotList, firstHash } = rollbackInit();
 
             const beforeRollbackList = [ ...spellActionSnapshotList ];
 
@@ -240,9 +220,9 @@ describe('# SpellActionManager', () => {
         });
     });
 
-    it('should rollback on turn end', async () => {
+    it('should rollback on turn end', () => {
 
-        const { spellActionSnapshotList, firstHash } = await rollbackInit();
+        const { spellActionSnapshotList, firstHash } = rollbackInit();
 
         const beforeRollbackList = [ ...spellActionSnapshotList ];
 
@@ -259,9 +239,9 @@ describe('# SpellActionManager', () => {
         ]);
     });
 
-    it('should clear snapshot list on turn start', async () => {
+    it('should clear snapshot list on turn start', () => {
 
-        const { spellActionSnapshotList } = await rollbackInit();
+        const { spellActionSnapshotList } = rollbackInit();
 
         StoreTest.dispatch<BStateTurnStartAction>({
             type: 'battle/state/event',

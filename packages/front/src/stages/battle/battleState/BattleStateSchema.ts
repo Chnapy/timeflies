@@ -3,6 +3,7 @@ import { IGameAction } from '../../../action/GameAction';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { EngineCreator } from '../engine/Engine';
 import { SpellPrepareEngine } from '../engine/SpellPrepareEngine';
+import { WatchEngine } from '../engine/WatchEngine';
 import { SpellAction } from '../spellAction/SpellActionManager';
 
 
@@ -72,7 +73,7 @@ export interface BStateSchemaRoot {
 }
 
 type BStateEngineCreator<S extends BState> = {
-    watch: EngineCreator<undefined, any>;
+    watch: typeof WatchEngine;
     spellPrepare: typeof SpellPrepareEngine;
 }[ S ];
 

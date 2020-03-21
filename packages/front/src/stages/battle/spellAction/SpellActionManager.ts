@@ -2,7 +2,6 @@ import { ConfirmSAction, Position, SpellActionSnapshot } from '@timeflies/shared
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
-import { serviceNetwork } from '../../../services/serviceNetwork';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { Spell } from '../entities/Spell';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
@@ -37,22 +36,11 @@ export const SpellActionManager = (
         })
     });
 
-    const network = serviceNetwork({
-        sendSpellAction: (spellAction: SpellActionSnapshot) => ({
-            type: 'battle/spellAction',
-            spellAction
-        })
-    });
-
     const getLastSnapshot = (): SpellActionSnapshot | undefined => spellActionSnapshotList[ spellActionSnapshotList.length - 1 ];
 
     const getSnapshotEndTime = ({ startTime, duration }: SpellActionSnapshot) => startTime + duration;
 
-    const onSpellAction = (
-        action: SpellAction,
-        startTime: number,
-        sendSpellAction: (snap: SpellActionSnapshot) => void
-    ) => {
+    const onSpellAction = (action: SpellAction, startTime: number) => {
         const { spell, position, beforeCommit } = action;
 
         const { duration } = spell.feature;
@@ -71,8 +59,6 @@ export const SpellActionManager = (
             battleHash,
             validated: false
         };
-
-        sendSpellAction(snap);
 
         spellActionSnapshotList.push(snap);
 
@@ -107,12 +93,9 @@ export const SpellActionManager = (
             ? Math.max(getSnapshotEndTime(lastSnapshot), now)
             : now;
 
-        network.then(({ sendSpellAction }) => {
-
-            spellActionList.forEach(spellAction => {
-                onSpellAction(spellAction, nextStartTime, sendSpellAction);
-                nextStartTime += spellAction.spell.feature.duration;
-            });
+        spellActionList.forEach(spellAction => {
+            onSpellAction(spellAction, nextStartTime);
+            nextStartTime += spellAction.spell.feature.duration;
         });
     };
 

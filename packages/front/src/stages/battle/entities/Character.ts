@@ -23,8 +23,6 @@ export interface Character extends WithSnapshot<CharacterSnapshot> {
 
     readonly player: Player;
 
-    // readonly characterGraphic: CharacterGraphic;
-
     set(o: { [ K in keyof Pick<Character, 'state' | 'position' | 'orientation'> ]?: Character[ K ] }): void;
 
     hasSpell(spellType: SpellType): boolean;
@@ -70,7 +68,6 @@ export const Character = ({
             return features.life > 0;
         },
         player,
-        // team,
 
         getSnapshot() {
             return {

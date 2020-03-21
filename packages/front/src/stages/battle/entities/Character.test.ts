@@ -1,6 +1,7 @@
 import { CharacterFeatures, CharacterSnapshot, Orientation, Position, SpellSnapshot, StaticCharacter } from "@timeflies/shared";
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter, seedCharacterData } from "../../../__seeds__/seedCharacter";
+import { Character } from './Character';
 
 describe('# Character', () => {
 
@@ -34,6 +35,28 @@ describe('# Character', () => {
         expect(character.isAlive).toBe(false);
     });
 
+    it('should update props correctly with set()', () => {
+        const character = seedCharacter();
+
+        character.set({
+            orientation: 'right',
+            position: { x: 67, y: 27 },
+            state: 'move'
+        });
+
+        expect(character).toMatchObject<Partial<Character>>({
+            orientation: 'right',
+            position: { x: 67, y: 27 },
+            state: 'move'
+        });
+    });
+
+    it('should correctly check if spell exists', () => {
+        const character = seedCharacter();
+
+        expect(character.hasSpell('move')).toBe(true);
+    });
+
     it('should return correct snapshot', () => {
 
 
@@ -45,7 +68,7 @@ describe('# Character', () => {
                 life: 100,
                 actionTime: 2000
             },
-            staticSpells: [{
+            staticSpells: [ {
                 id: '2',
                 name: 'toto',
                 color: '#F00',
@@ -55,7 +78,7 @@ describe('# Character', () => {
                     area: 1,
                     attack: -1
                 }
-            }],
+            } ],
             defaultSpellId: '2'
         };
 
@@ -67,7 +90,7 @@ describe('# Character', () => {
         const orientation: Orientation = 'bottom';
         const position: Position = { x: 4, y: 3 };
 
-        const spellsSnapshots: SpellSnapshot[] = [{
+        const spellsSnapshots: SpellSnapshot[] = [ {
             id: '2',
             staticData: {
                 id: '2',
@@ -85,7 +108,7 @@ describe('# Character', () => {
                 area: 1,
                 attack: -1
             }
-        }];
+        } ];
 
         const character = seedCharacter({
             staticData,
@@ -104,7 +127,7 @@ describe('# Character', () => {
             position,
         });
         expect(snapshot.spellsSnapshots.length).toBe(1);
-        expect(snapshot.spellsSnapshots[0].staticData.id).toBe('2');
+        expect(snapshot.spellsSnapshots[ 0 ].staticData.id).toBe('2');
     });
 
     it('should update from snapshot correctly', () => {

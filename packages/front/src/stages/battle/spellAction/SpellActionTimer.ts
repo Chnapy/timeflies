@@ -2,6 +2,7 @@ import { assertIsDefined, SpellActionSnapshot } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceBattleData } from '../../../services/serviceBattleData';
+import { serviceNetwork } from '../../../services/serviceNetwork';
 
 export interface SpellActionTimerStartAction extends IGameAction<'battle/spell-action/start'> {
     spellActionSnapshot: SpellActionSnapshot;
@@ -33,6 +34,13 @@ export const SpellActionTimer = (): SpellActionTimer => {
     let currentSpellAction: SpellActionSnapshot | undefined;
     let timeout: NodeJS.Timeout | undefined;
 
+    const network = serviceNetwork({
+        sendSpellAction: (spellAction: SpellActionSnapshot) => ({
+            type: 'battle/spellAction',
+            spellAction
+        })
+    });
+
     const { spellActionSnapshotList } = serviceBattleData('future');
 
     const { dispatchStart, dispatchEnd } = serviceDispatch({
@@ -60,6 +68,10 @@ export const SpellActionTimer = (): SpellActionTimer => {
         timeout = setTimeout(endSpellAction, duration - delta);
 
         dispatchStart(snapshot);
+
+        network.then(({ sendSpellAction }) => {
+            sendSpellAction(snapshot);
+        });
     };
 
     const clearSpellAction = () => {
@@ -80,7 +92,7 @@ export const SpellActionTimer = (): SpellActionTimer => {
 
         clearSpellAction();
 
-        if(nextSnapshot) {
+        if (nextSnapshot) {
             startSpellAction(nextSnapshot);
         }
     };

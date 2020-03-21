@@ -1,6 +1,8 @@
 import { StoreTest } from '../../../StoreTest';
 import { SpellActionTimer, SpellActionTimerStartAction, SpellActionTimerEndAction } from './SpellActionTimer';
-import { TimerTester, SpellActionSnapshot } from '@timeflies/shared';
+import { TimerTester, SpellActionSnapshot, SpellActionCAction } from '@timeflies/shared';
+import { serviceNetwork } from '../../../services/serviceNetwork';
+import { SendMessageAction } from '../../../socket/WSClient';
 
 describe('# SpellActionTimer', () => {
 
@@ -43,7 +45,7 @@ describe('# SpellActionTimer', () => {
         expect(() => timer.onAdd(snapshot)).toThrowError();
     });
 
-    it('should launch current spell action', () => {
+    it('should launch current spell action and send message', async () => {
 
         StoreTest.initStore({
             data: {
@@ -68,11 +70,31 @@ describe('# SpellActionTimer', () => {
         };
 
         timer.onAdd(snapshot);
+
+        await serviceNetwork({});
         
-        expect(StoreTest.getActions()).toEqual<[SpellActionTimerStartAction]>([{
+        expect(StoreTest.getActions()).toEqual<[
+            SpellActionTimerStartAction, SendMessageAction<SpellActionCAction>
+        ]>([
+            {
             type: 'battle/spell-action/start',
             spellActionSnapshot: snapshot
-        }]);
+        },
+        {
+            type: 'message/send',
+            message: {
+                type: 'battle/spellAction' as const,
+                spellAction: {
+                    battleHash: '',
+                    duration: 200,
+                    position: { x: -1, y: -1 },
+                    spellId: '',
+                    startTime: timerTester.now,
+                    validated: false
+                }
+            }
+        }
+    ]);
     });
 
     it('should end current spell on its end', () => {
