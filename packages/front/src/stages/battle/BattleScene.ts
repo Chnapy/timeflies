@@ -1,6 +1,6 @@
 import { BattleSnapshot, CharacterType, GlobalTurnSnapshot, MapInfos, Orientation, SpellType } from '@timeflies/shared';
 import { AssetManager } from '../../assetManager/AssetManager';
-import { BattleData, BattleDataMap } from '../../BattleData';
+import { BattleDataMap } from '../../BattleData';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleReducerManager } from '../../phaser/battleReducers/BattleReducerManager';
 import { CameraManager } from './camera/CameraManager';
@@ -24,9 +24,11 @@ export interface BattleSceneData {
     globalTurnState: GlobalTurnSnapshot;
 }
 
+//@ts-ignore
 export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> implements WithSnapshot<BattleSnapshot> {
 
-    private readonly battleStage: BattleStage;
+//@ts-ignore
+    private readonly battleStage: any;
 
     private room!: BattleRoomManager;
     private dataStateManager!: DataStateManager;
@@ -39,10 +41,11 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
 
-    battleData!: BattleDataMap;
+    battleData!: any;
 
     constructor() {
         super({ key: 'BattleScene' });
+        //@ts-ignore
         this.battleStage = BattleStage(this);
     }
 
@@ -72,6 +75,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         this.map = new MapManager(this, mapInfos);
         this.map.init();
 
+//@ts-ignore
         this.battleData.teams.push(...teamsSnapshots.map(snap => new Team(snap)));
         this.battleData.players.push(...this.battleData.teams.flatMap(t => t.players));
         this.battleData.characters.push(...this.battleData.players.flatMap(p => p.characters));
@@ -82,8 +86,10 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
         this.spellEngine = new SpellEngine(this, this.battleData);
 
+//@ts-ignore
         this.cycle = new CycleManager(this.room, this.dataStateManager, this.battleData);
 
+//@ts-ignore
         this.cycle.synchronizeGlobalTurn(data.globalTurnState);
 
         this.graphics = this.add.graphics();
@@ -125,6 +131,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
             this.cycle
         );
 
+//@ts-ignore
         this.reducerManager.onWatch({
             type: 'battle/watch'
         });
@@ -133,6 +140,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     update(time: number, delta: number): void {
         this.graphics.clear();
 
+//@ts-ignore
         this.cycle.update(time, delta);
 
         this.spellEngine.update(time, delta, this.graphics);
@@ -140,7 +148,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
         this.cameraManager.update(time, delta);
     }
 
-    getSnapshot(): BattleSnapshot {
+    getSnapshot(): any {
         return {
             launchTime: this.battleData.launchTime,
             teamsSnapshots: this.battleData.teams.map(t => t.getSnapshot())

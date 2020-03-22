@@ -1,4 +1,4 @@
-import { assertIsDefined, assertThenGet, Position, SpellType } from "@timeflies/shared";
+import { assertIsDefined, assertThenGet, Position, SpellType, TileType } from "@timeflies/shared";
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { BStateResetAction, BStateSpellLaunchAction, BStateSpellPrepareAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
@@ -9,8 +9,8 @@ import { EngineCreator, SpellEngineBindAction } from './Engine';
 import { SpellPrepareMove } from "./spellEngine/move/SpellPrepareMove";
 
 export interface SpellPrepareSubEngine {
-    onTileHover(pointerPos: Position): void;
-    onTileClick(pointerPos: Position): void;
+    onTileHover(tilePos: Position, tileType: TileType): void;
+    onTileClick(tilePos: Position, tileType: TileType): void;
     stop(): void;
 }
 
@@ -97,18 +97,23 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
     const engine = spellPrepareMap[ spell.staticData.type ](spell, mapManager);
 
     const ifCanSpellBeUsed = <
-        F extends (...args: P) => void,
-        P extends unknown[]
-    >(fct: F) => (...args: P) => {
+        F extends (tilePos: Position, tileType: TileType) => void
+    >(fct: F) => (pointerPos: Position) => {
         const remainingTime = globalTurn.currentTurn.getRemainingTime('future');
         if (remainingTime >= spell.feature.duration) {
-            fct(...args);
+
+            const tilePos = { x: -1, y: -1 }; // TODO wordToTile(pointerPos)
+            const tileType = mapManager.getTileType(tilePos);
+
+            fct(tilePos, tileType);
         }
     };
 
     const { dispatchBind } = serviceDispatch({
         dispatchBind: (): SpellEngineBindAction => ({
             type: 'battle/spell-engine/bind',
+
+            // TODO send tile position & tile type
             onTileHover: ifCanSpellBeUsed(engine.onTileHover),
             onTileClick: ifCanSpellBeUsed(engine.onTileClick),
         })

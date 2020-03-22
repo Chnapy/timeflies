@@ -9,6 +9,8 @@ import { UIState } from './ui/UIState';
 import { WSClient } from './socket/WSClient';
 import { IController } from './IController';
 import { BStateTurnStartAction, BStateAction } from './stages/battle/battleState/BattleStateSchema';
+import { AssetLoader } from './assetManager/AssetLoader';
+import { StageManager } from './stages/StageManager';
 
 export interface Controller extends IController {
 }
@@ -17,6 +19,8 @@ let store: Store<UIState, GameAction>;
 let client: WSClient;
 // let game: GameEngine;
 let app: App;
+const loader = AssetLoader();
+let stageManager: StageManager;
 
 const onAppMount = (gameWrapper: HTMLElement): void => {
 
@@ -29,6 +33,8 @@ const onAppMount = (gameWrapper: HTMLElement): void => {
     });
 
     ro.observe(gameWrapper);
+
+    stageManager = StageManager();
 
     // game = new GameEngine(
     //     gameWrapper
@@ -65,7 +71,7 @@ export const Controller: Controller = {
 
             console.group(
                 action.type,
-                (action as BStateTurnStartAction).payload.characterId,
+                (action as unknown as BStateTurnStartAction).payload.characterId,
                 [ action ]
             );
             console.groupEnd();
@@ -86,5 +92,7 @@ export const Controller: Controller = {
 
     waitConnect() {
         return client.waitConnect();
-    }
+    },
+
+    loader
 };

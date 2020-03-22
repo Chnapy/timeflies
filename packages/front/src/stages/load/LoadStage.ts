@@ -1,68 +1,70 @@
-import { BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
-import { AssetManager } from "../../assetManager/AssetManager";
+import { BattleLoadPayload, BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
 import { BattleLaunchAction } from "../../phaser/battleReducers/BattleReducerManager";
 import { serviceDispatch } from "../../services/serviceDispatch";
 import { serviceEvent } from "../../services/serviceEvent";
 import { serviceNetwork } from "../../services/serviceNetwork";
-import { BattleScene } from "../battle/BattleScene";
-import { CharacterGraphic } from "../battle/graphics/CharacterGraphic";
-import { SpellGraphic } from "../battle/graphics/SpellGraphic";
-import { LoadScene } from "./LoadScene";
+import { BattleSceneData } from "../battle/BattleScene";
+import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
 
-export interface LoadStage {
-    onPreload(): void;
-    onCreate(): Promise<void>;
-}
+export type LoadStageParam = StageParam<'load', BattleLoadPayload>;
 
-type Scene = Pick<LoadScene, 'initData' | 'start'> & {
-    load: Pick<LoadScene[ 'load' ], 'image' | 'tilemapTiledJSON' | 'atlasXML'>;
-};
-
-export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
+export const LoadStage: StageCreator<'load', 'mapImage' | 'mapSchema'> = (payload) => {
+    const { mapInfos } = payload;
 
     return {
-        onPreload() {
-            const payload = initData;
-            const { mapInfos, characterTypes } = payload;
+        preload: () => {
             const { urls } = mapInfos;
 
             // map tiles
-            load.image('tiles', urls.sheet);
+            // load.image('tiles', urls.sheet);
 
-            // map in json format
-            load.tilemapTiledJSON('map', urls.schema);
+            // // map in json format
+            // load.tilemapTiledJSON('map', urls.schema);
 
-            characterTypes.forEach(type => {
-                const { image, schema } = AssetManager.characters[ type ];
+            // characterTypes.forEach(type => {
+            //     const { image, schema } = AssetManager.characters[ type ];
 
-                load.atlasXML(CharacterGraphic.getSheetKey(type), image, schema);
-            });
+            //     load.atlasXML(CharacterGraphic.getSheetKey(type), image, schema);
+            // });
 
-            load.atlasXML(SpellGraphic.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
+            // load.atlasXML(SpellGraphic.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
+
+            return {
+                mapImage: urls.sheet,
+                mapSchema: urls.schema
+            };
         },
-        async onCreate() {
+        async create(assets) {
 
             const { onAction, onMessageAction } = serviceEvent();
 
-            const { sendBattleLaunch } = serviceDispatch({
-                sendBattleLaunch: (battleSnapshot: BattleSnapshot, globalTurnState: GlobalTurnSnapshot): BattleLaunchAction => ({
+            const { dispatchStageChangeToBattle, dispatchBattleLaunch } = serviceDispatch({
+                dispatchStageChangeToBattle: (payload: BattleSceneData): StageChangeAction<'battle'> => ({
+                    type: 'stage/change',
+                    stageKey: 'battle',
+                    payload
+                }),
+                dispatchBattleLaunch: (battleSnapshot: BattleSnapshot, globalTurnState: GlobalTurnSnapshot): BattleLaunchAction => ({
                     type: 'battle/launch',
                     battleSceneData: {
-                        ...initData,
+                        ...payload,
                         battleSnapshot,
                         battleData: {
                             cycle: {
                                 launchTime: battleSnapshot.launchTime
                             },
                             current: {
+                                battleHash: '',
                                 teams: [],
                                 players: [],
                                 characters: []
                             },
                             future: {
+                                battleHash: '',
                                 teams: [],
                                 players: [],
-                                characters: []
+                                characters: [],
+                                spellActionSnapshotList: []
                             }
                         },
                         globalTurnState
@@ -73,7 +75,7 @@ export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
             onAction<BattleLaunchAction>('battle/launch', ({
                 battleSceneData
             }) => {
-                start<BattleScene>('BattleScene', battleSceneData);
+                dispatchStageChangeToBattle(battleSceneData);
             });
 
             const { sendBattleLoadEnded } = await serviceNetwork({
@@ -87,7 +89,7 @@ export const LoadStage = ({ initData, load, start }: Scene): LoadStage => {
             onMessageAction<BRunLaunchSAction>('battle-run/launch', ({
                 battleSnapshot, globalTurnState
             }) => {
-                sendBattleLaunch(battleSnapshot, globalTurnState);
+                dispatchBattleLaunch(battleSnapshot, globalTurnState);
             });
         }
     };

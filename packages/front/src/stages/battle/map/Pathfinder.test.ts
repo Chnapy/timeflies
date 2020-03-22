@@ -1,5 +1,5 @@
 import { Pathfinder } from './Pathfinder';
-import { Position } from '@timeflies/shared';
+import { Position, TileType } from '@timeflies/shared';
 
 describe('# Pathfinder', () => {
 
@@ -8,7 +8,7 @@ describe('# Pathfinder', () => {
         {
             map: number[][],
             charPos?: Position[],
-            startEnd: [Position, Position],
+            startEnd: [ Position, Position ],
             path: Position[]
         }
     ]>([
@@ -16,11 +16,11 @@ describe('# Pathfinder', () => {
             'no obstacles',
             {
                 map: [
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0]
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ]
                 ],
                 startEnd: [
                     { x: 1, y: 2 },
@@ -37,11 +37,11 @@ describe('# Pathfinder', () => {
             'some obstacles',
             {
                 map: [
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 1, 0, 0],
-                    [0, 0, 1, 0, 0],
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 1, 0, 0]
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ]
                 ],
                 startEnd: [
                     { x: 1, y: 2 },
@@ -60,11 +60,11 @@ describe('# Pathfinder', () => {
             'unattainable target',
             {
                 map: [
-                    [0, 1, 0, 0, 0],
-                    [0, 0, 1, 0, 0],
-                    [0, 0, 1, 0, 0],
-                    [0, 0, 1, 0, 0],
-                    [0, 0, 1, 0, 0]
+                    [ 0, 1, 0, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ]
                 ],
                 startEnd: [
                     { x: 1, y: 2 },
@@ -77,11 +77,11 @@ describe('# Pathfinder', () => {
             'characters presence',
             {
                 map: [
-                    [0, 1, 0, 0, 0],
-                    [0, 0, 1, 0, 0],
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0],
-                    [0, 0, 1, 0, 0]
+                    [ 0, 1, 0, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 0, 0, 0 ],
+                    [ 0, 0, 1, 0, 0 ]
                 ],
                 charPos: [
                     { x: 2, y: 2 }
@@ -101,18 +101,17 @@ describe('# Pathfinder', () => {
         ]
     ])('should find correct path with: %s', async (_, { map, charPos = [], startEnd, path }) => {
 
-        const width = map[0].length;
+        const width = map[ 0 ].length;
         const height = map.length;
 
-        const hasObstacleAt = ({ x, y }: Position): boolean => !!map[y][x];
+        const getTileType = ({ x, y }: Position): TileType => map[ y ][ x ] ? 'obstacle' : 'default';
 
         const finder = Pathfinder(
             {
-                tilemap: {
-                    width,
-                    height
-                },
-                hasObstacleAt
+                width,
+                height,
+                orientation: 'orthogonal',
+                getTileType
             },
             () => charPos
         );

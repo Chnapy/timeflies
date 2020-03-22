@@ -11,7 +11,8 @@
     "test-ci": "yarn test"
   },
   "dependencies": {
-    "easystarjs": "0.4.3"
+    "easystarjs": "0.4.3",
+    "resource-loader": "4.0.0-rc4"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "6.1.0",

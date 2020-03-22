@@ -1,8 +1,6 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, ClientAction, ConfirmSAction, NotifySAction } from '@timeflies/shared';
 import { Controller } from '../../Controller';
-import { BattleRollbackAction, BattleSpellLaunchAction } from '../battleReducers/BattleReducerManager';
 import { BattleScene, BattleSceneData } from '../../stages/battle/BattleScene';
-
 
 export interface SendPromise<S extends ClientAction> extends Promise<{
     send: S;
@@ -47,6 +45,7 @@ export class BattleRoomManager {
 
         const getOnReject = (reject: Function) => (reason) => {
 
+//@ts-ignore
             Controller.dispatch<BattleRollbackAction>({
                 type: 'battle/rollback',
                 config: {
@@ -74,74 +73,13 @@ export class BattleRoomManager {
 
         this.sendStack.push(sendTimed);
 
+//@ts-ignore
         Controller.client.send<S>(message);
 
         return promise;
     }
 
     private setupOnMessage(): void {
-
-        Controller.client.on<BRunGlobalTurnStartSAction>('battle-run/global-turn-start', this.onGlobalTurnStart);
-
-        Controller.client.on<BRunTurnStartSAction>('battle-run/turn-start', this.onTurnStart);
-
-        Controller.client.on<ConfirmSAction>('confirm', this.onConfirm);
-
-        Controller.client.on<NotifySAction>('notify', this.onNotify);
-    };
-
-    private readonly onGlobalTurnStart = (action: BRunGlobalTurnStartSAction): void => {
-        const {cycle} = this.scene;
-        
-        cycle.synchronizeGlobalTurn(action.globalTurnState);
-    };
-
-    private readonly onTurnStart = (action: BRunTurnStartSAction): void => {
-        const {cycle} = this.scene;
-        
-        cycle.synchronizeTurn(action.turnState);
-    };
-
-    private readonly onConfirm = (receive: ConfirmSAction): void => {
-        const { sendTime, isOk } = receive;
-        // TODO check time, may be wrong
-        while (this.sendStack.length && this.sendStack[this.sendStack.length - 1].time >= sendTime) {
-
-            const send = this.sendStack.pop()!;
-
-            if (isOk) {
-                send.resolvePromise(receive);
-            } else {
-                send.rejectPromise(receive);
-            }
-        }
-    };
-
-    private readonly onNotify = (receive: NotifySAction): void => {
-        const { startTime, charAction } = receive;
-
-        const spell = this.state.battleData.globalTurn?.currentTurn.character.spells
-            .find(s => s.id === charAction.spellId);
-
-        if (!spell) {
-            console.error(
-                'notify spell issue',
-                charAction.spellId,
-                this.state.battleData.globalTurn?.currentTurn?.character.spells.map(s => s.id)
-            );
-            return;
-        }
-
-        Controller.dispatch<BattleSpellLaunchAction>({
-            type: 'battle/spell/launch',
-            charAction: {
-                positions: charAction.positions,
-                state: 'running',
-                spell,
-                startTime,
-                duration: spell.feature.duration
-            }
-        });
     };
 
     // static mockResponse<R extends ServerAction>(delay: number, data: Omit<R, 'time'>, time?: number | 'last'): void {

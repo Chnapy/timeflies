@@ -1,4 +1,4 @@
-import { equals, Position } from '@timeflies/shared';
+import { equals, Position, TiledManager } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
 
 export interface PathPromise {
@@ -19,7 +19,7 @@ export interface Pathfinder extends ReturnType<typeof Pathfinder> { }
 const ACCEPTABLE_TILES: number[] = [ 0 ];
 
 export const Pathfinder = (
-    { tilemap, hasObstacleAt }: PathfinderMapUtils,
+    tiledManager: TiledManager,
     getCharactersPosition: () => Readonly<Position>[]
 ) => {
 
@@ -28,7 +28,7 @@ export const Pathfinder = (
     let charactersPositions: Position[];
 
     const getTileID = (p: Position): number => {
-        const obstacle = hasObstacleAt(p)
+        const obstacle = tiledManager.getTileType(p) === 'obstacle'
             || isSomeoneAtXY(p);
 
         return obstacle ? 1 : 0;
@@ -42,7 +42,7 @@ export const Pathfinder = (
 
         refreshGrid(): void {
 
-            const { width, height } = tilemap;
+            const { width, height } = tiledManager;
 
             charactersPositions = getCharactersPosition();
 
@@ -63,7 +63,7 @@ export const Pathfinder = (
             { x: startX, y: startY }: Position,
             { x: endX, y: endY }: Position
         ): PathPromise {
-            
+
             let instanceId;
             const promise: PathPromise[ 'promise' ] = new Promise(resolve => {
 

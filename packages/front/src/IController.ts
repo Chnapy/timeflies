@@ -1,6 +1,7 @@
 import { GameAction } from "./action/GameAction";
 import { Store } from 'redux';
 import { UIState } from './ui/UIState';
+import { AssetLoader } from './assetManager/AssetLoader';
 
 export interface IController {
 
@@ -11,4 +12,5 @@ export interface IController {
     addEventListener<A extends GameAction>(type: A['type'], fn: (action: A) => void): void
 
     waitConnect(): Promise<void>;
+    readonly loader: AssetLoader;
 }

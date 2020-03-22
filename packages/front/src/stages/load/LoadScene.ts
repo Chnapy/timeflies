@@ -12,10 +12,12 @@ export type LoadAction =
 
 export class LoadScene extends ConnectedScene<'LoadScene', BattleLoadPayload> {
 
+//@ts-ignore
     private readonly loadStage: LoadStage;
 
     constructor() {
         super({ key: 'LoadScene' });
+        //@ts-ignore
         this.loadStage = LoadStage(this);
     }
 

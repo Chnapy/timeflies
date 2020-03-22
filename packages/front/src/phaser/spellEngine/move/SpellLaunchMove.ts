@@ -1,5 +1,6 @@
 import { Position } from '@timeflies/shared'
 import { Controller } from '../../../Controller';
+//@ts-ignore
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
 import { SpellLaunch, SpellResult } from '../SpellLaunch';
 
@@ -13,6 +14,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
 
         const [firstPos] = targetPositions;
 
+//@ts-ignore
         this.character.setPosition(firstPos, false, true, true);
 
         if (state.includes('first')) {
@@ -36,6 +38,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
 
     private onStart(targetPositions: Position[]): void {
 
+//@ts-ignore
         this.character.setCharacterState('move');
 
         const duration = this.spell.feature.duration;
@@ -44,6 +47,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
             const pWorld = this.map.tileToWorldPosition(p);
 
             return {
+                //@ts-ignore
                 targets: this.character.getGraphics(),
                 x: { value: pWorld.x, duration },
                 y: { value: pWorld.y, duration },
@@ -77,6 +81,7 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
         this.timeline?.stop();
         delete this.timeline;
 
+//@ts-ignore
         this.character.characterGraphic.updatePosition();
     }
 }

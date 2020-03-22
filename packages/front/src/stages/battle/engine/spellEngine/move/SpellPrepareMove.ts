@@ -1,15 +1,14 @@
-import { Position } from '@timeflies/shared'
+import { Position, TileType } from '@timeflies/shared'
 import { serviceDispatch } from '../../../../../services/serviceDispatch'
 import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
 import { Spell } from '../../../entities/Spell'
-import { SpellGraphicMove } from '../../../graphics/spellGraphics/move/SpellGraphicMove'
 import { MapManager } from '../../../map/MapManager'
 import { SpellAction } from '../../../spellAction/SpellActionManager'
 import { SpellPrepareSubEngineCreator } from '../../SpellPrepareEngine'
 
-interface Dependencies {
-    graphics: typeof SpellGraphicMove;
-}
+// interface Dependencies {
+//     graphics: typeof SpellGraphicMove;
+// }
 
 export const spellLaunchMove = ({ spell, position }: SpellAction) => {
     const { character } = spell;
@@ -20,7 +19,7 @@ export const spellLaunchMove = ({ spell, position }: SpellAction) => {
 export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
     spell: Spell,
     mapManager: MapManager,
-    { graphics }: Dependencies = { graphics: SpellGraphicMove }
+    // { graphics }: Dependencies = { graphics: SpellGraphicMove }
 ) => {
 
     const { character } = spell;
@@ -29,7 +28,7 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
         state: 'idle'
     });
 
-    let pathWorld: Position[] = [];
+    // let pathWorld: Position[] = [];
     let pathTile: Position[] = [];
 
     let currentTile: { x: number; y: number; } | null = null;
@@ -46,9 +45,9 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
     });
 
     return {
-        onTileHover(pointerPos: Position) {
+        onTileHover(tilePos: Position, tileType: TileType) {
 
-            currentTile = mapManager.worldToTileIfExist(pointerPos);
+            currentTile = tileType === 'default' ? tilePos : null;
             if (currentTile) {
 
                 if (previousTile
@@ -62,7 +61,7 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
 
                 pathPromise.promise.then(path => {
                     pathTile = path;
-                    pathWorld = path.map(p => mapManager.tileToWorld(p, true));
+                    // pathWorld = path.map(p => mapManager.tileToWorld(p, true));
                 });
 
                 previousTile = currentTile;
@@ -76,7 +75,7 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
 
             const positions = pathTile.slice(1);
 
-            dispatchSpellLaunch(positions.map(position => ({
+            dispatchSpellLaunch(positions.map((position): SpellAction => ({
                 spell,
                 position
             })));

@@ -3,6 +3,7 @@ import { ConnectedScene } from '../ConnectedScene';
 
 export class BootScene extends ConnectedScene<'BootScene'> {
 
+//@ts-ignore
     private bootStage!: BootStage;
 
     constructor() {

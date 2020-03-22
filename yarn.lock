@@ -1400,7 +1400,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.7.0.tgz#b417deda18cf8400f278733499ad5547ed1abec4"
   integrity sha512-GnZbirvmqZUzMgkFn70c74OQpTTUcCzlhQliTzYjQMqg+hVKcDnxdL19Ne3UdYzdMA/+W3eb646FWn/ZaT1NfQ==
 
-"@types/object-hash@^1.3.1":
+"@types/object-hash@1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@types/object-hash/-/object-hash-1.3.1.tgz#b8145122b230bad5a13cba52016e78c54dae6ed5"
   integrity sha512-xhLwbVGAXi/LJEowMjRY1anbF5sQWeuocVjaMrFYy4bOEpl79A4eIby3xlowbkXytUdbISwOZB+vQx9Y/n0p8A==
@@ -7137,15 +7137,15 @@ object-copy@^0.1.0:
     define-property "^0.2.5"
     kind-of "^3.0.3"
 
+object-hash@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-2.0.3.tgz#d12db044e03cd2ca3d77c0570d87225b02e1e6ea"
+  integrity sha512-JPKn0GMu+Fa3zt3Bmr66JhokJU5BaNBIh4ZeTlaCBzrBsOeXzwcKKAK1tbLiPKgvwmPXsDvvLHoWh5Bm7ofIYg==
+
 object-hash@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-2.0.1.tgz#cef18a0c940cc60aa27965ecf49b782cbf101d96"
   integrity sha512-HgcGMooY4JC2PBt9sdUdJ6PMzpin+YtY3r/7wg0uTifP+HJWW8rammseSEHuyt0UeShI183UGssCJqm1bJR7QA==
-
-object-hash@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-2.0.3.tgz#d12db044e03cd2ca3d77c0570d87225b02e1e6ea"
-  integrity sha512-JPKn0GMu+Fa3zt3Bmr66JhokJU5BaNBIh4ZeTlaCBzrBsOeXzwcKKAK1tbLiPKgvwmPXsDvvLHoWh5Bm7ofIYg==
 
 object-inspect@^1.7.0:
   version "1.7.0"
@@ -7487,6 +7487,11 @@ parse-json@^5.0.0:
     error-ex "^1.3.1"
     json-parse-better-errors "^1.0.1"
     lines-and-columns "^1.1.6"
+
+parse-uri@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/parse-uri/-/parse-uri-1.0.0.tgz#2872dcc22f1a797acde1583d8a0ac29552ddac20"
+  integrity sha1-KHLcwi8aeXrN4Vg9igrClVLdrCA=
 
 parse5@4.0.0:
   version "4.0.0"
@@ -9109,6 +9114,14 @@ resolve@^1.14.2:
   dependencies:
     path-parse "^1.0.6"
 
+resource-loader@^4.0.0-rc4:
+  version "4.0.0-rc4"
+  resolved "https://registry.yarnpkg.com/resource-loader/-/resource-loader-4.0.0-rc4.tgz#4794fe9629f258964b53de651bd023046099c989"
+  integrity sha512-DuGS7xVDnL6rlDj0gU103N8CGGbEPkwqrIoZlL22/rGb97azFHgeb3DG53INW1MZCiAv9MUZfuk9ZxCIMBCM6g==
+  dependencies:
+    parse-uri "^1.0.0"
+    type-signals "^1.0.3"
+
 restore-cursor@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/restore-cursor/-/restore-cursor-3.1.0.tgz#39f67c54b3a7a58cea5236d95cf0034239631f7e"
@@ -10127,7 +10140,7 @@ thunky@^1.0.2:
   resolved "https://registry.yarnpkg.com/thunky/-/thunky-1.1.0.tgz#5abaf714a9405db0504732bbccd2cedd9ef9537d"
   integrity sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA==
 
-tiled-types@^1.0.0:
+tiled-types@1.0.0, tiled-types@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/tiled-types/-/tiled-types-1.0.0.tgz#34d73da609e7a9f4867b9f2e38e1ccc86c8c6be7"
   integrity sha512-7PETacEkgsilXIbNaATL32V8gVu6E5v+yLlm6fmbIwgb1W5KqDKHOIX01B+LFuOO5HsWqDCho/jJIUKr53t7ug==
@@ -10317,6 +10330,11 @@ type-is@~1.6.17, type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
+
+type-signals@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/type-signals/-/type-signals-1.0.3.tgz#45dbaf7e6371bed304be67ea43908c8a9850acec"
+  integrity sha512-u/CLzLSVG5/+Lq0oZVW77zf4h5u+GmaoRxIFZigM9H+zE9y8clezE08TdzK6HEaNlZ8ZDgMhjmSGZmsqIw4gtw==
 
 type@^1.0.1:
   version "1.2.0"

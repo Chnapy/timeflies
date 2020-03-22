@@ -1,36 +1,45 @@
-import { MapGraphics } from '../graphics/MapGraphics';
-import { Pathfinder } from './Pathfinder';
-import { Position } from '@timeflies/shared';
+import { MapInfos, TiledManager, TiledMap } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
+import { Pathfinder } from './Pathfinder';
 
 export interface MapManager extends
-    Pick<MapGraphics, 'tileToWorld' | 'worldToTile'>,
-    Pick<Pathfinder, 'calculatePath'> {
+    Pick<Pathfinder, 'calculatePath'>,
+    Pick<TiledManager, 'getTileType'> {
     refreshPathfinder(): void;
-    worldToTileIfExist(position: Position): Position | null;
+    // Pick<MapGraphics, 'tileToWorld' | 'worldToTile'>,
+    // worldToTileIfExist(position: Position): Position | null;
 }
 
 interface Dependencies {
+    tiledManagerCreator: typeof TiledManager;
     pathfinderCreator: typeof Pathfinder;
 }
 
 export const MapManager = (
-    getGraphics: () => MapGraphics,
-    { pathfinderCreator }: Dependencies = { pathfinderCreator: Pathfinder }
+    mapSchema: TiledMap,
+    mapInfos: MapInfos,
+    // getGraphics: () => MapGraphics,
+    { pathfinderCreator, tiledManagerCreator }: Dependencies = {
+        pathfinderCreator: Pathfinder,
+        tiledManagerCreator: TiledManager
+    }
 ): MapManager => {
+
+    const tiledManager = tiledManagerCreator(mapSchema, {
+        defaultTilelayerName: mapInfos.decorLayerKey,
+        obstacleTilelayerName: mapInfos.obstaclesLayerKey
+    });
 
     const { characters } = serviceBattleData('future');
 
-    const graphics = getGraphics();
+    // const graphics = getGraphics();
 
-    const { tilemap, hasObstacleAt, tileToWorld, worldToTile } = graphics;
+    // const { tilemap, hasObstacleAt, tileToWorld, worldToTile } = graphics;
 
     const pathfinder = pathfinderCreator(
-        { tilemap, hasObstacleAt },
+        tiledManager,
         () => characters.map(c => c.position)
     );
-
-    const { calculatePath } = pathfinder;
 
     return {
 
@@ -38,12 +47,14 @@ export const MapManager = (
             pathfinder.refreshGrid();
         },
 
-        calculatePath,
+        calculatePath: pathfinder.calculatePath,
 
-        tileToWorld,
-        worldToTile,
-        worldToTileIfExist(position: Position): Position | null {
-            // TODO
-        }
+        getTileType: tiledManager.getTileType
+
+        // tileToWorld,
+        // worldToTile,
+        // worldToTileIfExist(position: Position): Position | null {
+        //     // TODO
+        // }
     };
 };

@@ -1,6 +1,7 @@
 import { Position } from '@timeflies/shared'
 import { SpellType } from '@timeflies/shared'
 import { Controller } from '../../../Controller';
+//@ts-ignore
 import { BattleSpellLaunchAction, BattleSpellPrepareAction } from '../../battleReducers/BattleReducerManager';
 import { Character } from '../../../stages/battle/entities/Character';
 import { SpellPrepare } from '../SpellPrepare';

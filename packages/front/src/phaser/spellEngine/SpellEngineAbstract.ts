@@ -18,6 +18,7 @@ export abstract class SpellEngineAbstract<S extends Exclude<CurrentSpellState, '
         this.spell = spell;
         this.character = spell.character;
         this.map = scene.map;
+        //@ts-ignore
         this.characters = scene.battleData.characters;
     }
 

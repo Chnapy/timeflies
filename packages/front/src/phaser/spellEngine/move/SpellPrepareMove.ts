@@ -1,5 +1,6 @@
 import { Position } from '@timeflies/shared'
 import { Controller } from '../../../Controller';
+//@ts-ignore
 import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
 import { SpellPrepare } from '../SpellPrepare';
 
@@ -11,6 +12,7 @@ export class SpellPrepareMove extends SpellPrepare<'move'> {
     private prevTile: Phaser.Tilemaps.Tile | null = null;
 
     init(): void {
+        //@ts-ignore
         this.character.setCharacterState('idle');
     }
 
@@ -34,6 +36,7 @@ export class SpellPrepareMove extends SpellPrepare<'move'> {
 
             const mainPos = this.character.position;
 
+//@ts-ignore
             const pathPromise = pathfinder.calculatePath(mainPos.x, mainPos.y, this.currentTile.x, this.currentTile.y);
 
             pathPromise.promise.then(path => {

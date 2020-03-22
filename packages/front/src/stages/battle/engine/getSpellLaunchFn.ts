@@ -5,7 +5,8 @@ import { spellLaunchMove } from './spellEngine/move/SpellPrepareMove';
 const spellLaunchMap: {
     [ key in SpellType ]: (spellAction: SpellAction) => void;
 } = {
-    move: spellLaunchMove
-};
+    move: spellLaunchMove,
+    orientate: () => {}
+} as any;   // TODO
 
 export const getSpellLaunchFn = (spellType: SpellType) => spellLaunchMap[spellType];
