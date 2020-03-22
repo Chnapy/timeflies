@@ -11,6 +11,7 @@ import { SpellPrepareMove } from "./spellEngine/move/SpellPrepareMove";
 export interface SpellPrepareSubEngine {
     onTileHover(pointerPos: Position): void;
     onTileClick(pointerPos: Position): void;
+    stop(): void;
 }
 
 export interface SpellPrepareSubEngineCreator {
@@ -115,5 +116,9 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
 
     dispatchBind();
 
-    return {};
+    return {
+        stop() {
+            engine.stop();
+        }
+    };
 };

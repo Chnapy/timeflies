@@ -64,7 +64,7 @@ export class WSClient {
     private onMessage({ data }: MessageEvent): void {
 
         if (typeof data !== 'string') {
-            throw new Error(`typeof message not handled: ${typeof data}`);
+            throw new TypeError(`typeof message not handled: ${typeof data}`);
         }
 
         let action;
@@ -76,7 +76,7 @@ export class WSClient {
         console.log('->', action);
 
         if (typeof action !== 'object' || typeof action.type !== 'string') {
-            throw new Error(`message is not an Action: ${action}`);
+            throw new TypeError(`message is not an Action: ${action}`);
         }
 
         console.log(action);

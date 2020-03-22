@@ -37,8 +37,7 @@ export interface SpellActionSnapshot {
 }
 
 export interface NotifySAction extends TAction<'notify'> {
-    charAction: CharAction;
-    startTime: number;
+    spellActionSnapshot: SpellActionSnapshot;
 }
 
 export interface SpellActionCAction extends TAction<'battle/spellAction'> {

@@ -27,18 +27,13 @@ export interface BStateSpellPrepareAction extends BStateActionAbstract<'SPELL-PR
 export interface BStateSpellLaunchAction extends BStateActionAbstract<'SPELL-LAUNCH', {
     spellActions: SpellAction[];
 }> { }
-// export interface BStateSpellNotifyEvent extends BStateEventAbstract<'SPELL-NOTIFY', {
-//     spellId: string;
-//     positions: Position[];
-// }> { }
 
 export type BStateAction =
     | BStateResetAction
     | BStateTurnStartAction
     | BStateTurnEndAction
     | BStateSpellPrepareAction
-    | BStateSpellLaunchAction
-// | BStateSpellNotifyEvent;
+    | BStateSpellLaunchAction;
 
 export type BStateActionType = BStateAction[ 'eventType' ];
 
@@ -89,7 +84,7 @@ export const BStateSchemaRoot = (
         watch: watchCreator
     }: Dependencies = {
             spellPrepare: SpellPrepareEngine,
-            watch: () => ({})
+            watch: WatchEngine
         }
 ): BStateSchemaRoot => {
 
@@ -114,11 +109,7 @@ export const BStateSchemaRoot = (
             'TURN-START': [ {
                 target: 'spellPrepare',
                 cond: shouldBeOwnTurn
-            } ],
-            // 'SPELL-NOTIFY': [ {
-            //     target: 'spellLaunch',
-            //     cond: () => shouldNotBeOwnTurn() && shouldTurnBeRunning()
-            // } ]
+            } ]
         }
     };
 

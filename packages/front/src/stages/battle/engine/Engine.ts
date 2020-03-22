@@ -23,5 +23,7 @@ export interface EngineCreator<
     E extends BStateAction | undefined,
     O extends any[] = []
     > {
-    (param: EngineCreatorParam<E>, ...O): {};
+    (param: EngineCreatorParam<E>, ...O): {
+        stop(): void;
+    };
 }

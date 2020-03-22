@@ -21,14 +21,15 @@ describe('# BStateMachine', () => {
                 initialState: 'watch',
                 states: {
                     watch: {
-                        engineCreator: () => ({})
+                        engineCreator: () => ({
+                            stop() { }
+                        })
                     },
                     spellPrepare: {
-                        engineCreator: () => ({})
-                    },
-                    spellLaunch: {
-                        engineCreator: () => ({})
-                    },
+                        engineCreator: () => ({
+                            stop() { }
+                        })
+                    }
                 }
             })
         });
@@ -43,7 +44,9 @@ describe('# BStateMachine', () => {
                 initialState: 'watch',
                 states: {
                     watch: {
-                        engineCreator: () => ({}),
+                        engineCreator: () => ({
+                            stop() { }
+                        }),
                         on: {
                             "SPELL-PREPARE": [ {
                                 target: 'spellPrepare',
@@ -51,10 +54,9 @@ describe('# BStateMachine', () => {
                         }
                     },
                     spellPrepare: {
-                        engineCreator: () => ({})
-                    },
-                    spellLaunch: {
-                        engineCreator: () => ({})
+                        engineCreator: () => ({
+                            stop() { }
+                        })
                     },
                 }
             })
@@ -78,7 +80,9 @@ describe('# BStateMachine', () => {
                 initialState: 'watch',
                 states: {
                     watch: {
-                        engineCreator: () => ({}),
+                        engineCreator: () => ({
+                            stop() { }
+                        }),
                         on: {
                             "SPELL-PREPARE": [ {
                                 target: 'spellPrepare',
@@ -87,10 +91,9 @@ describe('# BStateMachine', () => {
                         }
                     },
                     spellPrepare: {
-                        engineCreator: () => ({})
-                    },
-                    spellLaunch: {
-                        engineCreator: () => ({})
+                        engineCreator: () => ({
+                            stop() { }
+                        })
                     },
                 }
             })
@@ -114,7 +117,9 @@ describe('# BStateMachine', () => {
                 initialState: 'watch',
                 states: {
                     watch: {
-                        engineCreator: () => ({}),
+                        engineCreator: () => ({
+                            stop() { }
+                        }),
                         on: {
                             "SPELL-PREPARE": [ {
                                 target: 'spellPrepare',
@@ -123,10 +128,9 @@ describe('# BStateMachine', () => {
                         }
                     },
                     spellPrepare: {
-                        engineCreator: () => ({})
-                    },
-                    spellLaunch: {
-                        engineCreator: () => ({})
+                        engineCreator: () => ({
+                            stop() { }
+                        })
                     },
                 }
             })
@@ -150,15 +154,16 @@ describe('# BStateMachine', () => {
                 initialState: 'watch',
                 states: {
                     watch: {
-                        engineCreator: () => ({}),
+                        engineCreator: () => ({
+                            stop() { }
+                        }),
                         on: {
                         }
                     },
                     spellPrepare: {
-                        engineCreator: () => ({})
-                    },
-                    spellLaunch: {
-                        engineCreator: () => ({})
+                        engineCreator: () => ({
+                            stop() { }
+                        })
                     },
                 }
             })

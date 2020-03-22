@@ -33,7 +33,7 @@ export const BStateMachine = (
         const trigger = triggers.find(t => !t.cond || t.cond());
         if (trigger) {
 
-            // TODO previous engine end
+            engine.stop();
 
             state = trigger.target;
             const { engineCreator } = schema.states[ state ];

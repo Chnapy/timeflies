@@ -1,12 +1,12 @@
 import { StoreTest } from '../../../StoreTest';
-import { TimerTester, SpellActionSnapshot, ConfirmSAction } from '@timeflies/shared';
-import { serviceNetwork } from '../../../services/serviceNetwork';
-import { SendMessageAction, ReceiveMessageAction } from '../../../socket/WSClient';
+import { TimerTester, SpellActionSnapshot, ConfirmSAction, NotifySAction } from '@timeflies/shared';
+import { ReceiveMessageAction } from '../../../socket/WSClient';
 import { BStateSpellLaunchAction, BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { Spell } from '../entities/Spell';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from './SpellActionManager';
-import { BattleDataCurrent, BattleDataFuture } from '../../../BattleData';
+import { BattleDataCurrent, BattleDataFuture, BattleDataCycle } from '../../../BattleData';
+import { seedCharacter } from '../../../__seeds__/seedCharacter';
 
 describe('# SpellActionManager', () => {
 
@@ -17,6 +17,17 @@ describe('# SpellActionManager', () => {
         const startTime = timerTester.now;
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
+
+        const currentCharacter = seedCharacter();
+
+        const cycleBattleData: BattleDataCycle = {
+            launchTime: -1,
+            globalTurn: {
+                currentTurn: {
+                    character: currentCharacter
+                }
+            } as any
+        };
 
         const currentBattleData: BattleDataCurrent = {
             battleHash: 'not-defined'
@@ -31,6 +42,7 @@ describe('# SpellActionManager', () => {
             data: {
                 state: 'battle',
                 battleData: {
+                    cycle: cycleBattleData,
                     current: currentBattleData,
                     future: futureBattleData
                 } as unknown as any
@@ -42,7 +54,8 @@ describe('# SpellActionManager', () => {
                 spellActionTimerCreator: () => ({
                     onAdd() { },
                     onRemove() { },
-                })
+                }),
+                getSpellLaunchFn: () => () => { }
             });
 
         return {
@@ -50,7 +63,8 @@ describe('# SpellActionManager', () => {
             spellActionSnapshotList,
             manager,
             currentBattleData,
-            futureBattleData
+            futureBattleData,
+            currentCharacter
         };
     };
 
@@ -71,13 +85,13 @@ describe('# SpellActionManager', () => {
                             id: 's1',
                             staticData: {
                                 id: 's1',
+                                type: 'move'
                             },
                             feature: {
                                 duration: 200
                             }
                         } as Spell,
-                        position: { x: -1, y: -1 },
-                        beforeCommit: () => { }
+                        position: { x: -1, y: -1 }
                     }
                 ]
             }
@@ -96,13 +110,13 @@ describe('# SpellActionManager', () => {
                             id: 's1',
                             staticData: {
                                 id: 's1',
+                                type: 'move'
                             },
                             feature: {
                                 duration: 200
                             }
                         } as Spell,
-                        position: { x: 0, y: -1 },
-                        beforeCommit: () => { }
+                        position: { x: 0, y: -1 }
                     }
                 ]
             }
@@ -134,8 +148,6 @@ describe('# SpellActionManager', () => {
 
         futureBattleData.battleHash = '-hash-';
 
-        const beforeCommit = jest.fn();
-
         StoreTest.dispatch<BStateSpellLaunchAction>({
             type: 'battle/state/event',
             eventType: 'SPELL-LAUNCH',
@@ -146,19 +158,17 @@ describe('# SpellActionManager', () => {
                             id: 's1',
                             staticData: {
                                 id: 's1',
+                                type: 'move'
                             },
                             feature: {
                                 duration: 200
                             }
                         } as Spell,
-                        position: { x: -1, y: -1 },
-                        beforeCommit
+                        position: { x: -1, y: -1 }
                     }
                 ]
             }
         });
-
-        expect(beforeCommit).toHaveBeenCalledTimes(1);
 
         expect(spellActionSnapshotList).toEqual<SpellActionSnapshot[]>([ {
             startTime,
@@ -252,5 +262,46 @@ describe('# SpellActionManager', () => {
         });
 
         expect(spellActionSnapshotList).toHaveLength(0);
+    });
+
+    it('should launch spell on message notify', () => {
+
+        const { startTime, spellActionSnapshotList, futureBattleData, currentCharacter } = init();
+
+        futureBattleData.battleHash = '-hash-';
+
+        const [ spell ] = currentCharacter.spells;
+
+        StoreTest.dispatch<ReceiveMessageAction<NotifySAction>>({
+            type: 'message/receive',
+            message: {
+                type: 'notify',
+                sendTime: -1,
+                spellActionSnapshot: {
+                    startTime,
+                    duration: spell.feature.duration,
+                    battleHash: '-hash-',
+                    spellId: spell.id,
+                    position: { x: -1, y: -1 },
+                    validated: false
+                }
+            }
+        });
+
+        expect(spellActionSnapshotList).toEqual<SpellActionSnapshot[]>([ {
+            startTime,
+            duration: spell.feature.duration,
+            battleHash: '-hash-',
+            spellId: spell.id,
+            position: { x: -1, y: -1 },
+            validated: false
+        } ]);
+
+        expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction ]>([
+            {
+                type: 'battle/commit',
+                time: timerTester.now + spell.feature.duration
+            }
+        ]);
     });
 });

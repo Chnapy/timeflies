@@ -1,4 +1,4 @@
-import { ConfirmSAction, Position, SpellActionSnapshot } from '@timeflies/shared';
+import { ConfirmSAction, Position, SpellActionSnapshot, NotifySAction, assertIsDefined } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
@@ -6,11 +6,11 @@ import { BStateAction } from '../battleState/BattleStateSchema';
 import { Spell } from '../entities/Spell';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { SpellActionTimer } from './SpellActionTimer';
+import { getSpellLaunchFn as GetterSpellLaunchFn } from '../engine/getSpellLaunchFn';
 
 export interface SpellAction {
     spell: Spell;
     position: Position;
-    beforeCommit: (action: SpellAction) => void;
 }
 
 export interface SpellActionManager {
@@ -18,10 +18,24 @@ export interface SpellActionManager {
 
 interface Dependencies {
     spellActionTimerCreator: typeof SpellActionTimer;
+    getSpellLaunchFn: typeof GetterSpellLaunchFn;
 }
 
+const assertSameHash = (hash1: string, hash2: string): void | never => {
+    if (hash1 !== hash2) {
+        throw new Error(`Hashs should be equal [${hash1}]<->[${hash2}].
+        There is an inconsistence front<->back.`);
+    }
+};
+
 export const SpellActionManager = (
-    { spellActionTimerCreator }: Dependencies = { spellActionTimerCreator: SpellActionTimer }
+    {
+        spellActionTimerCreator,
+        getSpellLaunchFn
+    }: Dependencies = {
+            spellActionTimerCreator: SpellActionTimer,
+            getSpellLaunchFn: GetterSpellLaunchFn
+        }
 ): SpellActionManager => {
 
     const spellActionTimer = spellActionTimerCreator();
@@ -41,11 +55,13 @@ export const SpellActionManager = (
     const getSnapshotEndTime = ({ startTime, duration }: SpellActionSnapshot) => startTime + duration;
 
     const onSpellAction = (action: SpellAction, startTime: number) => {
-        const { spell, position, beforeCommit } = action;
+        const { spell, position } = action;
 
         const { duration } = spell.feature;
 
-        beforeCommit(action);
+        const spellLaunchFn = getSpellLaunchFn(spell.staticData.type);
+
+        spellLaunchFn(action);
 
         dispatchCommit(startTime + duration);
 
@@ -143,6 +159,30 @@ export const SpellActionManager = (
         if (!isOk) {
             onRollback(lastCorrectHash);
         }
+    });
+
+    onMessageAction<NotifySAction>('notify', ({ spellActionSnapshot: {
+        spellId, position, startTime, battleHash
+    } }) => {
+
+        const { globalTurn } = serviceBattleData('cycle');
+
+        assertIsDefined(globalTurn);
+
+        const { character } = globalTurn.currentTurn;
+
+        const spell = character.spells.find(s => s.id === spellId);
+
+        assertIsDefined(spell);
+
+        const spellAction: SpellAction = {
+            spell,
+            position
+        };
+
+        onSpellAction(spellAction, startTime);
+
+        assertSameHash(getLastSnapshot()!.battleHash, battleHash);
     });
 
     return {};

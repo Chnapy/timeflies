@@ -11,6 +11,12 @@ interface Dependencies {
     graphics: typeof SpellGraphicMove;
 }
 
+export const spellLaunchMove = ({ spell, position }: SpellAction) => {
+    const { character } = spell;
+
+    character.set({ position });
+};
+
 export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
     spell: Spell,
     mapManager: MapManager,
@@ -70,17 +76,12 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
 
             const positions = pathTile.slice(1);
 
-            const beforeCommit = ({ spell, position }: SpellAction) => {
-                const { character } = spell;
-
-                character.set({ position });
-            };
-
             dispatchSpellLaunch(positions.map(position => ({
                 spell,
-                position,
-                beforeCommit
+                position
             })));
         },
+        stop() {
+        }
     }
 }
