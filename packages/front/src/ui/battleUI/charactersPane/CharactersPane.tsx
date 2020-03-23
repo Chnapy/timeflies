@@ -9,7 +9,9 @@ interface CharactersPaneInnerProps {
 }
 
 export const CharactersPane = connect<CharactersPaneInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { characters, globalTurn } } }) => {
+    ({ data: { battleData } }) => {
+        const { globalTurn } = battleData.cycle;
+        const { characters } = battleData.current;
         const charactersIds = characters
             .map(c => c.id)
             .sort((a, b) => globalTurn?.currentTurn.character.id === a ? -1 : 1);

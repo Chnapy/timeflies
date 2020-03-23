@@ -12,7 +12,7 @@ interface TimeGaugeInnerProps {
 }
 
 export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { globalTurn } } }) => {
+    ({ data: { battleData: { cycle: { globalTurn } } } }) => {
         if (!globalTurn) {
             return {
                 startDateTime: 0,
@@ -78,7 +78,7 @@ export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>
     });
 
     return <div className={classNames(css.root, {
-        [css.disabled]: disabled
+        [ css.disabled ]: disabled
     })}>
         <div ref={frontRef} className={css.gauge_front} />
     </div>;

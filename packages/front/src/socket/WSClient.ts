@@ -15,53 +15,23 @@ export type MessageAction = ReceiveMessageAction | SendMessageAction;
 
 const ENDPOINT = 'ws://localhost:4275';
 
-export class WSClient {
+export interface WSClient {
+    readonly isOpen: boolean;
+    waitConnect(): Promise<void>;
+}
 
-    private readonly socket: WebSocket;
-    private readonly dispatchMessage: (message: ServerAction) => void;
-    private readonly onAction: OnAction<SendMessageAction>;
+export const WSClient = (): WSClient => {
 
-    get isOpen(): boolean {
-        return this.socket.readyState === WebSocket.OPEN;
-    }
-
-    private readonly openPromise: Promise<void>;
-
-    constructor() {
-        this.socket = new WebSocket(ENDPOINT);
-
-        this.dispatchMessage = serviceDispatch({
-            dispatch: (message: ServerAction) => ({
-                type: 'message/receive',
-                message
-            })
-        }).dispatch;
-
-        this.onAction = serviceEvent().onAction;
-
-        this.socket.onmessage = this.onMessage.bind(this);
-
-        this.openPromise = new Promise((resolve, reject) => {
-            this.socket.onopen = () => resolve();
-            this.socket.onerror = () => reject();
-        });
-    }
-
-    async waitConnect(): Promise<void> {
-        return this.openPromise;
-    }
-
-    private readonly onSendMessageAction = this.onAction<SendMessageAction>('message/send', ({
-        message
-    }) => {
-        console.log('<-', message);
-        this.socket.send(JSON.stringify({
-            sendTime: Date.now(),
-            ...message
-        }));
+    const { dispatchMessage } = serviceDispatch({
+        dispatchMessage: (message: ServerAction) => ({
+            type: 'message/receive',
+            message
+        })
     });
 
-    private onMessage({ data }: MessageEvent): void {
+    const { onAction } = serviceEvent();
+
+    const onMessage = ({ data }: MessageEvent): void => {
 
         if (typeof data !== 'string') {
             throw new TypeError(`typeof message not handled: ${typeof data}`);
@@ -81,6 +51,34 @@ export class WSClient {
 
         console.log(action);
 
-        this.dispatchMessage(action);
-    }
+        dispatchMessage(action);
+    };
+
+    onAction<SendMessageAction>('message/send', ({
+        message
+    }) => {
+        console.log('<-', message);
+        socket.send(JSON.stringify({
+            sendTime: Date.now(),
+            ...message
+        }));
+    });
+
+    const socket = new WebSocket(ENDPOINT);
+
+    socket.onmessage = onMessage;
+
+    const openPromise = new Promise<void>((resolve, reject) => {
+        socket.onopen = () => resolve();
+        socket.onerror = () => reject();
+    });
+
+    return {
+        get isOpen(): boolean {
+            return socket.readyState === WebSocket.OPEN;
+        },
+        async waitConnect(): Promise<void> {
+            return openPromise;
+        }
+    };
 }

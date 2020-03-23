@@ -67,10 +67,11 @@ describe('services', () => {
     it('serviceCurrentPlayer should return current player data if exist', () => {
 
         StoreTest.initStore({
+            currentPlayer: null,
             data: {} as any
         });
 
-        expect(serviceCurrentPlayer()).toBeUndefined();
+        expect(serviceCurrentPlayer()).toBeNull();
 
         const currentPlayer = {
             id: 'id',

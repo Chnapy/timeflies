@@ -22,7 +22,7 @@ export type UIStateData = UIStateBoot | UIStateLoad | UIStateBattle;
 
 export interface UIState<D extends UIStateData['state'] = UIStateData['state']> {
 
-    currentPlayer?: CurrentPlayer;
+    currentPlayer: CurrentPlayer | null;
 
     data: NarrowState<UIStateData, D>;
 

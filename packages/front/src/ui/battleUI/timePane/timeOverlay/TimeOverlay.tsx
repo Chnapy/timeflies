@@ -3,7 +3,6 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { AssetManager } from "../../../../assetManager/AssetManager";
-import { CharActionState } from "../../../../stages/battle/cycle/CycleManager";
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
 import { UIState } from "../../../UIState";
 import css from './timeOverlay.module.css';
@@ -12,7 +11,7 @@ interface TimeAction {
     spellType: SpellType;
     startDateTime: number;
     duration: number;
-    state: CharActionState;
+    state: any//CharActionState;
 }
 
 interface TimeOverlayInnerProps {
@@ -23,7 +22,7 @@ interface TimeOverlayInnerProps {
 }
 
 export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { globalTurn } } }) => {
+    ({ data: { battleData: { cycle: { globalTurn }, future: {spellActionSnapshotList} } } }) => {
         if (!globalTurn) {
             return {
                 startDateTime: 0,
@@ -32,31 +31,29 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
                 disabled: true
             };
         }
-        
+
         const { currentTurn } = globalTurn;
 
-        const { charActionStack } = currentTurn;
+        const timeActions = spellActionSnapshotList.reduce<TimeAction[]>((acc, ca) => {
 
-        const timeActions = charActionStack.reduce<TimeAction[]>((acc, ca) => {
+            const previousCa = acc[ acc.length - 1 ];
+            // if (
+            //     previousCa
+            //     && previousCa.spellType === 'move'
+            //     && previousCa.spellType === ca.spell.staticData.type
+            //     && ca.startTime - previousCa.startDateTime - previousCa.duration < 50
+            // ) {
+            //     previousCa.duration += ca.spell.feature.duration;
 
-            const previousCa = acc[acc.length - 1];
-            if (
-                previousCa
-                && previousCa.spellType === 'move'
-                && previousCa.spellType === ca.spell.staticData.type
-                && ca.startTime - previousCa.startDateTime - previousCa.duration < 50
-            ) {
-                previousCa.duration += ca.spell.feature.duration;
+            // } else {
+                // acc.push({
+                //     spellType: ca.spell.staticData.type,
+                //     startDateTime: ca.startTime,
+                //     duration: ca.spell.feature.duration,
+                //     state: ca.state
+                // });
 
-            } else {
-                acc.push({
-                    spellType: ca.spell.staticData.type,
-                    startDateTime: ca.startTime,
-                    duration: ca.spell.feature.duration,
-                    state: ca.state
-                });
-
-            }
+            // }
 
             return acc;
         }, []);
@@ -92,7 +89,7 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
 
 
     return <div className={classNames(css.root, {
-        [css.disabled]: disabled
+        [ css.disabled ]: disabled
     })}>
 
         {itemsProps.map(props => <TimeOverlayItem key={props.top} {...props} />)}
@@ -104,16 +101,16 @@ interface TimeOverlayItemProps {
     top: number;
     height: number;
     spellType: SpellType;
-    state: CharActionState;
+    state: any// CharActionState;
 }
 
 const TimeOverlayItem: React.FC<TimeOverlayItemProps> = ({
     top, height, spellType, state
 }) => {
 
-    const typeName = AssetManager.spells.spellsMap[spellType];
+    const typeName = AssetManager.spells.spellsMap[ spellType ];
 
-    return <div className={classNames(css.item, css[state])} style={{
+    return <div className={classNames(css.item, css[ state ])} style={{
         top: `${top}%`,
         height: `${height}%`,
 
@@ -121,7 +118,7 @@ const TimeOverlayItem: React.FC<TimeOverlayItemProps> = ({
 
         <div className={css.itemLines} />
 
-        <div className={classNames(spriteCss.sprite, spriteCss[typeName], css.spellSprite)} />
+        <div className={classNames(spriteCss.sprite, spriteCss[ typeName ], css.spellSprite)} />
 
     </div>;
 };

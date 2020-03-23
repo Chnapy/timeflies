@@ -11,7 +11,7 @@ interface TimeTextInnerProps {
 }
 
 export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { globalTurn } } }) => {
+    ({ data: { battleData: { cycle: { globalTurn } } } }) => {
         if (!globalTurn) {
             return {
                 startDateTime: 0,
@@ -59,7 +59,7 @@ export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
     });
 
     return <div className={classNames(css.root, {
-        [css.disabled]: disabled
+        [ css.disabled ]: disabled
     })}>
 
         {timeAction !== undefined

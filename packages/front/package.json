@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "easystarjs": "0.4.3",
+    "pixi.js": "5.2.1",
     "resource-loader": "4.0.0-rc4"
   },
   "devDependencies": {

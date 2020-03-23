@@ -1,4 +1,4 @@
-import { assertIsDefined, assertThenGet, PlayerSnapshot, PlayerState } from '@timeflies/shared';
+import { assertIsNonNullable, assertThenGet, PlayerSnapshot, PlayerState } from '@timeflies/shared';
 import { serviceCurrentPlayer } from '../../../services/serviceCurrentPlayer';
 import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
 import { Character } from './Character';
@@ -30,7 +30,7 @@ export const Player = (
 ): Player => {
     const itsMe = id === assertThenGet(
         serviceCurrentPlayer(),
-        assertIsDefined
+        assertIsNonNullable
     ).id;
 
     const this_: Player = {

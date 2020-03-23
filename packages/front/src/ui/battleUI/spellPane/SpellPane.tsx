@@ -13,8 +13,8 @@ interface SpellPaneInnerProps {
 const sideSpellTypes: SpellType[] = [ 'move', 'orientate' ];
 
 export const SpellPane = connect<SpellPaneInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { globalTurn } } }) => ({
-        
+    ({ data: { battleData: { cycle: { globalTurn } } } }) => ({
+
         mainSpellIds: globalTurn?.currentTurn?.character.spells
             .filter(s => !sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || [],

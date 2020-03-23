@@ -26,7 +26,9 @@ interface CharacterItemInnerProps {
 }
 
 export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemExternProps, UIState<'battle'>>(
-    ({ data: { battleData: { characters, globalTurn } } }, { characterId }) => {
+    ({ data: { battleData } }, { characterId }) => {
+        const { globalTurn } = battleData.cycle;
+        const { characters } = battleData.current;
         const character = characters.find(c => c.id === characterId)!;
 
         return {
@@ -60,8 +62,8 @@ export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemE
     const lifeBarFrontWidth = `${lifePresent / lifeMax * 100}%`;
 
     return <div className={classNames(css.root, {
-        [css.current]: isCurrent,
-        [css.mine]: isMine
+        [ css.current ]: isCurrent,
+        [ css.mine ]: isMine
     })} style={{ borderColor: teamColor }}>
 
         <div className={css.title}>
@@ -100,11 +102,11 @@ export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemE
 
                     <div className={css.spells}>
                         {spells.map(type => {
-                            const typeName = AssetManager.spells.spellsMap[type];
+                            const typeName = AssetManager.spells.spellsMap[ type ];
 
                             return <div key={type} className={css.spellIcon}>
                                 <div className={css.spriteWrapper}>
-                                    <div className={classNames(spriteCss.sprite, spriteCss[typeName])} />
+                                    <div className={classNames(spriteCss.sprite, spriteCss[ typeName ])} />
                                 </div>
                             </div>;
                         })}

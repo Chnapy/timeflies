@@ -49,7 +49,7 @@ export const Controller: Controller = {
             RootReducer
         );
 
-        client = new WSClient();
+        client = WSClient();
 
         app = ReactDOM.render(
             React.createElement(App, {
