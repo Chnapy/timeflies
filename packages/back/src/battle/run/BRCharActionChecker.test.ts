@@ -1,4 +1,4 @@
-import { CharActionCAction, MapInfos, Position, TimerTester } from "@timeflies/shared";
+import { SpellActionCAction, MapInfos, Position, TimerTester } from "@timeflies/shared";
 import fs from 'fs';
 import { TiledMapOrthogonal } from "tiled-types/types";
 import { seedBCharacter } from "../../__seeds__/seedBCharacter";
@@ -114,8 +114,8 @@ describe('#BRCharActionChecker', () => {
 
     it('should fail on dead character', () => {
 
-        const action: CharActionCAction = {
-            type: 'charAction',
+        const action: SpellActionCAction = {
+            type: 'battle/spellAction',
             sendTime: Date.now(),
             charAction: {
                 spellId: spellDefault.id,

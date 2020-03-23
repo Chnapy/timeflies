@@ -1,4 +1,4 @@
-import { assertIsDefined, assertThenGet, BattleSnapshot, generateObjectHash, getId } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, BattleSnapshot, getBattleSnapshotWithHash, getId } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
 import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
@@ -94,18 +94,16 @@ export const SnapshotManager = (): SnapshotManager => {
             teamsSnapshots: teams.map(t => t.getSnapshot())
         };
 
-        const battleHash = generateObjectHash(partialSnap);
-
-        const snap: BattleSnapshot = { battleHash, ...partialSnap };
+        const snap: BattleSnapshot = getBattleSnapshotWithHash(partialSnap);
 
         snapshotList.push(snap);
 
         const futureBattleData = serviceBattleData('future');
-        futureBattleData.battleHash = battleHash;
+        futureBattleData.battleHash = snap.battleHash;
 
         if (isFirstSnapshot) {
             const currentBattleData = serviceBattleData('current');
-            currentBattleData.battleHash = battleHash;
+            currentBattleData.battleHash = snap.battleHash;
         }
     };
 

@@ -8,6 +8,10 @@ export interface BattleSnapshot {
     teamsSnapshots: TeamSnapshot[];
 }
 
-export const generateObjectHash = (o: object): string => {
-    return objectHash(o);
+export const getBattleSnapshotWithHash = (o: Omit<BattleSnapshot, 'battleHash'>): BattleSnapshot => {
+    const battleHash = objectHash(o);
+    return {
+        ...o,
+        battleHash
+    };
 }

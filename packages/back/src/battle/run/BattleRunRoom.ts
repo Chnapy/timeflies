@@ -1,4 +1,4 @@
-import { BattleSnapshot, BRunLaunchSAction, CharActionCAction, ConfirmSAction, MapInfos, NotifySAction } from '@timeflies/shared';
+import { BattleSnapshot, BRunLaunchSAction, SpellActionCAction, ConfirmSAction, MapInfos, NotifySAction, getBattleSnapshotWithHash } from '@timeflies/shared';
 import { Team } from '../../Team';
 import { BRCharActionChecker } from './BRCharActionChecker';
 import { BRMap } from "./BRMap";
@@ -27,6 +27,8 @@ export class BattleRunRoom {
     private cycle!: BRCycle;
     private state!: BRState;
 
+    private battleHashList: string[];
+
     constructor(
         mapInfos: MapInfos,
         teams: Team[]
@@ -35,13 +37,14 @@ export class BattleRunRoom {
         this.teams = teams.map(t => new BTeam(t));
         this.players = this.teams.flatMap(t => t.players);
         this.characters = this.players.flatMap(p => p.characters);
+        this.battleHashList = [];
     }
 
     init(): void {
         this.map = new BRMap(this.mapInfos);
         const { initPositions } = this.map;
         this.teams.forEach((team, i) => {
-            team.placeCharacters(initPositions[i]);
+            team.placeCharacters(initPositions[ i ]);
         });
     }
 
@@ -54,6 +57,8 @@ export class BattleRunRoom {
 
         const battleSnapshot = this.generateSnapshot();
 
+        this.battleHashList.push(battleSnapshot.battleHash);
+
         const launchAction: Omit<BRunLaunchSAction, 'sendTime'> = {
             type: 'battle-run/launch',
             battleSnapshot,
@@ -63,32 +68,34 @@ export class BattleRunRoom {
         this.players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
 
         this.players.forEach(p => {
-            const onReceive = this.onCharActionReceive(p);
-            p.socket.on<CharActionCAction>('charAction', onReceive);
+            const onReceive = this.onSpellActionReceive(p);
+            p.socket.on<SpellActionCAction>('battle/spellAction', onReceive);
         });
     }
 
-    private onCharActionReceive(player: BPlayer) {
-        return (action: CharActionCAction): void => {
+    private onSpellActionReceive(player: BPlayer) {
+        return (action: SpellActionCAction): void => {
 
             const isOk = this.charActionChecker.check(action, player).success;
+
+            const lastCorrectHash = this.battleHashList[ this.battleHashList.length - 1 ];
 
             const confirmAction: ConfirmSAction = {
                 type: 'confirm',
                 sendTime: action.sendTime,
-                isOk
+                isOk,
+                lastCorrectHash
             };
 
             player.socket.send<ConfirmSAction>(confirmAction);
 
             if (confirmAction.isOk) {
-                this.state.applyCharAction(action.charAction);
+                this.state.applyCharAction(action.spellAction);
                 this.players
                     .filter(p => p.id !== player.id)
                     .forEach(p => p.socket.send<NotifySAction>({
                         type: 'notify',
-                        charAction: action.charAction,
-                        startTime: action.sendTime
+                        spellActionSnapshot: action.spellAction,
                     }));
             }
         };
@@ -96,9 +103,10 @@ export class BattleRunRoom {
 
     private generateSnapshot(): BattleSnapshot {
 
-        return {
+        return getBattleSnapshotWithHash({
+            time: this.launchTime,
             launchTime: this.launchTime,
             teamsSnapshots: this.teams.map(team => team.toSnapshot())
-        };
+        });
     }
 }

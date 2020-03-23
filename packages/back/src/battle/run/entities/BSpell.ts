@@ -21,6 +21,7 @@ export class BSpell {
     
     toSnapshot(): SpellSnapshot {
         return {
+            id: this.staticData.id,
             staticData: this.staticData,
             features: this.features
         };

@@ -1,4 +1,4 @@
-import { CharActionCAction, Position } from "@timeflies/shared";
+import { SpellActionCAction, Position } from "@timeflies/shared";
 import { BRMap } from './BRMap';
 import { BRCycle } from './cycle/BRCycle';
 import { BPlayer } from "./entities/BPlayer";
@@ -16,7 +16,7 @@ export type CharActionCheckerResult =
 
 export class BRCharActionChecker {
 
-    private readonly checkList: readonly ((action: CharActionCAction, player: BPlayer) => CharActionCheckerResult)[];
+    private readonly checkList: readonly ((action: SpellActionCAction, player: BPlayer) => CharActionCheckerResult)[];
 
     private readonly cycle: BRCycle;
     private readonly map: BRMap;
@@ -32,7 +32,7 @@ export class BRCharActionChecker {
         ].map(c => c.bind(this));
     }
 
-    check(action: CharActionCAction, player: BPlayer): CharActionCheckerResult {
+    check(action: SpellActionCAction, player: BPlayer): CharActionCheckerResult {
 
         for (const c of this.checkList) {
             const result = c(action, player);
@@ -44,7 +44,7 @@ export class BRCharActionChecker {
         return { success: true };
     }
 
-    private checkPlayer(action: CharActionCAction, player: BPlayer): CharActionCheckerResult {
+    private checkPlayer(action: SpellActionCAction, player: BPlayer): CharActionCheckerResult {
         const { currentTurn } = this.cycle.globalTurn;
 
         if (currentTurn.character.player.id !== player.id) {
@@ -60,7 +60,7 @@ export class BRCharActionChecker {
         };
     }
 
-    private checkCharacter({ charAction }: CharActionCAction, player: BPlayer): CharActionCheckerResult {
+    private checkCharacter({ spellAction }: SpellActionCAction, player: BPlayer): CharActionCheckerResult {
         const { currentTurn: {
             character
         } } = this.cycle.globalTurn;
@@ -73,7 +73,7 @@ export class BRCharActionChecker {
             };
         }
 
-        const spell = character.spells.find(s => s.staticData.id === charAction.spellId);
+        const spell = character.spells.find(s => s.staticData.id === spellAction.spellId);
 
         if (!spell) {
             console.log('check spell');
@@ -88,7 +88,7 @@ export class BRCharActionChecker {
         };
     }
 
-    private checkTime({ sendTime, charAction }: CharActionCAction): CharActionCheckerResult {
+    private checkTime({ sendTime, spellAction }: SpellActionCAction): CharActionCheckerResult {
         const { currentTurn } = this.cycle.globalTurn;
 
         if (sendTime < currentTurn.startTime) {
@@ -101,7 +101,7 @@ export class BRCharActionChecker {
 
         const { character, turnDuration } = currentTurn;
 
-        const spell = character.spells.find(s => s.staticData.id === charAction.spellId)!;
+        const spell = character.spells.find(s => s.staticData.id === spellAction.spellId)!;
 
         if (sendTime - currentTurn.startTime + spell.features.duration > turnDuration) {
             console.log('check duration');
@@ -116,8 +116,8 @@ export class BRCharActionChecker {
         };
     }
 
-    private checkPositions({ charAction }: CharActionCAction): CharActionCheckerResult {
-        const { spellId, positions } = charAction;
+    private checkPositions({ spellAction }: SpellActionCAction): CharActionCheckerResult {
+        const { spellId, position } = spellAction;
 
         const { globalTurn: globalTurnState } = this.cycle;
 
@@ -129,34 +129,36 @@ export class BRCharActionChecker {
 
         const { features: { area } } = spell;
 
-        const [endPos] = positions;
+        // TODO use tiled manager
+
+        // const [endPos] = positions;
 
         // Check if in spell area
 
         let isInArea: boolean = false;
         let sum = 0;
-        for (let i = 0; i <= area * 2; i++) {
-            for (let k = 0; k <= (i - sum) * 2; k++) {
+        // for (let i = 0; i <= area * 2; i++) {
+        //     for (let k = 0; k <= (i - sum) * 2; k++) {
 
-                const currentPos: Position = {
-                    x: startPos.x - i + sum + k,
-                    y: startPos.y - area + i
-                };
+        //         const currentPos: Position = {
+        //             x: startPos.x - i + sum + k,
+        //             y: startPos.y - area + i
+        //         };
 
-                if (currentPos.x === endPos.x && currentPos.y === endPos.y) {
-                    isInArea = true;
-                    break;
-                }
-            }
+        //         if (currentPos.x === endPos.x && currentPos.y === endPos.y) {
+        //             isInArea = true;
+        //             break;
+        //         }
+        //     }
 
-            if (isInArea) {
-                break;
-            }
+        //     if (isInArea) {
+        //         break;
+        //     }
 
-            if (i >= area) {
-                sum += 2;
-            }
-        }
+        //     if (i >= area) {
+        //         sum += 2;
+        //     }
+        // }
 
         if (!isInArea) {
             console.log('check isInArea');
@@ -169,44 +171,44 @@ export class BRCharActionChecker {
 
         // Check obstacles
 
-        const line = this.map.getBresenhamLine(startPos, endPos)
-            .slice(1);
+        // const line = this.map.getBresenhamLine(startPos, endPos)
+        //     .slice(1);
 
-        if (line.some(({ d }) => d !== 0)) {
-            console.log('check bresenham');
-            // TODO debug
-            // return {
-            //     success: false,
-            //     reason: 'bresenham'
-            // };
-        }
+        // if (line.some(({ d }) => d !== 0)) {
+        //     console.log('check bresenham');
+        //     // TODO debug
+        //     // return {
+        //     //     success: false,
+        //     //     reason: 'bresenham'
+        //     // };
+        // }
 
         // Check occupation
 
-        const occupiedPath = line.map(({ x, y }) => charactersOrdered
-            .some(({ isAlive, position: p }) => isAlive && p.x === x && p.y === y));
+        // const occupiedPath = line.map(({ x, y }) => charactersOrdered
+        //     .some(({ isAlive, position: p }) => isAlive && p.x === x && p.y === y));
 
         switch (spell.staticData.type) {
             case 'move':
-                if (occupiedPath.some(v => v)) {
-                    console.log('check move');
-                    // TODO debug
-                    // return {
-                    //     success: false,
-                    //     reason: 'specificType'
-                    // };
-                }
+                // if (occupiedPath.some(v => v)) {
+                //     console.log('check move');
+                //     // TODO debug
+                //     // return {
+                //     //     success: false,
+                //     //     reason: 'specificType'
+                //     // };
+                // }
                 break;
             default:
-                if (occupiedPath
-                    .slice(0, occupiedPath.length - 1)
-                    .some(v => v)) {
-                    console.log('check default');
-                    return {
-                        success: false,
-                        reason: 'specificType'
-                    };
-                }
+                // if (occupiedPath
+                //     .slice(0, occupiedPath.length - 1)
+                //     .some(v => v)) {
+                //     console.log('check default');
+                //     return {
+                //         success: false,
+                //         reason: 'specificType'
+                //     };
+                // }
                 break;
         }
 

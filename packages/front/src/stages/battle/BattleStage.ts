@@ -6,11 +6,23 @@ import { BattleStageGraphic } from './graphic/BattleStageGraphic';
 import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
+import { Team } from './entities/Team';
+import { BattleDataPeriod } from '../../BattleData';
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
-export const BattleStage: StageCreator<'battle', 'mapSchema'> = ({ mapInfos, globalTurnState }) => {
- 
+export const BattleStage: StageCreator<'battle', 'mapSchema'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
+
+    const fillBattleData = (period: BattleDataPeriod): void => {
+        const current = battleData[ period ];
+        current.battleHash = battleSnapshot.battleHash;
+        current.teams.push(...battleSnapshot.teamsSnapshots.map(Team));
+        current.players.push(...current.teams.flatMap(t => t.players));
+        current.characters.push(...current.players.flatMap(p => p.characters));
+    };
+
+    new Array<BattleDataPeriod>('current', 'future').forEach(fillBattleData);
+
     const graphic = BattleStageGraphic();
 
     return {

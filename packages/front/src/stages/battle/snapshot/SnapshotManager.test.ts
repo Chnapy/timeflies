@@ -1,7 +1,7 @@
 import { StoreTest } from '../../../StoreTest';
 import { SnapshotManager, BattleCommitAction } from './SnapshotManager';
 import { Team } from '../entities/Team';
-import { BattleSnapshot, generateObjectHash, TimerTester, TeamSnapshot } from '@timeflies/shared';
+import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester, TeamSnapshot } from '@timeflies/shared';
 import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 import { BattleDataCurrent, BattleDataFuture } from '../../../BattleData';
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
@@ -78,7 +78,7 @@ describe('# SnapshotManager', () => {
             teamsSnapshots: teams.map(t => t.getSnapshot())
         };
 
-        const battleHash = generateObjectHash(partialSnap);
+        const { battleHash } = getBattleSnapshotWithHash(partialSnap);
 
         expect(futureBattleData.battleHash).toBe(battleHash);
         expect(currentBattleData.battleHash).toBe(battleHash);

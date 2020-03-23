@@ -1,12 +1,12 @@
-import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getTurnIdGenerator, GLOBALTURN_DELAY, TurnIDGenerator } from "@timeflies/shared";
+import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GLOBALTURN_DELAY, IndexGenerator } from "@timeflies/shared";
 import { BCharacter } from "../entities/BCharacter";
 import { BPlayer } from "../entities/BPlayer";
 import { BGlobalTurn } from "./turn/BGlobalTurn";
 
 export class BRCycle {
 
-    private generateGlobalTurnId: TurnIDGenerator = getTurnIdGenerator();
-    private generateTurnId: TurnIDGenerator = getTurnIdGenerator();
+    private generateGlobalTurnId: IndexGenerator = getIndexGenerator();
+    private generateTurnId: IndexGenerator = getIndexGenerator();
 
     private readonly players: readonly BPlayer[];
     private readonly characters: readonly BCharacter[];

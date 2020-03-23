@@ -1,4 +1,4 @@
-import { CharAction, Position } from '@timeflies/shared';
+import { Position, SpellActionSnapshot } from '@timeflies/shared';
 import { BRCycle } from './cycle/BRCycle';
 import { BCharacter } from './entities/BCharacter';
 import { BSpell } from './entities/BSpell';
@@ -16,7 +16,7 @@ export class BRState {
         this.spells = characters.flatMap(c => c.spells);
     }
 
-    applyCharAction({ spellId, positions }: CharAction): void {
+    applyCharAction({ spellId, position }: SpellActionSnapshot): void {
         const spell = this.spells.find(s => s.id === spellId);
         if (!spell) {
             throw new Error();
@@ -25,11 +25,12 @@ export class BRState {
         const { staticData: { type } } = spell;
 
         if (type === 'move') {
-            this.applyMoveAction(spell, positions[ 0 ]);
+            this.applyMoveAction(spell, position);
         } else if (type === 'orientate') {
             // TODO
         } else {
-            this.applyDefaultAction(spell, positions);
+            // TODO
+            // this.applyDefaultAction(spell, position);
         }
     }
 

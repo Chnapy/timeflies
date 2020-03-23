@@ -34,6 +34,7 @@ export class BCharacter {
     
     toSnapshot(): CharacterSnapshot {
         return {
+            id: this.staticData.id,
             staticData: this.staticData,
             features: this.features,
             orientation: this.orientation,
