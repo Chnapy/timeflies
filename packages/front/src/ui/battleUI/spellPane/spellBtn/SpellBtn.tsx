@@ -60,13 +60,13 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
             return;
         }
 
-        Controller.dispatch<BStateSpellPrepareAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-PREPARE',
-            payload: {
-                spellType
-            }
-        });
+        // Controller.dispatch<BStateSpellPrepareAction>({
+        //     type: 'battle/state/event',
+        //     eventType: 'SPELL-PREPARE',
+        //     payload: {
+        //         spellType
+        //     }
+        // });
     };
 
     return <div className={classNames(css.root, {

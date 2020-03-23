@@ -1,5 +1,4 @@
 import { BattleLoadPayload, BattleLoadSAction } from '@timeflies/shared';
-import { Controller } from '../../Controller';
 import { CurrentPlayer } from '../../CurrentPlayer';
 import { serviceDispatch } from '../../services/serviceDispatch';
 import { serviceEvent } from '../../services/serviceEvent';
@@ -7,12 +6,16 @@ import { serviceNetwork } from '../../services/serviceNetwork';
 import { LoginSuccess } from '../../ui/reducers/CurrentPlayerReducer';
 import { LoadLaunchAction } from "../load/LoadScene";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
+import { BootStageGraphic } from './graphic/BootStageGraphic';
 
 export type BootStageParam = StageParam<'boot', {}>;
 
 export const BootStage: StageCreator<'boot', never> = () => {
 
+    const graphic = BootStageGraphic();
+
     return {
+        graphic,
         preload() {
             return {}
         },
@@ -20,7 +23,7 @@ export const BootStage: StageCreator<'boot', never> = () => {
 
             const { onAction, onMessageAction } = serviceEvent();
 
-            const { dispatchCurrentPlayer, dispatchStageChangeToLoad } = serviceDispatch({
+            const { dispatchCurrentPlayer, dispatchStageChangeToLoad, dispatchLoadLaunch } = serviceDispatch({
                 dispatchCurrentPlayer: (currentPlayer: CurrentPlayer): LoginSuccess => ({
                     type: 'login/success',
                     currentPlayer
@@ -28,6 +31,10 @@ export const BootStage: StageCreator<'boot', never> = () => {
                 dispatchStageChangeToLoad: (payload: BattleLoadPayload): StageChangeAction<'load'> => ({
                     type: 'stage/change',
                     stageKey: 'load',
+                    payload
+                }),
+                dispatchLoadLaunch: (payload: BattleLoadPayload): LoadLaunchAction => ({
+                    type: 'load/launch',
                     payload
                 })
             });
@@ -55,11 +62,7 @@ export const BootStage: StageCreator<'boot', never> = () => {
                 payload
             }) => {
 
-                Controller.dispatch<LoadLaunchAction>({
-                    type: 'load/launch',
-                    payload
-                });
-
+                dispatchLoadLaunch(payload);
             });
 
             sendMatchmakerEnter();

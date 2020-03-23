@@ -1,11 +1,12 @@
+import { ServerAction } from "@timeflies/shared";
+import { Action } from "redux";
+import { ActionListener, ActionListenerObject } from '../action/ActionManager';
 import { GameAction } from "../action/GameAction";
 import { Controller } from "../Controller";
 import { ReceiveMessageAction } from "../socket/WSClient";
-import { ServerAction } from "@timeflies/shared";
-import { Action } from "redux";
 
 export interface OnAction<RA extends Action> {
-    <A extends RA>(type: A['type'], fn: (action: A) => void): (action: A) => void;
+    <A extends RA>(type: A[ 'type' ], fn: ActionListener<A>): ActionListenerObject;
 }
 
 export interface EventManager {
@@ -15,10 +16,10 @@ export interface EventManager {
 
 export const serviceEvent = (): EventManager => {
 
-    const onAction: OnAction<GameAction> = (type, fn) => {
-        Controller.addEventListener(type, fn);
-        return fn;
-    };
+    const { actionManager } = Controller;
+
+    const onAction: OnAction<GameAction> = (type, fn) =>
+        actionManager.addActionListener(type, fn as ActionListener<GameAction>);
 
     return {
 

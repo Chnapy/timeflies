@@ -36,6 +36,20 @@ describe('services', () => {
         expect(serviceSelector(state => state.data)).toEqual(data);
     });
 
+    it('serviceBattleData should work only on battle context', () => {
+
+        StoreTest.initStore({
+            data: {
+                state: 'boot',
+                battleData: {
+                    cycle: {}
+                }
+            }
+        });
+
+        expect(() => serviceBattleData('cycle')).toThrowError();
+    });
+
     it('serviceBattleData should return the correct battle data', () => {
 
         const cycle = {
@@ -183,8 +197,7 @@ describe('services', () => {
                 message: {
                     type: 'notify',
                     sendTime: -1,
-                    charAction: null as any,
-                    startTime: -1
+                    spellActionSnapshot: null as any
                 }
             })
         });
@@ -203,8 +216,7 @@ describe('services', () => {
         expect(notifyFn).toHaveBeenNthCalledWith<[ NotifySAction ]>(1, {
             type: 'notify',
             sendTime: -1,
-            charAction: null as any,
-            startTime: -1
+            spellActionSnapshot: null as any
         });
     });
 

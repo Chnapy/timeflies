@@ -5,13 +5,17 @@ import { serviceEvent } from "../../services/serviceEvent";
 import { serviceNetwork } from "../../services/serviceNetwork";
 import { BattleSceneData } from "../battle/BattleScene";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
+import { LoadStageGraphic } from './graphic/LoadStageGraphic';
 
 export type LoadStageParam = StageParam<'load', BattleLoadPayload>;
 
 export const LoadStage: StageCreator<'load', 'mapImage' | 'mapSchema'> = (payload) => {
     const { mapInfos } = payload;
 
+    const graphic = LoadStageGraphic();
+
     return {
+        graphic,
         preload: () => {
             const { urls } = mapInfos;
 

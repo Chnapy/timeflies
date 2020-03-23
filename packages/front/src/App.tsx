@@ -8,7 +8,7 @@ import './app.css';
 
 export interface AppProps {
     store: Store<UIState, GameAction>;
-    onMount(gameWrapper: HTMLElement);
+    onMount(gameWrapper: HTMLElement, canvas: HTMLCanvasElement);
 }
 
 export class App extends React.Component<AppProps> {
@@ -37,7 +37,9 @@ export class App extends React.Component<AppProps> {
                     // minHeight: '400px',
                     width: '100vw',
                     // minWidth: '600px'
-                }} />
+                }}>
+                    <canvas/>
+                    </div>
 
                 <UI />
 
@@ -48,6 +50,8 @@ export class App extends React.Component<AppProps> {
     componentDidMount(): void {
         const gameWrapperElement = this.gameWrapperRef.current!;
 
-        this.props.onMount(gameWrapperElement);
+        const canvas = gameWrapperElement.firstElementChild as HTMLCanvasElement;
+
+        this.props.onMount(gameWrapperElement, canvas);
     }
 }

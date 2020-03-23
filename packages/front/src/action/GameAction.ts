@@ -7,18 +7,13 @@ import { SpellEngineBindAction } from '../stages/battle/engine/Engine';
 import { BattleCommitAction } from '../stages/battle/snapshot/SnapshotManager';
 import { SpellActionTimerAction } from '../stages/battle/spellAction/SpellActionTimer';
 import { LoadAction } from '../stages/load/LoadScene';
-import { StageChangeAction } from '../stages/StageManager';
+import { StageAction } from '../stages/StageManager';
 import { LoginSuccess } from '../ui/reducers/CurrentPlayerReducer';
 
-export type IGameAction<T extends string, G extends boolean = false> = Action<T>
-    & (G extends true ? {
-        onlyGame: true;
-    } : {
-        onlyGame?: never;
-    });
+export type IGameAction<T extends string> = Action<T>;
 
 export type GameAction =
-    | StageChangeAction<any>
+    | StageAction
     | MessageAction
     | LoadAction
     | BattleLaunchAction

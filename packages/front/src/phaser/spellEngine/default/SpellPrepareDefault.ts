@@ -1,8 +1,5 @@
 import { Position } from '@timeflies/shared'
 import { SpellType } from '@timeflies/shared'
-import { Controller } from '../../../Controller';
-//@ts-ignore
-import { BattleSpellLaunchAction, BattleSpellPrepareAction } from '../../battleReducers/BattleReducerManager';
 import { Character } from '../../../stages/battle/entities/Character';
 import { SpellPrepare } from '../SpellPrepare';
 
@@ -103,23 +100,23 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
 
     onTileClick(pointer: Phaser.Input.Pointer): void {
         if (this.rectHoveredIndex === -1) {
-            Controller.dispatch<BattleSpellPrepareAction>({
-                type: 'battle/spell/prepare',
-                spellType: this.character.defaultSpell.staticData.type
-            });
+            // Controller.dispatch<BattleSpellPrepareAction>({
+            //     type: 'battle/spell/prepare',
+            //     spellType: this.character.defaultSpell.staticData.type
+            // });
             return;
         }
 
-        Controller.dispatch<BattleSpellLaunchAction>({
-            type: 'battle/spell/launch',
-            charAction: {
-                state: 'running',
-                startTime: Date.now(),
-                spell: this.spell,
-                duration: this.spell.feature.duration,
-                positions: [ this.lastPositionHovered! ]
-            }
-        });
+        // Controller.dispatch<BattleSpellLaunchAction>({
+        //     type: 'battle/spell/launch',
+        //     charAction: {
+        //         state: 'running',
+        //         startTime: Date.now(),
+        //         spell: this.spell,
+        //         duration: this.spell.feature.duration,
+        //         positions: [ this.lastPositionHovered! ]
+        //     }
+        // });
     }
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {

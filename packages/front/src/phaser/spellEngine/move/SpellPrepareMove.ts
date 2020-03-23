@@ -56,17 +56,17 @@ export class SpellPrepareMove extends SpellPrepare<'move'> {
 
         const positions = this.pathTile.slice(1);
 
-        Controller.dispatch<BattleSpellLaunchAction>({
-            type: 'battle/spell/launch',
-            charAction: {
-                state: 'running',
-                startTime: Date.now(),
-                spell: this.spell,
-                duration: this.spell.feature.duration,
-                positions
-            },
-            launchState: positions.length > 1 ? ['first'] : ['first', 'last']
-        });
+        // Controller.dispatch<BattleSpellLaunchAction>({
+        //     type: 'battle/spell/launch',
+        //     charAction: {
+        //         state: 'running',
+        //         startTime: Date.now(),
+        //         spell: this.spell,
+        //         duration: this.spell.feature.duration,
+        //         positions
+        //     },
+        //     launchState: positions.length > 1 ? ['first'] : ['first', 'last']
+        // });
     }
 
     update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics) {

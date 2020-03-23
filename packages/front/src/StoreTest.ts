@@ -7,8 +7,11 @@ const mockStore = configureStore<UIState, GameAction>();
 
 let store: MockStoreEnhanced<UIState, GameAction>;
 
-const initStore = <S extends UIState>(state?: S) => {
-    store = mockStore(state);
+const initStore = <S extends UIState | Omit<UIState, 'currentPlayer'>>(state?: S) => {
+    if(state && !('currentPlayer' in state)) {
+        (state as UIState).currentPlayer = null;
+    }
+    store = mockStore(state as UIState);
 }
 
 initStore();

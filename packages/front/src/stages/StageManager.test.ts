@@ -18,17 +18,19 @@ describe('# StageManager', () => {
         const create = jest.fn();
 
         const bootFn = jest.fn((): Stage<never> => ({
+            graphic: { getContainer() { return null as any } },
             preload,
             create
         }));
 
-        const manager = StageManager({
-            stageCreators: {
-                boot: bootFn,
-                load: jest.fn(),
-                battle: jest.fn()
-            }
-        });
+        const manager = StageManager(
+            {
+                stageCreators: {
+                    boot: bootFn,
+                    load: jest.fn(),
+                    battle: jest.fn()
+                }
+            });
 
         await Controller.loader.newInstance().load();
 
@@ -40,11 +42,13 @@ describe('# StageManager', () => {
     it('should change stage on action and load its assets', async () => {
 
         const bootFn = jest.fn((): Stage<never> => ({
+            graphic: { getContainer() { return null as any } },
             preload() { return {} },
             create() { }
         }));
         const create = jest.fn();
         const loadFn = jest.fn((): Stage<never> => ({
+            graphic: { getContainer() { return null as any } },
             preload() {
                 return {
                     'test1': 'test1',
@@ -54,13 +58,14 @@ describe('# StageManager', () => {
             create
         }));
 
-        const manager = StageManager({
-            stageCreators: {
-                boot: bootFn,
-                load: loadFn,
-                battle: jest.fn()
-            }
-        });
+        const manager = StageManager(
+            {
+                stageCreators: {
+                    boot: bootFn,
+                    load: loadFn,
+                    battle: jest.fn()
+                }
+            });
 
         await Controller.loader.newInstance().load();
 

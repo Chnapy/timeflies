@@ -39,8 +39,10 @@ describe('# AssetLoader - note that this test suite needs special test environme
         const loader = AssetLoader();
 
         const { mapSchema, mapImage } = await loader.newInstance()
-            .add('mapImage', 'http://localhost:8887/life_icon.png')
-            .add('mapSchema', 'http://localhost:8887/map.json')
+            .addMultiple({
+                mapImage: 'http://localhost:8887/life_icon.png',
+                mapSchema: 'http://localhost:8887/map.json'
+            })
             .load();
 
         expect(mapImage).toHaveProperty('src');

@@ -2,6 +2,7 @@ import { StageCreator, StageParam } from '../StageManager';
 import { BattleSceneData } from "./BattleScene";
 import { BStateMachine } from "./battleState/BStateMachine";
 import { CycleManager } from './cycle/CycleManager';
+import { BattleStageGraphic } from './graphic/BattleStageGraphic';
 import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
@@ -9,8 +10,11 @@ import { SpellActionManager } from './spellAction/SpellActionManager';
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
 export const BattleStage: StageCreator<'battle', 'mapSchema'> = ({ mapInfos, globalTurnState }) => {
+ 
+    const graphic = BattleStageGraphic();
 
     return {
+        graphic,
         preload() {
             return {
                 mapSchema: 'mapSchema'

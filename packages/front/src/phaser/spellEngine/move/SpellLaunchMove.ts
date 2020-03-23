@@ -55,17 +55,17 @@ export class SpellLaunchMove extends SpellLaunch<'move'> {
                     ? () => {
                         const nextPos = [p];
 
-                        Controller.dispatch<BattleSpellLaunchAction>({
-                            type: 'battle/spell/launch',
-                            charAction: {
-                                state: 'running',
-                                startTime: Date.now(),
-                                spell: this.spell,
-                                duration: this.spell.feature.duration,
-                                positions: nextPos
-                            },
-                            launchState: i < targetPositions.length - 1 ? ['middle'] : ['last']
-                        });
+                        // Controller.dispatch<BattleSpellLaunchAction>({
+                        //     type: 'battle/spell/launch',
+                        //     charAction: {
+                        //         state: 'running',
+                        //         startTime: Date.now(),
+                        //         spell: this.spell,
+                        //         duration: this.spell.feature.duration,
+                        //         positions: nextPos
+                        //     },
+                        //     launchState: i < targetPositions.length - 1 ? ['middle'] : ['last']
+                        // });
                     }
                     : undefined
             };

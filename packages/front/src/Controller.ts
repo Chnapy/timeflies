@@ -1,53 +1,46 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, Store } from 'redux';
-import ResizeObserver from 'resize-observer-polyfill';
+import { applyMiddleware, createStore, Store } from 'redux';
+import { createLogger } from 'redux-logger';
+import { ActionManager } from './action/ActionManager';
 import { GameAction } from './action/GameAction';
 import { App } from './App';
+import { AssetLoader } from './assetManager/AssetLoader';
+import { GameCanvas } from './canvas/GameCanvas';
+import { IController } from './IController';
+import { WSClient } from './socket/WSClient';
+import { StageManager } from './stages/StageManager';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
-import { WSClient } from './socket/WSClient';
-import { IController } from './IController';
-import { BStateTurnStartAction, BStateAction } from './stages/battle/battleState/BattleStateSchema';
-import { AssetLoader } from './assetManager/AssetLoader';
-import { StageManager } from './stages/StageManager';
 
-export interface Controller extends IController {
-}
+const logger = createLogger({
+    collapsed: true
+});
 
-let store: Store<UIState, GameAction>;
+const store: Store<UIState, GameAction> = createStore<UIState, GameAction, any, any>(
+    RootReducer,
+    applyMiddleware(logger)
+);
 let client: WSClient;
-// let game: GameEngine;
+let gameCanvas: GameCanvas;
 let app: App;
+const actionManager = ActionManager(store.dispatch);
 const loader = AssetLoader();
 let stageManager: StageManager;
 
-const onAppMount = (gameWrapper: HTMLElement): void => {
+const onAppMount = (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void => {
 
-    const ro = new ResizeObserver((entries) => {
-        if (!entries.length) {
-            return;
-        }
-        const { width, height } = entries[ 0 ].contentRect;
-        // game.resize(width, height);
-    });
-
-    ro.observe(gameWrapper);
+    gameCanvas = GameCanvas(
+        canvas,
+        gameWrapper
+    );
 
     stageManager = StageManager();
-
-    // game = new GameEngine(
-    //     gameWrapper
-    // );
 };
 
-export const Controller: Controller = {
+export const Controller: IController = {
 
     start() {
-
-        store = createStore<UIState, GameAction, any, any>(
-            RootReducer
-        );
 
         client = WSClient();
 
@@ -64,35 +57,11 @@ export const Controller: Controller = {
         return store;
     },
 
-    dispatch<A extends GameAction>(action: A): void {
-
-        if (action.type === 'battle/state/event'
-            && (action as BStateAction).eventType === 'TURN-START') {
-
-            console.group(
-                action.type,
-                (action as unknown as BStateTurnStartAction).payload.characterId,
-                [ action ]
-            );
-            console.groupEnd();
-        } else {
-            console.log(action.type, action);
-        }
-
-        // game.emit(action);
-
-        if (!action.onlyGame) {
-            store.dispatch(action);
-        }
-    },
-
-    addEventListener<A extends GameAction>(type: A[ 'type' ], fn: (action: A) => void): void {
-        // TODO
-    },
-
     waitConnect() {
         return client.waitConnect();
     },
+
+    actionManager,
 
     loader
 };
