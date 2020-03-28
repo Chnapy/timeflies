@@ -98,12 +98,11 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
 
     const ifCanSpellBeUsed = <
         F extends (tilePos: Position, tileType: TileType) => void
-    >(fct: F) => (pointerPos: Position) => {
+    >(fct: F) => (tilePos: Position) => {
         const remainingTime = globalTurn.currentTurn.getRemainingTime('future');
         if (remainingTime >= spell.feature.duration) {
 
-            const tilePos = { x: -1, y: -1 }; // TODO wordToTile(pointerPos)
-            const tileType = mapManager.getTileType(tilePos);
+            const tileType = mapManager.tiledManager.getTileType(tilePos);
 
             fct(tilePos, tileType);
         }
@@ -113,7 +112,6 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
         dispatchBind: (): SpellEngineBindAction => ({
             type: 'battle/spell-engine/bind',
 
-            // TODO send tile position & tile type
             onTileHover: ifCanSpellBeUsed(engine.onTileHover),
             onTileClick: ifCanSpellBeUsed(engine.onTileClick),
         })

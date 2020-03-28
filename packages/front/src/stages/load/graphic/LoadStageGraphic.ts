@@ -1,7 +1,7 @@
-import { StageGraphic } from '../../../canvas/StageGraphic';
 import * as PIXI from 'pixi.js';
+import { StageGraphicCreator } from '../../../canvas/StageGraphic';
 
-export const LoadStageGraphic = (): StageGraphic => {
+export const LoadStageGraphic: StageGraphicCreator<never> = () => {
 
     const container = new PIXI.Container();
 
@@ -12,6 +12,9 @@ export const LoadStageGraphic = (): StageGraphic => {
     container.addChild(text);
 
     return {
+        onCreate(contextMap) {
+
+        },
         getContainer() {
             return container;
         }

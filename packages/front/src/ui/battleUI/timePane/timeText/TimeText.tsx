@@ -30,6 +30,7 @@ export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
 )(({
     startDateTime, timeAction, disabled
 }: TimeTextInnerProps) => {
+    if(1==1)return null;
 
     const total = ((timeAction || 0) / 1000).toFixed(1);
 

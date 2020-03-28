@@ -6,16 +6,12 @@ import { serviceNetwork } from '../../services/serviceNetwork';
 import { LoginSuccess } from '../../ui/reducers/CurrentPlayerReducer';
 import { LoadLaunchAction } from "../load/LoadScene";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
-import { BootStageGraphic } from './graphic/BootStageGraphic';
 
 export type BootStageParam = StageParam<'boot', {}>;
 
 export const BootStage: StageCreator<'boot', never> = () => {
 
-    const graphic = BootStageGraphic();
-
     return {
-        graphic,
         preload() {
             return {}
         },
@@ -66,6 +62,8 @@ export const BootStage: StageCreator<'boot', never> = () => {
             });
 
             sendMatchmakerEnter();
+
+            return {};
         }
     };
 };

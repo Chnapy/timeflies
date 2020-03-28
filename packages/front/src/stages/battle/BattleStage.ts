@@ -1,17 +1,16 @@
+import { BattleDataPeriod } from '../../BattleData';
 import { StageCreator, StageParam } from '../StageManager';
 import { BattleSceneData } from "./BattleScene";
 import { BStateMachine } from "./battleState/BStateMachine";
 import { CycleManager } from './cycle/CycleManager';
-import { BattleStageGraphic } from './graphic/BattleStageGraphic';
+import { Team } from './entities/Team';
 import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
-import { Team } from './entities/Team';
-import { BattleDataPeriod } from '../../BattleData';
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
-export const BattleStage: StageCreator<'battle', 'mapSchema'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
+export const BattleStage: StageCreator<'battle', 'map'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
 
     const fillBattleData = (period: BattleDataPeriod): void => {
         const current = battleData[ period ];
@@ -23,23 +22,20 @@ export const BattleStage: StageCreator<'battle', 'mapSchema'> = ({ mapInfos, glo
 
     new Array<BattleDataPeriod>('current', 'future').forEach(fillBattleData);
 
-    const graphic = BattleStageGraphic();
-
     return {
-        graphic,
         preload() {
             return {
-                mapSchema: 'mapSchema'
+                map: 'map'
             };
         },
 
-        create({ mapSchema }) {
+        async create({ map }) {
             const snapshotManager = SnapshotManager();
 
             const spellActionManager = SpellActionManager();
 
             const mapManager = MapManager(
-                mapSchema,
+                map,
                 mapInfos
             );
 
@@ -48,6 +44,10 @@ export const BattleStage: StageCreator<'battle', 'mapSchema'> = ({ mapInfos, glo
             const cycleManager = CycleManager();
 
             cycleManager.start(globalTurnState);
+
+            return {
+                mapManager
+            };
         }
     };
 };

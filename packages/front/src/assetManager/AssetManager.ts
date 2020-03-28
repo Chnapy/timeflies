@@ -11,7 +11,7 @@ export type IAssetManager = typeof AssetManager;
 type AnimStateMap = {
     [ ST in CharacterState ]: {
         [ SI in Orientation ]: {
-            frameNames: Phaser.Types.Animations.GenerateFrameNames | Phaser.Types.Animations.AnimationFrame[];
+            frameNames: any//Phaser.Types.Animations.GenerateFrameNames | Phaser.Types.Animations.AnimationFrame[];
             frameRate: number;
             frameRepeat: number;
         };
@@ -34,7 +34,7 @@ export type IAssetSpells = {
     };
 };
 
-function getGenerateFrameConfig(start: number, end: number = start): Phaser.Types.Animations.GenerateFrameNames {
+function getGenerateFrameConfig(start: number, end: number = start): any/*Phaser.Types.Animations.GenerateFrameNames*/ {
     return {
         start,
         end,
@@ -44,7 +44,7 @@ function getGenerateFrameConfig(start: number, end: number = start): Phaser.Type
     };
 }
 
-const getGenerateFrameArray = (...frames: number[]): Phaser.Types.Animations.GenerateFrameNames => ({
+const getGenerateFrameArray = (...frames: number[]): any/*Phaser.Types.Animations.GenerateFrameNames*/ => ({
     zeroPad: 2,
     prefix: 'player_',
     suffix: '.png',

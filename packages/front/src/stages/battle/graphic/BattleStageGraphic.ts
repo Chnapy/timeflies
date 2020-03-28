@@ -1,7 +1,9 @@
-import { StageGraphic } from '../../../canvas/StageGraphic';
 import * as PIXI from 'pixi.js';
+import { StageGraphic, StageGraphicCreator } from '../../../canvas/StageGraphic';
+import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
+import { CanvasContext } from '../../../canvas/CanvasContext';
 
-export const BattleStageGraphic = (): StageGraphic => {
+export const BattleStageGraphic: StageGraphicCreator<'mapManager'> = () => {
 
     const container = new PIXI.Container();
 
@@ -12,6 +14,15 @@ export const BattleStageGraphic = (): StageGraphic => {
     container.addChild(text);
 
     return {
+        onCreate(contextMap) {
+
+            CanvasContext.provider(contextMap, () => {
+
+                const mapGraphic = TiledMapGraphic();
+                container.addChild(mapGraphic.container);
+
+            });
+        },
         getContainer() {
             return container;
         }

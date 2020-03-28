@@ -1,40 +1,38 @@
-import { MapInfos, TiledManager, TiledMap } from '@timeflies/shared';
+import { MapInfos, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { Pathfinder } from './Pathfinder';
+import { TiledMapGraphic } from '../graphic/tiledMap/TiledMapGraphic';
 
 export interface MapManager extends
-    Pick<Pathfinder, 'calculatePath'>,
-    Pick<TiledManager, 'getTileType'> {
+    Pick<Pathfinder, 'calculatePath'> {
+    readonly tiledManager: TiledManager;
     refreshPathfinder(): void;
-    // Pick<MapGraphics, 'tileToWorld' | 'worldToTile'>,
-    // worldToTileIfExist(position: Position): Position | null;
 }
 
 interface Dependencies {
     tiledManagerCreator: typeof TiledManager;
     pathfinderCreator: typeof Pathfinder;
+    graphicCreator: typeof TiledMapGraphic;
 }
 
 export const MapManager = (
-    mapSchema: TiledMap,
+    mapAssets: TiledMapAssets,
     mapInfos: MapInfos,
-    // getGraphics: () => MapGraphics,
-    { pathfinderCreator, tiledManagerCreator }: Dependencies = {
+    { pathfinderCreator, tiledManagerCreator, graphicCreator }: Dependencies = {
         pathfinderCreator: Pathfinder,
-        tiledManagerCreator: TiledManager
+        tiledManagerCreator: TiledManager,
+        graphicCreator: TiledMapGraphic
     }
 ): MapManager => {
 
-    const tiledManager = tiledManagerCreator(mapSchema, {
+    const tiledManager = tiledManagerCreator(mapAssets, {
         defaultTilelayerName: mapInfos.decorLayerKey,
         obstacleTilelayerName: mapInfos.obstaclesLayerKey
     });
 
     const { characters } = serviceBattleData('future');
 
-    // const graphics = getGraphics();
-
-    // const { tilemap, hasObstacleAt, tileToWorld, worldToTile } = graphics;
+    // const graphics = graphicCreator(tiledManager);
 
     const pathfinder = pathfinderCreator(
         tiledManager,
@@ -43,18 +41,12 @@ export const MapManager = (
 
     return {
 
+        tiledManager,
+
         refreshPathfinder() {
             pathfinder.refreshGrid();
         },
 
         calculatePath: pathfinder.calculatePath,
-
-        getTileType: tiledManager.getTileType
-
-        // tileToWorld,
-        // worldToTile,
-        // worldToTileIfExist(position: Position): Position | null {
-        //     // TODO
-        // }
     };
 };

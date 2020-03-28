@@ -22,11 +22,6 @@ export interface ConfirmSAction extends TAction<'confirm'> {
     lastCorrectHash: string;
 }
 
-// export interface CharAction {
-//     spellId: string;
-//     positions: Position[];
-// }
-
 export interface SpellActionSnapshot {
     startTime: number;
     duration: number;

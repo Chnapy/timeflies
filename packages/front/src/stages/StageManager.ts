@@ -1,12 +1,12 @@
 import { IGameAction } from '../action/GameAction';
 import { AssetMap } from '../assetManager/AssetLoader';
-import { StageGraphic } from '../canvas/StageGraphic';
 import { Controller } from '../Controller';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
 import { BattleStage, BattleStageParam } from './battle/BattleStage';
 import { BootStage, BootStageParam } from './boot/BootStage';
 import { LoadStage, LoadStageParam } from './load/LoadStage';
+import { StageGraphicCreateParam } from '../canvas/GameCanvas';
 
 export interface StageChangeAction<K extends StageKey> extends IGameAction<'stage/change'> {
     stageKey: K;
@@ -14,12 +14,17 @@ export interface StageChangeAction<K extends StageKey> extends IGameAction<'stag
 }
 
 export interface StageChangeGraphicAction extends IGameAction<'stage/change/graphic'> {
-    stageGraphic: StageGraphic;
+    stageKey: StageKey;
+}
+
+export interface StageOnCreateGraphicAction<K extends StageKey> extends IGameAction<'stage/onCreate/graphic'> {
+    param: StageGraphicCreateParam<K>;
 }
 
 export type StageAction =
     | StageChangeAction<any>
-    | StageChangeGraphicAction;
+    | StageChangeGraphicAction
+    | StageOnCreateGraphicAction<any>;
 
 export interface StageParam<K extends string, P extends {}> {
     stageKey: K;
@@ -33,13 +38,12 @@ type StageParams = BootStageParam | LoadStageParam | BattleStageParam;
 export type StageKey = StageParams[ 'stageKey' ];
 
 export interface StageCreator<SK extends StageKey, K extends keyof AssetMap> {
-    (payload: ExtractPayload<SK>): Stage<K>;
+    (payload: ExtractPayload<SK>): Stage<SK, K>;
 }
 
-export interface Stage<K extends keyof AssetMap> {
-    graphic: StageGraphic;
+export interface Stage<SK extends StageKey, K extends keyof AssetMap> {
     preload(): { [ key in K ]?: string };
-    create(assets: Pick<AssetMap, K>): void;
+    create(assets: Pick<AssetMap, K>): Promise<StageGraphicCreateParam<SK>>;
 }
 
 export interface StageManager {
@@ -59,12 +63,16 @@ export const StageManager = ({ stageCreators }: Dependencies = {
     }
 }): StageManager => {
 
-    let currentStage: Stage<never>;
+    let currentStage: Stage<any, never>;
 
-    const { dispatchStageChangeGraphic } = serviceDispatch({
-        dispatchStageChangeGraphic: (stageGraphic: StageGraphic): StageChangeGraphicAction => ({
+    const { dispatchStageChangeGraphic, dispatchStageOnCreateGraphic } = serviceDispatch({
+        dispatchStageChangeGraphic: (stageKey: StageKey): StageChangeGraphicAction => ({
             type: 'stage/change/graphic',
-            stageGraphic
+            stageKey
+        }),
+        dispatchStageOnCreateGraphic: (param: StageGraphicCreateParam<any>): StageOnCreateGraphicAction<any> => ({
+            type: 'stage/onCreate/graphic',
+            param
         })
     })
 
@@ -73,7 +81,7 @@ export const StageManager = ({ stageCreators }: Dependencies = {
 
         console.log('Stage change:', stageKey);
 
-        dispatchStageChangeGraphic(currentStage.graphic);
+        dispatchStageChangeGraphic(stageKey);
 
         const assetsToLoad = currentStage.preload();
 
@@ -81,9 +89,11 @@ export const StageManager = ({ stageCreators }: Dependencies = {
             .addMultiple(assetsToLoad)
             .load();
 
-        currentStage.create(assets);
+        const graphicCreateParam = await currentStage.create(assets);
+
+        dispatchStageOnCreateGraphic(graphicCreateParam);
     };
- 
+
     goToStage({ stageKey: 'boot', payload: {} });
 
     const { onAction } = serviceEvent();

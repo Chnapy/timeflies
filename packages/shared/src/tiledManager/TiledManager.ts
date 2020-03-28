@@ -1,4 +1,4 @@
-import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType } from 'tiled-types';
+import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
 import { Position } from '../snapshot';
 import { assertIsDefined } from '../util';
 
@@ -10,7 +10,11 @@ export interface TiledManager {
     readonly width: number;
     readonly height: number;
 
+    readonly assets: TiledMapAssets;
+
     getTileType(position: Position): TileType;
+    getTilePositionFromIndex(index: number): Position;
+    getTilesetFromId(id: number): TiledTileset | undefined;
 }
 
 export type TileType = 'default' | 'obstacle' | null;
@@ -20,6 +24,11 @@ export interface TiledManagerConfig {
     obstacleTilelayerName: string;
 }
 
+export type TiledMapAssets = {
+    schema: TiledMap;
+    images: Record<string, HTMLImageElement>;
+};
+
 function assertMapIsAllowed(map: TiledMap): asserts map is TiledMapOrthogonal {
     if (map.orientation !== 'orthogonal') {
         throw new Error(`The given map should be orthogonal, but is [${map.orientation}]`);
@@ -27,12 +36,13 @@ function assertMapIsAllowed(map: TiledMap): asserts map is TiledMapOrthogonal {
 };
 
 export const TiledManager = (
-    map: TiledMap,
+    assets: TiledMapAssets,
     { defaultTilelayerName, obstacleTilelayerName }: TiledManagerConfig
 ): TiledManager => {
+    const { schema } = assets;
 
     const getTilelayer = (name: string): TiledLayerTilelayerWithData => {
-        const layer = map.layers.find((layer): layer is TiledLayerTilelayer =>
+        const layer = schema.layers.find((layer): layer is TiledLayerTilelayer =>
             layer.type === 'tilelayer' && layer.name === name
         );
         assertIsDefined(layer);
@@ -41,20 +51,26 @@ export const TiledManager = (
         return layer as TiledLayerTilelayerWithData;
     };
 
-    assertMapIsAllowed(map);
+    assertMapIsAllowed(schema);
 
-    const { orientation, width, height } = map;
+    const { orientation, width, height } = schema;
 
     const defaultTilelayer = getTilelayer(defaultTilelayerName);
     const obstacleTilelayer = getTilelayer(obstacleTilelayerName);
 
-    const getTile = ({ data, width }: TiledLayerTilelayerWithData, { x, y }: Position): number => {
+    const getTilePositionFromIndex = (index: number): Position => {
+        const y = Number.parseInt(index / width + '');
+        const x = (index % width);
+        return { x, y };
+    };
+
+    const getTileIdFromPosition = ({ data, width }: TiledLayerTilelayerWithData, { x, y }: Position): number => {
         const index = x + y * width;
         return data[ index ];
     };
 
     const hasTileFromLayer = (layer: TiledLayerTilelayerWithData, position: Position): boolean => {
-        return getTile(layer, position) !== 0;
+        return getTileIdFromPosition(layer, position) !== 0;
     };
 
     const getTileType = (position: Position): TileType => {
@@ -66,11 +82,18 @@ export const TiledManager = (
         return null;
     };
 
+    const getTilesetFromId = (id: number): TiledTileset | undefined =>
+        schema.tilesets.find(t => t.firstgid <= id && t.firstgid + t.tilecount - 1 >= id);
+
     return {
         orientation,
         width,
         height,
 
-        getTileType
+        assets,
+
+        getTilePositionFromIndex,
+        getTileType,
+        getTilesetFromId
     };
 }

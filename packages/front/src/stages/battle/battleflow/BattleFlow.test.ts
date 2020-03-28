@@ -23,8 +23,9 @@ describe('Battleflow', () => {
 
         mapManager = mapManager || {
             ...seedMapManager(),
-            getTileType(position) { return 'default' },
-            // worldToTileIfExist() { return { x: 5, y: 5 }; },
+            tiledManager: {
+                getTileType(position) { return 'default' },
+            } as any,
             calculatePath() {
                 pathPromise = new Promise<Position[]>(r => r([
                     { x: -1, y: -1 },

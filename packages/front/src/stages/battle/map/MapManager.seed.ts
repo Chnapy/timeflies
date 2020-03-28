@@ -2,11 +2,10 @@ import { MapManager } from './MapManager';
 
 export const seedMapManager = (): MapManager => {
     return {
+        tiledManager: {
+            getTileType(position) { return null }
+        },
         refreshPathfinder() { },
-        // tileToWorld(position, center) { return { x: -1, y: -1 } },
-        // worldToTile(position) { return { x: -1, y: -1 } },
-        // worldToTileIfExist(position) { return null },
         calculatePath() { return { cancel: () => true, promise: Promise.resolve([]) } },
-        getTileType(position) { return null }
     };
 };

@@ -36,7 +36,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     private spellEngine!: SpellEngine;
 
-    private graphics!: Phaser.GameObjects.Graphics;
+    private graphics!: any;
     map!: MapManager;
     cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
@@ -92,7 +92,7 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 //@ts-ignore
         this.cycle.synchronizeGlobalTurn(data.globalTurnState);
 
-        this.graphics = this.add.graphics();
+        // this.graphics = this.add.graphics();
 
         this.battleData.characters.forEach(c => c.initHUD());
 
@@ -100,22 +100,22 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
         decorLayer
             .setInteractive()
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
-                if((pointer.event.target as any).localName !== 'canvas') {
-                    return;
-                }
+            // .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
+            //     if((pointer.event.target as any).localName !== 'canvas') {
+            //         return;
+            //     }
 
-                this.spellEngine.onTileHover(pointer);
-            })
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, (pointer: Phaser.Input.Pointer) => {
-                if((pointer.event.target as any).localName !== 'canvas') {
-                    return;
-                }
+            //     this.spellEngine.onTileHover(pointer);
+            // })
+            // .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, (pointer: Phaser.Input.Pointer) => {
+            //     if((pointer.event.target as any).localName !== 'canvas') {
+            //         return;
+            //     }
                 
-                if (pointer.button === 0) {
-                    this.spellEngine.onTileClick(pointer);
-                }
-            });
+            //     if (pointer.button === 0) {
+            //         this.spellEngine.onTileClick(pointer);
+            //     }
+            // });
 
         this.cameraManager = new CameraManager(this);
 
@@ -174,14 +174,14 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
                 Utils.keysTyped(state).forEach((sideKey: Orientation) => {
                     const side = state[ sideKey ];
 
-                    this.anims.create({
-                        key: CharacterGraphic.getAnimKey(type, stateKey, sideKey),
-                        frames: Array.isArray(side.frameNames)
-                            ? side.frameNames
-                            : this.anims.generateFrameNames(CharacterGraphic.getSheetKey(type), side.frameNames),
-                        frameRate: side.frameRate,
-                        repeat: side.frameRepeat
-                    });
+                    // this.anims.create({
+                    //     key: CharacterGraphic.getAnimKey(type, stateKey, sideKey),
+                    //     frames: Array.isArray(side.frameNames)
+                    //         ? side.frameNames
+                    //         : this.anims.generateFrameNames(CharacterGraphic.getSheetKey(type), side.frameNames),
+                    //     frameRate: side.frameRate,
+                    //     repeat: side.frameRepeat
+                    // });
                 });
             });
         });

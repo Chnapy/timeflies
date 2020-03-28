@@ -1,29 +1,46 @@
 import * as PIXI from 'pixi.js';
 import { serviceEvent } from '../services/serviceEvent';
-import { StageChangeGraphicAction } from '../stages/StageManager';
+import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
+import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
+import { LoadStageGraphic } from '../stages/load/graphic/LoadStageGraphic';
+import { StageChangeGraphicAction, StageKey, StageOnCreateGraphicAction } from '../stages/StageManager';
+import { StageGraphicCreator, StageGraphic } from './StageGraphic';
+import { CanvasContextMap } from './CanvasContext';
+
+const stageGraphicsMap = {
+    boot: BootStageGraphic,
+    load: LoadStageGraphic,
+    battle: BattleStageGraphic
+} as const;
+
+export type StageGraphicCreateParam<SK extends StageKey> = (typeof stageGraphicsMap)[ SK ] extends StageGraphicCreator<infer K>
+    ? Pick<CanvasContextMap, K>
+    : never;
 
 export interface GameCanvas {
 }
 
 export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCanvas => {
 
+    const { onAction } = serviceEvent();
+
     const canvas = new PIXI.Application({
         view,
         resizeTo: parent
     });
 
-    // canvas.loader.add(sample).load((_, resources) => {
-    //     console.log(resources);
-    //     const sprite = new PIXI.Sprite(PIXI.Texture.from(resources[sample]!.data));
-    //     canvas.stage.addChild(sprite);
-    //     canvas.stage.removeChildren();
-    // })
+    let stageGraphic: StageGraphic<any>;
 
-    const { onAction } = serviceEvent();
-
-    onAction<StageChangeGraphicAction>('stage/change/graphic', ({ stageGraphic }) => {
+    onAction<StageChangeGraphicAction>('stage/change/graphic', ({ stageKey }) => {
         canvas.stage.removeChildren();
+
+        stageGraphic = stageGraphicsMap[ stageKey ]();
+
         canvas.stage.addChild(stageGraphic.getContainer());
+    });
+
+    onAction<StageOnCreateGraphicAction<any>>('stage/onCreate/graphic', ({ param }) => {
+        stageGraphic.onCreate(param);
     });
 
     return {};

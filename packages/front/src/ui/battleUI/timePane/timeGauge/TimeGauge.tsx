@@ -36,7 +36,7 @@ export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>
     animate,
     disabled
 }: TimeGaugeInnerProps) => {
-
+if(1==1)return null;
     const now = Date.now();
 
     const delta = Math.max(now - startDateTime, 0);

@@ -41,7 +41,7 @@ export class App extends React.Component<AppProps> {
                     <canvas/>
                     </div>
 
-                <UI />
+                <UI /> 
 
             </div>
         </Provider>;
