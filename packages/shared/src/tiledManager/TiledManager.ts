@@ -1,4 +1,5 @@
 import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
+import { MapConfig } from '../MapConfig';
 import { Position } from '../snapshot';
 import { assertIsDefined } from '../util';
 
@@ -19,10 +20,7 @@ export interface TiledManager {
 
 export type TileType = 'default' | 'obstacle' | null;
 
-export interface TiledManagerConfig {
-    defaultTilelayerName: string;
-    obstacleTilelayerName: string;
-}
+export type TiledManagerConfig = Pick<MapConfig, 'defaultTilelayerName' | 'obstacleTilelayerName'>;
 
 export type TiledMapAssets = {
     schema: TiledMap;

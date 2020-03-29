@@ -13,6 +13,10 @@ import { StageManager } from './stages/StageManager';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
 
+if (process.env.NODE_ENV === 'test') {
+    throw new Error(`Controller should not be used in 'test' env.`);
+}
+
 const logger = createLogger({
     collapsed: true
 });
@@ -40,9 +44,9 @@ const onAppMount = (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void =
 
 export const Controller: IController = {
 
-    start() {
+    start(websocketCreator) {
 
-        client = WSClient();
+        client = WSClient(websocketCreator && { websocketCreator });
 
         app = ReactDOM.render(
             React.createElement(App, {

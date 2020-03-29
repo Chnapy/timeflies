@@ -1,74 +1,12 @@
-import { TiledMap } from '@timeflies/shared';
-import { AbstractLoadStrategy, IAddOptions, ResourceType } from 'resource-loader';
 import { AssetLoader } from './AssetLoader';
 
-class MockLoadStrategy extends AbstractLoadStrategy<IAddOptions> {
-    load(): void {
-
-        const { name, url } = this.config;
-
-        if (url === 'error') {
-            throw new Error('error')
-        }
-
-        const ext = url.substr(url.lastIndexOf('.') + 1);
-
-        const getLoadedObject = (): { type: ResourceType, value: any } => {
-
-
-            switch (ext) {
-                case 'json':
-
-                    if (name === 'map') {
-                        const value: Partial<TiledMap> = {
-                            tilesets: [
-                                {
-                                    name: 'map_1',
-                                    image: 'url_1.png'
-                                } as any,
-                                {
-                                    name: 'map_2',
-                                    image: 'url_2.png'
-                                } as any
-                            ]
-                        };
-                        return {
-                            type: ResourceType.Json,
-                            value
-                        };
-                    }
-
-                    return {
-                        type: ResourceType.Json,
-                        value: JSON.parse('{"version": 4}')
-                    };
-
-                case 'png':
-                    const img = document.createElement('img');
-                    img.src = 'test';
-                    return {
-                        type: ResourceType.Image,
-                        value: img
-                    };
-            }
-            return { type: ResourceType.Unknown, value: null };
-        };
-
-        const { type, value } = getLoadedObject();
-
-        this.onComplete.dispatch(type, value);
-    }
-    abort(): void {
-        throw new Error('Method not implemented.');
-    }
-}
 
 /**
  * TODO fix jest file serving: https://github.com/englercj/resource-loader/issues/149
  */
 describe('# AssetLoader', () => {
 
-    const generateAssetLoader = () => AssetLoader({ loadStrategy: MockLoadStrategy });
+    const generateAssetLoader = () => AssetLoader();
 
     it('should correctly load an image', async () => {
         const loader = generateAssetLoader();
@@ -99,8 +37,8 @@ describe('# AssetLoader', () => {
 
         expect(map.schema).toHaveProperty('tilesets');
 
-        expect(map.images).toHaveProperty('map_1');
-        expect(map.images.map_1).toHaveProperty('src');
+        expect(map.images).toHaveProperty('map');
+        expect(map.images.map).toHaveProperty('src');
 
         expect(map.images).toHaveProperty('map_2');
         expect(map.images.map_2).toHaveProperty('src');

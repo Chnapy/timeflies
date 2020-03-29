@@ -3,9 +3,10 @@ import { serviceEvent } from '../services/serviceEvent';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
 import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
 import { LoadStageGraphic } from '../stages/load/graphic/LoadStageGraphic';
-import { StageChangeGraphicAction, StageKey, StageOnCreateGraphicAction } from '../stages/StageManager';
+import { StageKey, StageOnCreateGraphicAction, StageChangeAction } from '../stages/StageManager';
 import { StageGraphicCreator, StageGraphic } from './StageGraphic';
 import { CanvasContextMap } from './CanvasContext';
+import { assertIsDefined } from '@timeflies/shared';
 
 const stageGraphicsMap = {
     boot: BootStageGraphic,
@@ -31,7 +32,7 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
 
     let stageGraphic: StageGraphic<any>;
 
-    onAction<StageChangeGraphicAction>('stage/change/graphic', ({ stageKey }) => {
+    onAction<StageChangeAction<any>>('stage/change', ({ stageKey }) => {
         canvas.stage.removeChildren();
 
         stageGraphic = stageGraphicsMap[ stageKey ]();
@@ -40,6 +41,9 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
     });
 
     onAction<StageOnCreateGraphicAction<any>>('stage/onCreate/graphic', ({ param }) => {
+
+        assertIsDefined(stageGraphic);
+
         stageGraphic.onCreate(param);
     });
 

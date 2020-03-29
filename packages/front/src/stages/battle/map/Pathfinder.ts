@@ -19,7 +19,7 @@ export interface Pathfinder extends ReturnType<typeof Pathfinder> { }
 const ACCEPTABLE_TILES: number[] = [ 0 ];
 
 export const Pathfinder = (
-    tiledManager: TiledManager,
+    tiledManager: Pick<TiledManager, 'width' | 'height' | 'getTileType'>,
     getCharactersPosition: () => Readonly<Position>[]
 ) => {
 

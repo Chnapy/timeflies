@@ -1,5 +1,5 @@
 import { StoreTest } from '../../../StoreTest';
-import { Position, TimerTester, ConfirmSAction } from '@timeflies/shared';
+import { Position, TimerTester, ConfirmSAction, TiledManager } from '@timeflies/shared';
 import { serviceNetwork } from '../../../services/serviceNetwork';
 import { SendMessageAction, ReceiveMessageAction } from '../../../socket/WSClient';
 import { seedCharacter } from '../../../__seeds__/seedCharacter';
@@ -7,7 +7,6 @@ import { BState, BStateTurnStartAction } from '../battleState/BattleStateSchema'
 import { BStateMachine } from '../battleState/BStateMachine';
 import { CycleManager } from '../cycle/CycleManager';
 import { SpellEngineBindAction } from '../engine/Engine';
-import { MapManager } from '../map/MapManager';
 import { seedMapManager } from '../map/MapManager.seed';
 import { SnapshotManager } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from '../spellAction/SpellActionManager';
@@ -17,29 +16,12 @@ describe('Battleflow', () => {
 
     const timerTester = new TimerTester();
 
-    const init = (mapManager?: MapManager) => {
+    const init = () => {
 
-        let pathPromise;
+        const initialPos: Position = { x: 4, y: 3 };
 
-        mapManager = mapManager || {
-            ...seedMapManager(),
-            tiledManager: {
-                getTileType(position) { return 'default' },
-            } as any,
-            calculatePath() {
-                pathPromise = new Promise<Position[]>(r => r([
-                    { x: -1, y: -1 },
-                    { x: 5, y: 5 },
-                ]));
-                return {
-                    cancel: () => true,
-                    promise: pathPromise
-                };
-            }
-        };
-
-        const characterCurrent = seedCharacter();
-        const characterFuture = seedCharacter();
+        const characterCurrent = seedCharacter({ position: initialPos });
+        const characterFuture = seedCharacter({ position: initialPos });
 
         const currentBattleData: BattleDataCurrent = {
             battleHash: 'not-defined',
@@ -68,6 +50,17 @@ describe('Battleflow', () => {
                 }
             }
         });
+
+        const mapManager = seedMapManager('real', 'map_1');
+
+        mapManager.refreshPathfinder();
+
+        // from x:4 y:3
+        const posAvailables: readonly Position[] = [
+            {x: 4, y: 4},
+            {x: 5, y: 4},
+            {x: 6, y: 4},
+        ];
 
         const cycle = CycleManager();
 
@@ -105,8 +98,13 @@ describe('Battleflow', () => {
             bState,
             battleHash,
             bindAction,
-            pathPromise
+            posAvailables
         };
+    };
+
+    const awaitAndAdvance10 = async (promise: Promise<any>) => {
+        timerTester.advanceBy(10);
+        return await promise;
     };
 
     beforeEach(() => {
@@ -149,7 +147,7 @@ describe('Battleflow', () => {
 
         it('should rollback on turn end', async () => {
 
-            const { currentBattleData, futureBattleData, bindAction, pathPromise, characterCurrent } = init();
+            const { currentBattleData, futureBattleData, bindAction, characterCurrent, posAvailables } = init();
 
             timerTester.advanceBy(characterCurrent.features.actionTime - 50);
 
@@ -157,11 +155,9 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            onTileHover({ x: -1, y: -1 });
+            await awaitAndAdvance10(onTileHover(posAvailables[0]));
 
-            await pathPromise;
-
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[0]);
 
             await serviceNetwork({});
 
@@ -176,7 +172,7 @@ describe('Battleflow', () => {
 
         it('should not allow to launch spell with not enough time to use it', async () => {
 
-            const { characterCurrent, futureBattleData, bindAction, pathPromise } = init();
+            const { characterCurrent, futureBattleData, bindAction, posAvailables } = init();
 
             const firstHash = futureBattleData.battleHash;
 
@@ -184,11 +180,9 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            onTileHover({ x: -1, y: -1 });
+            await await awaitAndAdvance10(onTileHover(posAvailables[0]));
 
-            await pathPromise;
-
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[0]);
 
             await serviceNetwork({});
 
@@ -197,17 +191,15 @@ describe('Battleflow', () => {
 
         it('should commit after spell action', async () => {
 
-            const { currentBattleData, futureBattleData, bindAction, pathPromise } = init();
+            const { currentBattleData, futureBattleData, bindAction, posAvailables } = init();
 
             const firstHash = futureBattleData.battleHash;
 
             const { onTileHover, onTileClick } = bindAction;
+            
+            await awaitAndAdvance10(onTileHover(posAvailables[0]))
 
-            onTileHover({ x: -1, y: -1 });
-
-            await pathPromise;
-
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[0]);
 
             await serviceNetwork({});
 
@@ -217,17 +209,15 @@ describe('Battleflow', () => {
 
         it('should send message after spell action', async () => {
 
-            const { bindAction, pathPromise } = init();
+            const { bindAction, posAvailables } = init();
 
             const { onTileHover, onTileClick } = bindAction;
 
-            onTileHover({ x: -1, y: -1 });
-
-            await pathPromise;
+            await awaitAndAdvance10(onTileHover(posAvailables[0]))
 
             StoreTest.clearActions();
 
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[0]);
 
             await serviceNetwork({});
 
@@ -244,26 +234,9 @@ describe('Battleflow', () => {
             );
         });
 
-        it.skip('should change future battle data against current one after two spell actions', async () => {
+        it('should change future battle data against current one after two spell actions', async () => {
 
-            let getPos: () => Position;
-
-            let pathPromise;
-
-            const { characterCurrent, bindAction, currentBattleData, futureBattleData } = init({
-                ...seedMapManager(),
-                // worldToTileIfExist() { return getPos(); },
-                calculatePath() {
-                    pathPromise = new Promise<Position[]>(r => r([
-                        { x: -1, y: -1 },
-                        getPos(),
-                    ]));
-                    return {
-                        cancel: () => true,
-                        promise: pathPromise
-                    };
-                }
-            });
+            const { characterCurrent, bindAction, currentBattleData, futureBattleData, posAvailables } = init();
 
             const firstPos = characterCurrent.position;
 
@@ -271,31 +244,23 @@ describe('Battleflow', () => {
 
             // first spell action
 
-            getPos = () => ({ x: 5, y: 5 });
+            await awaitAndAdvance10(onTileHover(posAvailables[0]))
 
-            onTileHover({ x: -1, y: -1 });
-
-            await pathPromise;
-
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[0]);
 
             await serviceNetwork({});
 
-            expect(futureBattleData.characters[ 0 ].position).toEqual({ x: 5, y: 5 });
+            expect(futureBattleData.characters[ 0 ].position).toEqual(posAvailables[0]);
 
             // second spell action
 
-            getPos = () => ({ x: 6, y: 5 });
+            await awaitAndAdvance10(onTileHover(posAvailables[1]))
 
-            onTileHover({ x: -1, y: -1 });
-
-            await pathPromise;
-
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[1]);
 
             await serviceNetwork({});
 
-            expect(futureBattleData.characters[ 0 ].position).toEqual({ x: 6, y: 5 });
+            expect(futureBattleData.characters[ 0 ].position).toEqual(posAvailables[1]);
             expect(currentBattleData.characters[ 0 ].position).toEqual(firstPos);
         });
     });
@@ -304,7 +269,7 @@ describe('Battleflow', () => {
 
         it('should rollback on confirm KO', async () => {
 
-            const { characterCurrent, futureBattleData, bindAction, pathPromise } = init();
+            const { characterCurrent, futureBattleData, bindAction, posAvailables } = init();
 
             StoreTest.dispatch<BStateTurnStartAction>({
                 type: 'battle/state/event',
@@ -318,11 +283,9 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            onTileHover({ x: -1, y: -1 });
+            await awaitAndAdvance10(onTileHover(posAvailables[0]));
 
-            await pathPromise;
-
-            onTileClick({ x: -1, y: -1 });
+            await onTileClick(posAvailables[0]);
 
             await serviceNetwork({});
 

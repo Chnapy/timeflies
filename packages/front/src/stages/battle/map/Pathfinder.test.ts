@@ -3,6 +3,22 @@ import { Position, TileType } from '@timeflies/shared';
 
 describe('# Pathfinder', () => {
 
+    it('should throw error on trying to calculate path without refresh grid before', async () => {
+
+        const finder = Pathfinder(
+            {
+                width: 10,
+                height: 10,
+                getTileType: () => 'default'
+            },
+            () => ([])
+        );
+
+        expect(
+            finder.calculatePath({ x: 0, y: 0 }, { x: 1, y: 0 }).promise
+        ).rejects.toBeDefined();
+    });
+
     it.each<[
         string,
         {
@@ -110,7 +126,6 @@ describe('# Pathfinder', () => {
             {
                 width,
                 height,
-                orientation: 'orthogonal',
                 getTileType
             },
             () => charPos

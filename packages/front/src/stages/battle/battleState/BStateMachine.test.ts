@@ -16,7 +16,7 @@ describe('# BStateMachine', () => {
 
     it('should initialize with the initial state', () => {
 
-        const machine = BStateMachine(seedMapManager(), {
+        const machine = BStateMachine(seedMapManager('fake'), {
             battleStateSchemaCreator: () => ({
                 initialState: 'watch',
                 states: {
@@ -39,7 +39,7 @@ describe('# BStateMachine', () => {
 
     it('should change state on correct event', () => {
 
-        const machine = BStateMachine(seedMapManager(), {
+        const machine = BStateMachine(seedMapManager('fake'), {
             battleStateSchemaCreator: () => ({
                 initialState: 'watch',
                 states: {
@@ -75,7 +75,7 @@ describe('# BStateMachine', () => {
 
     it('should change state with correct condition', () => {
 
-        const machine = BStateMachine(seedMapManager(), {
+        const machine = BStateMachine(seedMapManager('fake'), {
             battleStateSchemaCreator: () => ({
                 initialState: 'watch',
                 states: {
@@ -112,7 +112,7 @@ describe('# BStateMachine', () => {
 
     it('should not change state with incorrect condition', () => {
 
-        const machine = BStateMachine(seedMapManager(), {
+        const machine = BStateMachine(seedMapManager('fake'), {
             battleStateSchemaCreator: () => ({
                 initialState: 'watch',
                 states: {
@@ -149,7 +149,7 @@ describe('# BStateMachine', () => {
 
     it('should not change state without corresponding trigger', () => {
 
-        const machine = BStateMachine(seedMapManager(), {
+        const machine = BStateMachine(seedMapManager('fake'), {
             battleStateSchemaCreator: () => ({
                 initialState: 'watch',
                 states: {

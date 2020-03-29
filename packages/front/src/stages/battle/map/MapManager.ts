@@ -1,7 +1,6 @@
-import { MapInfos, TiledManager, TiledMapAssets } from '@timeflies/shared';
+import { MapConfig, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { Pathfinder } from './Pathfinder';
-import { TiledMapGraphic } from '../graphic/tiledMap/TiledMapGraphic';
 
 export interface MapManager extends
     Pick<Pathfinder, 'calculatePath'> {
@@ -9,35 +8,35 @@ export interface MapManager extends
     refreshPathfinder(): void;
 }
 
-interface Dependencies {
+export interface MapManagerDependencies {
     tiledManagerCreator: typeof TiledManager;
     pathfinderCreator: typeof Pathfinder;
-    graphicCreator: typeof TiledMapGraphic;
 }
 
 export const MapManager = (
     mapAssets: TiledMapAssets,
-    mapInfos: MapInfos,
-    { pathfinderCreator, tiledManagerCreator, graphicCreator }: Dependencies = {
+    {
+        defaultTilelayerName,
+        obstacleTilelayerName
+    }: Pick<MapConfig, 'defaultTilelayerName' | 'obstacleTilelayerName'>,
+    { pathfinderCreator, tiledManagerCreator }: MapManagerDependencies = {
         pathfinderCreator: Pathfinder,
-        tiledManagerCreator: TiledManager,
-        graphicCreator: TiledMapGraphic
+        tiledManagerCreator: TiledManager
     }
 ): MapManager => {
 
     const tiledManager = tiledManagerCreator(mapAssets, {
-        defaultTilelayerName: mapInfos.decorLayerKey,
-        obstacleTilelayerName: mapInfos.obstaclesLayerKey
+        defaultTilelayerName,
+        obstacleTilelayerName
     });
 
     const { characters } = serviceBattleData('future');
-
-    // const graphics = graphicCreator(tiledManager);
 
     const pathfinder = pathfinderCreator(
         tiledManager,
         () => characters.map(c => c.position)
     );
+    pathfinder.refreshGrid();
 
     return {
 

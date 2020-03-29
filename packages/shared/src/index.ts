@@ -6,4 +6,4 @@ export * from './snapshot';
 export * from './tiledManager';
 
 export * from './BattleLoadPayload';
-export * from './MapInfos';
+export * from './MapConfig';

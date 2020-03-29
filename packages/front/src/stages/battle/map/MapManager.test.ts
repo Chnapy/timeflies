@@ -1,20 +1,25 @@
 import { StoreTest } from '../../../StoreTest';
 import { MapManager } from './MapManager';
-import { Position } from '@timeflies/shared';
+import { Position, TiledManager } from '@timeflies/shared';
 import { seedMapManager } from './MapManager.seed';
+import { Pathfinder } from './Pathfinder';
+import { seedCharacter } from '../../../__seeds__/seedCharacter';
+import { TiledMapSeedKey, seedTiledMapAssets, seedTiledConfig } from './TiledMap.seed';
 
 describe('# MapManager', () => {
 
-    let manager: MapManager;
-
     beforeEach(() => {
-        manager = undefined as any;
+        StoreTest.beforeTest();
     });
 
-    const getManager = ({ refreshGrid, tileToWorld, worldToTile }: {
-        refreshGrid?: () => void;
-        tileToWorld?: (arg: Position, center?: boolean) => Position;
-        worldToTile?: (arg: Position) => Position;
+    afterEach(() => {
+        StoreTest.afterTest();
+    });
+
+    const getManager = ({ mapKey, tiledManagerCreator, pathfinderCreator }: {
+        mapKey: TiledMapSeedKey;
+        tiledManagerCreator?: typeof TiledManager;
+        pathfinderCreator?: typeof Pathfinder;
     }): MapManager => {
 
         StoreTest.initStore({
@@ -22,83 +27,85 @@ describe('# MapManager', () => {
                 state: 'battle',
                 battleData: {
                     future: {
-                        characters: []
+                        characters: [ seedCharacter() ]
                     }
                 } as any
             }
         });
 
-        return MapManager(
+        return seedMapManager('real', mapKey,
             {
-                width: -1,
-                height: -1,
-                orientation: 'orthogonal',
-            } as any,
-            {} as any,
-            {
-                tiledManagerCreator: () => ({
+                tiledManagerCreator: tiledManagerCreator ?? (() => ({
                     width: -1,
                     height: -1,
                     orientation: 'orthogonal',
                     getTileType() { return null }
-                }),
-                pathfinderCreator: () => ({
-                    refreshGrid: refreshGrid ?? (() => { }),
+                } as any)),
+                pathfinderCreator: pathfinderCreator ?? (() => ({
+                    refreshGrid: () => { },
                     calculatePath: () => ({ promise: Promise.resolve([]), cancel: () => true })
-                })
+                }))
             }
         );
     };
+
+    it('should give to tiledManager assets and good config', () => {
+
+        const tiledManagerCreator: typeof TiledManager = jest.fn(() => ({} as TiledManager));
+
+        const manager = getManager({ mapKey: 'map_1', tiledManagerCreator });
+
+        const assets = seedTiledMapAssets('map_1');
+
+        const config = seedTiledConfig('map_1');
+
+        expect(tiledManagerCreator).toHaveBeenNthCalledWith<Parameters<typeof TiledManager>>(1,
+            assets, config);
+    });
+
+    it('should give to pathfinder characters positions getter', () => {
+
+        expect.assertions(1);
+
+        const pathfinderCreator: typeof Pathfinder = jest.fn((tiledManager, positionsGetter): Pathfinder => {
+            expect(positionsGetter()).toEqual<Position[]>([ { x: 4, y: 3 } ]);
+            return ({
+                calculatePath: () => ({} as any),
+                refreshGrid() { }
+            });
+        });
+
+        const manager = getManager({ mapKey: 'map_1', pathfinderCreator });
+    });
+
+    it('should call pathfinder#refreshGrid on creation', () => {
+
+        const refreshGrid = jest.fn();
+
+        const manager = getManager({
+            mapKey: 'map_1',
+            pathfinderCreator: () => ({
+                refreshGrid
+            } as any)
+        });
+
+        expect(refreshGrid).toHaveBeenCalled();
+    });
 
     it('should call pathfinder#refreshGrid on refreshPathfinder()', () => {
 
         const refreshGrid = jest.fn();
 
-        manager = getManager({ refreshGrid });
+        const manager = getManager({
+            mapKey: 'map_1',
+            pathfinderCreator: () => ({
+                refreshGrid
+            } as any)
+        });
 
         manager.refreshPathfinder();
 
-        expect(refreshGrid).toHaveBeenCalled();
-    });
-
-    it.skip('should call graphic#tileToWorld on tileToWorld()', () => {
-
-        const tileToWorld = jest.fn(() => ({
-            x: -1,
-            y: -1
-        }));
-
-        manager = getManager({ tileToWorld });
-
-        const p: Position = { x: 4, y: 2 };
-
-        manager.tileToWorld(p, true);
-
-        expect(tileToWorld).toHaveBeenCalledWith(p, true);
-        expect(tileToWorld).toReturnWith<Position>({
-            x: -1,
-            y: -1
-        });
-    });
-
-    it.skip('should call graphic#worldToTile on worldToTile()', () => {
-
-        const worldToTile = jest.fn(() => ({
-            x: -2,
-            y: -2
-        }));
-
-        manager = getManager({ worldToTile });
-
-        const p: Position = { x: 4, y: 2 };
-
-        manager.worldToTile(p);
-
-        expect(worldToTile).toHaveBeenCalledWith(p);
-        expect(worldToTile).toReturnWith<Position>({
-            x: -2,
-            y: -2
-        });
+        expect(refreshGrid).toHaveBeenCalledTimes(2);
     });
 
 });

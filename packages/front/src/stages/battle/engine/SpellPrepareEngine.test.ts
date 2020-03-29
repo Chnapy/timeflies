@@ -103,7 +103,7 @@ describe('# SpellPrepareEngine', () => {
                     }
                 },
                 deps: {
-                    mapManager: seedMapManager()
+                    mapManager: seedMapManager('fake')
                 }
             },
             {
@@ -111,7 +111,8 @@ describe('# SpellPrepareEngine', () => {
 
                     return {
                         onTileHover,
-                        onTileClick
+                        onTileClick,
+                        stop() {}
                     }
                 }
             }
@@ -211,7 +212,7 @@ describe('# SpellPrepareEngine', () => {
                     }
                 },
                 deps: {
-                    mapManager: seedMapManager()
+                    mapManager: seedMapManager('fake')
                 }
             },
             {
@@ -219,7 +220,8 @@ describe('# SpellPrepareEngine', () => {
 
                     return {
                         onTileHover,
-                        onTileClick
+                        onTileClick,
+                        stop(){}
                     }
                 }
             }

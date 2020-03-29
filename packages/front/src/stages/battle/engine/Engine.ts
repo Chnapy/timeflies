@@ -4,8 +4,8 @@ import { BStateAction } from '../battleState/BattleStateSchema';
 import { MapManager } from '../map/MapManager';
 
 export interface SpellEngineBindAction extends IGameAction<'battle/spell-engine/bind'> {
-    onTileHover: (tilePos: Position) => void;
-    onTileClick: (tilePos: Position) => void;
+    onTileHover: (tilePos: Position) => Promise<void>;
+    onTileClick: (tilePos: Position) => Promise<void>;
 }
 
 interface Dependencies {

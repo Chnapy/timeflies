@@ -1,7 +1,7 @@
-import { ClientAction, ServerAction, DistributiveOmit } from '@timeflies/shared';
+import { ClientAction, DistributiveOmit, ServerAction } from '@timeflies/shared';
 import { IGameAction } from '../action/GameAction';
 import { serviceDispatch } from '../services/serviceDispatch';
-import { OnAction, serviceEvent } from '../services/serviceEvent';
+import { serviceEvent } from '../services/serviceEvent';
 
 export interface ReceiveMessageAction<A extends ServerAction = ServerAction> extends IGameAction<'message/receive'> {
     message: A;
@@ -20,7 +20,17 @@ export interface WSClient {
     waitConnect(): Promise<void>;
 }
 
-export const WSClient = (): WSClient => {
+export interface WebSocketCreator {
+    (endPoint: string): WebSocket;
+}
+
+interface Dependencies {
+    websocketCreator: WebSocketCreator;
+}
+
+export const WSClient = ({ websocketCreator }: Dependencies = {
+    websocketCreator: endPoint => new WebSocket(endPoint)
+}): WSClient => {
 
     const { dispatchMessage } = serviceDispatch({
         dispatchMessage: (message: ServerAction) => ({
@@ -64,7 +74,7 @@ export const WSClient = (): WSClient => {
         }));
     });
 
-    const socket = new WebSocket(ENDPOINT);
+    const socket = websocketCreator(ENDPOINT);
 
     socket.onmessage = onMessage;
 

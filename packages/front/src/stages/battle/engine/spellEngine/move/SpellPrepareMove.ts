@@ -6,10 +6,6 @@ import { MapManager } from '../../../map/MapManager'
 import { SpellAction } from '../../../spellAction/SpellActionManager'
 import { SpellPrepareSubEngineCreator } from '../../SpellPrepareEngine'
 
-// interface Dependencies {
-//     graphics: typeof SpellGraphicMove;
-// }
-
 export const spellLaunchMove = ({ spell, position }: SpellAction) => {
     const { character } = spell;
 
@@ -19,16 +15,10 @@ export const spellLaunchMove = ({ spell, position }: SpellAction) => {
 export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
     spell: Spell,
     mapManager: MapManager,
-    // { graphics }: Dependencies = { graphics: SpellGraphicMove }
 ) => {
 
     const { character } = spell;
 
-    character.set({
-        state: 'idle'
-    });
-
-    // let pathWorld: Position[] = [];
     let pathTile: Position[] = [];
 
     let currentTile: { x: number; y: number; } | null = null;
@@ -45,7 +35,7 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
     });
 
     return {
-        onTileHover(tilePos: Position, tileType: TileType) {
+        async onTileHover(tilePos: Position, tileType: TileType) {
 
             currentTile = tileType === 'default' ? tilePos : null;
             if (currentTile) {
@@ -57,17 +47,14 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator = (
 
                 const mainPos = character.position;
 
-                const pathPromise = mapManager.calculatePath(mainPos, currentTile);
-
-                pathPromise.promise.then(path => {
-                    pathTile = path;
-                    // pathWorld = path.map(p => mapManager.tileToWorld(p, true));
-                });
+                const { promise } = mapManager.calculatePath(mainPos, currentTile);
 
                 previousTile = currentTile;
+
+                pathTile = await promise;
             }
         },
-        onTileClick() {
+        async onTileClick() {
             if (!currentTile
                 || !pathTile.length) {
                 return;

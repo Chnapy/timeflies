@@ -9,8 +9,8 @@ import { EngineCreator, SpellEngineBindAction } from './Engine';
 import { SpellPrepareMove } from "./spellEngine/move/SpellPrepareMove";
 
 export interface SpellPrepareSubEngine {
-    onTileHover(tilePos: Position, tileType: TileType): void;
-    onTileClick(tilePos: Position, tileType: TileType): void;
+    onTileHover(tilePos: Position, tileType: TileType): Promise<void>;
+    onTileClick(tilePos: Position, tileType: TileType): Promise<void>;
     stop(): void;
 }
 
@@ -96,15 +96,15 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
 
     const engine = spellPrepareMap[ spell.staticData.type ](spell, mapManager);
 
-    const ifCanSpellBeUsed = <
-        F extends (tilePos: Position, tileType: TileType) => void
-    >(fct: F) => (tilePos: Position) => {
+    const ifCanSpellBeUsed = <F extends SpellPrepareSubEngine[ 'onTileHover' | 'onTileClick' ]>(
+        fct: F
+    ) => async (tilePos: Position): Promise<void> => {
         const remainingTime = globalTurn.currentTurn.getRemainingTime('future');
         if (remainingTime >= spell.feature.duration) {
 
             const tileType = mapManager.tiledManager.getTileType(tilePos);
 
-            fct(tilePos, tileType);
+            await fct(tilePos, tileType);
         }
     };
 

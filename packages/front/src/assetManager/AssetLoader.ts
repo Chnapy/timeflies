@@ -1,6 +1,7 @@
 import { TiledMap, TiledMapAssets } from '@timeflies/shared';
 import { IAddOptions, ImageLoadStrategy, Loader, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
+import { MockLoadStrategy } from './AssetLoader.seed';
 
 export interface AssetMap {
     map: TiledMapAssets;
@@ -25,6 +26,12 @@ interface LoaderInstance<O extends {}> {
     addMultiple<K extends keyof AssetMap>(o: Record<K, string>): LoaderInstance<O & Pick<AssetMap, K>>;
     load: () => Promise<O>;
 }
+
+// check in runtime if we're in test env, 
+// because of high level tests where it's not conveniant to inject the mock
+const initialDependencies: Dependencies = process.env.NODE_ENV === 'test'
+    ? { loadStrategy: MockLoadStrategy }
+    : {};
 
 const mapKey: AssetMapKey = 'map';
 const mapImageKeyPrefix = 'map:';
@@ -110,7 +117,7 @@ const mapLoaderMiddleware = (loadStrategy: AbstractLoadStrategyCtor | undefined)
     });
 };
 
-export const AssetLoader = ({ loadStrategy }: Dependencies = {}): AssetLoader => {
+export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies): AssetLoader => {
 
     const loader = new Loader();
 
