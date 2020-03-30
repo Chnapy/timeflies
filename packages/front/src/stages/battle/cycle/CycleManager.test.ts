@@ -1,11 +1,11 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester } from "@timeflies/shared";
 import { ReceiveMessageAction } from "../../../socket/WSClient";
 import { StoreTest } from "../../../StoreTest";
-import { seedCharacter } from "../../../__seeds__/seedCharacter";
+import { seedCharacter } from "../entities/character/Character.seed";
 import { CycleManager, NotifyDeathsAction } from "./CycleManager";
-import { GlobalTurn } from "./GlobalTurn";
+import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
 import { TurnState } from "./Turn";
-import { Character } from '../entities/Character';
+import { Character } from '../entities/character/Character';
 
 describe('# CycleManager', () => {
 
@@ -38,8 +38,8 @@ describe('# CycleManager', () => {
     it('should create a GlobalTurn on corresponding message', () => {
 
         const characters = [
-            seedCharacter(),
-            seedCharacter(),
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         initStore(characters);
@@ -96,8 +96,8 @@ describe('# CycleManager', () => {
     it('should synchronize current GlobalTurn on corresponding message', () => {
 
         const characters = [
-            seedCharacter(),
-            seedCharacter(),
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null }),
         ];
 
         initStore(characters);
@@ -173,8 +173,8 @@ describe('# CycleManager', () => {
     it('should synchronize current Turn on corresponding message', () => {
 
         const characters = [
-            seedCharacter(),
-            seedCharacter(),
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         initStore(characters);
@@ -245,8 +245,8 @@ describe('# CycleManager', () => {
     it('should create new GlobalTurn when previous one ends with waiting snapshots', () => {
 
         const characters = [
-            seedCharacter(),
-            seedCharacter(),
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         initStore(characters);
@@ -329,9 +329,102 @@ describe('# CycleManager', () => {
         expect(onGlobalTurnCreate).toHaveBeenLastCalledWith(2);
     });
 
+    it('should create new GlobalTurn when previous one ends without waiting snapshots', () => {
+
+        const characters = [
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
+        ];
+
+        initStore(characters);
+
+        let endGlobalTurn = (endTime: number) => { };
+
+        const onGlobalTurnCreate = jest.fn();
+
+        let state: GlobalTurnState = 'running';
+
+        const globalTurnCreator: typeof GlobalTurn = (_snapshot, _characters, _generateTurnId, onGlobalTurnEnd) => {
+
+            endGlobalTurn = onGlobalTurnEnd;
+
+            onGlobalTurnCreate(_snapshot.id);
+
+            return {
+                id: 1,
+                get state() { return state },
+                currentTurn: {
+                    id: 1,
+                    character: characters[ 0 ],
+                    startTime: timerTester.now,
+                    turnDuration: 1000,
+                    endTime: timerTester.now + 1000,
+                    refreshTimedActions() { },
+                    state: 'running',
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
+                },
+                start() { },
+                notifyDeaths() { },
+                synchronize() { },
+                synchronizeTurn() { },
+            };
+        };
+
+        const cycle = CycleManager({ globalTurnCreator });
+
+        const order = characters.map(getId);
+
+        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
+            type: 'message/receive',
+            message: {
+                type: 'battle-run/global-turn-start',
+                sendTime: timerTester.now,
+                globalTurnState: {
+                    id: 1,
+                    order,
+                    startTime: timerTester.now,
+                    currentTurn: {
+                        id: 1,
+                        characterId: order[ 0 ],
+                        startTime: timerTester.now
+                    }
+                }
+            }
+        });
+
+        endGlobalTurn(-1);
+
+        state = 'ended';
+
+        timerTester.advanceBy(200);
+
+        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
+            type: 'message/receive',
+            message: {
+                type: 'battle-run/global-turn-start',
+                sendTime: timerTester.now,
+                globalTurnState: {
+                    id: 2,
+                    order,
+                    startTime: timerTester.now,
+                    currentTurn: {
+                        id: 1,
+                        characterId: order[ 0 ],
+                        startTime: timerTester.now
+                    }
+                }
+            }
+        });
+
+        expect(onGlobalTurnCreate).toHaveBeenLastCalledWith(2);
+    });
+
     it('should check if current character died on notify deaths action', () => {
 
-        const characters = [ seedCharacter() ];
+        const characters = [
+            seedCharacter('fake', { id: '1', player: null })
+        ];
 
         initStore(characters);
 
@@ -392,8 +485,8 @@ describe('# CycleManager', () => {
     it('should give coherent running state', () => {
 
         const characters = [
-            seedCharacter(),
-            seedCharacter(),
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         initStore(characters);

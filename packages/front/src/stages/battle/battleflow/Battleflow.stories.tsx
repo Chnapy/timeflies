@@ -4,8 +4,7 @@ import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../../../socket/WSClient';
-import { seedCharacter, seedCharacterData } from '../../../__seeds__/seedCharacter';
-import { BStateTurnEndAction } from '../battleState/BattleStateSchema';
+import { seedCharacter, seedCharacterStaticData } from '../entities/character/Character.seed';
 
 export default {
     title: 'Battleflow'
@@ -80,6 +79,8 @@ const receiveAction = <A extends ServerAction>(message: A) =>
 
 export const Default: React.FC = () => {
 
+    StoreTest.beforeTest();
+
     onSendAction<MatchmakerClientAction>('matchmaker/enter', () => {
 
         receiveAction<BattleLoadSAction>({
@@ -87,15 +88,11 @@ export const Default: React.FC = () => {
             sendTime: Date.now(),
             payload: {
                 mapInfos: {
-                    initLayerKey: 'init',
-                    decorLayerKey: 'decors',
-                    obstaclesLayerKey: 'obstacles',
-                    mapKey: 'sampleMap1',
-                    tilemapKey: '',
-                    urls: {
-                        schema: 'http://127.0.0.1:8887/map_2.json',
-                        sheet: 'http://localhost',
-                    }
+                    id: '',
+                    initLayerName: 'init',
+                    defaultTilelayerName: 'view',
+                    obstacleTilelayerName: 'obstacles',
+                    schemaUrl: 'http://127.0.0.1:8887/map.json',
                 },
                 characterTypes: [],
                 spellTypes: [],
@@ -127,7 +124,7 @@ export const Default: React.FC = () => {
                             name: 'Player mine',
                             state: 'battle-run' as const,
                             charactersSnapshots: [
-                                seedCharacterData({
+                                seedCharacterStaticData({
                                     id: 'c-1',
                                     staticData: {
                                         id: 'c-1',
@@ -180,7 +177,7 @@ export const Default: React.FC = () => {
                             name: 'Player bot 1',
                             state: 'battle-run' as const,
                             charactersSnapshots: [
-                                seedCharacterData({
+                                seedCharacterStaticData({
                                     id: 'c-bot-1',
                                     staticData: {
                                         id: 'c-bot-1',
@@ -242,7 +239,7 @@ export const Default: React.FC = () => {
 
     let gtid = 1;
     let turnid = 1;
-    
+
     setTimeout(() => {
         gtid++;
         turnid += 2;
@@ -274,7 +271,9 @@ export const Default: React.FC = () => {
             return socket;
         }
 
-        Controller.start(websocketCreator);
+        Controller.start(
+            // websocketCreator
+            );
 
         socket.onopen!(null as any);
 

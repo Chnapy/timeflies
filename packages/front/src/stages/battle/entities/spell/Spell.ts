@@ -1,6 +1,6 @@
 import { SpellFeatures, SpellSnapshot, StaticSpell } from '@timeflies/shared';
-import { Character } from './Character';
-import { WithSnapshot } from './WithSnapshot';
+import { Character } from '../character/Character';
+import { WithSnapshot } from '../WithSnapshot';
 
 export interface Spell extends WithSnapshot<SpellSnapshot> {
     readonly id: string;

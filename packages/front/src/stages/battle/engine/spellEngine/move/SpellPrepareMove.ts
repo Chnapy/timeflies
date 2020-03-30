@@ -1,7 +1,7 @@
 import { Position, TileType } from '@timeflies/shared'
 import { serviceDispatch } from '../../../../../services/serviceDispatch'
 import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
-import { Spell } from '../../../entities/Spell'
+import { Spell } from '../../../entities/spell/Spell'
 import { MapManager } from '../../../map/MapManager'
 import { SpellAction } from '../../../spellAction/SpellActionManager'
 import { SpellPrepareSubEngineCreator } from '../../SpellPrepareEngine'

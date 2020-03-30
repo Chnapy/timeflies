@@ -13,7 +13,7 @@ export const LoadStage: StageCreator<'load', 'map'> = (payload) => {
 
     return {
         preload: () => {
-            const { urls } = mapInfos;
+            const { schemaUrl } = mapInfos;
 
             // characterTypes.forEach(type => {
             //     const { image, schema } = AssetManager.characters[ type ];
@@ -24,7 +24,7 @@ export const LoadStage: StageCreator<'load', 'map'> = (payload) => {
             // load.atlasXML(SpellGraphic.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
 
             return {
-                map: urls.schema
+                map: schemaUrl
             };
         },
         async create(assets) {

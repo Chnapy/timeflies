@@ -1,6 +1,6 @@
 import { Position } from '@timeflies/shared'
 import { SpellType } from '@timeflies/shared'
-import { Character } from '../../../stages/battle/entities/Character';
+import { Character } from '../../../stages/battle/entities/character/Character';
 import { SpellPrepare } from '../SpellPrepare';
 
 export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' | 'orientate'>> {

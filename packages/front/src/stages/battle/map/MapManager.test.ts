@@ -3,7 +3,7 @@ import { MapManager } from './MapManager';
 import { Position, TiledManager } from '@timeflies/shared';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
-import { seedCharacter } from '../../../__seeds__/seedCharacter';
+import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { TiledMapSeedKey, seedTiledMapAssets, seedTiledConfig } from './TiledMap.seed';
 
 describe('# MapManager', () => {
@@ -27,7 +27,7 @@ describe('# MapManager', () => {
                 state: 'battle',
                 battleData: {
                     future: {
-                        characters: [ seedCharacter() ]
+                        characters: [ seedCharacter('fake', { id: '1', player: null }) ]
                     }
                 } as any
             }
@@ -68,7 +68,7 @@ describe('# MapManager', () => {
         expect.assertions(1);
 
         const pathfinderCreator: typeof Pathfinder = jest.fn((tiledManager, positionsGetter): Pathfinder => {
-            expect(positionsGetter()).toEqual<Position[]>([ { x: 4, y: 3 } ]);
+            expect(positionsGetter()).toEqual<Position[]>([ seedCharacterInitialPosition ]);
             return ({
                 calculatePath: () => ({} as any),
                 refreshGrid() { }

@@ -2,8 +2,8 @@ import { CharacterType, Orientation } from "@timeflies/shared";
 import { AssetManager } from "../../../assetManager/AssetManager";
 import { RectStyled } from "../../../hud/generics/RectStyled";
 import { BattleScene } from "../BattleScene";
-import { Character, CharacterState } from "../entities/Character";
-import { Spell } from "../entities/Spell";
+import { Character, CharacterState } from "../entities/character/Character";
+import { Spell } from "../entities/spell/Spell";
 import { SpellGraphic } from "./SpellGraphic";
 
 export class CharacterGraphic {

@@ -1,8 +1,8 @@
 import { TimerTester, SpellActionSnapshot } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
-import { seedCharacter } from "../../../__seeds__/seedCharacter";
+import { seedCharacter } from "../entities/character/Character.seed";
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
-import { Character } from "../entities/Character";
+import { Character } from "../entities/character/Character";
 import { Turn, TurnState } from "./Turn";
 
 describe('#BTurn', () => {
@@ -14,13 +14,12 @@ describe('#BTurn', () => {
     beforeEach(() => {
         StoreTest.beforeTest();
         timerTester.beforeTest();
-        character = seedCharacter({
-            staticData: {
-                initialFeatures: {
-                    actionTime: 2000,
-                    life: 100
-                }
-            }
+        character = seedCharacter('fake', {
+            id: '1',
+            initialFeatures: {
+                actionTime: 2000,
+            },
+            player: null
         });
     });
 

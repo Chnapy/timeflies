@@ -1,8 +1,8 @@
 import { StoreTest } from '../../../StoreTest';
-import { Position, TimerTester, ConfirmSAction, TiledManager } from '@timeflies/shared';
+import { Position, TimerTester, ConfirmSAction, BRunGlobalTurnStartSAction } from '@timeflies/shared';
 import { serviceNetwork } from '../../../services/serviceNetwork';
 import { SendMessageAction, ReceiveMessageAction } from '../../../socket/WSClient';
-import { seedCharacter } from '../../../__seeds__/seedCharacter';
+import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { BState, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { BStateMachine } from '../battleState/BStateMachine';
 import { CycleManager } from '../cycle/CycleManager';
@@ -10,7 +10,8 @@ import { SpellEngineBindAction } from '../engine/Engine';
 import { seedMapManager } from '../map/MapManager.seed';
 import { SnapshotManager } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from '../spellAction/SpellActionManager';
-import { BattleDataCurrent, BattleDataFuture } from '../../../BattleData';
+import { BattleDataCurrent, BattleDataFuture, BattleDataCycle } from '../../../BattleData';
+import { GlobalTurnState } from '../cycle/GlobalTurn';
 
 describe('Battleflow', () => {
 
@@ -18,10 +19,18 @@ describe('Battleflow', () => {
 
     const init = () => {
 
-        const initialPos: Position = { x: 4, y: 3 };
+        const initialPos: Position = seedCharacterInitialPosition;
 
-        const characterCurrent = seedCharacter({ position: initialPos });
-        const characterFuture = seedCharacter({ position: initialPos });
+        const characterCurrent = seedCharacter('real', {
+            id: '1',
+            position: initialPos,
+            player: { itsMe: true } as any
+        });
+        const characterFuture = seedCharacter('real', {
+            id: '1',
+            position: initialPos,
+            player: { itsMe: true } as any
+        });
 
         const currentBattleData: BattleDataCurrent = {
             battleHash: 'not-defined',
@@ -38,13 +47,15 @@ describe('Battleflow', () => {
             spellActionSnapshotList: []
         };
 
+        const cycleBattleData: BattleDataCycle = {
+            launchTime: timerTester.now
+        };
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
                 battleData: {
-                    cycle: {
-                        launchTime: timerTester.now
-                    },
+                    cycle: cycleBattleData,
                     current: currentBattleData,
                     future: futureBattleData
                 }
@@ -57,9 +68,9 @@ describe('Battleflow', () => {
 
         // from x:4 y:3
         const posAvailables: readonly Position[] = [
-            {x: 4, y: 4},
-            {x: 5, y: 4},
-            {x: 6, y: 4},
+            { x: 4, y: 4 },
+            { x: 5, y: 4 },
+            { x: 6, y: 4 },
         ];
 
         const cycle = CycleManager();
@@ -88,6 +99,7 @@ describe('Battleflow', () => {
         )!;
 
         return {
+            cycleBattleData,
             currentBattleData,
             futureBattleData,
             characterCurrent,
@@ -155,9 +167,9 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            await awaitAndAdvance10(onTileHover(posAvailables[0]));
+            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
-            await onTileClick(posAvailables[0]);
+            await onTileClick(posAvailables[ 0 ]);
 
             await serviceNetwork({});
 
@@ -165,6 +177,38 @@ describe('Battleflow', () => {
 
             expect(futureBattleData.battleHash).toBe(firstHash);
             expect(currentBattleData.battleHash).toBe(firstHash);
+        });
+
+        it('should start a new global turn after previous one ends', () => {
+
+            const { cycleBattleData, characterCurrent } = init();
+
+            timerTester.advanceBy(characterCurrent.features.actionTime);
+
+            timerTester.advanceBy(200);
+
+            expect(cycleBattleData.globalTurn?.state).toBe<GlobalTurnState>('ended');
+
+            StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
+                type: 'message/receive',
+
+                message: {
+                    type: 'battle-run/global-turn-start',
+                    sendTime: timerTester.now,
+                    globalTurnState: {
+                        id: 2,
+                        startTime: timerTester.now,
+                        order: [ characterCurrent.id ],
+                        currentTurn: {
+                            id: 2,
+                            startTime: timerTester.now,
+                            characterId: characterCurrent.id
+                        }
+                    }
+                }
+            });
+
+            expect(cycleBattleData.globalTurn?.id).toBe(2);
         });
     });
 
@@ -180,9 +224,9 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            await await awaitAndAdvance10(onTileHover(posAvailables[0]));
+            await await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
-            await onTileClick(posAvailables[0]);
+            await onTileClick(posAvailables[ 0 ]);
 
             await serviceNetwork({});
 
@@ -196,10 +240,10 @@ describe('Battleflow', () => {
             const firstHash = futureBattleData.battleHash;
 
             const { onTileHover, onTileClick } = bindAction;
-            
-            await awaitAndAdvance10(onTileHover(posAvailables[0]))
 
-            await onTileClick(posAvailables[0]);
+            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]))
+
+            await onTileClick(posAvailables[ 0 ]);
 
             await serviceNetwork({});
 
@@ -213,11 +257,11 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            await awaitAndAdvance10(onTileHover(posAvailables[0]))
+            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]))
 
             StoreTest.clearActions();
 
-            await onTileClick(posAvailables[0]);
+            await onTileClick(posAvailables[ 0 ]);
 
             await serviceNetwork({});
 
@@ -244,23 +288,23 @@ describe('Battleflow', () => {
 
             // first spell action
 
-            await awaitAndAdvance10(onTileHover(posAvailables[0]))
+            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]))
 
-            await onTileClick(posAvailables[0]);
+            await onTileClick(posAvailables[ 0 ]);
 
             await serviceNetwork({});
 
-            expect(futureBattleData.characters[ 0 ].position).toEqual(posAvailables[0]);
+            expect(futureBattleData.characters[ 0 ].position).toEqual(posAvailables[ 0 ]);
 
             // second spell action
 
-            await awaitAndAdvance10(onTileHover(posAvailables[1]))
+            await awaitAndAdvance10(onTileHover(posAvailables[ 1 ]))
 
-            await onTileClick(posAvailables[1]);
+            await onTileClick(posAvailables[ 1 ]);
 
             await serviceNetwork({});
 
-            expect(futureBattleData.characters[ 0 ].position).toEqual(posAvailables[1]);
+            expect(futureBattleData.characters[ 0 ].position).toEqual(posAvailables[ 1 ]);
             expect(currentBattleData.characters[ 0 ].position).toEqual(firstPos);
         });
     });
@@ -283,9 +327,9 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            await awaitAndAdvance10(onTileHover(posAvailables[0]));
+            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
-            await onTileClick(posAvailables[0]);
+            await onTileClick(posAvailables[ 0 ]);
 
             await serviceNetwork({});
 

@@ -1,6 +1,6 @@
 import { SpellType } from '@timeflies/shared'
-import { Character } from '../../stages/battle/entities/Character';
-import { Spell } from '../../stages/battle/entities/Spell';
+import { Character } from '../../stages/battle/entities/character/Character';
+import { Spell } from '../../stages/battle/entities/spell/Spell';
 import { MapManager } from '../map/MapManager';
 import { BattleScene } from '../../stages/battle/BattleScene';
 import { CurrentSpellState } from './SpellEngine';

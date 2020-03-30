@@ -5,7 +5,7 @@ import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleReducerManager } from '../../phaser/battleReducers/BattleReducerManager';
 import { CameraManager } from './camera/CameraManager';
 import { CharacterGraphic } from './graphics/CharacterGraphic';
-import { Team } from './entities/Team';
+import { Team } from './entities/team/Team';
 import { WithSnapshot } from './entities/WithSnapshot';
 import { MapManager } from '../../phaser/map/MapManager';
 import { BattleRoomManager } from '../../phaser/room/BattleRoomManager';

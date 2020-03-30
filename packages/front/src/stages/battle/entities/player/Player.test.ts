@@ -1,4 +1,4 @@
-import { StoreTest } from '../../../StoreTest';
+import { StoreTest } from '../../../../StoreTest';
 import { Player } from './Player';
 import { PlayerSnapshot, PlayerState } from '@timeflies/shared';
 

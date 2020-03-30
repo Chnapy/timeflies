@@ -3,7 +3,7 @@ import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from "../../../services/serviceDispatch";
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
-import { Character } from "../entities/Character";
+import { Character } from "../entities/character/Character";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 

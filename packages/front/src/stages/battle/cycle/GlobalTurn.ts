@@ -1,8 +1,8 @@
 import { assertIsDefined, assertThenGet, GlobalTurnSnapshot, IndexGenerator, TurnSnapshot, TURN_DELAY } from "@timeflies/shared";
-import { Character } from "../entities/Character";
+import { Character } from "../entities/character/Character";
 import { Turn } from "./Turn";
 
-export type GlobalTurnState = 'idle' | 'running';
+export type GlobalTurnState = 'idle' | 'running' | 'ended';
 
 export interface GlobalTurn {
     readonly id: number;
@@ -31,6 +31,8 @@ export const GlobalTurn = (
     ));
 
     const waitingTurns: TurnSnapshot[] = [];
+
+    let globalTurnEnded = false;
 
     let currentTurn: Turn;
 
@@ -62,6 +64,7 @@ export const GlobalTurn = (
     const runNextTurn = (nextCharacterIndex: number): void => {
 
         if (nextCharacterIndex >= charactersOrdered.length) {
+            globalTurnEnded = true;
             onGlobalTurnEnd(currentTurn.endTime);
         }
         else {
@@ -117,6 +120,9 @@ export const GlobalTurn = (
         },
         get state(): GlobalTurnState {
             const now = Date.now();
+            if(globalTurnEnded) {
+                return 'ended';
+            }
             if (now >= startTime) {
                 return 'running';
             }

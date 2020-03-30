@@ -1,6 +1,6 @@
-import { CharacterFeatures, getId, getIndexGenerator, TimerTester } from "@timeflies/shared";
+import { CharacterFeatures, getId, getIndexGenerator, TimerTester, GlobalTurnSnapshot } from "@timeflies/shared";
 import { StoreTest } from "../../../StoreTest";
-import { seedCharacter } from "../../../__seeds__/seedCharacter";
+import { seedCharacter } from "../entities/character/Character.seed";
 import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
 import { Turn, TurnState } from "./Turn";
 
@@ -8,7 +8,7 @@ describe('# GlobalTurn', () => {
 
     const timerTester = new TimerTester();
 
-    const getSnapshot = (startTime: number, order: string[]) => ({
+    const getSnapshot = (startTime: number, order: string[]): GlobalTurnSnapshot => ({
         id: 1, startTime, order, currentTurn: {
             id: 1, characterId: order[ 0 ], startTime
         }
@@ -26,7 +26,9 @@ describe('# GlobalTurn', () => {
 
     it('should keep coherent state', () => {
 
+        let onTurnEndFn;
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            onTurnEndFn = onTurnEnd;
             return {
                 id: 1,
                 character: characters[ 0 ],
@@ -41,7 +43,7 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter()
+            seedCharacter('fake', { id: '1', player: null })
         ];
 
         const idGenerator = getIndexGenerator();
@@ -64,6 +66,14 @@ describe('# GlobalTurn', () => {
 
         expect(globalTurnIdle.state).toBe<GlobalTurnState>('idle');
         expect(globalTurnRunning.state).toBe<GlobalTurnState>('running');
+
+        const globalTurnEnded = GlobalTurn(getSnapshot(timerTester.now, order),
+            characters, idGenerator,
+            () => null,
+            { turnCreator });
+        onTurnEndFn();
+
+        expect(globalTurnEnded.state).toBe<GlobalTurnState>('ended');
     });
 
     it('should change current turn when previous one ends', () => {
@@ -86,16 +96,8 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter({
-                staticData: {
-                    id: '1',
-                }
-            }),
-            seedCharacter({
-                staticData: {
-                    id: '2',
-                }
-            })
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -138,16 +140,8 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter({
-                staticData: {
-                    id: '1',
-                }
-            }),
-            seedCharacter({
-                staticData: {
-                    id: '2',
-                }
-            })
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -194,7 +188,7 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter(),
+            seedCharacter('fake', { id: '1', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -235,21 +229,9 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter({
-                staticData: {
-                    id: '1',
-                }
-            }),
-            seedCharacter({
-                staticData: {
-                    id: '2',
-                }
-            }),
-            seedCharacter({
-                staticData: {
-                    id: '3',
-                }
-            })
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null }),
+            seedCharacter('fake', { id: '3', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -265,7 +247,7 @@ describe('# GlobalTurn', () => {
 
         const secondChar = characters[ 1 ];
 
-        (secondChar.features as CharacterFeatures).life = 0;
+        (secondChar.isAlive as boolean) = false;
 
         onTurnEndFn();
 
@@ -289,16 +271,8 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter({
-                staticData: {
-                    id: '1',
-                }
-            }),
-            seedCharacter({
-                staticData: {
-                    id: '2',
-                }
-            })
+            seedCharacter('fake', { id: '1', player: null }),
+            seedCharacter('fake', { id: '2', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -314,7 +288,7 @@ describe('# GlobalTurn', () => {
 
         const firstChar = characters[ 0 ];
 
-        (firstChar.features as CharacterFeatures).life = 0;
+        (firstChar.isAlive as boolean) = false;
 
         globalTurn.notifyDeaths();
 
@@ -340,7 +314,7 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter()
+            seedCharacter('fake', { id: '1', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();

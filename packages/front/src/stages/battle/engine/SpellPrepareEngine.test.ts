@@ -1,6 +1,6 @@
 import { StoreTest } from '../../../StoreTest';
 import { SpellPrepareEngine, SpellPrepareSubEngine } from './SpellPrepareEngine';
-import { seedCharacter } from '../../../__seeds__/seedCharacter';
+import { seedCharacter } from '../entities/character/Character.seed';
 import { StaticSpell, TimerTester } from '@timeflies/shared';
 import { SpellEngineBindAction } from './Engine';
 import { BattleDataCycle, BattleDataFuture } from '../../../BattleData';
@@ -22,32 +22,16 @@ describe('# SpellPrepareEngine', () => {
 
     it('should not allow to launch hover & click functions if not enough time', () => {
 
-        const staticData: StaticSpell = {
+        const character = seedCharacter('fake',{
             id: '1',
-            type: 'move',
-            name: '',
-            color: '',
-            initialFeatures: {
-                area: 1,
-                attack: -1,
-                duration: 200
-            }
-        };
-
-        const character = seedCharacter({
-            staticData: {
-                staticSpells: [ staticData ],
-                defaultSpellId: staticData.id
-            },
-            spellsSnapshots: [ {
-                id: staticData.id,
-                staticData,
-                features: {
-                    area: 1,
-                    attack: -1,
+            player: null,
+            seedSpells: [{
+                id: 's1',
+                type: 'move',
+                initialFeatures: {
                     duration: 200
                 }
-            } ],
+            }]
         });
 
         const cycle: BattleDataCycle = {
@@ -143,20 +127,16 @@ describe('# SpellPrepareEngine', () => {
             }
         };
 
-        const character = seedCharacter({
-            staticData: {
-                staticSpells: [ staticData ],
-                defaultSpellId: staticData.id
-            },
-            spellsSnapshots: [ {
-                id: staticData.id,
-                staticData,
-                features: {
-                    area: 1,
-                    attack: -1,
+        const character = seedCharacter('fake',{
+            id: '1',
+            player: null,
+            seedSpells: [{
+                id: 's1',
+                type: 'move',
+                initialFeatures: {
                     duration: 200
                 }
-            } ],
+            }]
         });
 
         const cycle: BattleDataCycle = {

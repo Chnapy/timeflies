@@ -47,7 +47,7 @@ export const CycleManager = (
         } else {
             waitingSnapshots.push(globalTurnSnapshot);
 
-            if (!cycleData.globalTurn) {
+            if (!cycleData.globalTurn || cycleData.globalTurn.state === 'ended') {
                 onGlobalTurnEnd();
             }
         }

@@ -1,8 +1,8 @@
 import { SpellActionSnapshot } from '@timeflies/shared';
 import { GlobalTurn } from './stages/battle/cycle/GlobalTurn';
-import { Character } from './stages/battle/entities/Character';
-import { Player } from './stages/battle/entities/Player';
-import { Team } from './stages/battle/entities/Team';
+import { Character } from './stages/battle/entities/character/Character';
+import { Player } from './stages/battle/entities/player/Player';
+import { Team } from './stages/battle/entities/team/Team';
 
 export interface BattleDataCycle {
     readonly launchTime: number;

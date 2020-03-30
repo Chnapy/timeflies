@@ -3,7 +3,7 @@ import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { BStateAction } from '../battleState/BattleStateSchema';
-import { Spell } from '../entities/Spell';
+import { Spell } from '../entities/spell/Spell';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { SpellActionTimer } from './SpellActionTimer';
 import { getSpellLaunchFn as GetterSpellLaunchFn } from '../engine/getSpellLaunchFn';

@@ -1,9 +1,9 @@
 import { assertIsNonNullable, assertThenGet, PlayerSnapshot, PlayerState } from '@timeflies/shared';
-import { serviceCurrentPlayer } from '../../../services/serviceCurrentPlayer';
-import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
-import { Character } from './Character';
-import { Team } from "./Team";
-import { WithSnapshot } from './WithSnapshot';
+import { serviceCurrentPlayer } from '../../../../services/serviceCurrentPlayer';
+import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
+import { Character } from '../character/Character';
+import { Team } from "../team/Team";
+import { WithSnapshot } from '../WithSnapshot';
 
 export interface Player extends WithSnapshot<PlayerSnapshot> {
     readonly id: string;

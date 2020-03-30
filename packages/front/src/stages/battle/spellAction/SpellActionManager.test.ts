@@ -2,11 +2,11 @@ import { StoreTest } from '../../../StoreTest';
 import { TimerTester, SpellActionSnapshot, ConfirmSAction, NotifySAction } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../socket/WSClient';
 import { BStateSpellLaunchAction, BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
-import { Spell } from '../entities/Spell';
+import { Spell } from '../entities/spell/Spell';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from './SpellActionManager';
 import { BattleDataCurrent, BattleDataFuture, BattleDataCycle } from '../../../BattleData';
-import { seedCharacter } from '../../../__seeds__/seedCharacter';
+import { seedCharacter } from '../entities/character/Character.seed';
 
 describe('# SpellActionManager', () => {
 
@@ -18,7 +18,10 @@ describe('# SpellActionManager', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
-        const currentCharacter = seedCharacter();
+        const currentCharacter = seedCharacter('fake', {
+            id: '1',
+            player: null
+        });
 
         const cycleBattleData: BattleDataCycle = {
             launchTime: -1,

@@ -1,5 +1,5 @@
 import { Position } from '@timeflies/shared'
-import { Spell } from '../../stages/battle/entities/Spell';
+import { Spell } from '../../stages/battle/entities/spell/Spell';
 import { BattleScene } from '../../stages/battle/BattleScene';
 //@ts-ignore
 import { BattleData } from "../../BattleData";

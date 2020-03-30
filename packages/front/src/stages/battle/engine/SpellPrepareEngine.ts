@@ -2,8 +2,8 @@ import { assertIsDefined, assertThenGet, Position, SpellType, TileType } from "@
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { BStateResetAction, BStateSpellLaunchAction, BStateSpellPrepareAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
-import { Character } from '../entities/Character';
-import { Spell } from '../entities/Spell';
+import { Character } from '../entities/character/Character';
+import { Spell } from '../entities/spell/Spell';
 import { MapManager } from '../map/MapManager';
 import { EngineCreator, SpellEngineBindAction } from './Engine';
 import { SpellPrepareMove } from "./spellEngine/move/SpellPrepareMove";

@@ -1,10 +1,8 @@
-import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, compare, equals, getId, mergeAfterClean, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
-import { Player } from './Player';
-import { Spell } from './Spell';
-import { WithSnapshot } from './WithSnapshot';
-import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
-
-export type CharacterState = 'idle' | 'move';
+import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, equals, mergeAfterClean, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
+import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
+import { Player } from '../player/Player';
+import { Spell } from '../spell/Spell';
+import { WithSnapshot } from '../WithSnapshot';
 
 export interface Character extends WithSnapshot<CharacterSnapshot> {
     readonly id: string;
@@ -19,11 +17,9 @@ export interface Character extends WithSnapshot<CharacterSnapshot> {
 
     readonly isAlive: boolean;
 
-    readonly state: CharacterState;
-
     readonly player: Player;
 
-    set(o: { [ K in keyof Pick<Character, 'state' | 'position' | 'orientation'> ]?: Character[ K ] }): void;
+    set(o: { [ K in keyof Pick<Character, 'position' | 'orientation'> ]?: Character[ K ] }): void;
 
     hasSpell(spellType: SpellType): boolean;
 }
@@ -35,8 +31,6 @@ export const Character = ({
     let position: Readonly<Position> = _position;
     let orientation: Orientation = _orientation;
     let features: Readonly<CharacterFeatures> = _features;
-
-    let state: CharacterState = 'idle';
 
     const _this: Character = {
         get id(): string {
@@ -54,9 +48,6 @@ export const Character = ({
         },
         get features(): Readonly<CharacterFeatures> {
             return features;
-        },
-        get state(): CharacterState {
-            return state;
         },
         get spells(): readonly Spell[] {
             return spells;
@@ -98,9 +89,6 @@ export const Character = ({
                 return;
             }
 
-            if (o.state) {
-                state = o.state;
-            }
             if (o.position) {
                 position = o.position;
             }

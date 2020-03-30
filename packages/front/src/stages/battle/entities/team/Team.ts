@@ -1,7 +1,7 @@
 import { TeamSnapshot } from '@timeflies/shared';
-import { Player } from './Player';
-import { WithSnapshot } from './WithSnapshot';
-import { assertEntitySnapshotConsistency } from '../snapshot/SnapshotManager';
+import { Player } from '../player/Player';
+import { WithSnapshot } from '../WithSnapshot';
+import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 
 export interface Team extends WithSnapshot<TeamSnapshot> {
     readonly id: string;

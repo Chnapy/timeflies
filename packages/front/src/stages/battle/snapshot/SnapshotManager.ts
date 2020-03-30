@@ -76,7 +76,7 @@ export const SnapshotManager = (): SnapshotManager => {
         updateBattleDataFromSnapshot('current', snapshot);
 
         const serializedDeathsAfter = serializeDeaths();
-
+        
         if (serializedDeathsBefore !== serializedDeathsAfter) {
             dispatchNotifyDeaths();
         }

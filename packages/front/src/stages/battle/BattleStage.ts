@@ -3,7 +3,7 @@ import { StageCreator, StageParam } from '../StageManager';
 import { BattleSceneData } from "./BattleScene";
 import { BStateMachine } from "./battleState/BStateMachine";
 import { CycleManager } from './cycle/CycleManager';
-import { Team } from './entities/Team';
+import { Team } from './entities/team/Team';
 import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';

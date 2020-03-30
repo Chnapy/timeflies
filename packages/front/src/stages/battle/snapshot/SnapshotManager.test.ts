@@ -1,11 +1,11 @@
 import { StoreTest } from '../../../StoreTest';
 import { SnapshotManager, BattleCommitAction } from './SnapshotManager';
-import { Team } from '../entities/Team';
+import { Team } from '../entities/team/Team';
 import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester, TeamSnapshot } from '@timeflies/shared';
 import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 import { BattleDataCurrent, BattleDataFuture } from '../../../BattleData';
 import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
-import { seedCharacter } from '../../../__seeds__/seedCharacter';
+import { seedCharacter } from '../entities/character/Character.seed';
 import { NotifyDeathsAction } from '../cycle/CycleManager';
 
 describe('# SnapshotManager', () => {
@@ -349,9 +349,15 @@ describe('# SnapshotManager', () => {
                 } as unknown as Team
             ];
 
-            const currentCharacter = seedCharacter();
+            const currentCharacter = seedCharacter('fake', {
+                id: '1',
+                player: null
+            });
 
-            const futureCharacter = seedCharacter();
+            const futureCharacter = seedCharacter('fake', {
+                id: '1',
+                player: null
+            });
 
             const currentBattleData: BattleDataCurrent = {
                 battleHash: 'not-matter',
@@ -403,11 +409,15 @@ describe('# SnapshotManager', () => {
 
         it('should notify for deaths on spell action end action if there is new deaths', () => {
 
-            const currentCharacter = seedCharacter();
-            (currentCharacter as any)._ = 'CURRENT';
+            const currentCharacter = seedCharacter('real', {
+                id: '1',
+                player: null
+            });
 
-            const futureCharacter = seedCharacter();
-            (futureCharacter as any)._ = 'FUTURE';
+            const futureCharacter = seedCharacter('real', {
+                id: '1',
+                player: null
+            });
 
             const currentTeams: Team[] = [
                 {

@@ -1,6 +1,6 @@
 import { StoreTest } from '../../../../../StoreTest';
 import { Position } from '@timeflies/shared';
-import { seedCharacter } from '../../../../../__seeds__/seedCharacter';
+import { seedCharacter } from '../../../entities/character/Character.seed';
 import { MapManager } from '../../../map/MapManager';
 import { seedMapManager } from '../../../map/MapManager.seed';
 import { SpellPrepareMove } from './SpellPrepareMove';
@@ -40,7 +40,11 @@ describe('# SpellPrepareMove', () => {
 
         const [ mapManager, calculatePath ] = getMapManager();
 
-        const { defaultSpell } = seedCharacter();
+        const { defaultSpell } = seedCharacter('fake', {
+            id: '1',
+            seedSpells: [ { id: 's1', type: 'move' } ],
+            player: null
+        });
 
         const spellPrepareMove = SpellPrepareMove(defaultSpell, mapManager);
 
@@ -54,7 +58,11 @@ describe('# SpellPrepareMove', () => {
 
         const [ mapManager, calculatePath ] = getMapManager();
 
-        const { defaultSpell, position: charPosition } = seedCharacter();
+        const { defaultSpell, position: charPosition } = seedCharacter('fake', {
+            id: '1',
+            seedSpells: [ { id: 's1', type: 'move' } ],
+            player: null
+        });
 
         const spellPrepareMove = SpellPrepareMove(defaultSpell, mapManager);
 
@@ -77,7 +85,11 @@ describe('# SpellPrepareMove', () => {
 
         const [ mapManager ] = getMapManager();
 
-        const { defaultSpell } = seedCharacter();
+        const { defaultSpell } = seedCharacter('fake', {
+            id: '1',
+            seedSpells: [ { id: 's1', type: 'move' } ],
+            player: null
+        });
 
         const spellPrepareMove = SpellPrepareMove(defaultSpell, mapManager);
 
@@ -97,7 +109,11 @@ describe('# SpellPrepareMove', () => {
 
         const [ mapManager, calculatePath, pathPromise ] = getMapManager(expectedPath);
 
-        const { defaultSpell } = seedCharacter();
+        const { defaultSpell } = seedCharacter('fake', {
+            id: '1',
+            seedSpells: [ { id: 's1', type: 'move' } ],
+            player: null
+        });
 
         const spellPrepareMove = SpellPrepareMove(defaultSpell, mapManager);
 
