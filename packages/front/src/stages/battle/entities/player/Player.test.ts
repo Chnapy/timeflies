@@ -1,6 +1,6 @@
 import { StoreTest } from '../../../../StoreTest';
-import { Player } from './Player';
-import { PlayerSnapshot, PlayerState } from '@timeflies/shared';
+import { PlayerSnapshot } from '@timeflies/shared';
+import { seedPlayer, seedPlayerSnapshot } from './Player.seed';
 
 describe('# Player', () => {
 
@@ -22,37 +22,33 @@ describe('# Player', () => {
             data: null as any
         });
 
-        const player = Player(
-            {
-                id: 'p1',
-                name: 'p-1',
-                state: 'battle-run',
-                charactersSnapshots: [ {
-                    staticData: {
-                        id: 'c-1'
-                    }
-                } as any ]
-            },
-            {} as any,
-            {
+        const expectedSnapshot = seedPlayerSnapshot({
+            id: 'p1',
+            name: 'p-1',
+            seedCharacters: [ {
+                id: 'c-1',
+                seedSpells: [ { id: 's1', type: 'move' } ]
+            } ],
+        });
+
+        const player = seedPlayer('real', {
+            id: 'p1',
+            name: 'p-1',
+            seedCharacters: [ {
+                id: 'c-1',
+                seedSpells: [ { id: 's1', type: 'move' } ]
+            } ],
+            team: null,
+            dependencies: {
                 characterCreator: snap => ({
                     getSnapshot() {
                         return snap;
                     },
                 } as any)
             }
-        );
-
-        expect(player.getSnapshot()).toEqual<PlayerSnapshot>({
-            id: 'p1',
-            name: 'p-1',
-            state: 'battle-run',
-            charactersSnapshots: [ {
-                staticData: {
-                    id: 'c-1'
-                }
-            } as any ]
         });
+
+        expect(player.getSnapshot()).toEqual<PlayerSnapshot>(expectedSnapshot);
     });
 
     it('should update from snapshot correctly', () => {
@@ -67,39 +63,33 @@ describe('# Player', () => {
 
         const updateFromSnapshot = jest.fn();
 
-        const player = Player(
-            {
-                id: 'p1',
-                name: 'p-1',
-                state: 'battle-run',
-                charactersSnapshots: [ {
-                    staticData: {
-                        id: 'c-1'
-                    }
-                } as any ]
-            },
-            {} as any,
-            {
+        const player = seedPlayer('real', {
+            id: 'p1',
+            name: 'p-1',
+            seedCharacters: [ {
+                id: 'c-1',
+                seedSpells: [ { id: 's1', type: 'move' } ]
+            } ],
+            team: null,
+            dependencies: {
                 characterCreator: snap => ({
                     id: snap.staticData.id,
                     updateFromSnapshot
                 } as any)
             }
-        );
-
-        player.updateFromSnapshot({
-            id: 'p1',
-            name: 'p-1',
-            state: 'battle-ready',
-            charactersSnapshots: [ {
-                id: 'c-1',
-                staticData: {
-                    id: 'c-1'
-                }
-            } as any ]
         });
 
-        expect(player.state).toBe<PlayerState>('battle-ready');
+        const newSnapshot = seedPlayerSnapshot({
+            id: 'p1',
+            name: 'p-1',
+            seedCharacters: [ {
+                id: 'c-1',
+                seedSpells: [ { id: 's1', type: 'move' } ]
+            } ],
+        });
+
+        player.updateFromSnapshot(newSnapshot);
+
         expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
     });
 });

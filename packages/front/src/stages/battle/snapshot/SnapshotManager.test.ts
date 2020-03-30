@@ -430,7 +430,6 @@ describe('# SnapshotManager', () => {
                             playersSnapshots: [ {
                                 id: 'p1',
                                 name: 'p-1',
-                                state: 'battle-run',
                                 charactersSnapshots: [ currentCharacter.getSnapshot() ]
                             } ]
                         }
@@ -453,7 +452,6 @@ describe('# SnapshotManager', () => {
                             playersSnapshots: [ {
                                 id: 'p1',
                                 name: 'p-1',
-                                state: 'battle-run',
                                 charactersSnapshots: [ futureCharacter.getSnapshot() ]
                             } ]
                         }

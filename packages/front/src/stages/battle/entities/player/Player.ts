@@ -1,4 +1,4 @@
-import { assertIsNonNullable, assertThenGet, PlayerSnapshot, PlayerState } from '@timeflies/shared';
+import { assertIsNonNullable, assertThenGet, PlayerSnapshot } from '@timeflies/shared';
 import { serviceCurrentPlayer } from '../../../../services/serviceCurrentPlayer';
 import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 import { Character } from '../character/Character';
@@ -9,12 +9,11 @@ export interface Player extends WithSnapshot<PlayerSnapshot> {
     readonly id: string;
     readonly itsMe: boolean;
     readonly name: string;
-    readonly state: PlayerState;
     readonly team: Team;
     readonly characters: Character[];
 }
 
-interface Dependencies {
+export interface PlayerDependencies {
     characterCreator: typeof Character;
 }
 
@@ -22,11 +21,10 @@ export const Player = (
     {
         id,
         name,
-        state,
         charactersSnapshots
     }: PlayerSnapshot,
     team: Team,
-    { characterCreator }: Dependencies = { characterCreator: Character }
+    { characterCreator }: PlayerDependencies = { characterCreator: Character }
 ): Player => {
     const itsMe = id === assertThenGet(
         serviceCurrentPlayer(),
@@ -37,9 +35,6 @@ export const Player = (
         id,
         name,
         itsMe,
-        get state() {
-            return state;
-        },
         team,
         get characters() {
             return characters;
@@ -49,13 +44,11 @@ export const Player = (
             return {
                 id,
                 name,
-                state,
                 charactersSnapshots: characters.map(c => c.getSnapshot())
             };
         },
 
         updateFromSnapshot(snapshot: PlayerSnapshot): void {
-            state = snapshot.state;
 
             assertEntitySnapshotConsistency(characters, snapshot.charactersSnapshots);
 

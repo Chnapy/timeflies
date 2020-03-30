@@ -1,7 +1,7 @@
 import { StoreTest } from '../../../StoreTest';
 import { SpellPrepareEngine, SpellPrepareSubEngine } from './SpellPrepareEngine';
 import { seedCharacter } from '../entities/character/Character.seed';
-import { StaticSpell, TimerTester } from '@timeflies/shared';
+import { TimerTester } from '@timeflies/shared';
 import { SpellEngineBindAction } from './Engine';
 import { BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { seedMapManager } from '../map/MapManager.seed';
@@ -114,18 +114,6 @@ describe('# SpellPrepareEngine', () => {
     });
 
     it('should allow to launch hover & click functions if enough time', () => {
-
-        const staticData: StaticSpell = {
-            id: '1',
-            type: 'move',
-            name: '',
-            color: '',
-            initialFeatures: {
-                area: 1,
-                attack: -1,
-                duration: 200
-            }
-        };
 
         const character = seedCharacter('fake',{
             id: '1',
