@@ -37,6 +37,10 @@ export const ActionManager = (storeDispatcher: (action: GameAction) => void): Ac
         dispatch(action) {
             listenerMap.get(action.type)?.forEach(fn => fn(action));
 
+            if (action.type === 'app/reset') {
+                listenerMap.clear();
+            }
+
             storeDispatcher(action);
         }
     }

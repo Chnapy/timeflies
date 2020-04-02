@@ -1,14 +1,28 @@
-import { TiledMap, TiledMapAssets } from '@timeflies/shared';
-import { IAddOptions, ImageLoadStrategy, Loader, Resource } from 'resource-loader';
+import { assertIsDefined, CharacterType, TiledMap, TiledMapAssets } from '@timeflies/shared';
+import * as PIXI from 'pixi.js';
+import { Loader, LoaderResource } from 'pixi.js';
+import { IAddOptions, ImageLoadStrategy, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
 import { MockLoadStrategy } from './AssetLoader.seed';
+import { serviceEvent } from '../services/serviceEvent';
+import { AppResetAction } from '../Controller';
 
-export interface AssetMap {
+type ResourceMap = Partial<Record<string, LoaderResource>>;
+
+export type AssetMap = BaseAssetMap & SpritesheetMap;
+
+interface BaseAssetMap {
     map: TiledMapAssets;
 
     // for tests
     sampleImage: HTMLImageElement;
     sampleJSON: object;
+};
+
+type BaseAssetMapKey = keyof BaseAssetMap;
+
+type SpritesheetMap = {
+    [ k in CharacterType ]: PIXI.Spritesheet;
 };
 
 type AssetMapKey = keyof AssetMap;
@@ -22,8 +36,9 @@ interface Dependencies {
 }
 
 interface LoaderInstance<O extends {}> {
-    add<K extends keyof AssetMap>(key: K, path: string): LoaderInstance<O & Pick<AssetMap, K>>;
-    addMultiple<K extends keyof AssetMap>(o: Record<K, string>): LoaderInstance<O & Pick<AssetMap, K>>;
+    add<K extends BaseAssetMapKey>(key: K, path: string): LoaderInstance<O & Pick<BaseAssetMap, K>>;
+    addMultiple<K extends BaseAssetMapKey>(o: Record<K, string>): LoaderInstance<O & Pick<BaseAssetMap, K>>;
+    addSpritesheet<K extends CharacterType>(key: K, path: string): LoaderInstance<O & Pick<SpritesheetMap, K>>;
     load: () => Promise<O>;
 }
 
@@ -49,19 +64,26 @@ const mapStringUtil = {
     getMapImage: (name: string) => mapImageKeyPrefix + name,
 } as const;
 
-const getResourcesErrors = (resources: Loader.ResourceMap, keys: string[]): string[] => keys
+const getResourcesErrors = (resources: ResourceMap, keys: string[]): Error[] => keys
     .map(k => resources[ k ]!.error)
     .filter(Boolean);
 
-const getAssets = (resources: Loader.ResourceMap, keys: string[], key: string): AssetMap[ AssetMapKey ] => {
+const getAssets = (resources: ResourceMap, keys: string[], key: string): AssetMap[ AssetMapKey ] => {
     if (mapStringUtil.isMap(key)) {
         return getTiledMapAssets(resources, keys);
     }
 
-    return resources[ key ]!.data;
-}
+    const res = resources[ key ];
+    assertIsDefined(res);
 
-const getTiledMapAssets = (resources: Loader.ResourceMap, keys: string[]): TiledMapAssets => {
+    if (res.spritesheet) {
+        return res.spritesheet;
+    }
+
+    return res.data;
+};
+
+const getTiledMapAssets = (resources: ResourceMap, keys: string[]): TiledMapAssets => {
     const schema: TiledMap = resources[ mapKey ]!.data;
 
     const mapImageKeys = keys.filter(k => mapStringUtil.isMapImage(k));
@@ -105,48 +127,66 @@ const mapLoaderMiddleware = (loadStrategy: AbstractLoadStrategyCtor | undefined)
 
     const baseUrl = mapStringUtil.getBaseUrl(url);
 
-    map.tilesets.forEach(({ name, image }) => {
-        const loadOptions: IAddOptions = {
-            name: mapStringUtil.getMapImage(name),
-            url: baseUrl + image,
-            strategy: loadStrategy ?? ImageLoadStrategy,
-            parentResource: resource,
-            onComplete: onTilesetComplete,
-        };
-        this.add(loadOptions);
+    map.tilesets.forEach(({ name: _name, image }) => {
+        const name = mapStringUtil.getMapImage(_name);
+        if (!this.resources[ name ]) {
+            const loadOptions: IAddOptions = {
+                name,
+                url: baseUrl + image,
+                strategy: loadStrategy ?? ImageLoadStrategy,
+                parentResource: resource,
+                onComplete: onTilesetComplete,
+            };
+            this.add(loadOptions);
+        } else {
+            onTilesetComplete();
+        }
     });
 };
 
 export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies): AssetLoader => {
 
-    const loader = new Loader();
+    const { onAction } = serviceEvent();
+
+    const loader = Loader.shared;
 
     loader.use(mapLoaderMiddleware(loadStrategy));
+
+    onAction<AppResetAction>('app/reset', () => {
+        loader.reset();
+    });
+
+    const addResource = (name: string, url: string) => !loader.resources[ name ]
+        ? loader.add({
+            name,
+            url,
+            strategy: loadStrategy
+        })
+        : undefined;
 
     const newInstance = (): LoaderInstance<{}> => {
 
         const this_: LoaderInstance<{}> = {
 
-            add: <K extends keyof AssetMap>(key: K, path: string) => {
-                if (!loader.resources[ key ]) {
-                    loader.add({
-                        name: key,
-                        url: path,
-                        strategy: loadStrategy
-                    })
-                }
-                return this_ as LoaderInstance<Pick<AssetMap, K>>;
+            add: <K extends BaseAssetMapKey>(key: K, path: string) => {
+                addResource(key, path);
+                return this_ as LoaderInstance<Pick<BaseAssetMap, K>>;
             },
 
-            addMultiple: <K extends keyof AssetMap>(o: Record<K, string>) => {
+            addMultiple: <K extends BaseAssetMapKey>(o: Record<K, string>) => {
                 Object.keys(o)
-                    .forEach(key => this_.add(key as keyof AssetMap, o[ key ]));
-                return this_ as LoaderInstance<Pick<AssetMap, K>>;
+                    .forEach(key => this_.add(key as BaseAssetMapKey, o[ key ]));
+                return this_ as LoaderInstance<Pick<BaseAssetMap, K>>;
+            },
+
+            addSpritesheet: <K extends CharacterType>(key: K, path: string) => {
+                addResource(key, path);
+                return this_ as LoaderInstance<Pick<SpritesheetMap, K>>;
             },
 
             load: () => new Promise((resolve, reject) => {
 
-                loader.load((_: Loader, resources: Loader.ResourceMap) => {
+                loader.load((_: Loader, resources: ResourceMap) => {
                     const data: Partial<AssetMap> = {};
 
                     const keys = Object.keys(resources);

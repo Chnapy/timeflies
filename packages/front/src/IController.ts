@@ -7,10 +7,12 @@ import { UIState } from './ui/UIState';
 
 export interface IController {
 
-    start(websocketCreator?: WebSocketCreator): void;
+    start(container: Element, websocketCreator?: WebSocketCreator): void;
     getStore(): Store<UIState, GameAction>;
 
     waitConnect(): Promise<void>;
     readonly actionManager: ActionManager;
     readonly loader: AssetLoader;
+
+    reset(): void;
 }

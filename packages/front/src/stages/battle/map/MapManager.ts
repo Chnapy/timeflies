@@ -1,6 +1,7 @@
 import { MapConfig, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { Pathfinder } from './Pathfinder';
+import { Character } from '../entities/character/Character';
 
 export interface MapManager extends
     Pick<Pathfinder, 'calculatePath'> {
@@ -11,6 +12,7 @@ export interface MapManager extends
 export interface MapManagerDependencies {
     tiledManagerCreator: typeof TiledManager;
     pathfinderCreator: typeof Pathfinder;
+    getFutureCharacters: () => Character[];
 }
 
 export const MapManager = (
@@ -19,9 +21,10 @@ export const MapManager = (
         defaultTilelayerName,
         obstacleTilelayerName
     }: Pick<MapConfig, 'defaultTilelayerName' | 'obstacleTilelayerName'>,
-    { pathfinderCreator, tiledManagerCreator }: MapManagerDependencies = {
+    { pathfinderCreator, tiledManagerCreator, getFutureCharacters }: MapManagerDependencies = {
         pathfinderCreator: Pathfinder,
-        tiledManagerCreator: TiledManager
+        tiledManagerCreator: TiledManager,
+        getFutureCharacters: () => serviceBattleData('future').characters
     }
 ): MapManager => {
 
@@ -30,7 +33,7 @@ export const MapManager = (
         obstacleTilelayerName
     });
 
-    const { characters } = serviceBattleData('future');
+    const characters = getFutureCharacters();
 
     const pathfinder = pathfinderCreator(
         tiledManager,

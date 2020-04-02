@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { applyMiddleware, createStore, Store } from 'redux';
 import { createLogger } from 'redux-logger';
 import { ActionManager } from './action/ActionManager';
-import { GameAction } from './action/GameAction';
+import { GameAction, IGameAction } from './action/GameAction';
 import { App } from './App';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
@@ -12,9 +12,13 @@ import { WSClient } from './socket/WSClient';
 import { StageManager } from './stages/StageManager';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
+import { serviceDispatch } from './services/serviceDispatch';
 
 if (process.env.NODE_ENV === 'test') {
     throw new Error(`Controller should not be used in 'test' env.`);
+}
+
+export interface AppResetAction extends IGameAction<'app/reset'> {
 }
 
 const logger = createLogger({
@@ -29,7 +33,7 @@ let client: WSClient;
 let gameCanvas: GameCanvas;
 let app: App;
 const actionManager = ActionManager(store.dispatch);
-const loader = AssetLoader();
+let loader: AssetLoader;
 let stageManager: StageManager;
 
 const onAppMount = (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void => {
@@ -44,17 +48,21 @@ const onAppMount = (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void =
 
 export const Controller: IController = {
 
-    start(websocketCreator) {
+    start(container, websocketCreator) {
+
+        loader = AssetLoader();
 
         client = WSClient(websocketCreator && { websocketCreator });
 
-        app = ReactDOM.render(
-            React.createElement(App, {
-                store,
-                onMount: onAppMount
-            }),
-            document.getElementById('root')
-        );
+        if (container) {
+            app = ReactDOM.render(
+                React.createElement(App, {
+                    store,
+                    onMount: onAppMount
+                }),
+                container
+            );
+        }
     },
 
     getStore() {
@@ -67,5 +75,17 @@ export const Controller: IController = {
 
     actionManager,
 
-    loader
+    get loader() {
+        return loader;
+    },
+
+    reset() {
+        const { dispatchReset } = serviceDispatch({
+            dispatchReset: (): AppResetAction => ({
+                type: 'app/reset'
+            })
+        });
+
+        dispatchReset();
+    }
 };

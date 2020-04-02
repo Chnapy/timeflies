@@ -6,10 +6,11 @@ import { TiledManager } from '@timeflies/shared';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 
 export default {
-    title: 'TiledMapGraphic'
+    title: 'graphic/TiledMapGraphic'
 };
 
 export const Default = () => {
+    Controller.reset();
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;

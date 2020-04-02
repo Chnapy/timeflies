@@ -1,9 +1,9 @@
+import { TiledMapGraphic } from '../stages/battle/graphic/tiledMap/TiledMapGraphic';
 import { MapManager } from '../stages/battle/map/MapManager';
-import { ActionManager } from '../action/ActionManager';
 
 export interface CanvasContextMap {
     readonly mapManager: MapManager;
-    readonly actionManager: ActionManager;
+    readonly tiledMapGraphic: TiledMapGraphic;
 }
 
 export type CanvasContextKey = keyof CanvasContextMap;

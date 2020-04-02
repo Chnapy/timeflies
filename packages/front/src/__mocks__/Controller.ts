@@ -53,5 +53,7 @@ export const Controller: IController = {
             };
             return this_;
         }
-    }
+    },
+
+    reset() { }
 };

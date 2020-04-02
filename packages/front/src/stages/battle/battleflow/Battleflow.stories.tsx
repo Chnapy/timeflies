@@ -1,10 +1,10 @@
-import { BattleLoadSAction, ClientAction, MatchmakerClientAction, ServerAction, BattleLoadEndedCAction, BRunLaunchSAction, BRunGlobalTurnStartSAction } from '@timeflies/shared';
+import { BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, MatchmakerClientAction, ServerAction } from '@timeflies/shared';
 import React from 'react';
 import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../../../socket/WSClient';
-import { seedCharacter, seedCharacterStaticData } from '../entities/character/Character.seed';
+import { seedTeamSnapshot } from '../entities/team/Team.seed';
 
 export default {
     title: 'Battleflow'
@@ -56,14 +56,6 @@ const sendFns: { [ key in ClientAction[ 'type' ] ]?: (action: Omit<ClientAction,
 
 const { onAction } = serviceEvent();
 
-onAction<SendMessageAction<ClientAction>>('message/send', ({ message }) => {
-    const fn = sendFns[ message.type ];
-
-    if (fn) {
-        setImmediate(() => fn(message));
-    }
-});
-
 const onSendAction = <A extends ClientAction>(type: A[ 'type' ], fn: (action: Omit<A, 'sendTime'>) => void) => {
 
     sendFns[ type ] = (fn as any);
@@ -79,7 +71,15 @@ const receiveAction = <A extends ServerAction>(message: A) =>
 
 export const Default: React.FC = () => {
 
-    StoreTest.beforeTest();
+    Controller.reset();
+
+    onAction<SendMessageAction<ClientAction>>('message/send', ({ message }) => {
+        const fn = sendFns[ message.type ];
+
+        if (fn) {
+            setImmediate(() => fn(message));
+        }
+    });
 
     onSendAction<MatchmakerClientAction>('matchmaker/enter', () => {
 
@@ -97,8 +97,8 @@ export const Default: React.FC = () => {
                 characterTypes: [],
                 spellTypes: [],
                 playerInfos: {
-                    id: 'P-1234',
-                    name: 'toto'
+                    id: 'P1',
+                    name: 'p1'
                 }
             }
         });
@@ -114,123 +114,52 @@ export const Default: React.FC = () => {
                 battleHash: 'hash',
                 launchTime: Date.now(),
                 time: Date.now(),
-                teamsSnapshots: [
-                    {
-                        id: 't1',
-                        name: 'Team One',
-                        color: 'red',
-                        playersSnapshots: [ {
-                            id: 'P-1234',
-                            name: 'Player mine',
-                            state: 'battle-run' as const,
-                            charactersSnapshots: [
-                                seedCharacterStaticData({
-                                    id: 'c-1',
-                                    staticData: {
-                                        id: 'c-1',
-                                        defaultSpellId: 'c-1-s-1',
-                                        staticSpells: [ {
-                                            id: 'c-1-s-1',
-                                            color: 'red',
-                                            name: 'move',
-                                            type: 'move',
-                                            initialFeatures: {
-                                                area: 1,
-                                                attack: -1,
-                                                duration: 200
-                                            }
-                                        } ],
-                                        initialFeatures: {
-                                            actionTime: 4000,
-                                            life: 100
+                teamsSnapshots:
+                    [
+                        seedTeamSnapshot({
+                            id: 'T1',
+                            color: 'blue',
+                            seedPlayers: [
+                                {
+                                    id: 'P1',
+                                    seedCharacters: [
+                                        {
+                                            id: 'C1',
+                                            seedSpells: [
+                                                { id: 'S1', type: 'move' }
+                                            ]
                                         }
-                                    },
-                                    spellsSnapshots: [ {
-                                        id: 'c-1-s-1',
-                                        features: {
-                                            area: 1,
-                                            attack: -1,
-                                            duration: 200
-                                        },
-                                        staticData: {
-                                            id: 'c-1-s-1',
-                                            color: 'red',
-                                            name: 'move',
-                                            type: 'move',
-                                            initialFeatures: {
-                                                area: 1,
-                                                attack: -1,
-                                                duration: 200
-                                            }
-                                        }
-                                    } ]
-                                }),
+                                    ]
+                                }
                             ]
-                        } ]
-                    },
-                    {
-                        id: 't2',
-                        name: 'Team Two',
-                        color: 'blue',
-                        playersSnapshots: [ {
-                            id: 'P-bot1',
-                            name: 'Player bot 1',
-                            state: 'battle-run' as const,
-                            charactersSnapshots: [
-                                seedCharacterStaticData({
-                                    id: 'c-bot-1',
-                                    staticData: {
-                                        id: 'c-bot-1',
-                                        defaultSpellId: 'c-2-s-1',
-                                        staticSpells: [ {
-                                            id: 'c-2-s-1',
-                                            color: 'red',
-                                            name: 'move',
-                                            type: 'move',
-                                            initialFeatures: {
-                                                area: 1,
-                                                attack: -1,
-                                                duration: 200
-                                            }
-                                        } ],
-                                        initialFeatures: {
-                                            actionTime: 4000,
-                                            life: 100
+                        }),
+                        seedTeamSnapshot({
+                            id: 'T2',
+                            color: 'red',
+                            seedPlayers: [
+                                {
+                                    id: 'P2',
+                                    seedCharacters: [
+                                        {
+                                            id: 'C2',
+                                            seedSpells: [
+                                                { id: 'S2', type: 'move' }
+                                            ]
                                         }
-                                    },
-                                    spellsSnapshots: [ {
-                                        id: 'c-2-s-1',
-                                        features: {
-                                            area: 1,
-                                            attack: -1,
-                                            duration: 200
-                                        },
-                                        staticData: {
-                                            id: 'c-2-s-1',
-                                            color: 'red',
-                                            name: 'move',
-                                            type: 'move',
-                                            initialFeatures: {
-                                                area: 1,
-                                                attack: -1,
-                                                duration: 200
-                                            }
-                                        }
-                                    } ]
-                                }),
+                                    ]
+                                }
                             ]
-                        } ]
-                    }
-                ]
+                        })
+                    ]
             },
             globalTurnState: {
                 id: 1,
                 startTime: Date.now(),
-                order: [ 'c-1', 'c-bot-1' ],
+                order: [ 'C1', 'C2' ],
                 currentTurn: {
                     id: 1,
                     startTime: Date.now(),
-                    characterId: 'c-1'
+                    characterId: 'C1'
                 }
             }
         })
@@ -249,10 +178,10 @@ export const Default: React.FC = () => {
             globalTurnState: {
                 id: gtid,
                 startTime: Date.now(),
-                order: [ 'c-1', 'c-bot-1' ],
+                order: [ 'C1', 'C2' ],
                 currentTurn: {
                     id: turnid,
-                    characterId: 'c-1',
+                    characterId: 'C1',
                     startTime: Date.now()
                 }
             }
@@ -260,24 +189,28 @@ export const Default: React.FC = () => {
 
     }, 10000);
 
+    const ref = React.createRef<HTMLDivElement>();
+
     React.useEffect(() => {
 
         let socket!: MockWebSocket;
 
         const websocketCreator: WebSocketCreator = () => {
-
             socket = new MockWebSocket();
-
             return socket;
-        }
+        };
 
         Controller.start(
-            // websocketCreator
-            );
+            ref.current!,
+            websocketCreator
+        );
 
         socket.onopen!(null as any);
 
     }, []);
 
-    return null;
+    return <div ref={ref} style={{
+        width: '100%',
+        height: '100%'
+    }} />;
 };

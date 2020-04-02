@@ -5,15 +5,26 @@ import { serviceEvent } from "../../services/serviceEvent";
 import { serviceNetwork } from "../../services/serviceNetwork";
 import { BattleSceneData } from "../battle/BattleScene";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
+import { AssetManager } from '../../assetManager/AssetManager';
 
 export type LoadStageParam = StageParam<'load', BattleLoadPayload>;
 
 export const LoadStage: StageCreator<'load', 'map'> = (payload) => {
-    const { mapInfos } = payload;
+    const { mapInfos, characterTypes } = payload;
 
     return {
         preload: () => {
             const { schemaUrl } = mapInfos;
+
+            // TODO load manually...
+            // give loader in param, return promise
+            const spritesheets = characterTypes.reduce((acc, type) => {
+
+                acc[type] = AssetManager.characters[ type ].schema;
+
+                return acc;
+            }, {});
+
 
             // characterTypes.forEach(type => {
             //     const { image, schema } = AssetManager.characters[ type ];
@@ -24,7 +35,8 @@ export const LoadStage: StageCreator<'load', 'map'> = (payload) => {
             // load.atlasXML(SpellGraphic.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
 
             return {
-                map: schemaUrl
+                map: schemaUrl,
+                ...spritesheets
             };
         },
         async create(assets) {

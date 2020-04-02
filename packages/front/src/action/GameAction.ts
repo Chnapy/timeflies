@@ -1,4 +1,5 @@
 import { Action } from 'redux';
+import { AppResetAction } from '../Controller';
 import { BattleLaunchAction } from '../phaser/battleReducers/BattleReducerManager';
 import { MessageAction } from '../socket/WSClient';
 import { BStateAction } from '../stages/battle/battleState/BattleStateSchema';
@@ -13,6 +14,7 @@ import { LoginSuccess } from '../ui/reducers/CurrentPlayerReducer';
 export type IGameAction<T extends string> = Action<T>;
 
 export type GameAction =
+    | AppResetAction
     | StageAction
     | MessageAction
     | LoadAction

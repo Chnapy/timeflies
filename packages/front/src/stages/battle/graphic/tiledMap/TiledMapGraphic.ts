@@ -1,11 +1,13 @@
-import { assertIsDefined, Position, TiledLayerTilelayer, TiledManager, TiledTileset } from '@timeflies/shared';
+import { assertIsDefined, Position, TiledLayerTilelayer, TiledTileset } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
+import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { SpellEngineBindAction } from '../../engine/Engine';
-import { CanvasContext } from '../../../../canvas/CanvasContext';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
+
+    getWorldFromTile(tilePosition: Position): Position;
 }
 
 export const TiledMapGraphic = (): TiledMapGraphic => {
@@ -33,6 +35,11 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     const tilelayers = layers.filter((l): l is TiledLayerTilelayer => l.type === 'tilelayer');
 
     const textureCache: Partial<Record<number, PIXI.Texture>> = {};
+
+    const getWorldFromTile = ({ x, y }: Position): Position => ({
+        x: x * schema.tilewidth,
+        y: y * schema.tileheight
+    });
 
     const getWorldPositionFromIndex = (index: number, { tilewidth, tileheight }: TiledTileset): Position => {
         const tilePos = tiledManager.getTilePositionFromIndex(index);
@@ -108,6 +115,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     container.addChild(...layersContainers);
 
     return {
-        container
+        container,
+        getWorldFromTile
     };
 };

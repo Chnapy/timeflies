@@ -1,10 +1,9 @@
-import { BattleSnapshot, CharacterType, GlobalTurnSnapshot, MapInfos, Orientation, SpellType } from '@timeflies/shared';
+import { BattleSnapshot, CharacterType, GlobalTurnSnapshot, Orientation, SpellType } from '@timeflies/shared';
 import { AssetManager } from '../../assetManager/AssetManager';
 import { BattleDataMap } from '../../BattleData';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleReducerManager } from '../../phaser/battleReducers/BattleReducerManager';
 import { CameraManager } from './camera/CameraManager';
-import { CharacterGraphic } from './graphics/CharacterGraphic';
 import { Team } from './entities/team/Team';
 import { WithSnapshot } from './entities/WithSnapshot';
 import { MapManager } from '../../phaser/map/MapManager';
@@ -16,7 +15,7 @@ import { BattleStage } from './BattleStage';
 import { CycleManager } from './cycle/CycleManager';
 
 export interface BattleSceneData {
-    mapInfos: MapInfos;
+    mapInfos: any;
     characterTypes: CharacterType[];
     spellTypes: SpellType[];
     battleSnapshot: BattleSnapshot;
@@ -165,25 +164,25 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
     }
 
     private createCharactersAnimations(characterTypes: CharacterType[]): void {
-        characterTypes.forEach((type: CharacterType) => {
-            const { states } = AssetManager.characters[ type ];
+        // characterTypes.forEach((type: CharacterType) => {
+        //     const { states } = AssetManager.characters[ type ];
 
-            Utils.keysTyped(states).forEach(stateKey => {
-                const state = states[ stateKey ];
+        //     Utils.keysTyped(states).forEach(stateKey => {
+        //         const state = states[ stateKey ];
 
-                Utils.keysTyped(state).forEach((sideKey: Orientation) => {
-                    const side = state[ sideKey ];
+        //         Utils.keysTyped(state).forEach((sideKey: Orientation) => {
+        //             const side = state[ sideKey ];
 
-                    // this.anims.create({
-                    //     key: CharacterGraphic.getAnimKey(type, stateKey, sideKey),
-                    //     frames: Array.isArray(side.frameNames)
-                    //         ? side.frameNames
-                    //         : this.anims.generateFrameNames(CharacterGraphic.getSheetKey(type), side.frameNames),
-                    //     frameRate: side.frameRate,
-                    //     repeat: side.frameRepeat
-                    // });
-                });
-            });
-        });
+        //             // this.anims.create({
+        //             //     key: CharacterGraphic.getAnimKey(type, stateKey, sideKey),
+        //             //     frames: Array.isArray(side.frameNames)
+        //             //         ? side.frameNames
+        //             //         : this.anims.generateFrameNames(CharacterGraphic.getSheetKey(type), side.frameNames),
+        //             //     frameRate: side.frameRate,
+        //             //     repeat: side.frameRepeat
+        //             // });
+        //         });
+        //     });
+        // });
     }
 }
