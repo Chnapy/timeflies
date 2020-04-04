@@ -1,18 +1,44 @@
+import { Viewport } from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../canvas/CanvasContext';
 import { StageGraphicCreator } from '../../../canvas/StageGraphic';
-import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './charactersBoard/CharactersBoard';
+import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
 
-export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheets'> = () => {
+export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheets'> = (renderer) => {
 
-    const container = new PIXI.Container();
+    const viewport = new Viewport({
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        disableOnContextMenu: true,
+
+        interaction: renderer.plugins.interaction
+    });
+
+    const initViewport = ({ width, height, tilewidth, tileheight }: TiledMapGraphic) => {
+        viewport.screenWidth = window.innerWidth;
+        viewport.screenHeight = window.innerHeight;
+        viewport.worldWidth = tilewidth * width;
+        viewport.worldHeight = tileheight * height;
+        viewport
+            .clamp({ direction: 'all' })
+            .clampZoom({
+                minWidth: tilewidth * 4,
+                minHeight: tileheight * 4,
+                maxWidth: viewport.worldWidth,
+                maxHeight: viewport.worldHeight,
+            })
+            .wheel()
+            .drag({
+                mouseButtons: 'middle',
+            });
+    };
 
     const textStyle = new PIXI.TextStyle({
         fill: 'white'
     });
     const text = new PIXI.Text('Battle stage', textStyle);
-    container.addChild(text);
+    viewport.addChild(text);
 
     return {
         onCreate(contextMap) {
@@ -21,12 +47,14 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
 
                 const tiledMapGraphic = TiledMapGraphic();
 
+                initViewport(tiledMapGraphic);
+
                 CanvasContext.provider({ tiledMapGraphic }, () => {
 
                     const charactersBoardCurrent = CharactersBoard('current');
                     const charactersBoardFuture = CharactersBoard('future');
 
-                    container.addChild(
+                    viewport.addChild(
                         tiledMapGraphic.container,
                         charactersBoardCurrent.container,
                         charactersBoardFuture.container
@@ -35,7 +63,7 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
             });
         },
         getContainer() {
-            return container;
+            return viewport;
         }
     };
 };

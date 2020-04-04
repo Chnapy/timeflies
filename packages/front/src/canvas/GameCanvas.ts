@@ -1,12 +1,12 @@
+import { assertIsDefined } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { serviceEvent } from '../services/serviceEvent';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
 import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
 import { LoadStageGraphic } from '../stages/load/graphic/LoadStageGraphic';
-import { StageKey, StageOnCreateGraphicAction, StageChangeAction } from '../stages/StageManager';
-import { StageGraphicCreator, StageGraphic } from './StageGraphic';
+import { StageChangeAction, StageKey, StageOnCreateGraphicAction } from '../stages/StageManager';
 import { CanvasContextMap } from './CanvasContext';
-import { assertIsDefined } from '@timeflies/shared';
+import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
 const stageGraphicsMap = {
     boot: BootStageGraphic,
@@ -35,7 +35,7 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
     onAction<StageChangeAction<any>>('stage/change', ({ stageKey }) => {
         canvas.stage.removeChildren();
 
-        stageGraphic = stageGraphicsMap[ stageKey ]();
+        stageGraphic = stageGraphicsMap[ stageKey ](canvas.renderer);
 
         canvas.stage.addChild(stageGraphic.getContainer());
     });

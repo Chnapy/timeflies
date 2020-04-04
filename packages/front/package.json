@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "easystarjs": "0.4.3",
+    "pixi-viewport": "^4.10.0",
     "pixi.js": "5.2.1",
     "redux-logger": "^3.0.6",
     "resource-loader": "4.0.0-rc4"

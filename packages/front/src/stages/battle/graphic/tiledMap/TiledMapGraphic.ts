@@ -7,6 +7,8 @@ import { SpellEngineBindAction } from '../../engine/Engine';
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
 
+    readonly width: number;
+    readonly height: number;
     readonly tilewidth: number;
     readonly tileheight: number;
     getWorldFromTile(tilePosition: Position): Position;
@@ -117,6 +119,8 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
 
     return {
         container,
+        width: schema.width,
+        height: schema.height,
         tilewidth: schema.tilewidth,
         tileheight: schema.tileheight,
         getWorldFromTile

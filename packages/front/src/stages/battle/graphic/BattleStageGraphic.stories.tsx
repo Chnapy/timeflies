@@ -107,7 +107,7 @@ export const Default = () => {
             tiledManagerCreator: TiledManager
         });
 
-        const battleStageGraphic = BattleStageGraphic();
+        const battleStageGraphic = BattleStageGraphic(app.renderer);
 
         battleStageGraphic.onCreate({
             mapManager,

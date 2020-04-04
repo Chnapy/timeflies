@@ -1,12 +1,6 @@
 import { IGameAction } from '../../action/GameAction';
-import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { ReducerManager } from '../../ReducerManager';
 import { BattleScene, BattleSceneData } from '../../stages/battle/BattleScene';
-import { CameraManager } from '../../stages/battle/camera/CameraManager';
-import { CycleManager } from '../../stages/battle/cycle/CycleManager';
-import { MapManager } from '../map/MapManager';
-import { BattleRoomManager } from '../room/BattleRoomManager';
-import { SpellEngine } from '../spellEngine/SpellEngine';
 
 export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
     battleSceneData: BattleSceneData;
@@ -60,14 +54,7 @@ export class BattleReducerManager extends ReducerManager<BattleScene> {
 
     constructor(
         scene: BattleScene,
-        private readonly battleData: any,
-        private readonly room: BattleRoomManager,
-        private readonly dataStateManager: DataStateManager,
-        private readonly cameraManager: CameraManager,
-        private readonly spellEngine: SpellEngine,
-        private readonly graphics: Phaser.GameObjects.Graphics,
-        private readonly map: MapManager,
-        private readonly cycle: CycleManager
+        ...args: any[]
     ) {
         super(scene);
     }

@@ -1,3 +1,4 @@
+import * as PIXI from 'pixi.js';
 import { CanvasContextKey, CanvasContextMap } from './CanvasContext';
 
 export interface StageGraphic<K extends CanvasContextKey> {
@@ -6,5 +7,5 @@ export interface StageGraphic<K extends CanvasContextKey> {
 }
 
 export interface StageGraphicCreator<K extends CanvasContextKey> {
-    (): StageGraphic<K>;
+    (renderer: PIXI.Renderer): StageGraphic<K>;
 }
