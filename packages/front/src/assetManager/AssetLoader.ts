@@ -1,11 +1,11 @@
-import { assertIsDefined, CharacterType, TiledMap, TiledMapAssets } from '@timeflies/shared';
+import { assertIsDefined, TiledMap, TiledMapAssets } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { Loader, LoaderResource } from 'pixi.js';
 import { IAddOptions, ImageLoadStrategy, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
-import { MockLoadStrategy } from './AssetLoader.seed';
-import { serviceEvent } from '../services/serviceEvent';
 import { AppResetAction } from '../Controller';
+import { serviceEvent } from '../services/serviceEvent';
+import { MockLoadStrategy } from './AssetLoader.seed';
 
 type ResourceMap = Partial<Record<string, LoaderResource>>;
 
@@ -22,7 +22,7 @@ interface BaseAssetMap {
 type BaseAssetMapKey = keyof BaseAssetMap;
 
 type SpritesheetMap = {
-    [ k in CharacterType ]: PIXI.Spritesheet;
+    characters: PIXI.Spritesheet;
 };
 
 type AssetMapKey = keyof AssetMap;
@@ -36,9 +36,10 @@ interface Dependencies {
 }
 
 interface LoaderInstance<O extends {}> {
+    use<K extends AssetMapKey>(key: K): LoaderInstance<O & Pick<AssetMap, K>>;
     add<K extends BaseAssetMapKey>(key: K, path: string): LoaderInstance<O & Pick<BaseAssetMap, K>>;
     addMultiple<K extends BaseAssetMapKey>(o: Record<K, string>): LoaderInstance<O & Pick<BaseAssetMap, K>>;
-    addSpritesheet<K extends CharacterType>(key: K, path: string): LoaderInstance<O & Pick<SpritesheetMap, K>>;
+    addSpritesheet<K extends keyof SpritesheetMap>(key: K, path: string): LoaderInstance<O & Pick<SpritesheetMap, K>>;
     load: () => Promise<O>;
 }
 
@@ -168,6 +169,13 @@ export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies
 
         const this_: LoaderInstance<{}> = {
 
+            use: <K extends AssetMapKey>(key: K) => {
+                if(!loader.resources[ key ]) {
+                    throw new Error(`'${key}' is needed but not present in loaded resources`);
+                }
+                return this_ as LoaderInstance<Pick<AssetMap, K>>;
+            },
+
             add: <K extends BaseAssetMapKey>(key: K, path: string) => {
                 addResource(key, path);
                 return this_ as LoaderInstance<Pick<BaseAssetMap, K>>;
@@ -179,7 +187,7 @@ export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies
                 return this_ as LoaderInstance<Pick<BaseAssetMap, K>>;
             },
 
-            addSpritesheet: <K extends CharacterType>(key: K, path: string) => {
+            addSpritesheet: <K extends keyof SpritesheetMap>(key: K, path: string) => {
                 addResource(key, path);
                 return this_ as LoaderInstance<Pick<SpritesheetMap, K>>;
             },

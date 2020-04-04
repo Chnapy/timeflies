@@ -4,7 +4,6 @@ import spellsSpritesheetSchema from '../_assets/spritesheets/spells_spritesheet.
 
 export type IAssetManager = typeof AssetManager;
 
-
 export type IAssetSpells = {
     image: string;
     schema: string;
@@ -12,24 +11,6 @@ export type IAssetSpells = {
         [ K in SpellType ]: string;
     };
 };
-
-function getGenerateFrameConfig(start: number, end: number = start): any/*Phaser.Types.Animations.GenerateFrameNames*/ {
-    return {
-        start,
-        end,
-        zeroPad: 2,
-        prefix: 'player_',
-        suffix: '.png'
-    };
-}
-
-const getGenerateFrameArray = (...frames: number[]): any/*Phaser.Types.Animations.GenerateFrameNames*/ => ({
-    zeroPad: 2,
-    prefix: 'player_',
-    suffix: '.png',
-    frames
-});
-
 
 const AssetSpells: IAssetSpells = {
     image: spellsSpritesheetImage,

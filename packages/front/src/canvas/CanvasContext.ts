@@ -1,9 +1,13 @@
+import * as PIXI from 'pixi.js';
 import { TiledMapGraphic } from '../stages/battle/graphic/tiledMap/TiledMapGraphic';
 import { MapManager } from '../stages/battle/map/MapManager';
 
 export interface CanvasContextMap {
     readonly mapManager: MapManager;
     readonly tiledMapGraphic: TiledMapGraphic;
+    readonly spritesheets: {
+        readonly characters: PIXI.Spritesheet;
+    };
 }
 
 export type CanvasContextKey = keyof CanvasContextMap;

@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
-import { StageGraphic, StageGraphicCreator } from '../../../canvas/StageGraphic';
-import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
 import { CanvasContext } from '../../../canvas/CanvasContext';
+import { StageGraphicCreator } from '../../../canvas/StageGraphic';
+import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
+import { CharactersBoard } from './charactersBoard/CharactersBoard';
 
-export const BattleStageGraphic: StageGraphicCreator<'mapManager'> = () => {
+export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheets'> = () => {
 
     const container = new PIXI.Container();
 
@@ -18,9 +19,19 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager'> = () => {
 
             CanvasContext.provider(contextMap, () => {
 
-                const mapGraphic = TiledMapGraphic();
-                container.addChild(mapGraphic.container);
+                const tiledMapGraphic = TiledMapGraphic();
 
+                CanvasContext.provider({ tiledMapGraphic }, () => {
+
+                    const charactersBoardCurrent = CharactersBoard('current');
+                    const charactersBoardFuture = CharactersBoard('future');
+
+                    container.addChild(
+                        tiledMapGraphic.container,
+                        charactersBoardCurrent.container,
+                        charactersBoardFuture.container
+                    );
+                });
             });
         },
         getContainer() {

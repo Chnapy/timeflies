@@ -12,8 +12,8 @@ export type BootStageParam = StageParam<'boot', {}>;
 export const BootStage: StageCreator<'boot', never> = () => {
 
     return {
-        preload() {
-            return {}
+        async preload() {
+            return {};
         },
         async create() {
 

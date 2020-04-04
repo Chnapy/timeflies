@@ -7,10 +7,11 @@ import { Team } from './entities/team/Team';
 import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
+import { Controller } from '../../Controller';
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
-export const BattleStage: StageCreator<'battle', 'map'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
+export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
 
     const fillBattleData = (period: BattleDataPeriod): void => {
         const current = battleData[ period ];
@@ -24,12 +25,13 @@ export const BattleStage: StageCreator<'battle', 'map'> = ({ mapInfos, globalTur
 
     return {
         preload() {
-            return {
-                map: 'map'
-            };
+            return Controller.loader.newInstance()
+                .use('map')
+                .use('characters')
+                .load();
         },
 
-        async create({ map }) {
+        async create({ map, characters: charactersSheet }) {
             const snapshotManager = SnapshotManager();
 
             const spellActionManager = SpellActionManager();
@@ -46,7 +48,10 @@ export const BattleStage: StageCreator<'battle', 'map'> = ({ mapInfos, globalTur
             cycleManager.start(globalTurnState);
 
             return {
-                mapManager
+                mapManager,
+                spritesheets: {
+                    characters: charactersSheet
+                }
             };
         }
     };

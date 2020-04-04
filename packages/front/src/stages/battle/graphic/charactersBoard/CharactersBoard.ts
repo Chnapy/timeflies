@@ -1,27 +1,20 @@
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 import { BattleDataPeriod } from '../../../../BattleData';
+import { serviceBattleData } from '../../../../services/serviceBattleData';
+import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
 
 export interface CharactersBoard {
     readonly container: PIXI.Container;
 }
 
-// battleData period
-// tiledManager || mapManager
 export const CharactersBoard = (period: BattleDataPeriod) => {
 
-    // get characters
+    const { characters } = serviceBattleData(period);
 
-    // link with asset manager
-
-    // create sprite w/ spritesheet, animations
-
-    // use position & orientation
-
-    // on position change
-
-    // anim only in 'current' period
+    const charactersGraphics = characters.map(c => CharacterGraphic(period, c));
 
     const container = new PIXI.Container();
+    container.addChild(...charactersGraphics.map(c => c.container));
 
     return {
         container

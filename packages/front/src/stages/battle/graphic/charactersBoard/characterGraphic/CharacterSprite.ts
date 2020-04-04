@@ -14,7 +14,7 @@ export type CharacterSpriteMutableProps = Pick<CharacterSpriteProps,
 
 export type CharacterSpriteState = 'idle' | 'walk';
 
-const getAnimPath = (
+export const getAnimPath = (
     type: CharacterType,
     state: CharacterSpriteState,
     orientation: Orientation

@@ -37,7 +37,7 @@ export interface StageCreator<SK extends StageKey, K extends keyof AssetMap> {
 }
 
 export interface Stage<SK extends StageKey, K extends keyof AssetMap> {
-    preload(): { [ key in K ]?: string };
+    preload(): Promise<Pick<AssetMap, K>>;
     create(assets: Pick<AssetMap, K>): Promise<StageGraphicCreateParam<SK>>;
 }
 
@@ -79,9 +79,7 @@ export const StageManager = ({ stageCreators }: Dependencies = {
 
         const assetsToLoad = currentStage.preload();
 
-        const assets = await Controller.loader.newInstance()
-            .addMultiple(assetsToLoad)
-            .load();
+        const assets = await currentStage.preload();
 
         const graphicCreateParam = await currentStage.create(assets);
 

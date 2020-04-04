@@ -1,43 +1,30 @@
 import { BattleLoadPayload, BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
+import { Controller } from '../../Controller';
 import { BattleLaunchAction } from "../../phaser/battleReducers/BattleReducerManager";
 import { serviceDispatch } from "../../services/serviceDispatch";
 import { serviceEvent } from "../../services/serviceEvent";
 import { serviceNetwork } from "../../services/serviceNetwork";
 import { BattleSceneData } from "../battle/BattleScene";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
-import { AssetManager } from '../../assetManager/AssetManager';
 
 export type LoadStageParam = StageParam<'load', BattleLoadPayload>;
 
-export const LoadStage: StageCreator<'load', 'map'> = (payload) => {
+const spritesheetsUrls = {
+    // TODO use import (find a way for json)
+    characters: 'http://localhost:8887/sokoban.json'
+} as const;
+
+export const LoadStage: StageCreator<'load', 'map' | 'characters'> = (payload) => {
     const { mapInfos, characterTypes } = payload;
 
     return {
         preload: () => {
             const { schemaUrl } = mapInfos;
 
-            // TODO load manually...
-            // give loader in param, return promise
-            const spritesheets = characterTypes.reduce((acc, type) => {
-
-                acc[type] = AssetManager.characters[ type ].schema;
-
-                return acc;
-            }, {});
-
-
-            // characterTypes.forEach(type => {
-            //     const { image, schema } = AssetManager.characters[ type ];
-
-            //     load.atlasXML(CharacterGraphic.getSheetKey(type), image, schema);
-            // });
-
-            // load.atlasXML(SpellGraphic.getSheetKey(), AssetManager.spells.image, AssetManager.spells.schema);
-
-            return {
-                map: schemaUrl,
-                ...spritesheets
-            };
+            return Controller.loader.newInstance()
+                .add('map', schemaUrl)
+                .addSpritesheet('characters', spritesheetsUrls.characters)
+                .load();
         },
         async create(assets) {
 

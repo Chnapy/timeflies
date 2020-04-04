@@ -4,6 +4,7 @@ import { TiledMapGraphic } from './TiledMapGraphic';
 import { Controller } from '../../../../Controller';
 import { TiledManager } from '@timeflies/shared';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
+import { AssetLoader } from '../../../../assetManager/AssetLoader';
 
 export default {
     title: 'graphic/TiledMapGraphic'
@@ -16,7 +17,9 @@ export const Default = () => {
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const { map } = await Controller.loader.newInstance()
+        const loader = AssetLoader();
+
+        const { map } = await loader.newInstance()
             .add('map', 'http://127.0.0.1:8887/map.json')
             .load();
 
