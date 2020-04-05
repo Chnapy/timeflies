@@ -31,7 +31,7 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapI
                 .load();
         },
 
-        async create({ map, characters: charactersSheet }) {
+        async create({ map, characters: charactersSheet }, setupStageGraphic) {
             const snapshotManager = SnapshotManager();
 
             const spellActionManager = SpellActionManager();
@@ -45,14 +45,14 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapI
 
             const cycleManager = CycleManager();
 
-            cycleManager.start(globalTurnState);
-
-            return {
+            setupStageGraphic({
                 mapManager,
                 spritesheets: {
                     characters: charactersSheet
                 }
-            };
+            });
+
+            cycleManager.start(globalTurnState);
         }
     };
 };

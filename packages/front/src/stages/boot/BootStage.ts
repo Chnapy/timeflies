@@ -15,7 +15,7 @@ export const BootStage: StageCreator<'boot', never> = () => {
         async preload() {
             return {};
         },
-        async create() {
+        async create(assets, setupStageGraphic) {
 
             const { onAction, onMessageAction } = serviceEvent();
 
@@ -63,7 +63,7 @@ export const BootStage: StageCreator<'boot', never> = () => {
 
             sendMatchmakerEnter();
 
-            return {};
+            setupStageGraphic({});
         }
     };
 };

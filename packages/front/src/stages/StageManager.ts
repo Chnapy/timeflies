@@ -38,7 +38,7 @@ export interface StageCreator<SK extends StageKey, K extends keyof AssetMap> {
 
 export interface Stage<SK extends StageKey, K extends keyof AssetMap> {
     preload(): Promise<Pick<AssetMap, K>>;
-    create(assets: Pick<AssetMap, K>): Promise<StageGraphicCreateParam<SK>>;
+    create(assets: Pick<AssetMap, K>, setupStageGraphic: (param: StageGraphicCreateParam<SK>) => void): Promise<void>;
 }
 
 export interface StageManager {
@@ -81,9 +81,7 @@ export const StageManager = ({ stageCreators }: Dependencies = {
 
         const assets = await currentStage.preload();
 
-        const graphicCreateParam = await currentStage.create(assets);
-
-        dispatchStageOnCreateGraphic(graphicCreateParam);
+        await currentStage.create(assets, dispatchStageOnCreateGraphic);
     };
 
     const { onAction } = serviceEvent();

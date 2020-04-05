@@ -26,7 +26,7 @@ export const LoadStage: StageCreator<'load', 'map' | 'characters'> = (payload) =
                 .addSpritesheet('characters', spritesheetsUrls.characters)
                 .load();
         },
-        async create(assets) {
+        async create(assets, setupStageGraphic) {
 
             const { onAction, onMessageAction } = serviceEvent();
 
@@ -84,7 +84,7 @@ export const LoadStage: StageCreator<'load', 'map' | 'characters'> = (payload) =
                 dispatchBattleLaunch(battleSnapshot, globalTurnState);
             });
 
-            return {};
+            setupStageGraphic({});
         }
     };
 };

@@ -1,8 +1,10 @@
-import { assertIsDefined, Position, TiledLayerTilelayer, TiledTileset } from '@timeflies/shared';
+import { assertIsDefined, Position, TiledLayerTilelayer, TiledTileset, SpellType } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { SpellEngineBindAction } from '../../engine/Engine';
+import { getTiledMapHoverFn, ExtractHoverReturn } from '../../engine/spellMapping';
+import { TileGraphic } from './TileGraphic';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
@@ -14,29 +16,36 @@ export interface TiledMapGraphic {
     getWorldFromTile(tilePosition: Position): Position;
 }
 
+export interface TileHoverFnProps<ST extends SpellType> {
+    engineProps: NonNullable<ExtractHoverReturn<ST>>;
+    tileGraphicTarget: TileGraphic;
+    tileGraphicList: TileGraphic[];
+}
+
+export interface TileTriggerFn {
+    onTileHover: (tilePos: Position, tileGraphic: TileGraphic) => void;
+    onTileClick: (tilePos: Position) => void;
+}
+
 export const TiledMapGraphic = (): TiledMapGraphic => {
 
     const { mapManager: { tiledManager } } = CanvasContext.consumer('mapManager');
 
     const { onAction } = serviceEvent();
 
-    let onTileClick: (p: Position) => void = () => { };
-    let onTileHover: (p: Position) => void = () => { };
-    onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({ onTileClick: otc, onTileHover: oth }) => {
-        onTileClick = otc;
-        onTileHover = oth;
-    });
+    const triggerFn: TileTriggerFn = {
+        onTileHover: () => { },
+        onTileClick: () => { }
+    };
 
     const { schema, images } = tiledManager.assets;
-
-    const { layers } = schema;
 
     const mapTexture: Record<string, PIXI.Texture> = Object.keys(images).reduce((m, k) => {
         m[ k ] = PIXI.Texture.from(images[ k ]);
         return m;
     }, {});
 
-    const tilelayers = layers.filter((l): l is TiledLayerTilelayer => l.type === 'tilelayer');
+    const tilelayers = schema.layers.filter((l): l is TiledLayerTilelayer => l.type === 'tilelayer');
 
     const textureCache: Partial<Record<number, PIXI.Texture>> = {};
 
@@ -75,7 +84,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         return texture;
     };
 
-    const Tile = (id: number, index: number): PIXI.Sprite | null => {
+    const getTileGraphic = (id: number, index: number): TileGraphic | null => {
 
         const tileset = tiledManager.getTilesetFromId(id);
         if (!tileset) {
@@ -87,35 +96,57 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         const tilePos = tiledManager.getTilePositionFromIndex(index);
         const worldPos = getWorldPositionFromIndex(index, tileset);
 
-        const sprite = PIXI.Sprite.from(texture);
-        sprite.x = worldPos.x;
-        sprite.y = worldPos.y;
-        sprite.width = tileset.tilewidth;
-        sprite.height = tileset.tileheight;
+        const { tilewidth, tileheight } = tileset;
 
-        sprite.interactive = true;
-        sprite.on('mouseup', () => onTileClick(tilePos));
-        sprite.on('mouseover', () => onTileHover(tilePos));
-
-        return sprite;
+        return TileGraphic({
+            texture,
+            tilePos,
+            worldPos,
+            tilewidth,
+            tileheight,
+            triggerFn
+        });
     };
 
-    const layersContainers: PIXI.Container[] = tilelayers
+    const layersTiles: TileGraphic[][] = tilelayers
         .map(({ data }) => {
             assertIsDefined(data);
 
-            const tiles: PIXI.Sprite[] = data
-                .map(Tile)
-                .filter((tile): tile is PIXI.Sprite => tile !== null);
-
-            const container = new PIXI.Container();
-
-            container.addChild(...tiles);
-            return container;
+            return data
+                .map(getTileGraphic)
+                .filter((tile): tile is TileGraphic => tile !== null);
         });
+
+    const layersContainers: PIXI.Container[] = layersTiles.map(tiles => {
+
+        const container = new PIXI.Container();
+
+        container.addChild(...tiles.map(t => t.container));
+        return container;
+    });
 
     const container = new PIXI.Container();
     container.addChild(...layersContainers);
+
+    onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({ spellType, onTileClick: otc, onTileHover: oth }) => {
+        triggerFn.onTileClick = otc;
+        triggerFn.onTileHover = async (tilePos, tileGraphicTarget) => {
+            const engineProps = await oth(tilePos);
+
+            const tileGraphicList = layersTiles[ layersTiles.length - 1 ];
+            tileGraphicList.forEach(t => t.reset());
+            
+            if (engineProps) {
+                const hoverFn = getTiledMapHoverFn(spellType);
+
+                hoverFn({
+                    engineProps,
+                    tileGraphicTarget,
+                    tileGraphicList
+                });
+            }
+        };
+    });
 
     return {
         container,

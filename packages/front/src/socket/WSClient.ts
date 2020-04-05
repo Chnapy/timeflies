@@ -53,7 +53,7 @@ export const WSClient = ({ websocketCreator }: Dependencies = {
         } catch (e) {
             action = data;
         }
-        console.log('->', action);
+        // console.log('->', action);
 
         if (typeof action !== 'object' || typeof action.type !== 'string') {
             throw new TypeError(`message is not an Action: ${action}`);
@@ -67,7 +67,7 @@ export const WSClient = ({ websocketCreator }: Dependencies = {
     onAction<SendMessageAction>('message/send', ({
         message
     }) => {
-        console.log('<-', message);
+        // console.log('<-', message);
         socket.send(JSON.stringify({
             sendTime: Date.now(),
             ...message

@@ -24,6 +24,7 @@ export interface ConfirmSAction extends TAction<'confirm'> {
 
 export interface SpellActionSnapshot {
     startTime: number;
+    characterId: string;
     duration: number;
     spellId: string;
     position: Position;

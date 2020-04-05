@@ -24,13 +24,15 @@ export interface Character extends WithSnapshot<CharacterSnapshot> {
     hasSpell(spellType: SpellType): boolean;
 }
 
+// TODO add test to ensure that given objects are copied
+// TODO add period attribute to all entities
 export const Character = ({
     staticData, orientation: _orientation, position: _position, features: _features, spellsSnapshots: _spellsSnapshots
 }: CharacterSnapshot, player: Player): Character => {
 
-    let position: Readonly<Position> = _position;
+    let position: Position = { ..._position };
     let orientation: Orientation = _orientation;
-    let features: Readonly<CharacterFeatures> = _features;
+    const features: Readonly<CharacterFeatures> = { ..._features };
 
     const _this: Character = {
         get id(): string {
@@ -72,7 +74,7 @@ export const Character = ({
         },
 
         updateFromSnapshot(snapshot: CharacterSnapshot) {
-            position = snapshot.position;
+            position = { ...snapshot.position };
             orientation = snapshot.orientation;
 
             mergeAfterClean(features, snapshot.features);
@@ -90,7 +92,7 @@ export const Character = ({
             }
 
             if (o.position) {
-                position = o.position;
+                position = { ...o.position };
             }
             if (o.orientation) {
                 orientation = o.orientation;

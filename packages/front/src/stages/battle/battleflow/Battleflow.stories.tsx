@@ -106,6 +106,51 @@ export const Default: React.FC = () => {
 
     onSendAction<BattleLoadEndedCAction>('battle-load-end', () => {
 
+        const teamsSnapshots = [
+            seedTeamSnapshot({
+                id: 'T1',
+                color: 'blue',
+                seedPlayers: [
+                    {
+                        id: 'P1',
+                        seedCharacters: [
+                            {
+                                id: 'C1',
+                                seedSpells: [
+                                    { id: 'S1', type: 'move' }
+                                ],
+                                features: {
+                                    actionTime: 100_000
+                                },
+                                position: { x: 4, y: 3 }
+                            }
+                        ]
+                    }
+                ]
+            }),
+            seedTeamSnapshot({
+                id: 'T2',
+                color: 'red',
+                seedPlayers: [
+                    {
+                        id: 'P2',
+                        seedCharacters: [
+                            {
+                                id: 'C2',
+                                seedSpells: [
+                                    { id: 'S2', type: 'move' }
+                                ],
+                                features: {
+                                    actionTime: 3000
+                                },
+                                position: { x: 6, y: 3 }
+                            }
+                        ]
+                    }
+                ]
+            })
+        ];
+        console.log(teamsSnapshots);
 
         receiveAction<BRunLaunchSAction>({
             type: 'battle-run/launch',
@@ -114,43 +159,7 @@ export const Default: React.FC = () => {
                 battleHash: 'hash',
                 launchTime: Date.now(),
                 time: Date.now(),
-                teamsSnapshots:
-                    [
-                        seedTeamSnapshot({
-                            id: 'T1',
-                            color: 'blue',
-                            seedPlayers: [
-                                {
-                                    id: 'P1',
-                                    seedCharacters: [
-                                        {
-                                            id: 'C1',
-                                            seedSpells: [
-                                                { id: 'S1', type: 'move' }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }),
-                        seedTeamSnapshot({
-                            id: 'T2',
-                            color: 'red',
-                            seedPlayers: [
-                                {
-                                    id: 'P2',
-                                    seedCharacters: [
-                                        {
-                                            id: 'C2',
-                                            seedSpells: [
-                                                { id: 'S2', type: 'move' }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        })
-                    ]
+                teamsSnapshots
             },
             globalTurnState: {
                 id: 1,

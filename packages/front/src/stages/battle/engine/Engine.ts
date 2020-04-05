@@ -1,10 +1,12 @@
-import { Position } from '@timeflies/shared';
+import { Position, SpellType } from '@timeflies/shared';
 import { IGameAction } from '../../../action/GameAction';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { MapManager } from '../map/MapManager';
+import { ExtractHoverReturn } from './spellMapping';
 
-export interface SpellEngineBindAction extends IGameAction<'battle/spell-engine/bind'> {
-    onTileHover: (tilePos: Position) => Promise<void>;
+export interface SpellEngineBindAction<ST extends SpellType = SpellType> extends IGameAction<'battle/spell-engine/bind'> {
+    spellType: ST;
+    onTileHover: (tilePos: Position) => Promise<ExtractHoverReturn<ST>>;
     onTileClick: (tilePos: Position) => Promise<void>;
 }
 

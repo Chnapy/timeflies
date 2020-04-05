@@ -1,7 +1,9 @@
 import { MapConfig, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
-import { Pathfinder } from './Pathfinder';
+import { serviceEvent } from '../../../services/serviceEvent';
+import { BStateAction } from '../battleState/BattleStateSchema';
 import { Character } from '../entities/character/Character';
+import { Pathfinder } from './Pathfinder';
 
 export interface MapManager extends
     Pick<Pathfinder, 'calculatePath'> {
@@ -28,6 +30,8 @@ export const MapManager = (
     }
 ): MapManager => {
 
+    const { onAction } = serviceEvent();
+
     const tiledManager = tiledManagerCreator(mapAssets, {
         defaultTilelayerName,
         obstacleTilelayerName
@@ -40,6 +44,17 @@ export const MapManager = (
         () => characters.map(c => c.position)
     );
     pathfinder.refreshGrid();
+
+    onAction<BStateAction>('battle/state/event', action => {
+
+        if (action.eventType === 'SPELL-LAUNCH') {
+
+            // be sure to run that after spell had touched the character
+            setImmediate(() => {
+                pathfinder.refreshGrid();
+            });
+        }
+    });
 
     return {
 

@@ -10,7 +10,7 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
     const viewport = new Viewport({
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
-        disableOnContextMenu: true,
+        disableOnContextMenu: false,
 
         interaction: renderer.plugins.interaction
     });

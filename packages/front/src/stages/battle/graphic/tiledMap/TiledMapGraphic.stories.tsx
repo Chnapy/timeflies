@@ -2,9 +2,11 @@ import * as PIXI from 'pixi.js';
 import React from 'react';
 import { TiledMapGraphic } from './TiledMapGraphic';
 import { Controller } from '../../../../Controller';
-import { TiledManager } from '@timeflies/shared';
+import { TiledManager, SpellType } from '@timeflies/shared';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { AssetLoader } from '../../../../assetManager/AssetLoader';
+import { serviceDispatch } from '../../../../services/serviceDispatch';
+import { SpellEngineBindAction } from '../../engine/Engine';
 
 export default {
     title: 'graphic/TiledMapGraphic'
@@ -40,6 +42,19 @@ export const Default = () => {
             } as any
         }, TiledMapGraphic);
         app.stage.addChild(tiledMap.container);
+
+        const { dispatchBindAction } = serviceDispatch({
+            dispatchBindAction: (spellType: SpellType): SpellEngineBindAction => ({
+                type: 'battle/spell-engine/bind',
+                spellType,
+                onTileHover: async () => {
+                    return;
+                },
+                onTileClick: async () => { },
+            })
+        });
+
+        dispatchBindAction('move');
     };
 
     return <div ref={el => el && onMount(el)} style={{

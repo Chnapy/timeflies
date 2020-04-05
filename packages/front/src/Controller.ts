@@ -1,18 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { applyMiddleware, createStore, Store } from 'redux';
-import { createLogger } from 'redux-logger';
+import { createStore, Store } from 'redux';
 import { ActionManager } from './action/ActionManager';
 import { GameAction, IGameAction } from './action/GameAction';
 import { App } from './App';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
 import { IController } from './IController';
+import { serviceDispatch } from './services/serviceDispatch';
 import { WSClient } from './socket/WSClient';
 import { StageManager } from './stages/StageManager';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
-import { serviceDispatch } from './services/serviceDispatch';
 
 if (process.env.NODE_ENV === 'test') {
     throw new Error(`Controller should not be used in 'test' env.`);
@@ -21,13 +20,8 @@ if (process.env.NODE_ENV === 'test') {
 export interface AppResetAction extends IGameAction<'app/reset'> {
 }
 
-const logger = createLogger({
-    collapsed: true
-});
-
 const store: Store<UIState, GameAction> = createStore<UIState, GameAction, any, any>(
-    RootReducer,
-    applyMiddleware(logger)
+    RootReducer
 );
 let client: WSClient;
 let gameCanvas: GameCanvas;
@@ -46,6 +40,7 @@ const onAppMount = (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void =
     stageManager = StageManager();
 };
 
+// TODO add init fn to handle story & test context
 export const Controller: IController = {
 
     start(container, websocketCreator) {

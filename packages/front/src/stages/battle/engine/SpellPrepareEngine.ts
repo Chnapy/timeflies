@@ -6,16 +6,16 @@ import { Character } from '../entities/character/Character';
 import { Spell } from '../entities/spell/Spell';
 import { MapManager } from '../map/MapManager';
 import { EngineCreator, SpellEngineBindAction } from './Engine';
-import { SpellPrepareMove } from "./spellEngine/move/SpellPrepareMove";
+import { getSpellPrepareSubEngine } from './spellMapping';
 
-export interface SpellPrepareSubEngine {
-    onTileHover(tilePos: Position, tileType: TileType): Promise<void>;
+export interface SpellPrepareSubEngine<HR> {
+    onTileHover(tilePos: Position, tileType: TileType): Promise<HR>;
     onTileClick(tilePos: Position, tileType: TileType): Promise<void>;
     stop(): void;
 }
 
-export interface SpellPrepareSubEngineCreator {
-    (spell: Spell, mapManager: MapManager): SpellPrepareSubEngine;
+export interface SpellPrepareSubEngineCreator<HR> {
+    (spell: Spell, mapManager: MapManager): SpellPrepareSubEngine<HR>;
 }
 
 type Event =
@@ -23,14 +23,6 @@ type Event =
     | BStateSpellLaunchAction
     | BStateResetAction
     | BStateTurnStartAction;
-
-const SpellPrepareMap: Record<SpellType, SpellPrepareSubEngineCreator> = {
-    move: SpellPrepareMove,
-    orientate: SpellPrepareMove,
-    sampleSpell1: SpellPrepareMove,
-    sampleSpell2: SpellPrepareMove,
-    sampleSpell3: SpellPrepareMove,
-};
 
 const extractDataFromEvent = (event: Event): { character: Character; spell: Spell } => {
     const { globalTurn } = serviceBattleData('cycle');
@@ -53,7 +45,11 @@ const extractDataFromEvent = (event: Event): { character: Character; spell: Spel
             };
         case 'SPELL-PREPARE':
 
-            const character2 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const currentChar1 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const character2 = assertThenGet(
+                characters.find(c => c.id === currentChar1.id),
+                assertIsDefined
+            );
 
             const spell2 = assertThenGet(
                 character2.spells.find(s => s.staticData.type === event.payload.spellType),
@@ -66,7 +62,11 @@ const extractDataFromEvent = (event: Event): { character: Character; spell: Spel
             };
         case 'SPELL-LAUNCH':
 
-            const character3 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const currentChar2 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const character3 = assertThenGet(
+                characters.find(c => c.id === currentChar2.id),
+                assertIsDefined
+            );
 
             const spell3 = character3.defaultSpell;
 
@@ -77,16 +77,14 @@ const extractDataFromEvent = (event: Event): { character: Character; spell: Spel
     }
 };
 
-export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]> = (
+export const SpellPrepareEngine: EngineCreator<Event, [ typeof getSpellPrepareSubEngine ]> = (
     {
         event,
-
         deps: {
             mapManager
         }
     },
-
-    spellPrepareMap: Record<SpellType, SpellPrepareSubEngineCreator> = SpellPrepareMap
+    getSubEngine: typeof getSpellPrepareSubEngine = getSpellPrepareSubEngine
 ) => {
     const { spell } = extractDataFromEvent(event);
 
@@ -94,30 +92,30 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof SpellPrepareMap ]
 
     assertIsDefined(globalTurn);
 
-    const engine = spellPrepareMap[ spell.staticData.type ](spell, mapManager);
+    const engine = getSubEngine( spell.staticData.type )(spell, mapManager);
 
-    const ifCanSpellBeUsed = <F extends SpellPrepareSubEngine[ 'onTileHover' | 'onTileClick' ]>(
-        fct: F
-    ) => async (tilePos: Position): Promise<void> => {
+    const ifCanSpellBeUsed = <F extends SpellPrepareSubEngine<any>>(
+        fct: F[ 'onTileHover' ]
+    ) => async (tilePos: Position) => {
         const remainingTime = globalTurn.currentTurn.getRemainingTime('future');
         if (remainingTime >= spell.feature.duration) {
 
             const tileType = mapManager.tiledManager.getTileType(tilePos);
 
-            await fct(tilePos, tileType);
-        }
+            return await fct(tilePos, tileType);
+        } 
     };
 
     const { dispatchBind } = serviceDispatch({
-        dispatchBind: (): SpellEngineBindAction => ({
+        dispatchBind: (spellType: SpellType): SpellEngineBindAction => ({
             type: 'battle/spell-engine/bind',
-
+            spellType,
             onTileHover: ifCanSpellBeUsed(engine.onTileHover),
             onTileClick: ifCanSpellBeUsed(engine.onTileClick),
         })
     });
 
-    dispatchBind();
+    dispatchBind(spell.staticData.type);
 
     return {
         stop() {

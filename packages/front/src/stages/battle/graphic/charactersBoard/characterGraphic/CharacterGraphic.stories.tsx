@@ -1,4 +1,4 @@
-import { Orientation, switchUtil, TiledManager } from '@timeflies/shared';
+import { Orientation, Position, switchUtil, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { AssetLoader } from '../../../../../assetManager/AssetLoader';
@@ -67,12 +67,13 @@ export const Current: React.FC = () => {
         const waitByTime = (ms: number) => new Promise(r => setTimeout(r, ms));
 
         const { dispatchTimerStart, dispatchTimerEnd } = serviceDispatch({
-            dispatchTimerStart: (duration: number): SpellActionTimerStartAction => ({
+            dispatchTimerStart: (position: Position, duration: number): SpellActionTimerStartAction => ({
                 type: 'battle/spell-action/start',
                 spellActionSnapshot: {
                     battleHash: '',
+                    characterId: character.id,
                     duration,
-                    position: character.position,
+                    position,
                     spellId: character.defaultSpell.id,
                     startTime: Date.now(),
                     validated: false
@@ -81,7 +82,16 @@ export const Current: React.FC = () => {
             dispatchTimerEnd: (): SpellActionTimerEndAction => ({
                 type: 'battle/spell-action/end',
                 correctHash: '',
-                removed: false
+                removed: false,
+                spellActionSnapshot: {
+                    battleHash: '',
+                    characterId: character.id,
+                    duration: -1,
+                    position: character.position,
+                    spellId: character.defaultSpell.id,
+                    startTime: Date.now(),
+                    validated: false
+                }
             })
         });
 
@@ -107,17 +117,19 @@ export const Current: React.FC = () => {
                 }
             });
 
-            character.set({
-                position: {
-                    x: character.position.x + diffPos.x,
-                    y: character.position.y + diffPos.y,
-                },
-                orientation
-            });
+            const position = {
+                x: character.position.x + diffPos.x,
+                y: character.position.y + diffPos.y,
+            };
 
-            dispatchTimerStart(500);
+            dispatchTimerStart(position, 500);
 
             await waitByTime(500);
+
+            character.set({
+                position,
+                orientation
+            });
 
             dispatchTimerEnd();
         };

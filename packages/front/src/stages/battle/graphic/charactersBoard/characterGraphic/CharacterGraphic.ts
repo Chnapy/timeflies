@@ -1,4 +1,4 @@
-import { Position, SpellActionSnapshot, switchUtil } from '@timeflies/shared';
+import { Position, SpellActionSnapshot, switchUtil, assertIsDefined, getOrientationFromTo } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { BattleDataPeriod } from '../../../../../BattleData';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
@@ -73,10 +73,12 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
 
     const onMoveAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot) => {
 
+        const orientation = getOrientationFromTo(character.position, endPosition);
+        
         animatedSprite
             .setProps({
                 characterState: 'walk',
-                orientation: character.orientation
+                orientation
             })
             .play();
 
@@ -100,7 +102,12 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
     };
 
     onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({
+        spellActionSnapshot: { characterId }
     }) => {
+        if (characterId !== character.id) {
+            return;
+        }
+
         ticker.destroy();
 
         const { x, y } = tiledMapGraphic.getWorldFromTile(previousPosition);
@@ -108,6 +115,7 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
         animatedSprite
             .setProps({
                 characterState: 'idle',
+                orientation: character.orientation
             })
             .play();
     });
@@ -115,13 +123,15 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
     onAction<SpellActionTimerStartAction>('battle/spell-action/start', ({
         spellActionSnapshot,
         spellActionSnapshot: {
-            spellId, position: endPosition
+            characterId, spellId, position: endPosition
         }
     }) => {
-        const spell = character.spells.find(s => s.id === spellId);
-        if (!spell) {
+        if (characterId !== character.id) {
             return;
         }
+
+        const spell = character.spells.find(s => s.id === spellId);
+        assertIsDefined(spell);
 
         if (ticker?.started) {
             throw new Error('Spell action received while ticker running');
