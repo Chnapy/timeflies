@@ -1,11 +1,18 @@
 import { assertIsDefined, TiledMap, TiledMapAssets } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
-import { Loader, LoaderResource } from 'pixi.js';
+import { Loader as _Loader, LoaderResource } from 'pixi.js';
 import { IAddOptions, ImageLoadStrategy, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
 import { AppResetAction } from '../Controller';
 import { serviceEvent } from '../services/serviceEvent';
-import { MockLoadStrategy } from './AssetLoader.seed';
+
+export type AppLoader = Pick<_Loader,
+    | 'resources'
+    | 'add'
+    | 'use'
+    | 'load'
+    | 'reset'
+>;
 
 type ResourceMap = Partial<Record<string, LoaderResource>>;
 
@@ -32,6 +39,7 @@ export interface AssetLoader {
 }
 
 interface Dependencies {
+    getLoader: () => AppLoader;
     loadStrategy?: AbstractLoadStrategyCtor;
 }
 
@@ -42,12 +50,6 @@ interface LoaderInstance<O extends {}> {
     addSpritesheet<K extends keyof SpritesheetMap>(key: K, path: string): LoaderInstance<O & Pick<SpritesheetMap, K>>;
     load: () => Promise<O>;
 }
-
-// check in runtime if we're in test env, 
-// because of high level tests where it's not conveniant to inject the mock
-const initialDependencies: Dependencies = process.env.NODE_ENV === 'test'
-    ? { loadStrategy: MockLoadStrategy }
-    : {};
 
 const mapKey: AssetMapKey = 'map';
 const mapImageKeyPrefix = 'map:';
@@ -104,7 +106,7 @@ const getTiledMapAssets = (resources: ResourceMap, keys: string[]): TiledMapAsse
     };
 };
 
-const mapLoaderMiddleware = (loadStrategy: AbstractLoadStrategyCtor | undefined) => function (this: Loader, resource: Resource, next: () => void): void {
+const mapLoaderMiddleware = function (this: AppLoader, resource: Resource, next: () => void): void {
     if (!mapStringUtil.isMap(resource.name)) {
         return next();
     }
@@ -134,7 +136,7 @@ const mapLoaderMiddleware = (loadStrategy: AbstractLoadStrategyCtor | undefined)
             const loadOptions: IAddOptions = {
                 name,
                 url: baseUrl + image,
-                strategy: loadStrategy ?? ImageLoadStrategy,
+                strategy: ImageLoadStrategy,
                 parentResource: resource,
                 onComplete: onTilesetComplete,
             };
@@ -145,13 +147,13 @@ const mapLoaderMiddleware = (loadStrategy: AbstractLoadStrategyCtor | undefined)
     });
 };
 
-export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies): AssetLoader => {
+export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Loader.shared }): AssetLoader => {
 
     const { onAction } = serviceEvent();
 
-    const loader = Loader.shared;
+    const loader = getLoader();
 
-    loader.use(mapLoaderMiddleware(loadStrategy));
+    loader.use(mapLoaderMiddleware);
 
     onAction<AppResetAction>('app/reset', () => {
         loader.reset();
@@ -160,8 +162,7 @@ export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies
     const addResource = (name: string, url: string) => !loader.resources[ name ]
         ? loader.add({
             name,
-            url,
-            strategy: loadStrategy
+            url
         })
         : undefined;
 
@@ -170,7 +171,7 @@ export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies
         const this_: LoaderInstance<{}> = {
 
             use: <K extends AssetMapKey>(key: K) => {
-                if(!loader.resources[ key ]) {
+                if (!loader.resources[ key ]) {
                     throw new Error(`'${key}' is needed but not present in loaded resources`);
                 }
                 return this_ as LoaderInstance<Pick<AssetMap, K>>;
@@ -194,7 +195,7 @@ export const AssetLoader = ({ loadStrategy }: Dependencies = initialDependencies
 
             load: () => new Promise((resolve, reject) => {
 
-                loader.load((_: Loader, resources: ResourceMap) => {
+                loader.load((_: AppLoader, resources: ResourceMap) => {
                     const data: Partial<AssetMap> = {};
 
                     const keys = Object.keys(resources);

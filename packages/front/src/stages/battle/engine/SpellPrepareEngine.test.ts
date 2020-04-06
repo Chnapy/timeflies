@@ -90,8 +90,8 @@ describe('# SpellPrepareEngine', () => {
                     mapManager: seedMapManager('fake')
                 }
             },
-            {
-                move: (spell, mapManager): SpellPrepareSubEngine => {
+            spellType => ({
+                move: (spell, mapManager): SpellPrepareSubEngine<any> => {
 
                     return {
                         onTileHover,
@@ -99,7 +99,7 @@ describe('# SpellPrepareEngine', () => {
                         stop() {}
                     }
                 }
-            }
+            }[spellType])
         );
 
         const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
@@ -183,8 +183,8 @@ describe('# SpellPrepareEngine', () => {
                     mapManager: seedMapManager('fake')
                 }
             },
-            {
-                move: (spell, mapManager): SpellPrepareSubEngine => {
+            spellType => ({
+                move: (spell, mapManager): SpellPrepareSubEngine<any> => {
 
                     return {
                         onTileHover,
@@ -192,7 +192,7 @@ describe('# SpellPrepareEngine', () => {
                         stop(){}
                     }
                 }
-            }
+            }[spellType])
         );
 
         const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>

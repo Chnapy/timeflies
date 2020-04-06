@@ -1,19 +1,24 @@
 import { StoreTest } from '../../../StoreTest';
 import { MapManager } from './MapManager';
-import { Position, TiledManager } from '@timeflies/shared';
+import { Position, TiledManager, TimerTester } from '@timeflies/shared';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
 import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { TiledMapSeedKey, seedTiledMapAssets, seedTiledConfig } from './TiledMap.seed';
+import { BStateAction } from '../battleState/BattleStateSchema';
 
 describe('# MapManager', () => {
 
+    const timerTester = new TimerTester();
+
     beforeEach(() => {
         StoreTest.beforeTest();
+        timerTester.beforeTest();
     });
 
     afterEach(() => {
         StoreTest.afterTest();
+        timerTester.afterTest();
     });
 
     const getManager = ({ mapKey, tiledManagerCreator, pathfinderCreator }: {
@@ -22,12 +27,14 @@ describe('# MapManager', () => {
         pathfinderCreator?: typeof Pathfinder;
     }): MapManager => {
 
+        const charactersFuture = [ seedCharacter('fake', { id: '1', player: null }) ];
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
                 battleData: {
                     future: {
-                        characters: [ seedCharacter('fake', { id: '1', player: null }) ]
+                        characters: charactersFuture
                     }
                 } as any
             }
@@ -44,7 +51,8 @@ describe('# MapManager', () => {
                 pathfinderCreator: pathfinderCreator ?? (() => ({
                     refreshGrid: () => { },
                     calculatePath: () => ({ promise: Promise.resolve([]), cancel: () => true })
-                }))
+                })),
+                getFutureCharacters: () => charactersFuture
             }
         );
     };
@@ -78,7 +86,7 @@ describe('# MapManager', () => {
         const manager = getManager({ mapKey: 'map_1', pathfinderCreator });
     });
 
-    it('should call pathfinder#refreshGrid on creation', () => {
+    it('should refresh pathfinder on creation', () => {
 
         const refreshGrid = jest.fn();
 
@@ -92,7 +100,7 @@ describe('# MapManager', () => {
         expect(refreshGrid).toHaveBeenCalled();
     });
 
-    it('should call pathfinder#refreshGrid on refreshPathfinder()', () => {
+    it('should refresh pathfinder on refreshPathfinder()', () => {
 
         const refreshGrid = jest.fn();
 
@@ -106,6 +114,37 @@ describe('# MapManager', () => {
         manager.refreshPathfinder();
 
         expect(refreshGrid).toHaveBeenCalledTimes(2);
+    });
+
+    it('should refresh pathfinder on spell launch action', () => {
+
+        let nbrCalls = 0;
+
+        const refreshGrid = jest.fn(() => nbrCalls++);
+
+        const manager = getManager({
+            mapKey: 'map_1',
+            pathfinderCreator: () => ({
+                refreshGrid
+            } as any)
+        });
+
+        const prevNbrCalls = nbrCalls;
+
+        StoreTest.dispatch<BStateAction>({
+            type: 'battle/state/event',
+            eventType: 'SPELL-LAUNCH',
+            payload: {
+                spellActions: []
+            }
+        });
+
+        expect(nbrCalls).toBe(prevNbrCalls);
+
+        timerTester.immediates.runAll();
+
+        expect(nbrCalls).toBe(prevNbrCalls + 1);
+
     });
 
 });

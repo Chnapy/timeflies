@@ -37,6 +37,7 @@ describe('# SpellActionTimer', () => {
             battleHash: '',
             duration: 200,
             position: { x: -1, y: -1 },
+            characterId: '1',
             spellId: '',
             startTime: timerTester.now + 100,
             validated: false
@@ -64,6 +65,7 @@ describe('# SpellActionTimer', () => {
             battleHash: '',
             duration: 200,
             position: { x: -1, y: -1 },
+            characterId: '1',
             spellId: '',
             startTime: timerTester.now,
             validated: false
@@ -88,6 +90,7 @@ describe('# SpellActionTimer', () => {
                     battleHash: '',
                     duration: 200,
                     position: { x: -1, y: -1 },
+                    characterId: '1',
                     spellId: '',
                     startTime: timerTester.now,
                     validated: false
@@ -116,6 +119,7 @@ describe('# SpellActionTimer', () => {
             battleHash: '-hash-',
             duration: 200,
             position: { x: -1, y: -1 },
+            characterId: '1',
             spellId: '',
             startTime: timerTester.now,
             validated: false
@@ -130,7 +134,8 @@ describe('# SpellActionTimer', () => {
         ).toContainEqual<SpellActionTimerEndAction>({
             type: 'battle/spell-action/end',
             removed: false,
-            correctHash: '-hash-'
+            correctHash: '-hash-',
+            spellActionSnapshot: snapshot
         });
     });
 
@@ -156,6 +161,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
                 validated: false
@@ -164,6 +170,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
                 validated: false
@@ -182,6 +189,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
                 validated: false
@@ -211,6 +219,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
                 validated: false
@@ -219,6 +228,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
                 validated: false
@@ -232,6 +242,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
                 validated: false
@@ -265,6 +276,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
                 validated: false
@@ -273,6 +285,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
                 validated: false
@@ -286,6 +299,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
                 validated: false
@@ -297,7 +311,16 @@ describe('# SpellActionTimer', () => {
         ).toContainEqual<SpellActionTimerEndAction>({
             type: 'battle/spell-action/end',
             removed: true,
-            correctHash: '-hash0-'
+            correctHash: '-hash0-',
+            spellActionSnapshot: {
+                battleHash: '-hash1-',
+                duration: 200,
+                position: { x: -1, y: -1 },
+                characterId: '1',
+                spellId: '',
+                startTime: timerTester.now,
+                validated: false
+            }
         });
     });
 
@@ -323,6 +346,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
                 validated: false
@@ -331,6 +355,7 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
                 validated: false
@@ -341,11 +366,14 @@ describe('# SpellActionTimer', () => {
 
         timerTester.advanceBy(300);
 
+        StoreTest.clearActions();
+
         timer.onRemove([
             {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                characterId: '1',
                 spellId: '',
                 startTime: timerTester.now - 300,
                 validated: false
@@ -357,7 +385,16 @@ describe('# SpellActionTimer', () => {
         ).toContainEqual<SpellActionTimerEndAction>({
             type: 'battle/spell-action/end',
             removed: true,
-            correctHash: '-hash0-'
+            correctHash: '-hash0-',
+            spellActionSnapshot: {
+                battleHash: '-hash1-',
+                duration: 200,
+                position: { x: -1, y: -1 },
+                characterId: '1',
+                spellId: '',
+                startTime: timerTester.now - 300,
+                validated: false
+            }
         });
     });
 });

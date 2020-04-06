@@ -8,11 +8,10 @@ export interface SpellActionTimerStartAction extends IGameAction<'battle/spell-a
     spellActionSnapshot: SpellActionSnapshot;
 }
 
-// TODO remove 'correctHash', hash is already in snapshot
 export interface SpellActionTimerEndAction extends IGameAction<'battle/spell-action/end'> {
     spellActionSnapshot: SpellActionSnapshot;
     removed: boolean;
-    correctHash: string;
+    correctHash: string;    // may be not the same as the snapshot one
 }
 
 export type SpellActionTimerAction =
@@ -100,11 +99,9 @@ export const SpellActionTimer = (): SpellActionTimer => {
         }
     };
 
-    const removeSpellAction = (correctHash: string) => {
+    const removeSpellAction = (snapshot: SpellActionSnapshot, correctHash: string) => {
 
-        assertIsDefined(currentSpellAction);
-
-        dispatchEnd(currentSpellAction, true, correctHash);
+        dispatchEnd(snapshot, true, correctHash);
 
         clearSpellAction();
     };
@@ -124,7 +121,7 @@ export const SpellActionTimer = (): SpellActionTimer => {
             );
 
             if (currentOrPassedSnapshot) {
-                removeSpellAction(correctHash);
+                removeSpellAction(currentOrPassedSnapshot, correctHash);
             }
         }
     };

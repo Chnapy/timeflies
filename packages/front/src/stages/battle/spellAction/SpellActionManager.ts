@@ -23,8 +23,8 @@ interface Dependencies {
 
 const assertSameHash = (hash1: string, hash2: string): void | never => {
     if (hash1 !== hash2) {
-        throw new Error(`Hashs should be equal [${hash1}]<->[${hash2}].
-        There is an inconsistence front<->back.`);
+        throw new Error(`Hashes should be equal [${hash1}]<->[${hash2}].
+        There is an inconsistency front<->back.`);
     }
 };
 

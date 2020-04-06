@@ -14,11 +14,10 @@ describe('# StageManager', () => {
 
     it('should init with boot stage', async () => {
 
-        const preload = jest.fn(() => ({}));
+        const preload = jest.fn(() => Promise.resolve({}));
         const create = jest.fn();
 
-        const bootFn = jest.fn((): Stage<never> => ({
-            graphic: { getContainer() { return null as any } },
+        const bootFn = jest.fn((): Stage<'boot', never> => ({
             preload,
             create
         }));
@@ -41,19 +40,17 @@ describe('# StageManager', () => {
 
     it('should change stage on action and load its assets', async () => {
 
-        const bootFn = jest.fn((): Stage<never> => ({
-            graphic: { getContainer() { return null as any } },
-            preload() { return {} },
-            create() { }
+        const bootFn = jest.fn((): Stage<'boot', never> => ({
+            preload() { return Promise.resolve({}) },
+            create() { return Promise.resolve(); }
         }));
         const create = jest.fn();
-        const loadFn = jest.fn((): Stage<never> => ({
-            graphic: { getContainer() { return null as any } },
+        const loadFn = jest.fn((): Stage<'load', any> => ({
             preload() {
-                return {
+                return Promise.resolve({
                     'test1': 'test1',
                     'test2': 'test2',
-                };
+                });
             },
             create
         }));
@@ -82,7 +79,7 @@ describe('# StageManager', () => {
             // note: only keys should be checked here, value doesn't matter
             'test1': 'test1',
             'test2': 'test2',
-        });
+        }, expect.anything());
     });
 
 });

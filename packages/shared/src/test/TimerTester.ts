@@ -26,6 +26,10 @@ export class TimerTester {
         jest.advanceTimersByTime(msToRun);
     }
 
+    immediates = {
+        runAll: () => jest.runAllImmediates()
+    } as const;
+
     afterTest(): void {
         jest.clearAllTimers();
         jest.useRealTimers();

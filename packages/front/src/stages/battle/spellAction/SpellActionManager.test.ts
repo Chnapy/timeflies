@@ -1,12 +1,12 @@
-import { StoreTest } from '../../../StoreTest';
-import { TimerTester, SpellActionSnapshot, ConfirmSAction, NotifySAction } from '@timeflies/shared';
+import { ConfirmSAction, NotifySAction, SpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { BattleDataCurrent, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { ReceiveMessageAction } from '../../../socket/WSClient';
+import { StoreTest } from '../../../StoreTest';
 import { BStateSpellLaunchAction, BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
-import { Spell } from '../entities/spell/Spell';
+import { seedCharacter } from '../entities/character/Character.seed';
+import { seedSpell } from '../entities/spell/Spell.seed';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from './SpellActionManager';
-import { BattleDataCurrent, BattleDataFuture, BattleDataCycle } from '../../../BattleData';
-import { seedCharacter } from '../entities/character/Character.seed';
 
 describe('# SpellActionManager', () => {
 
@@ -73,10 +73,19 @@ describe('# SpellActionManager', () => {
 
     const rollbackInit = () => {
 
-        const { startTime, spellActionSnapshotList, currentBattleData, futureBattleData } = init();
+        const { startTime, spellActionSnapshotList, currentBattleData, futureBattleData, currentCharacter } = init();
 
         const firstHash = 'firstHash';
         futureBattleData.battleHash = firstHash;
+
+        const spell = seedSpell('fake', {
+            id: 's1',
+            character: currentCharacter,
+            type: 'move',
+            initialFeatures: {
+                duration: 200
+            }
+        });
 
         StoreTest.dispatch<BStateSpellLaunchAction>({
             type: 'battle/state/event',
@@ -84,16 +93,7 @@ describe('# SpellActionManager', () => {
             payload: {
                 spellActions: [
                     {
-                        spell: {
-                            id: 's1',
-                            staticData: {
-                                id: 's1',
-                                type: 'move'
-                            },
-                            feature: {
-                                duration: 200
-                            }
-                        } as Spell,
+                        spell,
                         position: { x: -1, y: -1 }
                     }
                 ]
@@ -109,16 +109,7 @@ describe('# SpellActionManager', () => {
             payload: {
                 spellActions: [
                     {
-                        spell: {
-                            id: 's1',
-                            staticData: {
-                                id: 's1',
-                                type: 'move'
-                            },
-                            feature: {
-                                duration: 200
-                            }
-                        } as Spell,
+                        spell,
                         position: { x: 0, y: -1 }
                     }
                 ]
@@ -147,9 +138,18 @@ describe('# SpellActionManager', () => {
 
     it('should catch spell action, then commit', () => {
 
-        const { startTime, spellActionSnapshotList, futureBattleData } = init();
+        const { startTime, spellActionSnapshotList, futureBattleData, currentCharacter } = init();
 
         futureBattleData.battleHash = '-hash-';
+
+        const spell = seedSpell('fake', {
+            id: 's1',
+            character: currentCharacter,
+            type: 'move',
+            initialFeatures: {
+                duration: 200
+            }
+        });
 
         StoreTest.dispatch<BStateSpellLaunchAction>({
             type: 'battle/state/event',
@@ -157,16 +157,7 @@ describe('# SpellActionManager', () => {
             payload: {
                 spellActions: [
                     {
-                        spell: {
-                            id: 's1',
-                            staticData: {
-                                id: 's1',
-                                type: 'move'
-                            },
-                            feature: {
-                                duration: 200
-                            }
-                        } as Spell,
+                        spell,
                         position: { x: -1, y: -1 }
                     }
                 ]
@@ -177,6 +168,7 @@ describe('# SpellActionManager', () => {
             startTime,
             duration: 200,
             battleHash: '-hash-',
+            characterId: '1',
             spellId: 's1',
             position: { x: -1, y: -1 },
             validated: false
@@ -284,6 +276,7 @@ describe('# SpellActionManager', () => {
                     startTime,
                     duration: spell.feature.duration,
                     battleHash: '-hash-',
+                    characterId: '1',
                     spellId: spell.id,
                     position: { x: -1, y: -1 },
                     validated: false
@@ -295,6 +288,7 @@ describe('# SpellActionManager', () => {
             startTime,
             duration: spell.feature.duration,
             battleHash: '-hash-',
+            characterId: '1',
             spellId: spell.id,
             position: { x: -1, y: -1 },
             validated: false

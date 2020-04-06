@@ -1,3 +1,4 @@
+import './StoreTest';
 
 //
 // Mock Canvas / Context2D calls

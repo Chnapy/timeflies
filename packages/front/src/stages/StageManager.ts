@@ -77,8 +77,6 @@ export const StageManager = ({ stageCreators }: Dependencies = {
 
         console.log('Stage change:', stageKey);
 
-        const assetsToLoad = currentStage.preload();
-
         const assets = await currentStage.preload();
 
         await currentStage.create(assets, dispatchStageOnCreateGraphic);

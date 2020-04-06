@@ -1,4 +1,6 @@
-import { AssetLoader } from './AssetLoader';
+import { AppLoader, AssetLoader } from './AssetLoader';
+import { seedTiledMapAssets } from '../stages/battle/map/TiledMap.seed';
+import { ImageLoadStrategy } from 'resource-loader';
 
 
 /**
@@ -6,62 +8,130 @@ import { AssetLoader } from './AssetLoader';
  */
 describe('# AssetLoader', () => {
 
-    const generateAssetLoader = () => AssetLoader();
-
-    it('should correctly load an image', async () => {
-        const loader = generateAssetLoader();
-
-        const { sampleImage } = await loader.newInstance()
-            .add('sampleImage', 'image.png')
-            .load();
-
-        expect(sampleImage).toHaveProperty('src');
-    });
-
-    it('should correctly load a json', async () => {
-        const loader = generateAssetLoader();
-
-        const { sampleJSON } = await loader.newInstance()
-            .add('sampleJSON', 'schema.json')
-            .load();
-
-        expect(sampleJSON).toEqual({ version: 4 });
+    const generateAssetLoader = (loader: Partial<AppLoader> = {}) => AssetLoader({
+        getLoader: () => ({
+            add() { return this as any; },
+            use() { return this as any; },
+            resources: {},
+            load(cb) {
+                cb && cb(this as any, {})
+                return this as any;
+            },
+            reset() { return this as any; },
+            ...loader
+        })
     });
 
     it('should correctly load a tilemap', async () => {
-        const loader = generateAssetLoader();
+        const resources = {};
+
+        const addFn = jest.fn(props => {
+            resources[ props.name ] = true;
+            return null as any;
+        });
+
+        let mapMiddleware;
+
+        const useFn = jest.fn((middleware) => {
+            mapMiddleware = middleware;
+            return null as any;
+        });
+
+        const assets = seedTiledMapAssets('map_1');
+
+        const loaderProps = {
+            resources,
+            add: addFn,
+            use: useFn,
+
+            load: jest.fn(cb => {
+
+                mapMiddleware.bind(loaderProps)({
+                    name: 'map',
+                    url: 'http://placeholder.com/map.json',
+                    data: assets.schema
+                }, () => { });
+
+                cb && cb(null as any, {
+                    map: {
+                        data: assets.schema
+                    } as any,
+                    'map:map': {
+                        data: document.createElement('img')
+                    } as any
+                });
+
+                return null as any;
+            })
+        };
+
+        const loader = generateAssetLoader(loaderProps);
 
         const { map } = await loader.newInstance()
             .add('map', 'schema.json')
             .load();
 
+        expect(addFn).toHaveBeenCalledWith(
+            expect.objectContaining({
+                name: 'map:map',
+                url: 'http://placeholder.com/map.png',
+                strategy: ImageLoadStrategy
+            })
+        );
+
         expect(map.schema).toHaveProperty('tilesets');
 
         expect(map.images).toHaveProperty('map');
         expect(map.images.map).toHaveProperty('src');
-
-        expect(map.images).toHaveProperty('map_2');
-        expect(map.images.map_2).toHaveProperty('src');
     });
 
     it.todo('should correctly load a spritesheet');
 
     it('should correctly load multiple resources in the same time', async () => {
-        const loader = generateAssetLoader();
+        const resources = {};
 
-        const { sampleJSON, sampleImage } = await loader.newInstance()
+        const addFn = jest.fn(props => {
+            resources[ props.name ] = true;
+            return null as any;
+        });
+
+        const loaderProps = {
+            resources,
+            add: addFn,
+
+            load: jest.fn(cb => {
+
+                cb && cb(null as any, {
+                });
+
+                return null as any;
+            })
+        };
+
+        const loader = generateAssetLoader(loaderProps);
+
+        await loader.newInstance()
             .addMultiple({
                 sampleImage: 'image.png',
                 sampleJSON: 'schema.json'
             })
             .load();
 
-        expect(sampleImage).toHaveProperty('src');
-        expect(sampleJSON).toEqual({ version: 4 });
+        expect(addFn).toHaveBeenCalledWith({ name: 'sampleImage', url: 'image.png' });
+        expect(addFn).toHaveBeenCalledWith({ name: 'sampleJSON', url: 'schema.json' });
     });
 
-    it('should failed if one of multiple resources loading failed', async () => {
-        const loader = generateAssetLoader();
+    it('should fail if one of multiple resources loading failed', async () => {
+        const loader = generateAssetLoader({
+            load(cb) {
+                cb && cb(null as any, {
+                    sampleImage: {
+                        error: new Error()
+                    } as any
+                });
+                return null as any;
+            }
+        });
 
         await expect(
             loader.newInstance()
@@ -71,17 +141,35 @@ describe('# AssetLoader', () => {
     });
 
     it('should just return requested asset if already loaded', async () => {
-        const loader = generateAssetLoader();
 
-        const { sampleJSON } = await loader.newInstance()
+        const resources = {};
+
+        const addFn = jest.fn(props => {
+            resources[ props.name ] = true;
+            return null as any;
+        });
+
+        const loader = generateAssetLoader({
+            resources,
+            add: addFn,
+            load: jest.fn(cb => {
+                cb && cb(null as any, {
+                    sampleJSON: {
+                        data: ''
+                    } as any
+                });
+                return null as any;
+            })
+        });
+
+        await loader.newInstance()
             .add('sampleJSON', 'schema.json')
             .load();
 
-        const { sampleJSON: sampleJSON2 } = await loader.newInstance()
+        await loader.newInstance()
             .add('sampleJSON', 'schema.json')
             .load();
 
-        expect(sampleJSON2).toHaveProperty('version');
-        expect(sampleJSON2).toBe(sampleJSON);
+        expect(addFn).toHaveBeenCalledTimes(1);
     });
 });
