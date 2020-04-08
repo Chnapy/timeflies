@@ -6,75 +6,120 @@ import { GameAction, IGameAction } from './action/GameAction';
 import { App } from './App';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
-import { IController } from './IController';
 import { serviceDispatch } from './services/serviceDispatch';
-import { WSClient } from './socket/WSClient';
+import { WSClient, WebSocketCreator } from './socket/WSClient';
 import { StageManager } from './stages/StageManager';
 import { RootReducer } from './ui/reducers/RootReducer';
 import { UIState } from './ui/UIState';
 
-if (process.env.NODE_ENV === 'test') {
-    throw new Error(`Controller should not be used in 'test' env.`);
-}
-
 export interface AppResetAction extends IGameAction<'app/reset'> {
 }
 
-const store: Store<UIState, GameAction> = createStore<UIState, GameAction, any, any>(
-    RootReducer
-);
-let client: WSClient;
-let gameCanvas: GameCanvas;
-let app: App;
-const actionManager = ActionManager(store.dispatch);
-let loader: AssetLoader;
-let stageManager: StageManager;
+export interface ControllerProps {
+    websocketCreator?: WebSocketCreator;
+    initialState?: UIState;
+}
 
-const onAppMount = (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void => {
+export interface ControllerStarter {
+    start(container: Element): Promise<void>;
+}
 
-    gameCanvas = GameCanvas(
-        canvas,
-        gameWrapper
-    );
+interface ControllerResources {
+    store?: Store<UIState, GameAction>;
+    client?: WSClient;
+    gameCanvas?: GameCanvas;
+    app?: App;
+    actionManager?: ActionManager;
+    loader?: AssetLoader;
+    stageManager?: StageManager;
+}
 
-    stageManager = StageManager();
+const checkEnv = () => {
+    if (process.env.NODE_ENV === 'test') {
+        throw new Error(`Controller should not be used in 'test' env.`);
+    }
 };
 
-// TODO add init fn to handle story & test context
-export const Controller: IController = {
+const getResource = <K extends keyof ControllerResources>(key: K): NonNullable<ControllerResources[ K ]> => {
 
-    start(container, websocketCreator) {
+    checkEnv();
 
-        loader = AssetLoader();
+    if (!controllerResources || !controllerResources[ key ]) {
+        throw new Error(`Controller resource [${key}] not present`);
+    }
+    return controllerResources[ key ]!;
+};
 
-        client = WSClient(websocketCreator && { websocketCreator });
+let controllerResources: ControllerResources | null = null;
 
-        if (container) {
-            app = ReactDOM.render(
-                React.createElement(App, {
-                    store,
-                    onMount: onAppMount
-                }),
-                container
-            );
+export const Controller = {
+
+    init({ initialState, websocketCreator }: ControllerProps = {}): ControllerStarter {
+
+        checkEnv();
+
+        if (controllerResources) {
+            Controller.reset();
         }
+
+        const resources: ControllerResources = {};
+        controllerResources = resources;
+
+        resources.store = createStore<UIState, GameAction, any, any>(
+            RootReducer,
+            initialState
+        );
+        resources.actionManager = ActionManager(getResource('store').dispatch);
+
+        resources.client = WSClient(websocketCreator && { websocketCreator });
+        resources.loader = AssetLoader();
+
+        return {
+            start(container: Element): Promise<void> {
+
+                return new Promise(resolve => {
+
+                    resources.app = ReactDOM.render(
+                        React.createElement(App, {
+                            store: getResource('store'),
+                            onMount: (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void => {
+
+                                resources.gameCanvas = GameCanvas(
+                                    canvas,
+                                    gameWrapper
+                                );
+
+                                resources.stageManager = StageManager();
+
+                                resolve();
+                            }
+                        }),
+                        container
+                    );
+                });
+            }
+        };
     },
 
-    getStore() {
-        return store;
+    getStore(): Store<UIState, GameAction> {
+        return getResource('store');
     },
 
-    waitConnect() {
-        return client.waitConnect();
+    waitConnect(): Promise<void> {
+        return getResource('client').waitConnect();
     },
 
-    actionManager,
-
-    get loader() {
-        return loader;
+    get actionManager(): ActionManager {
+        return getResource('actionManager');
     },
 
-    reset() {
+    get loader(): AssetLoader {
+        return getResource('loader');
+    },
+
+    reset(): void {
+        checkEnv();
+
         const { dispatchReset } = serviceDispatch({
             dispatchReset: (): AppResetAction => ({
                 type: 'app/reset'

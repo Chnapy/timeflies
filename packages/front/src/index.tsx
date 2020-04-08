@@ -1,3 +1,5 @@
 import { Controller } from './Controller';
 
-Controller.start(document.getElementById('root')!);
+Controller
+    .init()
+    .start(document.getElementById('root')!);

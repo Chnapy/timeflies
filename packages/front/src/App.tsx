@@ -26,25 +26,27 @@ export class App extends React.Component<AppProps> {
     render(): React.ReactElement {
         const { store } = this.props;
 
-        return <Provider store={store}>
-            <div>
+        return <React.StrictMode>
+            <Provider store={store}>
+                <div>
 
-                <div ref={this.gameWrapperRef} style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    height: '100vh',
-                    // minHeight: '400px',
-                    width: '100vw',
-                    // minWidth: '600px'
-                }}>
-                    <canvas/>
+                    <div ref={this.gameWrapperRef} style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        height: '100vh',
+                        // minHeight: '400px',
+                        width: '100vw',
+                        // minWidth: '600px'
+                    }}>
+                        <canvas />
                     </div>
 
-                <UI /> 
+                    <UI />
 
-            </div>
-        </Provider>;
+                </div>
+            </Provider>
+        </React.StrictMode>;
     }
 
     componentDidMount(): void {

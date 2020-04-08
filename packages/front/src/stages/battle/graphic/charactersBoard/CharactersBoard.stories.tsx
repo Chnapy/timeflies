@@ -1,13 +1,11 @@
 import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
-import { createStore, Store } from 'redux';
-import { GameAction } from '../../../../action/GameAction';
+import { StoryProps } from '../../../../../.storybook/preview';
 import { AssetLoader } from '../../../../assetManager/AssetLoader';
 import { BattleDataPeriod } from '../../../../BattleData';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { Controller } from '../../../../Controller';
-import { RootReducer } from '../../../../ui/reducers/RootReducer';
 import { UIState } from '../../../../ui/UIState';
 import mapPath from '../../../../_assets/map/map.json';
 import charactersSpritesheetPath from '../../../../_assets/spritesheets/sokoban.json';
@@ -23,8 +21,7 @@ export default {
     component: CharactersBoard
 };
 
-const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
-    Controller.reset();
+const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ websocketCreator, period }) => {
 
     const characters = [
         seedCharacter('real', {
@@ -53,12 +50,10 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
         }
     };
 
-    const store: Store<UIState, GameAction> = createStore<UIState, GameAction, any, any>(
-        RootReducer,
+    Controller.init({
+        websocketCreator,
         initialState
-    );
-
-    (Controller.getStore as any) = () => store;
+    });
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -70,11 +65,8 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
             .add('map', mapPath)
             .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
-
-        console.log(resources)
-
+aaa
         const sheet = resources.characters;
-        console.log(sheet);
 
         const mapAssets = resources.map;
 
@@ -110,6 +102,6 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
     </div>;
 };
 
-export const Current: React.FC = () => <Render period='current' />;
+export const Current: React.FC<StoryProps> = (props) => <Render {...props} period='current' />;
 
-export const Future: React.FC = () => <Render period='future' />;
+export const Future: React.FC<StoryProps> = (props) => <Render {...props} period='future' />;

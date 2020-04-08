@@ -1,78 +1,34 @@
 import { BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, MatchmakerClientAction, ServerAction } from '@timeflies/shared';
 import React from 'react';
-import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../../../socket/WSClient';
 import mapPath from '../../../_assets/map/map.json';
 import { seedTeamSnapshot } from '../entities/team/Team.seed';
+import { StoryProps } from '../../../../.storybook/preview';
 
 export default {
     title: 'Battleflow'
 };
 
-class MockWebSocket implements WebSocket {
-    prototype: any;
+export const Default: React.FC<StoryProps> = ({controllerStart}) => {
 
-    readonly CLOSED: any;
-    readonly CLOSING: any;
-    readonly CONNECTING: any;
-    readonly OPEN: any = WebSocket.OPEN;
-
-    binaryType;
-    bufferedAmount;
-    extensions;
-    onclose: ((this: WebSocket, ev: CloseEvent) => any) | null = null;
-    onerror: ((this: WebSocket, ev: Event) => any) | null = null;
-    onmessage: ((this: WebSocket, ev: MessageEvent) => any) | null = null;
-    onopen: ((this: WebSocket, ev: Event) => any) | null = null;
-    protocol;
-    readyState = WebSocket.OPEN;
-    url;
-
-    constructor() {
-    }
-
-    close(code?: number | undefined, reason?: string | undefined): void {
-    }
-    send(data: string | ArrayBuffer | SharedArrayBuffer | Blob | ArrayBufferView): void {
-    }
-
-    addEventListener<K extends "close" | "error" | "message" | "open">(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[ K ]) => any, options?: boolean | AddEventListenerOptions | undefined): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions | undefined): void;
-    addEventListener(type: any, listener: any, options?: any) {
-    }
-
-    removeEventListener<K extends "close" | "error" | "message" | "open">(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[ K ]) => any, options?: boolean | EventListenerOptions | undefined): void;
-    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions | undefined): void;
-    removeEventListener(type: any, listener: any, options?: any) {
-    }
-
-    dispatchEvent(event: Event): boolean {
-        return false;
-    }
-}
-
-const sendFns: { [ key in ClientAction[ 'type' ] ]?: (action: Omit<ClientAction, 'sendTime'>) => void } = {};
-
-const { onAction } = serviceEvent();
-
-const onSendAction = <A extends ClientAction>(type: A[ 'type' ], fn: (action: Omit<A, 'sendTime'>) => void) => {
-
-    sendFns[ type ] = (fn as any);
-};
-
-const receiveAction = <A extends ServerAction>(message: A) =>
-    serviceDispatch({
-        dispatch: (): ReceiveMessageAction<A> => ({
-            type: 'message/receive',
-            message
-        })
-    }).dispatch();
-
-export const Default: React.FC = () => {
-
-    Controller.reset();
+    const sendFns: { [ key in ClientAction[ 'type' ] ]?: (action: Omit<ClientAction, 'sendTime'>) => void } = {};
+    
+    const { onAction } = serviceEvent();
+    
+    const onSendAction = <A extends ClientAction>(type: A[ 'type' ], fn: (action: Omit<A, 'sendTime'>) => void) => {
+    
+        sendFns[ type ] = (fn as any);
+    };
+    
+    const receiveAction = <A extends ServerAction>(message: A) =>
+        serviceDispatch({
+            dispatch: (): ReceiveMessageAction<A> => ({
+                type: 'message/receive',
+                message
+            })
+        }).dispatch();
 
     onAction<SendMessageAction<ClientAction>>('message/send', ({ message }) => {
         const fn = sendFns[ message.type ];
@@ -151,7 +107,6 @@ export const Default: React.FC = () => {
                 ]
             })
         ];
-        console.log(teamsSnapshots);
 
         receiveAction<BRunLaunchSAction>({
             type: 'battle-run/launch',
@@ -203,19 +158,7 @@ export const Default: React.FC = () => {
 
     React.useEffect(() => {
 
-        let socket!: MockWebSocket;
-
-        const websocketCreator: WebSocketCreator = () => {
-            socket = new MockWebSocket();
-            return socket;
-        };
-
-        Controller.start(
-            ref.current!,
-            websocketCreator
-        );
-
-        socket.onopen!(null as any);
+        controllerStart(ref.current!);
 
     }, []);
 

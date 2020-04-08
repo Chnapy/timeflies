@@ -13,10 +13,9 @@ const webpackNoAssetsHashNorData64 = (webpackConfig: Configuration): Configurati
 
   const throwUnexpectedConfigError = (message: string): never => { throw new Error(message); };
 
-  const oneOfRule = webpackConfig?.module?.rules
-    ?.find(r => !!r.oneOf);
+  const oneOfRule = webpackConfig.module?.rules.find(r => !!r.oneOf);
 
-  const fileLoader = oneOfRule?.oneOf!.find(r => typeof r.loader === 'string' && (r.loader as string).includes('file-loader'));
+  const fileLoader = oneOfRule?.oneOf!.find(r => typeof r.loader === 'string' && r.loader.includes('file-loader'));
 
   if (!fileLoader) {
     throwUnexpectedConfigError('file-loader not found');
@@ -24,7 +23,7 @@ const webpackNoAssetsHashNorData64 = (webpackConfig: Configuration): Configurati
 
   (fileLoader!.options as Record<string, any>).name = 'static/media/[name].[ext]';
 
-  oneOfRule!.oneOf = oneOfRule!.oneOf!.filter(r => typeof r.loader !== 'string' || !(r.loader as string).includes('url-loader'))
+  oneOfRule!.oneOf = oneOfRule!.oneOf!.filter(r => typeof r.loader !== 'string' || !r.loader.includes('url-loader'));
 
   return webpackConfig;
 };

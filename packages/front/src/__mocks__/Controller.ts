@@ -1,11 +1,15 @@
 import { GameAction } from "../action/GameAction";
 import { AssetLoader } from '../assetManager/AssetLoader';
-import { IController } from "../IController";
+import { Controller as IController } from "../Controller";
 import { StoreTest } from '../StoreTest';
 
-export const Controller: IController = {
+export const Controller: typeof IController = {
 
-    start() { },
+    init() {
+        return {
+            async start(container) {}
+        }
+     },
 
     getStore() {
         return StoreTest.getStore();

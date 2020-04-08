@@ -1,12 +1,10 @@
 import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
-import { createStore, Store } from 'redux';
-import { GameAction } from '../../../action/GameAction';
+import { StoryProps } from '../../../../.storybook/preview';
 import { AssetLoader } from '../../../assetManager/AssetLoader';
 import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
-import { RootReducer } from '../../../ui/reducers/RootReducer';
 import { UIState } from '../../../ui/UIState';
 import mapPath from '../../../_assets/map/map.json';
 import charactersSpritesheetPath from '../../../_assets/spritesheets/sokoban.json';
@@ -24,8 +22,7 @@ export default {
     component: BattleStageGraphic
 }
 
-export const Default = () => {
-    Controller.reset();
+export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
@@ -82,12 +79,10 @@ export const Default = () => {
         }
     };
 
-    const store: Store<UIState, GameAction> = createStore<UIState, GameAction, any, any>(
-        RootReducer,
+    Controller.init({
+        websocketCreator,
         initialState
-    );
-
-    (Controller.getStore as any) = () => store;
+    });
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -100,10 +95,7 @@ export const Default = () => {
             .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
-        console.log(resources)
-
         const charactersSheet = resources.characters;
-        console.log(charactersSheet);
 
         const mapAssets = resources.map;
 
@@ -137,8 +129,7 @@ export const Default = () => {
     </div>;
 };
 
-export const Pathfinder = () => {
-    Controller.reset();
+export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
@@ -195,13 +186,10 @@ export const Pathfinder = () => {
         }
     };
 
-    const store: Store<UIState, GameAction> = createStore<UIState, GameAction, any, any>(
-        RootReducer,
+    Controller.init({
+        websocketCreator,
         initialState
-    );
-
-    (Controller.getStore as any) = () => store;
-
+    });
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;

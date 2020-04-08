@@ -3,7 +3,6 @@ import * as PIXI from 'pixi.js';
 import React from 'react';
 import { AssetLoader } from '../../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
-import { Controller } from '../../../../../Controller';
 import { serviceDispatch } from '../../../../../services/serviceDispatch';
 import mapPath from '../../../../../_assets/map/map.json';
 import charactersSpritesheetPath from '../../../../../_assets/spritesheets/sokoban.json';
@@ -23,7 +22,6 @@ export default {
 };
 
 export const Current: React.FC = () => {
-    Controller.reset();
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -36,10 +34,7 @@ export const Current: React.FC = () => {
             .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
-        console.log(resources)
-
         const sheet = resources.characters;
-        console.log(sheet);
 
         const character = seedCharacter('real', { id: '1', player: null });
 
@@ -179,7 +174,6 @@ export const Current: React.FC = () => {
 };
 
 export const Future: React.FC = () => {
-    Controller.reset();
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -192,10 +186,7 @@ export const Future: React.FC = () => {
             .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
-        console.log(resources)
-
         const sheet = resources.characters;
-        console.log(sheet);
 
         const character = seedCharacter('real', { id: '1', player: null });
 

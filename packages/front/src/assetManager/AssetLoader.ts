@@ -157,6 +157,13 @@ export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Lo
 
     onAction<AppResetAction>('app/reset', () => {
         loader.reset();
+
+        for (const textureUrl in PIXI.utils.BaseTextureCache) {
+            delete PIXI.utils.BaseTextureCache[ textureUrl ];
+        }
+        for (const textureUrl in PIXI.utils.TextureCache) {
+            delete PIXI.utils.TextureCache[ textureUrl ];
+        }
     });
 
     const addResource = (name: string, url: string) => !loader.resources[ name ]

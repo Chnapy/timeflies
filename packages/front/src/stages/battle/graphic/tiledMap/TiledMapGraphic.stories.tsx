@@ -3,7 +3,6 @@ import * as PIXI from 'pixi.js';
 import React from 'react';
 import { AssetLoader } from '../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
-import { Controller } from '../../../../Controller';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
 import mapPath from '../../../../_assets/map/map.json';
 import { SpellEngineBindAction } from '../../engine/Engine';
@@ -14,7 +13,6 @@ export default {
 };
 
 export const Default = () => {
-    Controller.reset();
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
