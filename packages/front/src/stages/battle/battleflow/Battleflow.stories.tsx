@@ -4,6 +4,7 @@ import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../../../socket/WSClient';
+import mapPath from '../../../_assets/map/map.json';
 import { seedTeamSnapshot } from '../entities/team/Team.seed';
 
 export default {
@@ -92,7 +93,7 @@ export const Default: React.FC = () => {
                     initLayerName: 'init',
                     defaultTilelayerName: 'view',
                     obstacleTilelayerName: 'obstacles',
-                    schemaUrl: 'http://127.0.0.1:8887/map.json',
+                    schemaUrl: mapPath,
                 },
                 characterTypes: [],
                 spellTypes: [],

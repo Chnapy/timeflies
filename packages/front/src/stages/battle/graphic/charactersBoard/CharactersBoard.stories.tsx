@@ -9,6 +9,8 @@ import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { Controller } from '../../../../Controller';
 import { RootReducer } from '../../../../ui/reducers/RootReducer';
 import { UIState } from '../../../../ui/UIState';
+import mapPath from '../../../../_assets/map/map.json';
+import charactersSpritesheetPath from '../../../../_assets/spritesheets/sokoban.json';
 import { seedCharacter } from '../../entities/character/Character.seed';
 import { MapManager } from '../../map/MapManager';
 import { Pathfinder } from '../../map/Pathfinder';
@@ -44,7 +46,7 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
         data: {
             state: 'battle',
             battleData: {
-                [period]: {
+                [ period ]: {
                     characters
                 }
             } as any
@@ -65,8 +67,8 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', 'http://localhost:8887/map.json')
-            .addSpritesheet('characters', 'http://localhost:8887/sokoban.json')
+            .add('map', mapPath)
+            .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
         console.log(resources)
@@ -108,6 +110,6 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
     </div>;
 };
 
-export const Current: React.FC = () => <Render period='current'/>;
+export const Current: React.FC = () => <Render period='current' />;
 
-export const Future: React.FC = () => <Render period='future'/>;
+export const Future: React.FC = () => <Render period='future' />;

@@ -1,15 +1,11 @@
-import { BattleSnapshot, CharacterType, GlobalTurnSnapshot, Orientation, SpellType } from '@timeflies/shared';
-import { AssetManager } from '../../assetManager/AssetManager';
+import { BattleSnapshot, CharacterType, GlobalTurnSnapshot, SpellType } from '@timeflies/shared';
 import { BattleDataMap } from '../../BattleData';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleReducerManager } from '../../phaser/battleReducers/BattleReducerManager';
-import { CameraManager } from './camera/CameraManager';
 import { Team } from './entities/team/Team';
 import { WithSnapshot } from './entities/WithSnapshot';
-import { MapManager } from '../../phaser/map/MapManager';
 import { BattleRoomManager } from '../../phaser/room/BattleRoomManager';
 import { SpellEngine } from '../../phaser/spellEngine/SpellEngine';
-import { Utils } from '../../Utils';
 import { ConnectedScene } from '../ConnectedScene';
 import { BattleStage } from './BattleStage';
 import { CycleManager } from './cycle/CycleManager';
@@ -31,12 +27,12 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
     private room!: BattleRoomManager;
     private dataStateManager!: DataStateManager;
-    private cameraManager!: CameraManager;
+    private cameraManager!: any;
 
     private spellEngine!: SpellEngine;
 
     private graphics!: any;
-    map!: MapManager;
+    map!: any;
     cycle!: CycleManager;
     private reducerManager!: BattleReducerManager;
 
@@ -71,7 +67,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
 
         this.createCharactersAnimations(characterTypes);
 
-        this.map = new MapManager(this, mapInfos);
         this.map.init();
 
 //@ts-ignore
@@ -116,7 +111,6 @@ export class BattleScene extends ConnectedScene<'BattleScene', BattleSceneData> 
             //     }
             // });
 
-        this.cameraManager = new CameraManager(this);
 
         this.reducerManager = new BattleReducerManager(
             this,

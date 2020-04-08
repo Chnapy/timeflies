@@ -4,14 +4,14 @@ import { BattleLaunchAction } from "../../phaser/battleReducers/BattleReducerMan
 import { serviceDispatch } from "../../services/serviceDispatch";
 import { serviceEvent } from "../../services/serviceEvent";
 import { serviceNetwork } from "../../services/serviceNetwork";
+import charactersSpritesheetPath from '../../_assets/spritesheets/sokoban.json';
 import { BattleSceneData } from "../battle/BattleScene";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
 
 export type LoadStageParam = StageParam<'load', BattleLoadPayload>;
 
 const spritesheetsUrls = {
-    // TODO use import (find a way for json)
-    characters: 'http://localhost:8887/sokoban.json'
+    characters: charactersSpritesheetPath
 } as const;
 
 export const LoadStage: StageCreator<'load', 'map' | 'characters'> = (payload) => {

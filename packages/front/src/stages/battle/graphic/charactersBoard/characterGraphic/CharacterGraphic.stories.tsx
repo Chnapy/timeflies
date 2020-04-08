@@ -5,6 +5,8 @@ import { AssetLoader } from '../../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { Controller } from '../../../../../Controller';
 import { serviceDispatch } from '../../../../../services/serviceDispatch';
+import mapPath from '../../../../../_assets/map/map.json';
+import charactersSpritesheetPath from '../../../../../_assets/spritesheets/sokoban.json';
 import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema';
 import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
@@ -30,8 +32,8 @@ export const Current: React.FC = () => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', 'http://localhost:8887/map.json')
-            .addSpritesheet('characters', 'http://localhost:8887/sokoban.json')
+            .add('map', mapPath)
+            .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
         console.log(resources)
@@ -186,8 +188,8 @@ export const Future: React.FC = () => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', 'http://localhost:8887/map.json')
-            .addSpritesheet('characters', 'http://localhost:8887/sokoban.json')
+            .add('map', mapPath)
+            .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
         console.log(resources)
@@ -219,8 +221,6 @@ export const Future: React.FC = () => {
         });
 
         app.stage.addChild(container);
-
-        // const waitByTime = (ms: number) => new Promise(r => setTimeout(r, ms));
 
         const { dispatchSpellLaunch } = serviceDispatch({
             dispatchSpellLaunch: (): BStateSpellLaunchAction => ({

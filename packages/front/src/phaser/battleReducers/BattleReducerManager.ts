@@ -27,7 +27,7 @@ export interface BattleStartAction extends IGameAction<'battle/start'> {
 
 // export interface BattleSpellLaunchAction extends IGameAction<'battle/spell/launch'> {
 //     charAction: CharAction<'running'>;
-//     launchState?: LaunchState[];  // TODO remove after stack action done
+//     launchState?: LaunchState[];
 // }
 
 // export interface BattleRollbackAction extends IGameAction<'battle/rollback'> {

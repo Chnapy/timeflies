@@ -5,17 +5,19 @@ import { createStore, Store } from 'redux';
 import { GameAction } from '../../../action/GameAction';
 import { AssetLoader } from '../../../assetManager/AssetLoader';
 import { Controller } from '../../../Controller';
+import { serviceDispatch } from '../../../services/serviceDispatch';
 import { RootReducer } from '../../../ui/reducers/RootReducer';
 import { UIState } from '../../../ui/UIState';
+import mapPath from '../../../_assets/map/map.json';
+import charactersSpritesheetPath from '../../../_assets/spritesheets/sokoban.json';
+import { SpellEngineBindAction } from '../engine/Engine';
+import { SpellPrepareMove } from '../engine/spellEngine/move/SpellPrepareMove';
 import { seedCharacter } from '../entities/character/Character.seed';
+import { seedSpell } from '../entities/spell/Spell.seed';
 import { MapManager } from '../map/MapManager';
 import { Pathfinder as Pathfinder_ } from '../map/Pathfinder';
 import { seedTiledConfig } from '../map/TiledMap.seed';
 import { BattleStageGraphic } from './BattleStageGraphic';
-import { SpellPrepareMove } from '../engine/spellEngine/move/SpellPrepareMove';
-import { seedSpell } from '../entities/spell/Spell.seed';
-import { serviceDispatch } from '../../../services/serviceDispatch';
-import { SpellEngineBindAction } from '../engine/Engine';
 
 export default {
     title: 'graphic/BattleStageGraphic',
@@ -94,8 +96,8 @@ export const Default = () => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', 'http://localhost:8887/map.json')
-            .addSpritesheet('characters', 'http://localhost:8887/sokoban.json')
+            .add('map', mapPath)
+            .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
         console.log(resources)
@@ -208,8 +210,8 @@ export const Pathfinder = () => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', 'http://localhost:8887/map.json')
-            .addSpritesheet('characters', 'http://localhost:8887/sokoban.json')
+            .add('map', mapPath)
+            .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
 
         const charactersSheet = resources.characters;
@@ -253,7 +255,7 @@ export const Pathfinder = () => {
                         tiledMapManager.getTileType(tilePos)
                     );
                 },
-                onTileClick: async (tilePos) => { 
+                onTileClick: async (tilePos) => {
                     return await spellPrepareEngine.onTileClick(
                         tilePos,
                         tiledMapManager.getTileType(tilePos)

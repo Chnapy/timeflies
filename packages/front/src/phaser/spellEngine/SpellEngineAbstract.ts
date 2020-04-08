@@ -1,7 +1,6 @@
 import { SpellType } from '@timeflies/shared'
 import { Character } from '../../stages/battle/entities/character/Character';
 import { Spell } from '../../stages/battle/entities/spell/Spell';
-import { MapManager } from '../map/MapManager';
 import { BattleScene } from '../../stages/battle/BattleScene';
 import { CurrentSpellState } from './SpellEngine';
 
@@ -10,7 +9,7 @@ export abstract class SpellEngineAbstract<S extends Exclude<CurrentSpellState, '
     protected readonly scene: BattleScene;
     readonly spell: Spell;
     protected readonly character: Character;
-    protected readonly map: MapManager;
+    protected readonly map: any;
     protected readonly characters: Character[];
 
     constructor(spell: Spell, scene: BattleScene) {

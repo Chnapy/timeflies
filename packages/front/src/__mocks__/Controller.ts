@@ -1,4 +1,5 @@
 import { GameAction } from "../action/GameAction";
+import { AssetLoader } from '../assetManager/AssetLoader';
 import { IController } from "../IController";
 import { StoreTest } from '../StoreTest';
 
@@ -38,10 +39,12 @@ export const Controller: IController = {
 
     loader: {
         newInstance() {
-            const this_ = {
-                _keys: [] as string[],
+            const this_: ReturnType<AssetLoader[ 'newInstance' ]> & { _keys: string[] } = {
+                _keys: [],
+                use() { return this_ as any },
                 add(key, path) { this_._keys.push(key); return this_ as any },
                 addMultiple(o) { this_._keys.push(...Object.keys(o)); return this_ as any },
+                addSpritesheet(key, path) { return this_ as any },
                 load() {
                     return Promise.resolve(
                         this_._keys.reduce<{}>((o, k) => {

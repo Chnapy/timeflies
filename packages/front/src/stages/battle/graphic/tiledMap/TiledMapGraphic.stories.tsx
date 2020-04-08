@@ -1,12 +1,13 @@
+import { SpellType, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
-import { TiledMapGraphic } from './TiledMapGraphic';
-import { Controller } from '../../../../Controller';
-import { TiledManager, SpellType } from '@timeflies/shared';
-import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { AssetLoader } from '../../../../assetManager/AssetLoader';
+import { CanvasContext } from '../../../../canvas/CanvasContext';
+import { Controller } from '../../../../Controller';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
+import mapPath from '../../../../_assets/map/map.json';
 import { SpellEngineBindAction } from '../../engine/Engine';
+import { TiledMapGraphic } from './TiledMapGraphic';
 
 export default {
     title: 'graphic/TiledMapGraphic'
@@ -20,9 +21,9 @@ export const Default = () => {
         const app = new PIXI.Application({ view, resizeTo: parent });
 
         const loader = AssetLoader();
-
+        
         const { map } = await loader.newInstance()
-            .add('map', 'http://127.0.0.1:8887/map.json')
+            .add('map', mapPath)
             .load();
 
         const tiledManager = TiledManager(map, {
@@ -48,7 +49,7 @@ export const Default = () => {
                 type: 'battle/spell-engine/bind',
                 spellType,
                 onTileHover: async () => {
-                    return;
+                    return undefined;
                 },
                 onTileClick: async () => { },
             })

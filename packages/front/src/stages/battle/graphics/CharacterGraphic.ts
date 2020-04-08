@@ -2,7 +2,7 @@ import { CharacterType, Orientation } from "@timeflies/shared";
 import { AssetManager } from "../../../assetManager/AssetManager";
 import { RectStyled } from "../../../hud/generics/RectStyled";
 import { BattleScene } from "../BattleScene";
-import { Character, CharacterState } from "../entities/character/Character";
+import { Character } from "../entities/character/Character";
 import { Spell } from "../entities/spell/Spell";
 import { SpellGraphic } from "./SpellGraphic";
 
@@ -14,7 +14,7 @@ export class CharacterGraphic {
 
     static readonly getAnimKey = (
         type: CharacterType,
-        state: CharacterState,
+        state: any,
         orientation: Orientation
     ): string => `${type}_${state}_${orientation}`;
 
@@ -193,10 +193,10 @@ export class CharacterGraphic {
     }
 
     updateAnimation(): void {
-        const { staticData: { type }, state, orientation } = this.character;
+        const { staticData: { type }, orientation } = this.character;
 
         this.sprite.anims.play(
-            CharacterGraphic.getAnimKey(type, state, orientation),
+            CharacterGraphic.getAnimKey(type, null as any, orientation),
             true
         );
     }
