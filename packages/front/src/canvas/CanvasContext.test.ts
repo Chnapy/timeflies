@@ -1,7 +1,7 @@
+import { TiledMapGraphic } from '../stages/battle/graphic/tiledMap/TiledMapGraphic';
+import { seedMapManager } from '../stages/battle/map/MapManager.seed';
 import { StoreTest } from '../StoreTest';
 import { CanvasContext } from './CanvasContext';
-import { seedMapManager } from '../stages/battle/map/MapManager.seed';
-import { ActionManager } from '../action/ActionManager';
 
 describe('# CanvasContext', () => {
 
@@ -36,18 +36,20 @@ describe('# CanvasContext', () => {
     it('should handle multiple providers', () => {
 
         const mapManager = seedMapManager('fake');
-        const actionManager: ActionManager = {} as any;
+        const tiledMapGraphic: TiledMapGraphic = {
+            container: null as any
+        } as TiledMapGraphic;
 
         const ret = CanvasContext.provider({ mapManager }, () => {
 
-            return CanvasContext.provider({ actionManager }, () => {
+            return CanvasContext.provider({ tiledMapGraphic }, () => {
 
-                return CanvasContext.consumer('mapManager', 'actionManager');
+                return CanvasContext.consumer('mapManager', 'tiledMapGraphic');
             });
 
         });
 
-        expect(ret).toEqual({ mapManager, actionManager });
+        expect(ret).toEqual({ mapManager, tiledMapGraphic });
     });
 
 });

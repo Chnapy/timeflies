@@ -16,15 +16,14 @@ export interface CharacterGraphic {
 
 interface PeriodFn {
     (
-        character: Character,
+        character: Character<BattleDataPeriod>,
         tiledMapGraphic: TiledMapGraphic,
         charactersSheet: PIXI.Spritesheet
     ): PIXI.Sprite;
 }
 
 export const CharacterGraphic = (
-    period: BattleDataPeriod,
-    character: Readonly<Character>
+    character: Readonly<Character<BattleDataPeriod>>
 ): CharacterGraphic => {
 
     const { tiledMapGraphic, spritesheets: {
@@ -33,7 +32,7 @@ export const CharacterGraphic = (
 
     const container = new PIXI.Container();
 
-    const periodFn: PeriodFn = period === 'current'
+    const periodFn: PeriodFn = character.period === 'current'
         ? periodCurrent
         : periodFuture;
 

@@ -2,6 +2,8 @@ import { CharacterFeatures, CharacterSnapshot, CharacterType, Orientation, Posit
 import { Player } from '../player/Player';
 import { seedSpell, SeedSpellProps, seedSpellSnapshot, seedSpellStaticData } from '../spell/Spell.seed';
 import { Character } from './Character';
+import { BattleDataPeriod } from '../../../../BattleData';
+import { SeedPeriodicProps } from '../PeriodicEntity';
 
 export type SeedCharacterProps<FK extends 'features' | 'initialFeatures' = 'initialFeatures'> = {
     id: string;
@@ -60,34 +62,35 @@ export const seedCharacterSnapshot = (props: SeedCharacterProps<'features'>): Ch
     };
 };
 
-type SeedCharacterExtraProps = {
+type SeedCharacterExtraProps<P extends BattleDataPeriod> = {
     seedSpells?: SeedSpellProps[];
     isMine?: boolean;
     isAlive?: boolean;
-    player: Player | null;
+    player: Player<P> | null;
 };
 
-export const seedCharacter = (type: 'real' | 'fake', props: Omit<SeedCharacterProps, 'seedSpells'> & SeedCharacterExtraProps): Character => {
-    const { id, orientation, position, defaultSpellId, initialFeatures, player, isMine, isAlive } = props;
+export const seedCharacter = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: Omit<SeedCharacterProps, 'seedSpells'> & SeedPeriodicProps<P> & SeedCharacterExtraProps<P>): Character<P> => {
+    const { period, id, orientation, position, defaultSpellId, initialFeatures, player, isMine, isAlive } = props;
     const seedSpells = props.seedSpells ?? seedCharacterInitialSeedSpells;
 
     if (type === 'real') {
-        return Character(seedCharacterSnapshot({
+        return Character(period, seedCharacterSnapshot({
             ...props,
             seedSpells,
             defaultSpellId: defaultSpellId ?? seedSpells[ 0 ].id,
             features: initialFeatures
-        }), player as Player);
+        }), player as Player<P>);
     }
 
-    const character: Character = {
+    const character: Character<P> = {
+        period,
         id,
         staticData: seedCharacterStaticData({ ...props, seedSpells }),
         isMine: isMine ?? true,
         isAlive: isAlive ?? true,
         position: seedPosition(position),
         orientation: seedOrientation(orientation),
-        player: player as Player,
+        player: player as Player<P>,
         features: seedCharacterFeatures(initialFeatures),
         get spells() { return spells; },
         get defaultSpell() { return spells.find(s => s.id === defaultSpellId) ?? spells[ 0 ]; },
@@ -103,7 +106,11 @@ export const seedCharacter = (type: 'real' | 'fake', props: Omit<SeedCharacterPr
         set(o) { }
     };
 
-    const spells = seedSpells.map(s => seedSpell('fake', { ...s, character }));
+    const spells = seedSpells.map(s => seedSpell('fake', {
+        ...s,
+        period,
+        character
+    }));
 
     return character;
 };

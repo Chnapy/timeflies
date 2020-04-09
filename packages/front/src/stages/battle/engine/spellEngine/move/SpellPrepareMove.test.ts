@@ -41,6 +41,7 @@ describe('# SpellPrepareMove', () => {
         const [ mapManager, calculatePath ] = getMapManager();
 
         const { defaultSpell } = seedCharacter('fake', {
+            period: 'future',
             id: '1',
             seedSpells: [ { id: 's1', type: 'move' } ],
             player: null
@@ -59,6 +60,7 @@ describe('# SpellPrepareMove', () => {
         const [ mapManager, calculatePath ] = getMapManager();
 
         const { defaultSpell, position: charPosition } = seedCharacter('fake', {
+            period: 'future',
             id: '1',
             seedSpells: [ { id: 's1', type: 'move' } ],
             player: null
@@ -86,6 +88,7 @@ describe('# SpellPrepareMove', () => {
         const [ mapManager ] = getMapManager();
 
         const { defaultSpell } = seedCharacter('fake', {
+            period: 'future',
             id: '1',
             seedSpells: [ { id: 's1', type: 'move' } ],
             player: null
@@ -110,6 +113,7 @@ describe('# SpellPrepareMove', () => {
         const [ mapManager, calculatePath, pathPromise ] = getMapManager(expectedPath);
 
         const { defaultSpell } = seedCharacter('fake', {
+            period: 'future',
             id: '1',
             seedSpells: [ { id: 's1', type: 'move' } ],
             player: null

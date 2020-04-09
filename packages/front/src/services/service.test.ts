@@ -113,7 +113,8 @@ describe('services', () => {
             dispatchSpellActionEnd: (): SpellActionTimerEndAction => ({
                 type: 'battle/spell-action/end',
                 removed: false,
-                correctHash: ''
+                correctHash: '',
+                spellActionSnapshot: {} as any
             })
         });
 
@@ -132,7 +133,8 @@ describe('services', () => {
         expect(StoreTest.getActions()).toEqual<[ SpellActionTimerEndAction ]>([ {
             type: 'battle/spell-action/end',
             removed: false,
-            correctHash: ''
+            correctHash: '',
+            spellActionSnapshot: {} as any
         } ]);
     });
 
@@ -153,7 +155,8 @@ describe('services', () => {
             dispatchSpellActionEnd: (): SpellActionTimerEndAction => ({
                 type: 'battle/spell-action/end',
                 removed: false,
-                correctHash: ''
+                correctHash: '',
+                spellActionSnapshot: {} as any
             })
         });
 
@@ -168,7 +171,8 @@ describe('services', () => {
         expect(spellActionEndFn).toHaveBeenNthCalledWith<[ SpellActionTimerEndAction ]>(1, {
             type: 'battle/spell-action/end',
             removed: false,
-            correctHash: ''
+            correctHash: '',
+            spellActionSnapshot: {} as any
         });
     });
 

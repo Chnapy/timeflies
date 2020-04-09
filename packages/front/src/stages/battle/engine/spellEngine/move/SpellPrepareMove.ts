@@ -17,7 +17,7 @@ export const spellLaunchMove = ({ spell, position }: SpellAction) => {
 export const SpellPrepareMove: SpellPrepareSubEngineCreator<
     { path: Position[] } | undefined
 > = (
-    spell: Spell,
+    spell: Spell<'future'>,
     mapManager: MapManager,
     ) => {
 
@@ -79,4 +79,4 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
             stop() {
             }
         }
-    }
+    };

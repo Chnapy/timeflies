@@ -3,35 +3,38 @@ import { serviceCurrentPlayer } from '../../../../services/serviceCurrentPlayer'
 import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 import { Character } from '../character/Character';
 import { Team } from "../team/Team";
-import { WithSnapshot } from '../WithSnapshot';
+import { PeriodicEntity } from '../PeriodicEntity';
+import { BattleDataPeriod } from '../../../../BattleData';
 
-export interface Player extends WithSnapshot<PlayerSnapshot> {
+export interface Player<P extends BattleDataPeriod> extends PeriodicEntity<P, PlayerSnapshot> {
     readonly id: string;
     readonly itsMe: boolean;
     readonly name: string;
-    readonly team: Team;
-    readonly characters: Character[];
+    readonly team: Team<P>;
+    readonly characters: Character<P>[];
 }
 
 export interface PlayerDependencies {
     characterCreator: typeof Character;
 }
 
-export const Player = (
+export const Player = <P extends BattleDataPeriod>(
+    period: P,
     {
         id,
         name,
         charactersSnapshots
     }: PlayerSnapshot,
-    team: Team,
+    team: Team<P>,
     { characterCreator }: PlayerDependencies = { characterCreator: Character }
-): Player => {
+): Player<P> => {
     const itsMe = id === assertThenGet(
         serviceCurrentPlayer(),
         assertIsNonNullable
     ).id;
 
-    const this_: Player = {
+    const this_: Player<P> = {
+        period,
         id,
         name,
         itsMe,
@@ -58,7 +61,7 @@ export const Player = (
         }
     };
 
-    const characters = charactersSnapshots.map(snap => characterCreator(snap, this_));
+    const characters = charactersSnapshots.map(snap => characterCreator(period, snap, this_));
 
     return this_;
 };

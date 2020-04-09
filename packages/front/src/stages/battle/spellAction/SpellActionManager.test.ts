@@ -19,6 +19,13 @@ describe('# SpellActionManager', () => {
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
         const currentCharacter = seedCharacter('fake', {
+            period: 'current',
+            id: '1',
+            player: null
+        });
+
+        const futureCharacter = seedCharacter('fake', {
+            period: 'future',
             id: '1',
             player: null
         });
@@ -33,13 +40,15 @@ describe('# SpellActionManager', () => {
         };
 
         const currentBattleData: BattleDataCurrent = {
-            battleHash: 'not-defined'
-        } as any;
+            battleHash: 'not-defined',
+            characters: [ currentCharacter ],
+        } as BattleDataCurrent;
 
         const futureBattleData: BattleDataFuture = {
             battleHash: 'not-defined',
+            characters: [ futureCharacter ],
             spellActionSnapshotList
-        } as any;
+        } as BattleDataFuture;
 
         StoreTest.initStore({
             data: {
@@ -67,20 +76,21 @@ describe('# SpellActionManager', () => {
             manager,
             currentBattleData,
             futureBattleData,
-            currentCharacter
+            futureCharacter
         };
     };
 
     const rollbackInit = () => {
 
-        const { startTime, spellActionSnapshotList, currentBattleData, futureBattleData, currentCharacter } = init();
+        const { startTime, spellActionSnapshotList, currentBattleData, futureBattleData, futureCharacter } = init();
 
         const firstHash = 'firstHash';
         futureBattleData.battleHash = firstHash;
 
-        const spell = seedSpell('fake', {
+        const spell = seedSpell<'future'>('fake', {
+            period: 'future',
             id: 's1',
-            character: currentCharacter,
+            character: futureCharacter,
             type: 'move',
             initialFeatures: {
                 duration: 200
@@ -138,13 +148,14 @@ describe('# SpellActionManager', () => {
 
     it('should catch spell action, then commit', () => {
 
-        const { startTime, spellActionSnapshotList, futureBattleData, currentCharacter } = init();
+        const { startTime, spellActionSnapshotList, futureBattleData, futureCharacter } = init();
 
         futureBattleData.battleHash = '-hash-';
 
         const spell = seedSpell('fake', {
+            period: 'future',
             id: 's1',
-            character: currentCharacter,
+            character: futureCharacter,
             type: 'move',
             initialFeatures: {
                 duration: 200
@@ -261,11 +272,11 @@ describe('# SpellActionManager', () => {
 
     it('should launch spell on message notify', () => {
 
-        const { startTime, spellActionSnapshotList, futureBattleData, currentCharacter } = init();
+        const { startTime, spellActionSnapshotList, futureBattleData, futureCharacter } = init();
 
         futureBattleData.battleHash = '-hash-';
 
-        const [ spell ] = currentCharacter.spells;
+        const [ spell ] = futureCharacter.spells;
 
         StoreTest.dispatch<ReceiveMessageAction<NotifySAction>>({
             type: 'message/receive',

@@ -43,7 +43,7 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null })
         ];
 
         const idGenerator = getIndexGenerator();
@@ -96,8 +96,8 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -140,8 +140,8 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -188,7 +188,7 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -229,9 +229,9 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null }),
-            seedCharacter('fake', { id: '3', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null }),
+            seedCharacter('fake', { period: 'current', id: '3', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -271,8 +271,8 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();
@@ -314,7 +314,7 @@ describe('# GlobalTurn', () => {
         };
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null })
         ];
 
         const turnIdGenerator = getIndexGenerator();

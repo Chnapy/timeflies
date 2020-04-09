@@ -22,7 +22,21 @@ describe('# SpellPrepareEngine', () => {
 
     it('should not allow to launch hover & click functions if not enough time', () => {
 
-        const character = seedCharacter('fake',{
+        const characterCurrent = seedCharacter('fake',{
+            period: 'current',
+            id: '1',
+            player: null,
+            seedSpells: [{
+                id: 's1',
+                type: 'move',
+                initialFeatures: {
+                    duration: 200
+                }
+            }]
+        });
+
+        const characterFuture = seedCharacter('fake',{
+            period: 'future',
             id: '1',
             player: null,
             seedSpells: [{
@@ -41,7 +55,7 @@ describe('# SpellPrepareEngine', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character,
+                    character: characterCurrent,
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -58,7 +72,7 @@ describe('# SpellPrepareEngine', () => {
         }
 
         const future: Pick<BattleDataFuture, 'characters'> = {
-            characters: [ character ],
+            characters: [ characterFuture ],
         };
 
         StoreTest.initStore({
@@ -72,7 +86,7 @@ describe('# SpellPrepareEngine', () => {
             }
         });
 
-        const [ spell ] = character.spells;
+        const [ spell ] = characterCurrent.spells;
 
         const onTileHover = jest.fn();
         const onTileClick = jest.fn();
@@ -115,7 +129,21 @@ describe('# SpellPrepareEngine', () => {
 
     it('should allow to launch hover & click functions if enough time', () => {
 
-        const character = seedCharacter('fake',{
+        const characterCurrent = seedCharacter('fake',{
+            period: 'current',
+            id: '1',
+            player: null,
+            seedSpells: [{
+                id: 's1',
+                type: 'move',
+                initialFeatures: {
+                    duration: 200
+                }
+            }]
+        });
+
+        const characterFuture = seedCharacter('fake',{
+            period: 'future',
             id: '1',
             player: null,
             seedSpells: [{
@@ -134,7 +162,7 @@ describe('# SpellPrepareEngine', () => {
                 state: 'running',
                 currentTurn: {
                     id: 1,
-                    character,
+                    character: characterCurrent,
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
@@ -151,7 +179,7 @@ describe('# SpellPrepareEngine', () => {
         }
 
         const future: Pick<BattleDataFuture, 'characters'> = {
-            characters: [ character ],
+            characters: [ characterFuture ],
         };
 
         StoreTest.initStore({
@@ -165,7 +193,7 @@ describe('# SpellPrepareEngine', () => {
             }
         });
 
-        const [ spell ] = character.spells;
+        const [ spell ] = characterCurrent.spells;
 
         const onTileHover = jest.fn();
         const onTileClick = jest.fn();

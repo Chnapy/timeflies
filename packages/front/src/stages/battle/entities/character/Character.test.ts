@@ -17,6 +17,7 @@ describe('# Character', () => {
     it('should be alive with life more than 0', () => {
 
         const character = seedCharacter('real', {
+            period: 'current',
             id: '1',
             player: null
         });
@@ -28,6 +29,7 @@ describe('# Character', () => {
     it('should not be alive with life to 0', () => {
 
         const character = seedCharacter('real', {
+            period: 'current',
             id: '1',
             player: null
         });
@@ -38,6 +40,7 @@ describe('# Character', () => {
 
     it('should update props correctly with set()', () => {
         const character = seedCharacter('real', {
+            period: 'current',
             id: '1',
             player: null
         });
@@ -47,7 +50,7 @@ describe('# Character', () => {
             position: { x: 67, y: 27 }
         });
 
-        expect(character).toMatchObject<Partial<Character>>({
+        expect(character).toMatchObject<Partial<Character<any>>>({
             orientation: 'right',
             position: { x: 67, y: 27 },
         });
@@ -55,6 +58,7 @@ describe('# Character', () => {
 
     it('should correctly check if spell exists', () => {
         const character = seedCharacter('real', {
+            period: 'current',
             id: '1',
             seedSpells: [ {
                 id: 's1',
@@ -120,6 +124,7 @@ describe('# Character', () => {
         } ];
 
         const character = seedCharacter('real', {
+            period: 'current',
             id: staticData.id,
             type: staticData.type,
             player: null,
@@ -152,6 +157,7 @@ describe('# Character', () => {
     it('should update from snapshot correctly', () => {
 
         const character = seedCharacter('real', {
+            period: 'current',
             id: '1',
             player: null
         });

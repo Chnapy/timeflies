@@ -2,9 +2,10 @@ import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, e
 import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 import { Player } from '../player/Player';
 import { Spell } from '../spell/Spell';
-import { WithSnapshot } from '../WithSnapshot';
+import { PeriodicEntity } from '../PeriodicEntity';
+import { BattleDataPeriod } from '../../../../BattleData';
 
-export interface Character extends WithSnapshot<CharacterSnapshot> {
+export interface Character<P extends BattleDataPeriod> extends PeriodicEntity<P, CharacterSnapshot> {
     readonly id: string;
     readonly staticData: Readonly<StaticCharacter>;
     readonly isMine: boolean;
@@ -12,29 +13,30 @@ export interface Character extends WithSnapshot<CharacterSnapshot> {
     readonly orientation: Orientation;
     readonly features: Readonly<CharacterFeatures>;
 
-    readonly spells: readonly Spell[];
-    readonly defaultSpell: Spell;
+    readonly spells: readonly Spell<P>[];
+    readonly defaultSpell: Spell<P>;
 
     readonly isAlive: boolean;
 
-    readonly player: Player;
+    readonly player: Player<P>;
 
-    set(o: { [ K in keyof Pick<Character, 'position' | 'orientation'> ]?: Character[ K ] }): void;
+    set(o: { [ K in keyof Pick<Character<P>, 'position' | 'orientation'> ]?: Character<P>[ K ] }): void;
 
     hasSpell(spellType: SpellType): boolean;
 }
 
 // TODO add test to ensure that given objects are copied
 // TODO add period attribute to all entities
-export const Character = ({
+export const Character = <P extends BattleDataPeriod>(period: P, {
     staticData, orientation: _orientation, position: _position, features: _features, spellsSnapshots: _spellsSnapshots
-}: CharacterSnapshot, player: Player): Character => {
+}: CharacterSnapshot, player: Player<P>): Character<P> => {
 
     let position: Position = { ..._position };
     let orientation: Orientation = _orientation;
     const features: Readonly<CharacterFeatures> = { ..._features };
 
-    const _this: Character = {
+    const _this: Character<P> = {
+        period,
         get id(): string {
             return staticData.id;
         },
@@ -51,10 +53,10 @@ export const Character = ({
         get features(): Readonly<CharacterFeatures> {
             return features;
         },
-        get spells(): readonly Spell[] {
+        get spells(): readonly Spell<P>[] {
             return spells;
         },
-        get defaultSpell(): Spell {
+        get defaultSpell(): Spell<P> {
             return defaultSpell;
         },
         get isAlive(): boolean {
@@ -104,7 +106,7 @@ export const Character = ({
         }
     };
 
-    const spells = _spellsSnapshots.map(snap => Spell(snap, _this));
+    const spells = _spellsSnapshots.map(snap => Spell(period, snap, _this));
     const defaultSpell = assertThenGet(spells.find(s => s.id === staticData.defaultSpellId), assertIsDefined);
 
     return _this;

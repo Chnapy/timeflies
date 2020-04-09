@@ -2,7 +2,7 @@ import { BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, 
 import React from 'react';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
-import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../../../socket/WSClient';
+import { ReceiveMessageAction, SendMessageAction } from '../../../socket/WSClient';
 import mapPath from '../../../_assets/map/map.json';
 import { seedTeamSnapshot } from '../entities/team/Team.seed';
 import { StoryProps } from '../../../../.storybook/preview';

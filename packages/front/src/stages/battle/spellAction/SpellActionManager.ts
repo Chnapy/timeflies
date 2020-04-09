@@ -9,7 +9,7 @@ import { SpellActionTimer } from './SpellActionTimer';
 import { getSpellLaunchFn as GetterSpellLaunchFn } from '../engine/spellMapping';
 
 export interface SpellAction {
-    spell: Spell;
+    spell: Spell<'future'>;
     position: Position;
 }
 
@@ -167,10 +167,13 @@ export const SpellActionManager = (
     } }) => {
 
         const { globalTurn } = serviceBattleData('cycle');
+        const { characters } = serviceBattleData('future');
 
         assertIsDefined(globalTurn);
 
-        const { character } = globalTurn.currentTurn;
+        const character = characters.find(c => c.id === globalTurn.currentTurn.character.id);
+
+        assertIsDefined(character);
 
         const spell = character.spells.find(s => s.id === spellId);
 

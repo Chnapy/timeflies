@@ -6,8 +6,9 @@ import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { NotifyDeathsAction } from '../cycle/CycleManager';
-import { WithSnapshot } from '../entities/WithSnapshot';
+import { PeriodicEntity } from '../entities/PeriodicEntity';
 import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { Team } from '../entities/team/Team';
 
 export interface BattleCommitAction extends IGameAction<'battle/commit'> {
     time: number;
@@ -17,7 +18,7 @@ export interface SnapshotManager {
 }
 
 export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
-    entityList: WithSnapshot<S>[],
+    entityList: PeriodicEntity<any, S>[],
     snapshotList: S[]
 ): void | never => {
     const serialize = (list: { id: string; }[]) => list.map(getId).sort().join('.');
@@ -55,10 +56,12 @@ export const SnapshotManager = (): SnapshotManager => {
 
         battleData.battleHash = battleHash;
 
-        assertEntitySnapshotConsistency(battleData.teams, teamsSnapshots);
+        const teams: Team<BattleDataPeriod>[] = battleData.teams;
+
+        assertEntitySnapshotConsistency(teams, teamsSnapshots);
 
         teamsSnapshots.forEach(snap =>
-            battleData.teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap)
+            teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap)
         );
     };
 

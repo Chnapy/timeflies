@@ -25,12 +25,14 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ websocket
 
     const characters = [
         seedCharacter('real', {
+            period,
             id: '1',
             player: null,
             position: { x: 2, y: 3 },
             orientation: 'right'
         }),
         seedCharacter('real', {
+            period,
             id: '2',
             player: null,
             position: { x: 4, y: 2 },
@@ -65,7 +67,7 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ websocket
             .add('map', mapPath)
             .addSpritesheet('characters', charactersSpritesheetPath)
             .load();
-aaa
+
         const sheet = resources.characters;
 
         const mapAssets = resources.map;

@@ -9,17 +9,17 @@ export interface BattleDataCycle {
     globalTurn?: GlobalTurn;
 }
 
-interface BattleData {
+interface BattleData<P extends BattleDataPeriod> {
     battleHash: string;
-    readonly teams: Team[];
-    readonly players: Player[];
-    readonly characters: Character[];
+    readonly teams: Team<P>[];
+    readonly players: Player<P>[];
+    readonly characters: Character<P>[];
 }
 
-export interface BattleDataCurrent extends BattleData {
+export interface BattleDataCurrent extends BattleData<'current'> {
 }
 
-export interface BattleDataFuture extends BattleData {
+export interface BattleDataFuture extends BattleData<'future'> {
     readonly spellActionSnapshotList: SpellActionSnapshot[];
 }
 

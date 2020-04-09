@@ -11,7 +11,7 @@ describe('# CycleManager', () => {
 
     const timerTester = new TimerTester();
 
-    const initStore = (characters: Character[]) => {
+    const initStore = (characters: Character<'current'>[]) => {
         StoreTest.initStore({
             data: {
                 state: 'battle',
@@ -38,8 +38,8 @@ describe('# CycleManager', () => {
     it('should create a GlobalTurn on corresponding message', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         initStore(characters);
@@ -96,8 +96,8 @@ describe('# CycleManager', () => {
     it('should synchronize current GlobalTurn on corresponding message', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null }),
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null }),
         ];
 
         initStore(characters);
@@ -173,8 +173,8 @@ describe('# CycleManager', () => {
     it('should synchronize current Turn on corresponding message', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         initStore(characters);
@@ -245,8 +245,8 @@ describe('# CycleManager', () => {
     it('should create new GlobalTurn when previous one ends with waiting snapshots', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         initStore(characters);
@@ -332,8 +332,8 @@ describe('# CycleManager', () => {
     it('should create new GlobalTurn when previous one ends without waiting snapshots', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         initStore(characters);
@@ -423,7 +423,7 @@ describe('# CycleManager', () => {
     it('should check if current character died on notify deaths action', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null })
         ];
 
         initStore(characters);
@@ -485,8 +485,8 @@ describe('# CycleManager', () => {
     it('should give coherent running state', () => {
 
         const characters = [
-            seedCharacter('fake', { id: '1', player: null }),
-            seedCharacter('fake', { id: '2', player: null })
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
         ];
 
         initStore(characters);

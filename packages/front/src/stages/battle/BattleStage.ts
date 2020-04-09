@@ -8,17 +8,25 @@ import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
 import { Controller } from '../../Controller';
+import { Player } from './entities/player/Player';
+import { Character } from './entities/character/Character';
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
 export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
 
     const fillBattleData = (period: BattleDataPeriod): void => {
-        const current = battleData[ period ];
-        current.battleHash = battleSnapshot.battleHash;
-        current.teams.push(...battleSnapshot.teamsSnapshots.map(Team));
-        current.players.push(...current.teams.flatMap(t => t.players));
-        current.characters.push(...current.players.flatMap(p => p.characters));
+        const data = battleData[ period ];
+        data.battleHash = battleSnapshot.battleHash;
+
+        const teams: Team<BattleDataPeriod>[] = data.teams;
+        teams.push(...battleSnapshot.teamsSnapshots.map(snap => Team(period, snap)));
+
+        const players: Player<BattleDataPeriod>[] = data.players;
+        players.push(...teams.flatMap(t => t.players));
+
+        const characters: Character<BattleDataPeriod>[] = data.characters;
+        characters.push(...players.flatMap(p => p.characters));
     };
 
     new Array<BattleDataPeriod>('current', 'future').forEach(fillBattleData);

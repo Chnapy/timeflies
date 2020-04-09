@@ -27,7 +27,7 @@ describe('# MapManager', () => {
         pathfinderCreator?: typeof Pathfinder;
     }): MapManager => {
 
-        const charactersFuture = [ seedCharacter('fake', { id: '1', player: null }) ];
+        const charactersFuture = [ seedCharacter('fake', { period: 'future', id: '1', player: null }) ];
 
         StoreTest.initStore({
             data: {

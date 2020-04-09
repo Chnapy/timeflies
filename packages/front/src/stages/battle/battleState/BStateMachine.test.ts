@@ -1,6 +1,6 @@
 import { StoreTest } from '../../../StoreTest';
 import { seedMapManager } from '../map/MapManager.seed';
-import { BState, BStateAction, BStateSpellPrepareAction } from './BattleStateSchema';
+import { BState, BStateSpellPrepareAction } from './BattleStateSchema';
 import { BStateMachine } from './BStateMachine';
 
 

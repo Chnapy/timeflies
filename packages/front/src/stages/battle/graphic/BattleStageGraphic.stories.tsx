@@ -26,12 +26,14 @@ export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
+            period: 'current',
             id: '1',
             player: null,
             position: { x: 4, y: 3 },
             orientation: 'right'
         }),
         seedCharacter('real', {
+            period: 'current',
             id: '2',
             player: null,
             position: { x: 6, y: 4 },
@@ -41,12 +43,14 @@ export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
 
     const charactersFuture = [
         seedCharacter('real', {
+            period: 'future',
             id: '1',
             player: null,
             position: { x: 4, y: 3 },
             orientation: 'right'
         }),
         seedCharacter('real', {
+            period: 'future',
             id: '2',
             player: null,
             position: { x: 6, y: 4 },
@@ -133,12 +137,14 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
+            period: 'current',
             id: '1',
             player: null,
             position: { x: 4, y: 3 },
             orientation: 'right'
         }),
         seedCharacter('real', {
+            period: 'current',
             id: '2',
             player: null,
             position: { x: 6, y: 4 },
@@ -148,12 +154,14 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
 
     const charactersFuture = [
         seedCharacter('real', {
+            period: 'future',
             id: '1',
             player: null,
             position: { x: 4, y: 3 },
             orientation: 'right'
         }),
         seedCharacter('real', {
+            period: 'future',
             id: '2',
             player: null,
             position: { x: 6, y: 4 },
@@ -213,9 +221,10 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
         });
 
         const spell = seedSpell('fake', {
+            period: 'future',
             id: '1',
             type: 'move',
-            character: charactersCurrent[ 0 ],
+            character: charactersFuture[ 0 ],
         });
 
         const tiledMapManager = TiledManager(mapAssets, seedTiledConfig('map_1'));

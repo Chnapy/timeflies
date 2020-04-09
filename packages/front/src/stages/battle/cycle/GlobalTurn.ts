@@ -19,7 +19,7 @@ interface Dependencies {
 }
 
 export const GlobalTurn = (
-    snapshot: GlobalTurnSnapshot, characters: readonly Character[], generateTurnId: IndexGenerator, onGlobalTurnEnd: (endTime: number) => void,
+    snapshot: GlobalTurnSnapshot, characters: readonly Character<'current'>[], generateTurnId: IndexGenerator, onGlobalTurnEnd: (endTime: number) => void,
     { turnCreator }: Dependencies = { turnCreator: Turn }
 ): GlobalTurn => {
 

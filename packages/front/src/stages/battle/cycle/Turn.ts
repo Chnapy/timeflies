@@ -9,7 +9,7 @@ export type TurnState = 'idle' | 'running' | 'ended';
 
 export interface Turn {
     readonly id: number;
-    readonly character: Readonly<Character>;
+    readonly character: Readonly<Character<'current'>>;
     readonly state: TurnState;
     readonly startTime: number;
     readonly turnDuration: number;
@@ -20,7 +20,7 @@ export interface Turn {
     getRemainingTime(period: BattleDataPeriod): number;
 }
 
-export const Turn = (id: number, startTime: number, character: Character, onTurnEnd: () => void): Turn => {
+export const Turn = (id: number, startTime: number, character: Character<'current'>, onTurnEnd: () => void): Turn => {
 
     const { dispatchStart, dispatchEnd } = serviceDispatch({
         dispatchStart: (): BStateTurnStartAction => ({

@@ -24,7 +24,7 @@ describe('# SnapshotManager', () => {
 
     it('should commit battle data future on commit action, then get the correct hash', () => {
 
-        const teams: Team[] = [
+        const teams: Team<any>[] = [
             {
                 getSnapshot() {
                     return {
@@ -34,7 +34,7 @@ describe('# SnapshotManager', () => {
                         playersSnapshots: []
                     }
                 }
-            } as unknown as Team
+            } as unknown as Team<any>
         ];
 
         const currentBattleData: BattleDataCurrent = {
@@ -92,7 +92,7 @@ describe('# SnapshotManager', () => {
 
             let teamColor = 'red';
 
-            const teams: Team[] = [
+            const teams: Team<any>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -104,7 +104,7 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot
-                } as unknown as Team
+                } as unknown as Team<any>
             ];
 
             const currentBattleData: BattleDataCurrent = {
@@ -154,7 +154,8 @@ describe('# SnapshotManager', () => {
             StoreTest.dispatch<SpellActionTimerEndAction>({
                 type: 'battle/spell-action/end',
                 removed: true,
-                correctHash: firstHash
+                correctHash: firstHash,
+                spellActionSnapshot: {} as any
             });
 
             expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
@@ -168,7 +169,7 @@ describe('# SnapshotManager', () => {
 
             let teamColor = 'red';
 
-            const teams: Team[] = [
+            const teams: Team<any>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -180,7 +181,7 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot
-                } as unknown as Team
+                } as unknown as Team<any>
             ];
 
             const currentBattleData: BattleDataCurrent = {
@@ -232,7 +233,8 @@ describe('# SnapshotManager', () => {
             StoreTest.dispatch<SpellActionTimerEndAction>({
                 type: 'battle/spell-action/end',
                 removed: true,
-                correctHash: firstHash
+                correctHash: firstHash,
+                spellActionSnapshot: {} as any
             });
 
             expect(futureBattleData.battleHash).toBe(firstHash);
@@ -241,7 +243,7 @@ describe('# SnapshotManager', () => {
 
         it('should update current battle data from future on spell action end action', () => {
 
-            const currentTeams: Team[] = [
+            const currentTeams: Team<'current'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -253,10 +255,10 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot() { }
-                } as unknown as Team
+                } as unknown as Team<'current'>
             ];
 
-            const futureTeams: Team[] = [
+            const futureTeams: Team<'future'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -268,7 +270,7 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot() { }
-                } as unknown as Team
+                } as unknown as Team<'future'>
             ];
 
             const currentBattleData: BattleDataCurrent = {
@@ -311,7 +313,8 @@ describe('# SnapshotManager', () => {
             StoreTest.dispatch<SpellActionTimerEndAction>({
                 type: 'battle/spell-action/end',
                 removed: false,
-                correctHash: lastHash
+                correctHash: lastHash,
+                spellActionSnapshot: {} as any
             });
 
             expect(currentBattleData.battleHash).toBe(lastHash);
@@ -319,7 +322,7 @@ describe('# SnapshotManager', () => {
 
         it('should not notify for deaths on spell action end action if there is not new deaths', () => {
 
-            const currentTeams: Team[] = [
+            const currentTeams: Team<'current'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -331,10 +334,10 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot() { }
-                } as unknown as Team
+                } as unknown as Team<'current'>
             ];
 
-            const futureTeams: Team[] = [
+            const futureTeams: Team<'future'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -346,15 +349,17 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot() { }
-                } as unknown as Team
+                } as unknown as Team<'future'>
             ];
 
             const currentCharacter = seedCharacter('fake', {
+                period: 'current',
                 id: '1',
                 player: null
             });
 
             const futureCharacter = seedCharacter('fake', {
+                period: 'future',
                 id: '1',
                 player: null
             });
@@ -399,7 +404,8 @@ describe('# SnapshotManager', () => {
             StoreTest.dispatch<SpellActionTimerEndAction>({
                 type: 'battle/spell-action/end',
                 removed: false,
-                correctHash: lastHash
+                correctHash: lastHash,
+                spellActionSnapshot: {} as any
             });
 
             expect(StoreTest.getActions()).not.toContainEqual<NotifyDeathsAction>({
@@ -410,16 +416,18 @@ describe('# SnapshotManager', () => {
         it('should notify for deaths on spell action end action if there is new deaths', () => {
 
             const currentCharacter = seedCharacter('real', {
+                period: 'current',
                 id: '1',
                 player: null
             });
 
             const futureCharacter = seedCharacter('real', {
+                period: 'future',
                 id: '1',
                 player: null
             });
 
-            const currentTeams: Team[] = [
+            const currentTeams: Team<'current'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -438,10 +446,10 @@ describe('# SnapshotManager', () => {
                         const [ characterSnapshot ] = snapshot.playersSnapshots[ 0 ].charactersSnapshots;
                         (currentCharacter.features.life as number) = characterSnapshot.features.life;
                     }
-                } as unknown as Team
+                } as unknown as Team<'current'>
             ];
 
-            const futureTeams: Team[] = [
+            const futureTeams: Team<'future'>[] = [
                 {
                     id: 't1',
                     getSnapshot(): TeamSnapshot {
@@ -460,7 +468,7 @@ describe('# SnapshotManager', () => {
                         const [ characterSnapshot ] = snapshot.playersSnapshots[ 0 ].charactersSnapshots;
                         (futureCharacter.features.life as number) = characterSnapshot.features.life;
                     }
-                } as unknown as Team
+                } as unknown as Team<'future'>
             ];
 
             const currentBattleData: BattleDataCurrent = {
@@ -505,7 +513,8 @@ describe('# SnapshotManager', () => {
             StoreTest.dispatch<SpellActionTimerEndAction>({
                 type: 'battle/spell-action/end',
                 removed: false,
-                correctHash: lastHash
+                correctHash: lastHash,
+                spellActionSnapshot: {} as any
             });
 
             expect(StoreTest.getActions()).toContainEqual<NotifyDeathsAction>({
@@ -518,7 +527,7 @@ describe('# SnapshotManager', () => {
 
         it('should commit on turn start with date now', () => {
 
-            const teams: Team[] = [
+            const teams: Team<any>[] = [
                 {
                     getSnapshot() {
                         return {
@@ -528,7 +537,7 @@ describe('# SnapshotManager', () => {
                             playersSnapshots: []
                         }
                     }
-                } as unknown as Team
+                } as unknown as Team<any>
             ];
 
             const currentBattleData: BattleDataCurrent = {
@@ -577,7 +586,7 @@ describe('# SnapshotManager', () => {
 
         it('should rollback to before now on turn end', () => {
 
-            const currentTeams: Team[] = [
+            const currentTeams: Team<'current'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -589,10 +598,10 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot() { }
-                } as unknown as Team
+                } as unknown as Team<'current'>
             ];
 
-            const futureTeams: Team[] = [
+            const futureTeams: Team<'future'>[] = [
                 {
                     id: 't1',
                     getSnapshot() {
@@ -604,7 +613,7 @@ describe('# SnapshotManager', () => {
                         }
                     },
                     updateFromSnapshot() { }
-                } as unknown as Team
+                } as unknown as Team<'future'>
             ];
 
             const currentBattleData: BattleDataCurrent = {

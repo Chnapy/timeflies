@@ -1,18 +1,23 @@
 import { TeamSnapshot } from '@timeflies/shared';
 import { Player } from '../player/Player';
-import { WithSnapshot } from '../WithSnapshot';
+import { PeriodicEntity } from '../PeriodicEntity';
 import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
+import { BattleDataPeriod } from '../../../../BattleData';
 
-export interface Team extends WithSnapshot<TeamSnapshot> {
+export interface Team<P extends BattleDataPeriod> extends PeriodicEntity<P, TeamSnapshot> {
     readonly id: string;
     readonly name: string;
     readonly color: string;
-    readonly players: Player[];
+    readonly players: Player<P>[];
 }
 
-export const Team = ({ id, name, color, playersSnapshots }: TeamSnapshot): Team => {
+export const Team = <P extends BattleDataPeriod>(
+    period: P,
+    { id, name, color, playersSnapshots }: TeamSnapshot
+): Team<P> => {
 
-    const this_: Team = {
+    const this_: Team<P> = {
+        period,
         id,
         name,
         color,
@@ -39,7 +44,7 @@ export const Team = ({ id, name, color, playersSnapshots }: TeamSnapshot): Team 
         }
     };
 
-    const players = playersSnapshots.map(snap => Player(snap, this_));
+    const players = playersSnapshots.map(snap => Player(period, snap, this_));
 
     return this_;
 };

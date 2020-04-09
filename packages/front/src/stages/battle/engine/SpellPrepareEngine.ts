@@ -15,7 +15,7 @@ export interface SpellPrepareSubEngine<HR> {
 }
 
 export interface SpellPrepareSubEngineCreator<HR> {
-    (spell: Spell, mapManager: MapManager): SpellPrepareSubEngine<HR>;
+    (spell: Spell<'future'>, mapManager: MapManager): SpellPrepareSubEngine<HR>;
 }
 
 type Event =
@@ -24,7 +24,7 @@ type Event =
     | BStateResetAction
     | BStateTurnStartAction;
 
-const extractDataFromEvent = (event: Event): { character: Character; spell: Spell } => {
+const extractDataFromEvent = (event: Event): { character: Character<'future'>; spell: Spell<'future'> } => {
     const { globalTurn } = serviceBattleData('cycle');
     const { characters } = serviceBattleData('future');
 

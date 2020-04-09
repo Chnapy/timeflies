@@ -2,8 +2,10 @@ import { PlayerSnapshot } from '@timeflies/shared';
 import { SeedCharacterProps, seedCharacterSnapshot, seedCharacter } from '../character/Character.seed';
 import { Player, PlayerDependencies } from './Player';
 import { Team } from '../team/Team';
+import { SeedPeriodicProps } from '../PeriodicEntity';
+import { BattleDataPeriod } from '../../../../BattleData';
 
-export type SeedPlayerProps = {
+export interface SeedPlayerProps {
     id: string;
     name?: string;
     seedCharacters?: SeedCharacterProps<'features'>[],
@@ -23,34 +25,37 @@ export const seedPlayerSnapshot = ({ id, name, seedCharacters }: SeedPlayerProps
     };
 };
 
-export interface SeedPlayerFullProps extends SeedPlayerProps {
-    team: Team | null;
+export interface SeedPlayerFullProps<P extends BattleDataPeriod> extends SeedPlayerProps {
+    team: Team<P> | null;
     itsMe?: boolean;
     dependencies?: PlayerDependencies;
 }
 
-export const seedPlayer = (type: 'real' | 'fake', props: SeedPlayerFullProps): Player => {
+export const seedPlayer = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedPlayerFullProps<P> & SeedPeriodicProps<P>): Player<P> => {
+
+    const { period, id, name, itsMe, seedCharacters, team, dependencies } = props;
 
     if (type === 'real') {
         return Player(
+            period,
             seedPlayerSnapshot(props),
-            props.team as Team,
-            props.dependencies
+            team as Team<P>,
+            dependencies
         );
     }
-    const { id, name, itsMe, seedCharacters, team } = props;
 
-
-    const player: Player = {
+    const player: Player<P> = {
+        period,
         id,
         itsMe: itsMe ?? true,
         name: name ?? 'P-' + id,
         characters: (seedCharacters ?? seedInitialSeedCharactersSnapshot).map(c => seedCharacter('fake', {
             ...c,
+            period,
             initialFeatures: c.features,
             player
         })),
-        team: team as Team,
+        team: team as Team<P>,
         getSnapshot() { return seedPlayerSnapshot(props); },
         updateFromSnapshot(snapshot) { }
     };

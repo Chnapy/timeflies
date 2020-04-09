@@ -22,11 +22,13 @@ describe('Battleflow', () => {
         const initialPos: Position = seedCharacterInitialPosition;
 
         const characterCurrent = seedCharacter('real', {
+            period: 'current',
             id: '1',
             position: initialPos,
             player: { itsMe: true } as any
         });
         const characterFuture = seedCharacter('real', {
+            period: 'future',
             id: '1',
             position: initialPos,
             player: { itsMe: true } as any

@@ -14,7 +14,7 @@ export interface MapManager extends
 export interface MapManagerDependencies {
     tiledManagerCreator: typeof TiledManager;
     pathfinderCreator: typeof Pathfinder;
-    getFutureCharacters: () => Character[];
+    getFutureCharacters: () => Character<'future'>[];
 }
 
 export const MapManager = (

@@ -12,6 +12,7 @@ describe('# Spell', () => {
         });
 
         const spell = seedSpell('real', {
+            period: 'current',
             id: snapshot.id,
             type: snapshot.staticData.type,
             initialFeatures: snapshot.staticData.initialFeatures,

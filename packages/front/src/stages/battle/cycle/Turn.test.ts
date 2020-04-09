@@ -9,12 +9,13 @@ describe('#BTurn', () => {
 
     const timerTester = new TimerTester();
 
-    let character: Character;
+    let character: Character<'current'>;
 
     beforeEach(() => {
         StoreTest.beforeTest();
         timerTester.beforeTest();
         character = seedCharacter('fake', {
+            period: 'current',
             id: '1',
             initialFeatures: {
                 actionTime: 2000,

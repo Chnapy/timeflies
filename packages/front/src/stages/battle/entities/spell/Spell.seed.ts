@@ -1,6 +1,8 @@
 import { SpellFeatures, SpellSnapshot, SpellType, StaticSpell } from '@timeflies/shared';
 import { Character } from '../character/Character';
 import { Spell } from './Spell';
+import { BattleDataPeriod } from '../../../../BattleData';
+import { SeedPeriodicProps } from '../PeriodicEntity';
 
 export type SeedSpellProps<FK extends 'features' | 'initialFeatures' = 'initialFeatures'> = {
     id: string;
@@ -40,17 +42,18 @@ export const seedSpellSnapshot = (props: SeedSpellProps<'features'>): SpellSnaps
     };
 };
 
-export const seedSpell = (type: 'real' | 'fake', props: SeedSpellProps & Record<'character', Character>): Spell => {
+export const seedSpell = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedSpellProps & SeedPeriodicProps<P> & Record<'character', Character<P>>): Spell<P> => {
     const { id, character, initialFeatures } = props;
 
     if (type === 'real') {
-        return Spell(seedSpellSnapshot({
+        return Spell(props.period, seedSpellSnapshot({
             ...props,
             features: initialFeatures
         }), character);
     }
 
-    const spell: Spell = {
+    const spell: Spell<P> = {
+        period: props.period,
         id,
         character,
         feature: seedSpellFeatures(initialFeatures),

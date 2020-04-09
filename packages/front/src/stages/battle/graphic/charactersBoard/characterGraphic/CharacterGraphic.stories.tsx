@@ -36,7 +36,11 @@ export const Current: React.FC = () => {
 
         const sheet = resources.characters;
 
-        const character = seedCharacter('real', { id: '1', player: null });
+        const characterCurrent = seedCharacter('real', {
+            period: 'current',
+            id: '1',
+            player: null
+        });
 
         const mapAssets = resources.map;
 
@@ -56,7 +60,7 @@ export const Current: React.FC = () => {
                 characters: sheet
             }
         }, () => {
-            return CharacterGraphic('current', character);
+            return CharacterGraphic(characterCurrent);
         });
 
         app.stage.addChild(container);
@@ -68,10 +72,10 @@ export const Current: React.FC = () => {
                 type: 'battle/spell-action/start',
                 spellActionSnapshot: {
                     battleHash: '',
-                    characterId: character.id,
+                    characterId: characterCurrent.id,
                     duration,
                     position,
-                    spellId: character.defaultSpell.id,
+                    spellId: characterCurrent.defaultSpell.id,
                     startTime: Date.now(),
                     validated: false
                 }
@@ -82,10 +86,10 @@ export const Current: React.FC = () => {
                 removed: false,
                 spellActionSnapshot: {
                     battleHash: '',
-                    characterId: character.id,
+                    characterId: characterCurrent.id,
                     duration: -1,
-                    position: character.position,
-                    spellId: character.defaultSpell.id,
+                    position: characterCurrent.position,
+                    spellId: characterCurrent.defaultSpell.id,
                     startTime: Date.now(),
                     validated: false
                 }
@@ -115,15 +119,15 @@ export const Current: React.FC = () => {
             });
 
             const position = {
-                x: character.position.x + diffPos.x,
-                y: character.position.y + diffPos.y,
+                x: characterCurrent.position.x + diffPos.x,
+                y: characterCurrent.position.y + diffPos.y,
             };
 
             dispatchTimerStart(position, 500);
 
             await waitByTime(500);
 
-            character.set({
+            characterCurrent.set({
                 position,
                 orientation
             });
@@ -188,7 +192,11 @@ export const Future: React.FC = () => {
 
         const sheet = resources.characters;
 
-        const character = seedCharacter('real', { id: '1', player: null });
+        const characterFuture = seedCharacter('real', {
+            period: 'future',
+            id: '1',
+            player: null
+        });
 
         const mapAssets = resources.map;
 
@@ -208,7 +216,7 @@ export const Future: React.FC = () => {
                 characters: sheet
             }
         }, () => {
-            return CharacterGraphic('future', character);
+            return CharacterGraphic(characterFuture);
         });
 
         app.stage.addChild(container);
@@ -219,7 +227,10 @@ export const Future: React.FC = () => {
                 eventType: 'SPELL-LAUNCH',
                 payload: {
                     spellActions: [ {
-                        spell: seedSpell('fake', { id: '1', type: 'move', character: null as any }),
+                        spell: seedSpell('fake', {
+                            period: 'future',
+                            id: '1', type: 'move', character: null as any
+                        }),
                         position: { x: -1, y: -1 }
                     } ]
                 }
@@ -248,10 +259,10 @@ export const Future: React.FC = () => {
                 }
             });
 
-            character.set({
+            characterFuture.set({
                 position: {
-                    x: character.position.x + diffPos.x,
-                    y: character.position.y + diffPos.y,
+                    x: characterFuture.position.x + diffPos.x,
+                    y: characterFuture.position.y + diffPos.y,
                 },
                 orientation
             });

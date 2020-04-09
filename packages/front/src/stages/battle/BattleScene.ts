@@ -3,7 +3,6 @@ import { BattleDataMap } from '../../BattleData';
 import { DataStateManager } from '../../dataStateManager/DataStateManager';
 import { BattleReducerManager } from '../../phaser/battleReducers/BattleReducerManager';
 import { Team } from './entities/team/Team';
-import { WithSnapshot } from './entities/WithSnapshot';
 import { BattleRoomManager } from '../../phaser/room/BattleRoomManager';
 import { SpellEngine } from '../../phaser/spellEngine/SpellEngine';
 import { ConnectedScene } from '../ConnectedScene';

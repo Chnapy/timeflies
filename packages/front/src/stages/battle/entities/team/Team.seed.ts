@@ -1,5 +1,7 @@
 import { TeamSnapshot } from '@timeflies/shared';
-import { SeedPlayerProps, seedPlayerSnapshot, seedPlayer } from '../player/Player.seed';
+import { BattleDataPeriod } from '../../../../BattleData';
+import { seedPlayer, SeedPlayerProps, seedPlayerSnapshot } from '../player/Player.seed';
+import { SeedPeriodicProps } from '../PeriodicEntity';
 import { Team } from './Team';
 
 export interface SeedTeamProps {
@@ -19,19 +21,22 @@ export const seedTeamSnapshot = ({ id, name, color, seedPlayers }: SeedTeamProps
     };
 };
 
-export const seedTeam = (type: 'real' | 'fake', props: SeedTeamProps): Team => {
+export const seedTeam = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedTeamProps & SeedPeriodicProps<P>): Team<P> => {
+
+    const { period, id, name, color, seedPlayers } = props;
 
     if (type === 'real') {
-        return Team(seedTeamSnapshot(props));
+        return Team(period, seedTeamSnapshot(props));
     }
-    const { id, name, color, seedPlayers } = props;
 
-    const team = {
+    const team: Team<P> = {
+        period,
         id,
         name: name ?? 'T-' + id,
         color: color ?? 'red',
         players: seedPlayers.map(p => seedPlayer('fake', {
             ...p,
+            period,
             team
         })),
         getSnapshot() { return seedTeamSnapshot(props); },

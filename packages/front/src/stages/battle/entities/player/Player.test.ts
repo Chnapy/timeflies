@@ -32,6 +32,7 @@ describe('# Player', () => {
         });
 
         const player = seedPlayer('real', {
+            period: 'current',
             id: 'p1',
             name: 'p-1',
             seedCharacters: [ {
@@ -40,7 +41,7 @@ describe('# Player', () => {
             } ],
             team: null,
             dependencies: {
-                characterCreator: snap => ({
+                characterCreator: (period, snap) => ({
                     getSnapshot() {
                         return snap;
                     },
@@ -64,6 +65,7 @@ describe('# Player', () => {
         const updateFromSnapshot = jest.fn();
 
         const player = seedPlayer('real', {
+            period: 'current',
             id: 'p1',
             name: 'p-1',
             seedCharacters: [ {
@@ -72,7 +74,7 @@ describe('# Player', () => {
             } ],
             team: null,
             dependencies: {
-                characterCreator: snap => ({
+                characterCreator: (period, snap) => ({
                     id: snap.staticData.id,
                     updateFromSnapshot
                 } as any)
