@@ -1,4 +1,4 @@
-import { Position, SpellActionSnapshot, switchUtil, assertIsDefined, getOrientationFromTo } from '@timeflies/shared';
+import { assertIsDefined, getOrientationFromTo, Orientation, Position, SpellActionSnapshot, switchUtil } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { BattleDataPeriod } from '../../../../../BattleData';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
@@ -20,6 +20,11 @@ interface PeriodFn {
         tiledMapGraphic: TiledMapGraphic,
         charactersSheet: PIXI.Spritesheet
     ): PIXI.Sprite;
+}
+
+interface GeoState {
+    position: Position;
+    orientation: Orientation;
 }
 
 export const CharacterGraphic = (
@@ -66,14 +71,17 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
     });
     animatedSprite.animationSpeed = 0.4;
 
-    let previousPosition: Position = character.position;
+    let previousState: GeoState = {
+        position: character.position,
+        orientation: character.orientation
+    };
 
     let ticker: PIXI.Ticker;
 
-    const onMoveAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot) => {
+    const onMoveAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
 
         const orientation = getOrientationFromTo(character.position, endPosition);
-        
+
         animatedSprite
             .setProps({
                 characterState: 'walk',
@@ -81,7 +89,7 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
             })
             .play();
 
-        const startWorldPos: Position = tiledMapGraphic.getWorldFromTile(previousPosition);
+        const startWorldPos: Position = tiledMapGraphic.getWorldFromTile(previousState.position);
         const endWorldPos: Position = tiledMapGraphic.getWorldFromTile(endPosition);
         const diffWorldPos: Position = {
             x: endWorldPos.x - startWorldPos.x,
@@ -98,6 +106,11 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
                 startWorldPos.y + ratio * diffWorldPos.y,
             );
         });
+
+        return {
+            position: endPosition,
+            orientation
+        };
     };
 
     onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({
@@ -109,12 +122,17 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
 
         ticker.destroy();
 
-        const { x, y } = tiledMapGraphic.getWorldFromTile(previousPosition);
+        previousState = {
+            position: character.position,
+            orientation: character.orientation
+        };
+
+        const { x, y } = tiledMapGraphic.getWorldFromTile(previousState.position);
         animatedSprite.position.set(x, y);
         animatedSprite
             .setProps({
                 characterState: 'idle',
-                orientation: character.orientation
+                orientation: previousState.orientation
             })
             .play();
     });
@@ -122,7 +140,7 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
     onAction<SpellActionTimerStartAction>('battle/spell-action/start', ({
         spellActionSnapshot,
         spellActionSnapshot: {
-            characterId, spellId, position: endPosition
+            characterId, spellId
         }
     }) => {
         if (characterId !== character.id) {
@@ -138,18 +156,17 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
 
         ticker = new PIXI.Ticker();
 
-        const actionFn = switchUtil(spell.staticData.type, {
-            move: onMoveAction,
-            orientate: () => { },
-            sampleSpell1: () => { },
-            sampleSpell2: () => { },
-            sampleSpell3: () => { },
-        });
-        actionFn(spellActionSnapshot);
+        const actionFn: (snapshot: SpellActionSnapshot) => GeoState =
+            switchUtil(spell.staticData.type, {
+                move: onMoveAction,
+                orientate: () => ({} as any),
+                sampleSpell1: () => ({} as any),
+                sampleSpell2: () => ({} as any),
+                sampleSpell3: () => ({} as any),
+            });
+        previousState = actionFn(spellActionSnapshot);
 
         ticker.start();
-
-        previousPosition = endPosition;
     });
 
     return animatedSprite;
@@ -177,7 +194,11 @@ const periodFuture: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
                 sprite.texture = texture;
                 const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
                 sprite.position.set(worldPos.x, worldPos.y);
+                sprite.visible = true;
             });
+        } else if(action.eventType === 'TURN-END') {
+
+            sprite.visible = false;
         }
     });
 
