@@ -2,6 +2,7 @@
 export type SpellType =
     | 'move'
     | 'orientate'
+    | 'simpleAttack'
     | 'sampleSpell1'
     | 'sampleSpell2'
     | 'sampleSpell3';

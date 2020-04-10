@@ -3,9 +3,11 @@ import { IGameAction } from '../../../action/GameAction';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { MapManager } from '../map/MapManager';
 import { ExtractHoverReturn } from './spellMapping';
+import { Spell } from '../entities/spell/Spell';
 
 export interface SpellEngineBindAction<ST extends SpellType = SpellType> extends IGameAction<'battle/spell-engine/bind'> {
-    spellType: ST;
+    spell: Spell<'future'>;
+    rangeArea: Position[];
     onTileHover: (tilePos: Position) => Promise<ExtractHoverReturn<ST>>;
     onTileClick: (tilePos: Position) => Promise<void>;
 }

@@ -1,7 +1,4 @@
 import { Position } from '@timeflies/shared'
-import { Controller } from '../../../Controller';
-//@ts-ignore
-import { BattleSpellLaunchAction } from '../../battleReducers/BattleReducerManager';
 import { SpellPrepare } from '../SpellPrepare';
 
 export class SpellPrepareMove extends SpellPrepare<'move'> {

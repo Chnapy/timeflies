@@ -11,17 +11,17 @@ export default {
     title: 'Battleflow'
 };
 
-export const Default: React.FC<StoryProps> = ({controllerStart}) => {
+export const Default: React.FC<StoryProps> = ({ controllerStart }) => {
 
     const sendFns: { [ key in ClientAction[ 'type' ] ]?: (action: Omit<ClientAction, 'sendTime'>) => void } = {};
-    
+
     const { onAction } = serviceEvent();
-    
+
     const onSendAction = <A extends ClientAction>(type: A[ 'type' ], fn: (action: Omit<A, 'sendTime'>) => void) => {
-    
+
         sendFns[ type ] = (fn as any);
     };
-    
+
     const receiveAction = <A extends ServerAction>(message: A) =>
         serviceDispatch({
             dispatch: (): ReceiveMessageAction<A> => ({
@@ -74,7 +74,16 @@ export const Default: React.FC<StoryProps> = ({controllerStart}) => {
                             {
                                 id: 'C1',
                                 seedSpells: [
-                                    { id: 'S1', type: 'move' }
+                                    {
+                                        id: 'S1', type: 'move', initialFeatures: {
+                                            duration: 200
+                                        }
+                                    },
+                                    {
+                                        id: 'S2', type: 'simpleAttack', initialFeatures: {
+                                            duration: 1000, attack: 20, area: 5
+                                        }
+                                    }
                                 ],
                                 features: {
                                     actionTime: 100_000

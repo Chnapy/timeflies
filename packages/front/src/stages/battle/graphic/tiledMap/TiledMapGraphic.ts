@@ -1,9 +1,9 @@
-import { assertIsDefined, Position, TiledLayerTilelayer, TiledTileset, SpellType } from '@timeflies/shared';
+import { assertIsDefined, equals, Position, SpellType, TiledLayerTilelayer, TiledTileset } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { SpellEngineBindAction } from '../../engine/Engine';
-import { getTiledMapHoverFn, ExtractHoverReturn } from '../../engine/spellMapping';
+import { ExtractHoverReturn, getTiledMapHoverFn } from '../../engine/spellMapping';
 import { TileGraphic } from './TileGraphic';
 
 export interface TiledMapGraphic {
@@ -128,19 +128,44 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     const container = new PIXI.Container();
     container.addChild(...layersContainers);
 
-    onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({ spellType, onTileClick: otc, onTileHover: oth }) => {
+    onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({
+        spell, rangeArea, onTileClick: otc, onTileHover: oth
+    }) => {
+
+        const tileGraphicList = layersTiles[ layersTiles.length - 1 ];
+
+        tileGraphicList.forEach(t => t.reset());
+
+        const rangeTiles = rangeArea.map(pos => {
+            const tile = tileGraphicList.find(t => equals(t.tilePos)(pos));
+            assertIsDefined(tile);
+            tile.showRange();
+            return tile;
+        });
+
         triggerFn.onTileClick = otc;
         triggerFn.onTileHover = async (tilePos, tileGraphicTarget) => {
+
+            if (spell.staticData.type === 'move') {
+
+                tileGraphicList.forEach(t => t.reset());
+            } else {
+
+                rangeTiles.forEach(t => t.showRange());
+
+                const isInArea = rangeTiles.some(t => equals(tileGraphicTarget.tilePos)(t.tilePos));
+                if (!isInArea) {
+                    return;
+                }
+            }
+
             const engineProps = await oth(tilePos);
 
-            const tileGraphicList = layersTiles[ layersTiles.length - 1 ];
-            tileGraphicList.forEach(t => t.reset());
-            
             if (engineProps) {
-                const hoverFn = getTiledMapHoverFn(spellType);
+                const hoverFn = getTiledMapHoverFn(spell.staticData.type);
 
                 hoverFn({
-                    engineProps,
+                    engineProps: engineProps as any,
                     tileGraphicTarget,
                     tileGraphicList
                 });

@@ -23,6 +23,8 @@ export interface TileGraphic {
 
     reset(): void;
     showPath(): void;
+    showRange(): void;
+    showAction(): void;
 }
 
 export const TileGraphic = ({
@@ -57,8 +59,25 @@ export const TileGraphic = ({
     };
 
     const showPath = () => {
+        reset();
         graphics.lineStyle(1, 0x00FF00);
         graphics.beginFill(0x00FF00, 0.1);
+        graphics.drawRect(tilewidth / 4, tileheight / 4, tilewidth / 2, tileheight / 2);
+        graphics.endFill();
+    };
+
+    const showRange = () => {
+        reset();
+        graphics.lineStyle(1, 0x0000FF);
+        graphics.beginFill(0x0000FF, 0.1);
+        graphics.drawRect(tilewidth / 4, tileheight / 4, tilewidth / 2, tileheight / 2);
+        graphics.endFill();
+    };
+
+    const showAction = () => {
+        reset();
+        graphics.lineStyle(1, 0xFF0000);
+        graphics.beginFill(0xFF0000, 0.1);
         graphics.drawRect(tilewidth / 4, tileheight / 4, tilewidth / 2, tileheight / 2);
         graphics.endFill();
     };
@@ -67,7 +86,9 @@ export const TileGraphic = ({
         container,
         tilePos,
         reset,
-        showPath
+        showPath,
+        showRange,
+        showAction
     };
     return this_;
 };

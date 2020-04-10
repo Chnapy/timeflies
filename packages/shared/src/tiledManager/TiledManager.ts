@@ -16,6 +16,9 @@ export interface TiledManager {
     getTileType(position: Position): TileType;
     getTilePositionFromIndex(index: number): Position;
     getTilesetFromId(id: number): TiledTileset | undefined;
+
+    getRangeArea(center: Position, r: number): Position[];
+    getActionArea(center: Position, r: number): Position[];
 }
 
 export type TileType = 'default' | 'obstacle' | null;
@@ -83,6 +86,31 @@ export const TiledManager = (
     const getTilesetFromId = (id: number): TiledTileset | undefined =>
         schema.tilesets.find(t => t.firstgid <= id && t.firstgid + t.tilecount - 1 >= id);
 
+    // TODO check vision lines with bresenham
+    const getRangeArea = (center: Position, r: number): Position[] => {
+
+        const area: Position[] = [];
+        let sum = 0;
+        for (let i = 0; i <= r * 2; i++) {
+            for (let k = 0; k <= (i - sum) * 2; k++) {
+
+                const pos: Position = {
+                    x: center.x - i + sum + k,
+                    y: center.y - r + i
+                };
+
+                if (getTileType(pos) === 'default') {
+                    area.push(pos);
+                }
+            }
+
+            if (i >= r) {
+                sum += 2;
+            }
+        }
+        return area;
+    };
+
     return {
         orientation,
         width,
@@ -92,6 +120,9 @@ export const TiledManager = (
 
         getTilePositionFromIndex,
         getTileType,
-        getTilesetFromId
+        getTilesetFromId,
+
+        getRangeArea,
+        getActionArea: getRangeArea
     };
 }

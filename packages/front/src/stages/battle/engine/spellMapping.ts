@@ -1,9 +1,11 @@
 import { inferFn, SpellType } from '@timeflies/shared';
 import { TileHoverFnProps } from '../graphic/tiledMap/TiledMapGraphic';
+import { onMoveTileHover, onSimpleAttackTileHover } from '../graphic/tiledMap/tiledSpellFns';
 import { SpellAction } from '../spellAction/SpellActionManager';
 import { spellLaunchMove, SpellPrepareMove } from './spellEngine/move/SpellPrepareMove';
+import { spellLaunchSimpleAttack, SpellPrepareSimpleAttack } from './spellEngine/simpleAttack/SpellPrepareSimpleAttack';
 import { SpellPrepareSubEngineCreator } from './SpellPrepareEngine';
-import { onMoveTileHover } from '../graphic/tiledMap/tiledSpellFns';
+import { Character } from '../entities/character/Character';
 
 interface GraphicTriggerFn<ST extends SpellType, EngineReturn> {
     characterFn?: (props: {
@@ -13,7 +15,7 @@ interface GraphicTriggerFn<ST extends SpellType, EngineReturn> {
 }
 
 interface SpellMapValue<ST extends SpellType, HR> {
-    launchFn: (spellAction: SpellAction) => void;
+    launchFn: (spellAction: SpellAction, characterList: Character<'future'>[]) => void;
     prepareEngine: SpellPrepareSubEngineCreator<HR>;
 }
 
@@ -37,6 +39,10 @@ const spellMap = inferFn<{
     orientate: {
         launchFn: spellLaunchMove,
         prepareEngine: SpellPrepareMove
+    },
+    simpleAttack: {
+        launchFn: spellLaunchSimpleAttack,
+        prepareEngine: SpellPrepareSimpleAttack
     },
     sampleSpell1: {
         launchFn: spellLaunchMove,
@@ -63,6 +69,11 @@ const spellMapGraphic: {
     orientate: {
         onHover: {
             tiledMapFn: () => { }
+        }
+    },
+    simpleAttack: {
+        onHover: {
+            tiledMapFn: onSimpleAttackTileHover
         }
     },
     sampleSpell1: {

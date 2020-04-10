@@ -125,7 +125,10 @@ export const BStateSchemaRoot = (
             ],
             'SPELL-LAUNCH': [ {
                 target: 'spellPrepare'
-            } ]
+            } ],
+            'SPELL-PREPARE': [{
+                target: 'spellPrepare'
+            }]
         }
     };
 

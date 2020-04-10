@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import React from 'react';
 import { connect } from "react-redux";
 import { AssetManager } from '../../../../assetManager/AssetManager';
-import { Controller } from '../../../../Controller';
 import { CurrentSpellState } from "../../../../phaser/spellEngine/SpellEngine";
+import { serviceDispatch } from '../../../../services/serviceDispatch';
 import { BStateSpellPrepareAction } from '../../../../stages/battle/battleState/BattleStateSchema';
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
 import { UIState } from "../../../UIState";
@@ -60,13 +60,17 @@ export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIS
             return;
         }
 
-        // Controller.dispatch<BStateSpellPrepareAction>({
-        //     type: 'battle/state/event',
-        //     eventType: 'SPELL-PREPARE',
-        //     payload: {
-        //         spellType
-        //     }
-        // });
+        const { dispatchSpellPrepare } = serviceDispatch({
+            dispatchSpellPrepare: (): BStateSpellPrepareAction => ({
+                type: 'battle/state/event',
+                eventType: 'SPELL-PREPARE',
+                payload: {
+                    spellType
+                }
+            })
+        });
+
+        dispatchSpellPrepare();
     };
 
     return <div className={classNames(css.root, {

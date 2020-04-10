@@ -28,6 +28,7 @@ export interface SpellActionSnapshot {
     duration: number;
     spellId: string;
     position: Position;
+    actionArea: Position[];
     battleHash: string;
     validated: boolean;
 }

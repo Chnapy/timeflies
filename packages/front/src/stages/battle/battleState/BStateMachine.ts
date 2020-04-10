@@ -36,6 +36,7 @@ export const BStateMachine = (
             engine.stop();
 
             state = trigger.target;
+            console.log('state', state);
             const { engineCreator } = schema.states[ state ];
             engine = engineCreator({
                 event: event as never,

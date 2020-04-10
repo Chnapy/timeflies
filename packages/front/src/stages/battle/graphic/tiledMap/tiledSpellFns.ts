@@ -11,3 +11,13 @@ export const onMoveTileHover = ({ engineProps, tileGraphicList }: TileHoverFnPro
 
     tileGraphicPath.forEach(t => t.showPath());
 };
+
+export const onSimpleAttackTileHover = ({ engineProps, tileGraphicList }: TileHoverFnProps<'simpleAttack'>) => {
+    const { actionArea } = engineProps;
+
+    const tileGraphicArea = actionArea
+        .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
+
+    tileGraphicArea.forEach(t => t.showAction());
+};
+

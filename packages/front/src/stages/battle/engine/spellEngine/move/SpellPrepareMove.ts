@@ -39,6 +39,10 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
         });
 
         return {
+
+            getRangeArea() {
+                return [];
+            },
             async onTileHover(tilePos: Position, tileType: TileType) {
 
                 currentTile = tileType === 'default' ? tilePos : null;
@@ -73,7 +77,8 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
 
                 dispatchSpellLaunch(positions.map((position): SpellAction => ({
                     spell,
-                    position
+                    position,
+                    actionArea: [ position ]
                 })));
             },
             stop() {

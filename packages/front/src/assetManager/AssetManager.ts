@@ -18,6 +18,7 @@ const AssetSpells: IAssetSpells = {
     spellsMap: {
         move: 'attack_mask',
         orientate: '',
+        simpleAttack: 'thunder-1',
         sampleSpell1: 'blizzard-1',
         sampleSpell2: 'sword-cold',
         sampleSpell3: 'thunder-1'

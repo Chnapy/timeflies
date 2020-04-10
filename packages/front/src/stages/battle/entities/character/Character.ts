@@ -22,18 +22,19 @@ export interface Character<P extends BattleDataPeriod> extends PeriodicEntity<P,
 
     set(o: { [ K in keyof Pick<Character<P>, 'position' | 'orientation'> ]?: Character<P>[ K ] }): void;
 
+    alterLife(add: number): void;
+
     hasSpell(spellType: SpellType): boolean;
 }
 
 // TODO add test to ensure that given objects are copied
-// TODO add period attribute to all entities
 export const Character = <P extends BattleDataPeriod>(period: P, {
     staticData, orientation: _orientation, position: _position, features: _features, spellsSnapshots: _spellsSnapshots
 }: CharacterSnapshot, player: Player<P>): Character<P> => {
 
     let position: Position = { ..._position };
     let orientation: Orientation = _orientation;
-    const features: Readonly<CharacterFeatures> = { ..._features };
+    const features: CharacterFeatures = { ..._features };
 
     const _this: Character<P> = {
         period,
@@ -98,6 +99,13 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
             }
             if (o.orientation) {
                 orientation = o.orientation;
+            }
+        },
+
+        alterLife(add: number): void {
+            features.life += add;
+            if(features.life <= 0) {
+                features.life = 0;
             }
         },
 

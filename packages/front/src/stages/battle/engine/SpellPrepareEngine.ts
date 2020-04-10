@@ -1,4 +1,4 @@
-import { assertIsDefined, assertThenGet, Position, SpellType, TileType } from "@timeflies/shared";
+import { assertIsDefined, assertThenGet, Position, TileType } from "@timeflies/shared";
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { BStateResetAction, BStateSpellLaunchAction, BStateSpellPrepareAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
@@ -9,6 +9,7 @@ import { EngineCreator, SpellEngineBindAction } from './Engine';
 import { getSpellPrepareSubEngine } from './spellMapping';
 
 export interface SpellPrepareSubEngine<HR> {
+    getRangeArea(): Position[];
     onTileHover(tilePos: Position, tileType: TileType): Promise<HR>;
     onTileClick(tilePos: Position, tileType: TileType): Promise<void>;
     stop(): void;
@@ -107,15 +108,18 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof getSpellPrepareSu
     };
 
     const { dispatchBind } = serviceDispatch({
-        dispatchBind: (spellType: SpellType): SpellEngineBindAction => ({
+        dispatchBind: (spell: Spell<'future'>, rangeArea: Position[]): SpellEngineBindAction => ({
             type: 'battle/spell-engine/bind',
-            spellType,
+            spell,
+            rangeArea,
             onTileHover: ifCanSpellBeUsed(engine.onTileHover),
             onTileClick: ifCanSpellBeUsed(engine.onTileClick),
         })
     });
 
-    dispatchBind(spell.staticData.type);
+    const rangeArea = engine.getRangeArea();
+
+    dispatchBind(spell, rangeArea);
 
     return {
         stop() {

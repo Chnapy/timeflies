@@ -113,6 +113,13 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
         };
     };
 
+    const onSimpleAttackAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
+
+        // TODO find a graphic way to show the spell
+
+        return previousState;
+    };
+
     onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({
         spellActionSnapshot: { characterId }
     }) => {
@@ -160,6 +167,7 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
             switchUtil(spell.staticData.type, {
                 move: onMoveAction,
                 orientate: () => ({} as any),
+                simpleAttack: onSimpleAttackAction,
                 sampleSpell1: () => ({} as any),
                 sampleSpell2: () => ({} as any),
                 sampleSpell3: () => ({} as any),

@@ -11,6 +11,7 @@ import { getSpellLaunchFn as GetterSpellLaunchFn } from '../engine/spellMapping'
 export interface SpellAction {
     spell: Spell<'future'>;
     position: Position;
+    actionArea: Position[];
 }
 
 export interface SpellActionManager {
@@ -40,7 +41,7 @@ export const SpellActionManager = (
 
     const spellActionTimer = spellActionTimerCreator();
 
-    const { spellActionSnapshotList } = serviceBattleData('future');
+    const { spellActionSnapshotList, characters } = serviceBattleData('future');
 
     const { onAction, onMessageAction } = serviceEvent();
     const { dispatchCommit } = serviceDispatch({
@@ -61,7 +62,7 @@ export const SpellActionManager = (
 
         const spellLaunchFn = getSpellLaunchFn(spell.staticData.type);
 
-        spellLaunchFn(action);
+        spellLaunchFn(action, characters);
 
         dispatchCommit(startTime + duration);
 
@@ -73,6 +74,7 @@ export const SpellActionManager = (
             duration,
             spellId: spell.id,
             position,
+            actionArea: action.actionArea,
             battleHash,
             validated: false
         };
@@ -163,7 +165,7 @@ export const SpellActionManager = (
     });
 
     onMessageAction<NotifySAction>('notify', ({ spellActionSnapshot: {
-        spellId, position, startTime, battleHash
+        spellId, position, actionArea, startTime, battleHash
     } }) => {
 
         const { globalTurn } = serviceBattleData('cycle');
@@ -181,7 +183,8 @@ export const SpellActionManager = (
 
         const spellAction: SpellAction = {
             spell,
-            position
+            position,
+            actionArea
         };
 
         onSpellAction(spellAction, startTime);
