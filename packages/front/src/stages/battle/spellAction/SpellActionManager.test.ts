@@ -104,7 +104,8 @@ describe('# SpellActionManager', () => {
                 spellActions: [
                     {
                         spell,
-                        position: { x: -1, y: -1 }
+                        position: { x: -1, y: -1 },
+                        actionArea: [ { x: -1, y: -1 } ]
                     }
                 ]
             }
@@ -120,7 +121,8 @@ describe('# SpellActionManager', () => {
                 spellActions: [
                     {
                         spell,
-                        position: { x: 0, y: -1 }
+                        position: { x: 0, y: -1 },
+                        actionArea: [ { x: 0, y: -1 } ]
                     }
                 ]
             }
@@ -169,7 +171,8 @@ describe('# SpellActionManager', () => {
                 spellActions: [
                     {
                         spell,
-                        position: { x: -1, y: -1 }
+                        position: { x: -1, y: -1 },
+                        actionArea: [ { x: -1, y: -1 } ]
                     }
                 ]
             }
@@ -182,6 +185,8 @@ describe('# SpellActionManager', () => {
             characterId: '1',
             spellId: 's1',
             position: { x: -1, y: -1 },
+            actionArea: [ { x: -1, y: -1 } ],
+            fromNotify: false,
             validated: false
         } ]);
 
@@ -290,6 +295,8 @@ describe('# SpellActionManager', () => {
                     characterId: '1',
                     spellId: spell.id,
                     position: { x: -1, y: -1 },
+                    actionArea: [ { x: -1, y: -1 } ],
+                    fromNotify: true,
                     validated: false
                 }
             }
@@ -302,6 +309,8 @@ describe('# SpellActionManager', () => {
             characterId: '1',
             spellId: spell.id,
             position: { x: -1, y: -1 },
+            actionArea: [ { x: -1, y: -1 } ],
+            fromNotify: true,
             validated: false
         } ]);
 

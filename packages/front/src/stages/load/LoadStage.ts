@@ -1,12 +1,24 @@
 import { BattleLoadPayload, BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
+import { IGameAction } from '../../action/GameAction';
 import { Controller } from '../../Controller';
-import { BattleLaunchAction } from "../../phaser/battleReducers/BattleReducerManager";
 import { serviceDispatch } from "../../services/serviceDispatch";
 import { serviceEvent } from "../../services/serviceEvent";
 import { serviceNetwork } from "../../services/serviceNetwork";
 import charactersSpritesheetPath from '../../_assets/spritesheets/sokoban.json';
-import { BattleSceneData } from "../battle/BattleScene";
+import { BattleSceneData } from '../battle/BattleStage';
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
+
+export interface LoadLaunchAction extends IGameAction<'load/launch'> {
+    payload: BattleLoadPayload;
+}
+
+export interface BattleLaunchAction extends IGameAction<'battle/launch'> {
+    battleSceneData: BattleSceneData;
+}
+
+export type LoadAction =
+    | LoadLaunchAction
+    | BattleLaunchAction;
 
 export type LoadStageParam = StageParam<'load', BattleLoadPayload>;
 

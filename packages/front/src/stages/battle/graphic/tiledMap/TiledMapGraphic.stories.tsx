@@ -7,6 +7,8 @@ import { serviceDispatch } from '../../../../services/serviceDispatch';
 import mapPath from '../../../../_assets/map/map.json';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { TiledMapGraphic } from './TiledMapGraphic';
+import { Spell } from '../../entities/spell/Spell';
+import { seedSpell } from '../../entities/spell/Spell.seed';
 
 export default {
     title: 'graphic/TiledMapGraphic'
@@ -19,7 +21,7 @@ export const Default = () => {
         const app = new PIXI.Application({ view, resizeTo: parent });
 
         const loader = AssetLoader();
-        
+
         const { map } = await loader.newInstance()
             .add('map', mapPath)
             .load();
@@ -43,17 +45,20 @@ export const Default = () => {
         app.stage.addChild(tiledMap.container);
 
         const { dispatchBindAction } = serviceDispatch({
-            dispatchBindAction: (spellType: SpellType): SpellEngineBindAction => ({
+            dispatchBindAction: (spell: Spell<'future'>): SpellEngineBindAction => ({
                 type: 'battle/spell-engine/bind',
-                spellType,
+                spell,
                 onTileHover: async () => {
                     return undefined;
                 },
                 onTileClick: async () => { },
+                rangeArea: []
             })
         });
 
-        dispatchBindAction('move');
+        dispatchBindAction(seedSpell('fake', {
+            period: 'future', id: '', type: 'move', character: null as any
+        }));
     };
 
     return <div ref={el => el && onMount(el)} style={{

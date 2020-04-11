@@ -37,9 +37,11 @@ describe('# SpellActionTimer', () => {
             battleHash: '',
             duration: 200,
             position: { x: -1, y: -1 },
+            actionArea: [ { x: -1, y: -1 } ],
             characterId: '1',
             spellId: '',
             startTime: timerTester.now + 100,
+            fromNotify: false,
             validated: false
         };
 
@@ -65,39 +67,43 @@ describe('# SpellActionTimer', () => {
             battleHash: '',
             duration: 200,
             position: { x: -1, y: -1 },
+            actionArea: [ { x: -1, y: -1 } ],
             characterId: '1',
             spellId: '',
             startTime: timerTester.now,
+            fromNotify: false,
             validated: false
         };
 
         timer.onAdd(snapshot);
 
         await serviceNetwork({});
-        
+
         expect(StoreTest.getActions()).toEqual<[
             SpellActionTimerStartAction, SendMessageAction<SpellActionCAction>
         ]>([
             {
-            type: 'battle/spell-action/start',
-            spellActionSnapshot: snapshot
-        },
-        {
-            type: 'message/send',
-            message: {
-                type: 'battle/spellAction' as const,
-                spellAction: {
-                    battleHash: '',
-                    duration: 200,
-                    position: { x: -1, y: -1 },
-                    characterId: '1',
-                    spellId: '',
-                    startTime: timerTester.now,
-                    validated: false
+                type: 'battle/spell-action/start',
+                spellActionSnapshot: snapshot
+            },
+            {
+                type: 'message/send',
+                message: {
+                    type: 'battle/spellAction' as const,
+                    spellAction: {
+                        battleHash: '',
+                        duration: 200,
+                        position: { x: -1, y: -1 },
+                        actionArea: [ { x: -1, y: -1 } ],
+                        characterId: '1',
+                        spellId: '',
+                        startTime: timerTester.now,
+                        fromNotify: false,
+                        validated: false
+                    }
                 }
             }
-        }
-    ]);
+        ]);
     });
 
     it('should end current spell on its end', () => {
@@ -119,16 +125,18 @@ describe('# SpellActionTimer', () => {
             battleHash: '-hash-',
             duration: 200,
             position: { x: -1, y: -1 },
+            actionArea: [ { x: -1, y: -1 } ],
             characterId: '1',
             spellId: '',
             startTime: timerTester.now,
+            fromNotify: false,
             validated: false
         };
 
         timer.onAdd(snapshot);
 
         timerTester.advanceBy(200);
-        
+
         expect(
             StoreTest.getActions()
         ).toContainEqual<SpellActionTimerEndAction>({
@@ -142,7 +150,7 @@ describe('# SpellActionTimer', () => {
     it('should remove current spell action on its end & launch the next one', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
-        
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
@@ -161,18 +169,22 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             },
             {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
+                fromNotify: false,
                 validated: false
             }
         );
@@ -180,7 +192,7 @@ describe('# SpellActionTimer', () => {
         spellActionSnapshotList.forEach(timer.onAdd);
 
         timerTester.advanceBy(200);
-        
+
         expect(
             StoreTest.getActions()
         ).toContainEqual<SpellActionTimerStartAction>({
@@ -189,9 +201,11 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             }
         });
@@ -200,7 +214,7 @@ describe('# SpellActionTimer', () => {
     it('should not end current spell action on future rollback', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
-        
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
@@ -219,18 +233,22 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             },
             {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
+                fromNotify: false,
                 validated: false
             }
         );
@@ -242,22 +260,24 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
+                fromNotify: false,
                 validated: false
             }
         ], '-hash1-');
-        
+
         expect(
             StoreTest.getActions().map(a => a.type)
-        ).not.toContain<SpellActionTimerEndAction['type']>('battle/spell-action/end');
+        ).not.toContain<SpellActionTimerEndAction[ 'type' ]>('battle/spell-action/end');
     });
 
     it('should end current spell action on current rollback', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
-        
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
@@ -276,18 +296,22 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             },
             {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
+                fromNotify: false,
                 validated: false
             }
         );
@@ -299,13 +323,15 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             }
         ], '-hash0-');
-        
+
         expect(
             StoreTest.getActions()
         ).toContainEqual<SpellActionTimerEndAction>({
@@ -316,9 +342,11 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             }
         });
@@ -327,7 +355,7 @@ describe('# SpellActionTimer', () => {
     it('should end passed spell action on delayed rollback', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
-        
+
         StoreTest.initStore({
             data: {
                 state: 'battle',
@@ -346,18 +374,22 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now,
+                fromNotify: false,
                 validated: false
             },
             {
                 battleHash: '-hash2-',
                 duration: 300,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now + 200,
+                fromNotify: false,
                 validated: false
             }
         );
@@ -373,13 +405,15 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now - 300,
+                fromNotify: false,
                 validated: false
             }
         ], '-hash0-');
-        
+
         expect(
             StoreTest.getActions()
         ).toContainEqual<SpellActionTimerEndAction>({
@@ -390,9 +424,11 @@ describe('# SpellActionTimer', () => {
                 battleHash: '-hash1-',
                 duration: 200,
                 position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
                 characterId: '1',
                 spellId: '',
                 startTime: timerTester.now - 300,
+                fromNotify: false,
                 validated: false
             }
         });

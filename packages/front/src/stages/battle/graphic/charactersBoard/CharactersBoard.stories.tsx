@@ -2,7 +2,6 @@ import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../../.storybook/preview';
-import { AssetLoader } from '../../../../assetManager/AssetLoader';
 import { BattleDataPeriod } from '../../../../BattleData';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { Controller } from '../../../../Controller';
@@ -21,7 +20,7 @@ export default {
     component: CharactersBoard
 };
 
-const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ websocketCreator, period }) => {
+const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeApi, period }) => {
 
     const characters = [
         seedCharacter('real', {
@@ -52,8 +51,7 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ websocket
         }
     };
 
-    Controller.init({
-        websocketCreator,
+    fakeApi.init({
         initialState
     });
 
@@ -61,7 +59,7 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ websocket
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const loader = AssetLoader();
+        const loader = Controller.loader;
 
         const resources = await loader.newInstance()
             .add('map', mapPath)

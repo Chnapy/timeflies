@@ -2,6 +2,7 @@ import { assertIsDefined, equals, Position, SpellType, TiledLayerTilelayer, Tile
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
+import { BStateTurnEndAction, BStateAction } from '../../battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { ExtractHoverReturn, getTiledMapHoverFn } from '../../engine/spellMapping';
 import { TileGraphic } from './TileGraphic';
@@ -128,11 +129,11 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     const container = new PIXI.Container();
     container.addChild(...layersContainers);
 
+    const tileGraphicList = layersTiles[ layersTiles.length - 1 ];
+
     onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({
         spell, rangeArea, onTileClick: otc, onTileHover: oth
     }) => {
-
-        const tileGraphicList = layersTiles[ layersTiles.length - 1 ];
 
         tileGraphicList.forEach(t => t.reset());
 
@@ -171,6 +172,17 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
                 });
             }
         };
+    });
+
+    onAction<BStateAction>('battle/state/event', action => {
+
+        if (action.eventType === 'TURN-END') {
+
+            triggerFn.onTileHover = () => { };
+            triggerFn.onTileClick = () => { };
+
+            tileGraphicList.forEach(t => t.reset());
+        }
     });
 
     return {

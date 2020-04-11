@@ -1,15 +1,22 @@
-import { BattleDataPeriod } from '../../BattleData';
+import { BattleSnapshot, GlobalTurnSnapshot, MapConfig } from '@timeflies/shared';
+import { BattleDataMap, BattleDataPeriod } from '../../BattleData';
+import { Controller } from '../../Controller';
 import { StageCreator, StageParam } from '../StageManager';
-import { BattleSceneData } from "./BattleScene";
 import { BStateMachine } from "./battleState/BStateMachine";
 import { CycleManager } from './cycle/CycleManager';
+import { Character } from './entities/character/Character';
+import { Player } from './entities/player/Player';
 import { Team } from './entities/team/Team';
 import { MapManager } from "./map/MapManager";
 import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
-import { Controller } from '../../Controller';
-import { Player } from './entities/player/Player';
-import { Character } from './entities/character/Character';
+
+export interface BattleSceneData {
+    mapInfos: MapConfig;
+    battleSnapshot: BattleSnapshot;
+    battleData: BattleDataMap;
+    globalTurnState: GlobalTurnSnapshot;
+}
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 

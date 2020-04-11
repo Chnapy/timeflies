@@ -108,6 +108,7 @@ describe('# SpellPrepareEngine', () => {
                 move: (spell, mapManager): SpellPrepareSubEngine<any> => {
 
                     return {
+                        getRangeArea() {return []},
                         onTileHover,
                         onTileClick,
                         stop() {}
@@ -215,6 +216,7 @@ describe('# SpellPrepareEngine', () => {
                 move: (spell, mapManager): SpellPrepareSubEngine<any> => {
 
                     return {
+                        getRangeArea() {return []},
                         onTileHover,
                         onTileClick,
                         stop(){}

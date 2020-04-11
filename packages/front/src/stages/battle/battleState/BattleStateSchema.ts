@@ -120,7 +120,7 @@ export const BStateSchemaRoot = (
             'TURN-END': [
                 {
                     target: 'watch',
-                    cond: shouldBeOwnTurn
+                    // cond: shouldBeOwnTurn
                 }
             ],
             'SPELL-LAUNCH': [ {

@@ -55,7 +55,7 @@ export const SpellActionManager = (
 
     const getSnapshotEndTime = ({ startTime, duration }: SpellActionSnapshot) => startTime + duration;
 
-    const onSpellAction = (action: SpellAction, startTime: number) => {
+    const onSpellAction = (action: SpellAction, startTime: number, fromNotify: boolean) => {
         const { spell, position } = action;
 
         const { duration } = spell.feature;
@@ -76,6 +76,7 @@ export const SpellActionManager = (
             position,
             actionArea: action.actionArea,
             battleHash,
+            fromNotify,
             validated: false
         };
 
@@ -113,7 +114,7 @@ export const SpellActionManager = (
             : now;
 
         spellActionList.forEach(spellAction => {
-            onSpellAction(spellAction, nextStartTime);
+            onSpellAction(spellAction, nextStartTime, false);
             nextStartTime += spellAction.spell.feature.duration;
         });
     };
@@ -165,15 +166,12 @@ export const SpellActionManager = (
     });
 
     onMessageAction<NotifySAction>('notify', ({ spellActionSnapshot: {
-        spellId, position, actionArea, startTime, battleHash
+        characterId, spellId, position, actionArea, startTime, battleHash
     } }) => {
 
-        const { globalTurn } = serviceBattleData('cycle');
         const { characters } = serviceBattleData('future');
 
-        assertIsDefined(globalTurn);
-
-        const character = characters.find(c => c.id === globalTurn.currentTurn.character.id);
+        const character = characters.find(c => c.id === characterId);
 
         assertIsDefined(character);
 
@@ -187,7 +185,7 @@ export const SpellActionManager = (
             actionArea
         };
 
-        onSpellAction(spellAction, startTime);
+        onSpellAction(spellAction, startTime, true);
 
         assertSameHash(getLastSnapshot()!.battleHash, battleHash);
     });

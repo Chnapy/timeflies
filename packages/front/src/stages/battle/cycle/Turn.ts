@@ -37,7 +37,19 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
         })
     });
 
-    let timedActionTimeout: NodeJS.Timeout | undefined;
+    const timedActionManager = (() => {
+        let timedActionTimeout: NodeJS.Timeout | undefined;
+
+        return {
+            set: (value: NodeJS.Timeout | undefined) => {
+                if(timedActionTimeout) {
+                    clearTimeout(timedActionTimeout);
+                }
+                timedActionTimeout = value;
+            }
+        }
+    })();
+
     let lastCallback: 'start' | 'end' | undefined;
 
     const this_: Turn = {
@@ -108,10 +120,7 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
     };
 
     function clearTimedActions(): void {
-        if (timedActionTimeout) {
-            clearTimeout(timedActionTimeout);
-            timedActionTimeout = undefined;
-        }
+        timedActionManager.set(undefined);
     }
 
     function synchronize(snapshot: TurnSnapshot): void {
@@ -127,7 +136,9 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
         if (this_.state === 'idle') {
             if (!lastCallback) {
                 const diff = this_.startTime - now;
-                timedActionTimeout = setTimeout(start, diff);
+                timedActionManager.set(
+                    setTimeout(start, diff)
+                );
             }
         }
 
@@ -140,17 +151,23 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
 
             if (lastCallback === 'start') {
                 const diff = this_.endTime - now;
-                timedActionTimeout = setTimeout(end, diff);
+                timedActionManager.set(
+                    setTimeout(end, diff)
+                );
             }
 
         }
 
         if (this_.state === 'idle') {
             const diff = startTime - now;
-            timedActionTimeout = setTimeout(start, diff);
+            timedActionManager.set(
+                setTimeout(start, diff)
+            );
         } else if (this_.state === 'running') {
             const diff = this_.endTime - now;
-            timedActionTimeout = setTimeout(end, diff);
+            timedActionManager.set(
+                setTimeout(end, diff)
+            );
         }
     }
 

@@ -30,6 +30,7 @@ export interface SpellActionSnapshot {
     position: Position;
     actionArea: Position[];
     battleHash: string;
+    fromNotify: boolean;
     validated: boolean;
 }
 

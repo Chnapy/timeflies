@@ -102,6 +102,7 @@ export const seedCharacter = <P extends BattleDataPeriod>(type: 'real' | 'fake',
             });
         },
         updateFromSnapshot(snapshot) { },
+        alterLife(add) { },
         hasSpell(spellType) { return false; },
         set(o) { }
     };

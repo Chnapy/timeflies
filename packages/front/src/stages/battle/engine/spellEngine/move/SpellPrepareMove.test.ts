@@ -134,7 +134,8 @@ describe('# SpellPrepareMove', () => {
                 payload: {
                     spellActions: expectedPath.map((position): SpellAction => ({
                         spell: defaultSpell,
-                        position
+                        position,
+                        actionArea: [position]
                     }))
                 }
             }

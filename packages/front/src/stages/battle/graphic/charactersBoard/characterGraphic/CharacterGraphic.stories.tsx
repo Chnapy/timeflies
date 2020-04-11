@@ -75,8 +75,10 @@ export const Current: React.FC = () => {
                     characterId: characterCurrent.id,
                     duration,
                     position,
+                    actionArea: [],
                     spellId: characterCurrent.defaultSpell.id,
                     startTime: Date.now(),
+                    fromNotify: false,
                     validated: false
                 }
             }),
@@ -89,8 +91,10 @@ export const Current: React.FC = () => {
                     characterId: characterCurrent.id,
                     duration: -1,
                     position: characterCurrent.position,
+                    actionArea: [],
                     spellId: characterCurrent.defaultSpell.id,
                     startTime: Date.now(),
+                    fromNotify: false,
                     validated: false
                 }
             })
@@ -231,7 +235,8 @@ export const Future: React.FC = () => {
                             period: 'future',
                             id: '1', type: 'move', character: null as any
                         }),
-                        position: { x: -1, y: -1 }
+                        position: { x: -1, y: -1 },
+                        actionArea: []
                     } ]
                 }
             })

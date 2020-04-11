@@ -4,7 +4,7 @@ import { serviceDispatch } from '../../services/serviceDispatch';
 import { serviceEvent } from '../../services/serviceEvent';
 import { serviceNetwork } from '../../services/serviceNetwork';
 import { LoginSuccess } from '../../ui/reducers/CurrentPlayerReducer';
-import { LoadLaunchAction } from "../load/LoadScene";
+import { LoadLaunchAction } from "../load/LoadStage";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
 
 export type BootStageParam = StageParam<'boot', {}>;

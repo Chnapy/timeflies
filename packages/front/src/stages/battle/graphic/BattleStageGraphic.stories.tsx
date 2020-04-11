@@ -22,7 +22,7 @@ export default {
     component: BattleStageGraphic
 }
 
-export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
+export const Default: React.FC<StoryProps> = ({ fakeApi }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
@@ -83,8 +83,7 @@ export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
         }
     };
 
-    Controller.init({
-        websocketCreator,
+    fakeApi.init({
         initialState
     });
 
@@ -92,7 +91,7 @@ export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const loader = AssetLoader();
+        const loader = Controller.loader;
 
         const resources = await loader.newInstance()
             .add('map', mapPath)
@@ -133,7 +132,7 @@ export const Default: React.FC<StoryProps> = ({ websocketCreator }) => {
     </div>;
 };
 
-export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
+export const Pathfinder: React.FC<StoryProps> = ({ fakeApi }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
@@ -194,8 +193,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
         }
     };
 
-    Controller.init({
-        websocketCreator,
+    fakeApi.init({
         initialState
     });
 
@@ -203,7 +201,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const loader = AssetLoader();
+        const loader = Controller.loader;
 
         const resources = await loader.newInstance()
             .add('map', mapPath)
@@ -245,7 +243,9 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
         const { dispatchBindAction } = serviceDispatch({
             dispatchBindAction: (): SpellEngineBindAction => ({
                 type: 'battle/spell-engine/bind',
-                spellType: 'move',
+                spell: seedSpell('fake', {
+                    period: 'future', id: '', type: 'move', character: null as any
+                }),
                 onTileHover: async (tilePos) => {
                     return await spellPrepareEngine.onTileHover(
                         tilePos,
@@ -258,6 +258,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ websocketCreator }) => {
                         tiledMapManager.getTileType(tilePos)
                     );
                 },
+                rangeArea: []
             })
         });
 

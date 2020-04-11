@@ -1,9 +1,9 @@
-import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, equals, mergeAfterClean, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, equals, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
+import { BattleDataPeriod } from '../../../../BattleData';
 import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
+import { PeriodicEntity } from '../PeriodicEntity';
 import { Player } from '../player/Player';
 import { Spell } from '../spell/Spell';
-import { PeriodicEntity } from '../PeriodicEntity';
-import { BattleDataPeriod } from '../../../../BattleData';
 
 export interface Character<P extends BattleDataPeriod> extends PeriodicEntity<P, CharacterSnapshot> {
     readonly id: string;
@@ -34,7 +34,7 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
 
     let position: Position = { ..._position };
     let orientation: Orientation = _orientation;
-    const features: CharacterFeatures = { ..._features };
+    let features: Readonly<CharacterFeatures> = { ..._features };
 
     const _this: Character<P> = {
         period,
@@ -69,7 +69,7 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
             return {
                 id: staticData.id,
                 staticData,
-                features,
+                features: { ...features },
                 position,
                 orientation,
                 spellsSnapshots: spells.map(s => s.getSnapshot())
@@ -80,7 +80,10 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
             position = { ...snapshot.position };
             orientation = snapshot.orientation;
 
-            mergeAfterClean(features, snapshot.features);
+            // TODO do something about object ref issues
+            features = {
+                ...snapshot.features
+            };
 
             assertEntitySnapshotConsistency(spells, snapshot.spellsSnapshots);
 
@@ -103,10 +106,8 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
         },
 
         alterLife(add: number): void {
-            features.life += add;
-            if(features.life <= 0) {
-                features.life = 0;
-            }
+            const life = Math.max(features.life + add, 0);
+            features = { ...features, life };
         },
 
         hasSpell(spellType) {
