@@ -2,7 +2,7 @@ import { assertIsDefined, equals, Position, SpellType, TiledLayerTilelayer, Tile
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
-import { BStateTurnEndAction, BStateAction } from '../../battleState/BattleStateSchema';
+import { BStateAction } from '../../battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { ExtractHoverReturn, getTiledMapHoverFn } from '../../engine/spellMapping';
 import { TileGraphic } from './TileGraphic';

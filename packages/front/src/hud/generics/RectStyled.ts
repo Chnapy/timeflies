@@ -14,9 +14,9 @@ export interface RectStyleProperties extends BasicStyleProperties {
 
 export class RectStyled<C extends Styled<any>> extends StyledParent<RectStyleProperties, C> {
 
-    private readonly rectangle: Phaser.GameObjects.Rectangle;
+    private readonly rectangle: any;
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: any) {
         super(scene);
 
         this.rectangle = scene.add.rectangle(0, 0)

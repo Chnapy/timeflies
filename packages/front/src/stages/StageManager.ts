@@ -1,6 +1,5 @@
 import { IGameAction } from '../action/GameAction';
 import { AssetMap } from '../assetManager/AssetLoader';
-import { Controller } from '../Controller';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
 import { BattleStage, BattleStageParam } from './battle/BattleStage';

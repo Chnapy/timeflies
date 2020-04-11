@@ -1,4 +1,3 @@
-import { ReducerManager } from '../../ReducerManager';
 import { Utils } from '../../Utils';
 import { HasGameObject } from '../layout/HasGameObject';
 
@@ -15,14 +14,14 @@ export type StyleEngine<S extends Record<string, any>> = {
 
 export type DefaultStyleEngine = Readonly<StyleEngine<Pick<BasicStyleProperties, 'x' | 'y'>>>;
 
-export abstract class Styled<S extends BasicStyleProperties> extends ReducerManager<Phaser.Scene> implements HasGameObject {
+export abstract class Styled<S extends BasicStyleProperties> implements HasGameObject {
 
     private readonly defaultStyleEngine: DefaultStyleEngine = {
         x: v => this.container.setX(v),
         y: v => this.container.setY(v)
     };
 
-    protected readonly container: Phaser.GameObjects.Container;
+    protected readonly container: any;
 
     private readonly styleEngine: StyleEngine<S>;
     protected _style: Readonly<S>;
@@ -30,8 +29,7 @@ export abstract class Styled<S extends BasicStyleProperties> extends ReducerMana
         return this._style;
     }
 
-    constructor(scene: Phaser.Scene) {
-        super(scene);
+    constructor(scene: any) {
 
         this.styleEngine = this.getStyleEngine(this.defaultStyleEngine);
 
@@ -65,7 +63,7 @@ export abstract class Styled<S extends BasicStyleProperties> extends ReducerMana
         } as S);
     }
 
-    getRootGameObject(): Phaser.GameObjects.Container {
+    getRootGameObject(): any {
         return this.container;
     }
 

@@ -1,10 +1,8 @@
 import { CharacterType, Orientation } from "@timeflies/shared";
 import { AssetManager } from "../../../assetManager/AssetManager";
 import { RectStyled } from "../../../hud/generics/RectStyled";
-import { BattleScene } from "../BattleScene";
 import { Character } from "../entities/character/Character";
 import { Spell } from "../entities/spell/Spell";
-import { SpellGraphic } from "./SpellGraphic";
 
 export class CharacterGraphic {
 
@@ -18,23 +16,23 @@ export class CharacterGraphic {
         orientation: Orientation
     ): string => `${type}_${state}_${orientation}`;
 
-    private readonly scene: BattleScene;
-    private readonly character: Character;
+    private readonly scene: any;
+    private readonly character: any;
 
-    containerSprite!: Phaser.GameObjects.Container;
-    private sprite!: Phaser.GameObjects.Sprite;
+    containerSprite!: any;
+    private sprite!: any;
 
-    containerHUD!: Phaser.GameObjects.Container;
+    containerHUD!: any;
     private lifeBarBorder!: RectStyled<never>;
     private lifeBar!: RectStyled<RectStyled<never>>;
     private lifeBarFront!: RectStyled<never>;
     private teamRect!: RectStyled<never>;
 
     private caContainer!: RectStyled<never>;
-    private caText!: Phaser.GameObjects.Text;
-    private caIcon!: Phaser.GameObjects.Image;
+    private caText!: any;
+    private caIcon!: any;
 
-    constructor(scene: BattleScene, character: Character) {
+    constructor(scene: any, character: any) {
         this.scene = scene;
         this.character = character;
     }
@@ -66,12 +64,13 @@ export class CharacterGraphic {
             height: hudHeight
         };
 
-        const lifeBarFill = Phaser.Display.Color.HexStringToColor(window
+        const P: any = null as any;
+        const lifeBarFill = P.Display.Color.HexStringToColor(window
             .getComputedStyle(document.documentElement)
             .getPropertyValue('--bg-color-3')
             .substring(1));
 
-        const lifeBarFrontFill = Phaser.Display.Color.HexStringToColor(window
+        const lifeBarFrontFill = P.Display.Color.HexStringToColor(window
             .getComputedStyle(document.documentElement)
             .getPropertyValue('--life-color')
             .substring(1));
@@ -84,7 +83,7 @@ export class CharacterGraphic {
 
         this.caContainer = new RectStyled(this.scene);
 
-        const { color: teamColor } = Phaser.Display.Color.HexStringToColor(this.character.player.team.color);
+        const { color: teamColor } = P.Display.Color.HexStringToColor(this.character.player.team.color);
 
         this.teamRect.setStyle({
             originX: 0,
@@ -124,7 +123,7 @@ export class CharacterGraphic {
             fillColor: lifeBarFrontFill.color
         });
 
-        this.caIcon = this.scene.add.image(1, -hudHeight + 1, SpellGraphic.getSheetKey())
+        this.caIcon = this.scene.add.image(1, -hudHeight + 1, 'SpellGraphic.getSheetKey()')
             .setOrigin(0, 0)
             .setDisplaySize(hudHeight - 2, hudHeight - 2);
 
@@ -159,7 +158,7 @@ export class CharacterGraphic {
         this.updateLife();
     }
 
-    receiveSpell(spell: Spell): void {
+    receiveSpell(spell: any): void {
         const { staticData: { type }, feature: { attack } } = spell;
         this.caText.setText(attack ? `-${attack}` : '');
         this.caIcon.setFrame(AssetManager.spells.spellsMap[type])

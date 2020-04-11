@@ -27,7 +27,7 @@ const spritesheetsUrls = {
 } as const;
 
 export const LoadStage: StageCreator<'load', 'map' | 'characters'> = (payload) => {
-    const { mapInfos, characterTypes } = payload;
+    const { mapInfos } = payload;
 
     return {
         preload: () => {

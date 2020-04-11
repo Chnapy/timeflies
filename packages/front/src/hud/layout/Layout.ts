@@ -10,9 +10,9 @@ interface CellWrapper {
 
 export class Layout implements HasGameObject {
 
-    private debugRects: Phaser.GameObjects.Rectangle[];
+    private debugRects: any[];
 
-    private readonly scene: Phaser.Scene;
+    private readonly scene: any;
 
     private x: number;
     private y: number;
@@ -27,9 +27,9 @@ export class Layout implements HasGameObject {
  
     private readonly cellWrappers: CellWrapper[];
 
-    private readonly graphic: Phaser.GameObjects.Container;
+    private readonly graphic: any;
 
-    constructor(scene: Phaser.Scene,
+    constructor(scene: any,
         nbCellX: number, nbCellY: number,
         x: number, y: number,
         width: number, height: number) {
@@ -45,7 +45,7 @@ export class Layout implements HasGameObject {
         this.cellWrappers = [];
         this.graphic = scene.add.container(x, y);
 
-        this.scene.game.scale.on('resize', (size: Phaser.Structs.Size) => this.onResize(size));
+        this.scene.game.scale.on('resize', (size: any) => this.onResize(size));
         this.debugRects = [];
         this._debug();
     }
@@ -96,7 +96,7 @@ export class Layout implements HasGameObject {
         return this.graphic;
     }
 
-    private onResize(size: Phaser.Structs.Size): void {
+    private onResize(size: any): void {
         this.resize(this.x, this.y, size.width, size.height);
     }
 

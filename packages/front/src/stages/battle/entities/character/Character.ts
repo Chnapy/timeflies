@@ -308,7 +308,7 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
 //         });
 //     }
 
-//     getGraphics(): Phaser.GameObjects.Container[] {
+//     getGraphics(): any[] {
 //         return [
 //             this.characterGraphic.containerSprite,
 //             this.characterGraphic.containerHUD

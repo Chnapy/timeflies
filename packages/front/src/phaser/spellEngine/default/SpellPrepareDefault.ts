@@ -1,17 +1,19 @@
 import { Position } from '@timeflies/shared'
 import { SpellType } from '@timeflies/shared'
 import { Character } from '../../../stages/battle/entities/character/Character';
-import { SpellPrepare } from '../SpellPrepare';
 
-export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' | 'orientate'>> {
+export class SpellPrepareDefault {
 
-    private charactersFiltered!: Character[];
-
+    private charactersFiltered!: any[];
+scene: any;
+spell: any;
+character: any;
+characters: any;
     private readonly tilePositions: Position[] = [];
     private readonly worldPositions: Position[] = [];
-    private readonly rects: Phaser.Geom.Rectangle[] = [];
+    private readonly rects: any[] = [];
 
-    private readonly line: Phaser.Geom.Line = new Phaser.Geom.Line();
+    private readonly line: any;
 
     private lastPositionHovered?: Position;
     private rectHoveredIndex: number = -1;
@@ -46,7 +48,8 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
                 this.line.x2 = newPosition.x;
                 this.line.y2 = newPosition.y;
 
-                const points = Phaser.Geom.Line.BresenhamPoints(this.line, 1) as Position[];
+                const P: any = null as any;
+                const points = P.Geom.Line.BresenhamPoints(this.line, 1) as Position[];
 
                 let isTargetable = true;
                 for (let i = 0; i < points.length; i++) {
@@ -71,12 +74,12 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
 
         this.worldPositions.push(...tiles.map(p => map.tileToWorldPosition(p)));
 
-        this.rects.push(...this.worldPositions
-            .map(p => new Phaser.Geom.Rectangle(p.x, p.y,
-                map.tilemap.tileWidth, map.tilemap.tileHeight)));
+        // this.rects.push(...this.worldPositions
+        //     .map(p => new P.Geom.Rectangle(p.x, p.y,
+        //         map.tilemap.tileWidth, map.tilemap.tileHeight)));
     }
 
-    onTileHover(pointer: Phaser.Input.Pointer): void {
+    onTileHover(pointer: any): void {
         const { map } = this.scene;
 
         const position = map.worldToTilePosition({
@@ -98,7 +101,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
         }
     }
 
-    onTileClick(pointer: Phaser.Input.Pointer): void {
+    onTileClick(pointer: any): void {
         if (this.rectHoveredIndex === -1) {
             // Controller.dispatch<BattleSpellPrepareAction>({
             //     type: 'battle/spell/prepare',
@@ -119,7 +122,7 @@ export class SpellPrepareDefault extends SpellPrepare<Exclude<SpellType, 'move' 
         // });
     }
 
-    update(time: number, delta: number, graphics: Phaser.GameObjects.Graphics): void {
+    update(time: number, delta: number, graphics: any): void {
 
         graphics.fillStyle(0xFF0000, 0.5);
         graphics.lineStyle(2, 0x0000FF);

@@ -7,7 +7,7 @@ export abstract class StyledParent<S extends BasicStyleProperties, C extends Sty
         return this._children;
     }
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: any) {
         super(scene);
 
         this._children = [];

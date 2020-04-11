@@ -1,17 +1,15 @@
 import { HasGameObject } from './HasGameObject';
-import { ReducerManager } from '../../ReducerManager';
 
-export abstract class Cell extends ReducerManager<Phaser.Scene> implements HasGameObject {
+export abstract class Cell implements HasGameObject {
 
-    protected debugRect?: Phaser.GameObjects.Rectangle;
+    protected debugRect?: any;
 
     protected x: number;
     protected y: number;
     protected width: number;
     protected height: number;
 
-    constructor(scene: Phaser.Scene) {
-        super(scene);
+    constructor(scene: any) {
         this.x = 0;
         this.y = 0;
         this.width = 0;
@@ -30,19 +28,19 @@ export abstract class Cell extends ReducerManager<Phaser.Scene> implements HasGa
     update(time: number, delta: number): void {
     }
 
-    abstract getRootGameObject(): Phaser.GameObjects.GameObject;
+    abstract getRootGameObject(): any;
 
     protected abstract updateSizes(): void;
 
     protected _debug() {
 
-        if (!this.debugRect) {
-            this.debugRect = this.scene.add.rectangle()
-                .setOrigin(0, 0)
-                .setStrokeStyle(1, 0xFF0000);
-        }
+        // if (!this.debugRect) {
+        //     this.debugRect = this.scene.add.rectangle()
+        //         .setOrigin(0, 0)
+        //         .setStrokeStyle(1, 0xFF0000);
+        // }
 
-        this.debugRect.setPosition(this.x, this.y);
-        this.debugRect.setDisplaySize(this.width, this.height);
+        // this.debugRect.setPosition(this.x, this.y);
+        // this.debugRect.setDisplaySize(this.width, this.height);
     }
 }

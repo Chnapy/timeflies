@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import React from 'react';
 import { connect } from "react-redux";
 import { AssetManager } from '../../../../assetManager/AssetManager';
-import { CurrentSpellState } from "../../../../phaser/spellEngine/SpellEngine";
 import { serviceDispatch } from '../../../../services/serviceDispatch';
 import { BStateSpellPrepareAction } from '../../../../stages/battle/battleState/BattleStateSchema';
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
@@ -16,7 +15,7 @@ export interface SpellBtnExternProps {
 }
 
 interface SpellBtnInnerProps {
-    activeState: 'none' | CurrentSpellState;
+    activeState: 'none' | 'launch';
     disabled: boolean;
     spellType: SpellType;
     spellInfos: SpellBtnInfosProps;
