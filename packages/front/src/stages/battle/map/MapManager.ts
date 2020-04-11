@@ -1,8 +1,8 @@
 import { MapConfig, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
-import { BStateAction } from '../battleState/BattleStateSchema';
 import { Character } from '../entities/character/Character';
+import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { Pathfinder } from './Pathfinder';
 
 export interface MapManager extends
@@ -45,15 +45,9 @@ export const MapManager = (
     );
     pathfinder.refreshGrid();
 
-    onAction<BStateAction>('battle/state/event', action => {
+    onAction<BattleCommitAction>('battle/commit', action => {
 
-        if (action.eventType === 'SPELL-LAUNCH') {
-
-            // be sure to run that after spell had touched the character
-            setImmediate(() => {
-                pathfinder.refreshGrid();
-            });
-        }
+        pathfinder.refreshGrid();
     });
 
     return {

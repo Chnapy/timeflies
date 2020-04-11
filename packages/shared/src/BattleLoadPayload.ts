@@ -1,15 +1,12 @@
 import { MapConfig } from "./MapConfig";
-import { CharacterType } from "./snapshot/CharacterSnapshot";
-import { SpellType } from "./snapshot/SpellSnapshot";
 import { PlayerInfos } from "./snapshot/PlayerSnapshot";
+import { SpellType } from "./snapshot/SpellSnapshot";
 
 export interface BattleLoadPayload {
 
     playerInfos: PlayerInfos;
     
-    mapInfos: MapConfig;
-
-    characterTypes: CharacterType[];
+    mapConfig: MapConfig;
 
     spellTypes: SpellType[];
 }

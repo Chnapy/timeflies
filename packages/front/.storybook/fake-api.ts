@@ -183,14 +183,13 @@ export const FakeApi = () => {
                 type: 'battle-load',
                 sendTime: Date.now(),
                 payload: {
-                    mapInfos: {
+                    mapConfig: {
                         id: '',
                         initLayerName: 'init',
                         defaultTilelayerName: 'view',
                         obstacleTilelayerName: 'obstacles',
                         schemaUrl: mapPath,
                     },
-                    characterTypes: [],
                     spellTypes: [],
                     playerInfos: {
                         id: 'P1',

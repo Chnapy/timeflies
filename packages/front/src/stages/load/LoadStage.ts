@@ -27,11 +27,11 @@ const spritesheetsUrls = {
 } as const;
 
 export const LoadStage: StageCreator<'load', 'map' | 'characters'> = (payload) => {
-    const { mapInfos } = payload;
+    const { mapConfig } = payload;
 
     return {
         preload: () => {
-            const { schemaUrl } = mapInfos;
+            const { schemaUrl } = mapConfig;
 
             return Controller.loader.newInstance()
                 .add('map', schemaUrl)

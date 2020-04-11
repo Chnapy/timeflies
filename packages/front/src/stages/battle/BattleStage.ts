@@ -12,7 +12,7 @@ import { SnapshotManager } from './snapshot/SnapshotManager';
 import { SpellActionManager } from './spellAction/SpellActionManager';
 
 export interface BattleSceneData {
-    mapInfos: MapConfig;
+    mapConfig: MapConfig;
     battleSnapshot: BattleSnapshot;
     battleData: BattleDataMap;
     globalTurnState: GlobalTurnSnapshot;
@@ -20,7 +20,7 @@ export interface BattleSceneData {
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
-export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapInfos, globalTurnState, battleData, battleSnapshot }) => {
+export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapConfig, globalTurnState, battleData, battleSnapshot }) => {
 
     const fillBattleData = (period: BattleDataPeriod): void => {
         const data = battleData[ period ];
@@ -53,7 +53,7 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapI
 
             const mapManager = MapManager(
                 map,
-                mapInfos
+                mapConfig
             );
 
             const bStateMachine = BStateMachine(mapManager);
