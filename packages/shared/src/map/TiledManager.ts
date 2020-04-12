@@ -1,6 +1,6 @@
 import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
-import { MapConfig } from '../MapConfig';
-import { Position } from '../snapshot';
+import { MapConfig } from './MapConfig';
+import { Position } from '../geo';
 import { assertIsDefined } from '../util';
 
 type TiledLayerTilelayerWithData = Omit<TiledLayerTilelayer, 'data'>

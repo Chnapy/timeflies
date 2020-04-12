@@ -1,3 +1,4 @@
+import { Position } from '../geo/position';
 
 export type SpellType =
     | 'move'
@@ -25,4 +26,16 @@ export interface SpellSnapshot {
     readonly id: string;
     readonly staticData: Readonly<StaticSpell>;
     readonly features: SpellFeatures;
+}
+
+export interface SpellActionSnapshot {
+    startTime: number;
+    characterId: string;
+    duration: number;
+    spellId: string;
+    position: Position;
+    actionArea: Position[];
+    battleHash: string;
+    fromNotify: boolean;
+    validated: boolean;
 }

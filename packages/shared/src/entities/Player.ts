@@ -1,4 +1,4 @@
-import { CharacterSnapshot } from "./CharacterSnapshot";
+import { CharacterSnapshot } from "./Character";
 
 export interface PlayerInfos {
     id: string;

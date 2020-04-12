@@ -20,11 +20,3 @@ export const equals = <T>(
 
     return v2 => keys.every(k => equals(v1[k])(v2[k]));
 }
-
-export const compare = <V1, V2>(
-    v1: V1,
-    extractFn: (v: V1 | V2) => any
-): (v2: V2) => boolean => {
-
-    return v2 => extractFn(v1) === extractFn(v2);
-};

@@ -1,5 +1,5 @@
 import { TAction } from "./TAction";
-import { BattleLoadPayload } from "../BattleLoadPayload";
+import { BattleLoadPayload } from "../loadStage/BattleLoadPayload";
 
 export interface BattleLoadSAction extends TAction<'battle-load'> {
     payload: BattleLoadPayload;

@@ -1,4 +1,4 @@
-import { TeamSnapshot } from "./TeamSnapshot";
+import { TeamSnapshot } from "../entities/Team";
 import objectHash from 'object-hash';
 
 export interface BattleSnapshot {
@@ -8,6 +8,7 @@ export interface BattleSnapshot {
     teamsSnapshots: TeamSnapshot[];
 }
 
+// TODO do not include 'time'
 export const getBattleSnapshotWithHash = (o: Omit<BattleSnapshot, 'battleHash'>): BattleSnapshot => {
     const battleHash = objectHash(o);
     return {

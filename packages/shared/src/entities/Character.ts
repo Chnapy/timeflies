@@ -1,11 +1,5 @@
-import { SpellSnapshot, StaticSpell } from "./SpellSnapshot";
-
-export type Orientation = 'left' | 'right' | 'top' | 'bottom';
-
-export interface Position {
-    x: number;
-    y: number;
-}
+import { Orientation, Position } from '../geo';
+import { SpellSnapshot, StaticSpell } from "./Spell";
 
 export type CharacterType =
     | 'sampleChar1'

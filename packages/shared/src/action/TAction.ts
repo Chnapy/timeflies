@@ -7,7 +7,7 @@ export interface TAction<T extends string> {
     sendTime: number;
 }
 
-export type NarrowAction<T, N extends string> = T extends TAction<N> ? T : never;
+export type NarrowTAction<T, N extends string> = T extends TAction<N> ? T : never;
 
 export interface SetIDCAction extends TAction<'set-id'> {
     id: string;

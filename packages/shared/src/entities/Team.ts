@@ -1,4 +1,4 @@
-import { PlayerSnapshot } from "./PlayerSnapshot";
+import { PlayerSnapshot } from "./Player";
 
 export interface TeamSnapshot {
     id: string;

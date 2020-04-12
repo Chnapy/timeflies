@@ -1,8 +1,8 @@
+import { BattleSnapshot } from "../battleStage/BattleSnapshot";
+import { GlobalTurnSnapshot } from "../cycle/GlobalTurn";
+import { TurnSnapshot } from "../cycle/Turn";
+import { SpellActionSnapshot } from '../entities/Spell';
 import { TAction } from "./TAction";
-import { BattleSnapshot } from "../snapshot/BattleSnapshot";
-import { Position } from "../snapshot/CharacterSnapshot";
-import { GlobalTurnSnapshot } from "../snapshot/GlobalTurnSnapshot";
-import { TurnSnapshot } from "../snapshot/TurnSnapshot";
 
 export interface BRunLaunchSAction extends TAction<'battle-run/launch'> {
     battleSnapshot: BattleSnapshot;
@@ -20,18 +20,6 @@ export interface BRunTurnStartSAction extends TAction<'battle-run/turn-start'> {
 export interface ConfirmSAction extends TAction<'confirm'> {
     isOk: boolean;
     lastCorrectHash: string;
-}
-
-export interface SpellActionSnapshot {
-    startTime: number;
-    characterId: string;
-    duration: number;
-    spellId: string;
-    position: Position;
-    actionArea: Position[];
-    battleHash: string;
-    fromNotify: boolean;
-    validated: boolean;
 }
 
 export interface NotifySAction extends TAction<'notify'> {

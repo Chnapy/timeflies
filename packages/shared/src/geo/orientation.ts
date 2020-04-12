@@ -1,6 +1,6 @@
-import { Orientation, Position } from '../snapshot';
+import { Position } from './position';
 
-// TODO move Orientation here
+export type Orientation = 'left' | 'right' | 'top' | 'bottom';
 
 export const getOrientationFromTo = (
     from: Position,

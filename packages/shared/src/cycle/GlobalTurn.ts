@@ -1,4 +1,4 @@
-import { TurnSnapshot } from "./TurnSnapshot";
+import { TurnSnapshot } from "./Turn";
 
 export interface GlobalTurnSnapshot {
     id: number;
