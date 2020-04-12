@@ -1,4 +1,4 @@
-import { assertIsDefined, equals, Position, SpellType, TiledLayerTilelayer, TiledTileset } from '@timeflies/shared';
+import { assertIsDefined, equals, Position, SpellType, TiledLayerTilelayer, TiledTileset, assertThenGet } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
@@ -6,6 +6,7 @@ import { BStateAction } from '../../battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { ExtractHoverReturn, getTiledMapHoverFn } from '../../engine/spellMapping';
 import { TileGraphic } from './TileGraphic';
+import { Utils } from '../../../../Utils';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
@@ -109,36 +110,26 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         });
     };
 
-    const layersTiles: TileGraphic[][] = tilelayers
-        .map(({ data }) => {
-            assertIsDefined(data);
+    const renderableLayer = tiledManager.getRenderableLayer();
 
-            return data
-                .map(getTileGraphic)
-                .filter((tile): tile is TileGraphic => tile !== null);
-        });
+    const layerTiles: TileGraphic[] = assertThenGet(renderableLayer.data, assertIsDefined)
+        .map(getTileGraphic)
+        .filter((tile): tile is TileGraphic => tile !== null);
 
-    const layersContainers: PIXI.Container[] = layersTiles.map(tiles => {
-
-        const container = new PIXI.Container();
-
-        container.addChild(...tiles.map(t => t.container));
-        return container;
-    });
+    const layerContainer = new PIXI.Container();
+    layerContainer.addChild(...layerTiles.map(t => t.container));
 
     const container = new PIXI.Container();
-    container.addChild(...layersContainers);
-
-    const tileGraphicList = layersTiles[ layersTiles.length - 1 ];
+    container.addChild(layerContainer);
 
     onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({
         spell, rangeArea, onTileClick: otc, onTileHover: oth
     }) => {
 
-        tileGraphicList.forEach(t => t.reset());
+        layerTiles.forEach(t => t.reset());
 
         const rangeTiles = rangeArea.map(pos => {
-            const tile = tileGraphicList.find(t => equals(t.tilePos)(pos));
+            const tile = layerTiles.find(t => equals(t.tilePos)(pos));
             assertIsDefined(tile);
             tile.showRange();
             return tile;
@@ -149,7 +140,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
 
             if (spell.staticData.type === 'move') {
 
-                tileGraphicList.forEach(t => t.reset());
+                layerTiles.forEach(t => t.reset());
             } else {
 
                 rangeTiles.forEach(t => t.showRange());
@@ -168,7 +159,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
                 hoverFn({
                     engineProps: engineProps as any,
                     tileGraphicTarget,
-                    tileGraphicList
+                    tileGraphicList: layerTiles
                 });
             }
         };
@@ -181,7 +172,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
             triggerFn.onTileHover = () => { };
             triggerFn.onTileClick = () => { };
 
-            tileGraphicList.forEach(t => t.reset());
+            layerTiles.forEach(t => t.reset());
         }
     });
 

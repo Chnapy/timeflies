@@ -1,4 +1,4 @@
-import { MapInfos, Position } from '@timeflies/shared';
+import { MapConfig, Position } from '@timeflies/shared';
 import bresenham from 'bresenham';
 import fs from 'fs';
 import { TiledLayerTilelayer, TiledMapOrthogonal } from 'tiled-types';
@@ -6,7 +6,7 @@ import urlJoin from 'url-join';
 
 export class BRMap {
 
-    private readonly mapInfos: MapInfos;
+    private readonly mapConfig: MapConfig;
 
     private readonly schema: TiledMapOrthogonal;
 
@@ -15,22 +15,22 @@ export class BRMap {
 
     readonly initPositions: ReadonlyArray<ReadonlyArray<Position>>;
 
-    constructor(mapInfos: MapInfos) {
-        this.mapInfos = mapInfos;
+    constructor(mapConfig: MapConfig) {
+        this.mapConfig = mapConfig;
 
-        const { urls: { schema: schemaURL }, initLayerKey, obstaclesLayerKey } = mapInfos;
+        const { schemaUrl, obstacleTilelayerName, initLayerName } = mapConfig;
 
-        const data = fs.readFileSync(urlJoin('public', schemaURL), 'utf8');
+        const data = fs.readFileSync(urlJoin('public', schemaUrl), 'utf8');
 
         this.schema = JSON.parse(data);
 
-        const initLayer = this.schema.layers.find(l => l.name === initLayerKey);
+        const initLayer = this.schema.layers.find(l => l.name === initLayerName);
         if (!initLayer || initLayer.type !== 'tilelayer') {
             throw new Error('init layer type must be tilelayer');
         }
         this.initLayer = initLayer;
 
-        const obstaclesLayer = this.schema.layers.find(l => l.name === obstaclesLayerKey);
+        const obstaclesLayer = this.schema.layers.find(l => l.name === obstacleTilelayerName);
         if (!obstaclesLayer || obstaclesLayer.type !== 'tilelayer') {
             throw new Error('obstacle layer type must be tilelayer');
         }

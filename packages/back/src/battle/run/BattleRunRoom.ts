@@ -1,4 +1,4 @@
-import { BattleSnapshot, BRunLaunchSAction, SpellActionCAction, ConfirmSAction, MapInfos, NotifySAction, getBattleSnapshotWithHash } from '@timeflies/shared';
+import { BattleSnapshot, BRunLaunchSAction, SpellActionCAction, ConfirmSAction, MapConfig, NotifySAction, getBattleSnapshotWithHash } from '@timeflies/shared';
 import { Team } from '../../Team';
 import { BRCharActionChecker } from './BRCharActionChecker';
 import { BRMap } from "./BRMap";
@@ -12,7 +12,7 @@ const LAUNCH_DELAY = 5000; // TODO use config system
 
 export class BattleRunRoom {
 
-    private readonly mapInfos: MapInfos;
+    private readonly mapConfig: MapConfig;
 
     private readonly players: BPlayer[];
 
@@ -30,10 +30,10 @@ export class BattleRunRoom {
     private battleHashList: string[];
 
     constructor(
-        mapInfos: MapInfos,
+        mapConfig: MapConfig,
         teams: Team[]
     ) {
-        this.mapInfos = mapInfos;
+        this.mapConfig = mapConfig;
         this.teams = teams.map(t => new BTeam(t));
         this.players = this.teams.flatMap(t => t.players);
         this.characters = this.players.flatMap(p => p.characters);
@@ -41,7 +41,7 @@ export class BattleRunRoom {
     }
 
     init(): void {
-        this.map = new BRMap(this.mapInfos);
+        this.map = new BRMap(this.mapConfig);
         const { initPositions } = this.map;
         this.teams.forEach((team, i) => {
             team.placeCharacters(initPositions[ i ]);

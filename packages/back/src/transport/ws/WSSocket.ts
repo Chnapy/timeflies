@@ -1,4 +1,4 @@
-import { ClientAction, NarrowAction, ServerAction, SetIDCAction } from '@timeflies/shared';
+import { ClientAction, NarrowTAction, ServerAction, SetIDCAction } from '@timeflies/shared';
 import WebSocket from 'ws';
 
 export type SocketState = 'init' | 'hasID';
@@ -11,7 +11,7 @@ export class WSSocket {
     private readonly listeners: {
         [K in ClientAction['type']]?: {
             condition?: (socket: WSSocket) => boolean;
-            fn: (action: NarrowAction<ClientAction, K>) => void;
+            fn: (action: NarrowTAction<ClientAction, K>) => void;
         };
     };
 

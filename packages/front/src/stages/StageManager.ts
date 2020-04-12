@@ -69,7 +69,7 @@ export const StageManager = ({ stageCreators }: Dependencies = {
             type: 'stage/onCreate/graphic',
             param
         })
-    })
+    });
 
     const goToStage = async ({ stageKey, payload }: StageParams) => {
         currentStage = stageCreators[ stageKey ](payload as any);

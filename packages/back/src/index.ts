@@ -15,7 +15,7 @@ export const staticURL = urlJoin(httpBaseURL, staticPostURL);
 
 const app = express();
 app.use(
-  cors(),
+  cors({ allowedHeaders: '*' }),
   express.json()
 );
 

@@ -13,6 +13,8 @@ export interface TiledManager {
 
     readonly assets: TiledMapAssets;
 
+    getRenderableLayer(): TiledLayerTilelayer;
+
     getTileType(position: Position): TileType;
     getTilePositionFromIndex(index: number): Position;
     getTilesetFromId(id: number): TiledTileset | undefined;
@@ -58,6 +60,8 @@ export const TiledManager = (
 
     const defaultTilelayer = getTilelayer(defaultTilelayerName);
     const obstacleTilelayer = getTilelayer(obstacleTilelayerName);
+
+    const getRenderableLayer = () => defaultTilelayer;
 
     const getTilePositionFromIndex = (index: number): Position => {
         const y = Number.parseInt(index / width + '');
@@ -117,6 +121,8 @@ export const TiledManager = (
         height,
 
         assets,
+
+        getRenderableLayer,
 
         getTilePositionFromIndex,
         getTileType,

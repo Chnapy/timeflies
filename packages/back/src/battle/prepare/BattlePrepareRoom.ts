@@ -1,4 +1,4 @@
-import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, CharacterType, MapInfos, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
+import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
 import urlJoin from 'url-join';
 import { staticURL } from '../..';
 import { Player } from "../../Player";
@@ -13,7 +13,7 @@ export class BattlePrepareRoom {
     readonly minPlayer: number = 2;
     readonly maxPlayer: number = 10;
 
-    private mapInfos?: MapInfos;
+    private mapConfig?: MapConfig;
     readonly players: Player[];
     readonly teams: Team[];
     readonly characters: StaticCharacter[];
@@ -46,22 +46,16 @@ export class BattlePrepareRoom {
     launchBattle(): void {
         this.battleLaunched = true;
 
-        const mapInfos: MapInfos = this.mapInfos!;
-
-        const characterTypes: Set<CharacterType> = new Set(this.characters.map(c => c.type));
+        const mapConfig: MapConfig = this.mapConfig!;
 
         const spellTypes: Set<SpellType> = new Set(this.characters.flatMap(c => c.staticSpells.map(s => s.type)));
 
         const payload: Omit<BattleLoadPayload, 'playerInfos'> = {
-            mapInfos: {
-                ...mapInfos,
-                urls: {
-                    schema: urlJoin(staticURL, mapInfos.urls.schema),
-                    sheet: urlJoin(staticURL, mapInfos.urls.sheet)
-                }
+            mapConfig: {
+                ...mapConfig,
+                schemaUrl: urlJoin(staticURL, mapConfig.schemaUrl)
             },
-            characterTypes: [...characterTypes],
-            spellTypes: [...spellTypes]
+            spellTypes: [ ...spellTypes ]
         };
 
         this.players.forEach(p => {
@@ -88,7 +82,7 @@ export class BattlePrepareRoom {
 
                     // move everybody to battlerunroom
                     console.log('lets go dudes')
-                    this.battleRunRoom = new BattleRunRoom(mapInfos, this.teams);
+                    this.battleRunRoom = new BattleRunRoom(mapConfig, this.teams);
                     this.battleRunRoom.init();
                     this.battleRunRoom.start();
                 }
@@ -114,16 +108,12 @@ export class BattlePrepareRoom {
 
     private mock(): void {
 
-        this.mapInfos = {
-            urls: {
-                schema: 'map/sample1/map_2.json',
-                sheet: 'map/sample1/map_2.png'
-            },
-            mapKey: 'sampleMap1',
-            tilemapKey: 'map_main',
-            decorLayerKey: 'decors',
-            obstaclesLayerKey: 'obstacles',
-            initLayerKey: 'init'
+        this.mapConfig = {
+            id: 'map-1',
+            schemaUrl: 'map/sample2/map.json',
+            defaultTilelayerName: 'view',
+            obstacleTilelayerName: 'obstacles',
+            initLayerName: 'init'
         };
 
         this.characters.length = 0;
@@ -136,13 +126,13 @@ export class BattlePrepareRoom {
                 id: '1',
                 color: '#FF0000',
                 name: 'Team Rocket',
-                players: [this.players[0]]
+                players: [ this.players[ 0 ] ]
             },
-            this.players[1] && {
+            this.players[ 1 ] && {
                 id: '2',
                 color: '#FF00FF',
                 name: 'Team Azure',
-                players: [this.players[1]]
+                players: [ this.players[ 1 ] ]
             }
         ].filter(Boolean));
 

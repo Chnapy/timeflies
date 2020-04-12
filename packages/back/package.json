@@ -8,7 +8,8 @@
     "start": "ts-node src/index.ts",
     "test": "jest --watch",
     "test-ci": "jest",
-    "build": "rm -rf lib && tsc"
+    "build": "rm -rf lib && tsc",
+    "check-type": "tsc --noEmit"
   },
   "author": "",
   "license": "UNLICENSED",

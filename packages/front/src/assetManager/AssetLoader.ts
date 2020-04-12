@@ -111,6 +111,10 @@ const mapLoaderMiddleware = function (this: AppLoader, resource: Resource, next:
         return next();
     }
 
+    if(resource.error) {
+        return next();
+    }
+
     const { url } = resource;
     const map: TiledMap = resource.data;
 
