@@ -1,7 +1,8 @@
+import bresenham from 'bresenham';
 import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
-import { MapConfig } from './MapConfig';
 import { Position } from '../geo';
 import { assertIsDefined } from '../util';
+import { MapConfig } from './MapConfig';
 
 type TiledLayerTilelayerWithData = Omit<TiledLayerTilelayer, 'data'>
     & Pick<Required<TiledLayerTilelayer>, 'data'>;
@@ -19,8 +20,8 @@ export interface TiledManager {
     getTilePositionFromIndex(index: number): Position;
     getTilesetFromId(id: number): TiledTileset | undefined;
 
-    getRangeArea(center: Position, r: number): Position[];
-    getActionArea(center: Position, r: number): Position[];
+    getArea(center: Position, r: number): Position[];
+    getBresenhamLine(start: Position, end: Position): BresenhamPoint[];
 }
 
 export type TileType = 'default' | 'obstacle' | null;
@@ -31,6 +32,11 @@ export type TiledMapAssets = {
     schema: TiledMap;
     images: Record<string, HTMLImageElement>;
 };
+
+export interface BresenhamPoint {
+    position: Position;
+    tileType: TileType;
+}
 
 function assertMapIsAllowed(map: TiledMap): asserts map is TiledMapOrthogonal {
     if (map.orientation !== 'orthogonal') {
@@ -90,8 +96,7 @@ export const TiledManager = (
     const getTilesetFromId = (id: number): TiledTileset | undefined =>
         schema.tilesets.find(t => t.firstgid <= id && t.firstgid + t.tilecount - 1 >= id);
 
-    // TODO check vision lines with bresenham
-    const getRangeArea = (center: Position, r: number): Position[] => {
+    const getArea = (center: Position, r: number): Position[] => {
 
         const area: Position[] = [];
         let sum = 0;
@@ -115,6 +120,16 @@ export const TiledManager = (
         return area;
     };
 
+    const getBresenhamLine = (start: Position, end: Position): BresenhamPoint[] => {
+
+        const path: Position[] = bresenham(start.x, start.y, end.x, end.y);
+
+        return path.map((position): BresenhamPoint => ({
+            position,
+            tileType: getTileType(position)
+        }));
+    };
+
     return {
         orientation,
         width,
@@ -128,7 +143,7 @@ export const TiledManager = (
         getTileType,
         getTilesetFromId,
 
-        getRangeArea,
-        getActionArea: getRangeArea
+        getArea,
+        getBresenhamLine
     };
 }

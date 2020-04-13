@@ -2476,7 +2476,7 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/bresenham@0.0.0":
+"@types/bresenham@^0.0.0":
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/@types/bresenham/-/bresenham-0.0.0.tgz#dbc14209044b92e485363dc8967daa9cdc0ebb52"
   integrity sha512-QqR0H0AgrE8xuelL53vj/MHMWip2GjMj/m8qpAB1YflN4Xj9s9Kr5J+tUd5Im0/Va0eiGZXCBpbPKY27nNTMZw==
@@ -4168,7 +4168,7 @@ braces@^3.0.1, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-bresenham@0.0.4:
+bresenham@^0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/bresenham/-/bresenham-0.0.4.tgz#157ff5cb6340b9c54add3b765c50869e8c759193"
   integrity sha1-FX/1y2NAucVK3Tt2XFCGnox1kZM=

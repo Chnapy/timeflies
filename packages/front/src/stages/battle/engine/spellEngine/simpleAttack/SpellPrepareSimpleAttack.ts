@@ -1,11 +1,12 @@
-import { Position, TileType, equals } from '@timeflies/shared'
+import { equals, Position, TileType } from '@timeflies/shared'
+import { serviceBattleData } from '../../../../../services/serviceBattleData'
+import { serviceDispatch } from '../../../../../services/serviceDispatch'
+import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
+import { Character } from '../../../entities/character/Character'
 import { Spell } from '../../../entities/spell/Spell'
 import { MapManager } from '../../../map/MapManager'
 import { SpellAction } from '../../../spellAction/SpellActionManager'
 import { SpellPrepareSubEngineCreator } from '../../SpellPrepareEngine'
-import { serviceDispatch } from '../../../../../services/serviceDispatch'
-import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
-import { Character } from '../../../entities/character/Character'
 
 export const spellLaunchSimpleAttack = ({ actionArea }: SpellAction, characterList: Character<'future'>[]) => {
 
@@ -21,6 +22,8 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
     mapManager: MapManager,
     ) => {
 
+        const { characters } = serviceBattleData('future');
+
         const { dispatchSpellLaunch } = serviceDispatch({
             dispatchSpellLaunch: (spellActions: SpellAction[]): BStateSpellLaunchAction => ({
                 type: 'battle/state/event',
@@ -34,7 +37,11 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
         const { character } = spell;
         const { tiledManager } = mapManager;
 
-        const rangeArea: Position[] = tiledManager.getRangeArea(character.position, spell.feature.area);
+        const rangeArea: Position[] = mapManager.getRangeArea(
+            character.position,
+            spell.feature.area,
+            characters.map(c => c.position)
+        );
 
         return {
 
@@ -49,7 +56,7 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
                     return;
                 }
 
-                const actionArea = tiledManager.getActionArea(tilePos, 1);
+                const actionArea = tiledManager.getArea(tilePos, 1);
 
                 return {
                     actionArea
@@ -62,7 +69,7 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
                     return;
                 }
 
-                const actionArea = tiledManager.getActionArea(tilePos, 1);
+                const actionArea = tiledManager.getArea(tilePos, 1);
 
                 const spellAction: SpellAction = {
                     spell,

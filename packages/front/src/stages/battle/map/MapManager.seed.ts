@@ -21,6 +21,7 @@ export const seedMapManager = (type: 'real' | 'fake', mapKey: TiledMapSeedKey = 
             } as any,
             refreshPathfinder() { },
             calculatePath() { return { cancel: () => true, promise: Promise.resolve([]) } },
+            getRangeArea(center, r, charactersPos) { return [] }
         };
     }
 

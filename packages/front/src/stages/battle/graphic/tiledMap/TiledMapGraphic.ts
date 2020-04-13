@@ -138,9 +138,9 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         triggerFn.onTileClick = otc;
         triggerFn.onTileHover = async (tilePos, tileGraphicTarget) => {
 
+            layerTiles.forEach(t => t.reset());
             if (spell.staticData.type === 'move') {
 
-                layerTiles.forEach(t => t.reset());
             } else {
 
                 rangeTiles.forEach(t => t.showRange());
