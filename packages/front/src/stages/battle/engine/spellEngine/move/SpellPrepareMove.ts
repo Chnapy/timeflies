@@ -10,7 +10,7 @@ export const spellLaunchMove = ({ spell, position }: SpellAction) => {
     const { character } = spell;
 
     const orientation = getOrientationFromTo(character.position, position);
-
+    
     character.set({ position, orientation });
 };
 

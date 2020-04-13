@@ -1,17 +1,18 @@
-import { StoreTest } from '../../../StoreTest';
-import { Position, TimerTester, ConfirmSAction, BRunGlobalTurnStartSAction } from '@timeflies/shared';
+import { BRunGlobalTurnStartSAction, ConfirmSAction, Position, TimerTester } from '@timeflies/shared';
+import { BattleDataCurrent, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-import { SendMessageAction, ReceiveMessageAction } from '../../../socket/WSClient';
-import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
+import { ReceiveMessageAction, SendMessageAction } from '../../../socket/WSClient';
+import { StoreTest } from '../../../StoreTest';
 import { BState, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { BStateMachine } from '../battleState/BStateMachine';
 import { CycleManager } from '../cycle/CycleManager';
+import { GlobalTurnState } from '../cycle/GlobalTurn';
 import { SpellEngineBindAction } from '../engine/Engine';
+import { seedCharacterInitialPosition } from '../entities/character/Character.seed';
+import { seedTeam } from '../entities/team/Team.seed';
 import { seedMapManager } from '../map/MapManager.seed';
 import { SnapshotManager } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from '../spellAction/SpellActionManager';
-import { BattleDataCurrent, BattleDataFuture, BattleDataCycle } from '../../../BattleData';
-import { GlobalTurnState } from '../cycle/GlobalTurn';
 
 describe('Battleflow', () => {
 
@@ -21,31 +22,18 @@ describe('Battleflow', () => {
 
         const initialPos: Position = seedCharacterInitialPosition;
 
-        const characterCurrent = seedCharacter('real', {
-            period: 'current',
-            id: '1',
-            position: initialPos,
-            player: { itsMe: true } as any
-        });
-        const characterFuture = seedCharacter('real', {
-            period: 'future',
-            id: '1',
-            position: initialPos,
-            player: { itsMe: true } as any
-        });
-
         const currentBattleData: BattleDataCurrent = {
             battleHash: 'not-defined',
             teams: [],
-            players: null as any,
-            characters: [ characterCurrent ],
+            players: [],
+            characters: [],
         };
 
         const futureBattleData: BattleDataFuture = {
             battleHash: 'not-defined',
             teams: [],
-            players: null as any,
-            characters: [ characterFuture ],
+            players: [],
+            characters: [],
             spellActionSnapshotList: []
         };
 
@@ -54,6 +42,10 @@ describe('Battleflow', () => {
         };
 
         StoreTest.initStore({
+            currentPlayer: {
+                id: 'p1',
+                name: 'p1'
+            },
             data: {
                 state: 'battle',
                 battleData: {
@@ -63,6 +55,42 @@ describe('Battleflow', () => {
                 }
             }
         });
+
+        currentBattleData.teams.push(
+            seedTeam('real', {
+                id: 't1', period: 'current', seedPlayers: [ {
+                    id: 'p1', seedCharacters: [ {
+                        id: '1',
+                        position: initialPos,
+                        seedSpells: [ {
+                            id: 's1',
+                            type: 'move',
+                        } ]
+                    } ]
+                } ]
+            })
+        );
+        currentBattleData.players.push(currentBattleData.teams[ 0 ].players[ 0 ]);
+        currentBattleData.characters.push(currentBattleData.players[ 0 ].characters[ 0 ]);
+        const characterCurrent = currentBattleData.characters[ 0 ];
+
+        futureBattleData.teams.push(
+            seedTeam('real', {
+                id: 't1', period: 'future', seedPlayers: [ {
+                    id: 'p1', seedCharacters: [ {
+                        id: '1',
+                        position: initialPos,
+                        seedSpells: [ {
+                            id: 's1',
+                            type: 'move',
+                        } ]
+                    } ]
+                } ]
+            })
+        );
+        futureBattleData.players.push(futureBattleData.teams[ 0 ].players[ 0 ]);
+        futureBattleData.characters.push(futureBattleData.players[ 0 ].characters[ 0 ]);
+        const characterFuture = futureBattleData.characters[ 0 ];
 
         const mapManager = seedMapManager('real', 'map_1');
 
@@ -243,7 +271,7 @@ describe('Battleflow', () => {
 
             const { onTileHover, onTileClick } = bindAction;
 
-            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]))
+            await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
             await onTileClick(posAvailables[ 0 ]);
 

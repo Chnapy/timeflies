@@ -34,13 +34,18 @@ export const seedTeam = <P extends BattleDataPeriod>(type: 'real' | 'fake', prop
         id,
         name: name ?? 'T-' + id,
         color: color ?? 'red',
-        players: seedPlayers.map(p => seedPlayer('fake', {
-            ...p,
-            period,
-            team
-        })),
+        get players() {
+            return players;
+        },
         getSnapshot() { return seedTeamSnapshot(props); },
         updateFromSnapshot(snapshot) { }
     };
+
+    const players = seedPlayers.map(p => seedPlayer('fake', {
+        ...p,
+        period,
+        team
+    }));
+
     return team;
 };

@@ -1,11 +1,11 @@
-import { StoreTest } from '../../../StoreTest';
-import { MapManager } from './MapManager';
 import { Position, TiledManager, TimerTester } from '@timeflies/shared';
+import { StoreTest } from '../../../StoreTest';
+import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
+import { BattleCommitAction } from '../snapshot/SnapshotManager';
+import { MapManager } from './MapManager';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
-import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
-import { TiledMapSeedKey, seedTiledMapAssets, seedTiledConfig } from './TiledMap.seed';
-import { BStateAction } from '../battleState/BattleStateSchema';
+import { seedTiledConfig, seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
 
 describe('# MapManager', () => {
 
@@ -116,7 +116,7 @@ describe('# MapManager', () => {
         expect(refreshGrid).toHaveBeenCalledTimes(2);
     });
 
-    it('should refresh pathfinder on spell launch action', () => {
+    it('should refresh pathfinder on commit action', () => {
 
         let nbrCalls = 0;
 
@@ -131,17 +131,10 @@ describe('# MapManager', () => {
 
         const prevNbrCalls = nbrCalls;
 
-        StoreTest.dispatch<BStateAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-LAUNCH',
-            payload: {
-                spellActions: []
-            }
+        StoreTest.dispatch<BattleCommitAction>({
+            type: 'battle/commit',
+            time: Date.now()
         });
-
-        expect(nbrCalls).toBe(prevNbrCalls);
-
-        timerTester.immediates.runAll();
 
         expect(nbrCalls).toBe(prevNbrCalls + 1);
 
