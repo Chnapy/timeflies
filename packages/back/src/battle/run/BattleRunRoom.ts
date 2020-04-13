@@ -1,112 +1,116 @@
-import { BattleSnapshot, BRunLaunchSAction, SpellActionCAction, ConfirmSAction, MapConfig, NotifySAction, getBattleSnapshotWithHash } from '@timeflies/shared';
-import { Team } from '../../Team';
-import { BRCharActionChecker } from './BRCharActionChecker';
-import { BRMap } from "./BRMap";
+import { BattleSnapshot, BRunLaunchSAction, ConfirmSAction, getBattleSnapshotWithHash, MapConfig, NotifySAction, SpellActionCAction } from '@timeflies/shared';
+import { TeamData } from '../../Team';
+import { SpellActionChecker } from './SpellActionChecker';
 import { BRState } from './BRState';
-import { BRCycle } from "./cycle/BRCycle";
-import { BCharacter } from "./entities/BCharacter";
-import { BPlayer } from "./entities/BPlayer";
-import { BTeam } from "./entities/BTeam";
+import { Cycle } from "./cycle/Cycle";
+import { Character } from "./entities/Character";
+import { Player } from "./entities/Player";
+import { Team } from "./entities/Team";
+import { MapManager } from "./MapManager";
 
 const LAUNCH_DELAY = 5000; // TODO use config system
 
-export class BattleRunRoom {
+export interface BattleRunRoom {
+    start(): void;
+}
 
-    private readonly mapConfig: MapConfig;
+export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): BattleRunRoom => {
 
-    private readonly players: BPlayer[];
+    const teams: Team[] = teamsData.map(Team);
+    const players: Player[] = teams.flatMap(t => t.players);
+    const characters: Character[] = players.flatMap(p => p.characters);
+    const battleHashList: string[] = [];
 
-    private readonly teams: BTeam[];
-    private readonly characters: BCharacter[];
+    const map = MapManager(mapConfig);
+    const { initPositions } = map;
+    teams.forEach((team, i) => {
+        team.placeCharacters(initPositions[ i ]);
+    });
 
-    map!: BRMap;
+    const cycle = Cycle(players, characters);
+    const spellActionChecker = SpellActionChecker(cycle, map);
+    const state = new BRState(cycle, characters);
 
-    private launchTime!: number;
+    const start = (): void => {
+        const launchTime = Date.now() + LAUNCH_DELAY;
 
-    private charActionChecker!: BRCharActionChecker;
-    private cycle!: BRCycle;
-    private state!: BRState;
+        const battleSnapshot = generateSnapshot(launchTime, launchTime);
 
-    private battleHashList: string[];
+        battleHashList.push(battleSnapshot.battleHash);
 
-    constructor(
-        mapConfig: MapConfig,
-        teams: Team[]
-    ) {
-        this.mapConfig = mapConfig;
-        this.teams = teams.map(t => new BTeam(t));
-        this.players = this.teams.flatMap(t => t.players);
-        this.characters = this.players.flatMap(p => p.characters);
-        this.battleHashList = [];
-    }
-
-    init(): void {
-        this.map = new BRMap(this.mapConfig);
-        const { initPositions } = this.map;
-        this.teams.forEach((team, i) => {
-            team.placeCharacters(initPositions[ i ]);
-        });
-    }
-
-    start(): void {
-        this.launchTime = Date.now() + LAUNCH_DELAY;
-
-        this.cycle = new BRCycle(this.players, this.characters, this.launchTime);
-        this.charActionChecker = new BRCharActionChecker(this.cycle, this.map);
-        this.state = new BRState(this.cycle, this.characters);
-
-        const battleSnapshot = this.generateSnapshot();
-
-        this.battleHashList.push(battleSnapshot.battleHash);
+        cycle.start(launchTime);
 
         const launchAction: Omit<BRunLaunchSAction, 'sendTime'> = {
             type: 'battle-run/launch',
             battleSnapshot,
-            globalTurnState: this.cycle.globalTurn.toSnapshot()
+            globalTurnState: cycle.globalTurn.toSnapshot()
         };
 
-        this.players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
+        players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
 
-        this.players.forEach(p => {
-            const onReceive = this.onSpellActionReceive(p);
+        players.forEach(p => {
+            const onReceive = getOnSpellActionReceive(p);
             p.socket.on<SpellActionCAction>('battle/spellAction', onReceive);
         });
-    }
+    };
 
-    private onSpellActionReceive(player: BPlayer) {
+    const getOnSpellActionReceive = (player: Player) => {
         return (action: SpellActionCAction): void => {
 
-            const isOk = this.charActionChecker.check(action, player).success;
+            const isCheckSuccess = spellActionChecker.check(action, player).success;
 
-            const lastCorrectHash = this.battleHashList[ this.battleHashList.length - 1 ];
+            const sendConfirmAction = (isOk: boolean, lastCorrectHash: string): void => {
 
-            const confirmAction: ConfirmSAction = {
-                type: 'confirm',
-                sendTime: action.sendTime,
-                isOk,
-                lastCorrectHash
+                player.socket.send<ConfirmSAction>({
+                    type: 'confirm',
+                    isOk,
+                    lastCorrectHash
+                });
             };
 
-            player.socket.send<ConfirmSAction>(confirmAction);
+            console.log('isCheckSuccess', isCheckSuccess);
 
-            if (confirmAction.isOk) {
-                this.state.applyCharAction(action.spellAction);
-                this.players
-                    .filter(p => p.id !== player.id)
-                    .forEach(p => p.socket.send<NotifySAction>({
-                        type: 'notify',
-                        spellActionSnapshot: action.spellAction,
-                    }));
+            if (isCheckSuccess) {
+
+                // TODO test on a copy before doing it on current data
+                state.applyCharAction(action.spellAction);
+
+                const snap = generateSnapshot(-1, -1);
+
+                const isOk = action.spellAction.battleHash === snap.battleHash;
+
+                if (isOk) {
+
+                    battleHashList.push(snap.battleHash);
+
+                    sendConfirmAction(true, snap.battleHash);
+
+                    players
+                        .filter(p => p.id !== player.id)
+                        .forEach(p => p.socket.send<NotifySAction>({
+                            type: 'notify',
+                            spellActionSnapshot: action.spellAction,
+                        }));
+                    return;
+                }
             }
-        };
-    }
 
-    private generateSnapshot(): BattleSnapshot {
+            const lastCorrectHash = battleHashList[ battleHashList.length - 1 ];
+
+            sendConfirmAction(false, lastCorrectHash);
+        };
+    };
+
+    const generateSnapshot = (launchTime: number, time: number): BattleSnapshot => {
 
         return getBattleSnapshotWithHash({
-            time: this.launchTime,
-            launchTime: this.launchTime,
-            teamsSnapshots: this.teams.map(team => team.toSnapshot())
+            time,
+            launchTime,
+            teamsSnapshots: teams.map(team => team.toSnapshot())
         });
-    }
-}
+    };
+
+    return {
+        start
+    };
+};

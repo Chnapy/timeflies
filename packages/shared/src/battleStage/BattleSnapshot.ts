@@ -8,11 +8,22 @@ export interface BattleSnapshot {
     teamsSnapshots: TeamSnapshot[];
 }
 
-// TODO do not include 'time'
-export const getBattleSnapshotWithHash = (o: Omit<BattleSnapshot, 'battleHash'>): BattleSnapshot => {
-    const battleHash = objectHash(o);
+export const getBattleSnapshotWithHash = ({
+    teamsSnapshots,
+    ...rest
+}: Omit<BattleSnapshot, 'battleHash'>): BattleSnapshot => {
+
+    const battleHash = objectHash(
+        // TODO workaround for https://github.com/puleos/object-hash/issues/62
+        JSON.parse(JSON.stringify(
+            teamsSnapshots
+        )), {
+        respectType: false
+    });
+
     return {
-        ...o,
+        teamsSnapshots,
+        ...rest,
         battleHash
     };
 }

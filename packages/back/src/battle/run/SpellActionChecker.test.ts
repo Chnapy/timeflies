@@ -1,37 +1,37 @@
 import { MapConfig, Position, SpellActionCAction, TimerTester } from "@timeflies/shared";
 import fs from 'fs';
 import { TiledMapOrthogonal } from "tiled-types/types";
-import { seedBCharacter } from "../../__seeds__/seedBCharacter";
-import { seedBPlayer } from "../../__seeds__/seedBPlayer";
-import { BRCharActionChecker, CharActionCheckerResult } from "./BRCharActionChecker";
-import { BRMap } from "./BRMap";
-import { BRCycle } from "./cycle/BRCycle";
-import { BCharacter } from "./entities/BCharacter";
-import { BSpell } from "./entities/BSpell";
+import { SpellActionChecker, CharActionCheckerResult } from "./SpellActionChecker";
+import { MapManager } from "./MapManager";
+import { Cycle } from "./cycle/Cycle";
+import { Character } from "./entities/Character";
+import { seedCharacter } from "./entities/Character.seed";
+import { seedPlayer } from "./entities/Player.seed";
+import { Spell } from "./entities/Spell";
 jest.mock('fs');
 
-describe('#BRCharActionChecker', () => {
+describe('# SpellActionChecker', () => {
 
     const timerTester = new TimerTester();
 
-    let cycle: BRCycle;
-    let character: BCharacter;
-    let spellMove: BSpell;
-    let spellDefault: BSpell;
+    let cycle: Cycle;
+    let character: Character;
+    let spellMove: Spell;
+    let spellDefault: Spell;
     let charPos: Position;
-    let checker: BRCharActionChecker;
+    let checker: SpellActionChecker;
 
-    const getCycle = (): BRCycle => {
+    const getCycle = (): Cycle => {
 
-        const players = [ seedBPlayer() ];
-        const characters = seedBCharacter({
+        const players = [ seedPlayer() ];
+        const characters = seedCharacter({
             length: 2
         }, () => players[ 0 ]);
 
-        return new BRCycle(players, characters, Date.now());
+        return Cycle(players, characters);
     };
 
-    const getMap = (): BRMap => {
+    const getMap = (): MapManager => {
 
         const width = 20, height = 20;
 
@@ -88,7 +88,7 @@ describe('#BRCharActionChecker', () => {
             obstacleTilelayerName: 'obstacles'
         };
 
-        return new BRMap(mapConfig);
+        return MapManager(mapConfig);
     };
 
     beforeEach(() => {
@@ -96,6 +96,7 @@ describe('#BRCharActionChecker', () => {
 
         cycle = getCycle();
         const map = getMap();
+        cycle.start(Date.now());
 
         character = cycle.globalTurn.currentTurn.character;
         character.position = { x: 10, y: 10 };
@@ -104,7 +105,7 @@ describe('#BRCharActionChecker', () => {
         spellMove = character.spells.find(s => s.staticData.type === 'move')!;
         spellDefault = character.spells.find(s => s.staticData.type !== 'move' && s.staticData.type !== 'orientate')!;
         charPos = character.position;
-        checker = new BRCharActionChecker(cycle, map);
+        checker = SpellActionChecker(cycle, map);
     });
 
     afterEach(() => {
@@ -134,7 +135,10 @@ describe('#BRCharActionChecker', () => {
             }
         };
 
-        character.features.life = 0;
+        character.features = {
+            ...character.features,
+            life: 0
+        };
 
         expect(
             checker.check(action, character.player)
@@ -342,7 +346,7 @@ describe('#BRCharActionChecker', () => {
 
     it('should fail on bad player', () => {
 
-        const otherPlayer = seedBPlayer();
+        const otherPlayer = seedPlayer();
 
         const position = {
             x: 10,

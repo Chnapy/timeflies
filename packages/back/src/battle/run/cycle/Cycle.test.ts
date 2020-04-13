@@ -1,15 +1,15 @@
-import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TURN_DELAY, TimerTester } from '@timeflies/shared';
+import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TimerTester, TURN_DELAY } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
-import { seedBCharacter } from '../../../__seeds__/seedBCharacter';
-import { seedBPlayer } from '../../../__seeds__/seedBPlayer';
-import { seedWebSocket } from '../../../__seeds__/seedWSSocket';
-import { BCharacter } from '../entities/BCharacter';
-import { BPlayer } from '../entities/BPlayer';
-import { BRCycle } from './BRCycle';
-import { BGlobalTurn, GlobalTurnState } from './turn/BGlobalTurn';
+import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
+import { Character } from '../entities/Character';
+import { seedCharacter } from '../entities/Character.seed';
+import { Player } from '../entities/Player';
+import { seedPlayer } from '../entities/Player.seed';
+import { Cycle } from './Cycle';
+import { GlobalTurn, GlobalTurnState } from './turn/GlobalTurn';
 import WebSocket = require('ws');
 
-describe('#BRCycle', () => {
+describe('# Cycle', () => {
 
     const timerTester = new TimerTester();
 
@@ -18,11 +18,11 @@ describe('#BRCycle', () => {
 
     let sockets: WebSocket[];
 
-    let players: BPlayer[];
+    let players: Player[];
 
-    let characters: BCharacter[];
+    let characters: Character[];
 
-    let cycle: BRCycle;
+    let cycle: Cycle;
 
     beforeEach(() => {
         timerTester.beforeTest();
@@ -36,11 +36,11 @@ describe('#BRCycle', () => {
             })
         ];
 
-        players = sockets.map(s => seedBPlayer({ socket: new WSSocket(s) }));
+        players = sockets.map(s => seedPlayer({ socket: new WSSocket(s) }));
 
-        characters = seedBCharacter(
+        characters = seedCharacter(
             { length: 3 },
-            i => i < 2 ? players[0] : players[1]
+            i => i < 2 ? players[ 0 ] : players[ 1 ]
         );
 
         onSendFn1 = () => { };
@@ -59,15 +59,23 @@ describe('#BRCycle', () => {
         timerTester.afterTest();
     });
 
+    it('should not start on init', () => {
+
+        const cycle = Cycle(players, characters);
+
+        expect(cycle.globalTurn).toBeUndefined();
+    });
+
     it('should run the first global turn & not send action', () => {
 
         onSendFn1 = jest.fn();
 
         const launchTime = timerTester.now;
 
-        cycle = new BRCycle(players, characters, launchTime);
+        cycle = Cycle(players, characters);
+        cycle.start(launchTime);
 
-        expect(cycle.globalTurn).toMatchObject<Partial<BGlobalTurn>>({
+        expect(cycle.globalTurn).toMatchObject<Partial<GlobalTurn>>({
             id: 0,
             startTime: launchTime
         });
@@ -90,7 +98,8 @@ describe('#BRCycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = new BRCycle(players, characters, launchTime);
+        cycle = Cycle(players, characters);
+        cycle.start(launchTime);
 
         expect(on).not.toHaveBeenCalled();
 
@@ -106,7 +115,7 @@ describe('#BRCycle', () => {
 
         expect(actions
             .map(a => a.type)
-        ).not.toContain<BRunGlobalTurnStartSAction['type']>('battle-run/global-turn-start')
+        ).not.toContain<BRunGlobalTurnStartSAction[ 'type' ]>('battle-run/global-turn-start')
     });
 
     it('should run a complete global turn, then run the next one', () => {
@@ -122,7 +131,8 @@ describe('#BRCycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = new BRCycle(players, characters, launchTime);
+        cycle = Cycle(players, characters);
+        cycle.start(launchTime);
 
         let advance = 0;
         characters.forEach((c, i) => {

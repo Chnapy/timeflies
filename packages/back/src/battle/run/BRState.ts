@@ -1,16 +1,16 @@
-import { Position, SpellActionSnapshot } from '@timeflies/shared';
-import { BRCycle } from './cycle/BRCycle';
-import { BCharacter } from './entities/BCharacter';
-import { BSpell } from './entities/BSpell';
+import { Position, SpellActionSnapshot, assertIsDefined, getOrientationFromTo } from '@timeflies/shared';
+import { Cycle } from './cycle/Cycle';
+import { Character } from './entities/Character';
+import { Spell } from './entities/Spell';
 
 export class BRState {
 
-    private readonly cycle: BRCycle;
+    private readonly cycle: Cycle;
 
-    private readonly characters: BCharacter[];
-    private readonly spells: BSpell[];
+    private readonly characters: Character[];
+    private readonly spells: Spell[];
 
-    constructor(cycle: BRCycle, characters: BCharacter[]) {
+    constructor(cycle: Cycle, characters: Character[]) {
         this.cycle = cycle;
         this.characters = characters;
         this.spells = characters.flatMap(c => c.spells);
@@ -18,9 +18,7 @@ export class BRState {
 
     applyCharAction({ spellId, position }: SpellActionSnapshot): void {
         const spell = this.spells.find(s => s.id === spellId);
-        if (!spell) {
-            throw new Error();
-        }
+        assertIsDefined(spell);
 
         const { staticData: { type } } = spell;
 
@@ -34,13 +32,17 @@ export class BRState {
         }
     }
 
-    private applyMoveAction(spell: BSpell, position: Position): void {
+    // TODO share all these functions
+    private applyMoveAction(spell: Spell, position: Position): void {
         const { character } = spell;
 
+        const orientation = getOrientationFromTo(character.position, position);
+
         character.position = position;
+        character.orientation = orientation;
     }
 
-    private applyDefaultAction(spell: BSpell, positions: Position[]): void {
+    private applyDefaultAction(spell: Spell, positions: Position[]): void {
         const targets = this.characters.filter(({ isAlive, position: p }) => isAlive
             && positions.some(p2 =>
                 p.x === p2.x && p.y === p2.y
@@ -49,14 +51,17 @@ export class BRState {
         const { features: { attack } } = spell;
 
         targets.forEach(t => {
-            t.features.life -= attack;
+            t.features = {
+                ...t.features,
+                life: Math.max(t.features.life - attack, 0)
+            };
         });
 
         const deads = targets.filter(t => !t.isAlive);
         this.notifyDeaths(deads);
     }
 
-    private notifyDeaths(deadChars: BCharacter[]): void {
+    private notifyDeaths(deadChars: Character[]): void {
         if (!deadChars.length) {
             return;
         }

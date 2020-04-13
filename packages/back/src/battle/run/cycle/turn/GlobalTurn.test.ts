@@ -1,8 +1,8 @@
 import { getIndexGenerator, TimerTester } from '@timeflies/shared';
-import { seedBCharacter } from '../../../../__seeds__/seedBCharacter';
-import { BGlobalTurn, GlobalTurnState } from './BGlobalTurn';
+import { seedCharacter } from '../../entities/Character.seed';
+import { GlobalTurn, GlobalTurnState } from './GlobalTurn';
 
-describe('#BGlobalTurn', () => {
+describe('# GlobalTurn', () => {
 
     const timerTester = new TimerTester();
 
@@ -16,7 +16,7 @@ describe('#BGlobalTurn', () => {
 
     it('should keep coherent state', () => {
 
-        const characters = seedBCharacter();
+        const characters = seedCharacter();
 
         const idGenerator = getIndexGenerator();
 
@@ -25,10 +25,10 @@ describe('#BGlobalTurn', () => {
             future: timerTester.now + 1000
         };
 
-        const globalTurnIdle = new BGlobalTurn(1, startTime.future,
+        const globalTurnIdle = GlobalTurn(1, startTime.future,
             characters, idGenerator,
             () => null, () => null);
-        const globalTurnRunning = new BGlobalTurn(1, startTime.past,
+        const globalTurnRunning = GlobalTurn(1, startTime.past,
             characters, idGenerator,
             () => null, () => null);
 
@@ -38,7 +38,7 @@ describe('#BGlobalTurn', () => {
 
     it('should change current turn when previous one ends', () => {
 
-        const characters = seedBCharacter({
+        const characters = seedCharacter({
             alterFn: char => char.initialFeatures.actionTime = 2000
         });
 
@@ -46,7 +46,7 @@ describe('#BGlobalTurn', () => {
 
         const startTime = timerTester.now;
 
-        const globalTurn = new BGlobalTurn(1, startTime,
+        const globalTurn = GlobalTurn(1, startTime,
             characters, turnIdGenerator,
             () => null, () => null);
 
@@ -60,7 +60,7 @@ describe('#BGlobalTurn', () => {
 
     it('should run callback when last turn ends', () => {
 
-        const characters = seedBCharacter({
+        const characters = seedCharacter({
             length: 1,
             alterFn: char => char.initialFeatures.actionTime = 2000
         });
@@ -71,7 +71,7 @@ describe('#BGlobalTurn', () => {
 
         const onGTurnEnd = jest.fn();
 
-        const globalTurn = new BGlobalTurn(1, startTime,
+        const globalTurn = GlobalTurn(1, startTime,
             characters, turnIdGenerator,
             onGTurnEnd, () => null);
 
@@ -86,7 +86,7 @@ describe('#BGlobalTurn', () => {
 
     it('should not run dead character turn', () => {
 
-        const characters = seedBCharacter({
+        const characters = seedCharacter({
             alterFn: char => char.initialFeatures.actionTime = 2000
         });
 
@@ -94,13 +94,16 @@ describe('#BGlobalTurn', () => {
 
         const startTime = timerTester.now;
 
-        const globalTurn = new BGlobalTurn(1, startTime,
+        const globalTurn = GlobalTurn(1, startTime,
             characters, turnIdGenerator,
             () => null, () => null);
 
         const secondChar = globalTurn.charactersOrdered[ 1 ];
 
-        secondChar.features.life = 0;
+        secondChar.features = {
+            ...secondChar.features,
+            life: 0
+        };
 
         timerTester.advanceBy(3000);
 
@@ -109,19 +112,22 @@ describe('#BGlobalTurn', () => {
 
     it('should stop turn if current character dies', () => {
 
-        const characters = seedBCharacter();
+        const characters = seedCharacter();
 
         const turnIdGenerator = getIndexGenerator();
 
         const startTime = timerTester.now;
 
-        const globalTurn = new BGlobalTurn(1, startTime,
+        const globalTurn = GlobalTurn(1, startTime,
             characters, turnIdGenerator,
             () => null, () => null);
 
         const firstChar = globalTurn.charactersOrdered[ 0 ];
 
-        firstChar.features.life = 0;
+        firstChar.features = {
+            ...firstChar.features,
+            life: 0
+        };
         
         globalTurn.notifyDeaths();
 

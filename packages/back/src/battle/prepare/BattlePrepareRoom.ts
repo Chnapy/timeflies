@@ -1,8 +1,8 @@
 import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
 import urlJoin from 'url-join';
 import { staticURL } from '../..';
-import { Player } from "../../Player";
-import { Team } from "../../Team";
+import { PlayerData } from "../../Player";
+import { TeamData } from "../../Team";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
 
@@ -14,8 +14,8 @@ export class BattlePrepareRoom {
     readonly maxPlayer: number = 10;
 
     private mapConfig?: MapConfig;
-    readonly players: Player[];
-    readonly teams: Team[];
+    readonly players: PlayerData[];
+    readonly teams: TeamData[];
     readonly characters: StaticCharacter[];
 
     private battleLaunched: boolean;
@@ -29,7 +29,7 @@ export class BattlePrepareRoom {
         this.battleLaunched = false;
     }
 
-    addPlayer(player: Player): void {
+    addPlayer(player: PlayerData): void {
         player.state = 'battle-prepare';
         this.players.push(player);
 
@@ -82,8 +82,7 @@ export class BattlePrepareRoom {
 
                     // move everybody to battlerunroom
                     console.log('lets go dudes')
-                    this.battleRunRoom = new BattleRunRoom(mapConfig, this.teams);
-                    this.battleRunRoom.init();
+                    this.battleRunRoom = BattleRunRoom(mapConfig, this.teams);
                     this.battleRunRoom.start();
                 }
             });

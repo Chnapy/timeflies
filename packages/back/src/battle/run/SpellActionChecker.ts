@@ -1,7 +1,7 @@
-import { SpellActionCAction, Position } from "@timeflies/shared";
-import { BRMap } from './BRMap';
-import { BRCycle } from './cycle/BRCycle';
-import { BPlayer } from "./entities/BPlayer";
+import { SpellActionCAction } from "@timeflies/shared";
+import { Cycle } from './cycle/Cycle';
+import { Player } from "./entities/Player";
+import { MapManager } from './MapManager';
 
 export type CharActionCheckerReason = 'player' | 'isAlive' | 'spell' | 'startTime' | 'duration' | 'isInArea' | 'bresenham' | 'specificType';
 
@@ -14,38 +14,19 @@ export type CharActionCheckerResult =
         reason: CharActionCheckerReason;
     };
 
-export class BRCharActionChecker {
+interface Checker {
+    (action: SpellActionCAction, player: Player): CharActionCheckerResult;
+}
 
-    private readonly checkList: readonly ((action: SpellActionCAction, player: BPlayer) => CharActionCheckerResult)[];
+export interface SpellActionChecker {
+    check: Checker;
+}
 
-    private readonly cycle: BRCycle;
-    private readonly map: BRMap;
+export const SpellActionChecker = (cycle: Cycle, map: MapManager): SpellActionChecker => {
 
-    constructor(cycle: BRCycle, map: BRMap) {
-        this.cycle = cycle;
-        this.map = map;
-        this.checkList = [
-            this.checkPlayer,
-            this.checkCharacter,
-            this.checkTime,
-            this.checkPositions
-        ].map(c => c.bind(this));
-    }
 
-    check(action: SpellActionCAction, player: BPlayer): CharActionCheckerResult {
-
-        for (const c of this.checkList) {
-            const result = c(action, player);
-            if (!result.success) {
-                return result;
-            }
-        }
-
-        return { success: true };
-    }
-
-    private checkPlayer(action: SpellActionCAction, player: BPlayer): CharActionCheckerResult {
-        const { currentTurn } = this.cycle.globalTurn;
+    const checkPlayer: Checker = (action, player) => {
+        const { currentTurn } = cycle.globalTurn;
 
         if (currentTurn.character.player.id !== player.id) {
             console.log('check player', currentTurn.character.player.id, player.id);
@@ -58,12 +39,12 @@ export class BRCharActionChecker {
         return {
             success: true
         };
-    }
+    };
 
-    private checkCharacter({ spellAction }: SpellActionCAction, player: BPlayer): CharActionCheckerResult {
+    const checkCharacter: Checker = ({ spellAction }, player): CharActionCheckerResult => {
         const { currentTurn: {
             character
-        } } = this.cycle.globalTurn;
+        } } = cycle.globalTurn;
 
         if (!character.isAlive) {
             console.log('check isAlive');
@@ -86,10 +67,10 @@ export class BRCharActionChecker {
         return {
             success: true
         };
-    }
+    };
 
-    private checkTime({ sendTime, spellAction }: SpellActionCAction): CharActionCheckerResult {
-        const { currentTurn } = this.cycle.globalTurn;
+    const checkTime: Checker = ({ sendTime, spellAction }) => {
+        const { currentTurn } = cycle.globalTurn;
 
         if (sendTime < currentTurn.startTime) {
             console.log('check startTime');
@@ -114,12 +95,12 @@ export class BRCharActionChecker {
         return {
             success: true
         };
-    }
+    };
 
-    private checkPositions({ spellAction }: SpellActionCAction): CharActionCheckerResult {
+    const checkPositions: Checker = ({ spellAction }) => {
         const { spellId, position } = spellAction;
 
-        const { globalTurn: globalTurnState } = this.cycle;
+        const { globalTurn: globalTurnState } = cycle;
 
         const { currentTurn: { character }, charactersOrdered } = globalTurnState;
 
@@ -215,5 +196,26 @@ export class BRCharActionChecker {
         return {
             success: true
         };
+    };
+
+    const checkList: readonly Checker[] = [
+        checkPlayer,
+        checkCharacter,
+        checkTime,
+        checkPositions
+    ];
+
+    return {
+        check: (action: SpellActionCAction, player: Player): CharActionCheckerResult => {
+
+            for (const c of checkList) {
+                const result = c(action, player);
+                if (!result.success) {
+                    return result;
+                }
+            }
+
+            return { success: true };
+        }
     }
-}
+};

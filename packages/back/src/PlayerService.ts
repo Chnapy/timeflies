@@ -1,12 +1,12 @@
 import { StaticCharacter } from "@timeflies/shared";
-import { Player } from "./Player";
+import { PlayerData } from "./Player";
 import { WSSocket } from "./transport/ws/WSSocket";
 import { Util } from "./Util";
-import { seedStaticCharacter } from "./__seeds__/seedStaticCharacter";
+import { seedStaticCharacter } from "./battle/run/entities/seedStaticCharacter";
 
 export class PlayerService {
 
-    getPlayer(socket: WSSocket): Player {
+    getPlayer(socket: WSSocket): PlayerData {
 
         // fetch...
 

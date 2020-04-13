@@ -1,9 +1,9 @@
-import { Player } from "./Player";
+import { PlayerData } from "./Player";
 
-export interface Team {
+export interface TeamData {
     id: string;
     name: string;
     color: string;
 
-    players: Player[];
+    players: PlayerData[];
 }

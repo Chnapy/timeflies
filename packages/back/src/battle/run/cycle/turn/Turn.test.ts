@@ -1,17 +1,17 @@
-import { BTurn, TurnState } from "./BTurn";
-import { seedBCharacter } from "../../../../__seeds__/seedBCharacter";
-import { BCharacter } from "../../entities/BCharacter";
 import { TimerTester } from "@timeflies/shared";
+import { seedCharacter } from "../../entities/Character.seed";
+import { Character } from "../../entities/Character";
+import { Turn, TurnState } from "./Turn";
 
-describe('#BTurn', () => {
+describe('# Turn', () => {
 
     const timerTester = new TimerTester();
 
-    let character: BCharacter;
+    let character: Character;
 
     beforeEach(() => {
         timerTester.beforeTest();
-        character = seedBCharacter({
+        character = seedCharacter({
             length: 1,
             alterFn: (char) => char.initialFeatures.actionTime = 2000
         })[ 0 ];
@@ -24,7 +24,7 @@ describe('#BTurn', () => {
     it('should not have timed actions on init', () => {
         const callback = jest.fn();
 
-        const turnIdle = new BTurn(1, timerTester.now - 100000, character, callback, callback);
+        const turnIdle = Turn(1, timerTester.now - 100000, character, callback, callback);
 
         expect(callback).not.toHaveBeenCalled();
     });
@@ -37,9 +37,9 @@ describe('#BTurn', () => {
             wayBefore: timerTester.now - 5000
         };
 
-        const turnIdle = new BTurn(1, startTimes.future, character, () => null, () => null);
-        const turnRunning = new BTurn(1, startTimes.past, character, () => null, () => null);
-        const turnEnded = new BTurn(1, startTimes.wayBefore, character, () => null, () => null);
+        const turnIdle = Turn(1, startTimes.future, character, () => null, () => null);
+        const turnRunning = Turn(1, startTimes.past, character, () => null, () => null);
+        const turnEnded = Turn(1, startTimes.wayBefore, character, () => null, () => null);
 
         const states: TurnState[] = [ 'idle', 'running', 'ended' ];
 
@@ -54,7 +54,7 @@ describe('#BTurn', () => {
 
         const startFn = jest.fn();
 
-        const turnIdle = new BTurn(1, startTime, character, startFn, () => {});
+        const turnIdle = Turn(1, startTime, character, startFn, () => { });
         turnIdle.refreshTimedActions();
 
         expect(startFn).toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe('#BTurn', () => {
         const startFn = jest.fn();
         const endFn = jest.fn();
 
-        const turnIdle = new BTurn(1, startTime, character, startFn, endFn);
+        const turnIdle = Turn(1, startTime, character, startFn, endFn);
         turnIdle.refreshTimedActions();
 
         timerTester.advanceBy(900);

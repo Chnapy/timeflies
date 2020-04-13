@@ -1,8 +1,8 @@
-import { Team } from "../Team";
-import { BTeam } from "../battle/run/entities/BTeam";
+import { Team } from "./Team";
+import { TeamData } from "../../../Team";
 
 let id = 0;
-const SEED_TEAM = (): Team => {
+const SEED_TEAM = (): TeamData => {
     id++;
     return {
         id: id.toString(),
@@ -12,8 +12,8 @@ const SEED_TEAM = (): Team => {
     };
 };
 
-export const seedBTeam = (partialTeam: Partial<Team> = {}): BTeam => {
-    return new BTeam({
+export const seedTeam = (partialTeam: Partial<TeamData> = {}): Team => {
+    return Team({
         ...SEED_TEAM(),
         ...partialTeam
     });
