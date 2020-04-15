@@ -1,5 +1,5 @@
 import { BattlePrepareRoom } from "./prepare/BattlePrepareRoom";
-import { PlayerData } from "../Player";
+import { PlayerData } from "../PlayerData";
 import { PlayerService } from "../PlayerService";
 import WebSocket  from "ws";
 import { WSSocket } from "../transport/ws/WSSocket";

@@ -2,7 +2,7 @@ import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, M
 import { Server, WebSocket } from 'mock-socket';
 import path from 'path';
 import { PlayerService } from '../../PlayerService';
-import { TeamData } from '../../Team';
+import { TeamData } from '../../TeamData';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { BattleRunRoom } from './BattleRunRoom';
 

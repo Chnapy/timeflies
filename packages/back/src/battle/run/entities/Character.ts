@@ -11,6 +11,7 @@ export interface Character {
     features: Readonly<CharacterFeatures>;
     readonly spells: readonly Spell[];
     readonly isAlive: boolean;
+    alterLife(add: number): void;
     toSnapshot(): CharacterSnapshot
 }
 
@@ -52,6 +53,10 @@ export const Character = (staticData: StaticCharacter, player: Player): Characte
         },
         get spells() {
             return spells;
+        },
+        alterLife(add) {
+            const life = Math.max(features.life + add, 0);
+            features = { ...features, life };
         },
         toSnapshot() {
             return {

@@ -6,6 +6,7 @@ import { GlobalTurn } from "./turn/GlobalTurn";
 export interface Cycle {
     readonly globalTurn: GlobalTurn;
     start(launchTime: number): void;
+    stop(): void;
 }
 
 export const Cycle = (players: readonly Player[], characters: readonly Character[]): Cycle => {
@@ -60,6 +61,9 @@ export const Cycle = (players: readonly Player[], characters: readonly Character
         },
         start(launchTime: number) {
             globalTurn = newGlobalTurn(launchTime, false);
+        },
+        stop() {
+            globalTurn.stop();
         }
     }
 };

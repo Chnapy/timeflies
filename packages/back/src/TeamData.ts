@@ -1,4 +1,4 @@
-import { PlayerData } from "./Player";
+import { PlayerData } from "./PlayerData";
 
 export interface TeamData {
     id: string;

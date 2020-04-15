@@ -1,4 +1,4 @@
-import { assertIsDefined, assertThenGet, BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GlobalTurnSnapshot, TurnSnapshot } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GlobalTurnSnapshot, TurnSnapshot, BRunEndSAction } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { GlobalTurn } from './GlobalTurn';
@@ -74,6 +74,13 @@ export const CycleManager = (
     onMessageAction<BRunTurnStartSAction>(
         'battle-run/turn-start',
         ({ turnState }) => synchronizeTurn(turnState)
+    );
+
+    onMessageAction<BRunEndSAction>(
+        'battle-run/end',
+        () => {
+            cycleData.globalTurn?.stop();
+        }
     );
 
     return {

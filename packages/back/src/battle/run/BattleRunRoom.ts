@@ -1,12 +1,12 @@
-import { BattleSnapshot, BRunLaunchSAction, ConfirmSAction, getBattleSnapshotWithHash, MapConfig, NotifySAction, SpellActionCAction } from '@timeflies/shared';
-import { TeamData } from '../../Team';
-import { SpellActionChecker } from './SpellActionChecker';
-import { BRState } from './BRState';
+import { BattleSnapshot, BRunLaunchSAction, ConfirmSAction, getBattleSnapshotWithHash, MapConfig, NotifySAction, SpellActionCAction, BRunEndSAction } from '@timeflies/shared';
+import { TeamData } from '../../TeamData';
+import { BattleState } from './BattleState';
 import { Cycle } from "./cycle/Cycle";
 import { Character } from "./entities/Character";
 import { Player } from "./entities/Player";
 import { Team } from "./entities/Team";
 import { MapManager } from "./MapManager";
+import { SpellActionChecker } from './SpellActionChecker';
 
 const LAUNCH_DELAY = 5000; // TODO use config system
 
@@ -29,7 +29,12 @@ export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): Batt
 
     const cycle = Cycle(players, characters);
     const spellActionChecker = SpellActionChecker(cycle, map);
-    const state = new BRState(cycle, characters);
+    const state = BattleState(cycle, characters);
+
+    players.forEach(p => p.socket.onClose(() => {
+        console.log('Player disconnect:', p.id, p.socket.isConnected);
+        checkDeathsAndDisconnects();
+    }));
 
     const start = (): void => {
         const launchTime = Date.now() + LAUNCH_DELAY;
@@ -73,7 +78,7 @@ export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): Batt
             if (isCheckSuccess) {
 
                 // TODO test on a copy before doing it on current data
-                state.applyCharAction(action.spellAction);
+                const deaths = state.applySpellAction(action.spellAction);
 
                 const snap = generateSnapshot(-1, -1);
 
@@ -91,6 +96,9 @@ export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): Batt
                             type: 'notify',
                             spellActionSnapshot: action.spellAction,
                         }));
+
+                    notifyDeaths(deaths)
+
                     return;
                 }
             }
@@ -108,6 +116,39 @@ export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): Batt
             launchTime,
             teamsSnapshots: teams.map(team => team.toSnapshot())
         });
+    };
+
+    const notifyDeaths = (deaths: Character[]): void => {
+        if (!deaths.length) {
+            return;
+        }
+
+        cycle.globalTurn.notifyDeaths();
+
+        checkDeathsAndDisconnects();
+    };
+
+    const checkDeathsAndDisconnects = () => {
+        const teamsRemains = teams.filter(t =>
+            t.players.some(p => p.socket.isConnected)
+            && t.characters.some(c => c.isAlive)
+        );
+        if (teamsRemains.length === 1) {
+            endBattle(teamsRemains[ 0 ]);
+        }
+    };
+
+    const endBattle = (team: Team): void => {
+        cycle.stop();
+        players.forEach(p => p.socket.clearBattleListeners());
+        players.forEach(p => p.socket.send<BRunEndSAction>({
+            type: 'battle-run/end',
+            winnerTeamId: team.id
+        }));
+
+        console.log('\n---');
+        console.log(`Battle ended. Team ${team.name} wins !`);
+        console.log('---\n');
     };
 
     return {

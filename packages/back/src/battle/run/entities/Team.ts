@@ -1,5 +1,5 @@
 import { Position, TeamSnapshot } from "@timeflies/shared";
-import { TeamData } from "../../../Team";
+import { TeamData } from "../../../TeamData";
 import { Character } from "./Character";
 import { Player } from "./Player";
 

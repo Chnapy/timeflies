@@ -1,5 +1,5 @@
 import { Team } from "./Team";
-import { TeamData } from "../../../Team";
+import { TeamData } from "../../../TeamData";
 
 let id = 0;
 const SEED_TEAM = (): TeamData => {

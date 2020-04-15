@@ -9,6 +9,7 @@ export interface GlobalTurn {
     readonly state: GlobalTurnState;
     readonly currentTurn: Turn;
     start(): void;
+    stop(): void;
     notifyDeaths(): void;
     synchronize(snapshot: GlobalTurnSnapshot): void;
     synchronizeTurn(turnSnapshot: TurnSnapshot): void;
@@ -80,6 +81,11 @@ export const GlobalTurn = (
     };
 
     const onTurnEnd = (): void => {
+
+        if(globalTurnEnded) {
+            return;
+        }
+
         if (checkWaitingTurns()) {
             return;
         }
@@ -130,6 +136,9 @@ export const GlobalTurn = (
         },
         start(): void {
             currentTurn.refreshTimedActions();
+        },
+        stop(): void {
+            globalTurnEnded = true;
         },
         notifyDeaths(): void {
             if (!currentTurn.character.isAlive) {

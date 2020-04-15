@@ -1,4 +1,4 @@
-import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester } from "@timeflies/shared";
+import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester, BRunEndSAction } from "@timeflies/shared";
 import { ReceiveMessageAction } from "../../../socket/WSClient";
 import { StoreTest } from "../../../StoreTest";
 import { seedCharacter } from "../entities/character/Character.seed";
@@ -64,6 +64,7 @@ describe('# CycleManager', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             };
         });
 
@@ -124,6 +125,7 @@ describe('# CycleManager', () => {
                 notifyDeaths() { },
                 synchronize,
                 synchronizeTurn() { },
+                stop() { }
             };
         };
 
@@ -201,6 +203,7 @@ describe('# CycleManager', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn,
+                stop() { }
             };
         };
 
@@ -279,6 +282,7 @@ describe('# CycleManager', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             };
         };
 
@@ -368,6 +372,7 @@ describe('# CycleManager', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             };
         };
 
@@ -450,6 +455,7 @@ describe('# CycleManager', () => {
                 notifyDeaths,
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             };
         };
 
@@ -513,6 +519,7 @@ describe('# CycleManager', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             };
         };
 
@@ -543,6 +550,70 @@ describe('# CycleManager', () => {
         });
 
         expect(cycle.isRunning).toBe(true);
+    });
+
+    it('should stop on battle end', () => {
+
+        const characters = [
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
+        ];
+
+        initStore(characters);
+
+        const stopFn = jest.fn();
+
+        const globalTurnCreator: typeof GlobalTurn = () => {
+
+            return {
+                id: 1,
+                state: 'running',
+                currentTurn: {
+                    id: 1,
+                    character: characters[ 0 ],
+                    startTime: timerTester.now,
+                    turnDuration: 1000,
+                    endTime: timerTester.now + 1000,
+                    refreshTimedActions() { },
+                    state: 'running',
+                    synchronize() { },
+                    getRemainingTime() { return -1; }
+                },
+                start() { },
+                notifyDeaths() { },
+                synchronize() { },
+                synchronizeTurn() { },
+                stop: stopFn
+            };
+        };
+
+        const cycle = CycleManager({ globalTurnCreator });
+
+        const order = characters.map(c => c.id);
+
+        cycle.start({
+            id: 1,
+            order,
+            startTime: timerTester.now,
+            currentTurn: {
+                id: 1,
+                characterId: order[ 0 ],
+                startTime: timerTester.now
+            }
+        });
+
+        expect(stopFn).not.toHaveBeenCalled();
+
+        StoreTest.dispatch<ReceiveMessageAction<BRunEndSAction>>({
+            type: 'message/receive',
+            message: {
+                type: 'battle-run/end',
+                sendTime: timerTester.now,
+                winnerTeamId: 'toto'
+            }
+        });
+
+        expect(stopFn).toHaveBeenCalledTimes(1);
     });
 
 });

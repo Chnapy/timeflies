@@ -4,6 +4,7 @@ import { serviceEvent } from '../../../services/serviceEvent';
 import { Character } from '../entities/character/Character';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
 import { Pathfinder } from './Pathfinder';
+import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 
 export interface MapManager extends Pick<Pathfinder, 'calculatePath'> {
     readonly tiledManager: TiledManager;
@@ -41,7 +42,9 @@ export const MapManager = (
 
     const pathfinder = pathfinderCreator(
         tiledManager,
-        () => characters.map(c => c.position)
+        () => characters
+            .filter(c => c.isAlive)
+            .map(c => c.position)
     );
     pathfinder.refreshGrid();
 
@@ -85,6 +88,13 @@ export const MapManager = (
     onAction<BattleCommitAction>('battle/commit', action => {
 
         pathfinder.refreshGrid();
+    });
+
+    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({ removed }) => {
+
+        if (removed) {
+            setImmediate(() => pathfinder.refreshGrid());
+        }
     });
 
     return {

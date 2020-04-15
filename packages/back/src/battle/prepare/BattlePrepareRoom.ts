@@ -1,8 +1,8 @@
 import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
 import urlJoin from 'url-join';
 import { staticURL } from '../..';
-import { PlayerData } from "../../Player";
-import { TeamData } from "../../Team";
+import { PlayerData } from "../../PlayerData";
+import { TeamData } from "../../TeamData";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
 

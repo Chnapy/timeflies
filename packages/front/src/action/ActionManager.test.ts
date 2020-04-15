@@ -1,5 +1,5 @@
-import { ActionManager } from './ActionManager';
 import { StoreTest } from '../StoreTest';
+import { ActionManager } from './ActionManager';
 
 describe('# ActionManager', () => {
 
@@ -174,6 +174,84 @@ describe('# ActionManager', () => {
         });
 
         expect(nbCalls).toBe(nbCallsBefore);
+    });
+
+    describe('on battle context', () => {
+
+        it('should call common listener on dispatch', () => {
+            const manager = ActionManager(() => { });
+
+            const listener = jest.fn();
+
+            manager.addActionListener('stage/change', listener);
+
+            manager.beginBattleSession();
+
+            manager.dispatch({
+                type: 'stage/change',
+                stageKey: 'boot',
+                payload: {}
+            });
+
+            expect(listener).toHaveBeenNthCalledWith(1, {
+                type: 'stage/change',
+                stageKey: 'boot',
+                payload: {}
+            });
+        });
+
+        it('should call battle listeners on dispatch', () => {
+            const manager = ActionManager(() => { });
+
+            const listener = jest.fn();
+
+            manager.beginBattleSession();
+
+            manager.addActionListener('stage/change', listener);
+
+            manager.dispatch({
+                type: 'stage/change',
+                stageKey: 'boot',
+                payload: {}
+            });
+
+            expect(listener).toHaveBeenNthCalledWith(1, {
+                type: 'stage/change',
+                stageKey: 'boot',
+                payload: {}
+            });
+        });
+
+        it('should clear battle listeners on session end', () => {
+            const manager = ActionManager(() => { });
+
+            let listener = jest.fn();
+
+            manager.beginBattleSession();
+
+            manager.addActionListener('stage/change', () => listener());
+
+            manager.dispatch({
+                type: 'stage/change',
+                stageKey: 'boot',
+                payload: {}
+            });
+
+            expect(listener).toHaveBeenCalledTimes(1);
+
+            manager.endBattleSession();
+
+            listener = jest.fn();
+
+            manager.dispatch({
+                type: 'stage/change',
+                stageKey: 'boot',
+                payload: {}
+            });
+
+            expect(listener).not.toHaveBeenCalled();
+        });
+
     });
 
 });

@@ -1,6 +1,7 @@
-import { BattleSnapshot, GlobalTurnSnapshot, MapConfig } from '@timeflies/shared';
+import { BattleSnapshot, BRunEndSAction, GlobalTurnSnapshot, MapConfig } from '@timeflies/shared';
 import { BattleDataMap, BattleDataPeriod } from '../../BattleData';
 import { Controller } from '../../Controller';
+import { serviceEvent } from '../../services/serviceEvent';
 import { StageCreator, StageParam } from '../StageManager';
 import { BStateMachine } from "./battleState/BStateMachine";
 import { CycleManager } from './cycle/CycleManager';
@@ -47,6 +48,11 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
         },
 
         async create({ map, characters: charactersSheet }, setupStageGraphic) {
+
+            Controller.actionManager.beginBattleSession();
+
+            const { onMessageAction } = serviceEvent();
+
             const snapshotManager = SnapshotManager();
 
             const spellActionManager = SpellActionManager();
@@ -59,6 +65,14 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
             const bStateMachine = BStateMachine(mapManager);
 
             const cycleManager = CycleManager();
+
+            onMessageAction<BRunEndSAction>('battle-run/end', ({
+                winnerTeamId
+            }) => {
+                Controller.actionManager.endBattleSession();
+
+                alert(`Battle ended. Team ${winnerTeamId} wins !`);
+            });
 
             setupStageGraphic({
                 mapManager,

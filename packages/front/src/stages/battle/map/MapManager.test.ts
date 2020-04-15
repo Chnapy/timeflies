@@ -6,6 +6,7 @@ import { MapManager } from './MapManager';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
 import { seedTiledConfig, seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
+import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 
 describe('# MapManager', () => {
 
@@ -135,6 +136,34 @@ describe('# MapManager', () => {
             type: 'battle/commit',
             time: Date.now()
         });
+
+        expect(nbrCalls).toBe(prevNbrCalls + 1);
+
+    });
+
+    it('should refresh pathfinder on spell cancel', () => {
+
+        let nbrCalls = 0;
+
+        const refreshGrid = jest.fn(() => nbrCalls++);
+
+        const manager = getManager({
+            mapKey: 'map_1',
+            pathfinderCreator: () => ({
+                refreshGrid
+            } as any)
+        });
+
+        const prevNbrCalls = nbrCalls;
+
+        StoreTest.dispatch<SpellActionTimerEndAction>({
+            type: 'battle/spell-action/end',
+            correctHash: '',
+            removed: true,
+            spellActionSnapshot: {} as any
+        });
+
+        jest.runAllImmediates();
 
         expect(nbrCalls).toBe(prevNbrCalls + 1);
 

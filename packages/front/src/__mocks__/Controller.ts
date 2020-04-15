@@ -20,6 +20,8 @@ export const Controller: typeof IController = {
     },
 
     actionManager: {
+        beginBattleSession() {},
+        endBattleSession() {},
         dispatch(action: GameAction): void {
             StoreTest.getStore().dispatch(action);
         },

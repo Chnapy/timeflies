@@ -2,6 +2,8 @@ import { ActionLogger } from './ActionLogger';
 import { GameAction } from './GameAction';
 
 export interface ActionManager {
+    beginBattleSession(): void;
+    endBattleSession(): void;
     addActionListener(type: GameAction[ 'type' ], fn: ActionListener<GameAction>): ActionListenerObject;
     dispatch(action: GameAction): void;
 }
@@ -14,21 +16,38 @@ export interface ActionListenerObject {
     removeActionListener: () => void;
 }
 
+type ListenerMap = Map<GameAction[ 'type' ], Set<ActionListener<GameAction>>>;
+
 export const ActionManager = (storeDispatcher: (action: GameAction) => void): ActionManager => {
 
-    const listenerMap: Map<
-        GameAction[ 'type' ],
-        Set<ActionListener<GameAction>>
-    > = new Map();
+    const commonListenerMap: ListenerMap = new Map();
+
+    const battleListenerMap: ListenerMap = new Map();
 
     const logger = ActionLogger();
 
+    let battleSession = false;
+
+    const getListenerMap = (): ListenerMap[] => battleSession
+        ? [ battleListenerMap, commonListenerMap ]
+        : [ commonListenerMap ];
+
     return {
 
+        beginBattleSession() {
+            battleSession = true;
+        },
+
+        endBattleSession() {
+            battleSession = false;
+            battleListenerMap.clear();
+        },
+
         addActionListener(type, fn) {
-            const values = listenerMap.get(type) ?? new Set();
+            const map = getListenerMap()[ 0 ];
+            const values = map.get(type) ?? new Set();
             values.add(fn);
-            listenerMap.set(type, values);
+            map.set(type, values);
 
             return {
                 removeActionListener: () => {
@@ -38,14 +57,17 @@ export const ActionManager = (storeDispatcher: (action: GameAction) => void): Ac
         },
 
         dispatch(action) {
+            const maps = getListenerMap();
 
             logger.log(action);
 
-            listenerMap.get(action.type)?.forEach(fn => fn(action));
+            maps.forEach(map => {
+                map.get(action.type)?.forEach(fn => fn(action));
 
-            if (action.type === 'app/reset') {
-                listenerMap.clear();
-            }
+                if (action.type === 'app/reset') {
+                    map.clear();
+                }
+            });
 
             storeDispatcher(action);
         }

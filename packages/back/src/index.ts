@@ -5,7 +5,7 @@ import urlJoin from 'url-join';
 import WebSocket from 'ws';
 import { App } from './App';
 
-// TDOO use shared config
+// TODO use shared config
 
 const httpPort = Number(process.env.PORT || 2567);
 const wsPort = 4275;

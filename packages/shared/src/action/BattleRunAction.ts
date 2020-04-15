@@ -9,6 +9,10 @@ export interface BRunLaunchSAction extends TAction<'battle-run/launch'> {
     globalTurnState: GlobalTurnSnapshot;
 }
 
+export interface BRunEndSAction extends TAction<'battle-run/end'> {
+    winnerTeamId: string;
+}
+
 export interface BRunGlobalTurnStartSAction extends TAction<'battle-run/global-turn-start'> {
     globalTurnState: GlobalTurnSnapshot;
 }
@@ -32,6 +36,7 @@ export interface SpellActionCAction extends TAction<'battle/spellAction'> {
 
 export type BattleRunSAction =
     | BRunLaunchSAction
+    | BRunEndSAction
     | BRunGlobalTurnStartSAction
     | BRunTurnStartSAction
     | ConfirmSAction

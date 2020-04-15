@@ -1,4 +1,4 @@
-import { PlayerData } from "../../../Player";
+import { PlayerData } from "../../../PlayerData";
 import { Player } from "./Player";
 import { seedTeam } from "./Team.seed";
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';

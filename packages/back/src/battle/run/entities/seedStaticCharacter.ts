@@ -24,7 +24,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '10',
                 name: 'S1',
-                type: 'sampleSpell1',
+                type: 'simpleAttack',
                 color: '#FF00FF',
                 initialFeatures: {
                     duration: 1000,
@@ -94,7 +94,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '20',
                 name: 'S3',
-                type: 'sampleSpell3',
+                type: 'simpleAttack',
                 color: '#22FF88',
                 initialFeatures: {
                     area: 8,

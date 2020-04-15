@@ -12,7 +12,7 @@ export const spellLaunchSimpleAttack = ({ actionArea }: SpellAction, characterLi
 
     const targets = characterList.filter(c => actionArea.some(p => equals(p)(c.position)));
 
-    targets.forEach(t => t.alterLife(-10));
+    targets.forEach(t => t.alterLife(-50));
 };
 
 export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<

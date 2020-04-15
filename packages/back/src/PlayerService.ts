@@ -1,5 +1,5 @@
 import { StaticCharacter } from "@timeflies/shared";
-import { PlayerData } from "./Player";
+import { PlayerData } from "./PlayerData";
 import { WSSocket } from "./transport/ws/WSSocket";
 import { Util } from "./Util";
 import { seedStaticCharacter } from "./battle/run/entities/seedStaticCharacter";

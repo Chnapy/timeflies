@@ -343,4 +343,47 @@ describe('# GlobalTurn', () => {
         expect(synchronize).toHaveBeenCalledTimes(1);
     });
 
+    it('should stop correctly', () => {
+
+        const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
+            return {
+                id,
+                character,
+                startTime,
+                turnDuration: 1000,
+                endTime: timerTester.now + 1000,
+                refreshTimedActions() { },
+                state: 'running',
+                synchronize() { },
+                getRemainingTime(period) { return -1 }
+            }
+        };
+
+        const characters = [
+            seedCharacter('fake', { period: 'current', id: '1', player: null }),
+            seedCharacter('fake', { period: 'current', id: '2', player: null })
+        ];
+
+        const turnIdGenerator = getIndexGenerator();
+
+        const order = characters.map(getId);
+
+        const startTime = timerTester.now;
+
+        const globalTurn = GlobalTurn(getSnapshot(startTime, order),
+            characters, turnIdGenerator,
+            () => null,
+            { turnCreator });
+
+        const currentTurnId = globalTurn.currentTurn.id;
+
+        globalTurn.stop();
+
+        expect(globalTurn.state).toBe<GlobalTurnState>('ended');
+
+        timerTester.advanceBy(1000000);
+
+        expect(globalTurn.currentTurn.id).toBe(currentTurnId);
+    });
+
 });

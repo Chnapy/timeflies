@@ -1,5 +1,5 @@
 import { PlayerSnapshot } from "@timeflies/shared";
-import { PlayerData } from "../../../Player";
+import { PlayerData } from "../../../PlayerData";
 import { WSSocket } from "../../../transport/ws/WSSocket";
 import { Team } from "./Team";
 import { Character } from "./Character";

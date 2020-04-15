@@ -11,6 +11,7 @@ export interface GlobalTurn {
     readonly state: GlobalTurnState;
     readonly currentTurn: Turn;
     notifyDeaths(): void;
+    stop(): void;
     toSnapshot(): GlobalTurnSnapshot;
 }
 
@@ -78,6 +79,10 @@ export const GlobalTurn = (
         };
     };
 
+    const stop = (): void => {
+        currentTurn.clearTimedActions();
+    };
+
     setCurrentTurn(Turn(turnId, startTime, charactersOrdered[ 0 ], () => null, onTurnEnd));
 
     const this_: GlobalTurn = {
@@ -95,6 +100,7 @@ export const GlobalTurn = (
             return currentTurn;
         },
         notifyDeaths,
+        stop,
         toSnapshot
     };
 
