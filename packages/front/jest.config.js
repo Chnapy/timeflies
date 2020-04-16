@@ -1,9 +1,11 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
+//@ts-check
+
 const rootConfig = require('../../jest.config');
 
-module.exports = {
+const config = {
 
   ...rootConfig,
 
@@ -26,7 +28,11 @@ module.exports = {
   // collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: null,
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.{seed,stories}.{ts,tsx}',
+  ],
 
   // The directory where Jest should output its coverage files
   // coverageDirectory: "coverage",
@@ -79,17 +85,13 @@ module.exports = {
   // ],
 
   // An array of file extensions your modules use
-  // moduleFileExtensions: [
-  //   "js",
-  //   "json",
-  //   "jsx",
-  //   "ts",
-  //   "tsx",
-  //   "node"
-  // ],
+  moduleFileExtensions: [ 'ts', 'tsx', 'js', 'node' ],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
+  moduleNameMapper: {
+    '^react-native$': 'react-native-web',
+    '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
+  },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
@@ -125,27 +127,22 @@ module.exports = {
   // rootDir: null,
 
   // A list of paths to directories that Jest should use to search for files in
-  // roots: [
-  //   "<rootDir>"
-  // ],
+  roots: [ '<rootDir>/src' ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  // setupFiles: [
-  //   ...(rootConfig.setupFiles || []),
-  //   "jest-canvas-mock"
-  // ],
+  setupFiles: [ 'react-app-polyfill/jsdom' ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  // setupFilesAfterEnv: [],
+  setupFilesAfterEnv: [ `<rootDir>/src/setupTests.ts` ],
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "jsdom",
+  testEnvironment: 'jest-environment-jsdom-fourteen',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -154,10 +151,10 @@ module.exports = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  // testMatch: [
-  //   "**/__tests__/**/*.ts",
-  //   "**/?(*.)+(spec|test).ts"
-  // ],
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
+    '<rootDir>/src/**/*.{spec,test}.{ts,tsx}',
+  ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
@@ -180,14 +177,17 @@ module.exports = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: {
-  //   "^.+\\.(ts|tsx)$": "ts-jest"
-  // },
+  transform: {
+    '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': require.resolve('babel-jest'),
+    '^.+\\.css$': require.resolve('./jest/cssTransform'),
+    '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)': require.resolve('./jest/fileTransform'),
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  // transformIgnorePatterns: [
-  //   "\\\\node_modules\\\\"
-  // ],
+  transformIgnorePatterns: [
+    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$',
+    '^.+\\.module\\.(css|sass|scss)$',
+  ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
@@ -200,4 +200,11 @@ module.exports = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
+
+  watchPlugins: [
+    'jest-watch-typeahead/filename',
+    'jest-watch-typeahead/testname',
+  ],
 };
+
+module.exports = config;
