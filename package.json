@@ -12,7 +12,7 @@
     "packages/*"
   ],
   "scripts": {
-    "heroku-postbuild": "yarn workspaces run build"
+    "heroku-postbuild": "yarn workspace @timeflies/shared run build && concurrently \"yarn workspace @timeflies/back run build\" \"yarn workspace @timeflies/front run build\""
   },
   "cacheDirectories": [
     "packages/back/node_modules",
