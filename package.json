@@ -12,7 +12,6 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace @timeflies/shared build && concurrently \"yarn workspace @timeflies/back build\" \"yarn workspace @timeflies/front build\"",
-    "serve": "concurrently \"PORT=4000 node packages/back/lib/index.js\" \"http-server packages/front/build\""
+    "heroku-postbuild": "yarn workspaces run build"
   }
 }

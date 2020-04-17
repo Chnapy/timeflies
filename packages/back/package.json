@@ -9,6 +9,7 @@
     "test": "jest --watch",
     "test-ci": "jest",
     "build": "rm -rf lib && tsc",
+    "serve": "node lib/index.js",
     "check-type": "tsc --noEmit"
   },
   "author": "",
