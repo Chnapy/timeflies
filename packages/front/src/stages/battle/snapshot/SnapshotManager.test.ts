@@ -65,7 +65,7 @@ describe('# SnapshotManager', () => {
             }
         });
 
-        const manager = SnapshotManager();
+        SnapshotManager();
 
         StoreTest.dispatch<BattleCommitAction>({
             type: 'battle/commit',
@@ -135,7 +135,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             StoreTest.dispatch<BattleCommitAction>({
                 type: 'battle/commit',
@@ -212,7 +212,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             StoreTest.dispatch<BattleCommitAction>({
                 type: 'battle/commit',
@@ -301,7 +301,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             StoreTest.dispatch<BattleCommitAction>({
                 type: 'battle/commit',
@@ -392,7 +392,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             StoreTest.dispatch<BattleCommitAction>({
                 type: 'battle/commit',
@@ -499,7 +499,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             (futureCharacter.features.life as number) = 0;
 
@@ -568,7 +568,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             expect(futureBattleData.battleHash).toBe('not-defined');
 
@@ -644,7 +644,7 @@ describe('# SnapshotManager', () => {
                 }
             });
 
-            const manager = SnapshotManager();
+            SnapshotManager();
 
             StoreTest.dispatch<BattleCommitAction>({
                 type: 'battle/commit',

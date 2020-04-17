@@ -9,6 +9,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "test-ci": "yarn test",
+    "lint": "eslint src --ext .ts,.tsx --cache",
     "test-coverage": "yarn test * --coverage --collectCoverageFrom=src/**/*.{ts,tsx} --collectCoverageFrom=!src/**/*.stories.{ts,tsx} --collectCoverageFrom=!src/**/*.seed.{ts,tsx}",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",

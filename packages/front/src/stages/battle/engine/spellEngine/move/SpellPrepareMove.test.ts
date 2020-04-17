@@ -110,7 +110,7 @@ describe('# SpellPrepareMove', () => {
             { x: 1, y: 1 },
         ];
 
-        const [ mapManager, calculatePath, pathPromise ] = getMapManager(expectedPath);
+        const [ mapManager, _calculatePath, pathPromise ] = getMapManager(expectedPath);
 
         const { defaultSpell } = seedCharacter('fake', {
             period: 'future',

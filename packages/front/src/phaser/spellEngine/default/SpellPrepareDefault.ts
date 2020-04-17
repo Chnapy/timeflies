@@ -1,6 +1,4 @@
 import { Position } from '@timeflies/shared'
-import { SpellType } from '@timeflies/shared'
-import { Character } from '../../../stages/battle/entities/character/Character';
 
 export class SpellPrepareDefault {
 

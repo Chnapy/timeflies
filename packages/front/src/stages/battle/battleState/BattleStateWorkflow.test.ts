@@ -1,4 +1,4 @@
-import { BStateActionType } from './BattleStateSchema';
+export {}
 
 describe('Battle state workflow', () => {
 

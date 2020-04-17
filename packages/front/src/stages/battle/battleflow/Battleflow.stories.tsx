@@ -30,7 +30,7 @@ export const Default: React.FC<StoryProps> = ({ fakeApiStart }) => {
 
             });
 
-    }, []);
+    }, [fakeApiStart, fns, ref]);
 
     return <div style={{
         position: 'relative',

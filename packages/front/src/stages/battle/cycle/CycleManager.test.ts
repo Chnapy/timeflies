@@ -68,7 +68,7 @@ describe('# CycleManager', () => {
             };
         });
 
-        const cycle = CycleManager({ globalTurnCreator });
+        CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -129,7 +129,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({ globalTurnCreator });
+        CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -207,7 +207,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({ globalTurnCreator });
+        CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -286,7 +286,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({ globalTurnCreator });
+        CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -376,7 +376,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({ globalTurnCreator });
+        CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 
@@ -459,7 +459,7 @@ describe('# CycleManager', () => {
             };
         };
 
-        const cycle = CycleManager({ globalTurnCreator });
+        CycleManager({ globalTurnCreator });
 
         const order = characters.map(getId);
 

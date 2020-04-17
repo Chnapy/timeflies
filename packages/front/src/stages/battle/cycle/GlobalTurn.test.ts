@@ -1,4 +1,4 @@
-import { CharacterFeatures, getId, getIndexGenerator, TimerTester, GlobalTurnSnapshot } from "@timeflies/shared";
+import { getId, getIndexGenerator, TimerTester, GlobalTurnSnapshot } from "@timeflies/shared";
 import { StoreTest } from "../../../StoreTest";
 import { seedCharacter } from "../entities/character/Character.seed";
 import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
@@ -199,7 +199,7 @@ describe('# GlobalTurn', () => {
 
         const onGTurnEnd = jest.fn();
 
-        const globalTurn = GlobalTurn(getSnapshot(startTime, order),
+        GlobalTurn(getSnapshot(startTime, order),
             characters, turnIdGenerator,
             onGTurnEnd,
             { turnCreator });

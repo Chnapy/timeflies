@@ -2,7 +2,6 @@ import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../.storybook/preview';
-import { AssetLoader } from '../../../assetManager/AssetLoader';
 import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { UIState } from '../../../ui/UIState';

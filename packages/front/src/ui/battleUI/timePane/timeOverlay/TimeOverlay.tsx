@@ -34,9 +34,9 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
 
         const { currentTurn } = globalTurn;
 
-        const timeActions = spellActionSnapshotList.reduce<TimeAction[]>((acc, ca) => {
+        const timeActions = spellActionSnapshotList.reduce<TimeAction[]>((acc, _ca) => {
 
-            const previousCa = acc[ acc.length - 1 ];
+            // const previousCa = acc[ acc.length - 1 ];
             // if (
             //     previousCa
             //     && previousCa.spellType === 'move'

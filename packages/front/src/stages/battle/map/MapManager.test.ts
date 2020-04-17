@@ -62,7 +62,7 @@ describe('# MapManager', () => {
 
         const tiledManagerCreator: typeof TiledManager = jest.fn(() => ({} as TiledManager));
 
-        const manager = getManager({ mapKey: 'map_1', tiledManagerCreator });
+        getManager({ mapKey: 'map_1', tiledManagerCreator });
 
         const assets = seedTiledMapAssets('map_1');
 
@@ -84,14 +84,14 @@ describe('# MapManager', () => {
             });
         });
 
-        const manager = getManager({ mapKey: 'map_1', pathfinderCreator });
+        getManager({ mapKey: 'map_1', pathfinderCreator });
     });
 
     it('should refresh pathfinder on creation', () => {
 
         const refreshGrid = jest.fn();
 
-        const manager = getManager({
+        getManager({
             mapKey: 'map_1',
             pathfinderCreator: () => ({
                 refreshGrid
@@ -123,7 +123,7 @@ describe('# MapManager', () => {
 
         const refreshGrid = jest.fn(() => nbrCalls++);
 
-        const manager = getManager({
+        getManager({
             mapKey: 'map_1',
             pathfinderCreator: () => ({
                 refreshGrid
@@ -147,7 +147,7 @@ describe('# MapManager', () => {
 
         const refreshGrid = jest.fn(() => nbrCalls++);
 
-        const manager = getManager({
+        getManager({
             mapKey: 'map_1',
             pathfinderCreator: () => ({
                 refreshGrid

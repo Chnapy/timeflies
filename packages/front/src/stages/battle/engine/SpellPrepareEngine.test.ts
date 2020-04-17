@@ -22,30 +22,30 @@ describe('# SpellPrepareEngine', () => {
 
     it('should not allow to launch hover & click functions if not enough time', () => {
 
-        const characterCurrent = seedCharacter('fake',{
+        const characterCurrent = seedCharacter('fake', {
             period: 'current',
             id: '1',
             player: null,
-            seedSpells: [{
+            seedSpells: [ {
                 id: 's1',
                 type: 'move',
                 initialFeatures: {
                     duration: 200
                 }
-            }]
+            } ]
         });
 
-        const characterFuture = seedCharacter('fake',{
+        const characterFuture = seedCharacter('fake', {
             period: 'future',
             id: '1',
             player: null,
-            seedSpells: [{
+            seedSpells: [ {
                 id: 's1',
                 type: 'move',
                 initialFeatures: {
                     duration: 200
                 }
-            }]
+            } ]
         });
 
         const cycle: BattleDataCycle = {
@@ -68,6 +68,7 @@ describe('# SpellPrepareEngine', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             }
         }
 
@@ -91,7 +92,7 @@ describe('# SpellPrepareEngine', () => {
         const onTileHover = jest.fn();
         const onTileClick = jest.fn();
 
-        const engine = SpellPrepareEngine(
+        SpellPrepareEngine(
             {
                 event: {
                     type: 'battle/state/event',
@@ -108,52 +109,52 @@ describe('# SpellPrepareEngine', () => {
                 move: (spell, mapManager): SpellPrepareSubEngine<any> => {
 
                     return {
-                        getRangeArea() {return []},
+                        getRangeArea() { return [] },
                         onTileHover,
                         onTileClick,
-                        stop() {}
+                        stop() { }
                     }
                 }
-            }[spellType])
+            }[ spellType ])
         );
 
         const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
             a.type === 'battle/spell-engine/bind'
         )!;
 
-        bindAction.onTileHover({x: -1, y: -1});
+        bindAction.onTileHover({ x: -1, y: -1 });
         expect(onTileHover).not.toHaveBeenCalled();
 
-        bindAction.onTileClick({x: -1, y: -1});
+        bindAction.onTileClick({ x: -1, y: -1 });
         expect(onTileClick).not.toHaveBeenCalled();
     });
 
     it('should allow to launch hover & click functions if enough time', () => {
 
-        const characterCurrent = seedCharacter('fake',{
+        const characterCurrent = seedCharacter('fake', {
             period: 'current',
             id: '1',
             player: null,
-            seedSpells: [{
+            seedSpells: [ {
                 id: 's1',
                 type: 'move',
                 initialFeatures: {
                     duration: 200
                 }
-            }]
+            } ]
         });
 
-        const characterFuture = seedCharacter('fake',{
+        const characterFuture = seedCharacter('fake', {
             period: 'future',
             id: '1',
             player: null,
-            seedSpells: [{
+            seedSpells: [ {
                 id: 's1',
                 type: 'move',
                 initialFeatures: {
                     duration: 200
                 }
-            }]
+            } ]
         });
 
         const cycle: BattleDataCycle = {
@@ -176,6 +177,7 @@ describe('# SpellPrepareEngine', () => {
                 notifyDeaths() { },
                 synchronize() { },
                 synchronizeTurn() { },
+                stop() { }
             }
         }
 
@@ -199,7 +201,7 @@ describe('# SpellPrepareEngine', () => {
         const onTileHover = jest.fn();
         const onTileClick = jest.fn();
 
-        const engine = SpellPrepareEngine(
+        SpellPrepareEngine(
             {
                 event: {
                     type: 'battle/state/event',
@@ -216,23 +218,23 @@ describe('# SpellPrepareEngine', () => {
                 move: (spell, mapManager): SpellPrepareSubEngine<any> => {
 
                     return {
-                        getRangeArea() {return []},
+                        getRangeArea() { return [] },
                         onTileHover,
                         onTileClick,
-                        stop(){}
+                        stop() { }
                     }
                 }
-            }[spellType])
+            }[ spellType ])
         );
 
         const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
             a.type === 'battle/spell-engine/bind'
         )!;
 
-        bindAction.onTileHover({x: -1, y: -1});
+        bindAction.onTileHover({ x: -1, y: -1 });
         expect(onTileHover).toHaveBeenCalledTimes(1);
 
-        bindAction.onTileClick({x: -1, y: -1});
+        bindAction.onTileClick({ x: -1, y: -1 });
         expect(onTileClick).toHaveBeenCalledTimes(1);
     });
 

@@ -1,4 +1,4 @@
-import { assertIsDefined, equals, Position, SpellType, TiledLayerTilelayer, TiledTileset, assertThenGet } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, equals, Position, SpellType, TiledTileset } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
@@ -6,7 +6,6 @@ import { BStateAction } from '../../battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { ExtractHoverReturn, getTiledMapHoverFn } from '../../engine/spellMapping';
 import { TileGraphic } from './TileGraphic';
-import { Utils } from '../../../../Utils';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
@@ -46,8 +45,6 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         m[ k ] = PIXI.Texture.from(images[ k ]);
         return m;
     }, {});
-
-    const tilelayers = schema.layers.filter((l): l is TiledLayerTilelayer => l.type === 'tilelayer');
 
     const textureCache: Partial<Record<number, PIXI.Texture>> = {};
 

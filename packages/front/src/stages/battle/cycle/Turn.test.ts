@@ -32,7 +32,7 @@ describe('#BTurn', () => {
     it('should not have timed actions on init', () => {
         const callback = jest.fn();
 
-        const turnIdle = Turn(1, timerTester.now - 100000, character, callback);
+        Turn(1, timerTester.now - 100000, character, callback);
 
         expect(StoreTest.getActions()).toHaveLength(0);
     });

@@ -53,16 +53,16 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
 
             const { onMessageAction } = serviceEvent();
 
-            const snapshotManager = SnapshotManager();
+            SnapshotManager();
 
-            const spellActionManager = SpellActionManager();
+            SpellActionManager();
 
             const mapManager = MapManager(
                 map,
                 mapConfig
             );
 
-            const bStateMachine = BStateMachine(mapManager);
+            BStateMachine(mapManager);
 
             const cycleManager = CycleManager();
 

@@ -1,8 +1,6 @@
 import { CharacterType, Orientation } from "@timeflies/shared";
 import { AssetManager } from "../../../assetManager/AssetManager";
 import { RectStyled } from "../../../hud/generics/RectStyled";
-import { Character } from "../entities/character/Character";
-import { Spell } from "../entities/spell/Spell";
 
 export class CharacterGraphic {
 

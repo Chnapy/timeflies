@@ -22,7 +22,7 @@ describe('# StageManager', () => {
             create
         }));
 
-        const manager = StageManager(
+        StageManager(
             {
                 stageCreators: {
                     boot: bootFn,
@@ -55,7 +55,7 @@ describe('# StageManager', () => {
             create
         }));
 
-        const manager = StageManager(
+        StageManager(
             {
                 stageCreators: {
                     boot: bootFn,
