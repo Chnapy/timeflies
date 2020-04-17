@@ -4,9 +4,15 @@
   "repository": "https://github.com/Chnapy/timeflies.git",
   "author": "Chnapy <richardhaddad@hotmail.fr>",
   "devDependencies": {
+    "concurrently": "5.1.0",
+    "http-server": "0.12.1",
     "typescript": "3.7.5"
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "build": "yarn workspace @timeflies/shared build && concurrently \"yarn workspace @timeflies/back build\" \"yarn workspace @timeflies/front build\"",
+    "serve": "concurrently \"PORT=4000 node packages/back/lib/index.js\" \"http-server packages/front/build\""
+  }
 }
