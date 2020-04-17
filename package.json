@@ -13,5 +13,9 @@
   ],
   "scripts": {
     "heroku-postbuild": "yarn workspaces run build"
-  }
+  },
+  "cacheDirectories": [
+    "packages/back/node_modules",
+    "packages/front/node_modules"
+  ]
 }
