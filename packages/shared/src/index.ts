@@ -8,3 +8,4 @@ export * from './cycle';
 export * from './loadStage';
 export * from './battleStage';
 export * from './map';
+export * from './net';

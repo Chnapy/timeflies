@@ -1,1 +1,1 @@
-web: yarn && yarn build && yarn serve
+web: yarn workspace @timeflies/back run serve

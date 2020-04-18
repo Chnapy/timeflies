@@ -1,5 +1,6 @@
-import { ClientAction, DistributiveOmit, ServerAction } from '@timeflies/shared';
+import { ClientAction, DistributiveOmit, getEndpoint, ServerAction } from '@timeflies/shared';
 import { IGameAction } from '../action/GameAction';
+import { envManager } from '../envManager';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
 
@@ -13,7 +14,8 @@ export interface SendMessageAction<A extends ClientAction = ClientAction> extend
 
 export type MessageAction = ReceiveMessageAction | SendMessageAction;
 
-const ENDPOINT = 'ws://localhost:4275';
+const ENDPOINT = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
+console.log('ws endpoint:', ENDPOINT);
 
 export interface WSClient {
     readonly isOpen: boolean;

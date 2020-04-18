@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/game.ts",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "REACT_APP_SERVER_URL=localhost:2567 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "test-ci": "yarn test",
@@ -58,5 +58,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
   }
 }
