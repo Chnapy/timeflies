@@ -18,5 +18,8 @@
     "packages/shared/node_modules",
     "packages/back/node_modules",
     "packages/front/node_modules"
-  ]
+  ],
+  "engines": {
+    "node": ">=12"
+  }
 }
