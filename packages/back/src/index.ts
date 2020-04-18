@@ -1,4 +1,4 @@
-import { getEndpoint, getPort } from '@timeflies/shared';
+import { getEndpoint } from '@timeflies/shared';
 import cors from "cors";
 import express from 'express';
 import http from 'http';
@@ -7,13 +7,20 @@ import WebSocket from 'ws';
 import { App } from './App';
 
 console.log('NODE_ENV', process.env.NODE_ENV);
-console.log('PORT', process.env.PORT);
 
 // TODO use shared config
+const getPort = () => {
+
+  if(!process.env.PORT) {
+    throw new Error('env PORT is not defined');
+  }
+
+  return Number(process.env.PORT);
+};
 
 const port = getPort();
 
-const httpBaseURL = getEndpoint('http');
+const httpBaseURL = `localhost:${port}`;
 const staticPostURL = '/static';
 
 export const staticURL = urlJoin(httpBaseURL, staticPostURL);
@@ -32,7 +39,7 @@ const ws = new WebSocket.Server({ server });
 
 server.listen(port, () => {
   console.log(`http listening on ${httpBaseURL}`);
-  console.log(`ws listening on ${getEndpoint('ws')}`);
+  console.log(`ws listening on ${getEndpoint('ws', httpBaseURL)}`);
 });
 
 const myApp = new App(ws);

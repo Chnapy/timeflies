@@ -1,5 +1,17 @@
 
-export const getPort = () => Number(process.env.PORT || 2567);
+export const getEndpoint = (protocol: 'http' | 'ws', url: string) => {
 
-export const getEndpoint = (protocol: 'http' | 'ws') =>
-    `${protocol}://localhost:${getPort()}`;
+    const isHttps = url.startsWith('https');
+
+    const startIndex = url.indexOf('://');
+    if (startIndex !== -1) {
+        url = url.substr(startIndex + 3);
+    }
+
+    const prefix = protocol === 'http' && isHttps
+        ? 'https'
+        : protocol;
+
+    return `${prefix}://${url}`;
+};
+

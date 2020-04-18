@@ -13,7 +13,12 @@ export interface SendMessageAction<A extends ClientAction = ClientAction> extend
 
 export type MessageAction = ReceiveMessageAction | SendMessageAction;
 
-const ENDPOINT = getEndpoint('ws');
+if(!process.env.REACT_APP_SERVER_URL) {
+    console.log('env', process.env);
+    throw new Error('env REACT_APP_SERVER_URL not defined');
+}
+
+const ENDPOINT = getEndpoint('ws', process.env.REACT_APP_SERVER_URL);
 console.log('ws endpoint:', ENDPOINT);
 
 export interface WSClient {
