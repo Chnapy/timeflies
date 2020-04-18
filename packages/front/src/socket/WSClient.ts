@@ -1,5 +1,6 @@
-import { ClientAction, DistributiveOmit, ServerAction, getEndpoint } from '@timeflies/shared';
+import { ClientAction, DistributiveOmit, getEndpoint, ServerAction } from '@timeflies/shared';
 import { IGameAction } from '../action/GameAction';
+import { envManager } from '../envManager';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
 
@@ -13,12 +14,7 @@ export interface SendMessageAction<A extends ClientAction = ClientAction> extend
 
 export type MessageAction = ReceiveMessageAction | SendMessageAction;
 
-if(!process.env.REACT_APP_SERVER_URL) {
-    console.log('env', process.env);
-    throw new Error('env REACT_APP_SERVER_URL not defined');
-}
-
-const ENDPOINT = getEndpoint('ws', process.env.REACT_APP_SERVER_URL);
+const ENDPOINT = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
 console.log('ws endpoint:', ENDPOINT);
 
 export interface WSClient {
