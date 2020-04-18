@@ -9,7 +9,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "test-ci": "yarn test",
-    "serve": "yarn global add http-server && http-server build",
     "lint": "eslint src --ext .ts,.tsx --cache",
     "test-coverage": "yarn test * --coverage --collectCoverageFrom=src/**/*.{ts,tsx} --collectCoverageFrom=!src/**/*.stories.{ts,tsx} --collectCoverageFrom=!src/**/*.seed.{ts,tsx}",
     "storybook": "start-storybook -p 9009 -s public",
@@ -60,6 +59,7 @@
       "last 1 safari version"
     ]
   },
+  "engineStrict": true,
   "engines": {
     "node": ">=12"
   }

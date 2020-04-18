@@ -1,1 +1,1 @@
-web: PORT=4000 yarn workspace @timeflies/back run serve & yarn workspace @timeflies/front run serve & wait -n
+web: yarn workspace @timeflies/back run serve

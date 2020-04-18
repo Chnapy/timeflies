@@ -4,14 +4,13 @@
   "repository": "https://github.com/Chnapy/timeflies.git",
   "author": "Chnapy <richardhaddad@hotmail.fr>",
   "devDependencies": {
-    "concurrently": "5.1.0",
     "typescript": "3.7.5"
   },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "heroku-postbuild": "yarn workspace @timeflies/shared run build && concurrently \"yarn workspace @timeflies/back run build\" \"yarn workspace @timeflies/front run build\""
+    "heroku-postbuild": "yarn workspace @timeflies/shared run build && yarn workspace @timeflies/back run build"
   },
   "cacheDirectories": [
     "node_modules",
@@ -19,6 +18,7 @@
     "packages/back/node_modules",
     "packages/front/node_modules"
   ],
+  "engineStrict": true,
   "engines": {
     "node": ">=12"
   }
