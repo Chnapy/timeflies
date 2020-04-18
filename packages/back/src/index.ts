@@ -19,7 +19,7 @@ const hostUrl = getEndpoint('http', envManager.HOST_URL);
 
 const staticPostURL = '/static';
 
-export const staticURL = urlJoin(`${hostUrl}:${port}`, staticPostURL);
+export const staticURL = urlJoin(hostUrl, staticPostURL);
 
 // Express
 
