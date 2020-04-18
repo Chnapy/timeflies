@@ -8,8 +8,8 @@ export const getEndpoint = (protocol: 'http' | 'ws', url: string) => {
         url = url.substr(startIndex + 3);
     }
 
-    const prefix = protocol === 'http' && isHttps
-        ? 'https'
+    const prefix = isHttps
+        ? protocol + 's'
         : protocol;
 
     return `${prefix}://${url}`;

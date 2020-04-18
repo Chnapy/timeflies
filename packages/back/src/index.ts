@@ -1,4 +1,3 @@
-import { getEndpoint } from '@timeflies/shared';
 import cors from "cors";
 import express from 'express';
 import http from 'http';
@@ -38,8 +37,8 @@ const server = http.createServer(app);
 const ws = new WebSocket.Server({ server });
 
 server.listen(port, () => {
-  console.log(`http listening on ${httpBaseURL}`);
-  console.log(`ws listening on ${getEndpoint('ws', httpBaseURL)}`);
+  console.log('server listening address', server.address());
+  console.log('ws listening address', ws.address());
 });
 
 const myApp = new App(ws);
