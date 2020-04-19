@@ -1,6 +1,6 @@
 import { MapConfig, Position } from '@timeflies/shared';
 import bresenham from 'bresenham';
-import fs from 'fs';
+import _fs from 'fs';
 import { TiledLayerTilelayer, TiledMapOrthogonal } from 'tiled-types';
 import urlJoin from 'url-join';
 
@@ -9,7 +9,11 @@ export interface MapManager {
     getBresenhamLine(start: Position, end: Position): (Position & { d: number })[];
 }
 
-export const MapManager = (mapConfig: MapConfig): MapManager => {
+interface Dependencies {
+    fs: Pick<typeof _fs, 'readFileSync'>;
+}
+
+export const MapManager = (mapConfig: MapConfig, { fs }: Dependencies = { fs: _fs }): MapManager => {
 
     const { schemaUrl, obstacleTilelayerName, initLayerName } = mapConfig;
 

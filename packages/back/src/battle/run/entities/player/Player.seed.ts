@@ -1,8 +1,8 @@
-import { PlayerData } from "../../../PlayerData";
+import { PlayerData } from "../../../../PlayerData";
+import { WSSocket } from '../../../../transport/ws/WSSocket';
+import { seedWebSocket } from '../../../../transport/ws/WSSocket.seed';
+import { seedTeam } from "../team/Team.seed";
 import { Player } from "./Player";
-import { seedTeam } from "./Team.seed";
-import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
-import { WSSocket } from '../../../transport/ws/WSSocket';
 
 let id = 0;
 const SEED_PLAYER: () => PlayerData = () => {

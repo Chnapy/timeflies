@@ -1,13 +1,13 @@
 import { MapConfig, Position, SpellActionCAction, TimerTester } from "@timeflies/shared";
 import fs from 'fs';
 import { TiledMapOrthogonal } from "tiled-types/types";
-import { SpellActionChecker, CharActionCheckerResult } from "./SpellActionChecker";
-import { MapManager } from "./MapManager";
 import { Cycle } from "./cycle/Cycle";
-import { Character } from "./entities/Character";
-import { seedCharacter } from "./entities/Character.seed";
-import { seedPlayer } from "./entities/Player.seed";
-import { Spell } from "./entities/Spell";
+import { Character } from "./entities/character/Character";
+import { seedCharacter } from "./entities/character/Character.seed";
+import { seedPlayer } from "./entities/player/Player.seed";
+import { Spell } from "./entities/spell/Spell";
+import { MapManager } from "./mapManager/MapManager";
+import { CharActionCheckerResult, SpellActionChecker } from "./SpellActionChecker";
 jest.mock('fs');
 
 describe('# SpellActionChecker', () => {
@@ -16,7 +16,6 @@ describe('# SpellActionChecker', () => {
 
     let cycle: Cycle;
     let character: Character;
-    let spellMove: Spell;
     let spellDefault: Spell;
     let charPos: Position;
     let checker: SpellActionChecker;
@@ -28,7 +27,7 @@ describe('# SpellActionChecker', () => {
             length: 2
         }, () => players[ 0 ]);
 
-        return Cycle(players, characters);
+        return Cycle({ players, characters });
     };
 
     const getMap = (): MapManager => {
@@ -102,7 +101,6 @@ describe('# SpellActionChecker', () => {
         character.position = { x: 10, y: 10 };
         const character2 = cycle.globalTurn.charactersOrdered[ 1 ];
         character2.position = { x: 9, y: 10 };
-        spellMove = character.spells.find(s => s.staticData.type === 'move')!;
         spellDefault = character.spells.find(s => s.staticData.type !== 'move' && s.staticData.type !== 'orientate')!;
         charPos = character.position;
         checker = SpellActionChecker(cycle, map);

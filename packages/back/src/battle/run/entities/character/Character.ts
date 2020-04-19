@@ -1,9 +1,9 @@
 import { CharacterFeatures, CharacterSnapshot, Orientation, Position, StaticCharacter } from '@timeflies/shared';
-import { Player } from "./Player";
-import { Spell } from "./Spell";
+import { Player } from "../player/Player";
+import { Spell } from "../spell/Spell";
+import { Entity } from '../Entity';
 
-export interface Character {
-    readonly id: string;
+export interface Character extends Entity<CharacterSnapshot> {
     readonly staticData: Readonly<StaticCharacter>;
     readonly player: Player;
     position: Readonly<Position>;
@@ -12,10 +12,16 @@ export interface Character {
     readonly spells: readonly Spell[];
     readonly isAlive: boolean;
     alterLife(add: number): void;
-    toSnapshot(): CharacterSnapshot
 }
 
-export const Character = (staticData: StaticCharacter, player: Player): Character => {
+interface Dependencies {
+    spellCreator: typeof Spell;
+}
+
+export const Character = (
+    staticData: StaticCharacter, player: Player,
+    { spellCreator }: Dependencies = { spellCreator: Spell }
+): Character => {
 
     let features: Readonly<CharacterFeatures> = {
         ...staticData.initialFeatures
@@ -67,10 +73,19 @@ export const Character = (staticData: StaticCharacter, player: Player): Characte
                 position,
                 spellsSnapshots: this.spells.map(s => s.toSnapshot())
             };
+        },
+        updateFromSnapshot(snapshot) {
+            features = { ...snapshot.features };
+            orientation = snapshot.orientation;
+            position = snapshot.position;
+
+            spells.forEach(spell => spell.updateFromSnapshot(
+                snapshot.spellsSnapshots.find(snap => snap.id === spell.id)!
+            ));
         }
     };
 
-    const spells = staticData.staticSpells.map(s => Spell(s, this_));
+    const spells = staticData.staticSpells.map(s => spellCreator(s, this_));
 
     return this_;
 }

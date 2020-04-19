@@ -1,7 +1,7 @@
+import { Player } from "../player/Player";
+import { seedPlayer } from "../player/Player.seed";
+import { seedStaticCharacter } from "../seedStaticCharacter";
 import { Character } from "./Character";
-import { seedStaticCharacter } from "./seedStaticCharacter";
-import { Player } from "./Player";
-import { seedPlayer } from "./Player.seed";
 
 export const seedCharacter = (charArgs?: Parameters<typeof seedStaticCharacter>[0], player?: (i: number) => Player): Character[] => {
     const staticChars = seedStaticCharacter(charArgs);

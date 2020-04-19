@@ -1,10 +1,10 @@
 import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TimerTester, TURN_DELAY } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
-import { Character } from '../entities/Character';
-import { seedCharacter } from '../entities/Character.seed';
-import { Player } from '../entities/Player';
-import { seedPlayer } from '../entities/Player.seed';
+import { Character } from '../entities/character/Character';
+import { seedCharacter } from '../entities/character/Character.seed';
+import { Player } from '../entities/player/Player';
+import { seedPlayer } from '../entities/player/Player.seed';
 import { Cycle } from './Cycle';
 import { GlobalTurn, GlobalTurnState } from './turn/GlobalTurn';
 import WebSocket = require('ws');
@@ -61,7 +61,7 @@ describe('# Cycle', () => {
 
     it('should not start on init', () => {
 
-        const cycle = Cycle(players, characters);
+        const cycle = Cycle({ players, characters });
 
         expect(cycle.globalTurn).toBeUndefined();
     });
@@ -72,7 +72,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle(players, characters);
+        cycle = Cycle({ players, characters });
         cycle.start(launchTime);
 
         expect(cycle.globalTurn).toMatchObject<Partial<GlobalTurn>>({
@@ -98,7 +98,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle(players, characters);
+        cycle = Cycle({ players, characters });
         cycle.start(launchTime);
 
         expect(on).not.toHaveBeenCalled();
@@ -131,7 +131,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle(players, characters);
+        cycle = Cycle({ players, characters });
         cycle.start(launchTime);
 
         let advance = 0;

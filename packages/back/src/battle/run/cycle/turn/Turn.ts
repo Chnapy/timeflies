@@ -1,5 +1,5 @@
 import { TurnSnapshot } from "@timeflies/shared";
-import { Character } from "../../entities/Character";
+import { Character } from "../../entities/character/Character";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 

@@ -1,7 +1,7 @@
 import { SpellActionCAction } from "@timeflies/shared";
 import { Cycle } from './cycle/Cycle';
-import { Player } from "./entities/Player";
-import { MapManager } from './MapManager';
+import { Player } from "./entities/player/Player";
+import { MapManager } from './mapManager/MapManager';
 
 export type CharActionCheckerReason = 'player' | 'isAlive' | 'spell' | 'startTime' | 'duration' | 'isInArea' | 'bresenham' | 'specificType';
 
