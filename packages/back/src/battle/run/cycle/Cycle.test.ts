@@ -137,7 +137,7 @@ describe('# Cycle', () => {
         let advance = 0;
         characters.forEach((c, i) => {
             const delay = i && TURN_DELAY;
-            advance += cycle.globalTurn.currentTurn.turnDuration + delay;
+            advance += c.features.actionTime + delay;
         });
         timerTester.advanceBy(advance);
 
