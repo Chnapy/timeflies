@@ -149,9 +149,11 @@ describe('BattleRunRoom', () => {
         teams = getTeams();
 
         server = new Server(URL);
+        let i = 0;
         server.on('connection', socket => {
             const wss = new WSSocket(socket as any);
-            const player = playerService.getPlayer(wss);
+            const player = playerService.getPlayer(wss, i);
+            i++;
             if (teams[ 0 ].players.length) {
                 teams[ 1 ].players.push(player);
             } else {
