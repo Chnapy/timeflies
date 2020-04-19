@@ -84,7 +84,7 @@ export const BattleStateManager = (
 
         const targets = characters.filter(c => c.isAlive && actionArea.some(p => equals(p)(c.position)));
 
-        targets.forEach(t => t.alterLife(-50));
+        targets.forEach(t => t.alterLife(-spell.features.attack));
 
         return targets.filter(t => !t.isAlive);
     };
@@ -148,6 +148,9 @@ export const BattleStateManager = (
                             });
                             return true;
                         }
+                        console.log('BAD HASH !');
+                        console.log('expected:', snapshotClone.battleHash);
+                        console.log('received:', spellAction.battleHash);
                         return false;
                     }
                 };

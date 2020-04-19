@@ -46,6 +46,7 @@ export const CharacterGraphic = (
         tiledMapGraphic,
         charactersSheet
     );
+    sprite.interactiveChildren = false;
     sprite.width = tiledMapGraphic.tilewidth;
     sprite.height = tiledMapGraphic.tileheight;
     const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
