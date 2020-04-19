@@ -1,5 +1,5 @@
 import { getIndexGenerator, TimerTester } from '@timeflies/shared';
-import { seedCharacter } from '../../entities/Character.seed';
+import { seedCharacter } from '../../entities/character/Character.seed';
 import { GlobalTurn, GlobalTurnState } from './GlobalTurn';
 
 describe('# GlobalTurn', () => {

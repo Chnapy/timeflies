@@ -17,6 +17,8 @@ export class Matchmaker {
 
     private readonly battlePrepareRooms: BattlePrepareRoom[];
 
+    private tempIndex = 0;
+
     constructor(ws: WebSocket.Server) {
         this.ws = ws;
         // this.namespace = io.of(namespaceStr);
@@ -26,7 +28,8 @@ export class Matchmaker {
     }
 
     connection(socket: WSSocket): void {
-        const player = this.playerService.getPlayer(socket);
+        const player = this.playerService.getPlayer(socket, this.tempIndex);
+        this.tempIndex++;
         this.players[player.id] = player;
 
         switch (player.state) {

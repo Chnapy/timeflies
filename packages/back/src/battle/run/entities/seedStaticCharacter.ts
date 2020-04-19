@@ -7,7 +7,7 @@ const MOCK_CHAR: StaticCharacter[] = [
         name: 'Ramio',
         initialFeatures: {
             life: 100,
-            actionTime: 6000
+            actionTime: 20000
         },
         staticSpells: [
             {
@@ -28,19 +28,8 @@ const MOCK_CHAR: StaticCharacter[] = [
                 color: '#FF00FF',
                 initialFeatures: {
                     duration: 1000,
-                    area: 30,
+                    area: 10,
                     attack: 10
-                }
-            },
-            {
-                id: '11',
-                name: 'S2',
-                type: 'sampleSpell2',
-                color: '#FFF0FF',
-                initialFeatures: {
-                    duration: 2000,
-                    area: 1,
-                    attack: 0
                 }
             }
         ],
@@ -50,21 +39,21 @@ const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '2',
         name: 'Guili',
-        type: 'sampleChar2',
+        type: 'sampleChar1',
         initialFeatures: {
-            life: 100,
-            actionTime: 7000
+            life: 120,
+            actionTime: 15000
         },
         staticSpells: [
             {
                 id: '2',
                 name: 'MOVE',
-                type: 'move',
+                type: 'simpleAttack',
                 color: '#FF0000',
                 initialFeatures: {
-                    duration: 100,
-                    area: 1,
-                    attack: -1
+                    duration: 4000,
+                    area: 8,
+                    attack: 30
                 }
             }
         ],
@@ -74,10 +63,10 @@ const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '3',
         name: 'Shoyi',
-        type: 'sampleChar3',
+        type: 'sampleChar1',
         initialFeatures: {
-            life: 100,
-            actionTime: 5000
+            life: 80,
+            actionTime: 22000
         },
         staticSpells: [
             {
@@ -87,7 +76,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 color: '#449955',
                 initialFeatures: {
                     area: 1,
-                    duration: 100,
+                    duration: 300,
                     attack: -1
                 }
             },
@@ -98,8 +87,8 @@ const MOCK_CHAR: StaticCharacter[] = [
                 color: '#22FF88',
                 initialFeatures: {
                     area: 8,
-                    duration: 1500,
-                    attack: 15
+                    duration: 500,
+                    attack: 10
                 }
             }
         ],

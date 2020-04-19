@@ -1,12 +1,11 @@
 import { SpellFeatures, SpellSnapshot, StaticSpell } from '@timeflies/shared';
-import { Character } from "./Character";
+import { Character } from "../character/Character";
+import { Entity } from '../Entity';
 
-export interface Spell {
-    readonly id: string;
+export interface Spell extends Entity<SpellSnapshot> {
     readonly staticData: Readonly<StaticSpell>;
     readonly character: Character;
     readonly features: SpellFeatures;
-    toSnapshot(): SpellSnapshot;
 }
 
 export const Spell = (staticData: StaticSpell, character: Character): Spell => {
@@ -16,9 +15,7 @@ export const Spell = (staticData: StaticSpell, character: Character): Spell => {
     };
 
     return {
-        get id(): string {
-            return staticData.id;
-        },
+        id: staticData.id,
         staticData,
         character,
         get features() {
@@ -30,6 +27,9 @@ export const Spell = (staticData: StaticSpell, character: Character): Spell => {
                 staticData,
                 features
             };
+        },
+        updateFromSnapshot(snapshot) {
+            features = { ...snapshot.features };
         }
     };
 }

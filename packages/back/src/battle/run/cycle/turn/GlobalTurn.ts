@@ -1,5 +1,5 @@
 import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY } from "@timeflies/shared";
-import { Character } from "../../entities/Character";
+import { Character } from "../../entities/character/Character";
 import { Turn } from "./Turn";
 
 export type GlobalTurnState = 'idle' | 'running';

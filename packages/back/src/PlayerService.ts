@@ -6,7 +6,7 @@ import { seedStaticCharacter } from "./battle/run/entities/seedStaticCharacter";
 
 export class PlayerService {
 
-    getPlayer(socket: WSSocket): PlayerData {
+    getPlayer(socket: WSSocket, index: number): PlayerData {
 
         // fetch...
 
@@ -17,7 +17,7 @@ export class PlayerService {
             name: 'P-' + id,
             state: 'init',
             socket,
-            staticCharacters: this.getCharacters(id).map(c => {
+            staticCharacters: this.getCharacters(index).map(c => {
                 const charId = Util.getUnique();
                 return {
                     ...c,
@@ -29,9 +29,9 @@ export class PlayerService {
         };
     }
 
-    private getCharacters(playerId: string): StaticCharacter[] {
+    private getCharacters(index: number): StaticCharacter[] {
 
-        if (!i) {
+        if (index % 2) {
             return [MOCK_CHAR[0], MOCK_CHAR[1]];
         } else {
             return [MOCK_CHAR[2]];
@@ -39,5 +39,4 @@ export class PlayerService {
     }
 }
 
-let i = 0;
 const MOCK_CHAR: StaticCharacter[] = seedStaticCharacter();

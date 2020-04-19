@@ -1,6 +1,5 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GLOBALTURN_DELAY, IndexGenerator } from "@timeflies/shared";
-import { Character } from "../entities/Character";
-import { Player } from "../entities/Player";
+import { BattleState } from '../battleStateManager/BattleStateManager';
 import { GlobalTurn } from "./turn/GlobalTurn";
 
 export interface Cycle {
@@ -9,7 +8,7 @@ export interface Cycle {
     stop(): void;
 }
 
-export const Cycle = (players: readonly Player[], characters: readonly Character[]): Cycle => {
+export const Cycle = ({ players, characters }: Pick<BattleState, 'players' | 'characters'>): Cycle => {
 
     const generateGlobalTurnId: IndexGenerator = getIndexGenerator();
     const generateTurnId: IndexGenerator = getIndexGenerator();

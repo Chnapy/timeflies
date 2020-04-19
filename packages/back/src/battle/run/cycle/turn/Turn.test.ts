@@ -1,6 +1,6 @@
 import { TimerTester } from "@timeflies/shared";
-import { seedCharacter } from "../../entities/Character.seed";
-import { Character } from "../../entities/Character";
+import { seedCharacter } from "../../entities/character/Character.seed";
+import { Character } from "../../entities/character/Character";
 import { Turn, TurnState } from "./Turn";
 
 describe('# Turn', () => {

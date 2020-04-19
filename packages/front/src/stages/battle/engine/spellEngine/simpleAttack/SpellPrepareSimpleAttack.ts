@@ -8,11 +8,11 @@ import { MapManager } from '../../../map/MapManager'
 import { SpellAction } from '../../../spellAction/SpellActionManager'
 import { SpellPrepareSubEngineCreator } from '../../SpellPrepareEngine'
 
-export const spellLaunchSimpleAttack = ({ actionArea }: SpellAction, characterList: Character<'future'>[]) => {
+export const spellLaunchSimpleAttack = ({ actionArea, spell }: SpellAction, characterList: Character<'future'>[]) => {
 
     const targets = characterList.filter(c => actionArea.some(p => equals(p)(c.position)));
 
-    targets.forEach(t => t.alterLife(-50));
+    targets.forEach(t => t.alterLife(-spell.feature.attack));
 };
 
 export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
