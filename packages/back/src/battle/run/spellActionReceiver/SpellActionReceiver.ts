@@ -4,7 +4,7 @@ import { Cycle } from '../cycle/Cycle';
 import { Character } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
 import { MapManager } from '../mapManager/MapManager';
-import { SpellActionChecker } from '../SpellActionChecker';
+import { SpellActionChecker } from '../spellActionChecker/SpellActionChecker';
 
 export interface SpellActionReceiver {
     getOnReceive(player: Player): (action: SpellActionCAction) => void;

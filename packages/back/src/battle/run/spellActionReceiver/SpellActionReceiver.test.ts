@@ -7,7 +7,7 @@ import { Character } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedPlayer } from '../entities/player/Player.seed';
 import { MapManager } from '../mapManager/MapManager';
-import { CharActionCheckerResult } from '../SpellActionChecker';
+import { CharActionCheckerResult } from '../spellActionChecker/SpellActionChecker';
 import { SpellActionReceiver } from './SpellActionReceiver';
 
 describe('# SpellActionReceiver', () => {
