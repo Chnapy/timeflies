@@ -1,8 +1,8 @@
 import { Controller } from '../Controller';
-import { UIState } from '../ui/UIState';
+import { GameState } from '../game-state';
 
 export const serviceSelector = <R>(
-    fn: (state: UIState) => R
+    fn: (state: GameState) => R
 ): R => {
     const state = Controller.getStore().getState();
     return fn(state);

@@ -5,8 +5,10 @@ import { serviceDispatch } from '../src/services/serviceDispatch';
 import { serviceEvent } from '../src/services/serviceEvent';
 import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../src/socket/WSClient';
 import { seedTeamSnapshot } from '../src/stages/battle/entities/team/Team.seed';
-import { UIState } from '../src/ui/UIState';
+import { GameState } from '../src/game-state';
 import mapPath from '../src/_assets/map/map.json';
+import React from 'react';
+import { Provider } from 'react-redux';
 
 class MockWebSocket implements WebSocket {
     prototype: any;
@@ -50,18 +52,19 @@ class MockWebSocket implements WebSocket {
     }
 }
 
-export interface FakeApiStarter {
-    start: (container: Element) => Promise<FakeApiRunner>;
+export interface FakeBattleApiStarter {
+    start: (container: Element) => Promise<FakeBattleApiRunner>;
+    Provider: React.FC;
 }
 
-export interface FakeApiRunner {
+export interface FakeBattleApiRunner {
     startCycleLoop(): void;
     stopCycleLoop(): void;
     rollback(): void;
     notify(): void;
 }
 
-export const FakeApi = () => {
+export const FakeBattleApi = () => {
 
     let isInBattle: boolean = false;
 
@@ -170,7 +173,7 @@ export const FakeApi = () => {
     };
 
     const initController = (
-        initialState: UIState | undefined,
+        initialState: GameState | undefined,
         websocketCreator: WebSocketCreator
     ) => {
         const { start } = Controller.init({ initialState, websocketCreator });
@@ -228,10 +231,10 @@ export const FakeApi = () => {
     return {
 
         init({ initialState }: {
-            initialState?: UIState;
+            initialState?: GameState;
             // mapConfig?: MapConfig;
             // firstGlobalTurn?: GlobalTurnSnapshot;
-        }): FakeApiStarter {
+        }): FakeBattleApiStarter {
 
             let socket!: MockWebSocket;
 
@@ -243,6 +246,13 @@ export const FakeApi = () => {
             const { start, onSendAction, receiveAction } = initController(initialState, websocketCreator);
 
             return {
+
+                Provider: ({children}) => (
+                    <Provider store={Controller.getStore()}>
+                        {children}
+                    </Provider>
+                ),
+
                 start: (container: Element) => start(container)
                     .then(() => new Promise(r => {
                         socket.onopen!(null as any);
@@ -254,7 +264,7 @@ export const FakeApi = () => {
                             }
                         }, 50);
                     }))
-                    .then((): FakeApiRunner => {
+                    .then((): FakeBattleApiRunner => {
 
                         let timeout: NodeJS.Timeout;
 

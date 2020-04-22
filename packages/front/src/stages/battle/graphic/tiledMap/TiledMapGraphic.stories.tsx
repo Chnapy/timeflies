@@ -9,12 +9,15 @@ import { SpellEngineBindAction } from '../../engine/Engine';
 import { Spell } from '../../entities/spell/Spell';
 import { seedSpell } from '../../entities/spell/Spell.seed';
 import { TiledMapGraphic } from './TiledMapGraphic';
+import { StoryProps } from '../../../../../.storybook/preview';
 
 export default {
     title: 'graphic/TiledMapGraphic'
 };
 
-export const Default = () => {
+export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
+
+    fakeApi.init({});
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;

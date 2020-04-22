@@ -4,7 +4,7 @@ import React from 'react';
 import { StoryProps } from '../../../../.storybook/preview';
 import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
-import { UIState } from '../../../ui/UIState';
+import { GameState } from '../../../game-state';
 import mapPath from '../../../_assets/map/map.json';
 import charactersSpritesheetPath from '../../../_assets/spritesheets/sokoban.json';
 import { SpellEngineBindAction } from '../engine/Engine';
@@ -21,7 +21,7 @@ export default {
     component: BattleStageGraphic
 }
 
-export const Default: React.FC<StoryProps> = ({ fakeApi }) => {
+export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
@@ -57,27 +57,27 @@ export const Default: React.FC<StoryProps> = ({ fakeApi }) => {
         }),
     ];
 
-    const initialState: UIState = {
+    const initialState: GameState = {
         currentPlayer: null,
-        data: {
-            state: 'battle',
-            battleData: {
-                cycle: {
-                    launchTime: -1
-                },
-                current: {
-                    characters: charactersCurrent,
-                    battleHash: '',
-                    players: [],
-                    teams: []
-                },
-                future: {
-                    characters: charactersFuture,
-                    battleHash: '',
-                    players: [],
-                    teams: [],
-                    spellActionSnapshotList: []
-                }
+        load: null,
+        room: null,
+        step: 'battle',
+        battle: {
+            cycle: {
+                launchTime: -1
+            },
+            current: {
+                characters: charactersCurrent,
+                battleHash: '',
+                players: [],
+                teams: []
+            },
+            future: {
+                characters: charactersFuture,
+                battleHash: '',
+                players: [],
+                teams: [],
+                spellActionSnapshotList: []
             }
         }
     };
@@ -131,7 +131,7 @@ export const Default: React.FC<StoryProps> = ({ fakeApi }) => {
     </div>;
 };
 
-export const Pathfinder: React.FC<StoryProps> = ({ fakeApi }) => {
+export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const charactersCurrent = [
         seedCharacter('real', {
@@ -167,27 +167,27 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeApi }) => {
         }),
     ];
 
-    const initialState: UIState = {
+    const initialState: GameState = {
         currentPlayer: null,
-        data: {
-            state: 'battle',
-            battleData: {
-                cycle: {
-                    launchTime: -1
-                },
-                current: {
-                    characters: charactersCurrent,
-                    battleHash: '',
-                    players: [],
-                    teams: []
-                },
-                future: {
-                    characters: charactersFuture,
-                    battleHash: '',
-                    players: [],
-                    teams: [],
-                    spellActionSnapshotList: []
-                }
+        load: null,
+        room: null,
+        step: 'battle',
+        battle: {
+            cycle: {
+                launchTime: -1
+            },
+            current: {
+                characters: charactersCurrent,
+                battleHash: '',
+                players: [],
+                teams: []
+            },
+            future: {
+                characters: charactersFuture,
+                battleHash: '',
+                players: [],
+                teams: [],
+                spellActionSnapshotList: []
             }
         }
     };

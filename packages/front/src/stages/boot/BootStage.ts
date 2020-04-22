@@ -3,7 +3,7 @@ import { CurrentPlayer } from '../../CurrentPlayer';
 import { serviceDispatch } from '../../services/serviceDispatch';
 import { serviceEvent } from '../../services/serviceEvent';
 import { serviceNetwork } from '../../services/serviceNetwork';
-import { LoginSuccess } from '../../ui/reducers/CurrentPlayerReducer';
+import { LoginSuccess } from '../../ui/reducers/current-player-reducer';
 import { LoadLaunchAction } from "../load/LoadStage";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
 

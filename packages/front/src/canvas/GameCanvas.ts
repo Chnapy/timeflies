@@ -4,12 +4,14 @@ import { serviceEvent } from '../services/serviceEvent';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
 import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
 import { LoadStageGraphic } from '../stages/load/graphic/LoadStageGraphic';
+import { RoomStageGraphic } from '../stages/room/graphic/RoomStageGraphic';
 import { StageChangeAction, StageKey, StageOnCreateGraphicAction } from '../stages/StageManager';
 import { CanvasContextMap } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
 const stageGraphicsMap = {
     boot: BootStageGraphic,
+    room: RoomStageGraphic,
     load: LoadStageGraphic,
     battle: BattleStageGraphic
 } as const;

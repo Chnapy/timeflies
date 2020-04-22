@@ -8,11 +8,13 @@ import { BattleCommitAction } from '../stages/battle/snapshot/SnapshotManager';
 import { SpellActionTimerAction } from '../stages/battle/spellAction/SpellActionTimer';
 import { LoadAction } from '../stages/load/LoadStage';
 import { StageAction } from '../stages/StageManager';
-import { LoginSuccess } from '../ui/reducers/CurrentPlayerReducer';
+import { LoginSuccess } from '../ui/reducers/current-player-reducer';
+import { RoomAction } from '../ui/reducers/room-reducers/room-reducer';
 
 export type IGameAction<T extends string> = Action<T>;
 
 export type GameAction =
+    | RoomAction    // TODO separate with context
     | AppResetAction
     | StageAction
     | MessageAction

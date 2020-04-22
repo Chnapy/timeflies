@@ -31,14 +31,11 @@ describe('# MapManager', () => {
         const charactersFuture = [ seedCharacter('fake', { period: 'future', id: '1', player: null }) ];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        characters: charactersFuture
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    characters: charactersFuture
+                }
+            } as any
         });
 
         return seedMapManager('real', mapKey,

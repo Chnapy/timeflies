@@ -27,7 +27,8 @@ describe('# StageManager', () => {
                 stageCreators: {
                     boot: bootFn,
                     load: jest.fn(),
-                    battle: jest.fn()
+                    battle: jest.fn(),
+                    room: jest.fn()
                 }
             });
 
@@ -60,7 +61,8 @@ describe('# StageManager', () => {
                 stageCreators: {
                     boot: bootFn,
                     load: loadFn,
-                    battle: jest.fn()
+                    battle: jest.fn(),
+                    room: jest.fn()
                 }
             });
 

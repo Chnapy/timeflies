@@ -51,14 +51,11 @@ describe('# SpellActionManager', () => {
         } as BattleDataFuture;
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    cycle: cycleBattleData,
-                    current: currentBattleData,
-                    future: futureBattleData
-                } as unknown as any
-            }
+            battle: {
+                cycle: cycleBattleData,
+                current: currentBattleData,
+                future: futureBattleData
+            } as unknown as any
         });
 
         const manager = SpellActionManager(

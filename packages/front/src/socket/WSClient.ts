@@ -14,9 +14,6 @@ export interface SendMessageAction<A extends ClientAction = ClientAction> extend
 
 export type MessageAction = ReceiveMessageAction | SendMessageAction;
 
-const ENDPOINT = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
-console.log('ws endpoint:', ENDPOINT);
-
 export interface WSClient {
     readonly isOpen: boolean;
     waitConnect(): Promise<void>;
@@ -33,6 +30,9 @@ interface Dependencies {
 export const WSClient = ({ websocketCreator }: Dependencies = {
     websocketCreator: endPoint => new WebSocket(endPoint)
 }): WSClient => {
+
+const ENDPOINT = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
+console.log('ws endpoint:', ENDPOINT);
 
     const { dispatchMessage } = serviceDispatch({
         dispatchMessage: (message: ServerAction) => ({

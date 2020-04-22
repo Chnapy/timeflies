@@ -46,13 +46,10 @@ describe('Battleflow', () => {
                 id: 'p1',
                 name: 'p1'
             },
-            data: {
-                state: 'battle',
-                battleData: {
-                    cycle: cycleBattleData,
-                    current: currentBattleData,
-                    future: futureBattleData
-                }
+            battle: {
+                cycle: cycleBattleData,
+                current: currentBattleData,
+                future: futureBattleData
             }
         });
 

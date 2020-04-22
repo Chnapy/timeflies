@@ -1,14 +1,14 @@
 import { BattleDataKey, BattleDataMap } from '../BattleData';
-import { UIStateBattle, UIStateData } from "../ui/UIState";
 import { serviceSelector } from './serviceSelector';
+import { GameStateStep } from '../game-state';
 
-function assertIsStateBattle(data: UIStateData): asserts data is UIStateBattle {
-    if (data.state !== 'battle') {
+function assertIsStateBattle(step: GameStateStep, battle: BattleDataMap | null): asserts battle is BattleDataMap {
+    if (step !== 'battle' ?? battle === null) {
         throw new TypeError('should be state "battle"');
     }
 };
 
-export const serviceBattleData = <B extends BattleDataKey, K extends keyof BattleDataMap[ B ]>(battleKey: B) => serviceSelector<Pick<BattleDataMap[ B ], K>>(({ data }) => {
-    assertIsStateBattle(data);
-    return data.battleData[ battleKey ];
+export const serviceBattleData = <B extends BattleDataKey, K extends keyof BattleDataMap[ B ]>(battleKey: B) => serviceSelector<Pick<BattleDataMap[ B ], K>>(({ step, battle }) => {
+    assertIsStateBattle(step, battle);
+    return battle[ battleKey ];
 });

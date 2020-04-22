@@ -1,12 +1,13 @@
+import { ConfirmSAction, NotifySAction, SetIDCAction, SpellActionCAction } from '@timeflies/shared';
+import { BattleDataMap } from '../BattleData';
+import { ReceiveMessageAction, SendMessageAction } from '../socket/WSClient';
+import { NotifyDeathsAction } from '../stages/battle/cycle/CycleManager';
+import { SpellActionTimerEndAction } from '../stages/battle/spellAction/SpellActionTimer';
 import { StoreTest } from '../StoreTest';
 import { serviceBattleData } from './serviceBattleData';
 import { serviceCurrentPlayer } from './serviceCurrentPlayer';
 import { serviceDispatch } from './serviceDispatch';
-import { NotifyDeathsAction } from '../stages/battle/cycle/CycleManager';
-import { SpellActionTimerEndAction } from '../stages/battle/spellAction/SpellActionTimer';
 import { serviceEvent } from './serviceEvent';
-import { ReceiveMessageAction, SendMessageAction } from '../socket/WSClient';
-import { ConfirmSAction, NotifySAction, SpellActionCAction, SetIDCAction } from '@timeflies/shared';
 import { serviceNetwork } from './serviceNetwork';
 import { serviceSelector } from './serviceSelector';
 
@@ -22,29 +23,25 @@ describe('services', () => {
 
     it('serviceSelector should return the correct data', () => {
 
-        const data = {
-            state: 'battle',
-            battleData: {
+        StoreTest.initStore({
+            battle: {
                 cycle: null as any,
                 current: null as any,
                 future: null as any
             }
-        };
+        });
 
-        StoreTest.initStore({ data: data as any });
-
-        expect(serviceSelector(state => state.data)).toEqual(data);
+        expect(serviceSelector(state => state.battle)).toEqual<BattleDataMap>({
+            cycle: null as any,
+            current: null as any,
+            future: null as any
+        });
     });
 
     it('serviceBattleData should work only on battle context', () => {
 
         StoreTest.initStore({
-            data: {
-                state: 'boot',
-                battleData: {
-                    cycle: {}
-                }
-            }
+            step: 'room'
         });
 
         expect(() => serviceBattleData('cycle')).toThrowError();
@@ -63,13 +60,10 @@ describe('services', () => {
         };
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    cycle: cycle as any,
-                    current: current as any,
-                    future: future as any
-                }
+            battle: {
+                cycle: cycle as any,
+                current: current as any,
+                future: future as any
             }
         });
 
@@ -81,8 +75,7 @@ describe('services', () => {
     it('serviceCurrentPlayer should return current player data if exist', () => {
 
         StoreTest.initStore({
-            currentPlayer: null,
-            data: {} as any
+            currentPlayer: null
         });
 
         expect(serviceCurrentPlayer()).toBeNull();
@@ -93,8 +86,7 @@ describe('services', () => {
         };
 
         StoreTest.initStore({
-            currentPlayer,
-            data: {} as any
+            currentPlayer
         });
 
         expect(serviceCurrentPlayer()).toEqual(currentPlayer);
@@ -102,9 +94,7 @@ describe('services', () => {
 
     it('serviceDispatch should dispatch any given action', () => {
 
-        StoreTest.initStore({
-            data: {} as any
-        });
+        StoreTest.initStore();
 
         const { dispatchNotifyDeaths, dispatchSpellActionEnd } = serviceDispatch({
             dispatchNotifyDeaths: (): NotifyDeathsAction => ({
