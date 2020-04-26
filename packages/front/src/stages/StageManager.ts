@@ -1,4 +1,4 @@
-import { IGameAction } from '../action/GameAction';
+import { IGameAction } from '../action/game-action/GameAction';
 import { AssetMap } from '../assetManager/AssetLoader';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';

@@ -1,8 +1,8 @@
 import { Reducer } from "redux";
-import { GameAction } from "../../../action/GameAction";
+import { BattleAction } from "../../../action/game-action/battle-action";
 import { BattleDataMap } from '../../../BattleData';
 
-export const BattleReducer: Reducer<BattleDataMap | null, GameAction> = (state = null, action) => {
+export const BattleReducer: Reducer<BattleDataMap | null, BattleAction> = (state = null, action) => {
 
     switch (action.type) {
         case 'battle/launch':

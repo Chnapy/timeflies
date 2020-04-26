@@ -1,5 +1,5 @@
 import { SpellType } from '@timeflies/shared';
-import { IGameAction } from '../../../action/GameAction';
+import { IGameAction } from '../../../action/game-action/GameAction';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { EngineCreator } from '../engine/Engine';
 import { SpellPrepareEngine } from '../engine/SpellPrepareEngine';

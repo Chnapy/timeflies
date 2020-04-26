@@ -1,71 +1,59 @@
-import { makeStyles } from '@material-ui/styles';
-import { assertIsDefined } from '@timeflies/shared';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Typography from '@material-ui/core/Typography';
+import { Skeleton } from '@material-ui/lab';
 import React from 'react';
-import { useGameDispatch } from '../../hooks/useGameDispatch';
-import { useGameStep } from '../../hooks/useGameStep';
-import { MapSelectAction } from '../../reducers/room-reducers/map-select-reducer';
 import { MyMapConfig } from './map-selector';
 
 export interface MapSelectorItemProps {
-    id: MyMapConfig[ 'id' ];
+    map: MyMapConfig;
+    isSelected: boolean;
+    onSelect: () => void;
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(({ spacing }) => ({
     root: ({ isSelected }: { isSelected: boolean }) => ({
-        display: 'flex',
-        background: isSelected ? '#fff' : '#F8F8F8',
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: '#888',
-        cursor: isSelected ? undefined : 'pointer'
+        display: 'inline-block',
     }),
-    leftSide: {
-        width: '50%',
-        flexShrink: 0
+    actionArea: {
+        display: 'flex',
+        alignItems: 'stretch'
     },
-    rightSide: {
-        flexGrow: 1
+    media: {
+        width: 180,
+        flexShrink: 0
     }
-});
+}));
 
-export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ id }) => {
-    const { mapList, mapSelected } = useGameStep('room', room => room.map);
-
-    const isSelected = mapSelected === id;
-
-    const map = mapList.find(m => m.id === id);
-
-    assertIsDefined(map);
-
-    const { name, width, height, nbrTeams, nbrCharactersPerTeam } = map;
+export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ map, isSelected, onSelect }) => {
+    const { name, previewUrl, width, height, nbrTeams, nbrCharactersPerTeam } = map;
 
     const classes = useStyles({ isSelected });
 
-    const { dispatchMapSelect } = useGameDispatch({
-        dispatchMapSelect: (): MapSelectAction => ({
-            type: 'room/map/select',
-            mapSelected: id
-        })
-    });
+    return (
+        <Card className={classes.root}>
+            <CardActionArea className={classes.actionArea} onClick={onSelect}>
 
-    const onClick = () => {
-        dispatchMapSelect();
-    };
+                <CardContent>
 
-    return <button className={classes.root} onClick={onClick}>
+                    <Typography variant='h6'>{name}</Typography>
+                    <Typography variant='subtitle1'>{width}x{height}</Typography>
 
-        <div className={classes.leftSide}>
+                    <Typography variant='body1'>
+                        Teams: {nbrTeams}
+                        <br />
+                        Characters: {nbrCharactersPerTeam * nbrTeams} ({nbrCharactersPerTeam}/team)
+                    </Typography>
 
-        </div>
+                </CardContent>
 
-        <div className={classes.rightSide}>
-
-            <div><b>{name}</b></div>
-            <div>{width}x{height}</div>
-            <div>Teams: {nbrTeams}</div>
-            <div>Characters: {nbrCharactersPerTeam * nbrTeams} ({nbrCharactersPerTeam}/team)</div>
-
-        </div>
-
-    </button>;
+                <CardMedia className={classes.media} image={previewUrl}>
+                    <Skeleton variant='rect' height='100%' animation={false} />
+                </CardMedia>
+            </CardActionArea>
+        </Card>
+    );
 };

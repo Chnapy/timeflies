@@ -1,5 +1,5 @@
 import { ActionLogger } from './ActionLogger';
-import { GameAction } from './GameAction';
+import { GameAction } from './game-action/GameAction';
 
 export interface ActionManager {
     beginBattleSession(): void;

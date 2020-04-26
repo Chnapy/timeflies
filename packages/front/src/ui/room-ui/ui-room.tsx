@@ -1,4 +1,7 @@
 import React from 'react';
+import { MapBoard } from './map-board/map-board';
+import { EntityTree } from './entity-tree/entity-tree';
+import { MapSelector } from './map-selector/map-selector';
 
 
 export const UIRoom: React.FC = () => {
@@ -11,32 +14,12 @@ export const UIRoom: React.FC = () => {
 
     return (
         <div>
+            
+            <MapBoard/>
 
-            <div>
-                Map choice
-                <ul>
-                    <li>
-                        <div>Map name 1</div>
-                        <div>Preview</div>
-                        <div>Size: XxX</div>
-                        <div>Nbr teams max: X</div>
-                        <div>Nbr characters max: X - X/team</div>
-                        <button>Choise</button>
-                    </li>
-                    <li>
-                        <div>Map name 2</div>
-                        <div>Preview</div>
-                        <div>Size: XxX</div>
-                        <div>Nbr teams max: X</div>
-                        <div>Nbr characters max: X - X/team</div>
-                        <button disabled>Choised</button>
-                    </li>
-                </ul>
-            </div>
+            <MapSelector/>
 
-            <div>
-                
-            </div>
+            <EntityTree/>
 
         </div>
     );

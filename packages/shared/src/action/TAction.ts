@@ -1,6 +1,7 @@
 import { BattlePrepareClientAction, BattlePrepareServerAction } from "./BattlePrepareAction";
 import { BattleRunCAction, BattleRunSAction } from "./BattleRunAction";
 import { MatchmakerClientAction } from './MatchmakerAction';
+import { RoomServerAction, RoomClientAction } from './room-action';
 
 export interface TAction<T extends string> {
     type: T;
@@ -15,10 +16,12 @@ export interface SetIDCAction extends TAction<'set-id'> {
 
 export type ServerAction =
     | BattlePrepareServerAction
-    | BattleRunSAction;
+    | BattleRunSAction
+    | RoomServerAction;
 
 export type ClientAction =
     | SetIDCAction
     | MatchmakerClientAction
     | BattlePrepareClientAction
-    | BattleRunCAction;
+    | BattleRunCAction
+    | RoomClientAction;

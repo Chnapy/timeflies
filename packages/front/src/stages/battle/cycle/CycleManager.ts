@@ -2,7 +2,7 @@ import { assertIsDefined, assertThenGet, BRunGlobalTurnStartSAction, BRunTurnSta
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { GlobalTurn } from './GlobalTurn';
-import { IGameAction } from '../../../action/GameAction';
+import { IGameAction } from '../../../action/game-action/GameAction';
 
 export interface NotifyDeathsAction extends IGameAction<'battle/notify-deaths'> {
 }

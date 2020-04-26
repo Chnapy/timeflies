@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, Store } from 'redux';
 import { ActionManager } from './action/ActionManager';
-import { GameAction, IGameAction } from './action/GameAction';
+import { GameAction, IGameAction } from './action/game-action/GameAction';
 import { App } from './app';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';

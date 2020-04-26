@@ -1,6 +1,6 @@
 import { BattleLoadPayload } from '@timeflies/shared';
 import { Reducer } from "redux";
-import { GameAction } from "../../../action/GameAction";
+import { GameAction } from "../../../action/game-action/GameAction";
 
 export const LoadReducer: Reducer<BattleLoadPayload | null, GameAction> = (state = null, action) => {
 

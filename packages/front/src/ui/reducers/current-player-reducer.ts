@@ -1,5 +1,5 @@
 import { CurrentPlayer } from "../../CurrentPlayer";
-import { GameAction, IGameAction } from "../../action/GameAction";
+import { GameAction, IGameAction } from "../../action/game-action/GameAction";
 import { Reducer } from "redux";
 
 export interface LoginSuccess extends IGameAction<'login/success'> {

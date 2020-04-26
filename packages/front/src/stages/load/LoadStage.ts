@@ -1,5 +1,5 @@
 import { BattleLoadPayload, BattleSnapshot, BRunLaunchSAction, GlobalTurnSnapshot } from "@timeflies/shared";
-import { IGameAction } from '../../action/GameAction';
+import { IGameAction } from '../../action/game-action/GameAction';
 import { Controller } from '../../Controller';
 import { serviceDispatch } from "../../services/serviceDispatch";
 import { serviceEvent } from "../../services/serviceEvent";

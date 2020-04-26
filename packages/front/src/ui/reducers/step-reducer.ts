@@ -1,6 +1,6 @@
 import { Reducer } from 'redux';
 import { GameStateStep } from '../../game-state';
-import { GameAction } from '../../action/GameAction';
+import { GameAction } from '../../action/game-action/GameAction';
 
 export const StepReducer: Reducer<GameStateStep, GameAction> = (state = 'boot', action) => {
 

@@ -29,6 +29,7 @@ interface BaseAssetMap {
 type BaseAssetMapKey = keyof BaseAssetMap;
 
 type SpritesheetMap = {
+    faces: PIXI.Spritesheet;
     characters: PIXI.Spritesheet;
 };
 

@@ -35,7 +35,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
     }, [ start, fns, ref ]);
 
     return <div style={{
-        position: 'relative',
+        position: 'absolute',
         width: '100%',
         height: '100vh'
     }}>

@@ -30,6 +30,9 @@ class MockWebSocket implements WebSocket {
     url;
 
     constructor() {
+        setImmediate(() => {
+            this.onopen && this.onopen(null as any);
+        });
     }
 
     close(code?: number | undefined, reason?: string | undefined): void {
@@ -232,8 +235,6 @@ export const FakeBattleApi = () => {
 
         init({ initialState }: {
             initialState?: GameState;
-            // mapConfig?: MapConfig;
-            // firstGlobalTurn?: GlobalTurnSnapshot;
         }): FakeBattleApiStarter {
 
             let socket!: MockWebSocket;
@@ -247,7 +248,7 @@ export const FakeBattleApi = () => {
 
             return {
 
-                Provider: ({children}) => (
+                Provider: ({ children }) => (
                     <Provider store={Controller.getStore()}>
                         {children}
                     </Provider>

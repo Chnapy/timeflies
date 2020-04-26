@@ -1,5 +1,5 @@
 import { assertIsDefined, SpellActionSnapshot } from '@timeflies/shared';
-import { IGameAction } from '../../../action/GameAction';
+import { IGameAction } from '../../../action/game-action/GameAction';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceNetwork } from '../../../services/serviceNetwork';

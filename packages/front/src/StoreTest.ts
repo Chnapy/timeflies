@@ -1,5 +1,5 @@
 import configureStore, { MockStoreEnhanced } from 'redux-mock-store';
-import { GameAction } from "./action/GameAction";
+import { GameAction } from "./action/game-action/GameAction";
 import { GameState } from "./game-state";
 jest.mock('./Controller');
 

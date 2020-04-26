@@ -1,5 +1,5 @@
 import { Position, SpellType } from '@timeflies/shared';
-import { IGameAction } from '../../../action/GameAction';
+import { IGameAction } from '../../../action/game-action/GameAction';
 import { BStateAction } from '../battleState/BattleStateSchema';
 import { MapManager } from '../map/MapManager';
 import { ExtractHoverReturn } from './spellMapping';
