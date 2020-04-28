@@ -1,14 +1,18 @@
 import { MapConfig } from '@timeflies/shared';
 import { MapManager, MapManagerDependencies } from './MapManager';
-import { seedTiledConfig, seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
+import { seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
 
 export const seedMapConfig = (mapKey: TiledMapSeedKey): MapConfig => {
 
     return {
-        ...seedTiledConfig(mapKey),
         id: '',
-        initLayerName: 'todo',
-        schemaUrl: 'placeholder'
+        schemaUrl: 'placeholder',
+        height: 10,
+        width: 10,
+        name: '',
+        nbrCharactersPerTeam: 1,
+        nbrTeams: 1,
+        previewUrl: '',
     };
 };
 
@@ -27,8 +31,6 @@ export const seedMapManager = (type: 'real' | 'fake', mapKey: TiledMapSeedKey = 
 
     const assets = seedTiledMapAssets(mapKey);
 
-    const mapConfig = seedMapConfig(mapKey);
-
-    return MapManager(assets, mapConfig, deps);
+    return MapManager(assets, deps);
 };
 

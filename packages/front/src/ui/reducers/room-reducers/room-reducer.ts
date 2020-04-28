@@ -1,7 +1,6 @@
 import { Reducer } from 'redux';
-import { IGameAction } from '../../../action/game-action/GameAction';
-import { RoomAction } from '../../../action/game-action/room-action';
-import { EntityTreeData, EntityTreeReducer } from './entity-tree-reducer';
+import { GameAction, IGameAction } from '../../../action/game-action/GameAction';
+import { EntityTreeData, EntityTreeReducer } from './entity-tree-reducer/entity-tree-reducer';
 import { MapSelectData, MapSelectReducer } from './map-select-reducer/map-select-reducer';
 
 export interface RoomJoinAction extends IGameAction<'room/join'> {
@@ -17,15 +16,20 @@ export interface RoomData {
     teamsTree: EntityTreeData;
 }
 
-export const RoomReducer: Reducer<RoomData | null, RoomAction> = (state = null, action) => {
+export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, action) => {
 
     switch (action.type) {
-        case 'room/join':
-        case 'room/create':
-            return {
-                map: MapSelectReducer(undefined, action),
-                teamsTree: EntityTreeReducer(undefined, action)
-            };
+
+        case 'message/receive':
+            const { message } = action;
+            if (message.type === 'room/create') {
+                return {
+                    map: MapSelectReducer(undefined, action),
+                    teamsTree: EntityTreeReducer(undefined, action)
+                };
+            }
+
+            break;
     }
 
     return state && {

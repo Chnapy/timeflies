@@ -190,11 +190,14 @@ export const FakeBattleApi = () => {
                 sendTime: Date.now(),
                 payload: {
                     mapConfig: {
-                        id: '',
-                        initLayerName: 'init',
-                        defaultTilelayerName: 'view',
-                        obstacleTilelayerName: 'obstacles',
+                        id: 'm1',
                         schemaUrl: mapPath,
+                        name: 'm1',
+                        height: 10,
+                        width: 10,
+                        previewUrl: '',
+                        nbrCharactersPerTeam: 1,
+                        nbrTeams: 1
                     },
                     spellTypes: [],
                     playerInfos: {

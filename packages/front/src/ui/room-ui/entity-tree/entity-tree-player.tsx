@@ -3,15 +3,22 @@ import CheckIcon from '@material-ui/icons/Check';
 import StarIcon from '@material-ui/icons/Star';
 import SyncIcon from '@material-ui/icons/Sync';
 import { TreeItem } from '@material-ui/lab';
-import { PlayerRoom } from '@timeflies/shared';
+import { PlayerRoom, assertIsDefined } from '@timeflies/shared';
 import React from 'react';
 import { EntityTreeCharacter } from './entity-tree-character';
+import { useGameStep } from '../../hooks/useGameStep';
 
 export interface EntityTreePlayerProps {
-    player: PlayerRoom;
+    playerId: PlayerRoom[ 'id' ];
 }
 
-export const EntityTreePlayer: React.FC<EntityTreePlayerProps> = ({ player }) => {
+export const EntityTreePlayer: React.FC<EntityTreePlayerProps> = ({ playerId }) => {
+
+    const player = useGameStep('room', room =>
+        room.teamsTree.playerList.find(p => p.id === playerId)
+    );
+    assertIsDefined(player);
+
     const { id, name, isAdmin, isReady, isLoading, characters } = player;
 
     return (

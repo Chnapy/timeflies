@@ -1,17 +1,15 @@
 import Box from '@material-ui/core/Box';
-import { Position, TileType } from '@timeflies/shared';
+import { Position, TileTypeWithPlacement } from '@timeflies/shared';
 import React from 'react';
 import { MapBoardTilePlacement, MapBoardTilePlacementProps } from './map-board-tile-placement';
 
-export type MapBoardTileInfosType = Extract<TileType, 'obstacle'> | 'placement';
-
-export type MapBoardTileInfos<T extends MapBoardTileInfosType = MapBoardTileInfosType> = {
+export type MapBoardTileInfos<T extends Extract<TileTypeWithPlacement, 'placement' | 'obstacle'> = 'placement' | 'obstacle'> = {
     obstacle: {
-        type: Extract<MapBoardTileInfosType, 'obstacle'>;
+        type: Extract<TileTypeWithPlacement, 'obstacle'>;
         position: Position;
     };
     placement: {
-        type: Extract<MapBoardTileInfosType, 'placement'>;
+        type: Extract<TileTypeWithPlacement, 'placement'>;
     } & MapBoardTilePlacementProps;
 }[ T ];
 

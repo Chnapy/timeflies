@@ -2,11 +2,11 @@ import { Position, TiledManager, TimerTester } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
+import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 import { MapManager } from './MapManager';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
-import { seedTiledConfig, seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
-import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
 
 describe('# MapManager', () => {
 
@@ -63,10 +63,8 @@ describe('# MapManager', () => {
 
         const assets = seedTiledMapAssets('map_1');
 
-        const config = seedTiledConfig('map_1');
-
         expect(tiledManagerCreator).toHaveBeenNthCalledWith<Parameters<typeof TiledManager>>(1,
-            assets, config);
+            assets);
     });
 
     it('should give to pathfinder characters positions getter', () => {

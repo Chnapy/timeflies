@@ -2,25 +2,29 @@ import React from 'react';
 import { MapBoard } from './map-board/map-board';
 import { EntityTree } from './entity-tree/entity-tree';
 import { MapSelector } from './map-selector/map-selector';
+import { Box } from '@material-ui/core';
 
 
 export const UIRoom: React.FC = () => {
 
-    /**
-     * List players (name)
-     *  List characters (type, face)
-     * Team
-     */
-
     return (
-        <div>
-            
-            <MapBoard/>
+        <Box display='flex' m={2}>
 
-            <MapSelector/>
+            <Box display='flex' flexDirection='column' width={400} flexShrink={0}>
 
-            <EntityTree/>
+                <MapSelector />
 
-        </div>
+                <Box mt={2}>
+                    <EntityTree />
+                </Box>
+            </Box>
+
+            <Box ml={2}>
+                <MapBoard />
+
+            </Box>
+
+
+        </Box>
     );
 };

@@ -13,7 +13,6 @@ import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { MapManager } from '../map/MapManager';
 import { Pathfinder as Pathfinder_ } from '../map/Pathfinder';
-import { seedTiledConfig } from '../map/TiledMap.seed';
 import { BattleStageGraphic } from './BattleStageGraphic';
 
 export default {
@@ -101,7 +100,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder_,
             tiledManagerCreator: TiledManager
@@ -211,7 +210,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => 
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => charactersFuture,
             pathfinderCreator: Pathfinder_,
             tiledManagerCreator: TiledManager
@@ -224,7 +223,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => 
             character: charactersFuture[ 0 ],
         });
 
-        const tiledMapManager = TiledManager(mapAssets, seedTiledConfig('map_1'));
+        const tiledMapManager = TiledManager(mapAssets);
 
         const spellPrepareEngine = SpellPrepareMove(spell, mapManager);
 

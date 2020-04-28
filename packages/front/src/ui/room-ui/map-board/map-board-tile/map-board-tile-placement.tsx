@@ -1,6 +1,6 @@
 import Box from '@material-ui/core/Box';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import { assertIsDefined, CharacterRoom, TeamRoom, Position, equals, CharacterType } from '@timeflies/shared';
+import { assertIsDefined, CharacterRoom, TeamRoom, Position, equals, CharacterType, PlayerRoom } from '@timeflies/shared';
 import React from 'react';
 import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
 import { useGameStep } from '../../../hooks/useGameStep';
@@ -8,53 +8,70 @@ import { TeamIndicator } from './team-indicator';
 import { RemoveBtn } from './remove-btn';
 import AddIcon from '@material-ui/icons/Add';
 import { Avatar, Menu, MenuItem } from '@material-ui/core';
+import { useGameNetwork } from '../../../hooks/useGameNetwork';
 
 export interface MapBoardTilePlacementProps {
     position: Position;
     teamId: TeamRoom[ 'id' ];
 }
 
-const getCharacter = (team: TeamRoom, position: Position) => {
-
-    const player = team.players.find(p => p.characters.some(c => equals(c.position)(position)));
-    if (!player) {
-        return;
-    }
-
-    const character = player.characters.find(c => equals(c.position)(position));
-    assertIsDefined(character);
-
-    return character;
+const findCharacter = ([ player, ...rest ]: PlayerRoom[], position: Position): CharacterRoom | undefined => {
+    return player
+        ? (player.characters.find(c => equals(c.position)(position)) ?? findCharacter(rest, position))
+        : undefined;
 };
 
 export const MapBoardTilePlacement: React.FC<MapBoardTilePlacementProps> = ({ teamId, position }) => {
 
     const currentPlayerId = useGameCurrentPlayer(p => p.id);
 
-    const team = useGameStep('room', room => room.teamsTree.teams.find(t => t.id === teamId));
-    assertIsDefined(team);
+    const { team, isAllowed, character } = useGameStep('room', ({ teamsTree }) => {
 
-    const isTileAllowed = team.players.some(p => p.id === currentPlayerId);
+        const team = teamsTree.teamList.find(t => t.id === teamId);
+        assertIsDefined(team);
 
-    const character = getCharacter(team, position);
+        const isAllowed = team.playersIds.some(id => id === currentPlayerId);
+
+        const character = findCharacter(teamsTree.playerList, position);
+
+        return {
+            team,
+            isAllowed,
+            character
+        };
+    });
 
     const tileProps: TilePlacementProps = {
+        position,
         team,
         character,
-        isAllowed: isTileAllowed
+        isAllowed
     };
 
     return <TilePlacement {...tileProps} />;
 };
 
 interface TilePlacementProps {
+    position: Position;
     team: TeamRoom;
     character: CharacterRoom | undefined;
     isAllowed: boolean;
 }
 
-const TilePlacement: React.FC<TilePlacementProps> = ({ team, character, isAllowed }) => {
+const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character, isAllowed }) => {
     const [ anchorEl, setAnchorEl ] = React.useState(null);
+
+    const { sendCharacterAdd, sendCharacterRemove } = useGameNetwork({
+        sendCharacterAdd: (characterType: CharacterType) => ({
+            type: 'room/character/add',
+            characterType,
+            position
+        }),
+        sendCharacterRemove: () => ({
+            type: 'room/character/remove',
+            position
+        }),
+    });
 
     const handleMainClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -67,15 +84,14 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ team, character, isAllowe
     const handleMenuItemClick = (characterType: CharacterType): void => {
         handleClose();
 
+        sendCharacterAdd(characterType);
     };
 
-    const mainRender = character
-        ? <Avatar variant='square' />
-        : (
-            isAllowed
-                ? <AddIcon fontSize='large' />
-                : null
-        );
+    const handleRemove = sendCharacterRemove;
+
+    const mainRender = isAllowed
+        ? (character ? <Avatar variant='square' /> : <AddIcon fontSize='large' />)
+        : null;
 
     return <Box
         position='relative'
@@ -102,7 +118,7 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ team, character, isAllowe
             <Box position='absolute' right={0} top={0} style={{
                 transform: 'translate(50%, -50%)'
             }}>
-                <RemoveBtn onClick={() => { }} />
+                <RemoveBtn onClick={handleRemove} />
             </Box>
         )}
 

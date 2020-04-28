@@ -5,11 +5,11 @@ import CardMedia from '@material-ui/core/CardMedia';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Skeleton } from '@material-ui/lab';
+import { MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { MyMapConfig } from './map-selector';
 
 export interface MapSelectorItemProps {
-    map: MyMapConfig;
+    map: MapConfig;
     isSelected: boolean;
     onSelect: () => void;
 }

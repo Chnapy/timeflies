@@ -29,10 +29,7 @@ export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
             .add('map', mapPath)
             .load();
 
-        const tiledManager = TiledManager(map, {
-            defaultTilelayerName: 'view',
-            obstacleTilelayerName: 'obstacles'
-        });
+        const tiledManager = TiledManager(map);
 
         CanvasContext.provider({
             mapManager: {

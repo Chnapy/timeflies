@@ -1,4 +1,4 @@
-import { PlayerSnapshot, PlayerRoom } from "./Player";
+import { PlayerSnapshot } from "./Player";
 
 export interface TeamSnapshot {
     id: string;
@@ -10,5 +10,5 @@ export interface TeamSnapshot {
 export interface TeamRoom {
     id: string;
     letter: string;
-    players: PlayerRoom[];
+    playersIds: string[];
 }

@@ -6,9 +6,9 @@ import { MapBoardTile } from './map-board-tile/map-board-tile';
 
 export const MapBoard: React.FC = () => {
 
-    const {mapList, mapSelected} = useGameStep('room', room => room.map);
+    const { mapList, mapSelected } = useGameStep('room', room => room.map);
 
-    if(!mapSelected) {
+    if (!mapSelected) {
         return null;
     }
 

@@ -11,7 +11,6 @@ import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
 import { MapManager } from '../../../map/MapManager';
 import { Pathfinder } from '../../../map/Pathfinder';
-import { seedTiledConfig } from '../../../map/TiledMap.seed';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/SpellActionTimer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
@@ -47,7 +46,7 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder,
             tiledManagerCreator: TiledManager
@@ -209,7 +208,7 @@ export const Future: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder,
             tiledManagerCreator: TiledManager

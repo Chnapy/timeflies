@@ -11,7 +11,7 @@ export interface EntityTreeTeamProps {
 }
 
 export const EntityTreeTeam: React.FC<EntityTreeTeamProps> = ({ team }) => {
-    const { letter, players } = team;
+    const { letter, playersIds } = team;
 
     return (
         <TreeItem nodeId={team.id} label={<Box display='flex' alignItems='flex-end' mb={1}>
@@ -19,8 +19,8 @@ export const EntityTreeTeam: React.FC<EntityTreeTeamProps> = ({ team }) => {
             <TeamIndicator teamLetter={letter} />
         </Box>}>
 
-            {players.map(p => (
-                <EntityTreePlayer key={p.id} player={p} />
+            {playersIds.map(id => (
+                <EntityTreePlayer key={id} playerId={id} />
             ))}
         </TreeItem>
     )

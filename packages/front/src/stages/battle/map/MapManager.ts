@@ -1,4 +1,4 @@
-import { BresenhamPoint, equals, MapConfig, Position, TiledManager, TiledMapAssets } from '@timeflies/shared';
+import { BresenhamPoint, equals, Position, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { Character } from '../entities/character/Character';
@@ -20,10 +20,6 @@ export interface MapManagerDependencies {
 
 export const MapManager = (
     mapAssets: TiledMapAssets,
-    {
-        defaultTilelayerName,
-        obstacleTilelayerName
-    }: Pick<MapConfig, 'defaultTilelayerName' | 'obstacleTilelayerName'>,
     { pathfinderCreator, tiledManagerCreator, getFutureCharacters }: MapManagerDependencies = {
         pathfinderCreator: Pathfinder,
         tiledManagerCreator: TiledManager,
@@ -33,10 +29,7 @@ export const MapManager = (
 
     const { onAction } = serviceEvent();
 
-    const tiledManager = tiledManagerCreator(mapAssets, {
-        defaultTilelayerName,
-        obstacleTilelayerName
-    });
+    const tiledManager = tiledManagerCreator(mapAssets);
 
     const characters = getFutureCharacters();
 

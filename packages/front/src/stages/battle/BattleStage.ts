@@ -57,10 +57,7 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
 
             SpellActionManager();
 
-            const mapManager = MapManager(
-                map,
-                mapConfig
-            );
+            const mapManager = MapManager(map);
 
             BStateMachine(mapManager);
 

@@ -6,17 +6,17 @@ import { Box } from '@material-ui/core';
 
 export const EntityTree: React.FC = () => {
 
-    const teams = useGameStep('room', room => room.teamsTree.teams);
+    const teamList = useGameStep('room', room => room.teamsTree.teamList);
 
-    const allId: string[] = teams.flatMap(t =>
-        [ t.id, ...t.players.flatMap(p =>
-            [ p.id, ...p.characters.map(c => c.id) ]
-        ) ]
-    );
+    // This is definitely a hack to ensure the TreeView to be always expanded 
+    // no matter the children items
+    const expandedHack: Array<string> = Object.assign<Array<string>, any>([], {
+        indexOf: () => true
+    });
 
     return (
-        <TreeView disableSelection expanded={allId}>
-            {teams.map(t => (
+        <TreeView disableSelection expanded={expandedHack}>
+            {teamList.map(t => (
                 <Box key={t.id} mb={2}>
                     <EntityTreeTeam team={t} />
                 </Box>

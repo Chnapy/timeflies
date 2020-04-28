@@ -1,4 +1,4 @@
-import { TiledMap, TiledMapAssets, TiledManager, TiledManagerConfig } from '@timeflies/shared';
+import { TiledMap, TiledMapAssets, TiledManager } from '@timeflies/shared';
 
 // Note: properties not in "" were not present in the generated JSON
 const tiledMap_2: TiledMap = {
@@ -87,6 +87,18 @@ const tiledMap_1: TiledMap = {
             "width": 20,
             "x": 0,
             "y": 0
+        },
+        {
+            id: 3,
+            "data": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            "height": 20,
+            "name": "init",
+            "opacity": 1,
+            "type": "tilelayer",
+            "visible": true,
+            "width": 20,
+            "x": 0,
+            "y": 0
         } ],
     "nextobjectid": 1,
     "orientation": "orthogonal",
@@ -145,17 +157,9 @@ export const seedTiledMapAssets = (mapKey: TiledMapSeedKey): TiledMapAssets => {
     };
 };
 
-export const seedTiledConfig = (mapKey: TiledMapSeedKey): TiledManagerConfig => {
-
-    return {
-        defaultTilelayerName: mapKey === 'map_1' ? 'view' : 'decors',
-        obstacleTilelayerName: 'obstacles'
-    };
-};
-
 export const seedTiledManager = (mapKey: TiledMapSeedKey): TiledManager => {
 
     const assets = seedTiledMapAssets(mapKey);
 
-    return TiledManager(assets, seedTiledConfig(mapKey));
+    return TiledManager(assets);
 };

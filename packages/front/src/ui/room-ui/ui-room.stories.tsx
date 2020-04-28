@@ -1,32 +1,27 @@
-import { equals } from '@timeflies/shared';
+import { equals, MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { StoryProps } from '../../../.storybook/preview';
 import { GameState } from '../../game-state';
-import { RootReducer } from '../reducers/root-reducer';
 import { MapBoardTileInfos } from './map-board/map-board-tile/map-board-tile';
-import { MyMapConfig } from './map-selector/map-selector';
 import { UIRoom } from './ui-room';
+import mapPreviewUrl from '../../_assets/map/map_preview.png';
 
 export default {
     title: 'Room',
     component: UIRoom
 };
 
-export const Default = () => {
+export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
 
-    const map: MyMapConfig = {
+    const map: MapConfig = {
         id: '1',
         name: 'Map 1',
-        previewUrl: 'placeholder',
+        previewUrl: mapPreviewUrl,
         width: 10,
         height: 8,
         nbrTeams: 2,
         nbrCharactersPerTeam: 3,
         schemaUrl: '',
-        defaultTilelayerName: 'decor',
-        obstacleTilelayerName: 'obstacles',
-        initLayerName: 'init'
     };
 
     const tileList: MapBoardTileInfos[] = [];
@@ -86,7 +81,6 @@ export const Default = () => {
         }
     }
 
-
     const initialState: GameState = {
         currentPlayer: {
             id: 'p1',
@@ -97,62 +91,59 @@ export const Default = () => {
         load: null,
         room: {
             teamsTree: {
-                teams: [
+                playerList: [
                     {
-                        id: 't1',
-                        letter: 'A',
-                        players: [
+                        id: 'p1',
+                        isAdmin: true,
+                        isLoading: true,
+                        isReady: true,
+                        name: 'p-1',
+                        characters: [
                             {
-                                id: 'p1',
-                                isAdmin: true,
-                                isLoading: true,
-                                isReady: true,
-                                name: 'p-1',
-                                characters: [
-                                    {
-                                        id: 'c1',
-                                        position: { x: 5, y: 2 },
-                                        type: 'sampleChar1'
-                                    }
-                                ]
+                                id: 'c1',
+                                position: { x: 5, y: 2 },
+                                type: 'sampleChar1'
                             }
                         ]
                     },
                     {
+                        id: 'p2',
+                        isAdmin: false,
+                        isLoading: true,
+                        isReady: false,
+                        name: 'p-2',
+                        characters: [ {
+                            id: 'c2',
+                            type: 'sampleChar2',
+                            position: { x: 3, y: 5 }
+                        } ]
+                    }
+                ],
+                teamList: [
+                    {
+                        id: 't1',
+                        letter: 'A',
+                        playersIds: [ 'p1' ]
+                    },
+                    {
                         id: 't2',
                         letter: 'B',
-                        players: [ {
-                            id: 'p2',
-                            isAdmin: false,
-                            isLoading: true,
-                            isReady: false,
-                            name: 'p-2',
-                            characters: [ {
-                                id: 'c2',
-                                type: 'sampleChar2',
-                                position: { x: 3, y: 5 }
-                            } ]
-                        } ]
+                        playersIds: [ 'p2' ]
                     }
                 ]
             },
             map: {
-                mapListLoading: false,
-                mapList: [map],
+                mapList: [ map ],
                 mapSelected: {
                     id: map.id,
+                    tileListLoading: false,
                     tileList
                 }
             }
         }
     };
 
-    const store = createStore(
-        RootReducer,
-        initialState
-    );
+    fakeBattleApi.init({ initialState });
 
-    return <Provider store={store}>
-        <UIRoom />
-    </Provider>;
+    return <UIRoom />;
 };

@@ -11,7 +11,6 @@ import charactersSpritesheetPath from '../../../../_assets/spritesheets/sokoban.
 import { seedCharacter } from '../../entities/character/Character.seed';
 import { MapManager } from '../../map/MapManager';
 import { Pathfinder } from '../../map/Pathfinder';
-import { seedTiledConfig } from '../../map/TiledMap.seed';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
 
@@ -70,7 +69,7 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeBattl
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder,
             tiledManagerCreator: TiledManager

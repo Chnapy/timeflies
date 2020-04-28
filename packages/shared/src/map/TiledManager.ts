@@ -2,10 +2,14 @@ import bresenham from 'bresenham';
 import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
 import { Position } from '../geo';
 import { assertIsDefined } from '../util';
-import { MapConfig } from './MapConfig';
 
 type TiledLayerTilelayerWithData = Omit<TiledLayerTilelayer, 'data'>
     & Pick<Required<TiledLayerTilelayer>, 'data'>;
+
+export interface TilePositioned<T extends TileTypeWithPlacement> {
+    type: T;
+    position: Position;
+}
 
 export interface TiledManager {
     readonly orientation: TiledMapType;
@@ -17,6 +21,11 @@ export interface TiledManager {
     getRenderableLayer(): TiledLayerTilelayer;
 
     getTileType(position: Position): TileType;
+    getTileTypeWithPlacement(position: Position): TileTypeWithPlacement;
+    getAllTilesOfType<T extends TileTypeWithPlacement>(...types: T[]): TilePositioned<T>[];
+
+    getPlacementTilesPositions(): Position[][];
+
     getTilePositionFromIndex(index: number): Position;
     getTilesetFromId(id: number): TiledTileset | undefined;
 
@@ -26,7 +35,7 @@ export interface TiledManager {
 
 export type TileType = 'default' | 'obstacle' | null;
 
-export type TiledManagerConfig = Pick<MapConfig, 'defaultTilelayerName' | 'obstacleTilelayerName'>;
+export type TileTypeWithPlacement = TileType | 'placement';
 
 export type TiledMapAssets = {
     schema: TiledMap;
@@ -44,10 +53,13 @@ function assertMapIsAllowed(map: TiledMap): asserts map is TiledMapOrthogonal {
     }
 };
 
-export const TiledManager = (
-    assets: TiledMapAssets,
-    { defaultTilelayerName, obstacleTilelayerName }: TiledManagerConfig
-): TiledManager => {
+const tileLayerNames = Object.freeze({
+    placement: 'init',
+    default: 'view',
+    obstacles: 'obstacles'
+});
+
+export const TiledManager = (assets: TiledMapAssets): TiledManager => {
     const { schema } = assets;
 
     const getTilelayer = (name: string): TiledLayerTilelayerWithData => {
@@ -64,8 +76,9 @@ export const TiledManager = (
 
     const { orientation, width, height } = schema;
 
-    const defaultTilelayer = getTilelayer(defaultTilelayerName);
-    const obstacleTilelayer = getTilelayer(obstacleTilelayerName);
+    const placementTilelayer = getTilelayer(tileLayerNames.placement);
+    const defaultTilelayer = getTilelayer(tileLayerNames.default);
+    const obstacleTilelayer = getTilelayer(tileLayerNames.obstacles);
 
     const getRenderableLayer = () => defaultTilelayer;
 
@@ -91,6 +104,56 @@ export const TiledManager = (
         if (hasTileFromLayer(defaultTilelayer, position)) return 'default';
 
         return null;
+    };
+
+    const getTileTypeWithPlacement = (position: Position): TileTypeWithPlacement => {
+
+        if (hasTileFromLayer(placementTilelayer, position)) return 'placement';
+
+        return getTileType(position);
+    };
+
+    const getAllTilesOfType = <T extends TileTypeWithPlacement>(...types: T[]): TilePositioned<T>[] => {
+        const tileList: TilePositioned<T>[] = [];
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const position: Position = { x, y };
+                const type = getTileTypeWithPlacement(position);
+
+                if (types.includes(type as T)) {
+                    tileList.push({
+                        type: type as T,
+                        position
+                    });
+                }
+            }
+        }
+
+        return tileList;
+    };
+
+    const getPlacementTilesPositions = (): Position[][] => {
+        const buffer = new Map<number, Position[]>();
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+
+                const position = { x, y };
+                const id = getTileIdFromPosition(placementTilelayer, position);
+
+                if (id) {
+
+                    if (!buffer.has(id)) {
+                        buffer.set(id, []);
+                    }
+
+                    buffer.get(id)!.push(position);
+                }
+            }
+        }
+
+        return [ ...buffer.values() ];
     };
 
     const getTilesetFromId = (id: number): TiledTileset | undefined =>
@@ -139,8 +202,13 @@ export const TiledManager = (
 
         getRenderableLayer,
 
-        getTilePositionFromIndex,
         getTileType,
+        getTileTypeWithPlacement,
+        getAllTilesOfType,
+
+        getPlacementTilesPositions,
+
+        getTilePositionFromIndex,
         getTilesetFromId,
 
         getArea,

@@ -11,21 +11,12 @@ import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useGameStep } from '../../hooks/useGameStep';
 import { MapSelectorItem } from './map-selector-item';
 
-export interface MyMapConfig extends MapConfig {
-    name: string;
-    previewUrl: string;
-    width: number;
-    height: number;
-    nbrTeams: number;
-    nbrCharactersPerTeam: number;
-}
-
 export interface MapSelectorProps {
     defaultOpen?: boolean;
 }
 
 const RenderSingleChild: React.FC<{
-    map: MyMapConfig | null;
+    map: MapConfig | null;
     onClick: () => void;
 }> = ({
     map, onClick
@@ -56,7 +47,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
 
     const [ open, setOpen ] = React.useState(defaultOpen);
 
-    const network = useGameNetwork({
+    const { sendMapSelect } = useGameNetwork({
         sendMapSelect: (mapId: string) => ({
             type: 'room/map/select',
             mapId
@@ -94,10 +85,8 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
                                 isSelected={config.id === mapSelected?.id}
                                 onSelect={() => {
                                     setOpen(false);
-                                    
-                                    network.then(({ sendMapSelect }) => {
-                                        sendMapSelect(config.id);
-                                    });
+
+                                    sendMapSelect(config.id);
                                 }}
                             />
                         </Grid>

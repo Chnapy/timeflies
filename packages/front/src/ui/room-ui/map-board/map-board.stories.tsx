@@ -1,20 +1,17 @@
-import { equals } from '@timeflies/shared';
+import { Box } from '@material-ui/core';
+import { equals, MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { StoryProps } from '../../../../.storybook/preview';
 import { GameState } from '../../../game-state';
-import { RootReducer } from '../../reducers/root-reducer';
-import { MyMapConfig } from '../map-selector/map-selector';
 import { MapBoard } from './map-board';
 import { MapBoardTile, MapBoardTileInfos } from './map-board-tile/map-board-tile';
-import { Box } from '@material-ui/core';
 
 export default {
     title: 'Room/Map Board',
     component: MapBoard
 };
 
-export const BoardTile: React.FC = () => {
+export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
 
     const initialState: GameState = {
         currentPlayer: {
@@ -26,57 +23,55 @@ export const BoardTile: React.FC = () => {
         load: null,
         room: {
             teamsTree: {
-                teams: [
+                playerList: [
                     {
-                        id: 't1',
-                        letter: 'A',
-                        players: [
+                        id: 'p1',
+                        isAdmin: true,
+                        isLoading: true,
+                        isReady: true,
+                        name: 'p-1',
+                        characters: [
                             {
-                                id: 'p1',
-                                isAdmin: true,
-                                isLoading: true,
-                                isReady: true,
-                                name: 'p-1',
-                                characters: [
-                                    {
-                                        id: 'c1',
-                                        position: { x: 2, y: 0 },
-                                        type: 'sampleChar1'
-                                    }
-                                ]
+                                id: 'c1',
+                                position: { x: 2, y: 0 },
+                                type: 'sampleChar1'
                             }
                         ]
                     },
                     {
+                        id: 'p2',
+                        isAdmin: false,
+                        isLoading: true,
+                        isReady: false,
+                        name: 'p-2',
+                        characters: [ {
+                            id: 'c2',
+                            type: 'sampleChar2',
+                            position: { x: 4, y: 0 }
+                        } ]
+                    }
+                ],
+                teamList: [
+                    {
+                        id: 't1',
+                        letter: 'A',
+                        playersIds: [ 'p1' ]
+                    },
+                    {
                         id: 't2',
                         letter: 'B',
-                        players: [ {
-                            id: 'p2',
-                            isAdmin: false,
-                            isLoading: true,
-                            isReady: false,
-                            name: 'p-2',
-                            characters: [ {
-                                id: 'c2',
-                                type: 'sampleChar2',
-                                position: { x: 4, y: 0 }
-                            } ]
-                        } ]
+                        playersIds: [ 'p2' ]
                     }
                 ]
             },
             map: {
-                mapListLoading: false,
                 mapList: [],
                 mapSelected: null
             }
         }
     };
 
-    const store = createStore(
-        RootReducer,
-        initialState
-    );
+    fakeBattleApi.init({ initialState });
 
     const tileInfosList: MapBoardTileInfos[] = [
         {
@@ -105,18 +100,18 @@ export const BoardTile: React.FC = () => {
         }
     ];
 
-    return <Provider store={store}>
+    return <>
         {tileInfosList.map((tileInfos, i) =>
             <Box key={i} m={2}>
                 <MapBoardTile tileInfos={tileInfos} />
             </Box>
         )}
-    </Provider>;
+    </>;
 };
 
-export const Board: React.FC = () => {
+export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
 
-    const map: MyMapConfig = {
+    const map: MapConfig = {
         id: '1',
         name: 'Map 1',
         previewUrl: 'placeholder',
@@ -125,9 +120,6 @@ export const Board: React.FC = () => {
         nbrTeams: 2,
         nbrCharactersPerTeam: 3,
         schemaUrl: '',
-        defaultTilelayerName: 'decor',
-        obstacleTilelayerName: 'obstacles',
-        initLayerName: 'init'
     };
 
     const tileList: MapBoardTileInfos[] = [];
@@ -198,62 +190,59 @@ export const Board: React.FC = () => {
         load: null,
         room: {
             teamsTree: {
-                teams: [
+                playerList: [
                     {
-                        id: 't1',
-                        letter: 'A',
-                        players: [
+                        id: 'p1',
+                        isAdmin: true,
+                        isLoading: true,
+                        isReady: true,
+                        name: 'p-1',
+                        characters: [
                             {
-                                id: 'p1',
-                                isAdmin: true,
-                                isLoading: true,
-                                isReady: true,
-                                name: 'p-1',
-                                characters: [
-                                    {
-                                        id: 'c1',
-                                        position: { x: 5, y: 2 },
-                                        type: 'sampleChar1'
-                                    }
-                                ]
+                                id: 'c1',
+                                position: { x: 5, y: 2 },
+                                type: 'sampleChar1'
                             }
                         ]
                     },
                     {
+                        id: 'p2',
+                        isAdmin: false,
+                        isLoading: true,
+                        isReady: false,
+                        name: 'p-2',
+                        characters: [ {
+                            id: 'c2',
+                            type: 'sampleChar2',
+                            position: { x: 3, y: 5 }
+                        } ]
+                    }
+                ],
+                teamList: [
+                    {
+                        id: 't1',
+                        letter: 'A',
+                        playersIds: [ 'p1' ]
+                    },
+                    {
                         id: 't2',
                         letter: 'B',
-                        players: [ {
-                            id: 'p2',
-                            isAdmin: false,
-                            isLoading: true,
-                            isReady: false,
-                            name: 'p-2',
-                            characters: [ {
-                                id: 'c2',
-                                type: 'sampleChar2',
-                                position: { x: 3, y: 5 }
-                            } ]
-                        } ]
+                        playersIds: [ 'p2' ]
                     }
                 ]
             },
             map: {
-                mapListLoading: false,
-                mapList: [map],
+                mapList: [ map ],
                 mapSelected: {
                     id: map.id,
+                    tileListLoading: false,
                     tileList
                 }
             }
         }
     };
 
-    const store = createStore(
-        RootReducer,
-        initialState
-    );
+    fakeBattleApi.init({ initialState });
 
-    return <Provider store={store}>
-        <MapBoard />
-    </Provider>;
+    return <MapBoard />;
 };
