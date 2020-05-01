@@ -1,10 +1,9 @@
-import { RoomServerAction, TiledLayerTilelayer } from '@timeflies/shared';
-import { ReceiveMessageAction } from '../../../../socket/WSClient';
-import { MapSelectData, MapSelectReducer, MapLoadedAction } from './map-select-reducer';
-import { StoreTest } from '../../../../StoreTest';
+import { RoomServerAction, seedTiledMap, TiledLayerTilelayer } from '@timeflies/shared';
 import { Controller } from '../../../../Controller';
-import { seedTiledMap } from '../../../../stages/battle/map/TiledMap.seed';
+import { ReceiveMessageAction } from '../../../../socket/WSClient';
+import { StoreTest } from '../../../../StoreTest';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
+import { MapLoadedAction, MapSelectData, MapSelectReducer } from './map-select-reducer';
 
 describe('# map-select-reducer', () => {
 

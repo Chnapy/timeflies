@@ -1,6 +1,6 @@
-import { MapConfig } from '@timeflies/shared';
+import { MapConfig, TiledMapSeedKey } from '@timeflies/shared';
 import { MapManager, MapManagerDependencies } from './MapManager';
-import { seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
+import { seedTiledMapAssetsWithImg } from './TiledMap.seed';
 
 export const seedMapConfig = (mapKey: TiledMapSeedKey): MapConfig => {
 
@@ -29,7 +29,7 @@ export const seedMapManager = (type: 'real' | 'fake', mapKey: TiledMapSeedKey = 
         };
     }
 
-    const assets = seedTiledMapAssets(mapKey);
+    const assets = seedTiledMapAssetsWithImg(mapKey);
 
     return MapManager(assets, deps);
 };

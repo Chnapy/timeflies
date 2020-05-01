@@ -110,9 +110,12 @@ export class BattlePrepareRoom {
         this.mapConfig = {
             id: 'map-1',
             schemaUrl: 'map/sample2/map.json',
-            defaultTilelayerName: 'view',
-            obstacleTilelayerName: 'obstacles',
-            initLayerName: 'init'
+            name: 'm1',
+            height: 10,
+            nbrCharactersPerTeam: 1,
+            nbrTeams: 1,
+            previewUrl: '',
+            width: 10
         };
 
         this.characters.length = 0;

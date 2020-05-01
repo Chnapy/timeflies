@@ -11,6 +11,11 @@ export type RoomServerAction =
     | RoomServerAction.MapSelect
     | RoomServerAction.PlayerRefresh;
 
+export type MapPlacementTile = {
+    teamId: string;
+    position: Position;
+};
+
 export module RoomServerAction {
 
     export type RoomCreate = TAction<'room/create'>;
@@ -24,6 +29,7 @@ export module RoomServerAction {
         action: 'remove';
         playerId: string;
         reason: 'leave' | 'disconnect';
+        playerList: PlayerRoom[];
     });
 
     export type CharacterSet = TAction<'room/character/set'> & {
@@ -44,15 +50,18 @@ export module RoomServerAction {
     export type MapSelect = TAction<'room/map/select'> & {
         mapSelected: {
             id: MapConfig[ 'id' ];
-            placementTiles: {
-                teamId: string;
-                position: Position;
-            }[];
+            placementTiles: MapPlacementTile[];
         } | null;
         teams: TeamRoom[];
+        playerList: PlayerRoom[];
     };
 
     export type PlayerRefresh = TAction<'room/player/refresh'> & {
-        player: Omit<PlayerRoom, 'characters'>;
+        player: Pick<PlayerRoom,
+            | 'id'
+            | 'isAdmin'
+            | 'isLoading'
+            | 'isReady'
+        >;
     };
 }

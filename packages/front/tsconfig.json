@@ -16,11 +16,7 @@
     "module": "esnext",
     "resolveJsonModule": false,
     "isolatedModules": true,
-    "noEmit": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ]
+    "noEmit": true
   },
   "include": [
     "src/**/*",

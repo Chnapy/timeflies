@@ -1,13 +1,29 @@
-import { ClientAction, NarrowTAction, ServerAction, SetIDCAction } from '@timeflies/shared';
+import { ClientAction, DistributiveOmit, NarrowTAction, ServerAction, SetIDCAction } from '@timeflies/shared';
 import WebSocket from 'ws';
-import { Util } from '../../Util';
 
 export type SocketState = 'init' | 'hasID';
+
+export type WSSocketPool = {
+    on: <A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void) => void | Promise<void>;
+    onDisconnect: (fn: () => void) => void;
+    send: <A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]) => void;
+    close: () => void;
+};
+
+type WSSocketPoolInner = WSSocketPool & {
+    isOpen(): boolean;
+    readonly listeners: {
+        [ K in ClientAction[ 'type' ] ]?: (action: NarrowTAction<ClientAction, K>) => void | Promise<void>;
+    };
+    readonly listenerDisconnect: () => void;
+};
 
 export class WSSocket {
 
     private readonly socket: WebSocket;
     private rooms: Set<string>;
+
+    private readonly poolList: WSSocketPoolInner[];
 
     private readonly listeners: {
         [ K in ClientAction[ 'type' ] ]?: {
@@ -41,24 +57,36 @@ export class WSSocket {
         this.state = 'init';
         this._id = '';
 
-        this.socket.on('message', message => {
+        this.poolList = [];
+
+
+        this.socket.on('close', () => {
+            const fns = this.poolList
+                .filter(p => p.isOpen())
+                .map(p => p.listenerDisconnect)
+                .filter(Boolean) as (() => void)[];
+
+            fns.forEach(fn => fn());
+        });
+
+        this.socket.on('message', (message): (void | Promise<void[]>)[] => {
 
             if (typeof message !== 'string') {
                 throw new Error(`typeof message not handled: ${typeof message}`);
             }
 
-            let action;
+            let actionList;
             try {
-                action = JSON.parse(message);
+                actionList = JSON.parse(message);
             } catch (e) {
-                action = message;
+                actionList = message;
             }
 
-            if (typeof action !== 'object' || typeof action.type !== 'string') {
-                throw new Error(`message is not an Action: ${action}`);
+            if (!Array.isArray(actionList)) {
+                throw new Error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
             }
 
-            this.onMessage(action);
+            return actionList.map(action => this.onMessage(action));
         });
 
         this.on<SetIDCAction>(
@@ -68,6 +96,58 @@ export class WSSocket {
                 this.state = 'hasID';
             },
             () => this.state === 'init');
+    }
+
+    createPool(): WSSocketPool {
+
+        let isOpen = true;
+
+        let listenerDisconnect: () => void = () => { };
+
+        const listeners: {
+            [ K in ClientAction[ 'type' ] ]?: (action: NarrowTAction<ClientAction, K>) => void;
+        } = {};
+
+        const assertIsOpen = (): void | never => {
+            if (!isOpen) throw new Error('pool is not open');
+        };
+
+        const pool: WSSocketPool = {
+            on: (type, fn) => {
+                assertIsOpen();
+
+                listeners[ type ] = fn as any;
+            },
+            onDisconnect: (fn) => {
+                assertIsOpen();
+
+                listenerDisconnect = fn;
+            },
+            send: (...messages) => {
+                assertIsOpen();
+
+                this.send(...messages);
+            },
+            close: () => {
+                assertIsOpen();
+
+                for (const k in listeners) delete (listeners as any)[ k ];
+                listenerDisconnect = () => { };
+
+                isOpen = false;
+            }
+        };
+
+        const innerPool: WSSocketPoolInner = {
+            ...pool,
+            isOpen() { return isOpen },
+            listenerDisconnect: () => listenerDisconnect(),
+            listeners
+        };
+
+        this.poolList.push(innerPool);
+
+        return pool;
     }
 
     on<A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void, condition?: (() => boolean)): void {
@@ -94,11 +174,12 @@ export class WSSocket {
         });
     }
 
-    send<A extends ServerAction>(action: Omit<A, 'sendTime'>): void {
-        this.socket.send(JSON.stringify({
-            sendTime: Date.now(),
-            ...action
-        }));
+    send<A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]): void {
+        const sendTime = Date.now();
+        this.socket.send(JSON.stringify(actionList.map(action => ({
+            sendTime,
+            ...action,
+        }))));
     }
 
     addRoom(room: string): void {
@@ -109,11 +190,22 @@ export class WSSocket {
         this.rooms.delete(room);
     }
 
-    protected onMessage(action: ClientAction): void {
-        console.log(action);
+    protected onMessage(action: ClientAction): void | Promise<void[]> {
+        // console.log(action);
+
+        const poolsFns = this.poolList
+            .filter(p => p.isOpen)
+            .map(p => p.listeners[ action.type ])
+            .filter(Boolean) as ((action: NarrowTAction<ClientAction, any>) => void | Promise<void>)[];
 
         const listener = this.battleListeners[ action.type ] ?? this.listeners[ action.type ];
-        if (listener) {
+
+        if (poolsFns.length) {
+            return Promise.all<any>(poolsFns
+                .map(fn => fn(action))
+                .filter(r => r instanceof Promise)
+            );
+        } else if (listener) {
 
             const { condition, fn } = listener;
             const isOK = condition
@@ -121,7 +213,9 @@ export class WSSocket {
                 : true;
 
             if (isOK)
-                fn(action as any);
+                return fn(action as any);
+        } else {
+            console.warn(`Action received but no listener for it: ${action.type}`);
         }
     }
 }

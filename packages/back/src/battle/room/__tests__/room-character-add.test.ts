@@ -1,0 +1,261 @@
+import { RoomServerAction, ServerAction, TeamRoom } from '@timeflies/shared';
+import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
+import { RoomTester } from './room-tester';
+
+describe('# room > on character add request', () => {
+
+    const { createPlayer, createRoom, createRoomWithMap, createRoomWithMapMinCharacters } = RoomTester;
+
+    describe('should fail if', () => {
+
+        it('no map selected', async () => {
+
+            const { ws: ws1, sendList: sendListJ1, receive } = seedWebSocket();
+
+            const creator = createPlayer('p1', ws1);
+
+            createRoom(creator);
+
+            await expect(receive({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: { x: 0, y: 0 }
+            })).rejects.toBeDefined();
+
+            const expected = expect.not.arrayContaining([
+                expect.objectContaining<Partial<RoomServerAction.CharacterSet>>({
+                    type: 'room/character/set'
+                })
+            ]);
+
+            expect(sendListJ1).toContainEqual(expected);
+        });
+
+        it('player is ready', async () => {
+
+            const { receiveJ1, secondTile } = await createRoomWithMapMinCharacters('p1', 'p2', 'm1');
+
+            await receiveJ1({
+                type: 'room/player/state',
+                sendTime: -1,
+                isReady: true,
+                isLoading: false
+            });
+
+            await expect(receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: secondTile.position
+            })).rejects.toBeDefined();
+        });
+
+        it('targeted position is occupied', async () => {
+
+            const { receiveJ1, receiveJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+
+            const [ firstTile ] = tilesTeamJ1;
+
+            await receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: firstTile.position
+            });
+
+            await expect(receiveJ2({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: firstTile.position
+            })).rejects.toBeDefined();
+        });
+
+        it('targeted position is not from own team', async () => {
+
+            const { receiveJ1, tilesTeamJ1, tilesTeamJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+
+            const [ firstTile ] = tilesTeamJ1;
+
+            await receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: firstTile.position
+            });
+
+            const [ otherTeamTile ] = tilesTeamJ2;
+
+            await expect(receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: otherTeamTile.position
+            })).rejects.toBeDefined();
+        });
+    });
+
+    describe('should send to everyone', () => {
+
+        it('the new character', async () => {
+
+            const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+
+            const [ firstTile ] = tilesTeamJ1;
+
+            await receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: firstTile.position
+            });
+
+            const expected: RoomServerAction.CharacterSet = {
+                type: 'room/character/set',
+                sendTime: expect.anything(),
+                action: 'add',
+                playerId: 'p1',
+                character: {
+                    id: expect.any(String),
+                    type: 'sampleChar1',
+                    position: firstTile.position
+                },
+                teams: expect.anything()
+            };
+
+            expect(sendListJ1).toContainEqual<RoomServerAction.CharacterSet>(expected);
+            expect(sendListJ2).toContainEqual<RoomServerAction.CharacterSet>(expected);
+        });
+
+        it('the new team', async () => {
+
+            const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1, teamJ1, teamJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+
+            const [ firstTile ] = tilesTeamJ1;
+
+            await receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: firstTile.position
+            });
+
+            const expected: RoomServerAction.CharacterSet = {
+                type: 'room/character/set',
+                sendTime: expect.anything(),
+                action: 'add',
+                playerId: 'p1',
+                character: expect.anything(),
+                teams: [
+                    {
+                        ...teamJ1,
+                        playersIds: [ 'p1' ]
+                    },
+                    teamJ2
+                ]
+            };
+
+            expect(sendListJ1).toContainEqual<RoomServerAction.CharacterSet>(expected);
+            expect(sendListJ2).toContainEqual<RoomServerAction.CharacterSet>(expected);
+        });
+
+        it('correct data on multiple character add', async () => {
+
+            const { receiveJ1, receiveJ2, sendListJ1, sendListJ2, tilesTeamJ1, tilesTeamJ2, teamJ1, teamJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+
+            const [ firstTileT1 ] = tilesTeamJ1;
+            const [ firstTileT2, secondTileT2 ] = tilesTeamJ2;
+
+            await receiveJ1({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: firstTileT1.position
+            });
+
+            await receiveJ2({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar2',
+                position: firstTileT2.position
+            });
+
+            await receiveJ2({
+                type: 'room/character/add',
+                sendTime: -1,
+                characterType: 'sampleChar1',
+                position: secondTileT2.position
+            });
+
+            const expected: RoomServerAction.CharacterSet[] = [
+                {
+                    type: 'room/character/set',
+                    sendTime: expect.anything(),
+                    action: 'add',
+                    playerId: 'p1',
+                    character: {
+                        id: expect.any(String),
+                        position: firstTileT1.position,
+                        type: 'sampleChar1'
+                    },
+                    teams: expect.arrayContaining<TeamRoom>([
+                        expect.objectContaining<TeamRoom>({
+                            ...teamJ1,
+                            playersIds: [ 'p1' ]
+                        })
+                    ])
+                },
+                {
+                    type: 'room/character/set',
+                    sendTime: expect.anything(),
+                    action: 'add',
+                    playerId: 'p2',
+                    character: {
+                        id: expect.any(String),
+                        position: firstTileT2.position,
+                        type: 'sampleChar2'
+                    },
+                    teams: expect.arrayContaining<TeamRoom>([
+                        expect.objectContaining<TeamRoom>({
+                            ...teamJ1,
+                            playersIds: [ 'p1' ]
+                        }),
+                        expect.objectContaining<TeamRoom>({
+                            ...teamJ2,
+                            playersIds: [ 'p2' ]
+                        })
+                    ])
+                },
+                {
+                    type: 'room/character/set',
+                    sendTime: expect.anything(),
+                    action: 'add',
+                    playerId: 'p2',
+                    character: {
+                        id: expect.any(String),
+                        position: secondTileT2.position,
+                        type: 'sampleChar1'
+                    },
+                    teams: expect.arrayContaining<TeamRoom>([
+                        expect.objectContaining<TeamRoom>({
+                            ...teamJ1,
+                            playersIds: [ 'p1' ]
+                        }),
+                        expect.objectContaining<TeamRoom>({
+                            ...teamJ2,
+                            playersIds: [ 'p2' ]
+                        })
+                    ])
+                }
+            ];
+
+            const expectActionList = (actionList: ServerAction[]) =>
+                expect(actionList.filter(a => a.type === 'room/character/set'))
+                    .toEqual(expect.arrayContaining(expected));
+
+            expectActionList(sendListJ1);
+            expectActionList(sendListJ2);
+        });
+    });
+});

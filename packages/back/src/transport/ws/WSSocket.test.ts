@@ -58,7 +58,7 @@ describe('WSSocket', () => {
 
         jest.runOnlyPendingTimers();
 
-        client.send(JSON.stringify(action));
+        client.send(JSON.stringify([action]));
 
         jest.runOnlyPendingTimers();
 
