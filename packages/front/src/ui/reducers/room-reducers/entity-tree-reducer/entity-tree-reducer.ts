@@ -16,27 +16,21 @@ type SubReducer<A> = (state: EntityTreeData, action: A) => EntityTreeData;
 
 const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, message) => {
     return {
-        ...state,
-        teamList: message.teams
+        playerList: message.playerList,
+        teamList: message.teamList
     };
 };
 
 const reducePlayerSet: SubReducer<RoomServerAction.PlayerSet> = (state, message) => {
-    const playerList = [ ...state.playerList ];
 
-    if (message.action === 'add') {
-        playerList.push(message.player);
-    } else {
-        playerList.splice(
-            playerList.findIndex(p => p.id === message.playerId),
-            1
-        );
-    }
+    const playerList: PlayerRoom[] = message.action === 'add'
+        ? [...state.playerList, message.player]
+        : message.playerList;
 
     return {
         ...state,
         playerList,
-        teamList: message.teams
+        teamList: message.teamList
     };
 };
 
@@ -70,7 +64,7 @@ const reducerCharacterSet: SubReducer<RoomServerAction.CharacterSet> = (state, m
 
     return {
         ...state,
-        teamList: message.teams
+        teamList: message.teamList
     };
 };
 

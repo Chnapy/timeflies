@@ -56,11 +56,12 @@ describe('# entity-tree-reducer', () => {
             type: 'room/map/select',
             sendTime: -1,
             mapSelected: null,
-            teams: [ {
+            teamList: [ {
                 id: 't-1',
                 letter: 'A',
                 playersIds: []
-            } ]
+            } ],
+            playerList: []
         });
 
         const state: EntityTreeData = {
@@ -92,17 +93,32 @@ describe('# entity-tree-reducer', () => {
             action: 'remove',
             playerId: 'p-1',
             reason: 'leave',
-            teams: [ {
+            teamList: [ {
                 id: 't-1',
                 letter: 'A',
                 playersIds: []
-            } ]
+            } ],
+            playerList: [{
+                id: 'p-2',
+                name: 'p2',
+                isAdmin: false,
+                isLoading: false,
+                isReady: false,
+                characters: []
+            }]
         });
 
         const state: EntityTreeData = {
             playerList: [ {
                 id: 'p-1',
                 name: 'p1',
+                isAdmin: false,
+                isLoading: false,
+                isReady: false,
+                characters: []
+            },{
+                id: 'p-2',
+                name: 'p2',
                 isAdmin: false,
                 isLoading: false,
                 isReady: false,
@@ -114,7 +130,14 @@ describe('# entity-tree-reducer', () => {
         expect(
             EntityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
-            playerList: [],
+            playerList: [{
+                id: 'p-2',
+                name: 'p2',
+                isAdmin: false,
+                isLoading: false,
+                isReady: false,
+                characters: []
+            }],
             teamList: [ {
                 id: 't-1',
                 letter: 'A',
@@ -137,7 +160,7 @@ describe('# entity-tree-reducer', () => {
                 name: 'p1',
                 characters: []
             },
-            teams: [ {
+            teamList: [ {
                 id: 't-1',
                 letter: 'A',
                 playersIds: []
@@ -178,7 +201,6 @@ describe('# entity-tree-reducer', () => {
                 isAdmin: false,
                 isLoading: true,
                 isReady: true,
-                name: 'p1',
             }
         });
 
@@ -217,7 +239,7 @@ describe('# entity-tree-reducer', () => {
             action: 'remove',
             playerId: 'p-1',
             characterId: 'c-1',
-            teams: []
+            teamList: []
         });
 
         const state: EntityTreeData = {
@@ -267,7 +289,7 @@ describe('# entity-tree-reducer', () => {
                 type: 'sampleChar1',
                 position: { x: -1, y: -1 }
             },
-            teams: []
+            teamList: []
         });
 
         const state: EntityTreeData = {

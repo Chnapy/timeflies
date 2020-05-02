@@ -65,7 +65,7 @@ const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, { mapSel
         mapSelected: {
             id: mapSelected.id,
             tileListLoading: true,
-            tileList: mapSelected.placementTiles.map(({ position, teamId }) => ({
+            tileList: mapSelected.placementTileList.map(({ position, teamId }) => ({
                 type: 'placement',
                 position,
                 teamId

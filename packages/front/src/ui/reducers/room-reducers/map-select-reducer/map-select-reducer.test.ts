@@ -100,33 +100,8 @@ describe('# map-select-reducer', () => {
             type: 'room/map/select',
             sendTime: -1,
             mapSelected: null,
-            teams: []
-        });
-
-        const state: MapSelectData = {
-            mapList: [],
-            mapSelected: {
-                id: '',
-                tileList: [],
-                tileListLoading: false
-            }
-        };
-
-        expect(
-            MapSelectReducer(state, action)
-        ).toEqual<MapSelectData>({
-            mapList: [],
-            mapSelected: null
-        });
-    });
-
-    it('should set map selected null on map selected "null" action', () => {
-
-        const action = getAction({
-            type: 'room/map/select',
-            sendTime: -1,
-            mapSelected: null,
-            teams: []
+            teamList: [],
+            playerList: []
         });
 
         const state: MapSelectData = {
@@ -153,7 +128,7 @@ describe('# map-select-reducer', () => {
             sendTime: -1,
             mapSelected: {
                 id: 'm1',
-                placementTiles: [ {
+                placementTileList: [ {
                     teamId: 't1',
                     position: { x: 1, y: 1 }
                 }, {
@@ -161,7 +136,8 @@ describe('# map-select-reducer', () => {
                     position: { x: 2, y: 2 }
                 } ]
             },
-            teams: []
+            teamList: [],
+            playerList: []
         });
 
         const state: MapSelectData = {
