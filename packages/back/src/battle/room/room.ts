@@ -1,4 +1,4 @@
-import { DeepReadonly, MapConfig, PlayerRoom, RoomClientAction, RoomServerAction, TiledMap } from '@timeflies/shared';
+import { DeepReadonly, MapConfig, PlayerRoom, RoomClientAction, RoomServerAction, TiledMap, ServerAction, DistributiveOmit } from '@timeflies/shared';
 import fs from 'fs';
 import util from 'util';
 import { WSSocket, WSSocketPool } from '../../transport/ws/WSSocket';
@@ -56,7 +56,7 @@ export type RoomDependencies = {
     readFileMap: (url: string) => Promise<TiledMap>;
 };
 
-export const Room = (creatorData: PlayerRoomData, { initialState, dataManager, readFileMap }: RoomDependencies = {
+export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencies = {
     initialState: {},
     dataManager: {
         getMapConfigList
@@ -103,23 +103,54 @@ export const Room = (creatorData: PlayerRoomData, { initialState, dataManager, r
                     type: 'room/player/set',
                     action: 'add',
                     player,
-                    teams: []
+                    teamList: []
                 }
             );
         } else {
 
-            sendToEveryone<RoomServerAction.PlayerSet>({
-                type: 'room/player/set',
-                action: 'add',
-                player,
-                teams: []
-            });
+            const { playerDataList } = stateManager.get();
+
+            sendTo<RoomServerAction.PlayerSet>(
+                playerDataList.filter(p => p.id !== id),
+                {
+                    type: 'room/player/set',
+                    action: 'add',
+                    player,
+                    teamList: []
+                }
+            );
+
+            const { mapSelected, playerList, teamList } = stateManager.clone('mapSelected', 'playerList', 'teamList');
+
+            sendTo<RoomServerAction.RoomState>(
+                [ playerData ],
+                {
+                    type: 'room/state',
+                    mapSelected: mapSelected
+                        ? {
+                            id: mapSelected.config.id,
+                            placementTileList: mapSelected.placementTileList
+                        }
+                        : null,
+                    playerList,
+                    teamList
+                }
+            );
         }
     };
 
-    const sendToEveryone: WSSocket[ 'send' ] = (action) => {
+    const sendTo = <A extends ServerAction>(
+        playerDataList: readonly PlayerRoomDataConnected[],
+        ...actionList: DistributiveOmit<A, 'sendTime'>[]
+    ): void => {
+        playerDataList.forEach(p => p.socket.send(...actionList));
+    };
+
+    const sendToEveryone = <A extends ServerAction>(
+        ...actionList: DistributiveOmit<A, 'sendTime'>[]
+    ): void => {
         const { playerDataList } = stateManager.get();
-        playerDataList.forEach(p => p.socket.send(action));
+        sendTo(playerDataList, ...actionList);
     };
 
     const initializePlayer = (playerData: PlayerRoomDataConnected) => {
@@ -150,12 +181,20 @@ export const Room = (creatorData: PlayerRoomData, { initialState, dataManager, r
         socket.on<RoomClientAction.PlayerLeave>('room/player/leave', getRoomPlayerLeave(deps));
     };
 
-    addNewPlayer(creatorData, true);
+    const { playerDataList } = stateManager.get();
+
+    playerDataList.forEach(initializePlayer);
+
+    // addNewPlayer(creatorData, true);
 
     return {
         onJoin: (playerData: PlayerRoomData) => {
 
-            addNewPlayer(playerData, false);
+            const { playerDataList } = stateManager.get();
+
+            const isAdmin = !playerDataList.length;
+
+            addNewPlayer(playerData, isAdmin);
         }
     };
 };

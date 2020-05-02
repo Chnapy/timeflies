@@ -43,7 +43,7 @@ export const getRoomMapSelect: RoomListener<RoomClientAction.MapSelect> = ({
         images: {}
     });
 
-    const placementTiles: MapPlacementTile[] = tiledManager.getPlacementTilesPositions()
+    const placementTileList: MapPlacementTile[] = tiledManager.getPlacementTilesPositions()
         .flatMap((positionList, i) => {
             const team = teamList[ i ];
             assertIsDefined(team);
@@ -56,7 +56,7 @@ export const getRoomMapSelect: RoomListener<RoomClientAction.MapSelect> = ({
 
     const mapSelected: RoomState[ 'mapSelected' ] = {
         config: map,
-        placementTiles
+        placementTileList
     };
 
     const mutable = stateManager.clone('playerList');
@@ -77,9 +77,9 @@ export const getRoomMapSelect: RoomListener<RoomClientAction.MapSelect> = ({
         type: 'room/map/select',
         mapSelected: {
             id: map.id,
-            placementTiles
+            placementTileList
         },
-        teams: teamList,
+        teamList,
         playerList
     });
 };

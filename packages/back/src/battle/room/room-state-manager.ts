@@ -7,7 +7,7 @@ export type RoomState = {
     teamList: TeamRoom[];
     mapSelected: {
         config: MapConfig;
-        placementTiles: MapPlacementTile[];
+        placementTileList: MapPlacementTile[];
     } | null;
 };
 
@@ -16,6 +16,16 @@ type RoomStateClone = Omit<RoomState, 'playerDataList'>;
 export type RoomStateManager = ReturnType<typeof RoomStateManager>;
 
 export const RoomStateManager = (initialState: Partial<RoomState>) => {
+
+    const cloneFn = <K extends keyof RoomStateClone>(...keys: K[]): Pick<RoomStateClone, K> => {
+
+        return keys.reduce((acc, k) => {
+
+            acc[ k ] = clone(state[ k ] as any) as any;
+
+            return acc;
+        }, {} as Pick<RoomStateClone, K>);
+    };
 
     let state: DeepReadonly<RoomState> = {
         playerDataList: [],
@@ -27,15 +37,7 @@ export const RoomStateManager = (initialState: Partial<RoomState>) => {
 
     return {
         get: (): DeepReadonly<RoomState> => state,
-        clone: <K extends keyof RoomStateClone>(...keys: K[]): Pick<RoomStateClone, K> => {
-
-            return keys.reduce((acc, k) => {
-
-                acc[ k ] = clone(state[ k ]) as any;
-
-                return acc;
-            }, {} as Pick<RoomStateClone, K>);
-        },
+        clone: cloneFn,
         set: (newState: Partial<RoomState>): void => {
             state = {
                 ...state,

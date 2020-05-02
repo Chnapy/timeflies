@@ -48,7 +48,7 @@ export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
             playerId: id,
             reason,
             playerList: mutable.playerList,
-            teams: mutable.teamList
+            teamList: mutable.teamList
         });
     };
 

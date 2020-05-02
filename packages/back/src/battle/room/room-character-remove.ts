@@ -8,9 +8,9 @@ export const getRoomCharacterRemove: RoomListener<RoomClientAction.CharacterRemo
 
     assertIsNonNullable(mapSelected);
 
-    const { placementTiles } = mapSelected;
+    const { placementTileList } = mapSelected;
 
-    const targetedTile = placementTiles.find(t => equals(t.position)(position));
+    const targetedTile = placementTileList.find(t => equals(t.position)(position));
 
     assertIsDefined(targetedTile);
 
@@ -46,6 +46,6 @@ export const getRoomCharacterRemove: RoomListener<RoomClientAction.CharacterRemo
         action: 'remove',
         playerId: id,
         characterId: deletedCharacter.id,
-        teams: mutable.teamList
+        teamList: mutable.teamList
     });
 };

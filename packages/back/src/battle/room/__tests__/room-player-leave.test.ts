@@ -1,26 +1,17 @@
 import { RoomServerAction, TeamRoom, PlayerRoom } from '@timeflies/shared';
-import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { RoomTester } from './room-tester';
 
 describe('# room > on player leave', () => {
 
-    const { createPlayer, createRoom, createRoomWithMap, createRoomWithMapMinCharacters } = RoomTester;
+    const { getRoomStateWithMap, getRoomStateWithTwoPlayers } = RoomTester;
 
     describe('should send to every one the action', () => {
 
         it('with reason: leave', async () => {
 
-            const { ws: ws1, sendList: sendListJ1 } = seedWebSocket();
+            const { receiveJ2, sendListJ1, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
-            const creator = createPlayer('p1', ws1);
-
-            const room = createRoom(creator);
-
-            const { ws: ws2, receive: receiveJ2 } = seedWebSocket();
-
-            const newPlayer = createPlayer('p2', ws2);
-
-            room.onJoin(newPlayer);
+            createRoom();
 
             await receiveJ2({
                 type: 'room/player/leave',
@@ -31,7 +22,7 @@ describe('# room > on player leave', () => {
                 expect.objectContaining<Partial<RoomServerAction.PlayerSet>>({
                     type: 'room/player/set',
                     action: 'remove',
-                    playerId: newPlayer.id,
+                    playerId: 'p2',
                     reason: 'leave',
                 })
             ]);
@@ -41,14 +32,11 @@ describe('# room > on player leave', () => {
 
         it('with player list, all not-ready', async () => {
 
-            const { receiveJ1, receiveJ2, sendListJ1 } = await createRoomWithMapMinCharacters('p1', 'p2', 'm1');
+            const { receiveJ2, sendListJ1, j1Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
-            await receiveJ1({
-                type: 'room/player/state',
-                sendTime: -1,
-                isReady: true,
-                isLoading: false
-            });
+            j1Infos.player.isReady = true;
+
+            createRoom();
 
             await receiveJ2({
                 type: 'room/player/leave',
@@ -73,7 +61,11 @@ describe('# room > on player leave', () => {
 
         it('with player list, new admin if previous one leaved', async () => {
 
-            const { receiveJ1, sendListJ2 } = await createRoomWithMapMinCharacters('p1', 'p2', 'm1');
+            const { receiveJ1, sendListJ2, j1Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
+
+            j1Infos.player.isReady = true;
+
+            createRoom();
 
             await receiveJ1({
                 type: 'room/player/leave',
@@ -96,9 +88,11 @@ describe('# room > on player leave', () => {
 
         it('with new team list', async () => {
 
-            const { receiveJ2, sendListJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ2, sendListJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
-            receiveJ2({
+            createRoom();
+
+            await receiveJ2({
                 type: 'room/player/leave',
                 sendTime: -1
             });
@@ -108,7 +102,7 @@ describe('# room > on player leave', () => {
                     type: 'room/player/set',
                     action: 'remove',
                     playerId: 'p2',
-                    teams: expect.arrayContaining([
+                    teamList: expect.arrayContaining([
                         expect.not.objectContaining<Partial<TeamRoom>>({
                             playersIds: [ 'p2' ]
                         })
@@ -122,19 +116,11 @@ describe('# room > on player leave', () => {
 
     it('should handle player disconnects', async () => {
 
-        const { ws: ws1, sendList: sendListJ1 } = seedWebSocket();
+        const { sendListJ1, j2Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
-        const creator = createPlayer('p1', ws1);
+        createRoom();
 
-        const room = createRoom(creator);
-
-        const { ws: ws2, close: closeJ2 } = seedWebSocket();
-
-        const newPlayer = createPlayer('p2', ws2);
-
-        room.onJoin(newPlayer);
-
-        closeJ2();
+        j2Infos.close();
 
         const expected = expect.arrayContaining([
             expect.objectContaining<Partial<RoomServerAction.PlayerSet>>({
@@ -150,17 +136,9 @@ describe('# room > on player leave', () => {
 
     it('should not send other message to leaved player', async () => {
 
-        const { ws: ws1, receive: receiveJ1 } = seedWebSocket();
+        const { receiveJ1, receiveJ2, sendListJ2, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
-        const creator = createPlayer('p1', ws1);
-
-        const room = createRoom(creator);
-
-        const { ws: ws2, sendList: sendListJ2, receive: receiveJ2 } = seedWebSocket();
-
-        const newPlayer = createPlayer('p2', ws2);
-
-        room.onJoin(newPlayer);
+        createRoom();
 
         await receiveJ2({
             type: 'room/player/leave',
@@ -181,17 +159,9 @@ describe('# room > on player leave', () => {
 
     it('should not handle messages from leaved players', async () => {
 
-        const { ws: ws1, sendList: sendListJ1 } = seedWebSocket();
+        const { receiveJ2, sendListJ1, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
-        const creator = createPlayer('p1', ws1);
-
-        const room = createRoom(creator);
-
-        const { ws: ws2, receive: receiveJ2 } = seedWebSocket();
-
-        const newPlayer = createPlayer('p2', ws2);
-
-        room.onJoin(newPlayer);
+        createRoom();
 
         await receiveJ2({
             type: 'room/player/leave',

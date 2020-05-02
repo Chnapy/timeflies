@@ -1,20 +1,15 @@
 import { RoomServerAction } from '@timeflies/shared';
-import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { RoomTester } from './room-tester';
 
 describe('# room > on player refresh request', () => {
 
-    const { createPlayer, createRoom, createRoomWithMap, createRoomWithMapMinCharacters } = RoomTester;
+    const { getRoomStateWithMap, getRoomStateWithMapMinCharacters, createRoomWithCreator } = RoomTester;
 
     describe('should fail if', () => {
 
         it('player ready with no map selected', async () => {
 
-            const { ws, receive } = seedWebSocket();
-
-            const creator = createPlayer('p1', ws);
-
-            createRoom(creator);
+            const { receive } = createRoomWithCreator('p1');
 
             await expect(receive({
                 type: 'room/player/state',
@@ -26,11 +21,7 @@ describe('# room > on player refresh request', () => {
 
         it('player loading with no map selected', async () => {
 
-            const { ws, receive } = seedWebSocket();
-
-            const creator = createPlayer('p1', ws);
-
-            createRoom(creator);
+            const { receive } = createRoomWithCreator('p1');
 
             await expect(receive({
                 type: 'room/player/state',
@@ -42,16 +33,17 @@ describe('# room > on player refresh request', () => {
 
         it('player ready without minimum characters placed (at least 2 teams)', async () => {
 
-            const { receiveJ1, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, tilesTeamJ1, createRoom, j1Infos } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             const [ firstTile ] = tilesTeamJ1;
 
-            await receiveJ1({
-                type: 'room/character/add',
-                sendTime: -1,
-                characterType: 'sampleChar1',
+            j1Infos.player.characters.push({
+                id: 'c1',
+                type: 'sampleChar1',
                 position: firstTile.position
             });
+
+            createRoom();
 
             await expect(receiveJ1({
                 type: 'room/player/state',
@@ -64,7 +56,9 @@ describe('# room > on player refresh request', () => {
 
     it('should send new player state loading with map selected', async () => {
 
-        const { receiveJ1, sendListJ1, sendListJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+        const { receiveJ1, sendListJ1, sendListJ2, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+        createRoom();
 
         await receiveJ1({
             type: 'room/player/state',
@@ -91,7 +85,9 @@ describe('# room > on player refresh request', () => {
 
     it('should send new player state ready with minimum characters placed', async () => {
 
-        const { receiveJ1, sendListJ1, sendListJ2 } = await createRoomWithMapMinCharacters('p1', 'p2', 'm1');
+        const { receiveJ1, sendListJ1, sendListJ2, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
+
+        createRoom();
 
         await receiveJ1({
             type: 'room/player/state',

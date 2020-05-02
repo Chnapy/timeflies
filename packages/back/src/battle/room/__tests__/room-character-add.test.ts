@@ -1,20 +1,15 @@
 import { RoomServerAction, ServerAction, TeamRoom } from '@timeflies/shared';
-import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { RoomTester } from './room-tester';
 
 describe('# room > on character add request', () => {
 
-    const { createPlayer, createRoom, createRoomWithMap, createRoomWithMapMinCharacters } = RoomTester;
+    const { createRoomWithCreator, getRoomStateWithMap, getRoomStateWithMapMinCharacters } = RoomTester;
 
     describe('should fail if', () => {
 
         it('no map selected', async () => {
 
-            const { ws: ws1, sendList: sendListJ1, receive } = seedWebSocket();
-
-            const creator = createPlayer('p1', ws1);
-
-            createRoom(creator);
+            const { receive } = createRoomWithCreator('p1');
 
             await expect(receive({
                 type: 'room/character/add',
@@ -22,26 +17,15 @@ describe('# room > on character add request', () => {
                 characterType: 'sampleChar1',
                 position: { x: 0, y: 0 }
             })).rejects.toBeDefined();
-
-            const expected = expect.not.arrayContaining([
-                expect.objectContaining<Partial<RoomServerAction.CharacterSet>>({
-                    type: 'room/character/set'
-                })
-            ]);
-
-            expect(sendListJ1).toContainEqual(expected);
         });
 
         it('player is ready', async () => {
 
-            const { receiveJ1, secondTile } = await createRoomWithMapMinCharacters('p1', 'p2', 'm1');
+            const { receiveJ1, secondTile, j1Infos, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
 
-            await receiveJ1({
-                type: 'room/player/state',
-                sendTime: -1,
-                isReady: true,
-                isLoading: false
-            });
+            j1Infos.player.isReady = true;
+
+            createRoom();
 
             await expect(receiveJ1({
                 type: 'room/character/add',
@@ -53,16 +37,17 @@ describe('# room > on character add request', () => {
 
         it('targeted position is occupied', async () => {
 
-            const { receiveJ1, receiveJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ2, j1Infos, tilesTeamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             const [ firstTile ] = tilesTeamJ1;
 
-            await receiveJ1({
-                type: 'room/character/add',
-                sendTime: -1,
-                characterType: 'sampleChar1',
+            j1Infos.player.characters.push({
+                id: 'c1',
+                type: 'sampleChar1',
                 position: firstTile.position
             });
+
+            createRoom();
 
             await expect(receiveJ2({
                 type: 'room/character/add',
@@ -74,16 +59,18 @@ describe('# room > on character add request', () => {
 
         it('targeted position is not from own team', async () => {
 
-            const { receiveJ1, tilesTeamJ1, tilesTeamJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, j1Infos, tilesTeamJ1, tilesTeamJ2, teamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             const [ firstTile ] = tilesTeamJ1;
 
-            await receiveJ1({
-                type: 'room/character/add',
-                sendTime: -1,
-                characterType: 'sampleChar1',
+            j1Infos.player.characters.push({
+                id: 'c1',
+                type: 'sampleChar1',
                 position: firstTile.position
             });
+            teamJ1.playersIds.push('p1');
+
+            createRoom();
 
             const [ otherTeamTile ] = tilesTeamJ2;
 
@@ -100,7 +87,9 @@ describe('# room > on character add request', () => {
 
         it('the new character', async () => {
 
-            const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1, createRoom } = await getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+            createRoom();
 
             const [ firstTile ] = tilesTeamJ1;
 
@@ -121,7 +110,7 @@ describe('# room > on character add request', () => {
                     type: 'sampleChar1',
                     position: firstTile.position
                 },
-                teams: expect.anything()
+                teamList: expect.anything()
             };
 
             expect(sendListJ1).toContainEqual<RoomServerAction.CharacterSet>(expected);
@@ -130,7 +119,9 @@ describe('# room > on character add request', () => {
 
         it('the new team', async () => {
 
-            const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1, teamJ1, teamJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1, teamJ1, teamJ2, createRoom } = await getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+            createRoom();
 
             const [ firstTile ] = tilesTeamJ1;
 
@@ -147,7 +138,7 @@ describe('# room > on character add request', () => {
                 action: 'add',
                 playerId: 'p1',
                 character: expect.anything(),
-                teams: [
+                teamList: [
                     {
                         ...teamJ1,
                         playersIds: [ 'p1' ]
@@ -162,7 +153,9 @@ describe('# room > on character add request', () => {
 
         it('correct data on multiple character add', async () => {
 
-            const { receiveJ1, receiveJ2, sendListJ1, sendListJ2, tilesTeamJ1, tilesTeamJ2, teamJ1, teamJ2 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, receiveJ2, sendListJ1, sendListJ2, tilesTeamJ1, tilesTeamJ2, teamJ1, teamJ2, createRoom } = await getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+            createRoom();
 
             const [ firstTileT1 ] = tilesTeamJ1;
             const [ firstTileT2, secondTileT2 ] = tilesTeamJ2;
@@ -199,7 +192,7 @@ describe('# room > on character add request', () => {
                         position: firstTileT1.position,
                         type: 'sampleChar1'
                     },
-                    teams: expect.arrayContaining<TeamRoom>([
+                    teamList: expect.arrayContaining<TeamRoom>([
                         expect.objectContaining<TeamRoom>({
                             ...teamJ1,
                             playersIds: [ 'p1' ]
@@ -216,7 +209,7 @@ describe('# room > on character add request', () => {
                         position: firstTileT2.position,
                         type: 'sampleChar2'
                     },
-                    teams: expect.arrayContaining<TeamRoom>([
+                    teamList: expect.arrayContaining<TeamRoom>([
                         expect.objectContaining<TeamRoom>({
                             ...teamJ1,
                             playersIds: [ 'p1' ]
@@ -237,7 +230,7 @@ describe('# room > on character add request', () => {
                         position: secondTileT2.position,
                         type: 'sampleChar1'
                     },
-                    teams: expect.arrayContaining<TeamRoom>([
+                    teamList: expect.arrayContaining<TeamRoom>([
                         expect.objectContaining<TeamRoom>({
                             ...teamJ1,
                             playersIds: [ 'p1' ]

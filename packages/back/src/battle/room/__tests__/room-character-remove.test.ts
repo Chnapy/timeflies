@@ -1,20 +1,15 @@
 import { RoomServerAction, TeamRoom } from '@timeflies/shared';
-import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { RoomTester } from './room-tester';
 
 describe('# room > on character remove request', () => {
 
-    const { createPlayer, createRoom, createRoomWithMap, createRoomWithMapMinCharacters } = RoomTester;
+    const { createRoomWithCreator, getRoomStateWithMap, getRoomStateWithMapMinCharacters } = RoomTester;
 
     describe('should fail if', () => {
 
         it('no map selected', async () => {
 
-            const { ws, receive } = seedWebSocket();
-
-            const creator = createPlayer('p1', ws);
-
-            createRoom(creator);
+            const { receive } = createRoomWithCreator('p1');
 
             await expect(receive({
                 type: 'room/character/remove',
@@ -25,14 +20,11 @@ describe('# room > on character remove request', () => {
 
         it('player is ready', async () => {
 
-            const { receiveJ1, firstTile } = await createRoomWithMapMinCharacters('p1', 'p2', 'm1');
+            const { receiveJ1, firstTile, j1Infos, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
 
-            await receiveJ1({
-                type: 'room/player/state',
-                sendTime: -1,
-                isReady: true,
-                isLoading: false
-            });
+            j1Infos.player.isReady = true;
+
+            createRoom();
 
             await expect(receiveJ1({
                 type: 'room/character/remove',
@@ -43,18 +35,22 @@ describe('# room > on character remove request', () => {
 
         it('target position does not exist', async () => {
 
-            const { receiveJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+            createRoom();
 
             await expect(receiveJ1({
                 type: 'room/character/remove',
                 sendTime: -1,
-                position: { x: 0, y: 0 }
+                position: { x: 32, y: 14 }
             })).rejects.toBeDefined();
         });
 
         it('target position is not occupied', async () => {
 
-            const { receiveJ1, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, tilesTeamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+            createRoom();
 
             const [ firstTile ] = tilesTeamJ1;
 
@@ -67,16 +63,17 @@ describe('# room > on character remove request', () => {
 
         it('target position character is not mine', async () => {
 
-            const { receiveJ1, receiveJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ2, tilesTeamJ1, j1Infos, createRoom } = await getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             const [ firstTile ] = tilesTeamJ1;
 
-            await receiveJ1({
-                type: 'room/character/add',
-                sendTime: -1,
-                characterType: 'sampleChar1',
+            j1Infos.player.characters.push({
+                id: 'c1',
+                type: 'sampleChar1',
                 position: firstTile.position
             });
+
+            createRoom();
 
             await expect(receiveJ2({
                 type: 'room/character/remove',
@@ -88,28 +85,25 @@ describe('# room > on character remove request', () => {
 
     it('should send remove action with current team list', async () => {
 
-        const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+        const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1, j1Infos, teamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
         const [ firstTile, secondTile ] = tilesTeamJ1;
 
-        await receiveJ1({
-            type: 'room/character/add',
-            sendTime: -1,
-            characterType: 'sampleChar1',
-            position: firstTile.position
-        });
+        j1Infos.player.characters.push(
+            {
+                id: 'c1',
+                type: 'sampleChar1',
+                position: firstTile.position
+            },
+            {
+                id: 'c2',
+                type: 'sampleChar1',
+                position: secondTile.position
+            }
+        );
+        teamJ1.playersIds.push('p1');
 
-        const { character } = sendListJ1
-            .find((a): a is Extract<RoomServerAction.CharacterSet, { action: 'add' }> =>
-                a.type === 'room/character/set'
-            )!;
-
-        await receiveJ1({
-            type: 'room/character/add',
-            sendTime: -1,
-            characterType: 'sampleChar1',
-            position: secondTile.position
-        });
+        createRoom();
 
         await receiveJ1({
             type: 'room/character/remove',
@@ -122,8 +116,8 @@ describe('# room > on character remove request', () => {
                 type: 'room/character/set',
                 action: 'remove',
                 playerId: 'p1',
-                characterId: character.id,
-                teams: expect.arrayContaining([
+                characterId: 'c1',
+                teamList: expect.arrayContaining([
                     expect.objectContaining<Partial<TeamRoom>>({
                         playersIds: [ 'p1' ]
                     })
@@ -137,21 +131,18 @@ describe('# room > on character remove request', () => {
 
     it('should remove player from its team if no any character left', async () => {
 
-        const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1 } = await createRoomWithMap('p1', 'p2', 'm1', 2);
+        const { receiveJ1, sendListJ1, sendListJ2, tilesTeamJ1, j1Infos, teamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
         const [ firstTile ] = tilesTeamJ1;
 
-        await receiveJ1({
-            type: 'room/character/add',
-            sendTime: -1,
-            characterType: 'sampleChar1',
+        j1Infos.player.characters.push({
+            id: 'c1',
+            type: 'sampleChar1',
             position: firstTile.position
         });
-
-        const { character } = sendListJ1
-            .find((a): a is Extract<RoomServerAction.CharacterSet, { action: 'add' }> =>
-                a.type === 'room/character/set'
-            )!;
+        teamJ1.playersIds.push('p1');
+        
+        createRoom();
 
         await receiveJ1({
             type: 'room/character/remove',
@@ -164,8 +155,8 @@ describe('# room > on character remove request', () => {
                 type: 'room/character/set',
                 action: 'remove',
                 playerId: 'p1',
-                characterId: character.id,
-                teams: expect.not.arrayContaining([
+                characterId: 'c1',
+                teamList: expect.not.arrayContaining([
                     expect.objectContaining<Partial<TeamRoom>>({
                         playersIds: [ 'p1' ]
                     })

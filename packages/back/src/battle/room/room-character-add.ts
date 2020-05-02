@@ -30,7 +30,7 @@ export const getRoomCharacterAdd: RoomListener<RoomClientAction.CharacterAdd> = 
 
     const currentTeam = teamList.find(t => t.playersIds.includes(id));
 
-    const targetedTeamId = mapSelected.placementTiles
+    const targetedTeamId = mapSelected.placementTileList
         .find(p => equals(p.position)(position))
         ?.teamId;
     assertIsDefined(targetedTeamId);
@@ -73,6 +73,6 @@ export const getRoomCharacterAdd: RoomListener<RoomClientAction.CharacterAdd> = 
         action: 'add',
         playerId: id,
         character,
-        teams: mutable.teamList
+        teamList: mutable.teamList
     });
 }

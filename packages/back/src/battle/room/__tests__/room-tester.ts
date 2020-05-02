@@ -1,8 +1,7 @@
-import { MapConfig, MapPlacementTile, seedTiledMap, TeamRoom } from '@timeflies/shared';
-import WebSocket from 'ws';
+import { MapConfig, MapPlacementTile, PlayerRoom, seedTiledMap, TeamRoom } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
-import { PlayerRoomData, Room, RoomDependencies } from '../room';
+import { PlayerRoomDataConnected, Room, RoomDependencies, PlayerRoomData } from '../room';
 import { RoomState } from '../room-state-manager';
 
 const createMapConfig = (id: string, nbrTeams: number): MapConfig => ({
@@ -16,14 +15,19 @@ const createMapConfig = (id: string, nbrTeams: number): MapConfig => ({
     schemaUrl: ''
 });
 
+type PlayerInfos = ReturnType<typeof seedWebSocket> & {
+    playerDataRaw: PlayerRoomData;
+    playerData: PlayerRoomDataConnected;
+    player: PlayerRoom;
+};
+
 export const RoomTester = {
 
     createRoom: (
-        creator: PlayerRoomData,
+        initialState: Partial<RoomState> = {},
         mapConfigList: MapConfig[] = [],
-        readFileMap: RoomDependencies[ 'readFileMap' ] = () => null as any,
-        initialState: Partial<RoomState> = {}
-    ) => Room(creator, {
+        readFileMap: RoomDependencies[ 'readFileMap' ] = () => null as any
+    ) => Room({
         initialState,
         dataManager: {
             getMapConfigList: () => mapConfigList
@@ -31,22 +35,120 @@ export const RoomTester = {
         readFileMap
     }),
 
-    createPlayer: (id: string, ws: WebSocket): PlayerRoomData => ({
-        id,
-        name: id,
-        socket: new WSSocket(ws),
-    }),
+    createPlayer: (id: string, isAdmin: boolean): PlayerInfos => {
+        const wsInfos = seedWebSocket();
+
+        const socket = new WSSocket(wsInfos.ws);
+
+        return {
+            ...wsInfos,
+            playerDataRaw: {
+                id,
+                name: id,
+                socket
+            },
+            playerData: {
+                id,
+                name: id,
+                socket: socket.createPool()
+            },
+            player: {
+                id,
+                name: id,
+                isAdmin,
+                isLoading: false,
+                isReady: false,
+                characters: []
+            }
+        };
+    },
+
+    createRoomWithCreator: (j1Id: string, isAdmin: boolean = true, mapConfigList?: MapConfig[]) => {
+        const j1Infos = RoomTester.createPlayer(j1Id, isAdmin);
+
+        const room = RoomTester.createRoom({
+            playerDataList: [ j1Infos.playerData ],
+            playerList: [ j1Infos.player ]
+        }, mapConfigList);
+
+        return {
+            ...j1Infos,
+            room
+        };
+    },
 
     createMapConfig,
 
-    createRoomWithMap: async (
-        j1Id: string, j2Id: string, mapId: string, nbrTeams: number,
-        initialState: Partial<RoomState> = {}
+    getRoomStateWithTwoPlayers: (j1Id: string, j2Id: string) => {
+        const j1Infos = RoomTester.createPlayer(j1Id, true);
+
+        const j2Infos = RoomTester.createPlayer(j2Id, false);
+
+        const {
+            player: j1, playerData: j1Data, sendList: sendListJ1, receive: receiveJ1
+        } = j1Infos;
+
+        const {
+            player: j2, playerData: j2Data, sendList: sendListJ2, receive: receiveJ2
+        } = j2Infos;
+
+        const playerDataList: PlayerRoomDataConnected[] = [
+            j1Data, j2Data
+        ];
+
+        const playerList: PlayerRoom[] = [
+            j1, j2
+        ];
+
+        const initialState: Partial<RoomState> = {
+            playerDataList,
+            playerList,
+        };
+
+        const createRoom = (
+            mapConfigList?: Parameters<typeof RoomTester.createRoom>[ 1 ],
+            readFileMap?: Parameters<typeof RoomTester.createRoom>[ 2 ],
+        ) => RoomTester.createRoom(
+            initialState,
+            mapConfigList,
+            readFileMap
+        );
+
+        return {
+            j1Infos,
+            j2Infos,
+            sendListJ1,
+            sendListJ2,
+            receiveJ1,
+            receiveJ2,
+            initialState,
+            createRoom
+        };
+    },
+
+    getRoomStateWithMap: (
+        j1Id: string, j2Id: string,
+        mapId: string, nbrTeams: number
     ) => {
+        const j1Infos = RoomTester.createPlayer(j1Id, true);
 
-        const { ws: ws1, sendList: sendListJ1, receive: receiveJ1 } = seedWebSocket();
+        const j2Infos = RoomTester.createPlayer(j2Id, false);
 
-        const creator = RoomTester.createPlayer(j1Id, ws1);
+        const {
+            player: j1, playerData: j1Data, sendList: sendListJ1, receive: receiveJ1
+        } = j1Infos;
+
+        const {
+            player: j2, playerData: j2Data, sendList: sendListJ2, receive: receiveJ2
+        } = j2Infos;
+
+        const playerDataList: PlayerRoomDataConnected[] = [
+            j1Data, j2Data
+        ];
+
+        const playerList: PlayerRoom[] = [
+            j1, j2
+        ];
 
         const mapConfig = createMapConfig(mapId, nbrTeams);
 
@@ -86,31 +188,31 @@ export const RoomTester = {
             playersIds: []
         };
 
-        const room = RoomTester.createRoom(creator, [ mapConfig ],
-            () => Promise.resolve(map),
-            {
-                mapSelected: {
-                    config: mapConfig,
-                    placementTiles: [
-                        ...tilesTeamJ1,
-                        ...tilesTeamJ2
-                    ]
-                },
-                teamList: [
-                    teamJ1,
-                    teamJ2
-                ],
-                ...initialState
-            }
+        const initialState: RoomState = {
+            mapSelected: {
+                config: mapConfig,
+                placementTileList: [
+                    ...tilesTeamJ1,
+                    ...tilesTeamJ2
+                ]
+            },
+            teamList: [
+                teamJ1,
+                teamJ2
+            ],
+            playerDataList,
+            playerList,
+        };
+
+        const createRoom = () => RoomTester.createRoom(
+            initialState,
+            [ mapConfig ],
+            () => Promise.resolve(map)
         );
 
-        const { ws: ws2, sendList: sendListJ2, receive: receiveJ2 } = seedWebSocket();
-
-        const newPlayer = RoomTester.createPlayer(j2Id, ws2);
-
-        room.onJoin(newPlayer);
-
         return {
+            j1Infos,
+            j2Infos,
             sendListJ1,
             sendListJ2,
             receiveJ1,
@@ -118,47 +220,52 @@ export const RoomTester = {
             teamJ1,
             teamJ2,
             tilesTeamJ1,
-            tilesTeamJ2
+            tilesTeamJ2,
+            initialState,
+            createRoom
         };
     },
 
-    createRoomWithMapMinCharacters: async (j1Id: string, j2Id: string, mapId: string) => {
+    getRoomStateWithMapMinCharacters: (j1Id: string, j2Id: string, mapId: string) => {
 
-        const teamJ1: TeamRoom = {
-            id: 'A',
-            letter: 'A',
-            playersIds: [ j1Id ]
-        };
+        const roomInfos = RoomTester.getRoomStateWithMap(j1Id, j2Id, mapId, 2);
 
-        const teamJ2: TeamRoom = {
-            id: 'B',
-            letter: 'B',
-            playersIds: [ j2Id ]
-        };
+        const { j1Infos, j2Infos, teamJ1, teamJ2 } = roomInfos;
 
-        const roomInfos = await RoomTester.createRoomWithMap(j1Id, j2Id, mapId, 2, {
-            teamList: [ teamJ1, teamJ2 ]
-        });
+        teamJ1.playersIds.push(j1Id);
+        teamJ2.playersIds.push(j2Id);
 
-        const { receiveJ1, receiveJ2, tilesTeamJ1, tilesTeamJ2 } = roomInfos;
+        const { tilesTeamJ1, tilesTeamJ2 } = roomInfos;
 
         const [ firstTile, secondTile ] = tilesTeamJ1;
 
         const [ otherTeamTile ] = tilesTeamJ2;
 
-        await receiveJ1({
-            type: 'room/character/add',
-            sendTime: -1,
-            characterType: 'sampleChar1',
-            position: firstTile.position
+        j1Infos.player.characters.push({
+            id: 'c1',
+            type: 'sampleChar1',
+            position: firstTile.position,
         });
 
-        await receiveJ2({
-            type: 'room/character/add',
-            sendTime: -1,
-            characterType: 'sampleChar1',
-            position: otherTeamTile.position
+        j2Infos.player.characters.push({
+            id: 'c2',
+            type: 'sampleChar1',
+            position: otherTeamTile.position,
         });
+
+        // await receiveJ1({
+        //     type: 'room/character/add',
+        //     sendTime: -1,
+        //     characterType: 'sampleChar1',
+        //     position: firstTile.position
+        // });
+
+        // await receiveJ2({
+        //     type: 'room/character/add',
+        //     sendTime: -1,
+        //     characterType: 'sampleChar1',
+        //     position: otherTeamTile.position
+        // });
 
         return {
             ...roomInfos,
