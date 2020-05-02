@@ -221,6 +221,7 @@ export const RoomTester = {
             teamJ2,
             tilesTeamJ1,
             tilesTeamJ2,
+            mapConfig,
             initialState,
             createRoom
         };

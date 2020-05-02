@@ -56,6 +56,8 @@ export type RoomDependencies = {
     readFileMap: (url: string) => Promise<TiledMap>;
 };
 
+export type Room = ReturnType<typeof Room>;
+
 export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencies = {
     initialState: {},
     dataManager: {
@@ -195,6 +197,21 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
             const isAdmin = !playerDataList.length;
 
             addNewPlayer(playerData, isAdmin);
+        },
+
+        isOpen: (): boolean => {
+
+            const { mapSelected, playerList } = stateManager.get();
+
+            if (!mapSelected) {
+                return false;
+            }
+
+            const { nbrTeams, nbrCharactersPerTeam } = mapSelected.config;
+
+            const nbrMaxPlayers = nbrTeams * nbrCharactersPerTeam;
+
+            return playerList.length < nbrMaxPlayers;
         }
     };
 };

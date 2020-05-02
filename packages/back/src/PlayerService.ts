@@ -15,7 +15,6 @@ export class PlayerService {
         return {
             id,
             name: 'P-' + id,
-            state: 'init',
             socket,
             staticCharacters: this.getCharacters(index).map(c => {
                 const charId = Util.getUnique();

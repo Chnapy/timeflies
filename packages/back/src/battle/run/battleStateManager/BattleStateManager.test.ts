@@ -3,6 +3,8 @@ import { seedStaticCharacter } from '../entities/seedStaticCharacter';
 import { seedTeam } from '../entities/team/Team.seed';
 import { BattleState, BattleStateManager } from './BattleStateManager';
 import util from 'util';
+import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
+import { WSSocket } from '../../../transport/ws/WSSocket';
 
 describe('# BattleStateManager', () => {
 
@@ -49,12 +51,13 @@ describe('# BattleStateManager', () => {
 
         it('should not call callback on bad hash', () => {
 
+            const { ws } = seedWebSocket();
+
             const teams = [ seedTeam({
                 players: [ {
                     id: 'p1',
                     name: '',
-                    state: 'battle-ready',
-                    socket: null as any,
+                    socket: new WSSocket(ws),
                     staticCharacters: [ seedStaticCharacter()[ 0 ] ]
                 } ]
             }) ];
@@ -98,12 +101,13 @@ describe('# BattleStateManager', () => {
 
         it('should call callback on correct hash', () => {
 
+            const { ws } = seedWebSocket();
+
             const teams = [ seedTeam({
                 players: [ {
                     id: 'p1',
                     name: '',
-                    state: 'battle-ready',
-                    socket: null as any,
+                    socket: new WSSocket(ws),
                     staticCharacters: [ seedStaticCharacter()[ 0 ] ]
                 } ]
             }) ];
@@ -147,12 +151,13 @@ describe('# BattleStateManager', () => {
 
         it('should change battle state on callback function called', () => {
 
+            const { ws } = seedWebSocket();
+
             const teams = [ seedTeam({
                 players: [ {
                     id: 'p1',
                     name: '',
-                    state: 'battle-ready',
-                    socket: null as any,
+                    socket: new WSSocket(ws),
                     staticCharacters: [ seedStaticCharacter()[ 0 ] ]
                 } ]
             }) ];

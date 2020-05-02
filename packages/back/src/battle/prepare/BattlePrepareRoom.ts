@@ -30,10 +30,7 @@ export class BattlePrepareRoom {
     }
 
     addPlayer(player: PlayerData): void {
-        player.state = 'battle-prepare';
         this.players.push(player);
-
-        player.socket.addRoom(this.id);
 
         console.log('player', player.name, ' => room', this.id, this.players.length);
 
@@ -65,7 +62,9 @@ export class BattlePrepareRoom {
                 name: p.name
             };
 
-            p.socket.send<BattleLoadSAction>({
+            const socket = p.socket.createPool();
+
+            socket.send<BattleLoadSAction>({
                 type: 'battle-load',
                 payload: {
                     ...payload,
@@ -73,18 +72,15 @@ export class BattlePrepareRoom {
                 }
             });
 
-            p.state = 'battle-loading';
+            socket.on<BattleLoadEndedCAction>('battle-load-end', action => {
 
-            p.socket.on<BattleLoadEndedCAction>('battle-load-end', action => {
-                p.state = 'battle-ready';
+                // if (this.players.every(p => p.state === 'battle-ready')) {
 
-                if (this.players.every(p => p.state === 'battle-ready')) {
-
-                    // move everybody to battlerunroom
-                    console.log('lets go dudes')
-                    this.battleRunRoom = BattleRunRoom(mapConfig, this.teams);
-                    this.battleRunRoom.start();
-                }
+                //     // move everybody to battlerunroom
+                //     console.log('lets go dudes')
+                //     this.battleRunRoom = BattleRunRoom(mapConfig, this.teams);
+                //     this.battleRunRoom.start();
+                // }
             });
         });
     }

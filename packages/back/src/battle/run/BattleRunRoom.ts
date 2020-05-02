@@ -46,11 +46,11 @@ export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): Batt
 
     const endBattle = (team: Team): void => {
         cycle.stop();
-        players.forEach(p => p.socket.clearBattleListeners());
         players.forEach(p => p.socket.send<BRunEndSAction>({
             type: 'battle-run/end',
             winnerTeamId: team.id
         }));
+        players.forEach(p => p.socket.close());
 
         console.log('\n---');
         console.log(`Battle ended. Team ${team.name} wins !`);
@@ -79,7 +79,7 @@ export const BattleRunRoom = (mapConfig: MapConfig, teamsData: TeamData[]): Batt
         checkDeathsAndDisconnects
     });
 
-    players.forEach(p => p.socket.onClose(() => {
+    players.forEach(p => p.socket.onDisconnect(() => {
         console.log('Player disconnect:', p.id, p.socket.isConnected);
         checkDeathsAndDisconnects();
     }));

@@ -1,54 +1,48 @@
-import { BattlePrepareRoom } from "./prepare/BattlePrepareRoom";
+import WebSocket from "ws";
 import { PlayerData } from "../PlayerData";
 import { PlayerService } from "../PlayerService";
-import WebSocket  from "ws";
 import { WSSocket } from "../transport/ws/WSSocket";
-
-// const namespaceStr = 'battle';
+import { Room } from './room/room';
 
 export class Matchmaker {
 
     private readonly ws: WebSocket.Server;
-    // private readonly namespace: Namespace;
 
     private readonly playerService: PlayerService;
 
     private readonly players: Record<string, PlayerData>;
 
-    private readonly battlePrepareRooms: BattlePrepareRoom[];
+    // private readonly battlePrepareRooms: BattlePrepareRoom[];
+    private readonly roomList: Room[];
 
     private tempIndex = 0;
 
     constructor(ws: WebSocket.Server) {
         this.ws = ws;
-        // this.namespace = io.of(namespaceStr);
         this.playerService = new PlayerService();
         this.players = {};
-        this.battlePrepareRooms = [];
+        // this.battlePrepareRooms = [];
+        this.roomList = [];
     }
 
     connection(socket: WSSocket): void {
         const player = this.playerService.getPlayer(socket, this.tempIndex);
         this.tempIndex++;
-        this.players[player.id] = player;
+        this.players[ player.id ] = player;
 
-        switch (player.state) {
-            case 'init':
-                this.onPrepareNewPlayer(player);
-                break;
-        }
+        this.onPrepareNewPlayer(player);
     }
 
     private onPrepareNewPlayer = (player: PlayerData): void => {
         const room = this.getOpenBattleRoom();
-        room.addPlayer(player);
+        room.onJoin(player);
     }
 
-    private getOpenBattleRoom(): BattlePrepareRoom {
-        let room = this.battlePrepareRooms.find(b => b.isOpen());
+    private getOpenBattleRoom(): Room {
+        let room = this.roomList.find(b => b.isOpen());
         if (!room) {
-            room = new BattlePrepareRoom();
-            this.battlePrepareRooms.push(room);
+            room = Room();
+            this.roomList.push(room);
         }
 
         return room;

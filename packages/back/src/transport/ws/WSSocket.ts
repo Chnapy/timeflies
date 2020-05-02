@@ -4,6 +4,7 @@ import WebSocket from 'ws';
 export type SocketState = 'init' | 'hasID';
 
 export type WSSocketPool = {
+    isConnected(): boolean;
     on: <A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void) => void | Promise<void>;
     onDisconnect: (fn: () => void) => void;
     send: <A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]) => void;
@@ -21,22 +22,8 @@ type WSSocketPoolInner = WSSocketPool & {
 export class WSSocket {
 
     private readonly socket: WebSocket;
-    private rooms: Set<string>;
 
     private readonly poolList: WSSocketPoolInner[];
-
-    private readonly listeners: {
-        [ K in ClientAction[ 'type' ] ]?: {
-            condition?: (socket: WSSocket) => boolean;
-            fn: (action: NarrowTAction<ClientAction, K>) => void;
-        };
-    };
-    private readonly battleListeners: {
-        [ K in ClientAction[ 'type' ] ]?: {
-            condition?: (socket: WSSocket) => boolean;
-            fn: (action: NarrowTAction<ClientAction, K>) => void;
-        };
-    };
 
     private state: SocketState;
 
@@ -51,9 +38,6 @@ export class WSSocket {
 
     constructor(socket: WebSocket) {
         this.socket = socket;
-        this.rooms = new Set();
-        this.listeners = {};
-        this.battleListeners = {};
         this.state = 'init';
         this._id = '';
 
@@ -89,13 +73,17 @@ export class WSSocket {
             return actionList.map(action => this.onMessage(action));
         });
 
-        this.on<SetIDCAction>(
+        const innerPool = this.createPool();
+
+        innerPool.on<SetIDCAction>(
             'set-id',
             action => {
-                this._id = action.id;
-                this.state = 'hasID';
-            },
-            () => this.state === 'init');
+                if (this.state === 'init') {
+                    this._id = action.id;
+                    this.state = 'hasID';
+                }
+            }
+        );
     }
 
     createPool(): WSSocketPool {
@@ -113,6 +101,7 @@ export class WSSocket {
         };
 
         const pool: WSSocketPool = {
+            isConnected: () => this.isConnected,
             on: (type, fn) => {
                 assertIsOpen();
 
@@ -150,44 +139,16 @@ export class WSSocket {
         return pool;
     }
 
-    on<A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void, condition?: (() => boolean)): void {
-        this.listeners[ type ] = {
-            condition,
-            fn: fn as any
-        };
-    }
-
-    onBattle<A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void, condition?: (() => boolean)): void {
-        this.battleListeners[ type ] = {
-            condition,
-            fn: fn as any
-        };
-    }
-
-    onClose(fn: () => void) {
+    private onClose(fn: () => void) {
         this.socket.on('close', fn);
     }
 
-    clearBattleListeners() {
-        Object.keys(this.battleListeners).forEach(k => {
-            delete this.battleListeners[ k as ClientAction[ 'type' ] ];
-        });
-    }
-
-    send<A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]): void {
+    private send<A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]): void {
         const sendTime = Date.now();
         this.socket.send(JSON.stringify(actionList.map(action => ({
             sendTime,
             ...action,
         }))));
-    }
-
-    addRoom(room: string): void {
-        this.rooms.add(room);
-    }
-
-    removeRoom(room: string): void {
-        this.rooms.delete(room);
     }
 
     protected onMessage(action: ClientAction): void | Promise<void[]> {
@@ -198,22 +159,11 @@ export class WSSocket {
             .map(p => p.listeners[ action.type ])
             .filter(Boolean) as ((action: NarrowTAction<ClientAction, any>) => void | Promise<void>)[];
 
-        const listener = this.battleListeners[ action.type ] ?? this.listeners[ action.type ];
-
         if (poolsFns.length) {
             return Promise.all<any>(poolsFns
                 .map(fn => fn(action))
                 .filter(r => r instanceof Promise)
             );
-        } else if (listener) {
-
-            const { condition, fn } = listener;
-            const isOK = condition
-                ? condition(this)
-                : true;
-
-            if (isOK)
-                return fn(action as any);
         } else {
             console.warn(`Action received but no listener for it: ${action.type}`);
         }
