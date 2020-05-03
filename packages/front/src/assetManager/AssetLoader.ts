@@ -1,8 +1,9 @@
-import { assertIsDefined, TiledMap, TiledMapAssets } from '@timeflies/shared';
+import { assertIsDefined, TiledMapAssets } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { Loader as _Loader, LoaderResource } from 'pixi.js';
 import { IAddOptions, ImageLoadStrategy, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
+import { TiledMap } from 'tiled-types';
 import { AppResetAction } from '../Controller';
 import { serviceEvent } from '../services/serviceEvent';
 
@@ -29,6 +30,7 @@ interface BaseAssetMap {
 type BaseAssetMapKey = keyof BaseAssetMap;
 
 type SpritesheetMap = {
+    faces: PIXI.Spritesheet;
     characters: PIXI.Spritesheet;
 };
 

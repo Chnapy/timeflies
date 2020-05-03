@@ -13,15 +13,12 @@ describe('# CycleManager', () => {
 
     const initStore = (characters: Character<'current'>[]) => {
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    current: {
-                        characters
-                    },
-                    cycle: {}
-                } as any
-            }
+            battle: {
+                current: {
+                    characters
+                },
+                cycle: {}
+            } as any
         });
     };
 

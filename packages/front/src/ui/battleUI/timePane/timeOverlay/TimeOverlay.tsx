@@ -4,7 +4,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { AssetManager } from "../../../../assetManager/AssetManager";
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
-import { UIState } from "../../../UIState";
+import { GameState } from "../../../../game-state";
 import css from './timeOverlay.module.css';
 
 interface TimeAction {
@@ -21,8 +21,9 @@ interface TimeOverlayInnerProps {
     disabled: boolean;
 }
 
-export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { cycle: { globalTurn }, future: {spellActionSnapshotList} } } }) => {
+export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, GameState>(
+    ({ battle }) => {
+        const { cycle: { globalTurn }, future: { spellActionSnapshotList } } = battle!;
         if (!globalTurn) {
             return {
                 startDateTime: 0,
@@ -46,12 +47,12 @@ export const TimeOverlay = connect<TimeOverlayInnerProps, {}, {}, UIState<'battl
             //     previousCa.duration += ca.spell.feature.duration;
 
             // } else {
-                // acc.push({
-                //     spellType: ca.spell.staticData.type,
-                //     startDateTime: ca.startTime,
-                //     duration: ca.spell.feature.duration,
-                //     state: ca.state
-                // });
+            // acc.push({
+            //     spellType: ca.spell.staticData.type,
+            //     startDateTime: ca.startTime,
+            //     duration: ca.spell.feature.duration,
+            //     state: ca.state
+            // });
 
             // }
 

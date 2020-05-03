@@ -5,19 +5,21 @@ export default {
     title: 'Battleflow'
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeApiStart }) => {
+export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
+
+    const { start } = fakeApi.init({});
 
     const ref = React.createRef<HTMLDivElement>();
 
     const fns = {
-        stopCycle: () => {},
-        rollback: () => {},
-        notify: () => {}
+        stopCycle: () => { },
+        rollback: () => { },
+        notify: () => { }
     };
 
     React.useEffect(() => {
 
-        fakeApiStart(ref.current!)
+        start(ref.current!)
             .then(api => {
 
                 fns.stopCycle = api.stopCycleLoop;
@@ -30,10 +32,10 @@ export const Default: React.FC<StoryProps> = ({ fakeApiStart }) => {
 
             });
 
-    }, [fakeApiStart, fns, ref]);
+    }, [ start, fns, ref ]);
 
     return <div style={{
-        position: 'relative',
+        position: 'absolute',
         width: '100%',
         height: '100vh'
     }}>

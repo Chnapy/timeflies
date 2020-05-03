@@ -11,11 +11,14 @@
     "test-ci": "yarn test",
     "lint": "eslint src --ext .ts,.tsx --cache",
     "test-coverage": "yarn test * --coverage --collectCoverageFrom=src/**/*.{ts,tsx} --collectCoverageFrom=!src/**/*.stories.{ts,tsx} --collectCoverageFrom=!src/**/*.seed.{ts,tsx}",
-    "storybook": "start-storybook -p 9009 -s public",
+    "storybook": "STORYBOOK_CONTEXT=true start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
     "check-type": "tsc --noEmit"
   },
   "dependencies": {
+    "@material-ui/core": "^4.9.11",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.50",
     "easystarjs": "0.4.3",
     "pixi-viewport": "^4.10.0",
     "pixi.js": "5.2.1",
@@ -44,6 +47,7 @@
     "redux": "4.0.5",
     "redux-devtools-extension": "2.13.8",
     "redux-mock-store": "^1.5.4",
+    "tiled-types": "^1.0.0",
     "timeflies-react-scripts": "3.4.1",
     "ts-loader": "6.2.1"
   },
@@ -62,5 +66,18 @@
   "engineStrict": true,
   "engines": {
     "node": ">=12"
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.seed.ts",
+      "!src/**/*.stories.tsx",
+      "!src/**/__*__/"
+    ],
+    "transformIgnorePatterns": [
+      "\\\\node_modules\\\\"
+    ]
   }
 }

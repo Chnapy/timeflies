@@ -6,7 +6,7 @@ import { AssetManager } from '../../../../assetManager/AssetManager';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
 import { BStateSpellPrepareAction } from '../../../../stages/battle/battleState/BattleStateSchema';
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
-import { UIState } from "../../../UIState";
+import { GameState } from "../../../../game-state";
 import css from './spellBtn.module.css';
 import { SpellBtnInfos, SpellBtnInfosProps } from './SpellBtnInfos';
 
@@ -21,13 +21,13 @@ interface SpellBtnInnerProps {
     spellInfos: SpellBtnInfosProps;
 }
 
-export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, UIState<'battle'>>(
+export const SpellBtn = connect<SpellBtnInnerProps, {}, SpellBtnExternProps, GameState>(
     ({
-        data: { battleData: { cycle: { globalTurn } } }
+        battle
     }, {
         spellId
     }) => {
-        const { character: currentCharacter } = globalTurn!.currentTurn;
+        const { character: currentCharacter } = battle!.cycle.globalTurn!.currentTurn;
 
         const spell = currentCharacter.spells.find(s => s.id === spellId)!;
         const activeState = /* currentSpell?.spell.id === spellId ? currentSpell.state :*/ 'none';

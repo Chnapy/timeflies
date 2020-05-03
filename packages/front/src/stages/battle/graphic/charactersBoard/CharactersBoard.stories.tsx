@@ -5,13 +5,12 @@ import { StoryProps } from '../../../../../.storybook/preview';
 import { BattleDataPeriod } from '../../../../BattleData';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { Controller } from '../../../../Controller';
-import { UIState } from '../../../../ui/UIState';
+import { GameState } from '../../../../game-state';
 import mapPath from '../../../../_assets/map/map.json';
 import charactersSpritesheetPath from '../../../../_assets/spritesheets/sokoban.json';
 import { seedCharacter } from '../../entities/character/Character.seed';
 import { MapManager } from '../../map/MapManager';
 import { Pathfinder } from '../../map/Pathfinder';
-import { seedTiledConfig } from '../../map/TiledMap.seed';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
 
@@ -20,7 +19,7 @@ export default {
     component: CharactersBoard
 };
 
-const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeApi, period }) => {
+const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeBattleApi: fakeApi, period }) => {
 
     const characters = [
         seedCharacter('real', {
@@ -39,16 +38,16 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeApi, 
         }),
     ];
 
-    const initialState: UIState = {
+    const initialState: GameState = {
         currentPlayer: null,
-        data: {
-            state: 'battle',
-            battleData: {
-                [ period ]: {
-                    characters
-                }
-            } as any
-        }
+        load: null,
+        room: null,
+        step: 'battle',
+        battle: {
+            [ period ]: {
+                characters
+            }
+        } as any
     };
 
     fakeApi.init({
@@ -70,7 +69,7 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeApi, 
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder,
             tiledManagerCreator: TiledManager

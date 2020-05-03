@@ -1,8 +1,8 @@
-import { StoreTest } from '../../../StoreTest';
-import { SpellActionTimer, SpellActionTimerStartAction, SpellActionTimerEndAction } from './SpellActionTimer';
-import { TimerTester, SpellActionSnapshot, SpellActionCAction } from '@timeflies/shared';
+import { SpellActionCAction, SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { serviceNetwork } from '../../../services/serviceNetwork';
 import { SendMessageAction } from '../../../socket/WSClient';
+import { StoreTest } from '../../../StoreTest';
+import { SpellActionTimer, SpellActionTimerEndAction, SpellActionTimerStartAction } from './SpellActionTimer';
 
 describe('# SpellActionTimer', () => {
 
@@ -21,14 +21,11 @@ describe('# SpellActionTimer', () => {
     it('should not allow future spell action without current one playing', () => {
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList: [],
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList: [],
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();
@@ -51,14 +48,11 @@ describe('# SpellActionTimer', () => {
     it('should launch current spell action and send message', async () => {
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList: [],
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList: [],
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();
@@ -109,14 +103,11 @@ describe('# SpellActionTimer', () => {
     it('should end current spell on its end', () => {
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList: []
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList: []
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();
@@ -152,14 +143,11 @@ describe('# SpellActionTimer', () => {
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();
@@ -216,14 +204,11 @@ describe('# SpellActionTimer', () => {
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();
@@ -279,14 +264,11 @@ describe('# SpellActionTimer', () => {
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();
@@ -357,14 +339,11 @@ describe('# SpellActionTimer', () => {
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList
+                }
+            } as any
         });
 
         const timer = SpellActionTimer();

@@ -53,15 +53,12 @@ describe('# SnapshotManager', () => {
         };
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    cycle: {
-                        launchTime: -1
-                    },
-                    current: currentBattleData,
-                    future: futureBattleData
-                }
+            battle: {
+                cycle: {
+                    launchTime: -1
+                },
+                current: currentBattleData,
+                future: futureBattleData
             }
         });
 
@@ -123,15 +120,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 
@@ -200,15 +194,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 
@@ -289,15 +280,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 
@@ -380,15 +368,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 
@@ -487,15 +472,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 
@@ -556,15 +538,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 
@@ -632,15 +611,12 @@ describe('# SnapshotManager', () => {
             };
 
             StoreTest.initStore({
-                data: {
-                    state: 'battle',
-                    battleData: {
-                        cycle: {
-                            launchTime: -1
-                        },
-                        current: currentBattleData,
-                        future: futureBattleData
-                    }
+                battle: {
+                    cycle: {
+                        launchTime: -1
+                    },
+                    current: currentBattleData,
+                    future: futureBattleData
                 }
             });
 

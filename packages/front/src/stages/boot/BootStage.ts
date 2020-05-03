@@ -1,9 +1,9 @@
-import { BattleLoadPayload, BattleLoadSAction } from '@timeflies/shared';
+import { BattleLoadPayload, RoomServerAction } from '@timeflies/shared';
 import { CurrentPlayer } from '../../CurrentPlayer';
 import { serviceDispatch } from '../../services/serviceDispatch';
 import { serviceEvent } from '../../services/serviceEvent';
 import { serviceNetwork } from '../../services/serviceNetwork';
-import { LoginSuccess } from '../../ui/reducers/CurrentPlayerReducer';
+import { LoginSuccess } from '../../ui/reducers/current-player-reducer';
 import { LoadLaunchAction } from "../load/LoadStage";
 import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
 
@@ -17,17 +17,17 @@ export const BootStage: StageCreator<'boot', never> = () => {
         },
         async create(assets, setupStageGraphic) {
 
-            const { onAction, onMessageAction } = serviceEvent();
+            const { onMessageAction } = serviceEvent();
 
-            const { dispatchCurrentPlayer, dispatchStageChangeToLoad, dispatchLoadLaunch } = serviceDispatch({
+            const { dispatchStageChangeToRoom } = serviceDispatch({
                 dispatchCurrentPlayer: (currentPlayer: CurrentPlayer): LoginSuccess => ({
                     type: 'login/success',
                     currentPlayer
                 }),
-                dispatchStageChangeToLoad: (payload: BattleLoadPayload): StageChangeAction<'load'> => ({
+                dispatchStageChangeToRoom: (): StageChangeAction<'room'> => ({
                     type: 'stage/change',
-                    stageKey: 'load',
-                    payload
+                    stageKey: 'room',
+                    payload: {}
                 }),
                 dispatchLoadLaunch: (payload: BattleLoadPayload): LoadLaunchAction => ({
                     type: 'load/launch',
@@ -35,12 +35,12 @@ export const BootStage: StageCreator<'boot', never> = () => {
                 })
             });
 
-            onAction<LoadLaunchAction>('load/launch', ({
-                payload
-            }) => {
-                dispatchCurrentPlayer(payload.playerInfos);
-                dispatchStageChangeToLoad(payload);
-            });
+            // onAction<LoadLaunchAction>('load/launch', ({
+            //     payload
+            // }) => {
+            //     dispatchCurrentPlayer(payload.playerInfos);
+            // dispatchStageChangeToLoad(payload);
+            // });
 
             const { sendSetID, sendMatchmakerEnter } = await serviceNetwork({
                 sendSetID: (id: string) => ({
@@ -54,11 +54,15 @@ export const BootStage: StageCreator<'boot', never> = () => {
 
             sendSetID(Math.random() + '');
 
-            onMessageAction<BattleLoadSAction>('battle-load', ({
-                payload
-            }) => {
+            // onMessageAction<BattleLoadSAction>('battle-load', ({
+            //     payload
+            // }) => {
 
-                dispatchLoadLaunch(payload);
+            //     dispatchLoadLaunch(payload);
+            // });
+
+            onMessageAction<RoomServerAction.RoomState>('room/state', () => {
+                dispatchStageChangeToRoom();
             });
 
             sendMatchmakerEnter();

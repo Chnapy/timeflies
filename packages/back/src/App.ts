@@ -17,7 +17,8 @@ export class App {
         this.ws.on('connection', _socket => {
             // TODO wait id before going further
             const socket = new WSSocket(_socket);
-            socket.on<MatchmakerEnterCAction>('matchmaker/enter', action => {
+            const appPool = socket.createPool();
+            appPool.on<MatchmakerEnterCAction>('matchmaker/enter', action => {
 
                 this.matchmaker.connection(socket);
             });

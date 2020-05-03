@@ -18,8 +18,7 @@ describe('# Player', () => {
             currentPlayer: {
                 id: 'p1',
                 name: 'p-1'
-            },
-            data: null as any
+            }
         });
 
         const expectedSnapshot = seedPlayerSnapshot({
@@ -58,8 +57,7 @@ describe('# Player', () => {
             currentPlayer: {
                 id: 'p1',
                 name: 'p-1'
-            },
-            data: null as any
+            }
         });
 
         const updateFromSnapshot = jest.fn();

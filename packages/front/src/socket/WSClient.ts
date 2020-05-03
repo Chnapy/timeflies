@@ -1,5 +1,5 @@
 import { ClientAction, DistributiveOmit, getEndpoint, ServerAction } from '@timeflies/shared';
-import { IGameAction } from '../action/GameAction';
+import { IGameAction } from '../action/game-action/GameAction';
 import { envManager } from '../envManager';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
@@ -13,9 +13,6 @@ export interface SendMessageAction<A extends ClientAction = ClientAction> extend
 }
 
 export type MessageAction = ReceiveMessageAction | SendMessageAction;
-
-const ENDPOINT = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
-console.log('ws endpoint:', ENDPOINT);
 
 export interface WSClient {
     readonly isOpen: boolean;
@@ -34,6 +31,9 @@ export const WSClient = ({ websocketCreator }: Dependencies = {
     websocketCreator: endPoint => new WebSocket(endPoint)
 }): WSClient => {
 
+    const ENDPOINT = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
+    console.log('ws endpoint:', ENDPOINT);
+
     const { dispatchMessage } = serviceDispatch({
         dispatchMessage: (message: ServerAction) => ({
             type: 'message/receive',
@@ -49,31 +49,32 @@ export const WSClient = ({ websocketCreator }: Dependencies = {
             throw new TypeError(`typeof message not handled: ${typeof data}`);
         }
 
-        let action;
+        let actionList;
         try {
-            action = JSON.parse(data);
+            actionList = JSON.parse(data);
         } catch (e) {
-            action = data;
-        }
-        // console.log('->', action);
-
-        if (typeof action !== 'object' || typeof action.type !== 'string') {
-            throw new TypeError(`message is not an Action: ${action}`);
+            actionList = data;
         }
 
-        console.log(action);
+        if (!Array.isArray(actionList)) {
+            throw new Error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
+        }
 
-        dispatchMessage(action);
+        actionList.forEach(action => dispatchMessage(action));
+
+        // console.log(action);
+
+        // dispatchMessage(action);
     };
 
     onAction<SendMessageAction>('message/send', ({
         message
     }) => {
         // console.log('<-', message);
-        socket.send(JSON.stringify({
+        socket.send(JSON.stringify([ {
             sendTime: Date.now(),
             ...message
-        }));
+        } ]));
     });
 
     const socket = websocketCreator(ENDPOINT);

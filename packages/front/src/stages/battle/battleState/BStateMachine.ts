@@ -39,11 +39,11 @@ export const BStateMachine = (
             console.log('state', state);
             const { engineCreator } = schema.states[ state ];
             engine = engineCreator({
-                event: event as never,
+                event: event,
                 deps: {
                     mapManager
                 }
-            });
+            } as any);
         }
     };
 

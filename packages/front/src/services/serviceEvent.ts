@@ -1,7 +1,7 @@
 import { ServerAction } from "@timeflies/shared";
 import { Action } from "redux";
 import { ActionListener, ActionListenerObject } from '../action/ActionManager';
-import { GameAction } from "../action/GameAction";
+import { GameAction } from "../action/game-action/GameAction";
 import { Controller } from "../Controller";
 import { ReceiveMessageAction } from "../socket/WSClient";
 

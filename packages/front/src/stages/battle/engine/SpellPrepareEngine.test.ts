@@ -77,13 +77,10 @@ describe('# SpellPrepareEngine', () => {
         };
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: future as BattleDataFuture,
-                    current: null as any,
-                    cycle
-                }
+            battle: {
+                future: future as BattleDataFuture,
+                current: null as any,
+                cycle
             }
         });
 
@@ -186,13 +183,10 @@ describe('# SpellPrepareEngine', () => {
         };
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: future as BattleDataFuture,
-                    current: null as any,
-                    cycle
-                }
+            battle: {
+                future: future as BattleDataFuture,
+                current: null as any,
+                cycle
             }
         });
 

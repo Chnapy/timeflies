@@ -35,7 +35,7 @@ module.exports = {
     '@storybook/addon-actions',
     '@storybook/addon-links',
   ],
-  webpackFinal: async (config: Configuration, { configType }): Promise<Configuration> => {
+  webpackFinal: async (config: Configuration): Promise<Configuration> => {
 
     webpackNoAssetsHashNorData64(config);
 

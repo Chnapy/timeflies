@@ -2,16 +2,16 @@ import React from 'react';
 import css from './charactersPane.module.css';
 import { connect } from 'react-redux';
 import { CharacterItem } from './characterItem/CharacterItem';
-import { UIState } from '../../UIState';
+import { GameState } from '../../../game-state';
 
 interface CharactersPaneInnerProps {
     charactersIds: string[];
 }
 
-export const CharactersPane = connect<CharactersPaneInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData } }) => {
-        const { globalTurn } = battleData.cycle;
-        const { characters } = battleData.current;
+export const CharactersPane = connect<CharactersPaneInnerProps, {}, {}, GameState>(
+    ({ battle: battleData }) => {
+        const { globalTurn } = battleData!.cycle;
+        const { characters } = battleData!.current;
         const charactersIds = characters
             .map(c => c.id)
             .sort((a, b) => globalTurn?.currentTurn.character.id === a ? -1 : 1);

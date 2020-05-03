@@ -1,7 +1,7 @@
 import { SpellType } from '@timeflies/shared'
 import React from 'react';
 import { connect } from "react-redux";
-import { UIState } from "../../UIState";
+import { GameState } from "../../../game-state";
 import { SpellBtn } from './spellBtn/SpellBtn';
 import css from './spellPane.module.css';
 
@@ -12,14 +12,14 @@ interface SpellPaneInnerProps {
 
 const sideSpellTypes: SpellType[] = [ 'move', 'orientate' ];
 
-export const SpellPane = connect<SpellPaneInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { cycle: { globalTurn } } } }) => ({
+export const SpellPane = connect<SpellPaneInnerProps, {}, {}, GameState>(
+    ({ battle }) => ({
 
-        mainSpellIds: globalTurn?.currentTurn?.character.spells
+        mainSpellIds: battle!.cycle.globalTurn?.currentTurn?.character.spells
             .filter(s => !sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || [],
 
-        sideSpellIds: globalTurn?.currentTurn?.character.spells
+        sideSpellIds: battle!.cycle.globalTurn?.currentTurn?.character.spells
             .filter(s => sideSpellTypes.includes(s.staticData.type))
             .map(s => s.id) || []
     })

@@ -1,4 +1,4 @@
-import { GameAction } from "../action/GameAction";
+import { GameAction } from "../action/game-action/GameAction";
 import { AssetLoader } from '../assetManager/AssetLoader';
 import { Controller as IController } from "../Controller";
 import { StoreTest } from '../StoreTest';

@@ -1,6 +1,6 @@
-import { AppLoader, AssetLoader } from './AssetLoader';
-import { seedTiledMapAssets } from '../stages/battle/map/TiledMap.seed';
 import { ImageLoadStrategy } from 'resource-loader';
+import { seedTiledMapAssetsWithImg } from '../stages/battle/map/TiledMap.seed';
+import { AppLoader, AssetLoader } from './AssetLoader';
 
 
 /**
@@ -37,7 +37,7 @@ describe('# AssetLoader', () => {
             return null as any;
         });
 
-        const assets = seedTiledMapAssets('map_1');
+        const assets = seedTiledMapAssetsWithImg('map_1');
 
         const loaderProps = {
             resources,

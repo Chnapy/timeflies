@@ -1,4 +1,4 @@
-import { GameAction } from './GameAction';
+import { GameAction } from './game-action/GameAction';
 import { switchUtil } from '@timeflies/shared';
 import { BStateAction } from '../stages/battle/battleState/BattleStateSchema';
 import { SendMessageAction, ReceiveMessageAction } from '../socket/WSClient';

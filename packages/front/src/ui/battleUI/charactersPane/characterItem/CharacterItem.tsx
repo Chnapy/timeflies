@@ -4,7 +4,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { AssetManager } from "../../../../assetManager/AssetManager";
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
-import { UIState } from "../../../UIState";
+import { GameState } from "../../../../game-state";
 import css from './characterItem.module.css';
 
 export interface CharacterItemExternProps {
@@ -25,10 +25,10 @@ interface CharacterItemInnerProps {
     spells: SpellType[];
 }
 
-export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemExternProps, UIState<'battle'>>(
-    ({ data: { battleData } }, { characterId }) => {
-        const { globalTurn } = battleData.cycle;
-        const { characters } = battleData.current;
+export const CharacterItem = connect<CharacterItemInnerProps, {}, CharacterItemExternProps, GameState>(
+    ({ battle: battleData }, { characterId }) => {
+        const { globalTurn } = battleData!.cycle;
+        const { characters } = battleData!.current;
         const character = characters.find(c => c.id === characterId)!;
 
         return {

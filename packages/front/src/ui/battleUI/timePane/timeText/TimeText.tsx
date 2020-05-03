@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { connect } from "react-redux";
-import { UIState } from '../../../UIState';
+import { GameState } from '../../../../game-state';
 import css from './timeText.module.css';
 import classNames from 'classnames';
 
@@ -10,16 +10,16 @@ interface TimeTextInnerProps {
     disabled: boolean;
 }
 
-export const TimeText = connect<TimeTextInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { cycle: { globalTurn } } } }) => {
-        if (!globalTurn) {
+export const TimeText = connect<TimeTextInnerProps, {}, {}, GameState>(
+    ({ battle }) => {
+        if (!battle!.cycle.globalTurn) {
             return {
                 startDateTime: 0,
                 disabled: true
             };
         }
 
-        const { startTime, character: currentCharacter } = globalTurn.currentTurn;
+        const { startTime, character: currentCharacter } = battle!.cycle.globalTurn.currentTurn;
 
         return {
             startDateTime: startTime,

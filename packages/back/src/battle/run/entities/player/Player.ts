@@ -1,13 +1,13 @@
 import { PlayerSnapshot } from "@timeflies/shared";
 import { PlayerData } from "../../../../PlayerData";
-import { WSSocket } from "../../../../transport/ws/WSSocket";
+import { WSSocketPool } from "../../../../transport/ws/WSSocket";
 import { Character } from "../character/Character";
 import { Entity } from '../Entity';
 import { Team } from "../team/Team";
 
 export interface Player extends Entity<PlayerSnapshot> {
     readonly name: string;
-    readonly socket: WSSocket;
+    readonly socket: WSSocketPool;
     readonly team: Team;
     readonly characters: Character[];
 }
@@ -24,7 +24,7 @@ export const Player = (
     const this_: Player = {
         id: playerData.id,
         name: playerData.name,
-        socket: playerData.socket,
+        socket: playerData.socket.createPool(),
         team,
         get characters() {
             return characters;

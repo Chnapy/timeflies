@@ -6,3 +6,9 @@ export interface TeamSnapshot {
     color: string;
     playersSnapshots: PlayerSnapshot[];
 }
+
+export interface TeamRoom {
+    id: string;
+    letter: string;
+    playersIds: string[];
+}

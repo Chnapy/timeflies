@@ -11,17 +11,19 @@ import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
 import { MapManager } from '../../../map/MapManager';
 import { Pathfinder } from '../../../map/Pathfinder';
-import { seedTiledConfig } from '../../../map/TiledMap.seed';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/SpellActionTimer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
+import { StoryProps } from '../../../../../../.storybook/preview';
 
 export default {
     title: 'graphic/CharacterGraphic',
     component: CharacterGraphic
 };
 
-export const Current: React.FC = () => {
+export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
+
+    fakeApi.init({});
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -44,7 +46,7 @@ export const Current: React.FC = () => {
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder,
             tiledManagerCreator: TiledManager
@@ -181,7 +183,9 @@ export const Current: React.FC = () => {
     </div>;
 };
 
-export const Future: React.FC = () => {
+export const Future: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
+
+    fakeApi.init({});
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -204,7 +208,7 @@ export const Future: React.FC = () => {
 
         const mapAssets = resources.map;
 
-        const mapManager = MapManager(mapAssets, seedTiledConfig('map_1'), {
+        const mapManager = MapManager(mapAssets, {
             getFutureCharacters: () => ([]),
             pathfinderCreator: Pathfinder,
             tiledManagerCreator: TiledManager

@@ -12,7 +12,7 @@ const SEED_PLAYER: () => PlayerData = () => {
         name: 'sample_player_' + id,
         state: 'init',
         staticCharacters: [],
-        socket: new WSSocket(seedWebSocket())
+        socket: new WSSocket(seedWebSocket().ws)
     };
 };
 

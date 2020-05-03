@@ -1,6 +1,6 @@
-import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
+import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, StaticCharacter } from '@timeflies/shared';
 import urlJoin from 'url-join';
-import { staticURL } from '../..';
+import { staticURL } from '../../config';
 import { PlayerData } from "../../PlayerData";
 import { TeamData } from "../../TeamData";
 import { Util } from "../../Util";
@@ -30,10 +30,7 @@ export class BattlePrepareRoom {
     }
 
     addPlayer(player: PlayerData): void {
-        player.state = 'battle-prepare';
         this.players.push(player);
-
-        player.socket.addRoom(this.id);
 
         console.log('player', player.name, ' => room', this.id, this.players.length);
 
@@ -48,14 +45,11 @@ export class BattlePrepareRoom {
 
         const mapConfig: MapConfig = this.mapConfig!;
 
-        const spellTypes: Set<SpellType> = new Set(this.characters.flatMap(c => c.staticSpells.map(s => s.type)));
-
         const payload: Omit<BattleLoadPayload, 'playerInfos'> = {
             mapConfig: {
                 ...mapConfig,
                 schemaUrl: urlJoin(staticURL, mapConfig.schemaUrl)
             },
-            spellTypes: [ ...spellTypes ]
         };
 
         this.players.forEach(p => {
@@ -65,7 +59,9 @@ export class BattlePrepareRoom {
                 name: p.name
             };
 
-            p.socket.send<BattleLoadSAction>({
+            const socket = p.socket.createPool();
+
+            socket.send<BattleLoadSAction>({
                 type: 'battle-load',
                 payload: {
                     ...payload,
@@ -73,18 +69,15 @@ export class BattlePrepareRoom {
                 }
             });
 
-            p.state = 'battle-loading';
+            socket.on<BattleLoadEndedCAction>('battle-load-end', action => {
 
-            p.socket.on<BattleLoadEndedCAction>('battle-load-end', action => {
-                p.state = 'battle-ready';
+                // if (this.players.every(p => p.state === 'battle-ready')) {
 
-                if (this.players.every(p => p.state === 'battle-ready')) {
-
-                    // move everybody to battlerunroom
-                    console.log('lets go dudes')
-                    this.battleRunRoom = BattleRunRoom(mapConfig, this.teams);
-                    this.battleRunRoom.start();
-                }
+                //     // move everybody to battlerunroom
+                //     console.log('lets go dudes')
+                //     this.battleRunRoom = BattleRunRoom(mapConfig, this.teams);
+                //     this.battleRunRoom.start();
+                // }
             });
         });
     }
@@ -110,9 +103,12 @@ export class BattlePrepareRoom {
         this.mapConfig = {
             id: 'map-1',
             schemaUrl: 'map/sample2/map.json',
-            defaultTilelayerName: 'view',
-            obstacleTilelayerName: 'obstacles',
-            initLayerName: 'init'
+            name: 'm1',
+            height: 10,
+            nbrCharactersPerTeam: 1,
+            nbrTeams: 1,
+            previewUrl: '',
+            width: 10
         };
 
         this.characters.length = 0;

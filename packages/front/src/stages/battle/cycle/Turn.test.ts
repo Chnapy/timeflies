@@ -5,7 +5,7 @@ import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/Battl
 import { Character } from "../entities/character/Character";
 import { Turn, TurnState } from "./Turn";
 
-describe('#BTurn', () => {
+describe('# Turn', () => {
 
     const timerTester = new TimerTester();
 
@@ -144,14 +144,11 @@ describe('#BTurn', () => {
         const now = timerTester.now;
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList: []
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList: []
+                }
+            } as any
         })
 
         const turn = Turn(1, now, character, () => { });
@@ -184,14 +181,11 @@ describe('#BTurn', () => {
         ];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    spellActionSnapshotList
+                }
+            } as any
         })
 
         const turn = Turn(1, now, character, () => { });
@@ -216,15 +210,12 @@ describe('#BTurn', () => {
         ];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        spellActionSnapshotList
-                    }
-                } as any
-            }
-        })
+            battle: {
+                future: {
+                    spellActionSnapshotList
+                }
+            } as any
+        });
 
         const turn = Turn(1, now, character, () => { });
         turn.refreshTimedActions();

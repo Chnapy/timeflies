@@ -1,12 +1,12 @@
-import { Position, TiledManager, TimerTester } from '@timeflies/shared';
+import { Position, TiledManager, TiledMapSeedKey, TimerTester } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { BattleCommitAction } from '../snapshot/SnapshotManager';
+import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 import { MapManager } from './MapManager';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
-import { seedTiledConfig, seedTiledMapAssets, TiledMapSeedKey } from './TiledMap.seed';
-import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { seedTiledMapAssetsWithImg } from './TiledMap.seed';
 
 describe('# MapManager', () => {
 
@@ -31,14 +31,11 @@ describe('# MapManager', () => {
         const charactersFuture = [ seedCharacter('fake', { period: 'future', id: '1', player: null }) ];
 
         StoreTest.initStore({
-            data: {
-                state: 'battle',
-                battleData: {
-                    future: {
-                        characters: charactersFuture
-                    }
-                } as any
-            }
+            battle: {
+                future: {
+                    characters: charactersFuture
+                }
+            } as any
         });
 
         return seedMapManager('real', mapKey,
@@ -64,12 +61,10 @@ describe('# MapManager', () => {
 
         getManager({ mapKey: 'map_1', tiledManagerCreator });
 
-        const assets = seedTiledMapAssets('map_1');
-
-        const config = seedTiledConfig('map_1');
+        const assets = seedTiledMapAssetsWithImg('map_1');
 
         expect(tiledManagerCreator).toHaveBeenNthCalledWith<Parameters<typeof TiledManager>>(1,
-            assets, config);
+            assets);
     });
 
     it('should give to pathfinder characters positions getter', () => {

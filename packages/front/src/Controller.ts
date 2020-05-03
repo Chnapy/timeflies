@@ -2,22 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, Store } from 'redux';
 import { ActionManager } from './action/ActionManager';
-import { GameAction, IGameAction } from './action/GameAction';
-import { App } from './App';
+import { GameAction, IGameAction } from './action/game-action/GameAction';
+import { App } from './app';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
 import { serviceDispatch } from './services/serviceDispatch';
 import { WSClient, WebSocketCreator } from './socket/WSClient';
 import { StageManager } from './stages/StageManager';
-import { RootReducer } from './ui/reducers/RootReducer';
-import { UIState } from './ui/UIState';
+import { RootReducer } from './ui/reducers/root-reducer';
+import { GameState } from './game-state';
 
 export interface AppResetAction extends IGameAction<'app/reset'> {
 }
 
 export interface ControllerProps {
     websocketCreator?: WebSocketCreator;
-    initialState?: UIState;
+    initialState?: GameState;
 }
 
 export interface ControllerStarter {
@@ -25,7 +25,7 @@ export interface ControllerStarter {
 }
 
 interface ControllerResources {
-    store?: Store<UIState, GameAction>;
+    store?: Store<GameState, GameAction>;
     client?: WSClient;
     gameCanvas?: GameCanvas;
     app?: App;
@@ -65,7 +65,7 @@ export const Controller = {
         const resources: ControllerResources = {};
         controllerResources = resources;
 
-        resources.store = createStore<UIState, GameAction, any, any>(
+        resources.store = createStore<GameState, GameAction, {}, {}>(
             RootReducer,
             initialState
         );
@@ -101,7 +101,7 @@ export const Controller = {
         };
     },
 
-    getStore(): Store<UIState, GameAction> {
+    getStore(): Store<GameState, GameAction> {
         return getResource('store');
     },
 

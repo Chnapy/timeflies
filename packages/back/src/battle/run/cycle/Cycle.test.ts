@@ -13,8 +13,8 @@ describe('# Cycle', () => {
 
     const timerTester = new TimerTester();
 
-    let onSendFn1: (action: ServerAction) => void;
-    let onSendFn2: (action: ServerAction) => void;
+    let onSendFn1: (action: ServerAction[]) => void;
+    let onSendFn2: (action: ServerAction[]) => void;
 
     let sockets: WebSocket[];
 
@@ -30,10 +30,10 @@ describe('# Cycle', () => {
         sockets = [
             seedWebSocket({
                 onSendFn: () => onSendFn1
-            }),
+            }).ws,
             seedWebSocket({
                 onSendFn: () => onSendFn2
-            })
+            }).ws
         ];
 
         players = sockets.map(s => seedPlayer({ socket: new WSSocket(s) }));
@@ -89,8 +89,8 @@ describe('# Cycle', () => {
 
         const actions: ServerAction[] = [];
 
-        const on = jest.fn((action: ServerAction) => {
-            actions.push(action);
+        const on = jest.fn((actionList: ServerAction[]) => {
+            actions.push(...actionList);
         });
 
         // test for the TWO players
@@ -122,8 +122,8 @@ describe('# Cycle', () => {
 
         const actions: ServerAction[] = [];
 
-        const on = jest.fn((action: ServerAction) => {
-            actions.push(action);
+        const on = jest.fn((actionList: ServerAction[]) => {
+            actions.push(...actionList);
         });
 
         // test for only ONE player

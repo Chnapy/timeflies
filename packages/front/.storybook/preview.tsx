@@ -1,30 +1,35 @@
+import CssBaseline from '@material-ui/core/CssBaseline';
+import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { addDecorator } from '@storybook/react';
+import React from 'react';
+import { appTheme } from '../src/ui/app-theme';
 // deploy files for AssetLoader
 import '../src/_assets/map/map.png';
 import '../src/_assets/spritesheets/sokoban.png';
-import { FakeApi, FakeApiRunner } from './fake-api';
-
+import { FakeBattleApi } from './fake-battle-api';
 
 export interface StoryProps {
-    fakeApi: ReturnType<typeof FakeApi>;
-    fakeApiStart: (container: Element) => Promise<FakeApiRunner>;
+    fakeBattleApi: ReturnType<typeof FakeBattleApi>;
 }
 
 addDecorator((storyFn, context) => {
 
-    const fakeApi = FakeApi();
-
-    const { start } = fakeApi.init({});
+    const fakeBattleApi = FakeBattleApi();
 
     const props: StoryProps = {
-        fakeApi,
-        fakeApiStart: start
+        fakeBattleApi
     };
 
-    return storyFn({
-        ...context,
-        ...props
-    });
-})
+    return (
 
-export { };
+        <ThemeProvider theme={appTheme}>
+            <CssBaseline />
+
+            {storyFn({
+                ...context,
+                ...props
+            })}
+
+        </ThemeProvider>
+    );
+})

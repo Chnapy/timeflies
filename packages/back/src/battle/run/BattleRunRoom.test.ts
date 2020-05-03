@@ -17,9 +17,12 @@ describe('BattleRunRoom', () => {
     const mapConfig: MapConfig = {
         id: 'm-1',
         schemaUrl: path.join('map', 'sample2', 'map.json'),
-        defaultTilelayerName: 'decors',
-        obstacleTilelayerName: 'obstacles',
-        initLayerName: 'init'
+        name: 'm1',
+        height: 10,
+        nbrCharactersPerTeam: 1,
+        nbrTeams: 1,
+        previewUrl: '',
+        width: 10
     };
 
 
@@ -66,18 +69,6 @@ describe('BattleRunRoom', () => {
 
             assertIsDefined(spell);
 
-            // const teamsCopy = teams.map(Team);
-            // const map = MapManager(mapConfig);
-            // const { initPositions } = map;
-            // teamsCopy.forEach((t, i) => {
-            //     t.placeCharacters(initPositions[ i ]);
-            // });
-            // teamsCopy[0].players[0].characters[0].position = position;
-            // const {battleHash: nextHash} = getBattleSnapshotWithHash({
-            //     launchTime: -1, time: -1, 
-            //     teamsSnapshots: teamsCopy.map(t => t.toSnapshot())
-            // });
-
             const initialAction: SpellActionCAction = {
                 type: 'battle/spellAction',
                 sendTime: Date.now() + 5000,
@@ -97,45 +88,49 @@ describe('BattleRunRoom', () => {
                 ? c0GetCharActionCAction(initialAction)
                 : initialAction;
 
-            clients[ 0 ].send(JSON.stringify(action));
+            clients[ 0 ].send(JSON.stringify([ action ]));
         };
 
         clients[ 0 ].onmessage = (message: any) => {
             if (message.type !== 'message') return;
 
-            const action: BattleRunSAction = JSON.parse(message.data);
+            const actionList: BattleRunSAction[] = JSON.parse(message.data);
 
-            switch (action.type) {
-                case 'battle-run/launch':
-                    const { teamsSnapshots } = action.battleSnapshot;
-                    const players = teamsSnapshots.flatMap(t => t.playersSnapshots);
-                    const characters = players.flatMap(p => p.charactersSnapshots);
+            actionList.forEach(action => {
 
-                    const char = characters[ 0 ];
+                switch (action.type) {
+                    case 'battle-run/launch':
+                        const { teamsSnapshots } = action.battleSnapshot;
+                        const players = teamsSnapshots.flatMap(t => t.playersSnapshots);
+                        const characters = players.flatMap(p => p.charactersSnapshots);
 
-                    if (c0OnStart)
-                        c0OnStart();
+                        const char = characters[ 0 ];
 
-                    onStart(char);
-                    break;
+                        if (c0OnStart)
+                            c0OnStart();
 
-                case 'confirm':
-                    if (c0OnConfirm)
-                        c0OnConfirm(action);
-                    break;
-            }
+                        onStart(char);
+                        break;
 
+                    case 'confirm':
+                        if (c0OnConfirm)
+                            c0OnConfirm(action);
+                        break;
+                }
+            });
         };
 
         clients[ 1 ].onmessage = (message: any) => {
             if (message.type !== 'message') return;
 
-            const action: BattleRunSAction = JSON.parse(message.data);
+            const actionList: BattleRunSAction[] = JSON.parse(message.data);
 
-            if (action.type === 'notify') {
-                if (c1OnNotify)
-                    c1OnNotify(action);
-            }
+            actionList.forEach(action => {
+                if (action.type === 'notify') {
+                    if (c1OnNotify)
+                        c1OnNotify(action);
+                }
+            });
         };
 
         battleRunRoom.start();
@@ -192,23 +187,25 @@ describe('BattleRunRoom', () => {
         clients[ 0 ].onmessage = (message: any) => {
             if (message.type !== 'message') return;
 
-            const action: BattleRunSAction = JSON.parse(message.data);
+            const actionList: BattleRunSAction[] = JSON.parse(message.data);
 
-            encounteredTypes.push(action.type);
+            actionList.forEach(action => {
+                encounteredTypes.push(action.type);
 
-            if (action.type === 'battle-run/launch') {
+                if (action.type === 'battle-run/launch') {
 
-                expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
+                    expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
 
-                const positions = action.battleSnapshot.teamsSnapshots
-                    .flatMap(t => t.playersSnapshots
-                        .flatMap(p => p.charactersSnapshots
-                            .flatMap(c => c.position)
-                        )
-                    );
-                expect(positions).not.toContain(undefined);
-                expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
-            }
+                    const positions = action.battleSnapshot.teamsSnapshots
+                        .flatMap(t => t.playersSnapshots
+                            .flatMap(p => p.charactersSnapshots
+                                .flatMap(c => c.position)
+                            )
+                        );
+                    expect(positions).not.toContain(undefined);
+                    expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
+                }
+            });
         };
 
         battleRunRoom.start();

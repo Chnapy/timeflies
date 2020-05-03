@@ -3,17 +3,33 @@ export type EnvManager<K extends string> = {
     readonly [ key in K ]: string;
 };
 
+const getStorybookFilledEnv = (requiredKeys: string[]) => requiredKeys.reduce((acc, k) => {
+
+    if(acc[k] === undefined) {
+        acc[k] = 'placeholder';
+    }
+
+    return acc;
+}, {...process.env});
+
+
 /**
  * Check presence of required env variables,
- * throw error if not.
+ * throw error if not (unless storybook context).
  * 
  * Return object filled by these variables.
  */
 export const EnvManager = <K extends string>(...requiredKeys: K[]): EnvManager<K> => {
 
+    const storybookContext = !!process.env['STORYBOOK_CONTEXT'];
+
+    const env = storybookContext
+        ? getStorybookFilledEnv(requiredKeys)
+        : process.env;
+
     const missingKeys: K[] = [];
     const envObject = requiredKeys.reduce<any>((acc, k) => {
-        const v = process.env[ k as any ];
+        const v = env[ k as any ];
 
         if (!v) {
             missingKeys.push(k);

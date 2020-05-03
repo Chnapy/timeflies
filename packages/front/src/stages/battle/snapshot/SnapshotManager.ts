@@ -1,5 +1,5 @@
 import { assertIsDefined, assertThenGet, BattleSnapshot, getBattleSnapshotWithHash, getId } from '@timeflies/shared';
-import { IGameAction } from '../../../action/GameAction';
+import { IGameAction } from '../../../action/game-action/GameAction';
 import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';

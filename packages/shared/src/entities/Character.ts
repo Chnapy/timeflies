@@ -28,3 +28,9 @@ export interface CharacterSnapshot {
     readonly features: CharacterFeatures;
     spellsSnapshots: SpellSnapshot[];
 }
+
+export interface CharacterRoom {
+    readonly id: string;
+    readonly type: CharacterType;
+    position: Position;
+}

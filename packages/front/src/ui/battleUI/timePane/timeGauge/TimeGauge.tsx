@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { connect } from "react-redux";
-import { UIState } from "../../../UIState";
+import { GameState } from "../../../../game-state";
 import css from './timeGauge.module.css';
 import classNames from "classnames";
 
@@ -11,8 +11,9 @@ interface TimeGaugeInnerProps {
     disabled: boolean;
 }
 
-export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, UIState<'battle'>>(
-    ({ data: { battleData: { cycle: { globalTurn } } } }) => {
+export const TimeGauge = connect<TimeGaugeInnerProps, {}, {}, GameState>(
+    ({ battle }) => {
+        const { globalTurn } = battle!.cycle;
         if (!globalTurn) {
             return {
                 startDateTime: 0,

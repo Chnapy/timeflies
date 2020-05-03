@@ -1,4 +1,4 @@
-import { GameAction } from "../action/GameAction";
+import { GameAction } from "../action/game-action/GameAction";
 import { Controller } from "../Controller";
 import { SendMessageAction } from "../socket/WSClient";
 

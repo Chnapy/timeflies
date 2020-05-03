@@ -21,8 +21,7 @@ describe('# SpellActionReceiver', () => {
     });
 
     const seedMapManager = (): MapManager => ({
-        initPositions: [],
-        getBresenhamLine: () => ([])
+        initPositions: []
     });
 
     const getAll = ({ checkResult, generateSnapshotHash, spellActionHash, isHashCorrect, deaths = [] }: {
@@ -41,10 +40,12 @@ describe('# SpellActionReceiver', () => {
 
         const sendFn = jest.fn();
 
+        const { ws } = seedWebSocket({
+            onSendFn: () => sendFn
+        });
+
         const p = seedPlayer({
-            socket: new WSSocket(seedWebSocket({
-                onSendFn: () => sendFn
-            }))
+            socket: new WSSocket(ws)
         });
 
         const sendFnP2 = jest.fn();
@@ -55,12 +56,12 @@ describe('# SpellActionReceiver', () => {
             seedPlayer({
                 socket: new WSSocket(seedWebSocket({
                     onSendFn: () => sendFnP2
-                }))
+                }).ws)
             }),
             seedPlayer({
                 socket: new WSSocket(seedWebSocket({
                     onSendFn: () => sendFnP3
-                }))
+                }).ws)
             })
         ];
 
@@ -143,12 +144,12 @@ describe('# SpellActionReceiver', () => {
                 spellAction
             });
 
-            expect(sendFn).toHaveBeenNthCalledWith<[ ConfirmSAction ]>(1, {
+            expect(sendFn).toHaveBeenNthCalledWith<[ [ ConfirmSAction ] ]>(1, [ {
                 type: 'confirm',
                 sendTime: expect.anything(),
                 isOk: false,
                 lastCorrectHash: 'firstHash'
-            });
+            } ]);
         });
 
     });
@@ -172,12 +173,12 @@ describe('# SpellActionReceiver', () => {
                 spellAction
             });
 
-            expect(sendFn).toHaveBeenNthCalledWith<[ ConfirmSAction ]>(1, {
+            expect(sendFn).toHaveBeenNthCalledWith<[ [ ConfirmSAction ] ]>(1, [ {
                 type: 'confirm',
                 sendTime: expect.anything(),
                 isOk: false,
                 lastCorrectHash: 'firstHash'
-            });
+            } ]);
         });
 
         it.todo('should not have modify battle state');
@@ -202,12 +203,12 @@ describe('# SpellActionReceiver', () => {
                 spellAction
             });
 
-            expect(sendFn).toHaveBeenNthCalledWith<[ ConfirmSAction ]>(1, {
+            expect(sendFn).toHaveBeenNthCalledWith<[ [ ConfirmSAction ] ]>(1, [ {
                 type: 'confirm',
                 sendTime: expect.anything(),
                 isOk: true,
                 lastCorrectHash: 'one'
-            });
+            } ]);
         });
 
         it('should notify others players', () => {
@@ -228,11 +229,11 @@ describe('# SpellActionReceiver', () => {
             });
 
             for (const fn of sendFnsOthers) {
-                expect(fn).toHaveBeenNthCalledWith<[ NotifySAction ]>(1, {
+                expect(fn).toHaveBeenNthCalledWith<[ [ NotifySAction ] ]>(1, [ {
                     type: 'notify',
                     sendTime: expect.anything(),
                     spellActionSnapshot: spellAction
-                });
+                } ]);
             }
         });
 

@@ -1,5 +1,6 @@
-import { assertIsDefined, assertThenGet, equals, Position, SpellType, TiledTileset } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, equals, Position, SpellType } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
+import { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { BStateAction } from '../../battleState/BattleStateSchema';
