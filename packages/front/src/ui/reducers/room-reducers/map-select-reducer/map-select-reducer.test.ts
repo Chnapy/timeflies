@@ -1,6 +1,7 @@
 import { RoomServerAction, seedTiledMap, TiledLayerTilelayer } from '@timeflies/shared';
 import { Controller } from '../../../../Controller';
 import { ReceiveMessageAction } from '../../../../socket/WSClient';
+import { seedMapConfig } from '../../../../stages/battle/map/MapManager.seed';
 import { StoreTest } from '../../../../StoreTest';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
 import { MapLoadedAction, MapSelectData, MapSelectReducer } from './map-select-reducer';
@@ -10,6 +11,14 @@ describe('# map-select-reducer', () => {
     const getAction = (roomMessage: RoomServerAction): ReceiveMessageAction<RoomServerAction> => ({
         type: 'message/receive',
         message: roomMessage
+    });
+
+    beforeEach(() => {
+        StoreTest.beforeTest();
+    });
+
+    afterEach(() => {
+        StoreTest.afterTest();
     });
 
     it('should return the good initial state', () => {
@@ -53,6 +62,46 @@ describe('# map-select-reducer', () => {
             mapList: [],
             mapSelected: null
         });
+    });
+
+    it('should init state on room state action', async () => {
+
+        const mapConfig = seedMapConfig('map_1');
+
+        const action: ReceiveMessageAction<RoomServerAction.RoomState> = {
+            type: 'message/receive',
+            message: {
+                type: 'room/state',
+                sendTime: -1,
+                roomId: '',
+                mapSelected: {
+                    config: mapConfig,
+                    placementTileList: [ {
+                        teamId: 't1',
+                        position: { x: 0, y: 0 }
+                    } ]
+                },
+                playerList: [],
+                teamList: []
+            }
+        };
+
+        expect(
+            MapSelectReducer(undefined, action)
+        ).toMatchObject<MapSelectData>({
+            mapList: [ mapConfig ],
+            mapSelected: {
+                id: mapConfig.id,
+                tileListLoading: true,
+                tileList: [ {
+                    type: 'placement',
+                    teamId: 't1',
+                    position: { x: 0, y: 0 }
+                } ]
+            }
+        });
+
+        await Controller.loader.newInstance().load();
     });
 
     it('should update tile list on map list action', () => {

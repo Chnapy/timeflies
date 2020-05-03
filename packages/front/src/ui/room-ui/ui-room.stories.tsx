@@ -90,6 +90,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         battle: null,
         load: null,
         room: {
+            roomId: '',
             teamsTree: {
                 playerList: [
                     {
@@ -143,7 +144,9 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    fakeBattleApi.init({ initialState });
+    const { Provider } = fakeBattleApi.init({ initialState });
 
-    return <UIRoom />;
+    return <Provider>
+        <UIRoom />
+    </Provider>;
 };

@@ -13,16 +13,19 @@ describe('# room > on player join', () => {
 
         room.onJoin(playerDataRaw);
 
-        expect(sendList).toContainEqual<RoomServerAction.PlayerSet>({
-            type: 'room/player/set',
-            action: 'add',
-            sendTime: expect.anything(),
-            player: expect.objectContaining<Partial<PlayerRoom>>({
-                id: 'p1',
-                isAdmin: true,
-            }),
-            teamList: []
-        });
+        expect(sendList).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining<Partial<RoomServerAction.RoomState>>({
+                    type: 'room/state',
+                    playerList: expect.arrayContaining([
+                        expect.objectContaining<Partial<PlayerRoom>>({
+                            id: 'p1',
+                            isAdmin: true,
+                        })
+                    ]),
+                })
+            ])
+        );
     });
 
     it('should notify next players joins as no-admin', async () => {
@@ -45,36 +48,62 @@ describe('# room > on player join', () => {
         });
     });
 
-    it('should notify everyone of new player join', () => {
+    describe('should notify everyone of', () => {
 
-        const { room, sendList: sendListJ1 } = createRoomWithCreator('p1');
+        it('new player', () => {
 
-        const { playerDataRaw, sendList: sendListJ2 } = createPlayer('p2', false);
+            const { room, sendList: sendListJ1 } = createRoomWithCreator('p1');
 
-        room.onJoin(playerDataRaw);
+            const { playerDataRaw, sendList: sendListJ2 } = createPlayer('p2', false);
 
-        const expectedSend: RoomServerAction.PlayerSet = {
-            type: 'room/player/set',
-            sendTime: expect.anything(),
-            action: 'add',
-            player: {
-                id: 'p2',
-                name: 'p2',
-                isAdmin: false,
-                isLoading: false,
-                isReady: false,
-                characters: []
-            },
-            teamList: []
-        };
+            room.onJoin(playerDataRaw);
 
-        expect(sendListJ1).toContainEqual(expectedSend);
-        expect(sendListJ2).not.toContainEqual(expectedSend);
+            const expectedSend: RoomServerAction.PlayerSet = {
+                type: 'room/player/set',
+                sendTime: expect.anything(),
+                action: 'add',
+                player: {
+                    id: 'p2',
+                    name: 'p2',
+                    isAdmin: false,
+                    isLoading: false,
+                    isReady: false,
+                    characters: []
+                },
+                teamList: expect.anything()
+            };
+
+            expect(sendListJ1).toContainEqual(expectedSend);
+            expect(sendListJ2).not.toContainEqual(expectedSend);
+        });
+
+        it('existing teams', () => {
+
+            const { createRoom, j1Infos, j2Infos, teamJ1, teamJ2 } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+
+            const room = createRoom();
+
+            const { playerDataRaw } = createPlayer('p3', false);
+
+            room.onJoin(playerDataRaw);
+
+            const expectedSend: RoomServerAction.PlayerSet = {
+                type: 'room/player/set',
+                sendTime: expect.anything(),
+                action: 'add',
+                player: expect.anything(),
+                teamList: [ teamJ1, teamJ2 ]
+            };
+
+            expect(j1Infos.sendList).toContainEqual(expectedSend);
+            expect(j2Infos.sendList).toContainEqual(expectedSend);
+        });
+
     });
 
     it('should send all the room state to new player join', async () => {
 
-        const { createRoom, tilesTeamJ1, tilesTeamJ2, j1Infos, j2Infos, teamJ1, teamJ2 } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+        const { createRoom, tilesTeamJ1, tilesTeamJ2, j1Infos, j2Infos, teamJ1, teamJ2, mapConfig, roomId } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
         const room = createRoom();
 
@@ -85,8 +114,9 @@ describe('# room > on player join', () => {
         const expectedSend: RoomServerAction.RoomState = {
             type: 'room/state',
             sendTime: expect.anything(),
+            roomId,
             mapSelected: {
-                id: 'm1',
+                config: mapConfig,
                 placementTileList: [
                     ...tilesTeamJ1, ...tilesTeamJ2
                 ]

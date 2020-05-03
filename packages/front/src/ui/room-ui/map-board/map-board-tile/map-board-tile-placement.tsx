@@ -25,19 +25,28 @@ export const MapBoardTilePlacement: React.FC<MapBoardTilePlacementProps> = ({ te
 
     const currentPlayerId = useGameCurrentPlayer(p => p.id);
 
-    const { team, isAllowed, character } = useGameStep('room', ({ teamsTree }) => {
+    const { team, isAllowed, character, isCharacterMine } = useGameStep('room', ({ teamsTree }) => {
 
-        const team = teamsTree.teamList.find(t => t.id === teamId);
+        const { teamList, playerList } = teamsTree;
+
+        const team = teamList.find(t => t.id === teamId);
         assertIsDefined(team);
 
-        const isAllowed = team.playersIds.some(id => id === currentPlayerId);
+        const isAllowed = team.playersIds.includes(currentPlayerId)
+            || !teamList.some(t => t.playersIds.includes(currentPlayerId))
 
-        const character = findCharacter(teamsTree.playerList, position);
+        const character = findCharacter(playerList, position);
+
+        const currentPlayer = playerList.find(p => p.id === currentPlayerId);
+        assertIsDefined(currentPlayer);
+
+        const isCharacterMine = currentPlayer.characters.some(c => c.id === character?.id);
 
         return {
             team,
             isAllowed,
-            character
+            character,
+            isCharacterMine
         };
     });
 
@@ -45,7 +54,8 @@ export const MapBoardTilePlacement: React.FC<MapBoardTilePlacementProps> = ({ te
         position,
         team,
         character,
-        isAllowed
+        isAllowed,
+        isCharacterMine
     };
 
     return <TilePlacement {...tileProps} />;
@@ -55,10 +65,11 @@ interface TilePlacementProps {
     position: Position;
     team: TeamRoom;
     character: CharacterRoom | undefined;
+    isCharacterMine: boolean;
     isAllowed: boolean;
 }
 
-const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character, isAllowed }) => {
+const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character, isAllowed, isCharacterMine }) => {
     const [ anchorEl, setAnchorEl ] = React.useState(null);
 
     const { sendCharacterAdd, sendCharacterRemove } = useGameNetwork({
@@ -93,6 +104,9 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
         ? (character ? <Avatar variant='square' /> : <AddIcon fontSize='large' />)
         : null;
 
+    const canAddCharacter = isAllowed && (!character || isCharacterMine);
+    const canRemove = isCharacterMine;
+
     return <Box
         position='relative'
         flexGrow={1}
@@ -101,7 +115,7 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
         bgcolor={isAllowed ? '#FFF' : '#F8F8F8'}
         border='2px solid #444'
     >
-        <CardActionArea disabled={!isAllowed} onClick={handleMainClick} style={{
+        <CardActionArea disabled={!canAddCharacter} onClick={handleMainClick} style={{
             flexGrow: 1,
             display: 'flex',
         }}>
@@ -114,7 +128,7 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
             <TeamIndicator teamLetter={team.letter} />
         </Box>
 
-        {isAllowed && character && (
+        {canRemove && (
             <Box position='absolute' right={0} top={0} style={{
                 transform: 'translate(50%, -50%)'
             }}>

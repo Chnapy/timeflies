@@ -47,7 +47,10 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
 
     const [ open, setOpen ] = React.useState(defaultOpen);
 
-    const { sendMapSelect } = useGameNetwork({
+    const { sendMapList, sendMapSelect } = useGameNetwork({
+        sendMapList: () => ({
+            type: 'room/map/list'
+        }),
         sendMapSelect: (mapId: string) => ({
             type: 'room/map/select',
             mapId
@@ -55,7 +58,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
     });
 
     const { mapList, mapSelected } = useGameStep('room', room => room.map);
-
+    
     const map = mapSelected
         ? mapList.find(m => m.id === mapSelected.id)
         : null;
@@ -67,6 +70,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
                 <RenderSingleChild
                     map={map}
                     onClick={() => {
+                        sendMapList();
                         setOpen(true);
                     }}
                 />

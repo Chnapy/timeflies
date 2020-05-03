@@ -4,7 +4,6 @@ import { MapConfig } from '../../map';
 import { TAction } from '../TAction';
 
 export type RoomServerAction =
-    | RoomServerAction.RoomCreate
     | RoomServerAction.PlayerSet
     | RoomServerAction.CharacterSet
     | RoomServerAction.MapList
@@ -18,8 +17,6 @@ export type MapPlacementTile = {
 };
 
 export module RoomServerAction {
-
-    export type RoomCreate = TAction<'room/create'>;
 
     export type PlayerSet = TAction<'room/player/set'> & {
         teamList: TeamRoom[];
@@ -66,6 +63,13 @@ export module RoomServerAction {
         >;
     };
 
-    export type RoomState = TAction<'room/state'> &
-        Omit<MapSelect, 'type'>;
+    export type RoomState = TAction<'room/state'> & {
+        roomId: string;
+        mapSelected: {
+            config: MapConfig;
+            placementTileList: MapPlacementTile[];
+        } | null;
+        teamList: TeamRoom[];
+        playerList: PlayerRoom[];
+    };
 }

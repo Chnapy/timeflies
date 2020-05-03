@@ -1,14 +1,26 @@
+import { Box, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { MapBoard } from './map-board/map-board';
 import { EntityTree } from './entity-tree/entity-tree';
+import { MapBoard } from './map-board/map-board';
 import { MapSelector } from './map-selector/map-selector';
-import { Box } from '@material-ui/core';
 
+
+const useStyles = makeStyles(({palette, spacing}) => ({
+    root: {
+        display: 'flex',
+        height: '100%',
+        padding: spacing(2),
+        backgroundColor: palette.background.default,
+        pointerEvents: 'all'
+    }
+}));
 
 export const UIRoom: React.FC = () => {
 
+    const classes = useStyles();
+
     return (
-        <Box display='flex' m={2}>
+        <div className={classes.root}>
 
             <Box display='flex' flexDirection='column' width={400} flexShrink={0}>
 
@@ -19,12 +31,12 @@ export const UIRoom: React.FC = () => {
                 </Box>
             </Box>
 
-            <Box ml={2}>
+            <Box overflow='auto' ml={2}>
                 <MapBoard />
 
             </Box>
 
 
-        </Box>
+        </div>
     );
 };

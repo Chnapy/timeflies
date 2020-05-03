@@ -2,6 +2,7 @@ import { clone, DeepReadonly, MapConfig, MapPlacementTile, PlayerRoom, TeamRoom 
 import { PlayerRoomDataConnected } from './room';
 
 export type RoomState = {
+    id: string;
     playerDataList: PlayerRoomDataConnected[];
     playerList: PlayerRoom[];
     teamList: TeamRoom[];
@@ -15,7 +16,7 @@ type RoomStateClone = Omit<RoomState, 'playerDataList'>;
 
 export type RoomStateManager = ReturnType<typeof RoomStateManager>;
 
-export const RoomStateManager = (initialState: Partial<RoomState>) => {
+export const RoomStateManager = (id: string, initialState: Partial<RoomState>) => {
 
     const cloneFn = <K extends keyof RoomStateClone>(...keys: K[]): Pick<RoomStateClone, K> => {
 
@@ -28,6 +29,7 @@ export const RoomStateManager = (initialState: Partial<RoomState>) => {
     };
 
     let state: DeepReadonly<RoomState> = {
+        id,
         playerDataList: [],
         playerList: [],
         teamList: [],

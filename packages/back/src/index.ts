@@ -1,25 +1,16 @@
-import { EnvManager, getEndpoint } from '@timeflies/shared';
 import cors from "cors";
 import express from 'express';
 import http from 'http';
-import urlJoin from 'url-join';
 import WebSocket from 'ws';
 import { App } from './App';
+import { envManager } from './envManager';
+import { staticPostURL } from './config';
 
 // TODO use shared config
 
 // Env variables
 
-const envManager = EnvManager('PORT', 'HOST_URL');
-
 const port = Number(envManager.PORT);
-const hostUrl = getEndpoint('http', envManager.HOST_URL);
-
-// Static
-
-const staticPostURL = '/static';
-
-export const staticURL = urlJoin(hostUrl, staticPostURL);
 
 // Express
 

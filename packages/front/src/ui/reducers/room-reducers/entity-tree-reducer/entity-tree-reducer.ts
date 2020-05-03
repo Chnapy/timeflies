@@ -14,6 +14,13 @@ const initialState: EntityTreeData = {
 
 type SubReducer<A> = (state: EntityTreeData, action: A) => EntityTreeData;
 
+const reduceMapState: SubReducer<RoomServerAction.RoomState> = (state, message) => {
+    return {
+        playerList: message.playerList,
+        teamList: message.teamList
+    };
+};
+
 const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, message) => {
     return {
         playerList: message.playerList,
@@ -75,6 +82,9 @@ export const EntityTreeReducer: Reducer<EntityTreeData, GameAction> = (state = i
             const { message } = action;
 
             switch (message.type) {
+
+                case 'room/state':
+                    return reduceMapState(state, message);
 
                 case 'room/map/select':
                     return reduceMapSelect(state, message);

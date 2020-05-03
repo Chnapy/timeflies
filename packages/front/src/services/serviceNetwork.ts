@@ -1,6 +1,5 @@
 import { ClientAction, DistributiveOmit } from "@timeflies/shared";
 import { Controller } from "../Controller";
-import { SendMessageAction } from "../socket/WSClient";
 
 type ClientActionWOSendTime<A extends ClientAction> = DistributiveOmit<A, 'sendTime'>;
 
@@ -9,9 +8,7 @@ type Params<A extends ClientAction> = {
 };
 
 type Return<P extends Params<A>, A extends ClientAction> = {
-    [ K in keyof P ]: P[ K ] extends (...args) => ClientActionWOSendTime<infer A>
-    ? (...args: Parameters<P[ K ]>) => SendMessageAction<A>
-    : never;
+    [ K in keyof P ]: (...args: Parameters<P[ K ]>) => Promise<void>;
 };
 
 export const serviceNetwork = async <P extends Params<A>, A extends ClientAction>(map: P): Promise<Return<P, A>> => {

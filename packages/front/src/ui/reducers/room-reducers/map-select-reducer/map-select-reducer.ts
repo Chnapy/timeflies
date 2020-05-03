@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
 import { GameAction, IGameAction } from '../../../../action/game-action/GameAction';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
-import { MapConfig, assertIsDefined, TiledMapAssets, TiledManager, RoomServerAction, assertIsNonNullable } from '@timeflies/shared';
+import { MapConfig, assertIsDefined, TiledMapAssets, TiledManager, RoomServerAction, assertIsNonNullable, MapPlacementTile } from '@timeflies/shared';
 import { Controller } from '../../../../Controller';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
 
@@ -25,6 +25,58 @@ const initialData: MapSelectData = {
 
 type SubReducer<A> = (state: MapSelectData, action: A) => MapSelectData;
 
+const handleMapSelect = (
+    state: MapSelectData,
+    mapConfig: MapConfig | null, placementTileList: MapPlacementTile[]
+): MapSelectData => {
+    if (!mapConfig) {
+        return {
+            ...state,
+            mapSelected: null
+        };
+    }
+
+    const { dispatchMapLoaded } = serviceDispatch({
+        dispatchMapLoaded: (assets: TiledMapAssets): MapLoadedAction => ({
+            type: 'room/map/loaded',
+            assets
+        })
+    });
+
+    Controller.loader.newInstance()
+        .add('map', mapConfig.schemaUrl)
+        .load()
+        .then(({ map }) => {
+            dispatchMapLoaded(map);
+        });
+
+    return {
+        ...state,
+        mapSelected: {
+            id: mapConfig.id,
+            tileListLoading: true,
+            tileList: placementTileList.map(({ position, teamId }) => ({
+                type: 'placement',
+                position,
+                teamId
+            }))
+        }
+    };
+};
+
+const reduceRoomState: SubReducer<RoomServerAction.RoomState> = (state, {
+    mapSelected
+}) => {
+    if (!mapSelected) {
+        return handleMapSelect(state, null, []);
+    }
+
+    return handleMapSelect({
+        ...state,
+        mapList: [ mapSelected.config ]
+    }, mapSelected.config, mapSelected.placementTileList);
+};
+
 const reduceMapList: SubReducer<RoomServerAction.MapList> = (state, { mapList }) => {
     return {
         ...state,
@@ -35,10 +87,7 @@ const reduceMapList: SubReducer<RoomServerAction.MapList> = (state, { mapList })
 const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, { mapSelected }) => {
 
     if (!mapSelected) {
-        return {
-            ...state,
-            mapSelected: null
-        };
+        return handleMapSelect(state, null, []);
     }
 
     const { mapList } = state;
@@ -46,32 +95,7 @@ const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, { mapSel
     const config = mapList.find(m => m.id === mapSelected.id);
     assertIsDefined(config);
 
-    const { dispatchMapLoaded } = serviceDispatch({
-        dispatchMapLoaded: (assets: TiledMapAssets): MapLoadedAction => ({
-            type: 'room/map/loaded',
-            assets
-        })
-    });
-
-    Controller.loader.newInstance()
-        .add('map', config.schemaUrl)
-        .load()
-        .then(({ map }) => {
-            dispatchMapLoaded(map);
-        });
-
-    return {
-        ...state,
-        mapSelected: {
-            id: mapSelected.id,
-            tileListLoading: true,
-            tileList: mapSelected.placementTileList.map(({ position, teamId }) => ({
-                type: 'placement',
-                position,
-                teamId
-            }))
-        }
-    };
+    return handleMapSelect(state, config, mapSelected.placementTileList);
 };
 
 const reduceMapLoaded: SubReducer<MapLoadedAction> = (state, action) => {
@@ -91,8 +115,8 @@ const reduceMapLoaded: SubReducer<MapLoadedAction> = (state, action) => {
             ...mapSelected,
             tileListLoading: false,
             tileList: [
-                ...mapSelected.tileList,
-                ...obstacleTiles
+                ...obstacleTiles,
+                ...mapSelected.tileList
             ]
         }
     };
@@ -106,6 +130,9 @@ export const MapSelectReducer: Reducer<MapSelectData, GameAction> = (state = ini
             const { message } = action;
 
             switch (message.type) {
+
+                case 'room/state':
+                    return reduceRoomState(state, message);
 
                 case 'room/map/list':
                     return reduceMapList(state, message);

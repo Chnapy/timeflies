@@ -50,6 +50,54 @@ describe('# entity-tree-reducer', () => {
         });
     });
 
+    it('should init state on room state action', () => {
+
+        const action: ReceiveMessageAction<RoomServerAction.RoomState> = {
+            type: 'message/receive',
+            message: {
+                type: 'room/state',
+                sendTime: -1,
+                roomId: '',
+                mapSelected: null,
+                playerList: [ {
+                    id: 'p1',
+                    name: 'p1',
+                    isAdmin: true,
+                    isLoading: false,
+                    isReady: false,
+                    characters: []
+                } ],
+                teamList: [ {
+                    id: 't1',
+                    letter: 'A',
+                    playersIds: [ 'p1' ]
+                } ]
+            }
+        };
+
+        expect(
+            EntityTreeReducer(undefined, action)
+        ).toMatchObject<EntityTreeData>({
+            playerList: [
+                {
+                    id: 'p1',
+                    name: 'p1',
+                    isAdmin: true,
+                    isLoading: false,
+                    isReady: false,
+                    characters: []
+                }
+            ],
+            teamList: [
+                {
+                    id: 't1',
+                    letter: 'A',
+                    playersIds: [ 'p1' ]
+                }
+            ]
+        });
+    });
+
     it('should update teams on map select', () => {
 
         const action = getAction({
@@ -98,14 +146,14 @@ describe('# entity-tree-reducer', () => {
                 letter: 'A',
                 playersIds: []
             } ],
-            playerList: [{
+            playerList: [ {
                 id: 'p-2',
                 name: 'p2',
                 isAdmin: false,
                 isLoading: false,
                 isReady: false,
                 characters: []
-            }]
+            } ]
         });
 
         const state: EntityTreeData = {
@@ -116,7 +164,7 @@ describe('# entity-tree-reducer', () => {
                 isLoading: false,
                 isReady: false,
                 characters: []
-            },{
+            }, {
                 id: 'p-2',
                 name: 'p2',
                 isAdmin: false,
@@ -130,14 +178,14 @@ describe('# entity-tree-reducer', () => {
         expect(
             EntityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
-            playerList: [{
+            playerList: [ {
                 id: 'p-2',
                 name: 'p2',
                 isAdmin: false,
                 isLoading: false,
                 isReady: false,
                 characters: []
-            }],
+            } ],
             teamList: [ {
                 id: 't-1',
                 letter: 'A',

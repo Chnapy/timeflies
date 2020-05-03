@@ -12,6 +12,7 @@ export interface RoomCreateAction extends IGameAction<'room/create'> {
 }
 
 export interface RoomData {
+    roomId: string;
     map: MapSelectData;
     teamsTree: EntityTreeData;
 }
@@ -22,8 +23,9 @@ export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, 
 
         case 'message/receive':
             const { message } = action;
-            if (message.type === 'room/create') {
+            if (message.type === 'room/state') {
                 return {
+                    roomId: message.roomId,
                     map: MapSelectReducer(undefined, action),
                     teamsTree: EntityTreeReducer(undefined, action)
                 };

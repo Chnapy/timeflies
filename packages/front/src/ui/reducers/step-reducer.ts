@@ -9,9 +9,11 @@ export const StepReducer: Reducer<GameStateStep, GameAction> = (state = 'boot', 
             return 'load';
         case 'battle/launch':
             return 'battle';
-        // case 'message/receive':
-        //     if(action.message.type === )
-        //     return 'room';
+        case 'message/receive':
+            if (action.message.type === 'room/state') {
+                return 'room';
+            }
+            break;
     }
 
     return state;

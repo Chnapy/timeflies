@@ -9,14 +9,23 @@ import { getRoomMapSelect } from './room-map-select';
 import { getRoomPlayerLeave } from './room-player-leave';
 import { getRoomPlayerState } from './room-player-state';
 import { RoomStateManager, RoomState } from './room-state-manager';
+import urlJoin from 'url-join';
+import { staticURL } from '../../config';
+import { Util } from '../../Util';
+
+type DataManager = {
+    urlTransform: (url: string) => ({
+        forServer: () => string;
+        forClient: () => string;
+    });
+    getMapConfigList: () => MapConfig[];
+};
 
 type RoomListenerDependencies = {
     playerData: PlayerRoomDataConnected;
     sendToEveryone: WSSocket[ 'send' ];
     stateManager: RoomStateManager;
-    dataManager: {
-        getMapConfigList: () => MapConfig[];
-    };
+    dataManager: DataManager;
     readFileMap: (url: string) => Promise<TiledMap>;
     getPlayerRoom: () => DeepReadonly<PlayerRoom>;
 };
@@ -29,12 +38,12 @@ const getMapConfigList = (): MapConfig[] => [
     {
         id: 'm1',
         name: 'Map 1',
-        width: 10,
-        height: 12,
+        width: 20,
+        height: 20,
         nbrTeams: 2,
         nbrCharactersPerTeam: 3,
         previewUrl: '',
-        schemaUrl: ''
+        schemaUrl: 'map/sample2/map.json'
     }
 ];
 
@@ -50,19 +59,23 @@ export type PlayerRoomDataConnected = IPlayerRoomData<WSSocketPool>;
 
 export type RoomDependencies = {
     initialState: Partial<RoomState>;
-    dataManager: {
-        getMapConfigList: () => MapConfig[];
-    };
+    dataManager: DataManager;
     readFileMap: (url: string) => Promise<TiledMap>;
 };
 
 export type Room = ReturnType<typeof Room>;
 
+const getDataManager = (): DataManager => ({
+    urlTransform: (url) => ({
+        forServer: () => urlJoin('public', url),
+        forClient: () => urlJoin(staticURL, url),
+    }),
+    getMapConfigList
+});
+
 export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencies = {
     initialState: {},
-    dataManager: {
-        getMapConfigList
-    },
+    dataManager: getDataManager(),
     readFileMap: async url => {
 
         const schemaRaw = await readFile(url, 'utf8');
@@ -71,7 +84,9 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
     }
 }) => {
 
-    const stateManager = RoomStateManager(initialState);
+    const stateManager = RoomStateManager(Util.getUnique(), initialState);
+
+    const roomId = stateManager.get().id;
 
     const addNewPlayer = ({ id, name, socket }: PlayerRoomData, isFirstPlayer: boolean) => {
 
@@ -97,48 +112,39 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
 
         initializePlayer(playerData);
 
-        if (isFirstPlayer) {
+        const { playerDataList } = stateManager.get();
 
-            playerData.socket.send(
-                { type: 'room/create' },
-                {
-                    type: 'room/player/set',
-                    action: 'add',
-                    player,
-                    teamList: []
-                }
-            );
-        } else {
+        const { mapSelected, playerList, teamList } = stateManager.clone('mapSelected', 'playerList', 'teamList');
 
-            const { playerDataList } = stateManager.get();
+        sendTo<RoomServerAction.PlayerSet>(
+            playerDataList.filter(p => p.id !== id),
+            {
+                type: 'room/player/set',
+                action: 'add',
+                player,
+                teamList
+            }
+        );
 
-            sendTo<RoomServerAction.PlayerSet>(
-                playerDataList.filter(p => p.id !== id),
-                {
-                    type: 'room/player/set',
-                    action: 'add',
-                    player,
-                    teamList: []
-                }
-            );
-
-            const { mapSelected, playerList, teamList } = stateManager.clone('mapSelected', 'playerList', 'teamList');
-
-            sendTo<RoomServerAction.RoomState>(
-                [ playerData ],
-                {
-                    type: 'room/state',
-                    mapSelected: mapSelected
-                        ? {
-                            id: mapSelected.config.id,
-                            placementTileList: mapSelected.placementTileList
-                        }
-                        : null,
-                    playerList,
-                    teamList
-                }
-            );
-        }
+        sendTo<RoomServerAction.RoomState>(
+            [ playerData ],
+            {
+                type: 'room/state',
+                roomId,
+                mapSelected: mapSelected
+                    ? {
+                        config: {
+                            ...mapSelected.config,
+                            schemaUrl: dataManager.urlTransform(mapSelected.config.schemaUrl)
+                                .forClient()
+                        },
+                        placementTileList: mapSelected.placementTileList
+                    }
+                    : null,
+                playerList,
+                teamList
+            }
+        );
     };
 
     const sendTo = <A extends ServerAction>(

@@ -14,5 +14,9 @@ export const getRoomMapList: RoomListener<RoomClientAction.MapList> = ({
     socket.send<RoomServerAction.MapList>({
         type: 'room/map/list',
         mapList: dataManager.getMapConfigList()
+            .map(c => ({
+                ...c,
+                schemaUrl: dataManager.urlTransform(c.schemaUrl).forClient()
+            }))
     });
 };

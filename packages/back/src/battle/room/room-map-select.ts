@@ -2,7 +2,6 @@ import { assertIsDefined, MapConfig, MapPlacementTile, PlayerRoom, RoomClientAct
 import { RoomListener } from './room';
 import { RoomState } from './room-state-manager';
 
-
 const teamLetters: readonly string[] = [ 'A', 'B', 'C', 'D', 'E' ];
 
 const createTeamList = ({ nbrTeams }: MapConfig): TeamRoom[] => {
@@ -31,12 +30,15 @@ export const getRoomMapSelect: RoomListener<RoomClientAction.MapSelect> = ({
         throw new Error();
     }
 
-    const map = dataManager.getMapConfigList().find(m => m.id === mapId);
+    const map = dataManager.getMapConfigList()
+        .find(m => m.id === mapId);
     assertIsDefined(map);
 
     const teamList = createTeamList(map);
 
-    const schema = await readFileMap(map.schemaUrl);
+    const schemaUrlServer = dataManager.urlTransform(map.schemaUrl).forServer();
+
+    const schema = await readFileMap(schemaUrlServer);
 
     const tiledManager = TiledManager({
         schema,

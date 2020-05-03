@@ -12,6 +12,7 @@ export interface MapSelectorItemProps {
     map: MapConfig;
     isSelected: boolean;
     onSelect: () => void;
+    isDisabled?: boolean;
 }
 
 const useStyles = makeStyles(({ spacing }) => ({
@@ -28,14 +29,14 @@ const useStyles = makeStyles(({ spacing }) => ({
     }
 }));
 
-export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ map, isSelected, onSelect }) => {
+export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ map, isSelected, onSelect, isDisabled }) => {
     const { name, previewUrl, width, height, nbrTeams, nbrCharactersPerTeam } = map;
 
     const classes = useStyles({ isSelected });
 
     return (
         <Card className={classes.root}>
-            <CardActionArea className={classes.actionArea} onClick={onSelect}>
+            <CardActionArea className={classes.actionArea} disabled={isDisabled} onClick={onSelect}>
 
                 <CardContent>
 

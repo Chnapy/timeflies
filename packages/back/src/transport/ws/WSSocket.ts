@@ -56,7 +56,8 @@ export class WSSocket {
         this.socket.on('message', (message): (void | Promise<void[]>)[] => {
 
             if (typeof message !== 'string') {
-                throw new Error(`typeof message not handled: ${typeof message}`);
+                console.error(`typeof message not handled: ${typeof message}`);
+                return [];
             }
 
             let actionList;
@@ -67,7 +68,8 @@ export class WSSocket {
             }
 
             if (!Array.isArray(actionList)) {
-                throw new Error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
+                console.error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
+                return [];
             }
 
             return actionList.map(action => this.onMessage(action));
@@ -137,10 +139,6 @@ export class WSSocket {
         this.poolList.push(innerPool);
 
         return pool;
-    }
-
-    private onClose(fn: () => void) {
-        this.socket.on('close', fn);
     }
 
     private send<A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]): void {

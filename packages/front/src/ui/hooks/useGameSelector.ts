@@ -1,4 +1,4 @@
 import { GameState } from '../../game-state';
-import { serviceSelector } from '../../services/serviceSelector';
+import { useSelector } from 'react-redux';
 
-export const useGameSelector = <R>(fn: (state: GameState) => R) => serviceSelector(fn);
+export const useGameSelector = <R>(fn: (state: GameState) => R) => useSelector(fn);

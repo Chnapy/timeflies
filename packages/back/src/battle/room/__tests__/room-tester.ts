@@ -30,6 +30,10 @@ export const RoomTester = {
     ) => Room({
         initialState,
         dataManager: {
+            urlTransform: (url) => ({
+                forClient: () => url,
+                forServer: () => url,
+            }),
             getMapConfigList: () => mapConfigList
         },
         readFileMap
@@ -188,7 +192,10 @@ export const RoomTester = {
             playersIds: []
         };
 
+        const roomId = 'room-id';
+
         const initialState: RoomState = {
+            id: roomId,
             mapSelected: {
                 config: mapConfig,
                 placementTileList: [
@@ -222,6 +229,7 @@ export const RoomTester = {
             tilesTeamJ1,
             tilesTeamJ2,
             mapConfig,
+            roomId,
             initialState,
             createRoom
         };

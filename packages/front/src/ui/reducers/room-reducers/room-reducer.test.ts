@@ -1,11 +1,14 @@
-import { RoomReducer } from './room-reducer';
-import { ReceiveMessageAction } from '../../../socket/WSClient';
 import { RoomServerAction } from '@timeflies/shared';
+import { Controller } from '../../../Controller';
+import { ReceiveMessageAction } from '../../../socket/WSClient';
+import { RoomData, RoomReducer } from './room-reducer';
 
 // TODO refactor all reducer tests to be less 'duck', more 'user though'
 // Also use redux-act or other, 
 // to improve reducer & action structure all over the app
 // https://dev.to/hbarcelos/a-better-approach-for-testing-your-redux-code-2ec9
+
+// TODO also handle promises to totally avoid free-promises
 
 describe('# room-reducer', () => {
 
@@ -34,18 +37,28 @@ describe('# room-reducer', () => {
         ).toBe(null);
     });
 
-    it('should init state on room create action', () => {
+    it('should init state on room state action', async () => {
 
-        const action: ReceiveMessageAction<RoomServerAction.RoomCreate> = {
+        const action: ReceiveMessageAction<RoomServerAction.RoomState> = {
             type: 'message/receive',
             message: {
-                type: 'room/create',
-                sendTime: -1
+                type: 'room/state',
+                sendTime: -1,
+                roomId: 'id',
+                mapSelected: null,
+                playerList: [],
+                teamList: []
             }
         };
 
         expect(
             RoomReducer(null, action)
-        ).toMatchObject({});
+        ).toMatchObject<RoomData>({
+            roomId: 'id',
+            map: expect.any(Object),
+            teamsTree: expect.any(Object)
+        });
+
+        await Controller.loader.newInstance().load();
     });
 });

@@ -3,10 +3,20 @@ import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { EntityTreeTeam } from './entity-tree-team';
 import { Box } from '@material-ui/core';
+import { EntityTreePlayer } from './entity-tree-player';
 
 export const EntityTree: React.FC = () => {
 
-    const teamList = useGameStep('room', room => room.teamsTree.teamList);
+    const { teamList, noTeamPlayerList } = useGameStep('room', room => {
+        const { teamList, playerList } = room.teamsTree;
+
+        const noTeamPlayerList = playerList.filter(p => !teamList.some(t => t.playersIds.includes(p.id)));
+
+        return {
+            teamList,
+            noTeamPlayerList
+        };
+    });
 
     // This is definitely a hack to ensure the TreeView to be always expanded 
     // no matter the children items
@@ -16,6 +26,11 @@ export const EntityTree: React.FC = () => {
 
     return (
         <TreeView disableSelection expanded={expandedHack}>
+            <>
+                {noTeamPlayerList.map(p => (
+                    <EntityTreePlayer key={p.id} playerId={p.id} />
+                ))}
+            </>
             {teamList.map(t => (
                 <Box key={t.id} mb={2}>
                     <EntityTreeTeam team={t} />

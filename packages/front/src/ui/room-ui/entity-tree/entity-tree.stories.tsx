@@ -92,6 +92,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         battle: null,
         load: null,
         room: {
+            roomId: '',
             map: {
                 mapList: [],
                 mapSelected: null
@@ -100,7 +101,9 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    fakeBattleApi.init({ initialState });
+    const { Provider } = fakeBattleApi.init({ initialState });
 
-    return <EntityTree />;
+    return <Provider>
+        <EntityTree />
+    </Provider>;
 };

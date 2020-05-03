@@ -43,6 +43,7 @@ export class Matchmaker {
         if (!room) {
             room = Room();
             this.roomList.push(room);
+            console.log('new room');
         }
 
         return room;

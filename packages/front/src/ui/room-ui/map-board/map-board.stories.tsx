@@ -22,6 +22,7 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         battle: null,
         load: null,
         room: {
+            roomId: '',
             teamsTree: {
                 playerList: [
                     {
@@ -71,7 +72,7 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    fakeBattleApi.init({ initialState });
+    const { Provider } = fakeBattleApi.init({ initialState });
 
     const tileInfosList: MapBoardTileInfos[] = [
         {
@@ -100,13 +101,13 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     ];
 
-    return <>
+    return <Provider>
         {tileInfosList.map((tileInfos, i) =>
             <Box key={i} m={2}>
                 <MapBoardTile tileInfos={tileInfos} />
             </Box>
         )}
-    </>;
+    </Provider>;
 };
 
 export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
@@ -189,6 +190,7 @@ export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         battle: null,
         load: null,
         room: {
+            roomId: '',
             teamsTree: {
                 playerList: [
                     {
@@ -242,7 +244,9 @@ export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    fakeBattleApi.init({ initialState });
+    const { Provider } = fakeBattleApi.init({ initialState });
 
-    return <MapBoard />;
+    return <Provider>
+        <MapBoard />
+    </Provider>;
 };
