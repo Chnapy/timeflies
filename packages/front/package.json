@@ -65,5 +65,18 @@
   "engineStrict": true,
   "engines": {
     "node": ">=12"
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.seed.ts",
+      "!src/**/*.stories.tsx",
+      "!src/**/__*__/"
+    ],
+    "transformIgnorePatterns": [
+      "\\\\node_modules\\\\"
+    ]
   }
 }
