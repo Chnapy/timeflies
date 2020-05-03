@@ -199,7 +199,6 @@ export const FakeBattleApi = () => {
                         nbrCharactersPerTeam: 1,
                         nbrTeams: 1
                     },
-                    spellTypes: [],
                     playerInfos: {
                         id: 'P1',
                         name: 'p1'

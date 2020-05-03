@@ -1,6 +1,6 @@
-import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, SpellType, StaticCharacter } from '@timeflies/shared';
+import { BattleLoadEndedCAction, BattleLoadPayload, BattleLoadSAction, MapConfig, PlayerInfos, StaticCharacter } from '@timeflies/shared';
 import urlJoin from 'url-join';
-import { staticURL } from '../..';
+import { staticURL } from '../../config';
 import { PlayerData } from "../../PlayerData";
 import { TeamData } from "../../TeamData";
 import { Util } from "../../Util";
@@ -45,14 +45,11 @@ export class BattlePrepareRoom {
 
         const mapConfig: MapConfig = this.mapConfig!;
 
-        const spellTypes: Set<SpellType> = new Set(this.characters.flatMap(c => c.staticSpells.map(s => s.type)));
-
         const payload: Omit<BattleLoadPayload, 'playerInfos'> = {
             mapConfig: {
                 ...mapConfig,
                 schemaUrl: urlJoin(staticURL, mapConfig.schemaUrl)
             },
-            spellTypes: [ ...spellTypes ]
         };
 
         this.players.forEach(p => {
