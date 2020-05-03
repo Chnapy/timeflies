@@ -1,4 +1,5 @@
-import { TiledMap, TiledMapAssets, TiledManager } from '..';
+import { TiledMapAssets, TiledManager } from '..';
+import { TiledMap } from 'tiled-types';
 
 // Note: properties not in "" were not present in the generated JSON
 const tiledMap_2: TiledMap = {

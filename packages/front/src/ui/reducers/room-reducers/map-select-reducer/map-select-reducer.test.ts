@@ -1,4 +1,5 @@
-import { RoomServerAction, seedTiledMap, TiledLayerTilelayer } from '@timeflies/shared';
+import { RoomServerAction, seedTiledMap } from '@timeflies/shared';
+import { TiledLayerTilelayer } from 'tiled-types';
 import { Controller } from '../../../../Controller';
 import { ReceiveMessageAction } from '../../../../socket/WSClient';
 import { seedMapConfig } from '../../../../stages/battle/map/MapManager.seed';
