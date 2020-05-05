@@ -7,7 +7,7 @@ export const seedWebSocket = ({ onSendFn }: {
 } = {}): {
     ws: WebSocket;
     sendList: ServerAction[];
-    receive: (...actionList: ClientAction[]) => Promise<void[]>;
+    receive: (...actionList: ClientAction[]) => Promise<void>;
     close: () => void;
 } => {
     const ws = new WebSocket('');
@@ -30,7 +30,7 @@ export const seedWebSocket = ({ onSendFn }: {
             onSendFn()(list);
     };
 
-    let onReceiveListener: (data: WebSocket.Data) => (Promise<void> | void)[];
+    let onReceiveListener: (data: WebSocket.Data) => Promise<void>;
 
     let onClose = () => { }
 
@@ -48,9 +48,7 @@ export const seedWebSocket = ({ onSendFn }: {
         sendList,
         receive: async (...actionList) => {
             const data = JSON.stringify(actionList);
-            return Promise.all(
-                onReceiveListener(data).filter(r => r instanceof Promise)
-            );
+            return onReceiveListener(data);
         },
         close: () => onClose()
     };

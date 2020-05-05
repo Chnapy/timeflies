@@ -1,4 +1,4 @@
-import { MapPlacementTile, PlayerRoom, RoomServerAction, seedTiledMap } from '@timeflies/shared';
+import { MapPlacementTile, PlayerRoom, RoomServerAction, seedTiledMap, ErrorServerAction } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('on map select request', () => {
@@ -17,45 +17,63 @@ describe('on map select request', () => {
 
         it('player is not admin', async () => {
 
-            const { receive } = createRoomWithCreator('p1', false);
+            const { receive, sendList } = createRoomWithCreator('p1', false);
 
             createRoom(undefined, ...getMapInfos('m1', 2));
 
-            await expect(receive({
+            await receive({
                 type: 'room/map/select',
                 sendTime: -1,
                 mapId: 'm1'
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendList).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('player is ready', async () => {
 
-            const { receiveJ1, j1Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
+            const { receiveJ1, sendListJ1, j1Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
             j1Infos.player.isReady = true;
 
             createRoom(...getMapInfos('m1', 2));
 
-            await expect(receiveJ1({
+            await receiveJ1({
                 type: 'room/map/select',
                 sendTime: -1,
                 mapId: 'm1'
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('map does not exist', async () => {
 
-            const { receiveJ1, j1Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
+            const { receiveJ1, sendListJ1, j1Infos, createRoom } = getRoomStateWithTwoPlayers('p1', 'p2');
 
             j1Infos.player.isReady = true;
 
             createRoom(...getMapInfos('m1', 2));
 
-            await expect(receiveJ1({
+            await receiveJ1({
                 type: 'room/map/select',
                 sendTime: -1,
                 mapId: 'fake'
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
     });
 

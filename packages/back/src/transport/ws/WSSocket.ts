@@ -1,5 +1,6 @@
 import { ClientAction, DistributiveOmit, NarrowTAction, ServerAction, SetIDCAction } from '@timeflies/shared';
 import WebSocket from 'ws';
+import { WSError } from './WSError';
 
 export type SocketState = 'init' | 'hasID';
 
@@ -8,6 +9,7 @@ export type WSSocketPool = {
     on: <A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void) => void | Promise<void>;
     onDisconnect: (fn: () => void) => void;
     send: <A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]) => void;
+    sendError: (error: WSError) => void;
     close: () => void;
 };
 
@@ -53,11 +55,10 @@ export class WSSocket {
             fns.forEach(fn => fn());
         });
 
-        this.socket.on('message', (message): (void | Promise<void[]>)[] => {
+        const onMessageFn = async (message: WebSocket.Data): Promise<void> => {
 
             if (typeof message !== 'string') {
-                console.error(`typeof message not handled: ${typeof message}`);
-                return [];
+                throw new WSError(400, `typeof message not handled: ${typeof message}`);
             }
 
             let actionList;
@@ -68,12 +69,25 @@ export class WSSocket {
             }
 
             if (!Array.isArray(actionList)) {
-                console.error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
-                return [];
+                throw new WSError(400, `message is not an array of Action: ${JSON.stringify(actionList)}`);
             }
 
-            return actionList.map(action => this.onMessage(action));
-        });
+            await Promise.all(
+                actionList.map(action => this.onMessage(action))
+                    .filter((r): r is Promise<any> => r instanceof Promise)
+            );
+        };
+
+        this.socket.on('message', message => onMessageFn(message)
+            .catch(reason => {
+                if (reason instanceof WSError) {
+                    this.sendError(reason);
+                } else {
+                    console.error(reason);
+                    this.sendError(new WSError(500, 'unexpected error'));
+                }
+            })
+        );
 
         const innerPool = this.createPool();
 
@@ -119,6 +133,11 @@ export class WSSocket {
 
                 this.send(...messages);
             },
+            sendError: (error) => {
+                assertIsOpen();
+
+                this.sendError(error);
+            },
             close: () => {
                 assertIsOpen();
 
@@ -147,6 +166,21 @@ export class WSSocket {
             sendTime,
             ...action,
         }))));
+    }
+
+    private sendError(error: WSError): void {
+        const { code, message } = error;
+
+        const logger = code === 500
+            ? console.error
+            : console.log;
+
+        logger(message);
+
+        this.send({
+            type: 'error',
+            code
+        });
     }
 
     protected onMessage(action: ClientAction): void | Promise<void[]> {

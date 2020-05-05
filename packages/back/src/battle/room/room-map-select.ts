@@ -15,19 +15,17 @@ const createTeamList = ({ nbrTeams }: MapConfig): TeamRoom[] => {
 };
 
 export const getRoomMapSelect: RoomListener<RoomClientAction.MapSelect> = ({
-    stateManager, sendToEveryone, dataManager, readFileMap, getPlayerRoom
+    stateManager, sendToEveryone, dataManager, readFileMap, getPlayerRoom, forbiddenError
 }) => async ({ mapId }) => {
 
     const playerRoom = getPlayerRoom();
 
     if (!playerRoom.isAdmin) {
-        // TODO manage error
-        throw new Error();
+        throw forbiddenError('cannot select map on non-admin player');
     }
 
     if (playerRoom.isReady) {
-        // TODO manage error
-        throw new Error();
+        throw forbiddenError('cannot select map if player is ready');
     }
 
     const map = dataManager.getMapConfigList()

@@ -1,27 +1,25 @@
 import { RoomListener } from './room';
-import { RoomClientAction, equals, assertIsDefined, CharacterRoom, RoomServerAction } from '@timeflies/shared';
+import { RoomClientAction, equals, assertIsDefined, CharacterRoom, RoomServerAction, assertIsNonNullable } from '@timeflies/shared';
 import { Util } from '../../Util';
 
 export const getRoomCharacterAdd: RoomListener<RoomClientAction.CharacterAdd> = ({
-    playerData: { id }, stateManager, sendToEveryone
+    playerData: { id }, stateManager, sendToEveryone, forbiddenError
 }) => ({ characterType, position }) => {
 
     const { mapSelected, teamList, playerList } = stateManager.get();
 
     // Check map
 
-    if (!mapSelected) {
-        // TODO manage error
-        throw new Error();
-    }
+    assertIsNonNullable(mapSelected,
+        forbiddenError('cannot add character if no map selected')
+    );
 
     // Check occupied positions
 
     const characterList = playerList.flatMap(p => p.characters);
 
     if (characterList.some(c => equals(c.position)(position))) {
-        //TODO manage error
-        throw new Error();
+        throw forbiddenError('cannot add character on occupied position');
     }
 
     const mutable = stateManager.clone('teamList', 'playerList');
@@ -43,8 +41,7 @@ export const getRoomCharacterAdd: RoomListener<RoomClientAction.CharacterAdd> = 
         team.playersIds.push(id);
 
     } else if (currentTeam.id !== targetedTeamId) {
-        // TODO manage error
-        throw new Error();
+        throw forbiddenError('cannot add character on other team position');
     }
 
     const player = mutable.playerList.find(p => p.id === id);
@@ -53,7 +50,7 @@ export const getRoomCharacterAdd: RoomListener<RoomClientAction.CharacterAdd> = 
     // Check player state
 
     if (player.isReady) {
-        throw new Error();
+        throw forbiddenError('cannot add character if player is ready');
     }
 
     // Add character to player

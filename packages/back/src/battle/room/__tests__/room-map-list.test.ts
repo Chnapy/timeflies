@@ -1,4 +1,4 @@
-import { RoomServerAction } from '@timeflies/shared';
+import { RoomServerAction, ErrorServerAction } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('# room > on map list request', () => {
@@ -7,16 +7,22 @@ describe('# room > on map list request', () => {
 
     it('should fail if player is ready', async () => {
 
-        const { receiveJ1, j1Infos, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
+        const { receiveJ1, sendListJ1, j1Infos, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
 
         j1Infos.player.isReady = true;
 
         createRoom();
 
-        await expect(receiveJ1({
+        await receiveJ1({
             type: 'room/map/list',
             sendTime: -1
-        })).rejects.toBeDefined();
+        });
+
+        expect(sendListJ1).toContainEqual<ErrorServerAction>({
+            type: 'error',
+            sendTime: expect.anything(),
+            code: 403
+        });
     });
 
     it('should send updated map list', async () => {

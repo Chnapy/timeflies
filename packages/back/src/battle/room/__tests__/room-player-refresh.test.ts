@@ -1,4 +1,4 @@
-import { RoomServerAction } from '@timeflies/shared';
+import { RoomServerAction, ErrorServerAction } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('# room > on player refresh request', () => {
@@ -9,31 +9,43 @@ describe('# room > on player refresh request', () => {
 
         it('player ready with no map selected', async () => {
 
-            const { receive } = createRoomWithCreator('p1');
+            const { receive, sendList } = createRoomWithCreator('p1');
 
-            await expect(receive({
+            await receive({
                 type: 'room/player/state',
                 sendTime: -1,
                 isLoading: false,
                 isReady: true
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendList).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('player loading with no map selected', async () => {
 
-            const { receive } = createRoomWithCreator('p1');
+            const { receive, sendList } = createRoomWithCreator('p1');
 
-            await expect(receive({
+            await receive({
                 type: 'room/player/state',
                 sendTime: -1,
                 isLoading: true,
                 isReady: false
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendList).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('player ready without minimum characters placed (at least 2 teams)', async () => {
 
-            const { receiveJ1, tilesTeamJ1, createRoom, j1Infos } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, sendListJ1, tilesTeamJ1, createRoom, j1Infos } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             const [ firstTile ] = tilesTeamJ1;
 
@@ -45,12 +57,18 @@ describe('# room > on player refresh request', () => {
 
             createRoom();
 
-            await expect(receiveJ1({
+            await receiveJ1({
                 type: 'room/player/state',
                 sendTime: -1,
                 isLoading: false,
                 isReady: true
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
     });
 
