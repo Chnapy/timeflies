@@ -13,6 +13,7 @@ import { getRoomMapSelect } from './room-map-select';
 import { getRoomPlayerLeave } from './room-player-leave';
 import { getRoomPlayerState } from './room-player-state';
 import { RoomState, RoomStateManager } from './room-state-manager';
+import { WSError } from '../../transport/ws/WSError';
 
 type DataManager = {
     urlTransform: (url: string) => ({
@@ -29,6 +30,7 @@ type RoomListenerDependencies = {
     dataManager: DataManager;
     readFileMap: (url: string) => Promise<TiledMap>;
     getPlayerRoom: () => DeepReadonly<PlayerRoom>;
+    forbiddenError(reason: string): Error;
 };
 
 export type RoomListener<A extends RoomClientAction> = (deps: RoomListenerDependencies) => (action: A) => void | Promise<void>;
@@ -88,6 +90,8 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
     const stateManager = RoomStateManager(Util.getUnique(), initialState);
 
     const roomId = stateManager.get().id;
+
+    const forbiddenError = (reason: string) => new WSError(403, reason);
 
     const addNewPlayer = ({ id, name, socket }: PlayerRoomData, isFirstPlayer: boolean) => {
 
@@ -174,7 +178,8 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
             sendToEveryone,
             dataManager,
             readFileMap,
-            getPlayerRoom
+            getPlayerRoom,
+            forbiddenError
         };
 
         socket.on<RoomClientAction.MapList>('room/map/list', getRoomMapList(deps));

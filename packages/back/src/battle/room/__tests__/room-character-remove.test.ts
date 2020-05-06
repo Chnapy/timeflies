@@ -1,4 +1,4 @@
-import { RoomServerAction, TeamRoom } from '@timeflies/shared';
+import { RoomServerAction, TeamRoom, ErrorServerAction } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('# room > on character remove request', () => {
@@ -9,61 +9,85 @@ describe('# room > on character remove request', () => {
 
         it('no map selected', async () => {
 
-            const { receive } = createRoomWithCreator('p1');
+            const { receive, sendList } = createRoomWithCreator('p1');
 
-            await expect(receive({
+            await receive({
                 type: 'room/character/remove',
                 sendTime: -1,
                 position: { x: 0, y: 0 }
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendList).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('player is ready', async () => {
 
-            const { receiveJ1, firstTile, j1Infos, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
+            const { receiveJ1, sendListJ1, firstTile, j1Infos, createRoom } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
 
             j1Infos.player.isReady = true;
 
             createRoom();
 
-            await expect(receiveJ1({
+            await receiveJ1({
                 type: 'room/character/remove',
                 sendTime: -1,
                 position: firstTile.position
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('target position does not exist', async () => {
 
-            const { receiveJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, sendListJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             createRoom();
 
-            await expect(receiveJ1({
+            await receiveJ1({
                 type: 'room/character/remove',
                 sendTime: -1,
                 position: { x: 32, y: 14 }
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('target position is not occupied', async () => {
 
-            const { receiveJ1, tilesTeamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ1, sendListJ1, tilesTeamJ1, createRoom } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             createRoom();
 
             const [ firstTile ] = tilesTeamJ1;
 
-            await expect(receiveJ1({
+            await receiveJ1({
                 type: 'room/character/remove',
                 sendTime: -1,
                 position: firstTile.position
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
 
         it('target position character is not mine', async () => {
 
-            const { receiveJ2, tilesTeamJ1, j1Infos, createRoom } = await getRoomStateWithMap('p1', 'p2', 'm1', 2);
+            const { receiveJ2, sendListJ2, tilesTeamJ1, j1Infos, createRoom } = await getRoomStateWithMap('p1', 'p2', 'm1', 2);
 
             const [ firstTile ] = tilesTeamJ1;
 
@@ -75,11 +99,17 @@ describe('# room > on character remove request', () => {
 
             createRoom();
 
-            await expect(receiveJ2({
+            await receiveJ2({
                 type: 'room/character/remove',
                 sendTime: -1,
                 position: firstTile.position
-            })).rejects.toBeDefined();
+            });
+
+            expect(sendListJ2).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
         });
     });
 

@@ -1,14 +1,14 @@
-import { RoomListener } from './room';
 import { RoomClientAction, RoomServerAction } from '@timeflies/shared';
+import { RoomListener } from './room';
 
 export const getRoomMapList: RoomListener<RoomClientAction.MapList> = ({
-    playerData: { socket }, getPlayerRoom, dataManager
+    playerData: { socket }, getPlayerRoom, dataManager, forbiddenError
 }) => () => {
 
     const player = getPlayerRoom();
 
     if (player.isReady) {
-        throw new Error();
+        throw forbiddenError('player should not be ready');
     }
 
     socket.send<RoomServerAction.MapList>({
