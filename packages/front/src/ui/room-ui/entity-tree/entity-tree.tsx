@@ -25,7 +25,7 @@ export const EntityTree: React.FC = () => {
     });
 
     return (
-        <TreeView disableSelection expanded={expandedHack}>
+        <TreeView disableSelection expanded={expandedHack} style={{ pointerEvents: 'none' }}>
             <>
                 {noTeamPlayerList.map(p => (
                     <EntityTreePlayer key={p.id} playerId={p.id} />

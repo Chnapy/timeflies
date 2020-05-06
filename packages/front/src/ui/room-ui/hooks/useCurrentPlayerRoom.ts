@@ -2,7 +2,7 @@ import { PlayerRoom, assertIsDefined } from '@timeflies/shared';
 import { useGameCurrentPlayer } from '../../hooks/useGameCurrentPlayer';
 import { useGameStep } from '../../hooks/useGameStep';
 
-export const useCurrentPlayerRoom = (): PlayerRoom => {
+export const useCurrentPlayerRoom = <R>(selector: (player: PlayerRoom) => R): R => {
 
     const id = useGameCurrentPlayer(currentPlayer => currentPlayer.id);
 
@@ -11,5 +11,5 @@ export const useCurrentPlayerRoom = (): PlayerRoom => {
     );
     assertIsDefined(currentPlayerRoom);
 
-    return currentPlayerRoom;
+    return selector(currentPlayerRoom);
 };

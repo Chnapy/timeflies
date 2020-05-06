@@ -15,8 +15,8 @@ export interface MapSelectorItemProps {
     isDisabled?: boolean;
 }
 
-const useStyles = makeStyles(({ spacing }) => ({
-    root: ({ isSelected }: { isSelected: boolean }) => ({
+const useStyles = makeStyles(() => ({
+    root: () => ({
         display: 'inline-block',
     }),
     actionArea: {
@@ -32,7 +32,7 @@ const useStyles = makeStyles(({ spacing }) => ({
 export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ map, isSelected, onSelect, isDisabled }) => {
     const { name, previewUrl, width, height, nbrTeams, nbrCharactersPerTeam } = map;
 
-    const classes = useStyles({ isSelected });
+    const classes = useStyles();
 
     return (
         <Card className={classes.root}>
