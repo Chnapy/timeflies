@@ -10,6 +10,7 @@ import React from 'react';
 import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useGameStep } from '../../hooks/useGameStep';
 import { MapSelectorItem } from './map-selector-item';
+import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
 
 export interface MapSelectorProps {
     defaultOpen?: boolean;
@@ -18,8 +19,9 @@ export interface MapSelectorProps {
 const RenderSingleChild: React.FC<{
     map: MapConfig | null;
     onClick: () => void;
+    disabled: boolean;
 }> = ({
-    map, onClick
+    map, onClick, disabled
 }) => {
 
         if (map) {
@@ -27,6 +29,7 @@ const RenderSingleChild: React.FC<{
                 <MapSelectorItem
                     map={map}
                     isSelected
+                    isDisabled={disabled}
                     onSelect={onClick}
                 />
             );
@@ -34,7 +37,7 @@ const RenderSingleChild: React.FC<{
 
         return (
             <Card>
-                <CardActionArea onClick={onClick}>
+                <CardActionArea onClick={onClick} disabled={disabled}>
                     <CardContent>
                         Click to select a map
                 </CardContent>
@@ -57,10 +60,13 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
         })
     });
 
-    const { mapList, mapSelected } = useGameStep('room', room => room.map);
-    
-    const map = mapSelected
-        ? mapList.find(m => m.id === mapSelected.id)
+    const mapList = useGameStep('room', room => room.map.mapList);
+    const mapSelectedId = useGameStep('room', room => room.map.mapSelected?.id);
+
+    const isAdmin = useCurrentPlayerRoom(p => p.isAdmin);
+
+    const map = mapSelectedId
+        ? mapList.find(m => m.id === mapSelectedId)
         : null;
     assertIsDefined(map);
 
@@ -73,6 +79,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
                         sendMapList();
                         setOpen(true);
                     }}
+                    disabled={!isAdmin}
                 />
             </Box>
             <Dialog open={open} fullScreen>
@@ -86,7 +93,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
                         <Grid key={config.id} item>
                             <MapSelectorItem
                                 map={config}
-                                isSelected={config.id === mapSelected?.id}
+                                isSelected={config.id === mapSelectedId}
                                 onSelect={() => {
                                     setOpen(false);
 

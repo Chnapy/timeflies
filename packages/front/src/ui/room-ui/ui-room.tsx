@@ -23,17 +23,17 @@ export const UIRoom: React.FC = () => {
     return (
         <div className={classes.root}>
 
-            <Box display='flex' flexDirection='column' justifyContent='space-between' minWidth={300} width={400} flexShrink={1}>
+            <Box display='flex' flexDirection='column' minWidth={300} width={400} flexShrink={1}>
 
-                <Box display='flex' flexDirection='column'>
+                <Box flexShrink={0}>
                     <MapSelector />
-
-                    <Box mt={2}>
-                        <EntityTree />
-                    </Box>
                 </Box>
 
-                <Box display='flex' flexDirection='column' mt={2}>
+                <Box flexGrow={1} overflow='auto' mt={2}>
+                    <EntityTree />
+                </Box>
+
+                <Box display='flex' flexDirection='column' flexShrink={0} mt={2}>
                     <ReadyButton />
                 </Box>
             </Box>

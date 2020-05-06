@@ -6,13 +6,15 @@ import { MapBoardTile } from './map-board-tile/map-board-tile';
 
 export const MapBoard: React.FC = () => {
 
-    const { mapList, mapSelected } = useGameStep('room', room => room.map);
+    const mapSelected = useGameStep('room', room => room.map.mapSelected);
+    const map = useGameStep('room', room => {
+        return room.map.mapList.find(m => m.id === mapSelected?.id);
+    });
 
     if (!mapSelected) {
         return null;
     }
 
-    const map = mapList.find(m => m.id === mapSelected.id);
     assertIsDefined(map);
 
     const { width, height } = map;

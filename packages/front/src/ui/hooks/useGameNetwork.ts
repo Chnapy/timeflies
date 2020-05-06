@@ -13,6 +13,7 @@ type Return<P extends Params<A>, A extends ClientAction> = {
 
 export const useGameNetwork = <P extends Params<A>, A extends ClientAction>(map: P): Return<P, A> => {
 
+
     const { actionManager } = Controller;
 
     return Object.entries(map)
