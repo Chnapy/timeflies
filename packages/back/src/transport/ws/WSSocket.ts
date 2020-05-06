@@ -45,7 +45,6 @@ export class WSSocket {
 
         this.poolList = [];
 
-
         this.socket.on('close', () => {
             const fns = this.poolList
                 .filter(p => p.isOpen())
@@ -55,17 +54,16 @@ export class WSSocket {
             fns.forEach(fn => fn());
         });
 
-        const onMessageFn = async (message: WebSocket.Data): Promise<void> => {
-
-            if (typeof message !== 'string') {
-                throw new WSError(400, `typeof message not handled: ${typeof message}`);
+        const onMessageFn = async (data: WebSocket.Data): Promise<void> => {
+            if (typeof data !== 'string') {
+                throw new WSError(400, `typeof message not handled: ${typeof data}`);
             }
 
             let actionList;
             try {
-                actionList = JSON.parse(message);
+                actionList = JSON.parse(data);
             } catch (e) {
-                actionList = message;
+                actionList = data;
             }
 
             if (!Array.isArray(actionList)) {
@@ -74,7 +72,6 @@ export class WSSocket {
 
             await Promise.all(
                 actionList.map(action => this.onMessage(action))
-                    .filter((r): r is Promise<any> => r instanceof Promise)
             );
         };
 
@@ -120,6 +117,10 @@ export class WSSocket {
             isConnected: () => this.isConnected,
             on: (type, fn) => {
                 assertIsOpen();
+
+                if (listeners[ type ]) {
+                    throw new Error(`A listener already exist for action ${type}`);
+                }
 
                 listeners[ type ] = fn as any;
             },
@@ -183,21 +184,20 @@ export class WSSocket {
         });
     }
 
-    protected onMessage(action: ClientAction): void | Promise<void[]> {
-        // console.log(action);
+    protected async onMessage(action: ClientAction): Promise<void> {
 
         const poolsFns = this.poolList
-            .filter(p => p.isOpen)
+            .filter(p => p.isOpen())
             .map(p => p.listeners[ action.type ])
             .filter(Boolean) as ((action: NarrowTAction<ClientAction, any>) => void | Promise<void>)[];
 
         if (poolsFns.length) {
-            return Promise.all<any>(poolsFns
+            await Promise.all<any>(poolsFns
                 .map(fn => fn(action))
                 .filter(r => r instanceof Promise)
             );
         } else {
-            console.warn(`Action received but no listener for it: ${action.type}`);
+            throw new WSError(404, `Action received but no listener for it: ${action.type}`);
         }
     }
 }
