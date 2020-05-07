@@ -10,7 +10,7 @@ export type WSSocketPool = {
     onDisconnect: (fn: () => void) => void;
     send: <A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]) => void;
     sendError: (error: WSError) => void;
-    close: () => void;
+    close: () => WSSocket;
 };
 
 type WSSocketPoolInner = WSSocketPool & {
@@ -146,6 +146,8 @@ export class WSSocket {
                 listenerDisconnect = () => { };
 
                 isOpen = false;
+
+                return this;
             }
         };
 

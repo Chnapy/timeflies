@@ -27,7 +27,7 @@ describe('# Character', () => {
             updateFromSnapshot
         } as any);
 
-        const character = Character(staticData, player, { spellCreator });
+        const character = Character(staticData, { x: 1, y: 1 }, player, { spellCreator });
 
         character.updateFromSnapshot({
             id: 'c1',

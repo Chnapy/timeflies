@@ -1,12 +1,12 @@
 import { StaticCharacter } from "@timeflies/shared";
-import { PlayerData } from "./PlayerData";
+import { PlayerRoomData } from './battle/room/room';
+import { seedStaticCharacter } from "./battle/run/entities/seedStaticCharacter";
 import { WSSocket } from "./transport/ws/WSSocket";
 import { Util } from "./Util";
-import { seedStaticCharacter } from "./battle/run/entities/seedStaticCharacter";
 
 export class PlayerService {
 
-    getPlayer(socket: WSSocket, index: number): PlayerData {
+    getPlayer(socket: WSSocket, index: number): PlayerRoomData {
 
         // fetch...
 
@@ -16,24 +16,26 @@ export class PlayerService {
             id,
             name: 'P-' + id,
             socket,
-            staticCharacters: this.getCharacters(index).map(c => {
-                const charId = Util.getUnique();
-                return {
-                    ...c,
-                    // mock
-                    id: charId,
-                    name: c.name + '-' + charId
-                };
-            })
+            // staticCharacters: this.getCharacters(index).map(c => {
+            //     const charId = Util.getUnique();
+            //     return {
+            //         staticData: {
+            //             ...c,
+            //             // mock
+            //             id: charId,
+            //             name: c.name + '-' + charId
+            //         }
+            //     };
+            // })
         };
     }
 
     private getCharacters(index: number): StaticCharacter[] {
 
         if (index % 2) {
-            return [MOCK_CHAR[0], MOCK_CHAR[1]];
+            return [ MOCK_CHAR[ 0 ], MOCK_CHAR[ 1 ] ];
         } else {
-            return [MOCK_CHAR[2]];
+            return [ MOCK_CHAR[ 2 ] ];
         }
     }
 }

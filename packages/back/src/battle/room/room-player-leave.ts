@@ -1,5 +1,5 @@
 import { RoomListener } from './room';
-import { RoomClientAction, RoomServerAction } from '@timeflies/shared';
+import { RoomClientAction, RoomServerAction, assertIsNonNullable } from '@timeflies/shared';
 
 export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
     playerData, stateManager, sendToEveryone
@@ -42,6 +42,25 @@ export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
             playerDataList: [ ...playerDataList ].filter(p => p.id !== id)
         }));
 
+        const { step, launchTimeout } = stateManager.get();
+
+        if (step === 'will-launch') {
+
+            assertIsNonNullable(launchTimeout);
+
+            clearTimeout(launchTimeout);
+
+            stateManager.set({
+                step: 'idle',
+                launchTimeout: null
+            });
+
+            sendToEveryone<RoomServerAction.BattleLaunch>({
+                type: 'room/battle-launch',
+                action: 'cancel'
+            });
+        }
+
         sendToEveryone<RoomServerAction.PlayerSet>({
             type: 'room/player/set',
             action: 'remove',
@@ -54,7 +73,5 @@ export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
 
     socket.onDisconnect(() => onPlayerLeave('disconnect'));
 
-    return () => {
-        onPlayerLeave('leave');
-    };
+    return () => onPlayerLeave('leave');
 };

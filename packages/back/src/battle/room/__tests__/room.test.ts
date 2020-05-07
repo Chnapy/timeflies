@@ -32,6 +32,25 @@ describe('# room', () => {
             expect(room.isOpen()).toBe(false);
         });
 
+        it('room step is will-launch', () => {
+            const { createRoom, initialState } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+    
+            initialState.step = 'will-launch';
+
+            const room = createRoom();
+    
+            expect(room.isOpen()).toBe(false);
+        });
+
+        it('room step is battle', () => {
+            const { createRoom, initialState } = getRoomStateWithMap('p1', 'p2', 'm1', 2);
+    
+            initialState.step = 'battle';
+
+            const room = createRoom();
+    
+            expect(room.isOpen()).toBe(false);
+        });
     });
 
     it('should be open if map selected and not full of players', () => {

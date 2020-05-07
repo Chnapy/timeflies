@@ -8,7 +8,7 @@ export const seedCharacter = (charArgs?: Parameters<typeof seedStaticCharacter>[
 
     const getBPlayer = player || (() => seedPlayer());
 
-    const result = staticChars.map<Character>((sc,i) => Character(sc, getBPlayer(i)));
+    const result = staticChars.map<Character>((sc,i) => Character(sc, {x: 0, y: 0}, getBPlayer(i)));
 
     return result;
 };

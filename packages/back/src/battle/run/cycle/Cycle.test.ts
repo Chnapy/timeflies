@@ -36,7 +36,7 @@ describe('# Cycle', () => {
             }).ws
         ];
 
-        players = sockets.map(s => seedPlayer({ socket: new WSSocket(s) }));
+        players = sockets.map(s => seedPlayer({ socket: new WSSocket(s).createPool() }));
 
         characters = seedCharacter(
             { length: 3 },

@@ -19,7 +19,8 @@ interface Dependencies {
 }
 
 export const Character = (
-    staticData: StaticCharacter, player: Player,
+    staticData: StaticCharacter, initialPosition: Position,
+    player: Player,
     { spellCreator }: Dependencies = { spellCreator: Spell }
 ): Character => {
 
@@ -28,7 +29,7 @@ export const Character = (
     };
 
     let orientation: Orientation = 'bottom'; // should be calculated (?)
-    let position: Position = { x: -1, y: -1 }; // same
+    let position: Position = { ...initialPosition };
 
     const this_: Character = {
         get id(): string {

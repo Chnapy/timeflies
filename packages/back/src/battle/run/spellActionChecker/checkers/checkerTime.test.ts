@@ -11,21 +11,24 @@ describe('# checkerTime', () => {
 
         const player = seedPlayer({
             staticCharacters: [ {
-                id: 'test',
-                defaultSpellId: 's1',
-                initialFeatures: {
-                    life: 100,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [ {
-                    id: 's1',
-                    color: '',
+                staticData: {
+                    id: 'test',
+                    defaultSpellId: 's1',
+                    initialFeatures: {
+                        life: 100,
+                        actionTime: 200,
+                    },
                     name: '',
-                    type: 'move',
-                    initialFeatures: {} as any
-                } ],
-                type: 'sampleChar1'
+                    staticSpells: [ {
+                        id: 's1',
+                        color: '',
+                        name: '',
+                        type: 'move',
+                        initialFeatures: {} as any
+                    } ],
+                    type: 'sampleChar1'
+                },
+                initialPosition: { x: 0, y: 0 }
             } ]
         });
 
@@ -68,25 +71,28 @@ describe('# checkerTime', () => {
 
         const player = seedPlayer({
             staticCharacters: [ {
-                id: 'test',
-                defaultSpellId: 's1',
-                initialFeatures: {
-                    life: 100,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [ {
-                    id: 's1',
-                    color: '',
-                    name: '',
-                    type: 'move',
+                staticData: {
+                    id: 'test',
+                    defaultSpellId: 's1',
                     initialFeatures: {
-                        duration: 1000,
-                        area: 1,
-                        attack: -1
-                    }
-                } ],
-                type: 'sampleChar1'
+                        life: 100,
+                        actionTime: 200,
+                    },
+                    name: '',
+                    staticSpells: [ {
+                        id: 's1',
+                        color: '',
+                        name: '',
+                        type: 'move',
+                        initialFeatures: {
+                            duration: 1000,
+                            area: 1,
+                            attack: -1
+                        }
+                    } ],
+                    type: 'sampleChar1'
+                },
+                initialPosition: { x: 0, y: 0 }
             } ]
         });
 
@@ -131,25 +137,28 @@ describe('# checkerTime', () => {
 
         const player = seedPlayer({
             staticCharacters: [ {
-                id: 'test',
-                defaultSpellId: 's1',
-                initialFeatures: {
-                    life: 100,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [ {
-                    id: 's1',
-                    color: '',
-                    name: '',
-                    type: 'move',
+                staticData: {
+                    id: 'test',
+                    defaultSpellId: 's1',
                     initialFeatures: {
-                        duration: 1000,
-                        area: 1,
-                        attack: -1
-                    }
-                } ],
-                type: 'sampleChar1'
+                        life: 100,
+                        actionTime: 200,
+                    },
+                    name: '',
+                    staticSpells: [ {
+                        id: 's1',
+                        color: '',
+                        name: '',
+                        type: 'move',
+                        initialFeatures: {
+                            duration: 1000,
+                            area: 1,
+                            attack: -1
+                        }
+                    } ],
+                    type: 'sampleChar1'
+                },
+                initialPosition: { x: 0, y: 0 }
             } ]
         });
 

@@ -9,15 +9,18 @@ describe('# checkerPlayer', () => {
 
     const getPlayer = () => seedPlayer({
         staticCharacters: [ {
-            id: 'test',
-            defaultSpellId: '',
-            initialFeatures: {
-                life: 100,
-                actionTime: 200,
+            staticData: {
+                id: 'test',
+                defaultSpellId: '',
+                initialFeatures: {
+                    life: 100,
+                    actionTime: 200,
+                },
+                name: '',
+                staticSpells: [],
+                type: 'sampleChar1'
             },
-            name: '',
-            staticSpells: [],
-            type: 'sampleChar1'
+            initialPosition: { x: 0, y: 0 }
         } ]
     });
 

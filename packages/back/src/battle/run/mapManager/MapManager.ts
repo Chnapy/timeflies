@@ -1,10 +1,9 @@
-import { MapConfig, Position, TiledManager } from '@timeflies/shared';
+import { MapConfig, TiledManager } from '@timeflies/shared';
 import _fs from 'fs';
 import { TiledMapOrthogonal } from 'tiled-types';
 import urlJoin from 'url-join';
 
 export interface MapManager {
-    readonly initPositions: ReadonlyArray<ReadonlyArray<Position>>;
 }
 
 interface Dependencies {
@@ -24,14 +23,6 @@ export const MapManager = (mapConfig: MapConfig, { fs }: Dependencies = { fs: _f
         images: {}
     });
 
-    const getInitPositions = (): Position[][] => {
-
-        return tiledManager.getPlacementTilesPositions();
-    };
-
-    const initPositions: ReadonlyArray<ReadonlyArray<Position>> = getInitPositions();
-
     return {
-        initPositions
     };
 };

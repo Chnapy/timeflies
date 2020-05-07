@@ -50,7 +50,7 @@ const getMapConfigList = (): MapConfig[] => [
     }
 ];
 
-type IPlayerRoomData<S> = {
+export type IPlayerRoomData<S> = {
     id: string;
     name: string;
     socket: S;
@@ -213,7 +213,11 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
 
         isOpen: (): boolean => {
 
-            const { mapSelected, playerList } = stateManager.get();
+            const { step, mapSelected, playerList } = stateManager.get();
+
+            if(step !== 'idle') {
+                return false;
+            }
 
             if (!mapSelected) {
                 return false;

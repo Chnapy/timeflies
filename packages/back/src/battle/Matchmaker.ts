@@ -1,8 +1,7 @@
 import WebSocket from "ws";
-import { PlayerData } from "../PlayerData";
 import { PlayerService } from "../PlayerService";
 import { WSSocket } from "../transport/ws/WSSocket";
-import { Room } from './room/room';
+import { PlayerRoomData, Room } from './room/room';
 
 export class Matchmaker {
 
@@ -10,7 +9,7 @@ export class Matchmaker {
 
     private readonly playerService: PlayerService;
 
-    private readonly players: Record<string, PlayerData>;
+    private readonly players: Record<string, PlayerRoomData>;
 
     // private readonly battlePrepareRooms: BattlePrepareRoom[];
     private readonly roomList: Room[];
@@ -33,7 +32,7 @@ export class Matchmaker {
         this.onPrepareNewPlayer(player);
     }
 
-    private onPrepareNewPlayer = (player: PlayerData): void => {
+    private onPrepareNewPlayer = (player: PlayerRoomData): void => {
         const room = this.getOpenBattleRoom();
         room.onJoin(player);
     }

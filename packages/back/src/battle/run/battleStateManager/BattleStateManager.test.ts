@@ -57,8 +57,11 @@ describe('# BattleStateManager', () => {
                 players: [ {
                     id: 'p1',
                     name: '',
-                    socket: new WSSocket(ws),
-                    staticCharacters: [ seedStaticCharacter()[ 0 ] ]
+                    socket: new WSSocket(ws).createPool(),
+                    staticCharacters: [ {
+                        staticData: seedStaticCharacter()[ 0 ],
+                        initialPosition: { x: 0, y: 0 }
+                    } ]
                 } ]
             }) ];
 
@@ -107,8 +110,11 @@ describe('# BattleStateManager', () => {
                 players: [ {
                     id: 'p1',
                     name: '',
-                    socket: new WSSocket(ws),
-                    staticCharacters: [ seedStaticCharacter()[ 0 ] ]
+                    socket: new WSSocket(ws).createPool(),
+                    staticCharacters: [ {
+                        staticData: seedStaticCharacter()[ 0 ],
+                        initialPosition: { x: 0, y: 0 }
+                    } ]
                 } ]
             }) ];
 
@@ -157,8 +163,11 @@ describe('# BattleStateManager', () => {
                 players: [ {
                     id: 'p1',
                     name: '',
-                    socket: new WSSocket(ws),
-                    staticCharacters: [ seedStaticCharacter()[ 0 ] ]
+                    socket: new WSSocket(ws).createPool(),
+                    staticCharacters: [ {
+                        staticData: seedStaticCharacter()[ 0 ],
+                        initialPosition: { x: 0, y: 0 }
+                    } ]
                 } ]
             }) ];
 
