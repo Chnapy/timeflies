@@ -1,8 +1,12 @@
 import { clone, DeepReadonly, MapConfig, MapPlacementTile, PlayerRoom, TeamRoom } from '@timeflies/shared';
 import { PlayerRoomDataConnected } from './room';
+import { BattleRunRoom } from '../run/BattleRunRoom';
+
+type RoomStateStep = 'idle' | 'will-launch' | 'battle';
 
 export type RoomState = {
     id: string;
+    step: RoomStateStep;
     playerDataList: PlayerRoomDataConnected[];
     playerList: PlayerRoom[];
     teamList: TeamRoom[];
@@ -10,9 +14,11 @@ export type RoomState = {
         config: MapConfig;
         placementTileList: MapPlacementTile[];
     } | null;
+    launchTimeout: NodeJS.Timeout | null;
+    battle: BattleRunRoom | null;
 };
 
-type RoomStateClone = Omit<RoomState, 'playerDataList'>;
+type RoomStateClone = Omit<RoomState, 'playerDataList' | 'launchTimeout' | 'battle'>;
 
 export type RoomStateManager = ReturnType<typeof RoomStateManager>;
 
@@ -30,10 +36,13 @@ export const RoomStateManager = (id: string, initialState: Partial<RoomState>) =
 
     let state: DeepReadonly<RoomState> = {
         id,
+        step: 'idle',
         playerDataList: [],
         playerList: [],
         teamList: [],
         mapSelected: null,
+        launchTimeout: null,
+        battle: null,
         ...initialState
     };
 

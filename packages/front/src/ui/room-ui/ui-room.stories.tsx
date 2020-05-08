@@ -88,7 +88,6 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         },
         step: 'room',
         battle: null,
-        load: null,
         room: {
             roomId: '',
             teamsTree: {
@@ -140,7 +139,8 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                     tileListLoading: false,
                     tileList
                 }
-            }
+            },
+            launchTime: null
         }
     };
 

@@ -9,7 +9,8 @@ export type RoomServerAction =
     | RoomServerAction.MapList
     | RoomServerAction.MapSelect
     | RoomServerAction.PlayerRefresh
-    | RoomServerAction.RoomState;
+    | RoomServerAction.RoomState
+    | RoomServerAction.BattleLaunch;
 
 export type MapPlacementTile = {
     teamId: string;
@@ -72,4 +73,11 @@ export module RoomServerAction {
         teamList: TeamRoom[];
         playerList: PlayerRoom[];
     };
+
+    export type BattleLaunch = TAction<'room/battle-launch'> & ({
+        action: 'launch';
+        launchTime: number;
+    } | {
+        action: 'cancel';
+    });
 }

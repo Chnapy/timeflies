@@ -1,9 +1,8 @@
+import { assertIsDefined, assertIsNonNullable, MapConfig, MapPlacementTile, RoomServerAction, TiledManager, TiledMapAssets } from '@timeflies/shared';
 import { Reducer } from 'redux';
 import { GameAction, IGameAction } from '../../../../action/game-action/GameAction';
+import { StageChangeAction } from '../../../../stages/StageManager';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
-import { MapConfig, assertIsDefined, TiledMapAssets, TiledManager, RoomServerAction, assertIsNonNullable, MapPlacementTile } from '@timeflies/shared';
-import { Controller } from '../../../../Controller';
-import { serviceDispatch } from '../../../../services/serviceDispatch';
 
 export interface MapLoadedAction extends IGameAction<'room/map/loaded'> {
     assets: TiledMapAssets;
@@ -36,20 +35,6 @@ const handleMapSelect = (
         };
     }
 
-    const { dispatchMapLoaded } = serviceDispatch({
-        dispatchMapLoaded: (assets: TiledMapAssets): MapLoadedAction => ({
-            type: 'room/map/loaded',
-            assets
-        })
-    });
-
-    Controller.loader.newInstance()
-        .add('map', mapConfig.schemaUrl)
-        .load()
-        .then(({ map }) => {
-            dispatchMapLoaded(map);
-        });
-
     return {
         ...state,
         mapSelected: {
@@ -64,8 +49,8 @@ const handleMapSelect = (
     };
 };
 
-const reduceRoomState: SubReducer<RoomServerAction.RoomState> = (state, {
-    mapSelected
+const reduceRoomState: SubReducer<StageChangeAction<'room'>> = (state, {
+    payload: { roomState: { mapSelected } }
 }) => {
     if (!mapSelected) {
         return handleMapSelect(state, null, []);
@@ -125,14 +110,17 @@ const reduceMapLoaded: SubReducer<MapLoadedAction> = (state, action) => {
 export const MapSelectReducer: Reducer<MapSelectData, GameAction> = (state = initialData, action) => {
 
     switch (action.type) {
+        case 'stage/change':
+            if (action.stageKey === 'room') {
+                return reduceRoomState(state, action as StageChangeAction<'room'>);
+            }
+            break;
+
         case 'message/receive':
 
             const { message } = action;
 
             switch (message.type) {
-
-                case 'room/state':
-                    return reduceRoomState(state, message);
 
                 case 'room/map/list':
                     return reduceMapList(state, message);

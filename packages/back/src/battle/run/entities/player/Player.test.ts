@@ -15,7 +15,7 @@ describe('# Player', () => {
         const staticData: PlayerData = {
             id: 'p1',
             name: 'p-1',
-            socket: new WSSocket(seedWebSocket().ws),
+            socket: new WSSocket(seedWebSocket().ws).createPool(),
             staticCharacters: [ { id: 'c1' } as any ]
         };
 

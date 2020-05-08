@@ -6,7 +6,6 @@ import { UIRoom } from './room-ui/ui-room';
 
 const stepComponentMap: Record<GameStateStep, React.ComponentType> = {
     'boot': () => null,
-    'load': () => null,
     'room': UIRoom,
     'battle': BattleUI
 };

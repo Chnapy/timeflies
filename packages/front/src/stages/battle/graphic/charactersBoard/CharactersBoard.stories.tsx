@@ -40,7 +40,6 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeBattl
 
     const initialState: GameState = {
         currentPlayer: null,
-        load: null,
         room: null,
         step: 'battle',
         battle: {

@@ -1,5 +1,6 @@
+import { useDispatch } from 'react-redux';
+import { Dispatch } from 'redux';
 import { GameAction } from '../../action/game-action/GameAction';
-import { serviceDispatch } from '../../services/serviceDispatch';
 import { SendMessageAction } from '../../socket/WSClient';
 
 type Params = {
@@ -8,5 +9,13 @@ type Params = {
 
 export const useGameDispatch = <P extends Params>(map: P): P => {
 
-    return serviceDispatch(map);
+    const dispatch = useDispatch<Dispatch<GameAction>>();
+
+    return Object.entries(map)
+        .reduce((arr, [ key, value ]) => {
+
+            arr[ key ] = (...args) => dispatch(value(...args));
+
+            return arr;
+        }, {}) as P;
 };

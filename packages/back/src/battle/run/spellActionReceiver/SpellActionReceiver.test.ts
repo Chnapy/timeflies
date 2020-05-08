@@ -6,7 +6,6 @@ import { Cycle } from '../cycle/Cycle';
 import { Character } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedPlayer } from '../entities/player/Player.seed';
-import { MapManager } from '../mapManager/MapManager';
 import { CharActionCheckerResult } from '../spellActionChecker/SpellActionChecker';
 import { SpellActionReceiver } from './SpellActionReceiver';
 
@@ -20,9 +19,7 @@ describe('# SpellActionReceiver', () => {
         } as any
     });
 
-    const seedMapManager = (): MapManager => ({
-        initPositions: []
-    });
+    const seedMapManager = () => ({});
 
     const getAll = ({ checkResult, generateSnapshotHash, spellActionHash, isHashCorrect, deaths = [] }: {
         checkResult: CharActionCheckerResult;
@@ -45,7 +42,7 @@ describe('# SpellActionReceiver', () => {
         });
 
         const p = seedPlayer({
-            socket: new WSSocket(ws)
+            socket: new WSSocket(ws).createPool()
         });
 
         const sendFnP2 = jest.fn();
@@ -56,12 +53,12 @@ describe('# SpellActionReceiver', () => {
             seedPlayer({
                 socket: new WSSocket(seedWebSocket({
                     onSendFn: () => sendFnP2
-                }).ws)
+                }).ws).createPool()
             }),
             seedPlayer({
                 socket: new WSSocket(seedWebSocket({
                     onSendFn: () => sendFnP3
-                }).ws)
+                }).ws).createPool()
             })
         ];
 

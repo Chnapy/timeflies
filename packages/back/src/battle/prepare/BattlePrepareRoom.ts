@@ -5,6 +5,7 @@ import { PlayerData } from "../../PlayerData";
 import { TeamData } from "../../TeamData";
 import { Util } from "../../Util";
 import { BattleRunRoom } from '../run/BattleRunRoom';
+import { WSSocketPool } from '../../transport/ws/WSSocket';
 
 export class BattlePrepareRoom {
 
@@ -59,7 +60,7 @@ export class BattlePrepareRoom {
                 name: p.name
             };
 
-            const socket = p.socket.createPool();
+            const socket: WSSocketPool = (p.socket as any).createPool();
 
             socket.send<BattleLoadSAction>({
                 type: 'battle-load',
@@ -113,7 +114,7 @@ export class BattlePrepareRoom {
 
         this.characters.length = 0;
         this.characters.push(
-            ...this.players.flatMap(p => p.staticCharacters)
+            // ...this.players.flatMap(p => p.staticCharacters)
         );
 
         this.teams.push(...[

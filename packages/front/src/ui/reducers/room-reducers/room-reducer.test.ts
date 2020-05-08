@@ -1,7 +1,7 @@
-import { RoomServerAction } from '@timeflies/shared';
 import { Controller } from '../../../Controller';
 import { ReceiveMessageAction } from '../../../socket/WSClient';
 import { RoomData, RoomReducer } from './room-reducer';
+import { StageChangeAction } from '../../../stages/StageManager';
 
 // TODO refactor all reducer tests to be less 'duck', more 'user though'
 // Also use redux-act or other, 
@@ -37,17 +37,20 @@ describe('# room-reducer', () => {
         ).toBe(null);
     });
 
-    it('should init state on room state action', async () => {
+    it('should init state on stage change action', async () => {
 
-        const action: ReceiveMessageAction<RoomServerAction.RoomState> = {
-            type: 'message/receive',
-            message: {
-                type: 'room/state',
-                sendTime: -1,
-                roomId: 'id',
-                mapSelected: null,
-                playerList: [],
-                teamList: []
+        const action: StageChangeAction<'room'> = {
+            type: 'stage/change',
+            stageKey: 'room',
+            payload: {
+                roomState: {
+                    type: 'room/state',
+                    sendTime: -1,
+                    roomId: 'id',
+                    mapSelected: null,
+                    playerList: [],
+                    teamList: []
+                }
             }
         };
 
@@ -56,7 +59,8 @@ describe('# room-reducer', () => {
         ).toMatchObject<RoomData>({
             roomId: 'id',
             map: expect.any(Object),
-            teamsTree: expect.any(Object)
+            teamsTree: expect.any(Object),
+            launchTime: null
         });
 
         await Controller.loader.newInstance().load();

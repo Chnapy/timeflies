@@ -1,6 +1,7 @@
-import { TeamRoom, PlayerRoom, assertIsDefined, RoomServerAction } from '@timeflies/shared';
+import { TeamRoom, PlayerRoom, RoomServerAction } from '@timeflies/shared';
 import { Reducer } from 'redux';
 import { GameAction } from '../../../../action/game-action/GameAction';
+import { StageChangeAction } from '../../../../stages/StageManager';
 
 export interface EntityTreeData {
     teamList: TeamRoom[];
@@ -14,10 +15,12 @@ const initialState: EntityTreeData = {
 
 type SubReducer<A> = (state: EntityTreeData, action: A) => EntityTreeData;
 
-const reduceMapState: SubReducer<RoomServerAction.RoomState> = (state, message) => {
+const reduceRoomState: SubReducer<StageChangeAction<'room'>> = (state, {
+    payload: { roomState: { playerList, teamList } }
+}) => {
     return {
-        playerList: message.playerList,
-        teamList: message.teamList
+        playerList,
+        teamList
     };
 };
 
@@ -31,7 +34,7 @@ const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, message)
 const reducePlayerSet: SubReducer<RoomServerAction.PlayerSet> = (state, message) => {
 
     const playerList: PlayerRoom[] = message.action === 'add'
-        ? [...state.playerList, message.player]
+        ? [ ...state.playerList, message.player ]
         : message.playerList;
 
     return {
@@ -57,20 +60,24 @@ const reducerPlayerRefresh: SubReducer<RoomServerAction.PlayerRefresh> = (state,
 };
 
 const reducerCharacterSet: SubReducer<RoomServerAction.CharacterSet> = (state, message) => {
-    const player = state.playerList.find(p => p.id === message.playerId);
-    assertIsDefined(player);
 
-    if (message.action === 'add') {
-        player.characters.push(message.character);
-    } else {
-        player.characters.splice(
-            player.characters.findIndex(c => c.id === message.characterId),
-            1
-        );
-    }
+    const playerList = state.playerList.map(p => {
+
+        if(p.id === message.playerId) {
+            return {
+                ...p,
+                characters: message.action === 'add'
+                    ? [...p.characters, message.character]
+                    : p.characters.filter(c => c.id !== message.characterId)
+            };
+        }
+
+        return {...p};
+    });
 
     return {
         ...state,
+        playerList,
         teamList: message.teamList
     };
 };
@@ -78,13 +85,16 @@ const reducerCharacterSet: SubReducer<RoomServerAction.CharacterSet> = (state, m
 export const EntityTreeReducer: Reducer<EntityTreeData, GameAction> = (state = initialState, action) => {
 
     switch (action.type) {
+        case 'stage/change':
+            if (action.stageKey === 'room') {
+                return reduceRoomState(state, action as StageChangeAction<'room'>);
+            }
+            break;
+
         case 'message/receive':
             const { message } = action;
 
             switch (message.type) {
-
-                case 'room/state':
-                    return reduceMapState(state, message);
 
                 case 'room/map/select':
                     return reduceMapSelect(state, message);

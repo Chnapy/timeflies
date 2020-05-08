@@ -22,9 +22,6 @@ export const Controller: typeof IController = {
     actionManager: {
         beginBattleSession() {},
         endBattleSession() {},
-        dispatch(action: GameAction): void {
-            StoreTest.getStore().dispatch(action);
-        },
         addActionListener(type, fn) {
             let removed = false;
             StoreTest.getStore().subscribe(() => {
@@ -41,6 +38,7 @@ export const Controller: typeof IController = {
                 }
             };
         },
+        getMiddleware() {return null as any}
     },
 
     loader: {

@@ -90,14 +90,14 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         },
         step: 'room',
         battle: null,
-        load: null,
         room: {
             roomId: '',
             map: {
                 mapList: [],
                 mapSelected: null
             },
-            teamsTree: entityTreeData
+            teamsTree: entityTreeData,
+            launchTime: null
         }
     };
 

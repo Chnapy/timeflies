@@ -24,7 +24,7 @@ export const Player = (
     const this_: Player = {
         id: playerData.id,
         name: playerData.name,
-        socket: playerData.socket.createPool(),
+        socket: playerData.socket,
         team,
         get characters() {
             return characters;
@@ -44,7 +44,9 @@ export const Player = (
         }
     };
 
-    const characters = playerData.staticCharacters.map(sc => characterCreator(sc, this_));
+    const characters = playerData.staticCharacters.map(({ staticData, initialPosition }) =>
+        characterCreator(staticData, initialPosition, this_)
+    );
 
     return this_;
 };

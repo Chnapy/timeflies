@@ -11,21 +11,24 @@ describe('# checkerCharacter', () => {
 
         const player = seedPlayer({
             staticCharacters: [ {
-                id: 'test',
-                defaultSpellId: 's1',
-                initialFeatures: {
-                    life: 0,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [ {
-                    id: 's1',
-                    color: '',
+                staticData: {
+                    id: 'test',
+                    defaultSpellId: 's1',
+                    initialFeatures: {
+                        life: 0,
+                        actionTime: 200,
+                    },
                     name: '',
-                    type: 'move',
-                    initialFeatures: {} as any
-                } ],
-                type: 'sampleChar1'
+                    staticSpells: [ {
+                        id: 's1',
+                        color: '',
+                        name: '',
+                        type: 'move',
+                        initialFeatures: {} as any
+                    } ],
+                    type: 'sampleChar1'
+                },
+                initialPosition: { x: 0, y: 0 }
             } ]
         });
 
@@ -63,21 +66,24 @@ describe('# checkerCharacter', () => {
 
         const player = seedPlayer({
             staticCharacters: [ {
-                id: 'test',
-                defaultSpellId: 's1',
-                initialFeatures: {
-                    life: 100,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [ {
-                    id: 's1',
-                    color: '',
+                staticData: {
+                    id: 'test',
+                    defaultSpellId: 's1',
+                    initialFeatures: {
+                        life: 100,
+                        actionTime: 200,
+                    },
                     name: '',
-                    type: 'move',
-                    initialFeatures: {} as any
-                } ],
-                type: 'sampleChar1'
+                    staticSpells: [ {
+                        id: 's1',
+                        color: '',
+                        name: '',
+                        type: 'move',
+                        initialFeatures: {} as any
+                    } ],
+                    type: 'sampleChar1'
+                },
+                initialPosition: { x: 0, y: 0 }
             } ]
         });
 
@@ -115,21 +121,24 @@ describe('# checkerCharacter', () => {
 
         const player = seedPlayer({
             staticCharacters: [ {
-                id: 'test',
-                defaultSpellId: 's1',
-                initialFeatures: {
-                    life: 100,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [ {
-                    id: 's1',
-                    color: '',
+                staticData: {
+                    id: 'test',
+                    defaultSpellId: 's1',
+                    initialFeatures: {
+                        life: 100,
+                        actionTime: 200,
+                    },
                     name: '',
-                    type: 'move',
-                    initialFeatures: {} as any
-                } ],
-                type: 'sampleChar1'
+                    staticSpells: [ {
+                        id: 's1',
+                        color: '',
+                        name: '',
+                        type: 'move',
+                        initialFeatures: {} as any
+                    } ],
+                    type: 'sampleChar1'
+                },
+                initialPosition: { x: 0, y: 0 }
             } ]
         });
 

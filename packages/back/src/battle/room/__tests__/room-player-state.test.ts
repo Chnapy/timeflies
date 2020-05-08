@@ -1,9 +1,19 @@
-import { RoomServerAction, ErrorServerAction } from '@timeflies/shared';
+import { RoomServerAction, ErrorServerAction, TimerTester } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
-describe('# room > on player refresh request', () => {
+describe('# room > on player state request', () => {
+
+    const timerTester = new TimerTester();
 
     const { getRoomStateWithMap, getRoomStateWithMapMinCharacters, createRoomWithCreator } = RoomTester;
+
+    beforeEach(() => {
+        timerTester.beforeTest();
+    });
+
+    afterEach(() => {
+        timerTester.afterTest();
+    });
 
     describe('should fail if', () => {
 
@@ -61,6 +71,28 @@ describe('# room > on player refresh request', () => {
                 type: 'room/player/state',
                 sendTime: -1,
                 isLoading: false,
+                isReady: true
+            });
+
+            expect(sendListJ1).toContainEqual<ErrorServerAction>({
+                type: 'error',
+                sendTime: expect.anything(),
+                code: 403
+            });
+        });
+
+        it('player loading & ready with room step at will-launch', async () => {
+
+            const { createRoom, receiveJ1, sendListJ1, initialState } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
+
+            initialState.step = 'will-launch';
+
+            createRoom();
+
+            await receiveJ1({
+                type: 'room/player/state',
+                sendTime: -1,
+                isLoading: true,
                 isReady: true
             });
 
@@ -130,4 +162,72 @@ describe('# room > on player refresh request', () => {
         expect(sendListJ2).toEqual(expected);
     });
 
+    describe('when everyone state is ready and not loading', () => {
+
+        it('should send to everyone launch time', async () => {
+
+            const { receiveJ2, sendListJ1, sendListJ2, createRoom, j1Infos } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
+    
+            j1Infos.player.isReady = true;
+
+            createRoom();
+    
+            await receiveJ2({
+                type: 'room/player/state',
+                sendTime: -1,
+                isLoading: false,
+                isReady: true
+            });
+    
+            const expected = expect.arrayContaining([
+                expect.objectContaining<Partial<RoomServerAction.BattleLaunch>>({
+                    type: 'room/battle-launch',
+                    action: 'launch',
+                    launchTime: expect.any(Number)
+                })
+            ]);
+    
+            expect(sendListJ1).toEqual(expected);
+            expect(sendListJ2).toEqual(expected);
+        });
+
+        it('should cancel launch on player state change to not ready', async () => {
+
+            const { receiveJ2, sendListJ1, sendListJ2, createRoom, j1Infos } = getRoomStateWithMapMinCharacters('p1', 'p2', 'm1');
+    
+            j1Infos.player.isReady = true;
+
+            createRoom();
+    
+            await receiveJ2({
+                type: 'room/player/state',
+                sendTime: -1,
+                isLoading: false,
+                isReady: true
+            });
+
+            timerTester.advanceBy(100);
+    
+            await receiveJ2({
+                type: 'room/player/state',
+                sendTime: -1,
+                isLoading: false,
+                isReady: false
+            });
+    
+            const expected = expect.arrayContaining([
+                expect.objectContaining<Partial<RoomServerAction.BattleLaunch>>({
+                    type: 'room/battle-launch',
+                    action: 'cancel'
+                })
+            ]);
+    
+            expect(sendListJ1).toEqual(expected);
+            expect(sendListJ2).toEqual(expected);
+
+            // TODO check that battle was not launched
+        });
+
+        it.todo('should launch battle after delay');
+    });
 });

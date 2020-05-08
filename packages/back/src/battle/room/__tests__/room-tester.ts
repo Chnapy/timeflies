@@ -194,7 +194,7 @@ export const RoomTester = {
 
         const roomId = 'room-id';
 
-        const initialState: RoomState = {
+        const initialState: Partial<RoomState> = {
             id: roomId,
             mapSelected: {
                 config: mapConfig,

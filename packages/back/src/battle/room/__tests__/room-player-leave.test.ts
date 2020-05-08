@@ -1,9 +1,19 @@
-import { RoomServerAction, TeamRoom, PlayerRoom } from '@timeflies/shared';
+import { RoomServerAction, TeamRoom, PlayerRoom, TimerTester } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('# room > on player leave', () => {
 
+    const timerTester = new TimerTester();
+
     const { getRoomStateWithMap, getRoomStateWithTwoPlayers } = RoomTester;
+
+    beforeEach(() => {
+        timerTester.beforeTest();
+    });
+
+    afterEach(() => {
+        timerTester.afterTest();
+    });
 
     describe('should send to every one the action', () => {
 
@@ -178,6 +188,29 @@ describe('# room > on player leave', () => {
         });
 
         expect(sendListJ1).toHaveLength(0);
+    });
+
+    it('should cancel room launch on player leave', async () => {
+        const { createRoom, initialState, receiveJ2, sendListJ1 } = getRoomStateWithTwoPlayers('p1', 'p2');
+
+        initialState.step = 'will-launch';
+        initialState.launchTimeout = setTimeout(() => {}, 10);
+
+        createRoom();
+
+        await receiveJ2({
+            type: 'room/player/leave',
+            sendTime: -1
+        });
+    
+        const expected = expect.arrayContaining([
+            expect.objectContaining<Partial<RoomServerAction.BattleLaunch>>({
+                type: 'room/battle-launch',
+                action: 'cancel'
+            })
+        ]);
+
+        expect(sendListJ1).toEqual(expected);
     });
 
     it.todo('should close the room on all players leave');

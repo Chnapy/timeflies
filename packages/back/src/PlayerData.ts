@@ -1,9 +1,12 @@
-import { StaticCharacter } from "@timeflies/shared";
-import { WSSocket } from "./transport/ws/WSSocket";
+import { Position, StaticCharacter } from "@timeflies/shared";
+import { WSSocketPool } from "./transport/ws/WSSocket";
 
 export interface PlayerData {
     id: string;
     name: string;
-    socket: WSSocket;
-    staticCharacters: StaticCharacter[];
+    socket: WSSocketPool;
+    staticCharacters: {
+        staticData: StaticCharacter;
+        initialPosition: Position;
+    }[];
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, Store } from 'redux';
+import { createStore, Store, applyMiddleware } from 'redux';
 import { ActionManager } from './action/ActionManager';
 import { GameAction, IGameAction } from './action/game-action/GameAction';
 import { App } from './app';
@@ -11,6 +11,7 @@ import { WSClient, WebSocketCreator } from './socket/WSClient';
 import { StageManager } from './stages/StageManager';
 import { RootReducer } from './ui/reducers/root-reducer';
 import { GameState } from './game-state';
+import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
 
 export interface AppResetAction extends IGameAction<'app/reset'> {
 }
@@ -65,11 +66,13 @@ export const Controller = {
         const resources: ControllerResources = {};
         controllerResources = resources;
 
+        resources.actionManager = ActionManager();
+        const actionManagerMiddleware = getResource('actionManager').getMiddleware();
         resources.store = createStore<GameState, GameAction, {}, {}>(
             RootReducer,
-            initialState
+            initialState,
+            applyMiddleware(roomMiddleware, actionManagerMiddleware)
         );
-        resources.actionManager = ActionManager(getResource('store').dispatch);
 
         resources.client = WSClient(websocketCreator && { websocketCreator });
         resources.loader = AssetLoader();
