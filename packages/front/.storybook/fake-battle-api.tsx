@@ -1,4 +1,4 @@
-import { assertIsDefined, BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, ConfirmSAction, GLOBALTURN_DELAY, MatchmakerClientAction, ServerAction, TeamSnapshot, TURN_DELAY, NotifySAction, Position } from '@timeflies/shared';
+import { assertIsDefined, BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, ConfirmSAction, GLOBALTURN_DELAY, MatchmakerClientAction, ServerAction, TeamSnapshot, TURN_DELAY, NotifySAction, Position, PlayerRoom, TeamRoom } from '@timeflies/shared';
 import { Controller } from '../src/Controller';
 import { serviceBattleData } from '../src/services/serviceBattleData';
 import { serviceDispatch } from '../src/services/serviceDispatch';
@@ -7,8 +7,11 @@ import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../sr
 import { seedTeamSnapshot } from '../src/stages/battle/entities/team/Team.seed';
 import { GameState } from '../src/game-state';
 import mapPath from '../src/_assets/map/map.json';
+import spritesheetPath from '../src/_assets/spritesheets/sokoban.json';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { StageChangeAction } from '../src/stages/StageManager';
+import { GameAction } from '../src/action/game-action/GameAction';
 
 class MockWebSocket implements WebSocket {
     prototype: any;
@@ -71,6 +74,10 @@ export const FakeBattleApi = () => {
 
     let isInBattle: boolean = false;
 
+    const dispatch = <A extends GameAction>(action: A) => serviceDispatch({
+        dispatch: <A extends GameAction>(action: A): A => action
+    }).dispatch(action);
+
     const receiveAction = <A extends ServerAction>(message: A) =>
         serviceDispatch({
             dispatch: (): ReceiveMessageAction<A> => ({
@@ -86,7 +93,7 @@ export const FakeBattleApi = () => {
                 color: 'blue',
                 seedPlayers: [
                     {
-                        id: 'P1',
+                        id: 'p1',
                         seedCharacters: [
                             {
                                 id: 'C1',
@@ -116,7 +123,7 @@ export const FakeBattleApi = () => {
                 color: 'red',
                 seedPlayers: [
                     {
-                        id: 'P2',
+                        id: 'p2',
                         seedCharacters: [
                             {
                                 id: 'C2',
@@ -183,6 +190,8 @@ export const FakeBattleApi = () => {
 
         const { onSendAction } = initWSActions();
 
+        const { onMessageAction } = serviceEvent();
+
         onSendAction<MatchmakerClientAction>('matchmaker/enter', () => {
 
             receiveAction<BattleLoadSAction>({
@@ -207,21 +216,53 @@ export const FakeBattleApi = () => {
             });
         });
 
-        onSendAction<BattleLoadEndedCAction>('battle-load-end', () => {
+        onMessageAction<BattleLoadSAction>('battle-load', async () => {
 
-            const teamsSnapshots = getTeamSnapshots();
-            console.log('SNAP', teamsSnapshots);
+            await Controller.loader.newInstance()
+                .add('map', mapPath)
+                .addSpritesheet('characters', spritesheetPath)
+                .load();
 
-            receiveAction<BRunLaunchSAction>({
-                type: 'battle-run/launch',
-                sendTime: Date.now(),
-                battleSnapshot: {
-                    battleHash: 'hash',
-                    launchTime: Date.now(),
-                    time: Date.now(),
-                    teamsSnapshots
-                },
-                globalTurnState: getGlobalState(1, 1)
+            dispatch<StageChangeAction<'battle'>>({
+                type: 'stage/change',
+                stageKey: 'battle',
+                payload: {
+                    mapConfig: {
+                        id: 'm1',
+                        schemaUrl: mapPath,
+                        name: 'm1',
+                        height: 10,
+                        width: 10,
+                        previewUrl: '',
+                        nbrCharactersPerTeam: 1,
+                        nbrTeams: 1
+                    },
+                    battleSnapshot: {
+                        battleHash: 'hash',
+                        launchTime: Date.now(),
+                        time: Date.now(),
+                        teamsSnapshots: getTeamSnapshots()
+                    },
+                    globalTurnState: getGlobalState(1, 1),
+                    battleData: {
+                        cycle: {
+                            launchTime: Date.now()
+                        },
+                        current: {
+                            battleHash: '',
+                            teams: [],
+                            players: [],
+                            characters: []
+                        },
+                        future: {
+                            battleHash: '',
+                            teams: [],
+                            players: [],
+                            characters: [],
+                            spellActionSnapshotList: []
+                        }
+                    }
+                }
             });
             isInBattle = true;
         });
@@ -233,9 +274,19 @@ export const FakeBattleApi = () => {
         };
     };
 
+    const _initialState: GameState = {
+        step: 'boot',
+        currentPlayer: {
+            id: 'p1',
+            name: 'Player 1'
+        },
+        room: null,
+        battle: null
+    };
+
     return {
 
-        init({ initialState }: {
+        init({ initialState = _initialState }: {
             initialState?: GameState;
         }): FakeBattleApiStarter {
 
@@ -246,7 +297,7 @@ export const FakeBattleApi = () => {
                 return socket;
             };
 
-            const { start, onSendAction, receiveAction } = initController(initialState, websocketCreator);
+            const { start, receiveAction } = initController(initialState, websocketCreator);
 
             return {
 

@@ -49,13 +49,23 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     const mapList: MapConfig[] = getMapList();
 
     const initialState: GameState = {
-        currentPlayer: null,
+        currentPlayer: {
+            id: 'p1',
+            name: 'p1'
+        },
         step: 'room',
         battle: null,
         room: {
             roomId: '',
             teamsTree: {
-                playerList: [],
+                playerList: [{
+                    id: 'p1',
+                    isAdmin: true,
+                    isLoading: false,
+                    isReady: false,
+                    name: 'p1',
+                    characters: []
+                }],
                 teamList: []
             },
             map: {
