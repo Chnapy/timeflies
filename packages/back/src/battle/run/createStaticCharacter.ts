@@ -65,6 +65,17 @@ const createSampleChar2 = (id: string): StaticCharacter => {
             {
                 id: '2',
                 name: 'MOVE',
+                type: 'move',
+                color: '#FF0000',
+                initialFeatures: {
+                    duration: 600,
+                    area: 1,
+                    attack: -1
+                }
+            },
+            {
+                id: '20',
+                name: 'Attack',
                 type: 'simpleAttack',
                 color: '#FF0000',
                 initialFeatures: {
@@ -101,7 +112,7 @@ const createSampleChar3 = (id: string): StaticCharacter => {
                 }
             },
             {
-                id: '20',
+                id: '30',
                 name: 'S3',
                 type: 'simpleAttack',
                 color: '#22FF88',
