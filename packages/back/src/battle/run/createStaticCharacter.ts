@@ -25,7 +25,7 @@ const createSampleChar1 = (id: string): StaticCharacter => {
         },
         staticSpells: [
             {
-                id: '1',
+                id: id + '-1',
                 name: 'MOVE',
                 type: 'move',
                 color: '#FF0000',
@@ -36,7 +36,7 @@ const createSampleChar1 = (id: string): StaticCharacter => {
                 }
             },
             {
-                id: '10',
+                id: id + '-10',
                 name: 'S1',
                 type: 'simpleAttack',
                 color: '#FF00FF',
@@ -47,7 +47,7 @@ const createSampleChar1 = (id: string): StaticCharacter => {
                 }
             }
         ],
-        defaultSpellId: '1'
+        defaultSpellId: id + '-1'
     }
 };
 
@@ -63,7 +63,7 @@ const createSampleChar2 = (id: string): StaticCharacter => {
         },
         staticSpells: [
             {
-                id: '2',
+                id: id + '-2',
                 name: 'MOVE',
                 type: 'move',
                 color: '#FF0000',
@@ -74,7 +74,7 @@ const createSampleChar2 = (id: string): StaticCharacter => {
                 }
             },
             {
-                id: '20',
+                id: id + '-20',
                 name: 'Attack',
                 type: 'simpleAttack',
                 color: '#FF0000',
@@ -85,7 +85,7 @@ const createSampleChar2 = (id: string): StaticCharacter => {
                 }
             }
         ],
-        defaultSpellId: '2'
+        defaultSpellId: id + '-2'
     }
 };
 
@@ -101,7 +101,7 @@ const createSampleChar3 = (id: string): StaticCharacter => {
         },
         staticSpells: [
             {
-                id: '3',
+                id: id + '-3',
                 name: 'MOVE',
                 type: 'move',
                 color: '#449955',
@@ -112,7 +112,7 @@ const createSampleChar3 = (id: string): StaticCharacter => {
                 }
             },
             {
-                id: '30',
+                id: id + '-30',
                 name: 'S3',
                 type: 'simpleAttack',
                 color: '#22FF88',
@@ -123,6 +123,6 @@ const createSampleChar3 = (id: string): StaticCharacter => {
                 }
             }
         ],
-        defaultSpellId: '3'
+        defaultSpellId: id + '-3'
     }
 };
