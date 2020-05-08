@@ -3,6 +3,19 @@ import { ActionManager } from './ActionManager';
 
 describe('# ActionManager', () => {
 
+    const getManager = () => {
+        const manager = ActionManager();
+
+        const middleware = manager.getMiddleware();
+
+        const middlewareDispatch = middleware(null as any)(a => a);
+
+        return {
+            manager,
+            middlewareDispatch
+        };
+    };
+
     beforeEach(() => {
         StoreTest.beforeTest();
     });
@@ -11,14 +24,14 @@ describe('# ActionManager', () => {
         StoreTest.afterTest();
     });
 
-    it('should launch given listener on dispatch', () => {
-        const manager = ActionManager(() => { });
+    it('should launch given listener on middleware dispatch', () => {
+        const { manager, middlewareDispatch } = getManager();
 
         const listener = jest.fn();
 
         manager.addActionListener('stage/change', listener);
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -31,8 +44,8 @@ describe('# ActionManager', () => {
         });
     });
 
-    it('should launch multiple listeners on dispatch', () => {
-        const manager = ActionManager(() => { });
+    it('should launch multiple listeners on middleware dispatch', () => {
+        const { manager, middlewareDispatch } = getManager();
 
         const listener1 = jest.fn();
         const listener2 = jest.fn();
@@ -40,7 +53,7 @@ describe('# ActionManager', () => {
         manager.addActionListener('stage/change', listener1);
         manager.addActionListener('stage/change', listener2);
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -59,14 +72,14 @@ describe('# ActionManager', () => {
     });
 
     it('should do nothing on adding multiple times the same listener', () => {
-        const manager = ActionManager(() => { });
+        const { manager, middlewareDispatch } = getManager();
 
         const listener = jest.fn();
 
         manager.addActionListener('stage/change', listener);
         manager.addActionListener('stage/change', listener);
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -80,13 +93,13 @@ describe('# ActionManager', () => {
     });
 
     it('should do nothing on dispatch with no listener concerned', () => {
-        const manager = ActionManager(() => { });
+        const { manager, middlewareDispatch } = getManager();
 
         const listener = jest.fn();
 
         manager.addActionListener('battle/notify-deaths', listener);
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -96,7 +109,7 @@ describe('# ActionManager', () => {
     });
 
     it('should remove listener on callback launch', () => {
-        const manager = ActionManager(() => { });
+        const { manager, middlewareDispatch } = getManager();
 
         let nbCalls = 0;
 
@@ -104,7 +117,7 @@ describe('# ActionManager', () => {
 
         const listenerCb = manager.addActionListener('stage/change', listener);
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -116,7 +129,7 @@ describe('# ActionManager', () => {
 
         const nbCallsBefore = nbCalls;
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -125,27 +138,27 @@ describe('# ActionManager', () => {
         expect(nbCalls).toBe(nbCallsBefore);
     });
 
-    it('should call store dispatch on dispatch call', () => {
+    it.skip('should call store dispatch on dispatch call', () => {
 
-        const storeDispatch = jest.fn();
+        // const storeDispatch = jest.fn();
 
-        const manager = ActionManager(storeDispatch);
+        // const manager = ActionManager(storeDispatch);
 
-        manager.dispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
-        });
+        // manager.dispatch({
+        //     type: 'stage/change',
+        //     stageKey: 'boot',
+        //     payload: {}
+        // });
 
-        expect(storeDispatch).toHaveBeenNthCalledWith(1, {
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
-        });
+        // expect(storeDispatch).toHaveBeenNthCalledWith(1, {
+        //     type: 'stage/change',
+        //     stageKey: 'boot',
+        //     payload: {}
+        // });
     });
 
     it('should remove all listener on reset action', () => {
-        const manager = ActionManager(() => { });
+        const { manager, middlewareDispatch } = getManager();
 
         let nbCalls = 0;
 
@@ -153,7 +166,7 @@ describe('# ActionManager', () => {
 
         manager.addActionListener('stage/change', listener);
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -161,13 +174,13 @@ describe('# ActionManager', () => {
 
         expect(listener).toHaveBeenCalled();
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'app/reset'
         });
 
         const nbCallsBefore = nbCalls;
 
-        manager.dispatch({
+        middlewareDispatch({
             type: 'stage/change',
             stageKey: 'boot',
             payload: {}
@@ -179,7 +192,7 @@ describe('# ActionManager', () => {
     describe('on battle context', () => {
 
         it('should call common listener on dispatch', () => {
-            const manager = ActionManager(() => { });
+            const { manager, middlewareDispatch } = getManager();
 
             const listener = jest.fn();
 
@@ -187,7 +200,7 @@ describe('# ActionManager', () => {
 
             manager.beginBattleSession();
 
-            manager.dispatch({
+            middlewareDispatch({
                 type: 'stage/change',
                 stageKey: 'boot',
                 payload: {}
@@ -201,7 +214,7 @@ describe('# ActionManager', () => {
         });
 
         it('should call battle listeners on dispatch', () => {
-            const manager = ActionManager(() => { });
+            const { manager, middlewareDispatch } = getManager();
 
             const listener = jest.fn();
 
@@ -209,7 +222,7 @@ describe('# ActionManager', () => {
 
             manager.addActionListener('stage/change', listener);
 
-            manager.dispatch({
+            middlewareDispatch({
                 type: 'stage/change',
                 stageKey: 'boot',
                 payload: {}
@@ -223,7 +236,7 @@ describe('# ActionManager', () => {
         });
 
         it('should clear battle listeners on session end', () => {
-            const manager = ActionManager(() => { });
+            const { manager, middlewareDispatch } = getManager();
 
             let listener = jest.fn();
 
@@ -231,7 +244,7 @@ describe('# ActionManager', () => {
 
             manager.addActionListener('stage/change', () => listener());
 
-            manager.dispatch({
+            middlewareDispatch({
                 type: 'stage/change',
                 stageKey: 'boot',
                 payload: {}
@@ -243,7 +256,7 @@ describe('# ActionManager', () => {
 
             listener = jest.fn();
 
-            manager.dispatch({
+            middlewareDispatch({
                 type: 'stage/change',
                 stageKey: 'boot',
                 payload: {}

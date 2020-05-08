@@ -87,6 +87,7 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
                 mapSelected,
                 playerDataList: roomState.playerDataList.map(p => {
 
+                    // TODO test that
                     const socket = p.socket.close();
 
                     return {
@@ -104,6 +105,8 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
                 step: 'battle',
                 battle
             });
+
+            battle.start();
 
         }, delay);
 

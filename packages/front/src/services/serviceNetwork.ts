@@ -13,14 +13,14 @@ type Return<P extends Params<A>, A extends ClientAction> = {
 
 export const serviceNetwork = async <P extends Params<A>, A extends ClientAction>(map: P): Promise<Return<P, A>> => {
 
-    const { actionManager } = Controller;
+    const { dispatch } = Controller.getStore();
 
     await Controller.waitConnect();
 
     return Object.entries(map)
         .reduce((arr, [ key, value ]) => {
 
-            arr[ key ] = (...args) => actionManager.dispatch({
+            arr[ key ] = (...args) => dispatch({
                 type: 'message/send',
                 message: value(...args)
             });

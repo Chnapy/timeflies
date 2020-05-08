@@ -8,12 +8,12 @@ type Params = {
 
 export const serviceDispatch = <P extends Params>(map: P): P => {
 
-    const { actionManager } = Controller;
+    const { dispatch } = Controller.getStore();
 
     return Object.entries(map)
         .reduce((arr, [ key, value ]) => {
 
-            arr[ key ] = (...args) => actionManager.dispatch(value(...args));
+            arr[ key ] = (...args) => dispatch(value(...args));
 
             return arr;
         }, {}) as P;

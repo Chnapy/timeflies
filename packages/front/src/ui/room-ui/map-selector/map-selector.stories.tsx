@@ -52,7 +52,6 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         currentPlayer: null,
         step: 'room',
         battle: null,
-        load: null,
         room: {
             roomId: '',
             teamsTree: {
@@ -62,7 +61,8 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             map: {
                 mapList,
                 mapSelected: null
-            }
+            },
+            launchTime: null
         }
     };
 

@@ -15,7 +15,6 @@ const initStore = (state?: Partial<GameState>): void => {
     store = mockStore({
         currentPlayer: null,
         battle: null,
-        load: null,
         room: null,
         step: 'battle',
         ...state

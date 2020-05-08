@@ -58,7 +58,6 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const initialState: GameState = {
         currentPlayer: null,
-        load: null,
         room: null,
         step: 'battle',
         battle: {
@@ -168,7 +167,6 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => 
 
     const initialState: GameState = {
         currentPlayer: null,
-        load: null,
         room: null,
         step: 'battle',
         battle: {

@@ -4,7 +4,6 @@ import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
 import { BattleStage, BattleStageParam } from './battle/BattleStage';
 import { BootStage, BootStageParam } from './boot/BootStage';
-import { LoadStage, LoadStageParam } from './load/LoadStage';
 import { StageGraphicCreateParam } from '../canvas/GameCanvas';
 import { RoomStageParam, RoomStage } from './room/RoomStage';
 
@@ -18,8 +17,8 @@ export interface StageOnCreateGraphicAction<K extends StageKey> extends IGameAct
 }
 
 export type StageAction =
-    | StageChangeAction<any>
-    | StageOnCreateGraphicAction<any>;
+    | StageChangeAction<StageKey>
+    | StageOnCreateGraphicAction<StageKey>;
 
 export interface StageParam<K extends string, P extends {}> {
     stageKey: K;
@@ -28,7 +27,7 @@ export interface StageParam<K extends string, P extends {}> {
 
 type ExtractPayload<K extends StageKey> = Extract<StageParams, { stageKey: K }>[ 'payload' ];
 
-type StageParams = BootStageParam | RoomStageParam | LoadStageParam | BattleStageParam;
+type StageParams = BootStageParam | RoomStageParam | BattleStageParam;
 
 export type StageKey = StageParams[ 'stageKey' ];
 
@@ -53,7 +52,6 @@ interface Dependencies {
 export const StageManager = ({ stageCreators }: Dependencies = {
     stageCreators: {
         boot: BootStage,
-        load: LoadStage,
         room: RoomStage,
         battle: BattleStage
     }

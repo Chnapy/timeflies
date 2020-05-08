@@ -1,11 +1,13 @@
 import { ActionLogger } from './ActionLogger';
 import { GameAction } from './game-action/GameAction';
+import { Middleware } from 'redux';
+import { GameState } from '../game-state';
 
 export interface ActionManager {
     beginBattleSession(): void;
     endBattleSession(): void;
     addActionListener(type: GameAction[ 'type' ], fn: ActionListener<GameAction>): ActionListenerObject;
-    dispatch(action: GameAction): void;
+    getMiddleware(): Middleware<{}, GameState>;
 }
 
 export interface ActionListener<A extends GameAction> {
@@ -18,7 +20,7 @@ export interface ActionListenerObject {
 
 type ListenerMap = Map<GameAction[ 'type' ], Set<ActionListener<GameAction>>>;
 
-export const ActionManager = (storeDispatcher: (action: GameAction) => void): ActionManager => {
+export const ActionManager = (): ActionManager => {
 
     const commonListenerMap: ListenerMap = new Map();
 
@@ -56,20 +58,24 @@ export const ActionManager = (storeDispatcher: (action: GameAction) => void): Ac
             }
         },
 
-        dispatch(action) {
-            const maps = getListenerMap();
+        getMiddleware() {
+            return api => next => action => {
 
-            logger.log(action);
+                // TODO use redux-logger
+                logger.log(action);
 
-            maps.forEach(map => {
-                map.get(action.type)?.forEach(fn => fn(action));
+                const maps = getListenerMap();
 
-                if (action.type === 'app/reset') {
-                    map.clear();
-                }
-            });
+                maps.forEach(map => {
+                    map.get(action.type)?.forEach(fn => fn(action));
 
-            storeDispatcher(action);
+                    if (action.type === 'app/reset') {
+                        map.clear();
+                    }
+                });
+
+                next(action);
+            };
         }
     }
 };

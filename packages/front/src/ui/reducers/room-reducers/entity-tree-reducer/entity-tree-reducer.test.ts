@@ -1,6 +1,7 @@
 import { RoomServerAction } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../../socket/WSClient';
 import { EntityTreeData, EntityTreeReducer } from './entity-tree-reducer';
+import { StageChangeAction } from '../../../../stages/StageManager';
 
 describe('# entity-tree-reducer', () => {
 
@@ -50,30 +51,33 @@ describe('# entity-tree-reducer', () => {
         });
     });
 
-    it('should init state on room state action', () => {
+    it('should init state on stage change action', () => {
 
-        const action: ReceiveMessageAction<RoomServerAction.RoomState> = {
-            type: 'message/receive',
-            message: {
-                type: 'room/state',
-                sendTime: -1,
-                roomId: '',
-                mapSelected: null,
-                playerList: [ {
-                    id: 'p1',
-                    name: 'p1',
-                    isAdmin: true,
-                    isLoading: false,
-                    isReady: false,
-                    characters: []
-                } ],
-                teamList: [ {
-                    id: 't1',
-                    letter: 'A',
-                    playersIds: [ 'p1' ]
-                } ]
+        const action: StageChangeAction<'room'> = {
+            type: 'stage/change',
+            stageKey: 'room',
+            payload: {
+                roomState: {
+                    type: 'room/state',
+                    sendTime: -1,
+                    roomId: '',
+                    mapSelected: null,
+                    playerList: [ {
+                        id: 'p1',
+                        name: 'p1',
+                        isAdmin: true,
+                        isLoading: false,
+                        isReady: false,
+                        characters: []
+                    } ],
+                    teamList: [ {
+                        id: 't1',
+                        letter: 'A',
+                        playersIds: [ 'p1' ]
+                    } ]
+                }
             }
-        };
+        }
 
         expect(
             EntityTreeReducer(undefined, action)

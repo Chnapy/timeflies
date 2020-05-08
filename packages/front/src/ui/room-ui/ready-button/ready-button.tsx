@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import { Button, Box, Typography } from '@material-ui/core';
 import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
 import CheckIcon from '@material-ui/icons/Check';
@@ -17,23 +17,82 @@ export const ReadyButton: React.FC = () => {
 
     const isReady = useCurrentPlayerRoom(p => p.isReady);
     const isLoading = useCurrentPlayerRoom(p => p.isLoading);
-    const characters = useCurrentPlayerRoom(p => p.characters);
+    const charactersEnough = useCurrentPlayerRoom(p => {console.log(p); return p.characters.length > 0});
 
-    const nbrTeams = useGameStep('room', ({ teamsTree }) => {
-        return teamsTree.teamList
-        .filter(t => t.playersIds.length > 0).length;
-    });
+    const nbrTeamsEnough = useGameStep('room', ({ teamsTree }) => teamsTree.teamList
+        .filter(t => t.playersIds.length > 0).length >= 2
+    );
 
-    const disabled = characters.length === 0 || nbrTeams < 2;
+    const launchTime = useGameStep('room', room => room.launchTime);
+
+    const disabled = !charactersEnough || !nbrTeamsEnough;
 
     const onClick = () => sendReadyState(!isReady, isLoading);
 
-    return <Button
-        variant='outlined'
-        onClick={onClick}
-        endIcon={isReady ? <CheckIcon /> : null}
-        disabled={disabled}
-    >
-        I'm ready
-    </Button>;
+    const timeRef = React.useRef<HTMLSpanElement>(null);
+console.log('R')
+    const getMessage = React.useCallback((): React.ReactNode => {
+console.log([ charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime ])
+        if (!charactersEnough) {
+            return 'You have to put at least one character on the map';
+        }
+        if (!nbrTeamsEnough) {
+            return 'At least 2 teams should have characters';
+        }
+        if (!isReady) {
+            return 'Indicate to others players you are ready to begin the battle';
+        }
+        if (isLoading) {
+            return 'Waiting for assets loading...';
+        }
+        if (!launchTime) {
+            return 'Waiting others players...'
+        }
+
+        return <>
+            Everyone is ready!
+            <b>Battle start in <span ref={timeRef} />s</b>
+        </>;
+    }, [ charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime ]);
+
+    const message: React.ReactNode = getMessage();
+
+    React.useEffect(() => {
+
+        const animationFunction = () => {
+            const { current } = timeRef;
+
+            if (!launchTime || !current) {
+                return;
+            }
+
+            const remains = launchTime - Date.now();
+
+            if (remains <= 0) {
+                current.innerHTML = '0';
+                return;
+            }
+
+            current.innerHTML = Number.parseInt((remains / 1000) + '') + '';
+
+            requestAnimationFrame(animationFunction);
+        };
+
+        requestAnimationFrame(animationFunction);
+
+    }, [ launchTime ]);
+
+    return <Box display='flex' flexDirection='column'>
+
+        <Typography variant='caption'>{message}</Typography>
+
+        <Button
+            variant='outlined'
+            onClick={onClick}
+            endIcon={isReady ? <CheckIcon /> : null}
+            disabled={disabled}
+        >
+            I'm ready
+    </Button>
+    </Box>;
 };

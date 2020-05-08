@@ -26,7 +26,6 @@ describe('# StageManager', () => {
             {
                 stageCreators: {
                     boot: bootFn,
-                    load: jest.fn(),
                     battle: jest.fn(),
                     room: jest.fn()
                 }
@@ -46,7 +45,7 @@ describe('# StageManager', () => {
             create() { return Promise.resolve(); }
         }));
         const create = jest.fn();
-        const loadFn = jest.fn((): Stage<'load', any> => ({
+        const roomFn = jest.fn((): Stage<'room', any> => ({
             preload() {
                 return Promise.resolve({
                     'test1': 'test1',
@@ -60,23 +59,22 @@ describe('# StageManager', () => {
             {
                 stageCreators: {
                     boot: bootFn,
-                    load: loadFn,
-                    battle: jest.fn(),
-                    room: jest.fn()
+                    room: roomFn,
+                    battle: jest.fn()
                 }
             });
 
         await Controller.loader.newInstance().load();
 
-        StoreTest.dispatch<StageChangeAction<'load'>>({
+        StoreTest.dispatch<StageChangeAction<'room'>>({
             type: 'stage/change',
-            stageKey: 'load',
+            stageKey: 'room',
             payload: { toto: 6 } as any
         });
 
         await Controller.loader.newInstance().load();
 
-        expect(loadFn).toHaveBeenNthCalledWith(1, { toto: 6 });
+        expect(roomFn).toHaveBeenNthCalledWith(1, { toto: 6 });
         expect(create).toHaveBeenNthCalledWith(1, {
             // note: only keys should be checked here, value doesn't matter
             'test1': 'test1',

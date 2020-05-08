@@ -20,7 +20,6 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         },
         step: 'room',
         battle: null,
-        load: null,
         room: {
             roomId: '',
             teamsTree: {
@@ -68,7 +67,8 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             map: {
                 mapList: [],
                 mapSelected: null
-            }
+            },
+            launchTime: null
         }
     };
 
@@ -188,7 +188,6 @@ export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         },
         step: 'room',
         battle: null,
-        load: null,
         room: {
             roomId: '',
             teamsTree: {
@@ -240,7 +239,8 @@ export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                     tileListLoading: false,
                     tileList
                 }
-            }
+            },
+            launchTime: null
         }
     };
 

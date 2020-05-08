@@ -3,6 +3,7 @@ import { TiledLayerTilelayer } from 'tiled-types';
 import { Controller } from '../../../../Controller';
 import { ReceiveMessageAction } from '../../../../socket/WSClient';
 import { seedMapConfig } from '../../../../stages/battle/map/MapManager.seed';
+import { StageChangeAction } from '../../../../stages/StageManager';
 import { StoreTest } from '../../../../StoreTest';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
 import { MapLoadedAction, MapSelectData, MapSelectReducer } from './map-select-reducer';
@@ -65,25 +66,28 @@ describe('# map-select-reducer', () => {
         });
     });
 
-    it('should init state on room state action', async () => {
+    it('should init state on stage change action', async () => {
 
         const mapConfig = seedMapConfig('map_1');
 
-        const action: ReceiveMessageAction<RoomServerAction.RoomState> = {
-            type: 'message/receive',
-            message: {
-                type: 'room/state',
-                sendTime: -1,
-                roomId: '',
-                mapSelected: {
-                    config: mapConfig,
-                    placementTileList: [ {
-                        teamId: 't1',
-                        position: { x: 0, y: 0 }
-                    } ]
-                },
-                playerList: [],
-                teamList: []
+        const action: StageChangeAction<'room'> = {
+            type: 'stage/change',
+            stageKey: 'room',
+            payload: {
+                roomState: {
+                    type: 'room/state',
+                    sendTime: -1,
+                    roomId: '',
+                    mapSelected: {
+                        config: mapConfig,
+                        placementTileList: [ {
+                            teamId: 't1',
+                            position: { x: 0, y: 0 }
+                        } ]
+                    },
+                    playerList: [],
+                    teamList: []
+                }
             }
         };
 
@@ -171,7 +175,7 @@ describe('# map-select-reducer', () => {
         });
     });
 
-    it('should set map selected on map selected action and start map load', async () => {
+    it('should set map selected on map selected action', async () => {
 
         const action = getAction({
             type: 'room/map/select',
@@ -235,12 +239,12 @@ describe('# map-select-reducer', () => {
             }
         });
 
-        await Controller.loader.newInstance().load();
+        // await Controller.loader.newInstance().load();
 
-        expect(StoreTest.getActions()).toEqual<[ MapLoadedAction ]>([ {
-            type: 'room/map/loaded',
-            assets: expect.anything()
-        } ]);
+        // expect(StoreTest.getActions()).toEqual<[ MapLoadedAction ]>([ {
+        //     type: 'room/map/loaded',
+        //     assets: expect.anything()
+        // } ]);
     });
 
     it('should add obstacles on map loaded action', () => {
