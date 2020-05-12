@@ -36,22 +36,22 @@
  "nextobjectid":1,
  "orientation":"orthogonal",
  "renderorder":"left-up",
- "tileheight":70,
+ "tileheight":64,
  "tilesets":[
         {
          "columns":1,
          "firstgid":1,
          "image":"map.png",
-         "imageheight":140,
-         "imagewidth":70,
+         "imageheight":128,
+         "imagewidth":64,
          "margin":0,
          "name":"map",
          "spacing":0,
          "tilecount":2,
-         "tileheight":70,
-         "tilewidth":70
+         "tileheight":64,
+         "tilewidth":64
         }],
- "tilewidth":70,
+ "tilewidth":64,
  "version":1,
  "width":20
 }

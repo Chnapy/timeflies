@@ -1,4 +1,4 @@
-import { switchUtil, TurnSnapshot } from "@timeflies/shared";
+import { SpellType, switchUtil, TurnSnapshot } from "@timeflies/shared";
 import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from "../../../services/serviceDispatch";
@@ -14,6 +14,7 @@ export interface Turn {
     readonly startTime: number;
     readonly turnDuration: number;
     readonly endTime: number;
+    currentSpellType: SpellType;
 
     synchronize(snapshot: TurnSnapshot): void;
     refreshTimedActions(): void;
@@ -52,6 +53,8 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
 
     let lastCallback: 'start' | 'end' | undefined;
 
+    let currentSpellType: SpellType;
+
     const this_: Turn = {
         id,
         character,
@@ -77,6 +80,14 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
 
         get endTime(): number {
             return startTime + this_.turnDuration;
+        },
+
+        get currentSpellType() {
+            return currentSpellType;
+        },
+
+        set currentSpellType(spellType) {
+            currentSpellType = spellType;
         },
 
         synchronize,

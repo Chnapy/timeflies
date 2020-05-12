@@ -29,7 +29,6 @@ interface ControllerResources {
     store?: Store<GameState, GameAction>;
     client?: WSClient;
     gameCanvas?: GameCanvas;
-    app?: App;
     actionManager?: ActionManager;
     loader?: AssetLoader;
     stageManager?: StageManager;
@@ -82,7 +81,7 @@ export const Controller = {
 
                 return new Promise(resolve => {
 
-                    resources.app = ReactDOM.render(
+                    ReactDOM.render(
                         React.createElement(App, {
                             store: getResource('store'),
                             onMount: (gameWrapper: HTMLElement, canvas: HTMLCanvasElement): void => {

@@ -1,65 +1,48 @@
-import CssBaseline from '@material-ui/core/CssBaseline';
-import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import { GameAction } from './action/game-action/GameAction';
-import './app.css';
+// import './app.css';
 import { GameState } from './game-state';
-import { appTheme } from './ui/app-theme';
 import { GameUI } from './ui/game-ui';
+import { UIProvider } from './ui/ui-provider';
 
 export interface AppProps {
     store: Store<GameState, GameAction>;
     onMount(gameWrapper: HTMLElement, canvas: HTMLCanvasElement);
 }
 
-export class App extends React.Component<AppProps> {
-    private readonly gameWrapperRef: React.RefObject<HTMLDivElement>;
+export const App: React.FC<AppProps> = ({ store, onMount }) => {
 
-    constructor(props: AppProps) {
-        super(props);
-        this.gameWrapperRef = React.createRef();
-    }
+    const gameWrapperRef = React.useRef<HTMLDivElement>(null);
 
-    shouldComponentUpdate() {
-        return false;
-    }
-
-    render(): React.ReactElement {
-        const { store } = this.props;
-
-        return <React.StrictMode>
-            <Provider store={store}>
-                <ThemeProvider theme={appTheme}>
-                    <CssBaseline />
-                    <div>
-
-                        <div ref={this.gameWrapperRef} style={{
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            height: '100vh',
-                            // minHeight: '400px',
-                            width: '100vw',
-                            // minWidth: '600px'
-                        }}>
-                            <canvas />
-                        </div>
-
-                        <GameUI />
-
-                    </div>
-                </ThemeProvider>
-            </Provider>
-        </React.StrictMode>;
-    }
-
-    componentDidMount(): void {
-        const gameWrapperElement = this.gameWrapperRef.current!;
+    React.useEffect(() => {
+        const gameWrapperElement = gameWrapperRef.current!;
 
         const canvas = gameWrapperElement.firstElementChild as HTMLCanvasElement;
 
-        this.props.onMount(gameWrapperElement, canvas);
-    }
-}
+        onMount(gameWrapperElement, canvas);
+    }, [ onMount ]);
+
+    return <React.StrictMode>
+        <Provider store={store}>
+            <UIProvider>
+                <div>
+
+                    <div ref={gameWrapperRef} style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        height: '100vh',
+                        width: '100vw',
+                    }}>
+                        <canvas />
+                    </div>
+
+                    <GameUI />
+
+                </div>
+            </UIProvider>
+        </Provider>
+    </React.StrictMode>;
+};

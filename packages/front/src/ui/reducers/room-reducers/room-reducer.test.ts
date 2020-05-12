@@ -8,6 +8,10 @@ import { StageChangeAction } from '../../../stages/StageManager';
 // to improve reducer & action structure all over the app
 // https://dev.to/hbarcelos/a-better-approach-for-testing-your-redux-code-2ec9
 
+// TODO consider using redux-toolkit for mutable state problematic
+
+// TODO use redux state in pixi object
+
 // TODO also handle promises to totally avoid free-promises
 
 describe('# room-reducer', () => {

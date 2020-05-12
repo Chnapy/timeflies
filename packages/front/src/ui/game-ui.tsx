@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { GameState, GameStateStep } from '../game-state';
-import { BattleUI } from './battleUI/BattleUI';
+import { BattleUI } from './battle-ui/battle-ui';
 import { UIRoom } from './room-ui/ui-room';
 
 const stepComponentMap: Record<GameStateStep, React.ComponentType> = {
