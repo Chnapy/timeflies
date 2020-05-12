@@ -3,9 +3,6 @@
   "private": true,
   "repository": "https://github.com/Chnapy/timeflies.git",
   "author": "Chnapy <richardhaddad@hotmail.fr>",
-  "devDependencies": {
-    "typescript": "3.9.1-rc"
-  },
   "workspaces": [
     "packages/*"
   ],
