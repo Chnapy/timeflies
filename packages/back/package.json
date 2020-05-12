@@ -25,7 +25,8 @@
     "mock-socket": "^9.0.3",
     "tiled-types": "^1.0.0",
     "ts-jest": "^24.3.0",
-    "ts-node": "8.5.4"
+    "ts-node": "8.5.4",
+    "typescript": "3.9.1-rc"
   },
   "dependencies": {
     "cors": "2.8.5",
