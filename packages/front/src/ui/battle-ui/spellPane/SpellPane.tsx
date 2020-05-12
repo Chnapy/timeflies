@@ -2,7 +2,7 @@ import { SpellType } from '@timeflies/shared'
 import React from 'react';
 import { connect } from "react-redux";
 import { GameState } from "../../../game-state";
-import { SpellBtn } from './spellBtn/SpellBtn';
+import { SpellButton } from './spellBtn/spell-button';
 import css from './spellPane.module.css';
 
 interface SpellPaneInnerProps {
@@ -28,11 +28,11 @@ export const SpellPane = connect<SpellPaneInnerProps, {}, {}, GameState>(
     return <div className={css.root}>
 
         <div className={css.sideSpells}>
-            {sideSpellIds.map(id => <SpellBtn key={id} spellId={id} />)}
+            {sideSpellIds.map(id => <SpellButton key={id} spellId={id} />)}
         </div>
 
         <div className={css.mainSpells}>
-            {mainSpellIds.map(id => <SpellBtn key={id} spellId={id} />)}
+            {mainSpellIds.map(id => <SpellButton key={id} spellId={id} />)}
         </div>
 
     </div>;

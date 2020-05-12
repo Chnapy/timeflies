@@ -70,6 +70,8 @@ export interface FakeBattleApiRunner {
     notify(): void;
 }
 
+export type FakeBattleApi = ReturnType<typeof FakeBattleApi>;
+
 export const FakeBattleApi = () => {
 
     let isInBattle: boolean = false;

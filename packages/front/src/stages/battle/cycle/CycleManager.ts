@@ -3,6 +3,7 @@ import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { GlobalTurn } from './GlobalTurn';
 import { IGameAction } from '../../../action/game-action/GameAction';
+import { BStateSpellPrepareAction } from '../battleState/BattleStateSchema';
 
 export interface NotifyDeathsAction extends IGameAction<'battle/notify-deaths'> {
 }
@@ -60,6 +61,14 @@ export const CycleManager = (
     };
 
     const { onAction, onMessageAction } = serviceEvent();
+
+    onAction<BStateSpellPrepareAction>(
+        'battle/state/event',
+        ({ payload: { spellType } }) => {
+            if (cycleData.globalTurn)
+                cycleData.globalTurn.currentTurn.currentSpellType = spellType;
+        }
+    );
 
     onAction<NotifyDeathsAction>(
         'battle/notify-deaths',
