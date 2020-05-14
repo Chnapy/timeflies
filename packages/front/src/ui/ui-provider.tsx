@@ -1,4 +1,5 @@
-import { CssBaseline, makeStyles, ThemeProvider } from '@material-ui/core';
+import { CssBaseline } from '@material-ui/core';
+import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import React from 'react';
 import { appTheme } from './app-theme';
 

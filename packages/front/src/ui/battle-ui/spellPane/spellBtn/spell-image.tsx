@@ -3,7 +3,8 @@ import React from 'react';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import spriteCss from '../../../../_assets/spritesheets/spells_spritesheet.module.css';
 import clsx from 'clsx';
-import { makeStyles, Box } from '@material-ui/core';
+import { Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 export type SpellImageProps = {
     spellType: SpellType;

@@ -1,4 +1,5 @@
-import { ButtonBase, makeStyles } from '@material-ui/core';
+import { ButtonBase } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import Remove from '@material-ui/icons/Remove';
 import React from 'react';
 

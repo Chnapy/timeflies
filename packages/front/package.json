@@ -39,6 +39,7 @@
     "@types/redux-logger": "^3.0.7",
     "@types/redux-mock-store": "^1.0.2",
     "@types/webpack": "^4.41.10",
+    "babel-plugin-import": "1.13.0",
     "classnames": "2.2.6",
     "file-loader": "5.0.2",
     "react": "16.13.1",
@@ -48,7 +49,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-mock-store": "^1.5.4",
     "tiled-types": "^1.0.0",
-    "timeflies-react-scripts": "3.4.1",
+    "timeflies-react-scripts": "3.4.1-20200514",
     "ts-loader": "6.2.1",
     "typescript": "3.9.1-rc"
   },
