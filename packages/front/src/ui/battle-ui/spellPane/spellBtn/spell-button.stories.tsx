@@ -15,6 +15,7 @@ import { SpellButton, SpellButtonProps } from './spell-button';
 import { SpellNumber } from './spell-number';
 import { UIText } from './ui-text';
 import { SpellImage } from './spell-image';
+import { UIGauge } from './ui-gauge';
 
 export default {
     component: SpellButton,
@@ -56,6 +57,7 @@ const Wrapper: React.FC<SpellButtonProps & {
 export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
 
     const turnDefault = seedTurn(1, {
+        getRemainingTime() { return 3000 },
         character: seedCharacter('fake', {
             id: 'c1', period: 'current', player: null,
             seedSpells: [ {
@@ -71,6 +73,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     });
 
     const turnSelected = seedTurn(1, {
+        getRemainingTime() { return 3000 },
         currentSpellType: 'simpleAttack',
         character: seedCharacter('fake', {
             id: 'c1', period: 'current', player: null,
@@ -87,6 +90,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     });
 
     const turnDisabledTime = seedTurn(1, {
+        getRemainingTime() { return 2500 },
         character: seedCharacter('fake', {
             id: 'c1', period: 'current', player: null,
             initialFeatures: { life: 100, actionTime: 0 },
@@ -103,6 +107,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     });
 
     const turnDisabledTurn = seedTurn(1, {
+        getRemainingTime() { return 3000 },
         character: seedCharacter('fake', {
             id: 'c1', period: 'current', player: null,
             isMine: false,
@@ -118,7 +123,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         })
     });
 
-    const stateQueue: GameState = seedGameState('p1', {
+    const getQueueGameState = (remainsTime: boolean, firstSpellActionStartTime: number): GameState => seedGameState('p1', {
         step: 'battle',
         battle: seedBattleData({
             cycle: {
@@ -136,7 +141,8 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                                     area: 4
                                 }
                             } ]
-                        })
+                        }),
+                        getRemainingTime() { return remainsTime ? 3000 : 2500; },
                     })
                 })
             },
@@ -147,21 +153,27 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                 teams: [],
                 spellActionSnapshotList: [
                     seedSpellActionSnapshot('s1', {
-                        duration: 2000,
-                        startTime: Date.now() + 6000
+                        duration: 10000,
+                        startTime: firstSpellActionStartTime
                     }),
                     seedSpellActionSnapshot('s1', {
-                        duration: 2000,
-                        startTime: Date.now() + 8000
+                        duration: 10000,
+                        startTime: firstSpellActionStartTime + 10000
                     }),
                     seedSpellActionSnapshot('s1', {
-                        duration: 2000,
-                        startTime: Date.now() + 10000
+                        duration: 10000,
+                        startTime: firstSpellActionStartTime + 20000
                     })
                 ]
             }
         })
     });
+
+    const stateQueue: GameState = getQueueGameState(true, Date.now() + 6000);
+
+    const stateQueueDisabled: GameState = getQueueGameState(false, Date.now() + 6000);
+
+    const stateQueueCurrentAction: GameState = getQueueGameState(true, Date.now() - 1500);
 
     return (
         <Box display='flex' flexWrap='wrap'>
@@ -173,16 +185,24 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             <Wrapper title='Disabled (time)' fakeApi={fakeBattleApi} turn={turnDisabledTime} spellId='s1' />
 
             <Wrapper title='Disabled (not my character)' fakeApi={fakeBattleApi} turn={turnDisabledTurn} spellId='s1' />
-            
+
             <Wrapper title='With queue' fakeApi={fakeBattleApi} initialState={stateQueue} spellId='s1' />
 
-            <Box>
-                <SpellNumber value={1}/>
-                <SpellNumber value={2}/>
+            <Wrapper title='With queue, disabled (time)' fakeApi={fakeBattleApi} initialState={stateQueueDisabled} spellId='s1' />
+
+            <Wrapper title='With queue, current action' fakeApi={fakeBattleApi} initialState={stateQueueCurrentAction} spellId='s1' />
+
+            <Box width='100%'>
+                <SpellNumber value={1} />
+                <SpellNumber value={2} />
                 <UIIcon icon='time' />
                 <UIIcon icon='attack' />
+                <UIIcon icon='time' strikeOut />
                 <UIText variant='numeric'>12.4s</UIText>
-                <SpellImage spellType={'move'} size={48}/>
+                <SpellImage spellType={'move'} size={48} />
+                <Box width={300}>
+                    <UIGauge timeElapsed={3000} durationTotal={10000} />
+                </Box>
             </Box>
         </Box>
     );
