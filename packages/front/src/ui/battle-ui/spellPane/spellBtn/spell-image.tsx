@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
     })
 }));
 
-export const SpellImage: React.FC<SpellImageProps> = ({ spellType, size }) => {
+export const SpellImage: React.FC<SpellImageProps> = React.memo(({ spellType, size }) => {
     const classes = useStyles({ size });
 
     const typeName = AssetManager.spells.spellsMap[ spellType ];
@@ -31,4 +31,4 @@ export const SpellImage: React.FC<SpellImageProps> = ({ spellType, size }) => {
             }} />
         </Box>
     );
-};
+});

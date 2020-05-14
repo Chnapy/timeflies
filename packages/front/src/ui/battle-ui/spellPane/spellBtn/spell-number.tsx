@@ -18,7 +18,7 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
     })
 }))
 
-export const SpellNumber: React.FC<SpellNumberProps> = ({ value, disabled }) => {
+export const SpellNumber: React.FC<SpellNumberProps> = React.memo(({ value, disabled }) => {
     const classes = useStyles({ disabled });
 
     return (
@@ -28,4 +28,4 @@ export const SpellNumber: React.FC<SpellNumberProps> = ({ value, disabled }) => 
             </UIText>
         </Avatar>
     );
-};
+});

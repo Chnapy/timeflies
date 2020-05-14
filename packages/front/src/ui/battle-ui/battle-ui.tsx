@@ -1,5 +1,5 @@
 import React from "react";
-import { SpellPane } from "./spellPane/SpellPane";
+import { SpellPanel } from "./spellPane/spell-panel";
 import { TimePane } from "./timePane/TimePane";
 import { CharactersPane } from "./charactersPane/CharactersPane";
 import css from './battleUI.module.css';
@@ -11,7 +11,7 @@ export const BattleUI: React.FC = () => {
         <div className={css.row_bottom}>
             <CharactersPane />
 
-            <SpellPane />
+            <SpellPanel />
 
             <TimePane />
         </div>

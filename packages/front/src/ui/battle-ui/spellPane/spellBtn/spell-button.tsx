@@ -1,5 +1,5 @@
-import { Box, Button, ButtonProps, makeStyles } from '@material-ui/core';
-import { assertIsDefined } from '@timeflies/shared';
+import { Box, Button, ButtonProps, Theme, useTheme, Tooltip } from '@material-ui/core';
+import { assertIsDefined, switchUtil } from '@timeflies/shared';
 import React from 'react';
 import { BattleDataMap } from '../../../../BattleData';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
@@ -12,18 +12,13 @@ import { SpellImage } from './spell-image';
 import { SpellNumber } from './spell-number';
 import { UIIcon, UIIconValue } from './ui-icon';
 import { formatMsToSeconds, UIText } from './ui-text';
+import { UIGauge } from './ui-gauge';
 
 export interface SpellButtonProps {
     spellId: string;
 }
 
-const useStyles = makeStyles(({ palette }) => ({
-    outlined: {
-        backgroundColor: palette.primary.contrastText
-    }
-}));
-
-export const SpellButton: React.FC<SpellButtonProps> = ({ spellId }) => {
+export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) => {
 
     const selectCurrentTurn = ({ cycle }: BattleDataMap): Turn => {
         assertIsDefined(cycle.globalTurn);
@@ -40,21 +35,76 @@ export const SpellButton: React.FC<SpellButtonProps> = ({ spellId }) => {
     const selectSpell = (battle: BattleDataMap): Spell<'current'> =>
         selectCurrentCharacter(battle).spells[ spellIndex ];
 
+    const now = Date.now();
+
     const duration = useGameStep('battle', battle => selectSpell(battle).feature.duration);
 
     const attack = useGameStep('battle', battle => selectSpell(battle).feature.attack);
 
     const spellType = useGameStep('battle', battle => selectSpell(battle).staticData.type);
 
+    const nbrWaitingSpellAction: number = useGameStep('battle', battle => {
+        const { spellActionSnapshotList } = battle.future;
+
+        return spellActionSnapshotList.filter(spellAction =>
+            spellAction.spellId === spellId
+            && spellAction.startTime > now
+        ).length;
+    });
+
+    const currentSpellActionStartTime = useGameStep('battle', battle => {
+        const { spellActionSnapshotList } = battle.future;
+
+        const spellAction = spellActionSnapshotList.find(_spellAction =>
+            _spellAction.spellId === spellId
+            && _spellAction.startTime <= now
+            && _spellAction.startTime + _spellAction.duration > now
+        );
+
+        return spellAction
+            ? spellAction.startTime
+            : undefined;
+    });
+
+    const currentSpellActionDuration = useGameStep('battle', battle => {
+
+        if (!currentSpellActionStartTime) {
+            return;
+        }
+
+        const { spellActionSnapshotList } = battle.future;
+
+        const spellAction = spellActionSnapshotList.find(_spellAction =>
+            _spellAction.startTime === currentSpellActionStartTime
+        );
+        assertIsDefined(spellAction);
+
+        return spellAction.duration;
+    });
+
+    const currentSpellActionInfos = currentSpellActionStartTime
+        ? {
+            timeElapsed: now - currentSpellActionStartTime,
+            duration: currentSpellActionDuration!
+        }
+        : null;
+
     const isSelected = useGameStep('battle', battle => selectCurrentTurn(battle).currentSpellType === spellType);
 
-    const isDisabled = useGameStep('battle', battle => !selectCurrentCharacter(battle).isMine);
+    const disableReason = useGameStep('battle', battle => {
 
-    // const isDisabled = useGameStep('battle', battle => {
+        if (!selectCurrentCharacter(battle).isMine) {
+            return 'player';
+        }
 
+        if (selectCurrentTurn(battle).getRemainingTime('future') < duration) {
+            return 'time';
+        }
 
+        return;
+    });
 
-    // });
+    const isDisabled = !!disableReason;
 
     const spellNumber = spellIndex + 1;
 
@@ -85,6 +135,12 @@ export const SpellButton: React.FC<SpellButtonProps> = ({ spellId }) => {
         </Box>
     );
 
+    const renderDisableIcon = () => switchUtil(disableReason ?? 'none', {
+        none: null,
+        time: <UIIcon icon='time' strikeOut />,
+        player: <UIIcon icon='play' strikeOut />
+    });
+
     const buttonProps: ButtonProps = isSelected
         ? {
             variant: 'contained',
@@ -94,30 +150,52 @@ export const SpellButton: React.FC<SpellButtonProps> = ({ spellId }) => {
             variant: 'outlined'
         };
 
-    const classes = useStyles();
+    const { palette } = useTheme<Theme>();
 
-    return <>
-        <Button classes={classes} onClick={onBtnClick} size='large' color='primary' disabled={isDisabled} {...buttonProps}>
+    const renderPoint = (key: number) =>
+        <Box key={key} width={4} height={4} borderRadius={10} bgcolor={palette.primary.main} mr={'1px'} />;
 
-            <Box display='flex' flexWrap='nowrap'>
+    return (
+        <Box display='flex' flexDirection='column'>
 
-                <Box display='flex' style={{ opacity: isDisabled ? .25 : 1 }}>
-                    <SpellImage spellType={spellType} size={48} />
-                </Box>
-
-                <Box display='flex' flexDirection='column' justifyContent='space-evenly' ml={1}>
-                    {renderAttribute('time', formatMsToSeconds(duration))}
-                    {renderAttribute('attack', attack)}
-                </Box>
-
+            <Box display='flex' height={4} mx={0.5} mb={0.5}>
+                {[ ...new Array(nbrWaitingSpellAction) ].map((_, i) => renderPoint(i))}
+                {currentSpellActionInfos && <UIGauge timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />}
             </Box>
 
-            <Box position='absolute' left={0} bottom={0} style={{
-                transform: 'translate(-25%, 25%)'
-            }}>
-                <SpellNumber value={spellNumber} disabled={isDisabled} />
-            </Box>
+            <Tooltip title={'Spell description'}>
+                <Button onClick={onBtnClick} size='large' color='primary' disabled={isDisabled} {...buttonProps}>
 
-        </Button>
-    </>;
-};
+                    <Box display='flex' flexWrap='nowrap'>
+
+                        <Box
+                            display='flex'
+                            border={1}
+                            borderColor={'currentColor'}
+                            style={{ opacity: isDisabled ? .25 : 1 }}
+                        >
+                            <SpellImage spellType={spellType} size={48} />
+                        </Box>
+
+                        <Box display='flex' flexDirection='column' justifyContent='space-evenly' ml={1}>
+                            {renderAttribute('time', formatMsToSeconds(duration) + 's')}
+                            {renderAttribute('attack', attack)}
+                        </Box>
+
+                    </Box>
+
+                    <Box position='absolute' left={0} bottom={0} style={{
+                        transform: 'translate(-25%, 25%)'
+                    }}>
+                        <SpellNumber value={spellNumber} disabled={isDisabled} />
+                    </Box>
+
+                    <Box color={palette.primary.main} position='absolute' top={4} right={4}>
+                        {renderDisableIcon()}
+                    </Box>
+
+                </Button>
+            </Tooltip>
+        </Box>
+    );
+});

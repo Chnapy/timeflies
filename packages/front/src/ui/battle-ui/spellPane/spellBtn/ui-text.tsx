@@ -27,7 +27,7 @@ const useStyles = makeStyles<Theme, 'root' | UITextVariant>(() => ({
     }
 }));
 
-export const UIText: React.FC<UITextProps> = ({ variant, children }) => {
+export const UIText: React.FC<UITextProps> = React.memo(({ variant, children }) => {
     const classes = useStyles();
 
     return (
@@ -35,4 +35,4 @@ export const UIText: React.FC<UITextProps> = ({ variant, children }) => {
             {children}
         </Typography>
     );
-};
+});
