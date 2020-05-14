@@ -1,4 +1,5 @@
-import { Box, makeStyles } from '@material-ui/core';
+import { Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { EntityTree } from './entity-tree/entity-tree';
 import { MapBoard } from './map-board/map-board';

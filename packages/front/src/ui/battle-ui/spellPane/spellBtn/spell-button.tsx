@@ -1,4 +1,5 @@
-import { Box, Button, ButtonProps, Theme, useTheme, Tooltip } from '@material-ui/core';
+import { Box, Button, ButtonProps, Tooltip } from '@material-ui/core';
+import { Theme, useTheme } from '@material-ui/core/styles';
 import { assertIsDefined, switchUtil } from '@timeflies/shared';
 import React from 'react';
 import { BattleDataMap } from '../../../../BattleData';

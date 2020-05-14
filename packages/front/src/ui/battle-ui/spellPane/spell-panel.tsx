@@ -1,4 +1,5 @@
-import { Paper, Box, makeStyles } from '@material-ui/core';
+import { Paper, Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { assertIsDefined } from '@timeflies/shared';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
