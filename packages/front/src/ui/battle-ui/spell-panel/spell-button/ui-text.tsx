@@ -13,10 +13,10 @@ export const formatMsToSeconds = (ms: number): string => {
     if (ms === 0) {
         return '0';
     }
-    const value = Number.parseInt(ms / 100 + '') / 10 + '';
-    return value.includes('.')
-        ? value
-        : value + '.0';
+
+    const [ seconds, decimals = '0' ] = (ms / 1000).toString().split('.');
+
+    return `${seconds}.${decimals[ 0 ]}`;
 };
 
 const useStyles = makeStyles<Theme, 'root' | UITextVariant>(() => ({

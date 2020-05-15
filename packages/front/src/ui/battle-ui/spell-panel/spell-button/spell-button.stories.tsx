@@ -19,7 +19,7 @@ import { UIGauge } from './ui-gauge';
 
 export default {
     component: SpellButton,
-    title: 'Battle/Spell button'
+    title: 'Battle/Spell panel/Spell button'
 };
 
 const Wrapper: React.FC<SpellButtonProps & {
@@ -201,7 +201,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                 <UIText variant='numeric'>12.4s</UIText>
                 <SpellImage spellType={'move'} size={48} />
                 <Box width={300}>
-                    <UIGauge timeElapsed={3000} durationTotal={10000} />
+                    <UIGauge variant='dynamic' timeElapsed={3000} durationTotal={10000} />
                 </Box>
             </Box>
         </Box>

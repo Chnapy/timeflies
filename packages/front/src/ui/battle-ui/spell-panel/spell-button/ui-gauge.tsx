@@ -1,0 +1,73 @@
+import React from 'react';
+import { assertIsNonNullable } from '@timeflies/shared';
+import { makeStyles } from '@material-ui/core/styles';
+
+export type UIGaugeProps = {
+    variant: 'dynamic' | 'static'
+    timeElapsed: number;
+    durationTotal: number;
+    children?: never;
+};
+
+const useStyles = makeStyles(({ palette, shape }) => ({
+    root: {
+        display: 'flex',
+        flexGrow: 1,
+        height: 4,
+        width: '100%',
+        backgroundColor: '#E7E7E7',
+        borderRadius: shape.borderRadius,
+        overflow: 'hidden'
+    },
+    content: ({ remainsPercent }: { remainsPercent: number }) => ({
+        width: `${remainsPercent}%`,
+        height: '100%',
+        backgroundColor: palette.primary.main,
+    })
+}))
+
+export const UIGauge: React.FC<UIGaugeProps> = React.memo(({ variant, timeElapsed, durationTotal }) => {
+
+    const remainsDuration = Math.max(durationTotal - timeElapsed, 0);
+
+    const remainsPercent = remainsDuration / durationTotal * 100;
+
+    const classes = useStyles({ remainsPercent });
+
+    const contentRef = React.useRef<HTMLDivElement>(null);
+
+    const [ animation, setAnimation ] = React.useState<Animation | null>(null);
+
+    React.useEffect(() => {
+
+        animation?.cancel();
+
+        if (variant === 'dynamic') {
+
+            const { current } = contentRef;
+            assertIsNonNullable(current);
+
+            try {
+                const anim = current.animate([
+                    { width: `${remainsPercent}%` },
+                    { width: 0 },
+                ], {
+                    duration: remainsDuration,
+                    fill: 'forwards'
+                });
+
+                setAnimation(anim);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ remainsDuration, remainsPercent, variant ]);
+
+    return (
+        <div className={classes.root}>
+            <div className={classes.content} ref={contentRef} />
+        </div>
+    );
+});
