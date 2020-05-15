@@ -5,6 +5,8 @@ import { TimerTester } from '@timeflies/shared';
 import { SpellEngineBindAction } from './Engine';
 import { BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { seedMapManager } from '../map/MapManager.seed';
+import { seedGlobalTurn } from '../cycle/global-turn.seed';
+import { seedTurn } from '../cycle/turn.seed';
 
 describe('# SpellPrepareEngine', () => {
 
@@ -50,26 +52,18 @@ describe('# SpellPrepareEngine', () => {
 
         const cycle: BattleDataCycle = {
             launchTime: -1,
-            globalTurn: {
-                id: 1,
+            globalTurn: seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
+                currentTurn: seedTurn(1, {
                     id: 1,
                     character: characterCurrent,
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
                     getRemainingTime() { return 100; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            }
+                })
+            })
         }
 
         const future: Pick<BattleDataFuture, 'characters'> = {
@@ -156,26 +150,17 @@ describe('# SpellPrepareEngine', () => {
 
         const cycle: BattleDataCycle = {
             launchTime: -1,
-            globalTurn: {
-                id: 1,
+            globalTurn: seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characterCurrent,
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
                     getRemainingTime() { return 300; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            }
+                })
+            })
         }
 
         const future: Pick<BattleDataFuture, 'characters'> = {

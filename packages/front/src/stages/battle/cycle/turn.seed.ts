@@ -1,7 +1,8 @@
 import { Turn } from './Turn';
 import { seedCharacter } from '../entities/character/Character.seed';
+import { assignKeepGetSet } from '@timeflies/shared';
 
-export const seedTurn = (id: number, partial: Partial<Turn> = {}): Turn => ({
+export const seedTurn = (id: number, partial: Partial<Turn> = {}): Turn => assignKeepGetSet({
     id,
     state: 'running',
     startTime: -1,
@@ -14,5 +15,4 @@ export const seedTurn = (id: number, partial: Partial<Turn> = {}): Turn => ({
     getRemainingTime(period) { return -1 },
     refreshTimedActions() { },
     synchronize(snapshot) { },
-    ...partial
-});
+}, partial);

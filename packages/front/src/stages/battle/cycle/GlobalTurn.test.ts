@@ -3,6 +3,7 @@ import { StoreTest } from "../../../StoreTest";
 import { seedCharacter } from "../entities/character/Character.seed";
 import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
 import { Turn, TurnState } from "./Turn";
+import { seedTurn } from './turn.seed';
 
 describe('# GlobalTurn', () => {
 
@@ -29,17 +30,13 @@ describe('# GlobalTurn', () => {
         let onTurnEndFn;
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
             onTurnEndFn = onTurnEnd;
-            return {
-                id: 1,
+            return seedTurn(1, {
                 character: characters[ 0 ],
                 startTime: timerTester.now,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 state: 'running',
-                synchronize() { },
-                getRemainingTime(period) { return -1 }
-            }
+            })
         };
 
         const characters = [
@@ -82,17 +79,13 @@ describe('# GlobalTurn', () => {
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
             onTurnEndFn = onTurnEnd;
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 state: 'running',
-                synchronize() { },
-                getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [
@@ -126,17 +119,13 @@ describe('# GlobalTurn', () => {
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
             onTurnEndFn = onTurnEnd;
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 get state() { return turnState; },
-                synchronize() { },
-                getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [
@@ -174,17 +163,13 @@ describe('# GlobalTurn', () => {
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
             onTurnEndFn = onTurnEnd;
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 state: 'running',
-                synchronize() { },
-                getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [
@@ -215,17 +200,13 @@ describe('# GlobalTurn', () => {
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
             onTurnEndFn = onTurnEnd;
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 state: 'running',
-                synchronize() { },
-                getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [
@@ -257,8 +238,7 @@ describe('# GlobalTurn', () => {
     it('should stop turn if current character dies', () => {
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
@@ -267,7 +247,7 @@ describe('# GlobalTurn', () => {
                 state: 'running',
                 synchronize() { },
                 getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [
@@ -300,17 +280,14 @@ describe('# GlobalTurn', () => {
         let synchronize = jest.fn();
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 state: 'running',
                 synchronize,
-                getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [
@@ -346,17 +323,13 @@ describe('# GlobalTurn', () => {
     it('should stop correctly', () => {
 
         const turnCreator: typeof Turn = (id, startTime, character, onTurnEnd) => {
-            return {
-                id,
+            return seedTurn(id, {
                 character,
                 startTime,
                 turnDuration: 1000,
                 endTime: timerTester.now + 1000,
-                refreshTimedActions() { },
                 state: 'running',
-                synchronize() { },
-                getRemainingTime(period) { return -1 }
-            }
+            });
         };
 
         const characters = [

@@ -6,6 +6,8 @@ import { CycleManager, NotifyDeathsAction } from "./CycleManager";
 import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
 import { TurnState } from "./Turn";
 import { Character } from '../entities/character/Character';
+import { seedGlobalTurn } from './global-turn.seed';
+import { seedTurn } from './turn.seed';
 
 describe('# CycleManager', () => {
 
@@ -43,26 +45,16 @@ describe('# CycleManager', () => {
 
         const globalTurnCreator: typeof GlobalTurn = jest.fn(() => {
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            };
+                }),
+            });
         });
 
         CycleManager({ globalTurnCreator });
@@ -104,26 +96,17 @@ describe('# CycleManager', () => {
 
         const globalTurnCreator: typeof GlobalTurn = () => {
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
+                }),
                 synchronize,
-                synchronizeTurn() { },
-                stop() { }
-            };
+            });
         };
 
         CycleManager({ globalTurnCreator });
@@ -182,26 +165,17 @@ describe('# CycleManager', () => {
 
         const globalTurnCreator: typeof GlobalTurn = () => {
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
+                }),
                 synchronizeTurn,
-                stop() { }
-            };
+            });
         };
 
         CycleManager({ globalTurnCreator });
@@ -261,26 +235,16 @@ describe('# CycleManager', () => {
 
             onGlobalTurnCreate(_snapshot.id);
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            };
+                }),
+            });
         };
 
         CycleManager({ globalTurnCreator });
@@ -351,26 +315,16 @@ describe('# CycleManager', () => {
 
             onGlobalTurnCreate(_snapshot.id);
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 get state() { return state },
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            };
+                }),
+            });
         };
 
         CycleManager({ globalTurnCreator });
@@ -434,26 +388,17 @@ describe('# CycleManager', () => {
 
         const globalTurnCreator: typeof GlobalTurn = (_snapshot, _characters, _generateTurnId) => {
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
+                }),
                 notifyDeaths,
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            };
+            });
         };
 
         CycleManager({ globalTurnCreator });
@@ -498,26 +443,16 @@ describe('# CycleManager', () => {
 
         const globalTurnCreator: typeof GlobalTurn = () => {
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: currentTurnState,
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
-                stop() { }
-            };
+                }),
+            });
         };
 
         const cycle = CycleManager({ globalTurnCreator });
@@ -562,26 +497,17 @@ describe('# CycleManager', () => {
 
         const globalTurnCreator: typeof GlobalTurn = () => {
 
-            return {
-                id: 1,
+            return seedGlobalTurn(1, {
                 state: 'running',
-                currentTurn: {
-                    id: 1,
+                currentTurn: seedTurn(1, {
                     character: characters[ 0 ],
                     startTime: timerTester.now,
                     turnDuration: 1000,
                     endTime: timerTester.now + 1000,
-                    refreshTimedActions() { },
                     state: 'running',
-                    synchronize() { },
-                    getRemainingTime() { return -1; }
-                },
-                start() { },
-                notifyDeaths() { },
-                synchronize() { },
-                synchronizeTurn() { },
+                }),
                 stop: stopFn
-            };
+            });
         };
 
         const cycle = CycleManager({ globalTurnCreator });
