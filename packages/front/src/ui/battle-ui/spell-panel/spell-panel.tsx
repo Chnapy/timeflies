@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { assertIsDefined } from '@timeflies/shared';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
-import { SpellButton } from './spellBtn/spell-button';
+import { SpellButton } from './spell-button/spell-button';
 
 const useStyles = makeStyles(() => ({
     root: {

@@ -161,7 +161,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
             <Box display='flex' height={4} mx={0.5} mb={0.5}>
                 {[ ...new Array(nbrWaitingSpellAction) ].map((_, i) => renderPoint(i))}
-                {currentSpellActionInfos && <UIGauge timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />}
+                {currentSpellActionInfos && <UIGauge variant='dynamic' timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />}
             </Box>
 
             <Tooltip title={'Spell description'}>
