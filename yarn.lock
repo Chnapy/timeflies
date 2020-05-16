@@ -4035,7 +4035,7 @@ babel-plugin-emotion@^10.0.20, babel-plugin-emotion@^10.0.27:
     find-root "^1.1.0"
     source-map "^0.5.7"
 
-babel-plugin-import@^1.13.0:
+babel-plugin-import@1.13.0:
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-import/-/babel-plugin-import-1.13.0.tgz#c532fd533df9db53b47d4d4db3676090fc5c07a5"
   integrity sha512-bHU8m0SrY89ub2hBBuYjbennOeH0YUYkVpH6jxKFk0uD8rhN+0jNHIPtXnac+Vn7N/hgkLGGDcIoYK7je3Hhew==
@@ -14350,10 +14350,10 @@ thunky@^1.0.2:
   resolved "https://registry.yarnpkg.com/thunky/-/thunky-1.1.0.tgz#5abaf714a9405db0504732bbccd2cedd9ef9537d"
   integrity sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA==
 
-tiled-types@1.0.0, tiled-types@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/tiled-types/-/tiled-types-1.0.0.tgz#34d73da609e7a9f4867b9f2e38e1ccc86c8c6be7"
-  integrity sha512-7PETacEkgsilXIbNaATL32V8gVu6E5v+yLlm6fmbIwgb1W5KqDKHOIX01B+LFuOO5HsWqDCho/jJIUKr53t7ug==
+tiled-types@1.1.0, tiled-types@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/tiled-types/-/tiled-types-1.1.0.tgz#5da1242c81fc3ae42f1f5873256534bbe858daf6"
+  integrity sha512-4BhUxSEHwuHbmX0QsQtkSbyQ5674G1dPHJluDcRHcilGUjY+nv0tizXAHYvm8qzr5HEvXSRIjfVBUrjULPjJHA==
 
 timeflies-react-scripts@3.4.1-20200514:
   version "3.4.1-20200514"

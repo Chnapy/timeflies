@@ -14,7 +14,7 @@ export const TimeGauge: React.FC = () => {
     const remainingTime = useGameStep('battle', ({ cycle }) =>
         cycle.globalTurn?.currentTurn.getRemainingTime('current') ?? 0);
 
-    const spellActionStartTimeList = useGameStep('battle', ({ future }) => (console.log(future.spellActionSnapshotList[0]) as any) ||
+    const spellActionStartTimeList = useGameStep('battle', ({ future }) =>
         future.spellActionSnapshotList.map(spellAction => spellAction.startTime),
         (a, b) => a.length === b.length);
 
