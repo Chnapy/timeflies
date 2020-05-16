@@ -51,7 +51,7 @@
     "tiled-types": "^1.1.0",
     "timeflies-react-scripts": "3.4.1-20200514",
     "ts-loader": "6.2.1",
-    "typescript": "3.9.1-rc"
+    "typescript": "3.9.2"
   },
   "browserslist": {
     "production": [
