@@ -48,7 +48,7 @@
     "redux": "4.0.5",
     "redux-devtools-extension": "2.13.8",
     "redux-mock-store": "^1.5.4",
-    "tiled-types": "^1.0.0",
+    "tiled-types": "^1.1.0",
     "timeflies-react-scripts": "3.4.1-20200514",
     "ts-loader": "6.2.1",
     "typescript": "3.9.1-rc"

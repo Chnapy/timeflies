@@ -3,9 +3,6 @@ import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledT
 import { Position } from '../geo';
 import { assertIsDefined } from '../util';
 
-type TiledLayerTilelayerWithData = Omit<TiledLayerTilelayer, 'data'>
-    & Pick<Required<TiledLayerTilelayer>, 'data'>;
-
 export interface TilePositioned<T extends TileTypeWithPlacement> {
     type: T;
     position: Position;
@@ -62,14 +59,13 @@ const tileLayerNames = Object.freeze({
 export const TiledManager = (assets: TiledMapAssets): TiledManager => {
     const { schema } = assets;
 
-    const getTilelayer = (name: string): TiledLayerTilelayerWithData => {
+    const getTilelayer = (name: string): TiledLayerTilelayer => {
         const layer = schema.layers.find((layer): layer is TiledLayerTilelayer =>
             layer.type === 'tilelayer' && layer.name === name
         );
         assertIsDefined(layer);
-        assertIsDefined(layer.data);
 
-        return layer as TiledLayerTilelayerWithData;
+        return layer;
     };
 
     assertMapIsAllowed(schema);
@@ -88,12 +84,12 @@ export const TiledManager = (assets: TiledMapAssets): TiledManager => {
         return { x, y };
     };
 
-    const getTileIdFromPosition = ({ data, width }: TiledLayerTilelayerWithData, { x, y }: Position): number => {
+    const getTileIdFromPosition = ({ data, width }: TiledLayerTilelayer, { x, y }: Position): number => {
         const index = x + y * width;
         return data[ index ];
     };
 
-    const hasTileFromLayer = (layer: TiledLayerTilelayerWithData, position: Position): boolean => {
+    const hasTileFromLayer = (layer: TiledLayerTilelayer, position: Position): boolean => {
         return getTileIdFromPosition(layer, position) !== 0;
     };
 
