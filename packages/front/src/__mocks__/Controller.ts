@@ -59,6 +59,9 @@ export const Controller: typeof IController = {
                 }
             };
             return this_;
+        },
+        get(key) {
+            return undefined;
         }
     },
 
