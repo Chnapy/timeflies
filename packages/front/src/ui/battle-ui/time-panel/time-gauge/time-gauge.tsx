@@ -8,22 +8,27 @@ import { SpellTimeGauge } from './spell-time-gauge';
 
 export const TimeGauge: React.FC = () => {
 
-    const turnDuration = useGameStep('battle', ({ cycle }) =>
-        cycle.globalTurn?.currentTurn.turnDuration ?? 0);
+    const { turnDuration, remainingTime } = useGameStep('battle', ({ cycle }) => {
+        if (!cycle.globalTurn) {
+            return {
+                startTime: 0,
+                turnDuration: 0,
+                remainingTime: 0
+            };
+        }
 
-    const remainingTime = useGameStep('battle', ({ cycle }) =>
-        cycle.globalTurn?.currentTurn.getRemainingTime('current') ?? 0);
+        const { currentTurn } = cycle.globalTurn;
+        return {
+            startTime: currentTurn.startTime,
+            turnDuration: currentTurn.turnDuration,
+            remainingTime: currentTurn.getRemainingTime('current')
+        };
+    }, (a, b) => a.startTime === b.startTime);
 
     const spellActionStartTimeList = useGameStep('battle', ({ future }) =>
         future.spellActionSnapshotList.map(spellAction => spellAction.startTime),
         (a, b) => a.length === b.length);
 
-    const renderSpellGauges = () => spellActionStartTimeList.map((startTime) => {
-
-        return <Box key={startTime} position='absolute' left={0} right={0} top={0} bottom={0}>
-            <SpellTimeGauge spellActionStartTime={startTime} />
-        </Box>;
-    });
 
     return <Box position='relative' display='flex' alignItems='center' flexGrow={1}>
 
@@ -33,7 +38,12 @@ export const TimeGauge: React.FC = () => {
 
         <UIGauge variant='dynamic' timeElapsed={turnDuration - remainingTime} durationTotal={turnDuration} />
 
-        {renderSpellGauges()}
+        {spellActionStartTimeList.map((startTime) => {
+
+            return <Box key={startTime} position='absolute' left={0} right={0} top={0} bottom={0}>
+                <SpellTimeGauge spellActionStartTime={startTime} />
+            </Box>;
+        })}
 
     </Box>;
 };

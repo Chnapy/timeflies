@@ -21,10 +21,13 @@ export const CharacterListPanel: React.FC = () => {
 
     const { palette } = useTheme<Theme>();
 
-    const [ current, ...charactersIds ] = useGameStep('battle', ({ current, cycle }) =>
-        current.characters
+    const [ current, ...charactersIds ] = useGameStep(
+        'battle',
+        ({ current, cycle }) => current.characters
             .map(c => c.id)
-            .sort((a, b) => cycle.globalTurn?.currentTurn.character.id === a ? -1 : 1));
+            .sort((a, b) => cycle.globalTurn?.currentTurn.character.id === a ? -1 : 1),
+        (a, b) => a.join('.') === b.join('.')
+    );
 
     return <Paper className={classes.root} elevation={3}>
 
