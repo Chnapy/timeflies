@@ -112,7 +112,7 @@ export const FakeBattleApi = () => {
                                     }
                                 ],
                                 features: {
-                                    actionTime: 6_000
+                                    actionTime: 12_000
                                 },
                                 position: { x: 4, y: 3 }
                             }
@@ -133,7 +133,7 @@ export const FakeBattleApi = () => {
                                     { id: 'S2', type: 'move' }
                                 ],
                                 features: {
-                                    actionTime: 6_000
+                                    actionTime: 12_000
                                 },
                                 position: { x: 6, y: 3 }
                             }
