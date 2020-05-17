@@ -1,9 +1,11 @@
 import React from 'react';
 import { assertIsNonNullable } from '@timeflies/shared';
 import { makeStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
 export type UIGaugeProps = {
-    variant: 'dynamic' | 'static'
+    className?: string;
+    variant: 'dynamic' | 'static';
     timeElapsed: number;
     durationTotal: number;
     children?: never;
@@ -22,11 +24,11 @@ const useStyles = makeStyles(({ palette, shape }) => ({
     content: ({ remainsPercent }: { remainsPercent: number }) => ({
         width: `${remainsPercent}%`,
         height: '100%',
-        backgroundColor: palette.primary.main,
+        backgroundColor: 'currentColor',
     })
 }))
 
-export const UIGauge: React.FC<UIGaugeProps> = React.memo(({ variant, timeElapsed, durationTotal }) => {
+export const UIGauge: React.FC<UIGaugeProps> = React.memo(({ className, variant, timeElapsed, durationTotal }) => {
 
     const remainsDuration = Math.max(durationTotal - timeElapsed, 0);
 
@@ -66,7 +68,7 @@ export const UIGauge: React.FC<UIGaugeProps> = React.memo(({ variant, timeElapse
     }, [ remainsDuration, remainsPercent, variant ]);
 
     return (
-        <div className={classes.root}>
+        <div className={clsx(classes.root, className)}>
             <div className={classes.content} ref={contentRef} />
         </div>
     );

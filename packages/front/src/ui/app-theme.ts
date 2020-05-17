@@ -48,6 +48,17 @@ export const appTheme: Theme = createMuiTheme({
             outlinedSizeLarge: {
                 padding: '6px 20px'
             },
+        },
+        MuiChip: {
+            root: {
+                borderRadius: 4
+            },
+            sizeSmall: {
+                height: 16
+            },
+            outlined: {
+                backgroundColor: contrast,
+            }
         }
     }
 });

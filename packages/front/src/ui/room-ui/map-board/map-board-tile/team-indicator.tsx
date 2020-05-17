@@ -1,34 +1,35 @@
-import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
+import React from 'react';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ palette }) => ({
     root: {
         display: 'inline-flex',
         justifyContent: 'center',
         alignItems: 'center',
         verticalAlign: 'bottom',
-        width: '1rem',
-        height: '1rem',
-        padding: '0.715em',
+        width: '2.4rem',
+        height: '2.4rem',
         borderWidth: 2,
         borderStyle: 'solid',
-        borderColor: '#444',
+        borderColor: 'currentColor',
         borderRadius: '100%',
-        color: '#444',
-        backgroundColor: '#FFF',
+        backgroundColor: palette.primary.contrastText,
+        fontSize: '1.4rem',
         fontWeight: 600
     }
 }));
 
 export interface TeamIndicatorProps {
     teamLetter: string;
+    className?: string;
 }
 
-export const TeamIndicator: React.FC<TeamIndicatorProps> = ({ teamLetter }) => {
+export const TeamIndicator: React.FC<TeamIndicatorProps> = ({ teamLetter, className }) => {
     const classes = useStyles();
 
     return (
-        <div className={classes.root}>
+        <div className={clsx(classes.root, className)}>
             {teamLetter}
         </div>
     );
