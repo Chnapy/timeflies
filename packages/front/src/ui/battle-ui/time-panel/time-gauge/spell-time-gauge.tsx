@@ -27,7 +27,7 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
             finished: spellAction.startTime + spellAction.duration < Date.now(),
             index: 1
         };
-    }, (a, b) => a.startTimeFromTurnStart === b.startTimeFromTurnStart && a.finished === b.finished);
+    }, (a, b) => (a.startTimeFromTurnStart === b.startTimeFromTurnStart) && (a.finished === b.finished));
 
     const paddingLeft = 2;
 

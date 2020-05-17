@@ -8,13 +8,15 @@ import { seedCharacter } from '../../stages/battle/entities/character/Character.
 import { seedPlayer } from '../../stages/battle/entities/player/Player.seed';
 import { seedTeam } from '../../stages/battle/entities/team/Team.seed';
 import { BattleUI } from './battle-ui';
+import { Controller } from '../../Controller';
+import { seedSpellActionSnapshot } from '@timeflies/shared';
 
 export default {
     title: 'Battle',
     component: BattleUI
 };
 
-export const Default: React.FC<StoryProps> = ({fakeBattleApi}) => {
+export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
 
     const now = Date.now();
 
@@ -158,7 +160,24 @@ export const Default: React.FC<StoryProps> = ({fakeBattleApi}) => {
 
     return (
         <Provider>
-            <BattleUI/>
+            <BattleUI />
+
+            <button onClick={() => {
+                const { getState, dispatch } = Controller.getStore();
+
+                for (let i = 0; i < 1; i++) {
+                    (getState().battle!.current.characters[ 0 ].features.life as any) = Number.parseInt(Math.random() * 100 + '');
+
+                    dispatch({
+                        type: 'battle/spell-action/end',
+                        correctHash: '',
+                        removed: false,
+                        spellActionSnapshot: seedSpellActionSnapshot('s1')
+                    })
+                }
+            }}>
+                test performance
+            </button>
         </Provider>
     )
 };

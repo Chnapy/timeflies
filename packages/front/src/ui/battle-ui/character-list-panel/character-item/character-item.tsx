@@ -79,9 +79,9 @@ type CharacterState = 'default' | 'disabled' | 'current';
 
 export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ characterId }) => {
 
-    const related: 'me' | 'ally' | 'ennemy' = useGameStep('battle', battle => {
+    const currentPlayerId = useGameCurrentPlayer(({ id }) => id);
 
-        const currentPlayerId = useGameCurrentPlayer(({ id }) => id);
+    const related: 'me' | 'ally' | 'ennemy' = useGameStep('battle', battle => {
 
         const { player } = characterSelector(battle, characterId);
 
@@ -114,24 +114,29 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
     const actionTime = useGameStep('battle', battle =>
         characterSelector(battle, characterId).features.actionTime);
 
-    const { turnDuration, getRemainingTime } = useGameStep('battle', ({ cycle }) => {
+    const { startTime, turnDuration, getRemainingTimeRaw } = useGameStep('battle', ({ cycle }) => {
 
-        if (cycle.globalTurn?.currentTurn.character.id !== characterId) {
+        const currentTurn = cycle.globalTurn?.currentTurn;
+
+        if (currentTurn?.character.id !== characterId) {
             return {
                 startTime: 0,
                 turnDuration: 0,
-                getRemainingTime: () => 0
+                getRemainingTimeRaw: () => 0
             };
         }
 
-        const { currentTurn } = cycle.globalTurn;
         return {
             startTime: currentTurn.startTime,
             turnDuration: currentTurn.turnDuration,
-            getRemainingTime: () => currentTurn.getRemainingTime('current')
+            getRemainingTimeRaw: () => currentTurn.getRemainingTime('current')
         };
 
     }, (a, b) => a.startTime === b.startTime);
+
+    const getRemainingTime = React.useCallback(() => getRemainingTimeRaw(),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [ startTime ]);
 
     const state: CharacterState = life === 0 ? 'disabled'
         : turnDuration !== 0 ? 'current'

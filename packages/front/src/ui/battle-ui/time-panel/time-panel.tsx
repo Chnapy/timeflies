@@ -18,10 +18,11 @@ const useStyles = makeStyles(({ spacing }) => ({
 }));
 
 export const TimePanel: React.FC = () => {
-
     const classes = useStyles();
 
-    const getRemainingTime = useGameStep('battle', ({ cycle }) => () => cycle.globalTurn?.currentTurn.getRemainingTime('current') ?? 0);
+    const getRemainingTime = useGameStep('battle',
+        ({ cycle }) => () => cycle.globalTurn?.currentTurn.getRemainingTime('current') ?? 0,
+        () => true);
 
     const remainingTimeSpan = React.useRef<HTMLSpanElement>(null);
 
@@ -33,7 +34,7 @@ export const TimePanel: React.FC = () => {
             }
 
             const remainingTime = getRemainingTime();
-            
+
             remainingTimeSpan.current.innerHTML = formatMsToSeconds(remainingTime);
 
             if (remainingTime) {

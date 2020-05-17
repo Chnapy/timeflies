@@ -6,6 +6,7 @@ import { Box } from '@material-ui/core';
 
 
 export const BattleUI: React.FC = () => {
+
     return <Box display='flex' alignItems='flex-end' justifyContent='space-between' width='100%' height='100%' p={1}>
 
         <Box display='flex' maxHeight='100%' mr={1}>
