@@ -8,6 +8,7 @@ import { useGameStep } from '../../hooks/useGameStep';
 
 const useStyles = makeStyles(({ spacing }) => ({
     root: {
+        pointerEvents: 'all',
         display: 'flex',
         flexGrow: 1,
         flexWrap: 'nowrap',

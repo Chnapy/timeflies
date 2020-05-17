@@ -7,6 +7,7 @@ import { SpellButton } from './spell-button/spell-button';
 
 const useStyles = makeStyles(() => ({
     root: {
+        pointerEvents: 'all',
         display: 'inline-flex'
     }
 }));
