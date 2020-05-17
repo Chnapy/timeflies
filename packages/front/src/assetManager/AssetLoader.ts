@@ -34,10 +34,11 @@ type SpritesheetMap = {
     characters: PIXI.Spritesheet;
 };
 
-type AssetMapKey = keyof AssetMap;
+export type AssetMapKey = keyof AssetMap;
 
 export interface AssetLoader {
     newInstance(): LoaderInstance<{}>;
+    get<K extends AssetMapKey>(key: K): AssetMap[ K ] | undefined;
 }
 
 interface Dependencies {
@@ -113,7 +114,7 @@ const mapLoaderMiddleware = function (this: AppLoader, resource: Resource, next:
         return next();
     }
 
-    if(resource.error) {
+    if (resource.error) {
         return next();
     }
 
@@ -232,6 +233,13 @@ export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Lo
     };
 
     return {
-        newInstance
+        newInstance,
+        get: <K extends AssetMapKey>(key: K) => {
+            try {
+                return getAssets(loader.resources, Object.keys(loader.resources), key) as AssetMap[K];
+            } catch (e) {
+                return undefined;
+            }
+        }
     };
 };

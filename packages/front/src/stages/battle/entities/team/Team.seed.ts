@@ -15,7 +15,7 @@ export const seedTeamSnapshot = ({ id, name, color, seedPlayers }: SeedTeamProps
 
     return {
         id,
-        name: name ?? 'T-' + id,
+        name: name ?? id,
         color: color ?? 'red',
         playersSnapshots: seedPlayers.map(seedPlayerSnapshot)
     };
