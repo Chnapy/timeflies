@@ -6,12 +6,11 @@ import { serviceEvent } from '../src/services/serviceEvent';
 import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../src/socket/WSClient';
 import { seedTeamSnapshot } from '../src/stages/battle/entities/team/Team.seed';
 import { GameState } from '../src/game-state';
-import mapPath from '../src/_assets/map/map.json';
-import spritesheetPath from '../src/_assets/spritesheets/sokoban.json';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { StageChangeAction } from '../src/stages/StageManager';
 import { GameAction } from '../src/action/game-action/GameAction';
+import { AssetManager } from '../src/assetManager/AssetManager';
 
 class MockWebSocket implements WebSocket {
     prototype: any;
@@ -202,7 +201,7 @@ export const FakeBattleApi = () => {
                 payload: {
                     mapConfig: {
                         id: 'm1',
-                        schemaUrl: mapPath,
+                        schemaUrl: AssetManager.fake.mapSchema,
                         name: 'm1',
                         height: 10,
                         width: 10,
@@ -221,8 +220,8 @@ export const FakeBattleApi = () => {
         onMessageAction<BattleLoadSAction>('battle-load', async () => {
 
             await Controller.loader.newInstance()
-                .add('map', mapPath)
-                .addSpritesheet('characters', spritesheetPath)
+                .add('map', AssetManager.fake.mapSchema)
+                .addSpritesheet('characters', AssetManager.spritesheets.characters)
                 .load();
 
             dispatch<StageChangeAction<'battle'>>({
@@ -231,7 +230,7 @@ export const FakeBattleApi = () => {
                 payload: {
                     mapConfig: {
                         id: 'm1',
-                        schemaUrl: mapPath,
+                        schemaUrl: AssetManager.fake.mapSchema,
                         name: 'm1',
                         height: 10,
                         width: 10,

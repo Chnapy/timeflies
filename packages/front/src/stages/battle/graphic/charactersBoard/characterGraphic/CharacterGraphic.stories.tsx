@@ -4,8 +4,6 @@ import React from 'react';
 import { AssetLoader } from '../../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { serviceDispatch } from '../../../../../services/serviceDispatch';
-import mapPath from '../../../../../_assets/map/map.json';
-import charactersSpritesheetPath from '../../../../../_assets/spritesheets/sokoban.json';
 import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema';
 import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
@@ -15,6 +13,7 @@ import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../..
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
 import { StoryProps } from '../../../../../../.storybook/preview';
+import { AssetManager } from '../../../../../assetManager/AssetManager';
 
 export default {
     title: 'graphic/CharacterGraphic',
@@ -32,8 +31,8 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', mapPath)
-            .addSpritesheet('characters', charactersSpritesheetPath)
+            .add('map', AssetManager.fake.mapSchema)
+            .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
         const sheet = resources.characters;
@@ -183,8 +182,8 @@ export const Future: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const loader = AssetLoader();
 
         const resources = await loader.newInstance()
-            .add('map', mapPath)
-            .addSpritesheet('characters', charactersSpritesheetPath)
+            .add('map', AssetManager.fake.mapSchema)
+            .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
         const sheet = resources.characters;

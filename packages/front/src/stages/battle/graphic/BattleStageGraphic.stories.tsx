@@ -5,8 +5,6 @@ import { StoryProps } from '../../../../.storybook/preview';
 import { Controller } from '../../../Controller';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { GameState } from '../../../game-state';
-import mapPath from '../../../_assets/map/map.json';
-import charactersSpritesheetPath from '../../../_assets/spritesheets/sokoban.json';
 import { SpellEngineBindAction } from '../engine/Engine';
 import { SpellPrepareMove } from '../engine/spellEngine/move/SpellPrepareMove';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -14,6 +12,7 @@ import { seedSpell } from '../entities/spell/Spell.seed';
 import { MapManager } from '../map/MapManager';
 import { Pathfinder as Pathfinder_ } from '../map/Pathfinder';
 import { BattleStageGraphic } from './BattleStageGraphic';
+import { AssetManager } from '../../../assetManager/AssetManager';
 
 export default {
     title: 'graphic/BattleStageGraphic',
@@ -91,8 +90,8 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const loader = Controller.loader;
 
         const resources = await loader.newInstance()
-            .add('map', mapPath)
-            .addSpritesheet('characters', charactersSpritesheetPath)
+            .add('map', AssetManager.fake.mapSchema)
+            .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
         const charactersSheet = resources.characters;
@@ -200,8 +199,8 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => 
         const loader = Controller.loader;
 
         const resources = await loader.newInstance()
-            .add('map', mapPath)
-            .addSpritesheet('characters', charactersSpritesheetPath)
+            .add('map', AssetManager.fake.mapSchema)
+            .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
         const charactersSheet = resources.characters;

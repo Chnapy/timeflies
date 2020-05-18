@@ -4,12 +4,12 @@ import React from 'react';
 import { AssetLoader } from '../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
-import mapPath from '../../../../_assets/map/map.json';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { Spell } from '../../entities/spell/Spell';
 import { seedSpell } from '../../entities/spell/Spell.seed';
 import { TiledMapGraphic } from './TiledMapGraphic';
 import { StoryProps } from '../../../../../.storybook/preview';
+import { AssetManager } from '../../../../assetManager/AssetManager';
 
 export default {
     title: 'graphic/TiledMapGraphic'
@@ -26,7 +26,7 @@ export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
         const loader = AssetLoader();
 
         const { map } = await loader.newInstance()
-            .add('map', mapPath)
+            .add('map', AssetManager.fake.mapSchema)
             .load();
 
         const tiledManager = TiledManager(map);
