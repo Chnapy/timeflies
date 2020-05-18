@@ -76,8 +76,6 @@ export const SpellActionManager = (
             position,
             actionArea: action.actionArea,
             battleHash,
-            fromNotify,
-            validated: false
         };
 
         spellActionSnapshotList.push(snap);

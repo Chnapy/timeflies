@@ -7,6 +7,7 @@ import { CharacterItem } from './character-item/character-item';
 const useStyles = makeStyles(() => ({
     root: {
         pointerEvents: 'all',
+        flexGrow: 1,
         maxHeight: '100%',
         display: 'flex',
         flexDirection: 'column',

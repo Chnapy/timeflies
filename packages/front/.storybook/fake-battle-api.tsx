@@ -1,4 +1,4 @@
-import { assertIsDefined, BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, ConfirmSAction, GLOBALTURN_DELAY, MatchmakerClientAction, ServerAction, TeamSnapshot, TURN_DELAY, NotifySAction, Position, PlayerRoom, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, ConfirmSAction, GLOBALTURN_DELAY, MatchmakerClientAction, ServerAction, TeamSnapshot, TURN_DELAY, NotifySAction, Position, PlayerRoom, TeamRoom, seedSpellActionSnapshot } from '@timeflies/shared';
 import { Controller } from '../src/Controller';
 import { serviceBattleData } from '../src/services/serviceBattleData';
 import { serviceDispatch } from '../src/services/serviceDispatch';
@@ -390,17 +390,14 @@ export const FakeBattleApi = () => {
                                 receiveAction<NotifySAction>({
                                     type: 'notify',
                                     sendTime: Date.now(),
-                                    spellActionSnapshot: {
+                                    spellActionSnapshot: seedSpellActionSnapshot(defaultSpell.id, {
                                         startTime: Date.now(),
-                                        spellId: defaultSpell.id,
                                         battleHash: Date.now() + '',
                                         characterId: character.id,
                                         duration: defaultSpell.feature.duration,
                                         position: nextPosition,
                                         actionArea: [ nextPosition ],
-                                        fromNotify: true,
-                                        validated: true
-                                    }
+                                    })
                                 });
                             }
                         };

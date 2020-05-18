@@ -1,4 +1,4 @@
-import { SpellActionCAction } from '@timeflies/shared';
+import { SpellActionCAction, seedSpellActionSnapshot } from '@timeflies/shared';
 import { seedCycle } from '../../cycle/Cycle.seed';
 import { seedPlayer } from '../../entities/player/Player.seed';
 import { seedMapManager } from '../../mapManager/MapManager.seed';
@@ -37,17 +37,9 @@ describe('# checkerPlayer', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: {
+            spellAction: seedSpellActionSnapshot('', {
                 characterId: 'other',
-                actionArea: [],
-                battleHash: '',
-                duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                spellId: '',
-                startTime: -1,
-                validated: false
-            }
+            })
         };
 
         expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({
@@ -73,17 +65,9 @@ describe('# checkerPlayer', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: {
+            spellAction: seedSpellActionSnapshot('', {
                 characterId: 'other',
-                actionArea: [],
-                battleHash: '',
-                duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                spellId: '',
-                startTime: -1,
-                validated: false
-            }
+            })
         };
 
         expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({ success: true });

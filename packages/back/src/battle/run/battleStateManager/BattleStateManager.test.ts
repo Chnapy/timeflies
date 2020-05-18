@@ -1,4 +1,4 @@
-import { SpellActionSnapshot } from '@timeflies/shared';
+import { SpellActionSnapshot, seedSpellActionSnapshot } from '@timeflies/shared';
 import { seedStaticCharacter } from '../entities/seedStaticCharacter';
 import { seedTeam } from '../entities/team/Team.seed';
 import { BattleState, BattleStateManager } from './BattleStateManager';
@@ -79,17 +79,11 @@ describe('# BattleStateManager', () => {
             const character = teams[ 0 ].characters[ 0 ];
             const spell = character.spells[ 0 ];
 
-            const spellAction: SpellActionSnapshot = {
-                spellId: spell.id,
+            const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: character.id,
                 battleHash: 'bad-hash',
-                startTime: -1,
-                actionArea: [ { x: -1, y: -1 } ],
                 duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                validated: false
-            };
+            });
 
             const callback = jest.fn();
 
@@ -132,17 +126,12 @@ describe('# BattleStateManager', () => {
             const character = teams[ 0 ].characters[ 0 ];
             const spell = character.spells[ 0 ];
 
-            const spellAction: SpellActionSnapshot = {
-                spellId: spell.id,
+            const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: character.id,
                 battleHash: 'hash',
-                startTime: -1,
                 actionArea: [ { x: -1, y: -1 } ],
                 duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                validated: false
-            };
+            });
 
             const callback = jest.fn();
 
@@ -185,17 +174,12 @@ describe('# BattleStateManager', () => {
             const character = teams[ 0 ].characters[ 0 ];
             const spell = character.spells[ 0 ];
 
-            const spellAction: SpellActionSnapshot = {
-                spellId: spell.id,
+            const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: character.id,
                 battleHash: 'hash',
-                startTime: -1,
                 actionArea: [ { x: -1, y: -1 } ],
                 duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                validated: false
-            };
+            });
 
             let applyReturn = undefined;
 
