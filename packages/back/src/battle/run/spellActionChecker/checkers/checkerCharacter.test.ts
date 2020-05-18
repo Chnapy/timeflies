@@ -1,4 +1,4 @@
-import { SpellActionCAction } from '@timeflies/shared';
+import { SpellActionCAction, seedSpellActionSnapshot } from '@timeflies/shared';
 import { seedCycle } from '../../cycle/Cycle.seed';
 import { seedPlayer } from '../../entities/player/Player.seed';
 import { seedMapManager } from '../../mapManager/MapManager.seed';
@@ -43,17 +43,10 @@ describe('# checkerCharacter', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: {
+            spellAction: seedSpellActionSnapshot(character.spells[ 0 ].id, {
                 characterId: 'other',
-                actionArea: [],
-                battleHash: '',
                 duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                spellId: character.spells[ 0 ].id,
-                startTime: -1,
-                validated: false
-            }
+            })
         };
 
         expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({
@@ -98,17 +91,9 @@ describe('# checkerCharacter', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: {
+            spellAction: seedSpellActionSnapshot('bad-id', {
                 characterId: 'other',
-                actionArea: [],
-                battleHash: '',
-                duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                spellId: 'bad-id',
-                startTime: -1,
-                validated: false
-            }
+            })
         };
 
         expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({
@@ -153,17 +138,9 @@ describe('# checkerCharacter', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: {
+            spellAction: seedSpellActionSnapshot(character.spells[ 0 ].id, {
                 characterId: 'other',
-                actionArea: [],
-                battleHash: '',
-                duration: 200,
-                fromNotify: false,
-                position: { x: -1, y: -1 },
-                spellId: character.spells[ 0 ].id,
-                startTime: -1,
-                validated: false
-            }
+            })
         };
 
         expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({ success: true });

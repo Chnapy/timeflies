@@ -1,4 +1,4 @@
-import { ConfirmSAction, NotifySAction, SpellActionSnapshot } from '@timeflies/shared';
+import { ConfirmSAction, NotifySAction, SpellActionSnapshot, seedSpellActionSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { BattleStateManager } from '../battleStateManager/BattleStateManager';
@@ -96,17 +96,9 @@ describe('# SpellActionReceiver', () => {
             })
         });
 
-        const spellAction: SpellActionSnapshot = {
-            spellId: '',
-            actionArea: [],
+        const spellAction: SpellActionSnapshot = seedSpellActionSnapshot('', {
             battleHash: spellActionHash,
-            characterId: '',
-            duration: -1,
-            fromNotify: false,
-            position: { x: -1, y: -1 },
-            startTime: -1,
-            validated: false
-        };
+        });
 
         return {
             battleHashList,

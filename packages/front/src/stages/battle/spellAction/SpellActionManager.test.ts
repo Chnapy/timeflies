@@ -183,8 +183,6 @@ describe('# SpellActionManager', () => {
             spellId: 's1',
             position: { x: -1, y: -1 },
             actionArea: [ { x: -1, y: -1 } ],
-            fromNotify: false,
-            validated: false
         } ]);
 
         expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction ]>([
@@ -293,8 +291,6 @@ describe('# SpellActionManager', () => {
                     spellId: spell.id,
                     position: { x: -1, y: -1 },
                     actionArea: [ { x: -1, y: -1 } ],
-                    fromNotify: true,
-                    validated: false
                 }
             }
         });
@@ -307,8 +303,6 @@ describe('# SpellActionManager', () => {
             spellId: spell.id,
             position: { x: -1, y: -1 },
             actionArea: [ { x: -1, y: -1 } ],
-            fromNotify: true,
-            validated: false
         } ]);
 
         expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction ]>([

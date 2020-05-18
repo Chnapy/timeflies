@@ -1,4 +1,4 @@
-import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, MapConfig, NotifySAction, SpellActionCAction, TimerTester } from '@timeflies/shared';
+import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, MapConfig, NotifySAction, SpellActionCAction, TimerTester, seedSpellActionSnapshot } from '@timeflies/shared';
 import { Server, WebSocket } from 'mock-socket';
 import path from 'path';
 import { PlayerService } from '../../PlayerService';
@@ -73,17 +73,13 @@ describe.skip('BattleRunRoom', () => {
             const initialAction: SpellActionCAction = {
                 type: 'battle/spellAction',
                 sendTime: Date.now() + 5000,
-                spellAction: {
+                spellAction: seedSpellActionSnapshot(spell.id, {
                     startTime: Date.now() + 5000,
-                    battleHash: '',
                     characterId: char.id,
                     duration: spell.features.duration,
-                    spellId: spell.id,
                     position,
                     actionArea: [ position ],
-                    fromNotify: false,
-                    validated: false
-                }
+                })
             };
             const action: SpellActionCAction = c0GetCharActionCAction
                 ? c0GetCharActionCAction(initialAction)

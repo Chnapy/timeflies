@@ -2,7 +2,6 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import { GameAction } from './action/game-action/GameAction';
-// import './app.css';
 import { GameState } from './game-state';
 import { GameUI } from './ui/game-ui';
 import { UIProvider } from './ui/ui-provider';

@@ -1,4 +1,4 @@
-import { Orientation, Position, switchUtil, TiledManager } from '@timeflies/shared';
+import { Orientation, Position, switchUtil, TiledManager, seedSpellActionSnapshot } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { AssetLoader } from '../../../../../assetManager/AssetLoader';
@@ -72,33 +72,22 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const { dispatchTimerStart, dispatchTimerEnd } = serviceDispatch({
             dispatchTimerStart: (position: Position, duration: number): SpellActionTimerStartAction => ({
                 type: 'battle/spell-action/start',
-                spellActionSnapshot: {
-                    battleHash: '',
+                spellActionSnapshot: seedSpellActionSnapshot(characterCurrent.defaultSpell.id, {
                     characterId: characterCurrent.id,
                     duration,
                     position,
-                    actionArea: [],
-                    spellId: characterCurrent.defaultSpell.id,
                     startTime: Date.now(),
-                    fromNotify: false,
-                    validated: false
-                }
+                })
             }),
             dispatchTimerEnd: (): SpellActionTimerEndAction => ({
                 type: 'battle/spell-action/end',
                 correctHash: '',
                 removed: false,
-                spellActionSnapshot: {
-                    battleHash: '',
+                spellActionSnapshot: seedSpellActionSnapshot(characterCurrent.defaultSpell.id, {
                     characterId: characterCurrent.id,
-                    duration: -1,
                     position: characterCurrent.position,
-                    actionArea: [],
-                    spellId: characterCurrent.defaultSpell.id,
                     startTime: Date.now(),
-                    fromNotify: false,
-                    validated: false
-                }
+                })
             })
         });
 

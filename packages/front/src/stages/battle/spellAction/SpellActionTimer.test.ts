@@ -8,6 +8,17 @@ describe('# SpellActionTimer', () => {
 
     const timerTester = new TimerTester();
 
+    const getSnapshot = (partial: Partial<SpellActionSnapshot> = {}): SpellActionSnapshot => ({
+        battleHash: '',
+        duration: 200,
+        position: { x: -1, y: -1 },
+        actionArea: [ { x: -1, y: -1 } ],
+        characterId: '1',
+        spellId: '',
+        startTime: timerTester.now,
+        ...partial
+    });
+
     beforeEach(() => {
         timerTester.beforeTest();
         StoreTest.beforeTest();
@@ -30,17 +41,7 @@ describe('# SpellActionTimer', () => {
 
         const timer = SpellActionTimer();
 
-        const snapshot: SpellActionSnapshot = {
-            battleHash: '',
-            duration: 200,
-            position: { x: -1, y: -1 },
-            actionArea: [ { x: -1, y: -1 } ],
-            characterId: '1',
-            spellId: '',
-            startTime: timerTester.now + 100,
-            fromNotify: false,
-            validated: false
-        };
+        const snapshot = getSnapshot({ startTime: timerTester.now + 100 });
 
         expect(() => timer.onAdd(snapshot)).toThrowError();
     });
@@ -57,17 +58,7 @@ describe('# SpellActionTimer', () => {
 
         const timer = SpellActionTimer();
 
-        const snapshot: SpellActionSnapshot = {
-            battleHash: '',
-            duration: 200,
-            position: { x: -1, y: -1 },
-            actionArea: [ { x: -1, y: -1 } ],
-            characterId: '1',
-            spellId: '',
-            startTime: timerTester.now,
-            fromNotify: false,
-            validated: false
-        };
+        const snapshot = getSnapshot({ startTime: timerTester.now });
 
         timer.onAdd(snapshot);
 
@@ -84,17 +75,7 @@ describe('# SpellActionTimer', () => {
                 type: 'message/send',
                 message: {
                     type: 'battle/spellAction' as const,
-                    spellAction: {
-                        battleHash: '',
-                        duration: 200,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ],
-                        characterId: '1',
-                        spellId: '',
-                        startTime: timerTester.now,
-                        fromNotify: false,
-                        validated: false
-                    }
+                    spellAction: snapshot
                 }
             }
         ]);
@@ -112,17 +93,9 @@ describe('# SpellActionTimer', () => {
 
         const timer = SpellActionTimer();
 
-        const snapshot: SpellActionSnapshot = {
-            battleHash: '-hash-',
-            duration: 200,
-            position: { x: -1, y: -1 },
-            actionArea: [ { x: -1, y: -1 } ],
-            characterId: '1',
-            spellId: '',
-            startTime: timerTester.now,
-            fromNotify: false,
-            validated: false
-        };
+        const snapshot = getSnapshot({
+            battleHash: '-hash-'
+        });
 
         timer.onAdd(snapshot);
 
@@ -153,28 +126,11 @@ describe('# SpellActionTimer', () => {
         const timer = SpellActionTimer();
 
         spellActionSnapshotList.push(
-            {
-                battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            },
-            {
+            getSnapshot({ battleHash: '-hash1-' }),
+            getSnapshot({
                 battleHash: '-hash2-',
-                duration: 300,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now + 200,
-                fromNotify: false,
-                validated: false
-            }
+                startTime: timerTester.now + 200
+            })
         );
 
         spellActionSnapshotList.forEach(timer.onAdd);
@@ -185,17 +141,7 @@ describe('# SpellActionTimer', () => {
             StoreTest.getActions()
         ).toContainEqual<SpellActionTimerStartAction>({
             type: 'battle/spell-action/start',
-            spellActionSnapshot: {
-                battleHash: '-hash2-',
-                duration: 300,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            }
+            spellActionSnapshot: spellActionSnapshotList[ 1 ]
         });
     });
 
@@ -214,44 +160,17 @@ describe('# SpellActionTimer', () => {
         const timer = SpellActionTimer();
 
         spellActionSnapshotList.push(
-            {
-                battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            },
-            {
+            getSnapshot({ battleHash: '-hash1-' }),
+            getSnapshot({
                 battleHash: '-hash2-',
-                duration: 300,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now + 200,
-                fromNotify: false,
-                validated: false
-            }
+                startTime: timerTester.now + 200
+            })
         );
 
         spellActionSnapshotList.forEach(timer.onAdd);
 
         timer.onRemove([
-            {
-                battleHash: '-hash2-',
-                duration: 300,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now + 200,
-                fromNotify: false,
-                validated: false
-            }
+            spellActionSnapshotList[ 1 ]
         ], '-hash1-');
 
         expect(
@@ -274,44 +193,17 @@ describe('# SpellActionTimer', () => {
         const timer = SpellActionTimer();
 
         spellActionSnapshotList.push(
-            {
-                battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            },
-            {
+            getSnapshot({ battleHash: '-hash1-' }),
+            getSnapshot({
                 battleHash: '-hash2-',
-                duration: 300,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now + 200,
-                fromNotify: false,
-                validated: false
-            }
+                startTime: timerTester.now + 200
+            })
         );
 
         spellActionSnapshotList.forEach(timer.onAdd);
 
         timer.onRemove([
-            {
-                battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            }
+            spellActionSnapshotList[ 0 ]
         ], '-hash0-');
 
         expect(
@@ -320,17 +212,7 @@ describe('# SpellActionTimer', () => {
             type: 'battle/spell-action/end',
             removed: true,
             correctHash: '-hash0-',
-            spellActionSnapshot: {
-                battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            }
+            spellActionSnapshot: getSnapshot({ battleHash: '-hash1-' })
         });
     });
 
@@ -349,28 +231,11 @@ describe('# SpellActionTimer', () => {
         const timer = SpellActionTimer();
 
         spellActionSnapshotList.push(
-            {
-                battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now,
-                fromNotify: false,
-                validated: false
-            },
-            {
+            getSnapshot({ battleHash: '-hash1-' }),
+            getSnapshot({
                 battleHash: '-hash2-',
-                duration: 300,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now + 200,
-                fromNotify: false,
-                validated: false
-            }
+                startTime: timerTester.now + 200
+            })
         );
 
         spellActionSnapshotList.forEach(timer.onAdd);
@@ -380,17 +245,10 @@ describe('# SpellActionTimer', () => {
         StoreTest.clearActions();
 
         timer.onRemove([
-            {
+            getSnapshot({
                 battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now - 300,
-                fromNotify: false,
-                validated: false
-            }
+                startTime: timerTester.now - 300
+            })
         ], '-hash0-');
 
         expect(
@@ -399,17 +257,10 @@ describe('# SpellActionTimer', () => {
             type: 'battle/spell-action/end',
             removed: true,
             correctHash: '-hash0-',
-            spellActionSnapshot: {
+            spellActionSnapshot: getSnapshot({
                 battleHash: '-hash1-',
-                duration: 200,
-                position: { x: -1, y: -1 },
-                actionArea: [ { x: -1, y: -1 } ],
-                characterId: '1',
-                spellId: '',
-                startTime: timerTester.now - 300,
-                fromNotify: false,
-                validated: false
-            }
+                startTime: timerTester.now - 300
+            })
         });
     });
 });
