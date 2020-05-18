@@ -10,8 +10,7 @@ describe('# Team', () => {
 
         const staticData: TeamData = {
             id: 'p1',
-            name: 'p-1',
-            color: 'red',
+            letter: 'A',
             players: [ { id: 'p1' } as any ]
         };
 
@@ -26,15 +25,13 @@ describe('# Team', () => {
 
         team.updateFromSnapshot({
             id: 'p1',
-            name: 'p-1',
-            color: 'red',
+            letter: 'A',
             playersSnapshots: [ { id: 'p1' } as any ]
         });
 
         expect(team).toMatchObject<OmitFn<Team, 'players' | 'characters'>>({
             id: 'p1',
-            name: 'p-1',
-            color: 'red',
+            letter: 'A',
         });
         expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
     });
@@ -43,8 +40,7 @@ describe('# Team', () => {
 
         const staticData: TeamData = {
             id: 'p1',
-            name: 'p-1',
-            color: 'red',
+            letter: 'A',
             players: [ { id: 'p1' } as any ]
         };
 

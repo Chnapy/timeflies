@@ -22,7 +22,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     const teamA = seedTeam('fake', {
         id: 't1',
         period: 'current',
-        name: 'A',
+        letter: 'A',
         seedPlayers: []
     });
 
@@ -94,7 +94,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                             team: seedTeam('fake', {
                                 id: 't2',
                                 period: 'current',
-                                name: 'B',
+                                letter: 'B',
                                 seedPlayers: []
                             })
                         })

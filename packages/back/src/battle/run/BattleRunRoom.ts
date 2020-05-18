@@ -31,8 +31,7 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
 
         return {
             id: t.id,
-            name: t.letter,
-            color: '',
+            letter: t.letter,
             players: t.playersIds.map((pid): PlayerData => {
                 const playerData = playerDataList.find(p => p.id === pid);
                 const player = playerList.find(p => p.id === pid);
@@ -97,7 +96,7 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
         players.forEach(p => p.socket.close());
 
         console.log('\n---');
-        console.log(`Battle ended. Team ${team.name} wins !`);
+        console.log(`Battle ended. Team ${team.letter} wins !`);
         console.log('---\n');
     };
 

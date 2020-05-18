@@ -6,24 +6,22 @@ import { Team } from './Team';
 
 export interface SeedTeamProps {
     id: string;
-    name?: string;
-    color?: string;
+    letter?: string;
     seedPlayers: SeedPlayerProps[];
 }
 
-export const seedTeamSnapshot = ({ id, name, color, seedPlayers }: SeedTeamProps): TeamSnapshot => {
+export const seedTeamSnapshot = ({ id, letter, seedPlayers }: SeedTeamProps): TeamSnapshot => {
 
     return {
         id,
-        name: name ?? id,
-        color: color ?? 'red',
+        letter: letter ?? id[0],
         playersSnapshots: seedPlayers.map(seedPlayerSnapshot)
     };
 };
 
 export const seedTeam = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedTeamProps & SeedPeriodicProps<P>): Team<P> => {
 
-    const { period, id, name, color, seedPlayers } = props;
+    const { period, id, letter, seedPlayers } = props;
 
     if (type === 'real') {
         return Team(period, seedTeamSnapshot(props));
@@ -32,8 +30,7 @@ export const seedTeam = <P extends BattleDataPeriod>(type: 'real' | 'fake', prop
     const team: Team<P> = {
         period,
         id,
-        name: name ?? 'T-' + id,
-        color: color ?? 'red',
+        letter: letter ?? id[0],
         get players() {
             return players;
         },

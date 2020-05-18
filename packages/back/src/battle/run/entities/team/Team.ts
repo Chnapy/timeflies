@@ -5,8 +5,7 @@ import { Entity } from '../Entity';
 import { Player } from "../player/Player";
 
 export interface Team extends Entity<TeamSnapshot> {
-    readonly name: string;
-    readonly color: string;
+    readonly letter: string;
     readonly players: Player[];
     readonly characters: Character[];
     clone(): Team;
@@ -21,8 +20,7 @@ export const Team = (teamData: TeamData, deps: Dependencies = { playerCreator: P
 
     const this_: Team = {
         id: teamData.id,
-        name: teamData.name,
-        color: teamData.color,
+        letter: teamData.letter,
         get players() {
             return players;
         },
@@ -32,8 +30,7 @@ export const Team = (teamData: TeamData, deps: Dependencies = { playerCreator: P
         toSnapshot(): TeamSnapshot {
             return {
                 id: this_.id,
-                name: this_.name,
-                color: this_.color,
+                letter: this_.letter,
                 playersSnapshots: players.map(p => p.toSnapshot())
             };
         },
