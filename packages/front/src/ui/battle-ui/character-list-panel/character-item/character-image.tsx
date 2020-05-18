@@ -20,7 +20,9 @@ const useAssetLoader = <K extends AssetMapKey>(key: K) => {
 
 export const CharacterImage: React.FC<CharacterImageProps> = React.memo(({characterType}) => {
 
-    const asset = useAssetLoader('faces');
+    const asset = useAssetLoader('characters');
+
+    console.log(asset)
 
     return <Avatar>
 

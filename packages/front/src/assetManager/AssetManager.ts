@@ -1,6 +1,9 @@
 import { SpellType } from '@timeflies/shared';
 import spellsSpritesheetImage from '../_assets/spritesheets/spells_spritesheet.png';
 import spellsSpritesheetSchema from '../_assets/spritesheets/spells_spritesheet.xml';
+import charactersSpritesheetPath from '../_assets/spritesheets/sokoban.json';
+import mapPath from '../_assets/map/map.json';
+import mapPreviewPath from '../_assets/map/map_preview.png';
 
 export type IAssetManager = typeof AssetManager;
 
@@ -27,5 +30,15 @@ const AssetSpells: IAssetSpells = {
 
 export const AssetManager = {
 
-    spells: AssetSpells
+    spritesheets: {
+        characters: charactersSpritesheetPath,
+    },
+
+    spells: AssetSpells,
+
+    fake: {
+        mapSchema: mapPath,
+
+        mapPreview: mapPreviewPath
+    }
 } as const;

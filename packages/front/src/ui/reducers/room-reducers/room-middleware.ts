@@ -5,8 +5,8 @@ import { StageChangeAction } from '../../../stages/StageManager';
 import { assertIsNonNullable, assertIsDefined, MapConfig } from '@timeflies/shared';
 import { Controller } from '../../../Controller';
 import { MapLoadedAction } from './map-select-reducer/map-select-reducer';
-import charactersSpritesheetPath from '../../../_assets/spritesheets/sokoban.json';
 import { SendMessageAction } from '../../../socket/WSClient';
+import { AssetManager } from '../../../assetManager/AssetManager';
 
 export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
@@ -97,7 +97,7 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                     });
 
                     await Controller.loader.newInstance()
-                        .addSpritesheet('characters', charactersSpritesheetPath)
+                        .addSpritesheet('characters', AssetManager.spritesheets.characters)
                         .load();
 
                     api.dispatch<SendMessageAction>({

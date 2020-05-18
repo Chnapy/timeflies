@@ -6,13 +6,12 @@ import { BattleDataPeriod } from '../../../../BattleData';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { Controller } from '../../../../Controller';
 import { GameState } from '../../../../game-state';
-import mapPath from '../../../../_assets/map/map.json';
-import charactersSpritesheetPath from '../../../../_assets/spritesheets/sokoban.json';
 import { seedCharacter } from '../../entities/character/Character.seed';
 import { MapManager } from '../../map/MapManager';
 import { Pathfinder } from '../../map/Pathfinder';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
+import { AssetManager } from '../../../../assetManager/AssetManager';
 
 export default {
     title: 'graphic/CharactersBoard',
@@ -60,8 +59,8 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeBattl
         const loader = Controller.loader;
 
         const resources = await loader.newInstance()
-            .add('map', mapPath)
-            .addSpritesheet('characters', charactersSpritesheetPath)
+            .add('map', AssetManager.fake.mapSchema)
+            .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
         const sheet = resources.characters;

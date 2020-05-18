@@ -4,7 +4,7 @@ import { StoryProps } from '../../../.storybook/preview';
 import { GameState } from '../../game-state';
 import { MapBoardTileInfos } from './map-board/map-board-tile/map-board-tile';
 import { UIRoom } from './ui-room';
-import mapPreviewUrl from '../../_assets/map/map_preview.png';
+import { AssetManager } from '../../assetManager/AssetManager';
 
 export default {
     title: 'Room',
@@ -16,7 +16,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     const map: MapConfig = {
         id: '1',
         name: 'Map 1',
-        previewUrl: mapPreviewUrl,
+        previewUrl: AssetManager.fake.mapPreview,
         width: 10,
         height: 8,
         nbrTeams: 2,
