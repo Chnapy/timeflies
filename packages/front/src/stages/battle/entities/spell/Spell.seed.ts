@@ -8,7 +8,6 @@ export type SeedSpellProps<FK extends 'features' | 'initialFeatures' = 'initialF
     id: string;
     type: SpellType;
     name?: string;
-    color?: string;
 } & { [ k in FK ]?: Partial<SpellFeatures> };
 
 export const seedSpellFeatures = (features: Partial<SpellFeatures> = {}): SpellFeatures => ({
@@ -18,13 +17,12 @@ export const seedSpellFeatures = (features: Partial<SpellFeatures> = {}): SpellF
     ...features
 });
 
-export const seedSpellStaticData = ({ id, type, name, color, initialFeatures }: SeedSpellProps): StaticSpell => {
+export const seedSpellStaticData = ({ id, type, name, initialFeatures }: SeedSpellProps): StaticSpell => {
 
     return {
         id,
         type,
         name: name ?? 'S-' + id,
-        color: color ?? 'red',
         initialFeatures: seedSpellFeatures(initialFeatures)
     };
 };

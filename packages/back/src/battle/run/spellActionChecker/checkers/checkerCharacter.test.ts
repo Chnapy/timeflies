@@ -21,7 +21,6 @@ describe('# checkerCharacter', () => {
                     name: '',
                     staticSpells: [ {
                         id: 's1',
-                        color: '',
                         name: '',
                         type: 'move',
                         initialFeatures: {} as any
@@ -69,7 +68,6 @@ describe('# checkerCharacter', () => {
                     name: '',
                     staticSpells: [ {
                         id: 's1',
-                        color: '',
                         name: '',
                         type: 'move',
                         initialFeatures: {} as any
@@ -116,7 +114,6 @@ describe('# checkerCharacter', () => {
                     name: '',
                     staticSpells: [ {
                         id: 's1',
-                        color: '',
                         name: '',
                         type: 'move',
                         initialFeatures: {} as any

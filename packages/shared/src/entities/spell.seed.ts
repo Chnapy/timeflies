@@ -6,9 +6,7 @@ export const seedSpellActionSnapshot = (spellId: string, partial: Partial<SpellA
     battleHash: '',
     characterId: '',
     duration: -1,
-    fromNotify: false,
     position: { x: -1, y: -1 },
     startTime: -1,
-    validated: false,
     ...partial
 });

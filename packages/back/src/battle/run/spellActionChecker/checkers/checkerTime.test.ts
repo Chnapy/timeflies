@@ -21,7 +21,6 @@ describe('# checkerTime', () => {
                     name: '',
                     staticSpells: [ {
                         id: 's1',
-                        color: '',
                         name: '',
                         type: 'move',
                         initialFeatures: {} as any
@@ -74,7 +73,6 @@ describe('# checkerTime', () => {
                     name: '',
                     staticSpells: [ {
                         id: 's1',
-                        color: '',
                         name: '',
                         type: 'move',
                         initialFeatures: {
@@ -132,7 +130,6 @@ describe('# checkerTime', () => {
                     name: '',
                     staticSpells: [ {
                         id: 's1',
-                        color: '',
                         name: '',
                         type: 'move',
                         initialFeatures: {
