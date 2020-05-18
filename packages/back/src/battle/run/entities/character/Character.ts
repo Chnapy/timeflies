@@ -86,7 +86,7 @@ export const Character = (
         }
     };
 
-    const spells = staticData.staticSpells.map(s => spellCreator(s, this_));
+    const spells = staticData.staticSpells.map((s, i) => spellCreator(s, i + 1, this_));
 
     return this_;
 }

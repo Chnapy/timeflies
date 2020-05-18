@@ -38,6 +38,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const now = Date.now();
 
+    const index = useGameStep('battle', battle => selectSpell(battle).index);
+
     const duration = useGameStep('battle', battle => selectSpell(battle).feature.duration);
 
     const attack = useGameStep('battle', battle => selectSpell(battle).feature.attack);
@@ -106,8 +108,6 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     });
 
     const isDisabled = !!disableReason;
-
-    const spellNumber = spellIndex + 1;
 
     const onBtnClick = React.useCallback((): void => {
         if (isDisabled) {
@@ -188,7 +188,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
                     <Box position='absolute' left={0} bottom={0} style={{
                         transform: 'translate(-25%, 25%)'
                     }}>
-                        <SpellNumber value={spellNumber} disabled={isDisabled} />
+                        <SpellNumber value={index} disabled={isDisabled} />
                     </Box>
 
                     <Box color={palette.primary.main} position='absolute' top={4} right={4}>

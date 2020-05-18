@@ -104,6 +104,7 @@ describe('# Character', () => {
 
         const spellsSnapshots: SpellSnapshot[] = [ {
             id: '2',
+            index: 1,
             staticData: {
                 id: '2',
                 name: 'toto',

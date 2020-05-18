@@ -101,12 +101,12 @@ export const FakeBattleApi = () => {
                                 id: 'C1',
                                 seedSpells: [
                                     {
-                                        id: 'S1', type: 'move', initialFeatures: {
+                                        id: 'S1', index: 1, type: 'move', initialFeatures: {
                                             duration: 200
                                         }
                                     },
                                     {
-                                        id: 'S2', type: 'simpleAttack', initialFeatures: {
+                                        id: 'S2', index: 2, type: 'simpleAttack', initialFeatures: {
                                             duration: 1000, attack: 20, area: 5
                                         }
                                     }

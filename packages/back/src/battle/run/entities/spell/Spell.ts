@@ -8,7 +8,7 @@ export interface Spell extends Entity<SpellSnapshot> {
     readonly features: SpellFeatures;
 }
 
-export const Spell = (staticData: StaticSpell, character: Character): Spell => {
+export const Spell = (staticData: StaticSpell, index: number, character: Character): Spell => {
 
     let features: Readonly<SpellFeatures> = {
         ...staticData.initialFeatures
@@ -24,6 +24,7 @@ export const Spell = (staticData: StaticSpell, character: Character): Spell => {
         toSnapshot(): SpellSnapshot {
             return {
                 id: staticData.id,
+                index,
                 staticData,
                 features
             };
