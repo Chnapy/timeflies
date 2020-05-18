@@ -100,7 +100,7 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
         characterSelector(battle, characterId).player.name);
 
     const teamLetter = useGameStep('battle', battle =>
-        characterSelector(battle, characterId).player.team.name);
+        characterSelector(battle, characterId).player.team.letter);
 
     const characterType = useGameStep('battle', battle =>
         characterSelector(battle, characterId).staticData.type);

@@ -29,14 +29,12 @@ describe.skip('BattleRunRoom', () => {
     const getTeams: () => TeamData[] = () => [
         {
             id: '1',
-            color: '#FF0000',
-            name: 'Team Rocket',
+            letter: 'A',
             players: []
         },
         {
             id: '2',
-            color: '#FF00FF',
-            name: 'Team Azure',
+            letter: 'B',
             players: []
         }
     ];

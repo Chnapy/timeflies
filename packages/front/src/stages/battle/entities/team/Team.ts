@@ -6,40 +6,37 @@ import { BattleDataPeriod } from '../../../../BattleData';
 
 export interface Team<P extends BattleDataPeriod> extends PeriodicEntity<P, TeamSnapshot> {
     readonly id: string;
-    readonly name: string;
-    readonly color: string;
+    readonly letter: string;
     readonly players: Player<P>[];
 }
 
 export const Team = <P extends BattleDataPeriod>(
     period: P,
-    { id, name, color, playersSnapshots }: TeamSnapshot
+    { id, letter, playersSnapshots }: TeamSnapshot
 ): Team<P> => {
 
     const this_: Team<P> = {
         period,
         id,
-        name,
-        color,
+        letter,
         get players() {
             return players;
         },
 
         getSnapshot(): TeamSnapshot {
             return {
-                id: this.id,
-                name: this.name,
-                color: this.color,
-                playersSnapshots: this.players.map(p => p.getSnapshot())
+                id: this_.id,
+                letter: this_.letter,
+                playersSnapshots: this_.players.map(p => p.getSnapshot())
             };
         },
 
         updateFromSnapshot(snapshot: TeamSnapshot): void {
 
-            assertEntitySnapshotConsistency(this.players, snapshot.playersSnapshots);
+            assertEntitySnapshotConsistency(this_.players, snapshot.playersSnapshots);
 
             snapshot.playersSnapshots.forEach(pSnap => {
-                this.players.find(p => p.id === pSnap.id)!.updateFromSnapshot(pSnap);
+                this_.players.find(p => p.id === pSnap.id)!.updateFromSnapshot(pSnap);
             });
         }
     };

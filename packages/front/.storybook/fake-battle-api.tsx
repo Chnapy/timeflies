@@ -92,7 +92,7 @@ export const FakeBattleApi = () => {
         return [
             seedTeamSnapshot({
                 id: 'A',
-                color: 'blue',
+                letter: 'A',
                 seedPlayers: [
                     {
                         id: 'p1',
@@ -122,7 +122,7 @@ export const FakeBattleApi = () => {
             }),
             seedTeamSnapshot({
                 id: 'B',
-                color: 'red',
+                letter: 'B',
                 seedPlayers: [
                     {
                         id: 'p2',

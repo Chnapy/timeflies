@@ -440,8 +440,7 @@ describe('# SnapshotManager', () => {
                     getSnapshot(): TeamSnapshot {
                         return {
                             id: 't1',
-                            color: 'red',
-                            name: '',
+                            letter: 'A',
                             playersSnapshots: [ {
                                 id: 'p1',
                                 name: 'p-1',
