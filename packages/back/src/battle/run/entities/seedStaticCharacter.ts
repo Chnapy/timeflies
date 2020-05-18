@@ -14,7 +14,6 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '1',
                 name: 'MOVE',
                 type: 'move',
-                color: '#FF0000',
                 initialFeatures: {
                     duration: 200,
                     area: 1,
@@ -25,7 +24,6 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '10',
                 name: 'S1',
                 type: 'simpleAttack',
-                color: '#FF00FF',
                 initialFeatures: {
                     duration: 1000,
                     area: 10,
@@ -49,7 +47,6 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '2',
                 name: 'MOVE',
                 type: 'simpleAttack',
-                color: '#FF0000',
                 initialFeatures: {
                     duration: 4000,
                     area: 8,
@@ -73,7 +70,6 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '3',
                 name: 'MOVE',
                 type: 'move',
-                color: '#449955',
                 initialFeatures: {
                     area: 1,
                     duration: 300,
@@ -84,7 +80,6 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '20',
                 name: 'S3',
                 type: 'simpleAttack',
-                color: '#22FF88',
                 initialFeatures: {
                     area: 8,
                     duration: 500,

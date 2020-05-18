@@ -84,7 +84,6 @@ describe('# Character', () => {
             staticSpells: [ {
                 id: '2',
                 name: 'toto',
-                color: '#F00',
                 type: 'move',
                 initialFeatures: {
                     duration: 100,
@@ -108,7 +107,6 @@ describe('# Character', () => {
             staticData: {
                 id: '2',
                 name: 'toto',
-                color: '#F00',
                 type: 'move',
                 initialFeatures: {
                     duration: 100,
@@ -133,7 +131,6 @@ describe('# Character', () => {
                 type: s.staticData.type,
                 initialFeatures: s.staticData.initialFeatures,
                 name: s.staticData.name,
-                color: s.staticData.color
             })),
             position,
             orientation,

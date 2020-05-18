@@ -18,7 +18,6 @@ export interface StaticSpell {
     id: string;
     name: string;
     type: SpellType;
-    color: string;
     initialFeatures: SpellFeatures;
 }
 

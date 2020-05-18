@@ -12,7 +12,6 @@ describe('# Spell', () => {
             id: 's1',
             type: 'move',
             name: 's-1',
-            color: 'red',
             initialFeatures: {
                 area: 5,
                 attack: 2,
