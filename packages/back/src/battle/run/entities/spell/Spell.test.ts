@@ -19,10 +19,11 @@ describe('# Spell', () => {
             }
         };
 
-        const spell = Spell(staticData, character);
+        const spell = Spell(staticData, 1, character);
 
         spell.updateFromSnapshot({
             id: 's1',
+            index: 1,
             staticData,
             features: {
                 area: 10,

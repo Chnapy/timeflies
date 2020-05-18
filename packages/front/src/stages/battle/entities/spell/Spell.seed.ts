@@ -6,6 +6,7 @@ import { SeedPeriodicProps } from '../PeriodicEntity';
 
 export type SeedSpellProps<FK extends 'features' | 'initialFeatures' = 'initialFeatures'> = {
     id: string;
+    index?: number;
     type: SpellType;
     name?: string;
 } & { [ k in FK ]?: Partial<SpellFeatures> };
@@ -28,10 +29,11 @@ export const seedSpellStaticData = ({ id, type, name, initialFeatures }: SeedSpe
 };
 
 export const seedSpellSnapshot = (props: SeedSpellProps<'features'>): SpellSnapshot => {
-    const { id, features } = props;
+    const { id, index, features } = props;
 
     return {
         id,
+        index: index ?? 1,
         features: seedSpellFeatures(features),
         staticData: seedSpellStaticData({
             ...props,
@@ -41,7 +43,7 @@ export const seedSpellSnapshot = (props: SeedSpellProps<'features'>): SpellSnaps
 };
 
 export const seedSpell = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedSpellProps & SeedPeriodicProps<P> & Record<'character', Character<P>>): Spell<P> => {
-    const { id, character, initialFeatures } = props;
+    const { id, index, character, initialFeatures } = props;
 
     if (type === 'real') {
         return Spell(props.period, seedSpellSnapshot({
@@ -53,6 +55,7 @@ export const seedSpell = <P extends BattleDataPeriod>(type: 'real' | 'fake', pro
     const spell: Spell<P> = {
         period: props.period,
         id,
+        index: index ?? 1,
         character,
         feature: seedSpellFeatures(initialFeatures),
         staticData: seedSpellStaticData(props),

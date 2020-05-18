@@ -23,6 +23,7 @@ export interface StaticSpell {
 
 export interface SpellSnapshot {
     readonly id: string;
+    readonly index: number;
     readonly staticData: Readonly<StaticSpell>;
     readonly features: SpellFeatures;
 }
