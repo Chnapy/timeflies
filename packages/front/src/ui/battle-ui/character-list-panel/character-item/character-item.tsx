@@ -215,7 +215,7 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
                     <Box display='flex' alignItems='center' m={0.5}>
 
                         <Box display='flex' alignItems='center' justifyContent='center' width={48} height={48}>
-                            <CharacterImage characterType={characterType} />
+                            <CharacterImage characterType={characterType} size={48}/>
                         </Box>
 
                         <Box display='flex' flexDirection='column' flexGrow={1} ml={1}>

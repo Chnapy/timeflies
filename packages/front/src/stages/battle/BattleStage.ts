@@ -74,7 +74,7 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
             setupStageGraphic({
                 mapManager,
                 spritesheets: {
-                    characters: charactersSheet
+                    characters: charactersSheet.spritesheet
                 }
             });
 

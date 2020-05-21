@@ -24,20 +24,29 @@ interface BaseAssetMap {
 
     // for tests
     sampleImage: HTMLImageElement;
-    sampleJSON: object;
+    sampleJSON: string;
 };
 
 type BaseAssetMapKey = keyof BaseAssetMap;
 
-type SpritesheetMap = {
-    characters: PIXI.Spritesheet;
+export type LoaderResourceSpritesheet = {
+    spritesheet: PIXI.Spritesheet;
+    resource: LoaderResource;
 };
 
-export type AssetMapKey = keyof AssetMap;
+type SpritesheetMap = {
+    characters: LoaderResourceSpritesheet;
+    spells: LoaderResourceSpritesheet;
+};
+
+export type SpritesheetMapKey = keyof SpritesheetMap;
+
+export type AssetMapKey = BaseAssetMapKey | SpritesheetMapKey;
 
 export interface AssetLoader {
     newInstance(): LoaderInstance<{}>;
     get<K extends AssetMapKey>(key: K): AssetMap[ K ] | undefined;
+    subscribeUnique: (onLoad: (data: Partial<AssetMap>) => void) => () => void;
 }
 
 interface Dependencies {
@@ -49,7 +58,7 @@ interface LoaderInstance<O extends {}> {
     use<K extends AssetMapKey>(key: K): LoaderInstance<O & Pick<AssetMap, K>>;
     add<K extends BaseAssetMapKey>(key: K, path: string): LoaderInstance<O & Pick<BaseAssetMap, K>>;
     addMultiple<K extends BaseAssetMapKey>(o: Record<K, string>): LoaderInstance<O & Pick<BaseAssetMap, K>>;
-    addSpritesheet<K extends keyof SpritesheetMap>(key: K, path: string): LoaderInstance<O & Pick<SpritesheetMap, K>>;
+    addSpritesheet<K extends SpritesheetMapKey>(key: K, path: string): LoaderInstance<O & Pick<SpritesheetMap, K>>;
     load: () => Promise<O>;
 }
 
@@ -82,10 +91,13 @@ const getAssets = (resources: ResourceMap, keys: string[], key: string): AssetMa
     assertIsDefined(res);
 
     if (res.spritesheet) {
-        return res.spritesheet;
+        return {
+            spritesheet: res.spritesheet,
+            resource: res.children[0]
+        };
     }
 
-    return res.data;
+    return res.data as BaseAssetMap[BaseAssetMapKey];
 };
 
 const getTiledMapAssets = (resources: ResourceMap, keys: string[]): TiledMapAssets => {
@@ -224,6 +236,7 @@ export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Lo
                     }
 
                     resolve(data);
+                    onLoad(data);
                 });
             })
         };
@@ -231,14 +244,26 @@ export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Lo
         return this_;
     };
 
+    let onLoad: (data: Partial<AssetMap>) => void = () => { };
+
+    const subscribeUnique = (_onLoad: (data: Partial<AssetMap>) => void): () => void => {
+
+        onLoad = _onLoad;
+
+        return () => {
+            onLoad = () => { };
+        };
+    };
+
     return {
         newInstance,
         get: <K extends AssetMapKey>(key: K) => {
             try {
-                return getAssets(loader.resources, Object.keys(loader.resources), key) as AssetMap[K];
+                return getAssets(loader.resources, Object.keys(loader.resources), key) as AssetMap[ K ];
             } catch (e) {
                 return undefined;
             }
-        }
+        },
+        subscribeUnique
     };
 };

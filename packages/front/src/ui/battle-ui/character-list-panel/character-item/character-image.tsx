@@ -1,30 +1,19 @@
 import { CharacterType } from '@timeflies/shared';
 import React from 'react';
-import { AssetMapKey } from '../../../../assetManager/AssetLoader';
-import { Controller } from '../../../../Controller';
-import { Avatar } from '@material-ui/core';
+import { SpriteImage } from '../../sprite-image';
 
 export type CharacterImageProps = {
     characterType: CharacterType;
+    size: number;
 };
 
-const useAssetLoader = <K extends AssetMapKey>(key: K) => {
-    const [resource, setResource] = React.useState(
-        Controller.loader.get(key)
-    );
+const getTexturePath = (type: CharacterType) => `${type}/face.png`;
 
-    // TODO loader provider + suscribe
+export const CharacterImage: React.FC<CharacterImageProps> = React.memo(({ characterType, size }) => {
 
-    return resource;
-};
-
-export const CharacterImage: React.FC<CharacterImageProps> = React.memo(({characterType}) => {
-
-    const asset = useAssetLoader('characters');
-
-    console.log(asset)
-
-    return <Avatar>
-
-    </Avatar>;
+    return <SpriteImage
+        spritesheetKey='characters'
+        textureKey={getTexturePath(characterType)}
+        size={size}
+    />;
 });

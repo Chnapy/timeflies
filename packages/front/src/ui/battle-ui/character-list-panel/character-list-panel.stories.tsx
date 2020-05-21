@@ -1,14 +1,16 @@
-import { CharacterListPanel } from './character-list-panel';
+import { Box } from '@material-ui/core';
+import React from 'react';
 import { StoryProps } from '../../../../.storybook/preview';
-import { seedTeam } from '../../../stages/battle/entities/team/Team.seed';
-import { seedPlayer } from '../../../stages/battle/entities/player/Player.seed';
-import { seedCharacter } from '../../../stages/battle/entities/character/Character.seed';
-import { seedGameState } from '../../../game-state.seed';
+import { AssetManager } from '../../../assetManager/AssetManager';
+import { useAssetLoader } from '../../../assetManager/AssetProvider';
 import { seedBattleData } from '../../../battle-data.seed';
+import { seedGameState } from '../../../game-state.seed';
 import { seedGlobalTurn } from '../../../stages/battle/cycle/global-turn.seed';
 import { seedTurn } from '../../../stages/battle/cycle/turn.seed';
-import React from 'react';
-import { Box } from '@material-ui/core';
+import { seedCharacter } from '../../../stages/battle/entities/character/Character.seed';
+import { seedPlayer } from '../../../stages/battle/entities/player/Player.seed';
+import { seedTeam } from '../../../stages/battle/entities/team/Team.seed';
+import { CharacterListPanel } from './character-list-panel';
 
 export default {
     title: 'Battle/Character list panel',
@@ -142,9 +144,16 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
     return <>
         <Provider>
             <Box maxHeight='100%' width={250}>
-                <CharacterListPanel />
+                <InnerDefault/>
             </Box>
         </Provider>
     </>;
 };
 
+const InnerDefault: React.FC = () => {
+    useAssetLoader('characters', AssetManager.spritesheets.characters, true);
+
+    return (
+        <CharacterListPanel />
+    );
+};

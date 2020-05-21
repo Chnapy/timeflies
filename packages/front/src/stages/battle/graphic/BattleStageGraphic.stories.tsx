@@ -94,7 +94,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-        const charactersSheet = resources.characters;
+        const charactersSheet = resources.characters.spritesheet;
 
         const mapAssets = resources.map;
 
@@ -203,7 +203,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => 
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-        const charactersSheet = resources.characters;
+        const charactersSheet = resources.characters.spritesheet;
 
         const mapAssets = resources.map;
 

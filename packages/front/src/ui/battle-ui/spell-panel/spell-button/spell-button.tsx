@@ -173,6 +173,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
                             display='flex'
                             border={1}
                             borderColor={'currentColor'}
+                            bgcolor={palette.primary.main}
+                            borderRadius={2}
                             style={{ opacity: isDisabled ? .25 : 1 }}
                         >
                             <SpellImage spellType={spellType} size={48} />
