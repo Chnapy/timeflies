@@ -9,7 +9,7 @@ export interface SpellEngineBindAction<ST extends SpellType = SpellType> extends
     spell: Spell<'future'>;
     rangeArea: Position[];
     onTileHover: (tilePos: Position) => Promise<ExtractHoverReturn<ST>>;
-    onTileClick: (tilePos: Position) => Promise<void>;
+    onTileClick: (tilePos: Position) => Promise<boolean>;
 }
 
 interface Dependencies {

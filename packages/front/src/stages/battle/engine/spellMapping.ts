@@ -1,18 +1,28 @@
-import { inferFn, SpellType } from '@timeflies/shared';
+import { inferFn, SpellType, SpellActionSnapshot } from '@timeflies/shared';
 import { TileHoverFnProps } from '../graphic/tiledMap/TiledMapGraphic';
-import { onMoveTileHover, onSimpleAttackTileHover } from '../graphic/tiledMap/tiledSpellFns';
+import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from '../graphic/tiledMap/tiledSpellFns';
 import { SpellAction } from '../spellAction/SpellActionManager';
 import { spellLaunchMove, SpellPrepareMove } from './spellEngine/move/SpellPrepareMove';
 import { spellLaunchSimpleAttack, SpellPrepareSimpleAttack } from './spellEngine/simpleAttack/SpellPrepareSimpleAttack';
 import { SpellPrepareSubEngineCreator } from './SpellPrepareEngine';
 import { Character } from '../entities/character/Character';
+import { TileGraphic } from '../graphic/tiledMap/TileGraphic';
 
-interface GraphicTriggerFn<ST extends SpellType, EngineReturn> {
-    characterFn?: (props: {
-        engineProps: EngineReturn;
-    }) => void;
-    tiledMapFn: (props: TileHoverFnProps<ST>) => void;
-}
+type TiledMapHoverFn<ST extends SpellType> = (props: TileHoverFnProps<ST>) => (startTime: number) => void;
+
+type TiledMapStartFn = (props: Pick<SpellActionSnapshot,
+    | 'startTime'
+    | 'position'
+    | 'actionArea'
+    | 'duration'
+> & {
+    tileGraphicList: TileGraphic[];
+}) => void;
+
+export type TiledMapSpellObject<ST extends SpellType> = {
+    onHoverFn: TiledMapHoverFn<ST>;
+    onSpellStartFn: TiledMapStartFn;
+};
 
 interface SpellMapValue<ST extends SpellType, HR> {
     launchFn: (spellAction: SpellAction, characterList: Character<'future'>[]) => void;
@@ -20,8 +30,12 @@ interface SpellMapValue<ST extends SpellType, HR> {
 }
 
 interface SpellMapGraphicValue<ST extends SpellType, HR> {
-    onHover: GraphicTriggerFn<ST, HR>;
-    // TODO on spell action start (check CharacterGraphic actionFn)
+    tiledMapObject: TiledMapSpellObject<ST>;
+    characterObject?: {
+        onHoverFn: (props: {
+            engineProps: HR;
+        }) => void;
+    };
 }
 
 type SpellMap = typeof spellMap;
@@ -62,34 +76,34 @@ const spellMapGraphic: {
     [ ST in SpellType ]: SpellMapGraphicValue<ST, ExtractHoverReturn<ST>>;
 } = {
     move: {
-        onHover: {
-            tiledMapFn: onMoveTileHover
-        }
+        tiledMapObject: tiledMapSpellMove,
     },
     orientate: {
-        onHover: {
-            tiledMapFn: () => { }
-        }
+        tiledMapObject: {
+            onHoverFn: () => () => { },
+            onSpellStartFn: () => { }
+        },
     },
     simpleAttack: {
-        onHover: {
-            tiledMapFn: onSimpleAttackTileHover
-        }
+        tiledMapObject: tiledMapSpellSimpleAttack,
     },
     sampleSpell1: {
-        onHover: {
-            tiledMapFn: () => { }
-        }
+        tiledMapObject: {
+            onHoverFn: () => () => { },
+            onSpellStartFn: () => { }
+        },
     },
     sampleSpell2: {
-        onHover: {
-            tiledMapFn: () => { }
-        }
+        tiledMapObject: {
+            onHoverFn: () => () => { },
+            onSpellStartFn: () => { }
+        },
     },
     sampleSpell3: {
-        onHover: {
-            tiledMapFn: () => { }
-        }
+        tiledMapObject: {
+            onHoverFn: () => () => { },
+            onSpellStartFn: () => { }
+        },
     }
 };
 
@@ -99,5 +113,5 @@ export const getSpellPrepareSubEngine = (spellType: SpellType) =>
 export const getSpellLaunchFn = (spellType: SpellType) =>
     spellMap[ spellType ].launchFn;
 
-export const getTiledMapHoverFn = (spellType: SpellType) =>
-    spellMapGraphic[ spellType ].onHover.tiledMapFn;
+export const getTiledMapSpellObject = (spellType: SpellType) =>
+    spellMapGraphic[ spellType ].tiledMapObject;

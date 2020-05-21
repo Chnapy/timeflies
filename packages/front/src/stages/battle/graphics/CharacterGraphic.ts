@@ -156,7 +156,7 @@ export class CharacterGraphic {
     }
 
     receiveSpell(spell: any): void {
-        const { staticData: { type }, feature: { attack } } = spell;
+        const { feature: { attack } } = spell;
         this.caText.setText(attack ? `-${attack}` : '');
         // this.caIcon.setFrame(AssetManager.spells.spellsMap[type])
         this.caContainer.setStyle({ visible: true });

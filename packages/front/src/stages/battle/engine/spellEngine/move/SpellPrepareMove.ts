@@ -70,7 +70,7 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
             async onTileClick() {
                 if (!currentTile
                     || !pathTile.length) {
-                    return;
+                    return false;
                 }
 
                 const positions = pathTile.slice(1);
@@ -80,6 +80,8 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
                     position,
                     actionArea: [ position ]
                 })));
+                
+                return true;
             },
             stop() {
             }

@@ -57,7 +57,8 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
                     viewport.addChild(
                         tiledMapGraphic.container,
                         charactersBoardCurrent.container,
-                        charactersBoardFuture.container
+                        charactersBoardFuture.container,
+                        tiledMapGraphic.containerOver
                     );
                 });
             });

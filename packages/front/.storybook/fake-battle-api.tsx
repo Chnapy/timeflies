@@ -106,12 +106,12 @@ export const FakeBattleApi = () => {
                                     },
                                     {
                                         id: 'S2', index: 2, type: 'simpleAttack', initialFeatures: {
-                                            duration: 1000, attack: 20, area: 5
+                                            duration: 10_000, attack: 20, area: 5
                                         }
                                     }
                                 ],
                                 features: {
-                                    actionTime: 12_000
+                                    actionTime: 42_000
                                 },
                                 position: { x: 4, y: 3 }
                             }

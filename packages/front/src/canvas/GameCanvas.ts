@@ -27,7 +27,11 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
 
     const canvas = new PIXI.Application({
         view,
-        resizeTo: parent
+        resizeTo: parent,
+        antialias: true,
+        autoDensity: true,
+        resolution: window.devicePixelRatio,
+        
     });
 
     let stageGraphic: StageGraphic<any>;
