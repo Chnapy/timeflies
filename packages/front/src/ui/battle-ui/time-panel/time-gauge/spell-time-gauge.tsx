@@ -16,18 +16,21 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
     const turnDuration = useGameStep('battle', ({ cycle }) =>
         cycle.globalTurn?.currentTurn.turnDuration ?? 0);
 
-    const { startTimeFromTurnStart, duration, index, finished } = useGameStep('battle', ({ future }) => {
+    const { spellId, startTimeFromTurnStart, duration, finished } = useGameStep('battle', ({ future }) => {
 
         const spellAction = future.spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime);
         assertIsDefined(spellAction);
 
         return {
+            spellId: spellAction.spellId,
             startTimeFromTurnStart: spellAction.startTime - turnStartTime,
             duration: spellAction.duration,
             finished: spellAction.startTime + spellAction.duration < Date.now(),
-            index: 1
         };
     }, (a, b) => (a.startTimeFromTurnStart === b.startTimeFromTurnStart) && (a.finished === b.finished));
+
+    const spellIndex = useGameStep('battle', ({ cycle }) =>
+        cycle.globalTurn?.currentTurn.character.spells.find(s => s.id === spellId)?.index ?? 0);
 
     const paddingLeft = 2;
 
@@ -39,7 +42,7 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
             display='flex' alignItems='center'
         >
             <Box display='inline-flex' height={4} bgcolor='#E7E7E7' width={paddingLeft + 2} mr={'-2px'} />
-            <SpellNumber value={index} disabled={finished}/>
+            <SpellNumber value={spellIndex} disabled={finished} />
         </Box>
     </Box>;
 });
