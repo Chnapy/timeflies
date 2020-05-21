@@ -17,7 +17,7 @@ export const ReadyButton: React.FC = () => {
 
     const isReady = useCurrentPlayerRoom(p => p.isReady);
     const isLoading = useCurrentPlayerRoom(p => p.isLoading);
-    const charactersEnough = useCurrentPlayerRoom(p => {console.log(p); return p.characters.length > 0});
+    const charactersEnough = useCurrentPlayerRoom(p => { console.log(p); return p.characters.length > 0 });
 
     const nbrTeamsEnough = useGameStep('room', ({ teamsTree }) => teamsTree.teamList
         .filter(t => t.playersIds.length > 0).length >= 2
@@ -30,9 +30,9 @@ export const ReadyButton: React.FC = () => {
     const onClick = () => sendReadyState(!isReady, isLoading);
 
     const timeRef = React.useRef<HTMLSpanElement>(null);
-console.log('R')
+
     const getMessage = React.useCallback((): React.ReactNode => {
-console.log([ charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime ])
+
         if (!charactersEnough) {
             return 'You have to put at least one character on the map';
         }
