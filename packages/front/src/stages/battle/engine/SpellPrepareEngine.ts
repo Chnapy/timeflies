@@ -11,7 +11,7 @@ import { getSpellPrepareSubEngine } from './spellMapping';
 export interface SpellPrepareSubEngine<HR> {
     getRangeArea(): Position[];
     onTileHover(tilePos: Position, tileType: TileType): Promise<HR>;
-    onTileClick(tilePos: Position, tileType: TileType): Promise<void>;
+    onTileClick(tilePos: Position, tileType: TileType): Promise<boolean>;
     stop(): void;
 }
 

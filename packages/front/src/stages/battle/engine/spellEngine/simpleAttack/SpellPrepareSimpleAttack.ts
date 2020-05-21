@@ -16,7 +16,10 @@ export const spellLaunchSimpleAttack = ({ actionArea, spell }: SpellAction, char
 };
 
 export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
-    undefined | { actionArea: Position[] }
+    undefined | { 
+        tilePos: Position;
+        actionArea: Position[];
+    }
 > = (
     spell: Spell<'future'>,
     mapManager: MapManager,
@@ -59,6 +62,7 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
                 const actionArea = tiledManager.getArea(tilePos, 1);
 
                 return {
+                    tilePos,
                     actionArea
                 };
             },
@@ -66,7 +70,7 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
 
                 const isInArea = rangeArea.some(equals(tilePos));
                 if (!isInArea) {
-                    return;
+                    return false;
                 }
 
                 const actionArea = tiledManager.getArea(tilePos, 1);
@@ -78,6 +82,8 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
                 };
 
                 dispatchSpellLaunch([ spellAction ]);
+
+                return true;
             },
             stop() {
             }

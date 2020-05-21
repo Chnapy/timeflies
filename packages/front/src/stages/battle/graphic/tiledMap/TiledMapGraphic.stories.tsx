@@ -51,7 +51,7 @@ export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
                 onTileHover: async () => {
                     return undefined;
                 },
-                onTileClick: async () => { },
+                onTileClick: async () => true,
                 rangeArea: []
             })
         });

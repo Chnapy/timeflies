@@ -48,6 +48,11 @@ export const appTheme: Theme = createMuiTheme({
             outlinedSizeLarge: {
                 padding: '6px 20px'
             },
+            root: {
+                "&$disabled": {
+                    pointerEvents: "all"
+                }
+            }
         },
         MuiChip: {
             root: {
@@ -58,6 +63,12 @@ export const appTheme: Theme = createMuiTheme({
             },
             outlined: {
                 backgroundColor: contrast,
+            }
+        },
+        MuiTooltip: {
+            tooltip: {
+                backgroundColor: main,
+                fontSize: '1rem'
             }
         }
     }

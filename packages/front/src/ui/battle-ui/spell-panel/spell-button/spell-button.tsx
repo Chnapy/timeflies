@@ -165,7 +165,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
             </Box>
 
             <Tooltip title={'Spell description'}>
-                <Button onClick={onBtnClick} size='large' color='primary' disabled={isDisabled} {...buttonProps}>
+                <Button component='span' onClick={onBtnClick} size='large' color='primary' disabled={isDisabled} {...buttonProps}>
 
                     <Box display='flex' flexWrap='nowrap'>
 

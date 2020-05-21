@@ -5,11 +5,14 @@ import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { BStateAction } from '../../battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../../engine/Engine';
-import { ExtractHoverReturn, getTiledMapHoverFn } from '../../engine/spellMapping';
+import { ExtractHoverReturn, getTiledMapSpellObject } from '../../engine/spellMapping';
 import { TileGraphic } from './TileGraphic';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../spellAction/SpellActionTimer';
+import { serviceBattleData } from '../../../../services/serviceBattleData';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
+    readonly containerOver: PIXI.Container;
 
     readonly width: number;
     readonly height: number;
@@ -20,8 +23,9 @@ export interface TiledMapGraphic {
 
 export interface TileHoverFnProps<ST extends SpellType> {
     engineProps: NonNullable<ExtractHoverReturn<ST>>;
-    tileGraphicTarget: TileGraphic;
     tileGraphicList: TileGraphic[];
+    rangeTiles: TileGraphic[];
+    duration: number;
 }
 
 export interface TileTriggerFn {
@@ -117,8 +121,14 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     const layerContainer = new PIXI.Container();
     layerContainer.addChild(...layerTiles.map(t => t.container));
 
+    const layerContainerOver = new PIXI.Container();
+    layerContainerOver.addChild(...layerTiles.map(t => t.containerOver));
+
     const container = new PIXI.Container();
     container.addChild(layerContainer);
+
+    const containerOver = new PIXI.Container();
+    containerOver.addChild(layerContainerOver);
 
     onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({
         spell, rangeArea, onTileClick: otc, onTileHover: oth
@@ -134,9 +144,13 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         });
 
         triggerFn.onTileClick = otc;
+
         triggerFn.onTileHover = async (tilePos, tileGraphicTarget) => {
 
+            const engineProps = await oth(tilePos);
+
             layerTiles.forEach(t => t.reset());
+
             if (spell.staticData.type === 'move') {
 
             } else {
@@ -149,18 +163,58 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
                 }
             }
 
-            const engineProps = await oth(tilePos);
-
             if (engineProps) {
-                const hoverFn = getTiledMapHoverFn(spell.staticData.type);
+                const { onHoverFn } = getTiledMapSpellObject(spell.staticData.type);
 
-                hoverFn({
+                const afterClick = onHoverFn({
                     engineProps: engineProps as any,
-                    tileGraphicTarget,
-                    tileGraphicList: layerTiles
+                    tileGraphicList: layerTiles,
+                    rangeTiles,
+                    duration: spell.feature.duration
                 });
+
+                triggerFn.onTileClick = async tilePos => {
+                    const isTargetable = await otc(tilePos);
+
+                    if(!isTargetable) {
+                        return;
+                    }
+
+                    const { spellActionSnapshotList } = serviceBattleData('future');
+
+                    const { startTime } = spellActionSnapshotList[ spellActionSnapshotList.length - 1 ]
+
+                    afterClick(startTime);
+                };
             }
         };
+    });
+
+    onAction<SpellActionTimerStartAction>('battle/spell-action/start', ({
+        spellActionSnapshot: { spellId, position, actionArea, startTime, duration }
+    }) => {
+
+        const { globalTurn } = serviceBattleData('cycle');
+        assertIsDefined(globalTurn);
+
+        const spell = globalTurn.currentTurn.character.spells.find(s => s.id === spellId);
+        assertIsDefined(spell);
+
+        const { onSpellStartFn } = getTiledMapSpellObject(spell.staticData.type);
+
+        onSpellStartFn({
+            tileGraphicList: layerTiles,
+            startTime,
+            position,
+            actionArea,
+            duration
+        });
+    });
+
+    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({
+        spellActionSnapshot: { startTime }, removed
+    }) => {
+        layerTiles.forEach(t => t.clearPersist(startTime, removed));
     });
 
     onAction<BStateAction>('battle/state/event', action => {
@@ -170,12 +224,16 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
             triggerFn.onTileHover = () => { };
             triggerFn.onTileClick = () => { };
 
-            layerTiles.forEach(t => t.reset());
+            layerTiles.forEach(t => {
+                t.reset();
+                t.clearPersist();
+            });
         }
     });
 
     return {
         container,
+        containerOver,
         width: schema.width,
         height: schema.height,
         tilewidth: schema.tilewidth,
