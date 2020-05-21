@@ -62,7 +62,8 @@ export const Controller: typeof IController = {
         },
         get(key) {
             return undefined;
-        }
+        },
+        subscribeUnique: () => {}
     },
 
     reset() { }

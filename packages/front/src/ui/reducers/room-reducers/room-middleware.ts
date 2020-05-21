@@ -98,6 +98,7 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
                     await Controller.loader.newInstance()
                         .addSpritesheet('characters', AssetManager.spritesheets.characters)
+                        .addSpritesheet('spells', AssetManager.spritesheets.spells)
                         .load();
 
                     api.dispatch<SendMessageAction>({

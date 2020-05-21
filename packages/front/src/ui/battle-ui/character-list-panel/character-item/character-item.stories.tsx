@@ -1,14 +1,16 @@
+import { Box } from '@material-ui/core';
 import React from 'react';
 import { StoryProps } from '../../../../../.storybook/preview';
-import { CharacterItem } from './character-item';
-import { Box } from '@material-ui/core';
-import { seedGameState } from '../../../../game-state.seed';
+import { AssetManager } from '../../../../assetManager/AssetManager';
+import { useAssetLoader } from '../../../../assetManager/AssetProvider';
 import { seedBattleData } from '../../../../battle-data.seed';
+import { seedGameState } from '../../../../game-state.seed';
+import { seedGlobalTurn } from '../../../../stages/battle/cycle/global-turn.seed';
+import { seedTurn } from '../../../../stages/battle/cycle/turn.seed';
 import { seedCharacter } from '../../../../stages/battle/entities/character/Character.seed';
 import { seedPlayer } from '../../../../stages/battle/entities/player/Player.seed';
 import { seedTeam } from '../../../../stages/battle/entities/team/Team.seed';
-import { seedGlobalTurn } from '../../../../stages/battle/cycle/global-turn.seed';
-import { seedTurn } from '../../../../stages/battle/cycle/turn.seed';
+import { CharacterItem } from './character-item';
 
 export default {
     title: 'Battle/Character list panel/Character item',
@@ -139,20 +141,26 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
 
     const { Provider } = fakeBattleApi.init({ initialState });
 
-    return <>
+    return (
         <Box width={215}>
             <Provider>
-                <CharacterItem characterId='c1' />
-                <CharacterItem characterId='c2' />
-                <CharacterItem characterId='c3' />
-                <CharacterItem characterId='c4' />
-
-                <Box bgcolor='#222' p={1}>
-
-                    <CharacterItem characterId='c5' />
-
-                </Box>
+                <InnerDefault />
             </Provider>
+        </Box>
+    )
+};
+
+const InnerDefault: React.FC = () => {
+    useAssetLoader('characters', AssetManager.spritesheets.characters, true);
+
+    return <>
+        <CharacterItem characterId='c1' />
+        <CharacterItem characterId='c2' />
+        <CharacterItem characterId='c3' />
+        <CharacterItem characterId='c4' />
+
+        <Box bgcolor='#222' p={1}>
+            <CharacterItem characterId='c5' />
         </Box>
     </>;
 };

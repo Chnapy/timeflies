@@ -16,6 +16,8 @@ import { SpellNumber } from './spell-number';
 import { UIText } from './ui-text';
 import { SpellImage } from './spell-image';
 import { UIGauge } from './ui-gauge';
+import { AssetManager } from '../../../../assetManager/AssetManager';
+import { useAssetLoader } from '../../../../assetManager/AssetProvider';
 
 export default {
     component: SpellButton,
@@ -48,9 +50,17 @@ const Wrapper: React.FC<SpellButtonProps & {
         <Provider>
             <Box display='inline-flex' flexDirection='column' mr={1} mb={1}>
                 <Typography variant='body2'>{title}</Typography>
-                <SpellButton {...props} />
+                <InnerWrapper {...props} />
             </Box>
         </Provider>
+    );
+};
+
+const InnerWrapper: React.FC<SpellButtonProps> = props => {
+    useAssetLoader('spells', AssetManager.spritesheets.spells, true);
+
+    return (
+        <SpellButton {...props} />
     );
 };
 

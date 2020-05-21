@@ -35,7 +35,7 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-        const sheet = resources.characters;
+        const sheet = resources.characters.spritesheet;
 
         const characterCurrent = seedCharacter('real', {
             period: 'current',
@@ -186,7 +186,7 @@ export const Future: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-        const sheet = resources.characters;
+        const sheet = resources.characters.spritesheet;
 
         const characterFuture = seedCharacter('real', {
             period: 'future',

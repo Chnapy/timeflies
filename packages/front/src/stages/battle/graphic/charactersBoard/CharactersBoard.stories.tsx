@@ -63,7 +63,7 @@ const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeBattl
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-        const sheet = resources.characters;
+        const sheet = resources.characters.spritesheet;
 
         const mapAssets = resources.map;
 

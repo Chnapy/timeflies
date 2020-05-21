@@ -1,5 +1,4 @@
 import { CharacterType, Orientation } from "@timeflies/shared";
-import { AssetManager } from "../../../assetManager/AssetManager";
 import { RectStyled } from "../../../hud/generics/RectStyled";
 
 export class CharacterGraphic {
@@ -159,7 +158,7 @@ export class CharacterGraphic {
     receiveSpell(spell: any): void {
         const { staticData: { type }, feature: { attack } } = spell;
         this.caText.setText(attack ? `-${attack}` : '');
-        this.caIcon.setFrame(AssetManager.spells.spellsMap[type])
+        // this.caIcon.setFrame(AssetManager.spells.spellsMap[type])
         this.caContainer.setStyle({ visible: true });
     }
 
