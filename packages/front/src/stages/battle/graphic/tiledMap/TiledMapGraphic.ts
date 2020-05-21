@@ -2,13 +2,14 @@ import { assertIsDefined, assertThenGet, equals, Position, SpellType } from '@ti
 import * as PIXI from 'pixi.js';
 import { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
+import { serviceBattleData } from '../../../../services/serviceBattleData';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { BStateAction } from '../../battleState/BattleStateSchema';
 import { SpellEngineBindAction } from '../../engine/Engine';
 import { ExtractHoverReturn, getTiledMapSpellObject } from '../../engine/spellMapping';
-import { TileGraphic } from './TileGraphic';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../spellAction/SpellActionTimer';
-import { serviceBattleData } from '../../../../services/serviceBattleData';
+import { graphicTheme } from '../graphic-theme';
+import { TileGraphic } from './TileGraphic';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
@@ -124,8 +125,21 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     const layerContainerOver = new PIXI.Container();
     layerContainerOver.addChild(...layerTiles.map(t => t.containerOver));
 
+    const { palette } = graphicTheme;
+
+    const gridGraphic = new PIXI.Graphics();
+    gridGraphic.lineStyle(1, palette.primary.main, 0.1);
+    for (let y = 0; y < schema.height; y++) {
+        gridGraphic.moveTo(0, y * schema.tileheight);
+        gridGraphic.lineTo(schema.width * schema.tilewidth, y * schema.tileheight);
+    }
+    for (let x = 0; x < schema.width; x++) {
+        gridGraphic.moveTo(x * schema.tilewidth, 0);
+        gridGraphic.lineTo(x * schema.tilewidth, schema.height * schema.tileheight);
+    }
+
     const container = new PIXI.Container();
-    container.addChild(layerContainer);
+    container.addChild(layerContainer, gridGraphic);
 
     const containerOver = new PIXI.Container();
     containerOver.addChild(layerContainerOver);
@@ -176,7 +190,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
                 triggerFn.onTileClick = async tilePos => {
                     const isTargetable = await otc(tilePos);
 
-                    if(!isTargetable) {
+                    if (!isTargetable) {
                         return;
                     }
 
