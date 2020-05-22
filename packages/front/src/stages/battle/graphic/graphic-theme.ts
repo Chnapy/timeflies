@@ -1,7 +1,7 @@
 import { appTheme } from '../../../ui/app-theme';
 import { Theme } from '@material-ui/core';
 
-type GraphicTheme = DeepStringToNumber<Pick<Theme, 'palette'>>;
+type GraphicTheme = DeepStringToNumber<Pick<Theme, 'palette' | 'typography'>>;
 
 type DeepStringToNumber<V> = string extends V ? number : (
     V extends number ? V : (
@@ -50,7 +50,8 @@ const createGraphicTheme = (): GraphicTheme => {
     };
 
     return compute({
-        palette: appTheme.palette
+        palette: appTheme.palette,
+        typography: appTheme.typography,
     });
 };
 
