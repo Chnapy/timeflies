@@ -18,17 +18,24 @@ export type UIIconValue = keyof typeof iconMap;
 export type UIIconProps = {
     icon: UIIconValue;
     strikeOut?: boolean;
+    inPixiContext?: boolean;
     children?: never;
 };
 
-export const UIIcon: React.FC<UIIconProps> = React.memo(({ icon, strikeOut }) => {
+export const UIIcon: React.FC<UIIconProps> = React.memo(({ icon, strikeOut, inPixiContext }) => {
 
     const IconComponent = iconMap[ icon ];
 
+    const renderIcon = () => <IconComponent style={{
+        opacity: strikeOut ? 0.75 : 1
+    }} />;
+
+    if(inPixiContext) {
+        return renderIcon();
+    }
+
     return <Box display='inline-flex' flexShrink={0} position='relative' overflow='hidden'>
-        <IconComponent style={{
-            opacity: strikeOut ? 0.75 : 1
-        }} />
+        {renderIcon()}
         {strikeOut && (
             <Box position='absolute' left={0} clone>
                 <BlockIcon />
