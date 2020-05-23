@@ -3,6 +3,7 @@ import { CanvasContext } from '../../../canvas/CanvasContext';
 import { StageGraphicCreator } from '../../../canvas/StageGraphic';
 import { CharactersBoard } from './charactersBoard/CharactersBoard';
 import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
+import { requestRender } from '../../../canvas/GameCanvas';
 
 export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheets'> = (renderer) => {
 
@@ -31,6 +32,13 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
             .drag({
                 mouseButtons: 'middle',
             });
+
+        let isDragging = false;
+
+        viewport.on('wheel', requestRender);
+        viewport.on('drag-start', () => isDragging = true);
+        viewport.on('drag-end', () => isDragging = false);
+        viewport.on('moved', () => isDragging && requestRender());
     };
 
     return {
@@ -53,6 +61,7 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
                         charactersBoardFuture.container,
                         tiledMapGraphic.containerOver
                     );
+                    requestRender();
                 });
             });
         },

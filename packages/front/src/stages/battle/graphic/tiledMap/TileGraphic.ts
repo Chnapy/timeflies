@@ -2,6 +2,7 @@ import { Position } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { TileTriggerFn } from './TiledMapGraphic';
 import { graphicTheme } from '../graphic-theme';
+import { requestRender } from '../../../../canvas/GameCanvas';
 
 export interface TileGraphicProps {
     texture: PIXI.Texture;
@@ -105,6 +106,8 @@ export const TileGraphic = ({
         sprite.alpha = 0.75;
         graphicsUnder.clear();
         graphicsOver.clear();
+
+        requestRender();
     };
 
     const showPath = (isLast: boolean) => {
@@ -133,12 +136,16 @@ export const TileGraphic = ({
 
             drawTarget();
         }
+
+        requestRender();
     };
 
     const showRange = () => {
         reset();
 
         sprite.alpha = 1;
+
+        requestRender();
     };
 
     const showAction = (inRange: boolean) => {
@@ -149,6 +156,8 @@ export const TileGraphic = ({
         }
 
         drawTarget();
+        
+        requestRender();
     };
 
     const drawTargetCurrent = () => {
@@ -184,6 +193,8 @@ export const TileGraphic = ({
         graphicsOverPersist.clear();
 
         drawTargetCurrent();
+        
+        requestRender();
     };
 
     const persistActionStart = (duration: number, startTime: number) => {
@@ -217,6 +228,8 @@ export const TileGraphic = ({
                 graphicsOverPersistStart.drawRoundedRect(marginX + 1, marginTop + 1, barWidth, height - 2, 2);
                 graphicsOverPersistStart.endFill();
             }
+        
+            requestRender();
         };
 
         drawGauge();
@@ -250,6 +263,8 @@ export const TileGraphic = ({
                 graphicsOverPersist.clear();
             }
         }
+        
+        requestRender();
     };
 
     const this_: TileGraphic = {

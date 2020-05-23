@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { graphicTheme } from './graphic-theme';
+import { requestRender } from '../../../canvas/GameCanvas';
 
 
 export const GaugeGraphic = (graphic: PIXI.Graphics = new PIXI.Graphics()) => {
@@ -26,6 +27,7 @@ export const GaugeGraphic = (graphic: PIXI.Graphics = new PIXI.Graphics()) => {
             graphic.drawRoundedRect(1, 1, barWidth, geoRect.height - 2, 2);
             graphic.endFill();
         }
+        requestRender();
     };
 
     return {

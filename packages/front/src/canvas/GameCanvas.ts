@@ -21,34 +21,62 @@ export type StageGraphicCreateParam<SK extends StageKey> = (typeof stageGraphics
 export interface GameCanvas {
 }
 
+let renderFn: () => void;
+
+let shouldRender: boolean = false;
+
+export const requestRender = () => {
+    if (!shouldRender) {
+        shouldRender = true;
+        requestAnimationFrame(renderFn);
+    }
+};
+
 export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCanvas => {
 
     const { onAction } = serviceEvent();
 
-    const canvas = new PIXI.Application({
+    const renderer = PIXI.autoDetectRenderer({
         view,
-        resizeTo: parent,
         antialias: true,
         autoDensity: true,
         resolution: window.devicePixelRatio,
-        
     });
 
-    let stageGraphic: StageGraphic<any>;
+    const rootStage = new PIXI.Container();
+
+    let stageGraphic: StageGraphic<any> | null = null;
+
+    renderFn = () => {
+        shouldRender = false;
+        renderer.render(rootStage);
+    };
+
+    const onResize = () => {
+        const { clientWidth, clientHeight } = parent;
+
+        renderer.resize(clientWidth, clientHeight);
+        requestRender();
+    };
+
+    window.addEventListener('resize', onResize);
+
+    onResize();
 
     onAction<StageChangeAction<any>>('stage/change', ({ stageKey }) => {
-        canvas.stage.removeChildren();
+        rootStage.removeChildren().forEach(c => c.destroy());
 
-        stageGraphic = stageGraphicsMap[ stageKey ](canvas.renderer);
+        stageGraphic = stageGraphicsMap[ stageKey ](renderer);
 
-        canvas.stage.addChild(stageGraphic.getContainer());
+        rootStage.addChild(stageGraphic!.getContainer());
+        requestRender();
     });
 
     onAction<StageOnCreateGraphicAction<any>>('stage/onCreate/graphic', ({ param }) => {
 
         assertIsDefined(stageGraphic);
 
-        stageGraphic.onCreate(param);
+        stageGraphic!.onCreate(param);
     });
 
     return {};
