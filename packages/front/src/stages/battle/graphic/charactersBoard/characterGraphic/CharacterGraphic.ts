@@ -12,6 +12,7 @@ import { CharacterHud } from './character-hud/character-hud';
 
 
 export interface CharacterGraphic {
+    readonly character: Readonly<Character<BattleDataPeriod>>;
     readonly container: PIXI.Container;
 }
 
@@ -45,7 +46,7 @@ export const CharacterGraphic = (
         ? periodCurrent
         : periodFuture;
 
-    const { sprite, hud } = periodFn(
+    const { sprite, hud, getTicker } = periodFn(
         character,
         tiledMapGraphic,
         charactersSheet
@@ -64,6 +65,7 @@ export const CharacterGraphic = (
     }
 
     return {
+        character,
         container
     };
 };
@@ -152,7 +154,7 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
         };
 
         const { x, y } = tiledMapGraphic.getWorldFromTile(previousState.position);
-        
+
         setPosition(x, y);
         animatedSprite
             .setProps({
