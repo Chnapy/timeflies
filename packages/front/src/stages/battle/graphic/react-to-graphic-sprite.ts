@@ -6,11 +6,11 @@ import { graphicTheme } from './graphic-theme';
 
 const cache: Map<string, PIXI.Texture> = new Map();
 
-export const ReactToGraphicSprite = (reactElement: React.ReactElement, width: number, height) => {
+export const ReactToGraphicSprite = (reactElement: React.ReactElement, width: number, height: number, customStyle?: string) => {
 
     const sprite = new PIXI.Sprite();
 
-    getTexture(reactElement, width, height).then(texture => sprite.texture = texture);
+    getTexture(reactElement, width, height, customStyle).then(texture => sprite.texture = texture);
 
     return sprite;
 };
@@ -35,7 +35,7 @@ const getHTMLString = (strElement: string): string => {
         + '</div></foreignObject>';
 };
 
-const getTexture = async (reactElement: React.ReactElement, width: number, height: number): Promise<PIXI.Texture> => {
+const getTexture = async (reactElement: React.ReactElement, width: number, height: number, customStyle: string | undefined): Promise<PIXI.Texture> => {
 
     const strElement = ReactDOMServer.renderToStaticMarkup(reactElement);
 
@@ -45,22 +45,23 @@ const getTexture = async (reactElement: React.ReactElement, width: number, heigh
         ? getHTMLString(strElement)
         : strElement;
 
-    if (cache.has(strContent)) {
-        return cache.get(strContent)!;
+    const key = [ strContent, width, height, customStyle ].join('+');
+
+    if (cache.has(key)) {
+        return cache.get(key)!;
     }
 
-
-    const dataUrl = await getHTMLDataURL(strContent, width, height);
+    const dataUrl = await getHTMLDataURL(strContent, width, height, customStyle);
 
     const baseTexture = new PIXI.BaseTexture(dataUrl);
     const texture = new PIXI.Texture(baseTexture);
 
-    cache.set(strContent, texture);
+    cache.set(key, texture);
 
     return texture;
 };
 
-const getHTMLDataURL = (strContent: string, width: number, height: number): Promise<string> => new Promise(r => {
+const getHTMLDataURL = (strContent: string, width: number, height: number, customStyle: string = ''): Promise<string> => new Promise(r => {
     const { typography } = graphicTheme;
 
     const headStyles = Array.from(document.head.getElementsByTagName('style'))
@@ -69,6 +70,7 @@ const getHTMLDataURL = (strContent: string, width: number, height: number): Prom
         + `<style>
             body {
                 background-color: transparent;
+                ${customStyle}
             }
         </style>`
 
@@ -82,7 +84,7 @@ const getHTMLDataURL = (strContent: string, width: number, height: number): Prom
 
     const rootFontSize = typography.fontSize + 'px';
 
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" style="font-size: ${rootFontSize}">`
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" style="font-size: ${rootFontSize};${customStyle}">`
         + headStyles
         + strContent
         + `</svg>`;

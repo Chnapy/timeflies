@@ -14,6 +14,10 @@ import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
 import { StoryProps } from '../../../../../../.storybook/preview';
 import { AssetManager } from '../../../../../assetManager/AssetManager';
+import { seedPlayer } from '../../../entities/player/Player.seed';
+import { seedTeam } from '../../../entities/team/Team.seed';
+import { seedGameState } from '../../../../../game-state.seed';
+import { seedBattleData } from '../../../../../battle-data.seed';
 
 export default {
     title: 'graphic/CharacterGraphic',
@@ -22,7 +26,12 @@ export default {
 
 export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
-    fakeApi.init({});
+    fakeApi.init({
+        initialState: seedGameState('p1', {
+            step: 'battle',
+            battle: seedBattleData()
+        })
+    });
 
     const onMount = async (parent: HTMLElement) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
@@ -37,10 +46,10 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
         const sheet = resources.characters.spritesheet;
 
-        const characterCurrent = seedCharacter('real', {
-            period: 'current',
-            id: '1',
-            player: null
+        const characterCurrent = seedCharacter('fake', {
+            id: '1', period: 'current', player: seedPlayer('fake', {
+                id: 'p1', period: 'current', team: seedTeam('fake', { id: 't1', letter: 'A', period: 'current', seedPlayers: [] })
+            })
         });
 
         const mapAssets = resources.map;

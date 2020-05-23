@@ -1,4 +1,4 @@
-import { MapConfig, TiledMapSeedKey } from '@timeflies/shared';
+import { MapConfig, TiledMapSeedKey, seedTiledManager } from '@timeflies/shared';
 import { MapManager, MapManagerDependencies } from './MapManager';
 import { seedTiledMapAssetsWithImg } from './TiledMap.seed';
 
@@ -20,9 +20,7 @@ export const seedMapManager = (type: 'real' | 'fake', mapKey: TiledMapSeedKey = 
 
     if (type === 'fake') {
         return {
-            tiledManager: {
-                getTileType(position) { return null }
-            } as any,
+            tiledManager: seedTiledManager(mapKey),
             refreshPathfinder() { },
             calculatePath() { return { cancel: () => true, promise: Promise.resolve([]) } },
             getRangeArea(center, r, charactersPos) { return [] }

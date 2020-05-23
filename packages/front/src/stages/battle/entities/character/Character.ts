@@ -123,30 +123,6 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
 
 // export class Character2 implements WithSnapshot<CharacterSnapshot> {
 
-//     static readonly getSheetKey = (
-//         type: CharacterType
-//     ): string => `${type}_sheet`;
-
-//     static readonly getAnimKey = (
-//         type: CharacterType,
-//         state: CharacterState,
-//         orientation: Orientation
-//     ): string => `${type}_${state}_${orientation}`;
-
-//     private readonly scene: BattleScene;
-
-//     readonly staticData: Readonly<StaticCharacter>;
-//     get id(): string {
-//         return this.staticData.id;
-//     }
-//     get isMine(): boolean {
-//         return this.player.itsMe;
-//     }
-
-//     private _position: Position;
-//     public get position(): Position {
-//         return this._position;
-//     }
 
 //     private _orientation: Orientation;
 //     public get orientation(): Orientation {
@@ -163,12 +139,9 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
 //     readonly player: Player;
 //     readonly team: Team;
 
-//     readonly characterGraphic: CharacterGraphic;
-
 //     constructor({
 //         staticData, orientation, position, features, spellsSnapshots
 //     }: CharacterSnapshot, player: Player, team: Team, scene: BattleScene) {
-//         this.scene = scene;
 //         this.staticData = staticData;
 //         this._orientation = orientation;
 //         this._position = position;
@@ -183,20 +156,6 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
 
 //         this.spells = spellsSnapshots.map(snap => Spell(snap, this));
 //         this.defaultSpell = this.spells.find(s => s.id === staticData.defaultSpellId)!;
-
-//         this.characterGraphic = new CharacterGraphic(scene, this);
-//     }
-
-//     init(): this {
-//         this.characterGraphic.init();
-
-//         this.characterGraphic.updateAnimation();
-
-//         return this;
-//     }
-
-//     initHUD(): void {
-//         this.characterGraphic.initHUD();
 //     }
 
 //     setCharacterState(state: CharacterState): void {
@@ -284,34 +243,3 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
 //     canOrientate(): boolean {
 //         return this.spells.some(s => s.staticData.type === 'orientate');
 //     }
-
-//     getSnapshot(): CharacterSnapshot {
-//         return {
-//             staticData: this.staticData,
-//             features: { ...this.features },
-//             orientation: this.orientation,
-//             position: this.position,
-//             spellsSnapshots: this.spells.map(s => s.getSnapshot())
-//         };
-//     }
-
-//     updateFromSnapshot(snapshot: CharacterSnapshot): void {
-//         this.setPosition(snapshot.position, true);
-//         this.setOrientation(snapshot.orientation, false);
-//         this.setCharacterState('idle');
-//         Object.keys(this.features).forEach(k => delete this.features[k]);
-//         Object.assign(this.features, snapshot.features);
-//         snapshot.spellsSnapshots.forEach(sSnap => {
-//             const spell = this.spells.find(s => s.id === sSnap.staticData.id);
-
-//             spell!.updateFromSnapshot(sSnap);
-//         });
-//     }
-
-//     getGraphics(): any[] {
-//         return [
-//             this.characterGraphic.containerSprite,
-//             this.characterGraphic.containerHUD
-//         ];
-//     }
-// }

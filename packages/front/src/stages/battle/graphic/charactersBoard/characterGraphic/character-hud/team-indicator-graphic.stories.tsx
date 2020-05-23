@@ -1,7 +1,7 @@
 import { TeamIndicatorGraphic } from './team-indicator-graphic';
 import React from 'react';
 import * as PIXI from 'pixi.js';
-import { StoryProps } from '../../../../../../.storybook/preview';
+import { StoryProps } from '../../../../../../../.storybook/preview';
 
 export default {
     title: 'graphic/CharacterGraphic/Team indicator graphic',

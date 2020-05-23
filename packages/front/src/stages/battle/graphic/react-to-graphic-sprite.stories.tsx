@@ -40,7 +40,7 @@ const InnerDefault: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         const muiIcon = ReactToGraphicSprite(<FavoriteIcon/>, 24, 24);
         muiIcon.x = 200;
 
-        const muiUIIcon = ReactToGraphicSprite(<UIIcon icon='life' inPixiContext/>, 24, 24);
+        const muiUIIcon = ReactToGraphicSprite(<UIIcon icon='life' inPixiContext/>, 24, 24, 'color: white');
         muiUIIcon.x = 300;
 
         game.stage.addChild(someText, muiTypography, muiIcon, muiUIIcon);

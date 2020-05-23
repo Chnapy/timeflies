@@ -8,18 +8,22 @@ import { Character } from '../../../entities/character/Character';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/SpellActionTimer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
+import { CharacterHud } from './character-hud/character-hud';
 
 
 export interface CharacterGraphic {
     readonly container: PIXI.Container;
 }
 
-interface PeriodFn {
+interface PeriodFn<P extends BattleDataPeriod> {
     (
-        character: Character<BattleDataPeriod>,
+        character: Character<P>,
         tiledMapGraphic: TiledMapGraphic,
         charactersSheet: PIXI.Spritesheet
-    ): PIXI.Sprite;
+    ): {
+        sprite: PIXI.Sprite;
+        hud?: CharacterHud;
+    };
 }
 
 interface GeoState {
@@ -37,11 +41,11 @@ export const CharacterGraphic = (
 
     const container = new PIXI.Container();
 
-    const periodFn: PeriodFn = character.period === 'current'
+    const periodFn: PeriodFn<any> = character.period === 'current'
         ? periodCurrent
         : periodFuture;
 
-    const sprite = periodFn(
+    const { sprite, hud } = periodFn(
         character,
         tiledMapGraphic,
         charactersSheet
@@ -49,17 +53,22 @@ export const CharacterGraphic = (
     sprite.interactiveChildren = false;
     sprite.width = tiledMapGraphic.tilewidth;
     sprite.height = tiledMapGraphic.tileheight;
+
+    container.addChild(sprite);
     const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
     sprite.position.set(worldPos.x, worldPos.y);
 
-    container.addChild(sprite);
+    if (hud) {
+        container.addChild(hud.container);
+        hud.container.position.set(worldPos.x, worldPos.y);
+    }
 
     return {
         container
     };
 };
 
-const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
+const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesheet) => {
 
     const { onAction } = serviceEvent();
 
@@ -71,6 +80,13 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
         orientation: character.orientation
     });
     animatedSprite.animationSpeed = 0.4;
+
+    const hud = CharacterHud(character);
+
+    const setPosition = (x: number, y: number) => {
+        animatedSprite.position.set(x, y);
+        hud.container.position.set(x, y);
+    };
 
     let previousState: GeoState = {
         position: character.position,
@@ -102,10 +118,10 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
             now = Date.now();
 
             ratio = (now - startTime) / duration;
-            animatedSprite.position.set(
-                startWorldPos.x + ratio * diffWorldPos.x,
-                startWorldPos.y + ratio * diffWorldPos.y,
-            );
+            const x = startWorldPos.x + ratio * diffWorldPos.x;
+            const y = startWorldPos.y + ratio * diffWorldPos.y;
+
+            setPosition(x, y);
         });
 
         return {
@@ -136,7 +152,8 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
         };
 
         const { x, y } = tiledMapGraphic.getWorldFromTile(previousState.position);
-        animatedSprite.position.set(x, y);
+        
+        setPosition(x, y);
         animatedSprite
             .setProps({
                 characterState: 'idle',
@@ -178,10 +195,13 @@ const periodCurrent: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
         ticker.start();
     });
 
-    return animatedSprite;
+    return {
+        sprite: animatedSprite,
+        hud
+    };
 };
 
-const periodFuture: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
+const periodFuture: PeriodFn<'future'> = (character, tiledMapGraphic, spritesheet) => {
 
     const { onAction } = serviceEvent();
 
@@ -205,11 +225,11 @@ const periodFuture: PeriodFn = (character, tiledMapGraphic, spritesheet) => {
                 sprite.position.set(worldPos.x, worldPos.y);
                 sprite.visible = true;
             });
-        } else if(action.eventType === 'TURN-END') {
+        } else if (action.eventType === 'TURN-END') {
 
             sprite.visible = false;
         }
     });
 
-    return sprite;
+    return { sprite };
 };
