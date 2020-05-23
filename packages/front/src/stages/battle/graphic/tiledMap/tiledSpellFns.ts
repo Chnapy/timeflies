@@ -1,6 +1,6 @@
-import { equals, assertIsDefined } from '@timeflies/shared';
-import { TileGraphic } from './TileGraphic';
+import { assertIsDefined, equals } from '@timeflies/shared';
 import { TiledMapSpellObject } from '../../engine/spellMapping';
+import { TileGraphic } from './TileGraphic';
 
 
 export const tiledMapSpellMove: TiledMapSpellObject<'move'> = {

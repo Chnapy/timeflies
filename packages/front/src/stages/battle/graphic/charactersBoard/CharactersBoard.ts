@@ -5,6 +5,7 @@ import { Character } from '../../entities/character/Character';
 import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { SpellActionTimerEndAction } from '../../spellAction/SpellActionTimer';
+import { requestRender } from '../../../../canvas/GameCanvas';
 
 export interface CharactersBoard {
     readonly container: PIXI.Container;
@@ -30,6 +31,7 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
                 // because of graphics retained by 'onAction' callbacks 
                 container.removeChild(characterContainer);
             });
+        requestRender();
     });
 
     return {

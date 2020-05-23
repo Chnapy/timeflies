@@ -7,8 +7,8 @@ import { BStateAction } from '../../../battleState/BattleStateSchema';
 import { Character } from '../../../entities/character/Character';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/SpellActionTimer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
-import { CharacterSprite, getAnimPath } from './CharacterSprite';
 import { CharacterHud } from './character-hud/character-hud';
+import { CharacterSprite, getAnimPath } from './CharacterSprite';
 
 
 export interface CharacterGraphic {
@@ -46,7 +46,7 @@ export const CharacterGraphic = (
         ? periodCurrent
         : periodFuture;
 
-    const { sprite, hud, getTicker } = periodFn(
+    const { sprite, hud } = periodFn(
         character,
         tiledMapGraphic,
         charactersSheet
