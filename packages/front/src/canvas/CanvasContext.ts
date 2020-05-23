@@ -18,6 +18,7 @@ const assertContextIsPresent = (providerMap: Partial<CanvasContextMap>, consumer
     }
 };
 
+// TODO may be source of memory leaks
 const contextsBuffer: Map<number, Partial<CanvasContextMap>> = new Map();
 
 export const CanvasContext = {
