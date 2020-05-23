@@ -1,5 +1,4 @@
 import { Viewport } from 'pixi-viewport';
-import * as PIXI from 'pixi.js';
 import { CanvasContext } from '../../../canvas/CanvasContext';
 import { StageGraphicCreator } from '../../../canvas/StageGraphic';
 import { CharactersBoard } from './charactersBoard/CharactersBoard';
@@ -33,12 +32,6 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
                 mouseButtons: 'middle',
             });
     };
-
-    const textStyle = new PIXI.TextStyle({
-        fill: 'white'
-    });
-    const text = new PIXI.Text('Battle stage', textStyle);
-    viewport.addChild(text);
 
     return {
         onCreate(contextMap) {
