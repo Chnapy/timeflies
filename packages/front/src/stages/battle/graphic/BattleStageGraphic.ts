@@ -8,25 +8,22 @@ import { requestRender } from '../../../canvas/GameCanvas';
 export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheets'> = (renderer) => {
 
     const viewport = new Viewport({
-        screenWidth: window.innerWidth,
-        screenHeight: window.innerHeight,
+        screenWidth: renderer.screen.width,
+        screenHeight: renderer.screen.height,
         disableOnContextMenu: false,
 
         interaction: renderer.plugins.interaction
     });
 
     const initViewport = ({ width, height, tilewidth, tileheight }: TiledMapGraphic) => {
-        viewport.screenWidth = window.innerWidth;
-        viewport.screenHeight = window.innerHeight;
         viewport.worldWidth = tilewidth * width;
         viewport.worldHeight = tileheight * height;
         viewport
             .clamp({ direction: 'all' })
             .clampZoom({
-                minWidth: tilewidth * 4,
-                minHeight: tileheight * 4,
-                maxWidth: viewport.worldWidth,
-                maxHeight: viewport.worldHeight,
+                minScale: 0.25,
+                maxScale: 1,
+
             })
             .wheel()
             .drag({
@@ -65,6 +62,11 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
                 });
             });
         },
+
+        onResize(width, height) {
+            viewport.resize(width, height);
+        },
+
         getContainer() {
             return viewport;
         }
