@@ -21,7 +21,7 @@ export type StageGraphicCreateParam<SK extends StageKey> = (typeof stageGraphics
 export interface GameCanvas {
 }
 
-let renderFn: () => void;
+let renderFn: () => void = () => {};
 
 let shouldRender: boolean = false;
 
