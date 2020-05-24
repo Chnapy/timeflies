@@ -144,7 +144,7 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
 
     const classes = useStyles({ state });
 
-    const { palette } = useTheme<Theme>();
+    const { palette, shape } = useTheme<Theme>();
 
     const actionTimeSpan = React.useRef<HTMLSpanElement>(null);
 
@@ -214,8 +214,9 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
                 <Paper className={classes.card} variant='outlined'>
                     <Box display='flex' alignItems='center' m={0.5}>
 
-                        <Box display='flex' alignItems='center' justifyContent='center' width={48} height={48}>
-                            <CharacterImage characterType={characterType} size={48}/>
+                        <Box display='flex' alignItems='center' justifyContent='center' width={48} height={48}
+                            bgcolor={state === 'current' ? palette.primary.contrastText : undefined} borderRadius={shape.borderRadius}>
+                            <CharacterImage characterType={characterType} size={48} />
                         </Box>
 
                         <Box display='flex' flexDirection='column' flexGrow={1} ml={1}>

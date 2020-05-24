@@ -56,6 +56,8 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
         const { clientWidth, clientHeight } = parent;
 
         renderer.resize(clientWidth, clientHeight);
+        stageGraphic?.onResize && stageGraphic.onResize(clientWidth, clientHeight);
+        
         requestRender();
     };
 
