@@ -7,6 +7,7 @@ import { PlayerRoom, assertIsDefined } from '@timeflies/shared';
 import React from 'react';
 import { EntityTreeCharacter } from './entity-tree-character';
 import { useGameStep } from '../../hooks/useGameStep';
+import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
 
 export interface EntityTreePlayerProps {
     playerId: PlayerRoom[ 'id' ];
@@ -23,16 +24,18 @@ export const EntityTreePlayer: React.FC<EntityTreePlayerProps> = ({ playerId }) 
 
     return (
         <TreeItem nodeId={id} label={<Box display='flex' mb={1}>
-            {isAdmin && <Box display='inline-flex' mr={1}>
-                <StarIcon />
-            </Box>}
-            {name}
-            {isReady && <Box display='inline-flex' ml={1}>
-                <CheckIcon />
-            </Box>}
-            {isLoading && <Box display='inline-flex' ml={1}>
-                <SyncIcon />
-            </Box>}
+            <UIText variant='username'>
+                {isAdmin && <Box display='inline-flex' mr={1}>
+                    <StarIcon />
+                </Box>}
+                {name}
+                {isReady && <Box display='inline-flex' ml={1}>
+                    <CheckIcon />
+                </Box>}
+                {isLoading && <Box display='inline-flex' ml={1}>
+                    <SyncIcon />
+                </Box>}
+            </UIText>
         </Box>}>
             {characters.map(c => (
                 <EntityTreeCharacter key={c.id} character={c} />

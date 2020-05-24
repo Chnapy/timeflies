@@ -246,6 +246,8 @@ export const TileGraphic = ({
 
         ticker?.destroy();
         ticker = null;
+        
+        requestRender();
 
         graphicsOverPersistStart.clear();
 
@@ -263,8 +265,6 @@ export const TileGraphic = ({
                 graphicsOverPersist.clear();
             }
         }
-        
-        requestRender();
     };
 
     const this_: TileGraphic = {

@@ -8,6 +8,7 @@ export type SpriteImageProps = {
     spritesheetKey: SpritesheetMapKey;
     textureKey: string;
     size: number;
+    placeholder?: React.ReactNode;
 };
 
 type StyleProps = {
@@ -48,7 +49,7 @@ const getStyleProps = (asset: LoaderResourceSpritesheet | undefined, textureKey:
     };
 };
 
-export const SpriteImage: React.FC<SpriteImageProps> = React.memo(({ spritesheetKey, textureKey, size }) => {
+export const SpriteImage: React.FC<SpriteImageProps> = React.memo(({ spritesheetKey, textureKey, size, placeholder }) => {
 
     const asset = useAsset(spritesheetKey);
 
@@ -57,11 +58,13 @@ export const SpriteImage: React.FC<SpriteImageProps> = React.memo(({ spritesheet
     );
 
     return React.useMemo(() => {
-        
+
         return (
             <div className={classes.root}>
-                <div className={classes.background} />
+                {asset ?
+                    <div className={classes.background} />
+                    : placeholder}
             </div>
         );
-    }, [ classes.root, classes.background ]);
+    }, [ classes.root, classes.background, asset, placeholder ]);
 });

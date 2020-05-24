@@ -4,13 +4,13 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import { assertIsDefined, MapConfig } from '@timeflies/shared';
 import React from 'react';
 import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useGameStep } from '../../hooks/useGameStep';
 import { MapSelectorItem } from './map-selector-item';
 import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
+import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
 
 export interface MapSelectorProps {
     defaultOpen?: boolean;
@@ -83,26 +83,29 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
                 />
             </Box>
             <Dialog open={open} fullScreen>
+                <Box p={1}>
 
-                <Typography variant={'h5'}>
-                    Select a map
-                </Typography>
+                    <Box mb={1}>
+                        <UIText variant='main'>Select a map</UIText>
+                    </Box>
 
-                <Grid container spacing={2}>
-                    {mapList.map(config => (
-                        <Grid key={config.id} item>
-                            <MapSelectorItem
-                                map={config}
-                                isSelected={config.id === mapSelectedId}
-                                onSelect={() => {
-                                    setOpen(false);
+                    <Grid container spacing={2}>
+                        {mapList.map(config => (
+                            <Grid key={config.id} item>
+                                <MapSelectorItem
+                                    map={config}
+                                    isSelected={config.id === mapSelectedId}
+                                    onSelect={() => {
+                                        setOpen(false);
 
-                                    sendMapSelect(config.id);
-                                }}
-                            />
-                        </Grid>
-                    ))}
-                </Grid>
+                                        sendMapSelect(config.id);
+                                    }}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+
+                </Box>
             </Dialog>
         </Box>
     );

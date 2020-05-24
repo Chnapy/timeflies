@@ -19,7 +19,7 @@ export const MapBoard: React.FC = () => {
 
     const { width, height } = map;
 
-    return <Box position='relative' width={width * 64} height={height * 64} bgcolor='#CCC'>
+    return <Box position='relative' width={width * 64 + 4} height={height * 64 + 4} bgcolor='#CCC' border={2} borderRadius={4}>
         {mapSelected.tileList.map((tileInfos) => {
             const { position: { x, y } } = tileInfos;
 
