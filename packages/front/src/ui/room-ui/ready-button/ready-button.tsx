@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, Box, Typography } from '@material-ui/core';
+import { Button, Box } from '@material-ui/core';
 import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
 import CheckIcon from '@material-ui/icons/Check';
 import { useGameStep } from '../../hooks/useGameStep';
+import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
 
 export const ReadyButton: React.FC = () => {
 
@@ -17,7 +18,7 @@ export const ReadyButton: React.FC = () => {
 
     const isReady = useCurrentPlayerRoom(p => p.isReady);
     const isLoading = useCurrentPlayerRoom(p => p.isLoading);
-    const charactersEnough = useCurrentPlayerRoom(p => { console.log(p); return p.characters.length > 0 });
+    const charactersEnough = useCurrentPlayerRoom(p => { return p.characters.length > 0 });
 
     const nbrTeamsEnough = useGameStep('room', ({ teamsTree }) => teamsTree.teamList
         .filter(t => t.playersIds.length > 0).length >= 2
@@ -51,7 +52,7 @@ export const ReadyButton: React.FC = () => {
 
         return <>
             Everyone is ready!
-            <b>Battle start in <span ref={timeRef} />s</b>
+            <UIText variant='main'>Battle start in <span ref={timeRef} />s</UIText>
         </>;
     }, [ charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime ]);
 
@@ -84,7 +85,7 @@ export const ReadyButton: React.FC = () => {
 
     return <Box display='flex' flexDirection='column'>
 
-        <Typography variant='caption'>{message}</Typography>
+        <UIText variant='second'>{message}</UIText>
 
         <Button
             variant='outlined'
@@ -92,7 +93,7 @@ export const ReadyButton: React.FC = () => {
             endIcon={isReady ? <CheckIcon /> : null}
             disabled={disabled}
         >
-            I'm ready
-    </Button>
+            <UIText variant='main'>I'm ready</UIText>
+        </Button>
     </Box>;
 };

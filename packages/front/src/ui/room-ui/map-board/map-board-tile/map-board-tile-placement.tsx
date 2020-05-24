@@ -1,14 +1,16 @@
+import { Menu, MenuItem } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import { assertIsDefined, CharacterRoom, TeamRoom, Position, equals, CharacterType, PlayerRoom } from '@timeflies/shared';
-import React from 'react';
-import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
-import { useGameStep } from '../../../hooks/useGameStep';
-import { TeamIndicator } from './team-indicator';
-import { RemoveBtn } from './remove-btn';
+import { Theme, useTheme } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import { Avatar, Menu, MenuItem } from '@material-ui/core';
+import { assertIsDefined, CharacterRoom, CharacterType, equals, PlayerRoom, Position, TeamRoom } from '@timeflies/shared';
+import React from 'react';
+import { CharacterImage } from '../../../battle-ui/character-list-panel/character-item/character-image';
+import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
 import { useGameNetwork } from '../../../hooks/useGameNetwork';
+import { useGameStep } from '../../../hooks/useGameStep';
+import { RemoveBtn } from './remove-btn';
+import { TeamIndicator } from './team-indicator';
 
 export interface MapBoardTilePlacementProps {
     position: Position;
@@ -76,7 +78,7 @@ export const MapBoardTilePlacement: React.FC<MapBoardTilePlacementProps> = ({ te
     const canAdd = isAllowed && (!character || isCharacterMine) && !isPlayerReady;
 
     const canRemove = isCharacterMine && !isPlayerReady;
-    
+
     const tileProps: TilePlacementProps = {
         position,
         team,
@@ -130,16 +132,17 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
     const handleRemove = sendCharacterRemove;
 
     const mainRender = isAllowed
-        ? (character ? <Avatar variant='square' /> : <AddIcon fontSize='large' />)
+        ? (character ? <CharacterImage characterType={character.type} size={40} /> : <AddIcon fontSize='large' />)
         : null;
+
+    const { palette } = useTheme<Theme>();
 
     return <Box
         position='relative'
         flexGrow={1}
         display='flex'
-        color='#444'
-        bgcolor={isAllowed ? '#FFF' : '#F8F8F8'}
-        border='2px solid #444'
+        bgcolor={isAllowed ? palette.primary.contrastText : palette.action.disabled}
+        border='2px solid currentColor'
     >
         <CardActionArea disabled={!canAdd} onClick={handleMainClick} style={{
             flexGrow: 1,
@@ -174,8 +177,7 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
         >
             {new Array<CharacterType>('sampleChar1', 'sampleChar2').map(type => (
                 <MenuItem key={type} onClick={() => handleMenuItemClick(type)}>
-                    <Avatar variant='square' />
-                    {type}
+                    <CharacterImage characterType={type} size={40} />
                 </MenuItem>
             ))}
         </Menu>

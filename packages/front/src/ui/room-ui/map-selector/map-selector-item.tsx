@@ -3,10 +3,10 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
 import { Skeleton } from '@material-ui/lab';
 import { MapConfig } from '@timeflies/shared';
 import React from 'react';
+import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
 
 export interface MapSelectorItemProps {
     map: MapConfig;
@@ -18,6 +18,8 @@ export interface MapSelectorItemProps {
 const useStyles = makeStyles(() => ({
     root: () => ({
         display: 'inline-block',
+        borderWidth: 2,
+        borderStyle: 'solid'
     }),
     actionArea: {
         display: 'flex',
@@ -35,19 +37,15 @@ export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ map, isSelecte
     const classes = useStyles();
 
     return (
-        <Card className={classes.root}>
+        <Card className={classes.root} elevation={0}>
             <CardActionArea className={classes.actionArea} disabled={isDisabled} onClick={onSelect}>
 
                 <CardContent>
 
-                    <Typography variant='h6'>{name}</Typography>
-                    <Typography variant='subtitle1'>{width}x{height}</Typography>
-
-                    <Typography variant='body1'>
-                        Teams: {nbrTeams}
-                        <br />
-                        Characters: {nbrCharactersPerTeam * nbrTeams} ({nbrCharactersPerTeam}/team)
-                    </Typography>
+                    <UIText variant='main'>{name}</UIText>
+                    <UIText variant='second'>{width}x{height}</UIText>
+                    <UIText variant='second'>Teams: {nbrTeams}</UIText>
+                    <UIText variant='second'>Characters: {nbrCharactersPerTeam * nbrTeams} ({nbrCharactersPerTeam}/team)</UIText>
 
                 </CardContent>
 

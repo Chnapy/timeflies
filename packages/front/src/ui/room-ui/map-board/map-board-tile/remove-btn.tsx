@@ -7,20 +7,17 @@ export interface RemoveBtnProps {
     onClick: () => void;
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({palette, shape}) => ({
     root: {
         display: 'inline-flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '1rem',
-        height: '1rem',
-        padding: '0.625rem',
+        width: '2rem',
+        height: '2rem',
         borderWidth: 2,
         borderStyle: 'solid',
-        borderColor: '#444',
-        borderRadius: 4,
-        color: '#444',
-        backgroundColor: '#FFF',
+        borderRadius: shape.borderRadius,
+        backgroundColor: palette.primary.contrastText,
     }
 }));
 

@@ -16,6 +16,9 @@ export const appTheme: Theme = createMuiTheme({
         action: {
             disabled: '#888',
             disabledBackground: '#888'
+        },
+        text: {
+            primary: main
         }
     },
     typography: {

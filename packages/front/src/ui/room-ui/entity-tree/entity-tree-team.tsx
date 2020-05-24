@@ -15,7 +15,6 @@ export const EntityTreeTeam: React.FC<EntityTreeTeamProps> = ({ team }) => {
 
     return (
         <TreeItem nodeId={team.id} label={<Box display='flex' alignItems='flex-end' mb={1}>
-            <Box display='inline-flex' mr={0.5}>Team</Box>
             <TeamIndicator teamLetter={letter} />
         </Box>}>
 
