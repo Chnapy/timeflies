@@ -1,4 +1,4 @@
-import { TiledManager } from '@timeflies/shared';
+import { TiledManager, Position } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../.storybook/preview';
@@ -13,56 +13,44 @@ import { MapManager } from '../map/MapManager';
 import { Pathfinder as Pathfinder_ } from '../map/Pathfinder';
 import { BattleStageGraphic } from './BattleStageGraphic';
 import { AssetManager } from '../../../assetManager/AssetManager';
+import { seedGameState } from '../../../game-state.seed';
+import { seedBattleData } from '../../../battle-data.seed';
+import { seedPlayer } from '../entities/player/Player.seed';
+import { seedTeam } from '../entities/team/Team.seed';
+import { BattleDataPeriod } from '../../../BattleData';
 
 export default {
     title: 'graphic/BattleStageGraphic',
     component: BattleStageGraphic
-}
+};
+
+const createCharacter = <P extends BattleDataPeriod>(id: string, period: P, position: Position) => seedCharacter('real', {
+    period,
+    id,
+    player: seedPlayer('fake', {
+        id: 'p' + id, period, team: seedTeam('fake', {
+            id: 't' + id, period, seedPlayers: []
+        })
+    }),
+    position,
+    orientation: 'right'
+});
 
 export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const charactersCurrent = [
-        seedCharacter('real', {
-            period: 'current',
-            id: '1',
-            player: null,
-            position: { x: 4, y: 3 },
-            orientation: 'right'
-        }),
-        seedCharacter('real', {
-            period: 'current',
-            id: '2',
-            player: null,
-            position: { x: 6, y: 4 },
-            orientation: 'left'
-        }),
+        createCharacter('1', 'current', {x: 4, y: 3}),
+        createCharacter('2', 'current', {x: 6, y: 4}),
     ];
 
     const charactersFuture = [
-        seedCharacter('real', {
-            period: 'future',
-            id: '1',
-            player: null,
-            position: { x: 4, y: 3 },
-            orientation: 'right'
-        }),
-        seedCharacter('real', {
-            period: 'future',
-            id: '2',
-            player: null,
-            position: { x: 6, y: 4 },
-            orientation: 'left'
-        }),
+        createCharacter('1', 'future', {x: 4, y: 3}),
+        createCharacter('2', 'future', {x: 6, y: 4}),
     ];
 
-    const initialState: GameState = {
-        currentPlayer: null,
-        room: null,
+    const initialState: GameState = seedGameState('p1', {
         step: 'battle',
-        battle: {
-            cycle: {
-                launchTime: -1
-            },
+        battle: seedBattleData({
             current: {
                 characters: charactersCurrent,
                 battleHash: '',
@@ -76,8 +64,8 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
                 teams: [],
                 spellActionSnapshotList: []
             }
-        }
-    };
+        })
+    });
 
     fakeApi.init({
         initialState
@@ -131,37 +119,13 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const charactersCurrent = [
-        seedCharacter('real', {
-            period: 'current',
-            id: '1',
-            player: null,
-            position: { x: 4, y: 3 },
-            orientation: 'right'
-        }),
-        seedCharacter('real', {
-            period: 'current',
-            id: '2',
-            player: null,
-            position: { x: 6, y: 4 },
-            orientation: 'left'
-        }),
+        createCharacter('1', 'current', {x: 4, y: 3}),
+        createCharacter('2', 'current', {x: 6, y: 4}),
     ];
 
     const charactersFuture = [
-        seedCharacter('real', {
-            period: 'future',
-            id: '1',
-            player: null,
-            position: { x: 4, y: 3 },
-            orientation: 'right'
-        }),
-        seedCharacter('real', {
-            period: 'future',
-            id: '2',
-            player: null,
-            position: { x: 6, y: 4 },
-            orientation: 'left'
-        }),
+        createCharacter('1', 'future', {x: 4, y: 3}),
+        createCharacter('2', 'future', {x: 6, y: 4}),
     ];
 
     const initialState: GameState = {

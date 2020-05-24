@@ -1,52 +1,53 @@
-import { TiledManager } from '@timeflies/shared';
+import { Position, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../../.storybook/preview';
+import { AssetManager } from '../../../../assetManager/AssetManager';
 import { BattleDataPeriod } from '../../../../BattleData';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { Controller } from '../../../../Controller';
-import { GameState } from '../../../../game-state';
 import { seedCharacter } from '../../entities/character/Character.seed';
+import { seedPlayer } from '../../entities/player/Player.seed';
+import { seedTeam } from '../../entities/team/Team.seed';
 import { MapManager } from '../../map/MapManager';
 import { Pathfinder } from '../../map/Pathfinder';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
-import { AssetManager } from '../../../../assetManager/AssetManager';
+import { seedBattleData } from '../../../../battle-data.seed';
+import { seedGameState } from '../../../../game-state.seed';
 
 export default {
     title: 'graphic/CharactersBoard',
     component: CharactersBoard
 };
 
+const createCharacter = <P extends BattleDataPeriod>(id: string, period: P, position: Position) => seedCharacter('real', {
+    period,
+    id,
+    player: seedPlayer('fake', {
+        id: 'p' + id, period, team: seedTeam('fake', {
+            id: 't' + id, period, seedPlayers: []
+        })
+    }),
+    position,
+    orientation: 'right'
+});
+
 const Render: React.FC<StoryProps & { period: BattleDataPeriod }> = ({ fakeBattleApi: fakeApi, period }) => {
 
     const characters = [
-        seedCharacter('real', {
-            period,
-            id: '1',
-            player: null,
-            position: { x: 2, y: 3 },
-            orientation: 'right'
-        }),
-        seedCharacter('real', {
-            period,
-            id: '2',
-            player: null,
-            position: { x: 4, y: 2 },
-            orientation: 'left'
-        }),
+        createCharacter('1', period, {x: 2, y: 3}),
+        createCharacter('2', period, {x: 4, y: 2}),
     ];
 
-    const initialState: GameState = {
-        currentPlayer: null,
-        room: null,
+    const initialState = seedGameState('p1', {
         step: 'battle',
-        battle: {
+        battle: seedBattleData({
             [ period ]: {
                 characters
             }
-        } as any
-    };
+        })
+    });
 
     fakeApi.init({
         initialState
