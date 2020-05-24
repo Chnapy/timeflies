@@ -8,7 +8,7 @@ export type CharacterImageProps = {
     size: number;
 };
 
-const getTexturePath = (type: CharacterType) => `${type}/face.png`;
+const getTexturePath = (type: CharacterType) => `${type}/${type}_face.png`;
 
 export const CharacterImage: React.FC<CharacterImageProps> = React.memo(({ characterType, size }) => {
 
