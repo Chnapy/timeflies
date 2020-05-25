@@ -133,9 +133,6 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
     };
 
     const onSimpleAttackAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
-
-        // TODO find a graphic way to show the spell
-
         return previousState;
     };
 

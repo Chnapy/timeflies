@@ -1,17 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, Store, applyMiddleware } from 'redux';
+import { applyMiddleware, createStore, Store } from 'redux';
+import { createLogger } from 'redux-logger';
 import { ActionManager } from './action/ActionManager';
 import { GameAction, IGameAction } from './action/game-action/GameAction';
 import { App } from './app';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
-import { serviceDispatch } from './services/serviceDispatch';
-import { WSClient, WebSocketCreator } from './socket/WSClient';
-import { StageManager } from './stages/StageManager';
-import { RootReducer } from './ui/reducers/root-reducer';
 import { GameState } from './game-state';
+import { serviceDispatch } from './services/serviceDispatch';
+import { WebSocketCreator, WSClient } from './socket/WSClient';
+import { StageManager } from './stages/StageManager';
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
+import { RootReducer } from './ui/reducers/root-reducer';
 
 export interface AppResetAction extends IGameAction<'app/reset'> {
 }
@@ -52,6 +53,18 @@ const getResource = <K extends keyof ControllerResources>(key: K): NonNullable<C
 
 let controllerResources: ControllerResources | null = null;
 
+const reset = (): void => {
+    checkEnv();
+
+    const { dispatchReset } = serviceDispatch({
+        dispatchReset: (): AppResetAction => ({
+            type: 'app/reset'
+        })
+    });
+
+    dispatchReset();
+};
+
 export const Controller = {
 
     init({ initialState, websocketCreator }: ControllerProps = {}): ControllerStarter {
@@ -59,18 +72,44 @@ export const Controller = {
         checkEnv();
 
         if (controllerResources) {
-            Controller.reset();
+            reset();
         }
 
         const resources: ControllerResources = {};
         controllerResources = resources;
 
         resources.actionManager = ActionManager();
+
         const actionManagerMiddleware = getResource('actionManager').getMiddleware();
+
+        const middlewareList = [ roomMiddleware, actionManagerMiddleware ];
+
+        if (process.env.NODE_ENV === 'development') {
+            const logger = createLogger({
+                collapsed: true,
+                actionTransformer: (action: GameAction) => {
+                    switch (action.type) {
+                        case 'battle/state/event':
+                            action.type += ' > ' + action.eventType;
+                            break;
+                        case 'message/send':
+                            action.type += ' > ' + action.message.type;
+                            break;
+                        case 'message/receive':
+                            action.type += ' > ' + action.message.type;
+                            break;
+                    }
+                    return action;
+                }
+            });
+
+            middlewareList.push(logger);
+        }
+
         resources.store = createStore<GameState, GameAction, {}, {}>(
             RootReducer,
             initialState,
-            applyMiddleware(roomMiddleware, actionManagerMiddleware)
+            applyMiddleware(...middlewareList)
         );
 
         resources.client = WSClient(websocketCreator && { websocketCreator });
@@ -118,16 +157,4 @@ export const Controller = {
     get loader(): AssetLoader {
         return getResource('loader');
     },
-
-    reset(): void {
-        checkEnv();
-
-        const { dispatchReset } = serviceDispatch({
-            dispatchReset: (): AppResetAction => ({
-                type: 'app/reset'
-            })
-        });
-
-        dispatchReset();
-    }
 };

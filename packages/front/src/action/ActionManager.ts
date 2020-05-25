@@ -1,4 +1,3 @@
-import { ActionLogger } from './ActionLogger';
 import { GameAction } from './game-action/GameAction';
 import { Middleware } from 'redux';
 import { GameState } from '../game-state';
@@ -25,8 +24,6 @@ export const ActionManager = (): ActionManager => {
     const commonListenerMap: ListenerMap = new Map();
 
     const battleListenerMap: ListenerMap = new Map();
-
-    const logger = ActionLogger();
 
     let battleSession = false;
 
@@ -55,14 +52,11 @@ export const ActionManager = (): ActionManager => {
                 removeActionListener: () => {
                     values.delete(fn);
                 }
-            }
+            };
         },
 
         getMiddleware() {
             return api => next => action => {
-
-                // TODO use redux-logger
-                logger.log(action);
 
                 const maps = getListenerMap();
 
