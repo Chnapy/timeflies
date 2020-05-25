@@ -6,15 +6,7 @@ const context = React.createContext<Partial<AssetMap>>({});
 
 export const AssetProvider = context.Provider;
 
-export const useAsset = <K extends AssetMapKey>(key: K) => {
-    const asset = useContext(context)[ key ];
-
-    if (!asset) {
-        console.error('Asset required not loaded:', key);
-    }
-
-    return asset;
-};
+export const useAsset = <K extends AssetMapKey>(key: K) => useContext(context)[ key ];
 
 /**
  * Storybook context only

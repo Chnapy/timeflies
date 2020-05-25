@@ -32,7 +32,7 @@ export const UIGauge: React.FC<UIGaugeProps> = React.memo(({ className, variant,
 
     const remainsDuration = Math.max(durationTotal - timeElapsed, 0);
 
-    const remainsPercent = remainsDuration / durationTotal * 100;
+    const remainsPercent = remainsDuration && (remainsDuration / durationTotal * 100);
 
     const classes = useStyles({ remainsPercent });
 
