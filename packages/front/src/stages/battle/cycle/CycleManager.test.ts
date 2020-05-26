@@ -1,5 +1,5 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester, BRunEndSAction } from "@timeflies/shared";
-import { ReceiveMessageAction } from "../../../socket/WSClient";
+import { ReceiveMessageAction } from "../../../socket/wsclient-actions";
 import { StoreTest } from "../../../StoreTest";
 import { seedCharacter } from "../entities/character/Character.seed";
 import { CycleManager, NotifyDeathsAction } from "./CycleManager";
@@ -61,23 +61,20 @@ describe('# CycleManager', () => {
 
         const order = characters.map(getId);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         expect(globalTurnCreator).toHaveBeenCalledTimes(1);
 
@@ -113,41 +110,35 @@ describe('# CycleManager', () => {
 
         const order = characters.map(getId);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now + 200,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now + 200,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         expect(synchronize).toHaveBeenCalledTimes(1);
     });
@@ -182,36 +173,30 @@ describe('# CycleManager', () => {
 
         const order = characters.map(getId);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/turn-start',
-                sendTime: timerTester.now,
-                turnState: {
-                    id: 1,
-                    startTime: timerTester.now + 200,
-                    characterId: order[ 0 ]
-                }
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/turn-start',
+            sendTime: timerTester.now,
+            turnState: {
+                id: 1,
+                startTime: timerTester.now + 200,
+                characterId: order[ 0 ]
             }
-        });
+        }));
 
         expect(synchronizeTurn).toHaveBeenCalledTimes(1);
     });
@@ -251,41 +236,35 @@ describe('# CycleManager', () => {
 
         const order = characters.map(getId);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
-                    id: 2,
-                    order,
-                    startTime: timerTester.now + 200,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 2,
+                order,
+                startTime: timerTester.now + 200,
+                currentTurn: {
+                    id: 1,
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         expect(onGlobalTurnCreate).not.toHaveBeenLastCalledWith(2);
 
@@ -331,23 +310,20 @@ describe('# CycleManager', () => {
 
         const order = characters.map(getId);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         endGlobalTurn(-1);
 
@@ -355,23 +331,20 @@ describe('# CycleManager', () => {
 
         timerTester.advanceBy(200);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
-                    id: 2,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 2,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
+                    id: 1,
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         expect(onGlobalTurnCreate).toHaveBeenLastCalledWith(2);
     });
@@ -405,23 +378,20 @@ describe('# CycleManager', () => {
 
         const order = characters.map(getId);
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         StoreTest.dispatch<NotifyDeathsAction>({
             type: 'battle/notify-deaths'
@@ -463,23 +433,20 @@ describe('# CycleManager', () => {
 
         currentTurnState = 'running';
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/global-turn-start',
-                sendTime: timerTester.now,
-                globalTurnState: {
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/global-turn-start',
+            sendTime: timerTester.now,
+            globalTurnState: {
+                id: 1,
+                order,
+                startTime: timerTester.now,
+                currentTurn: {
                     id: 1,
-                    order,
-                    startTime: timerTester.now,
-                    currentTurn: {
-                        id: 1,
-                        characterId: order[ 0 ],
-                        startTime: timerTester.now
-                    }
+                    characterId: order[ 0 ],
+                    startTime: timerTester.now
                 }
             }
-        });
+        }));
 
         expect(cycle.isRunning).toBe(true);
     });
@@ -527,14 +494,11 @@ describe('# CycleManager', () => {
 
         expect(stopFn).not.toHaveBeenCalled();
 
-        StoreTest.dispatch<ReceiveMessageAction<BRunEndSAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'battle-run/end',
-                sendTime: timerTester.now,
-                winnerTeamId: 'toto'
-            }
-        });
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'battle-run/end',
+            sendTime: timerTester.now,
+            winnerTeamId: 'toto'
+        }));
 
         expect(stopFn).toHaveBeenCalledTimes(1);
     });

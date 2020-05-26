@@ -3,7 +3,7 @@ import { Action } from "redux";
 import { ActionListener, ActionListenerObject } from '../action/ActionManager';
 import { GameAction } from "../action/game-action/GameAction";
 import { Controller } from "../Controller";
-import { ReceiveMessageAction } from "../socket/WSClient";
+import { ReceiveMessageAction } from "../socket/wsclient-actions";
 
 export interface OnAction<RA extends Action> {
     <A extends RA>(type: A[ 'type' ], fn: ActionListener<A>): ActionListenerObject;
@@ -27,9 +27,9 @@ export const serviceEvent = (): EventManager => {
 
         onMessageAction<A extends ServerAction>(type, fn) {
 
-            onAction<ReceiveMessageAction<A>>('message/receive', ({ message }) => {
-                if (type === message.type) {
-                    fn(message);
+            onAction(ReceiveMessageAction.type, ({ payload }: ReceiveMessageAction) => {
+                if (type === payload.type) {
+                    fn(payload);
                 }
             });
 

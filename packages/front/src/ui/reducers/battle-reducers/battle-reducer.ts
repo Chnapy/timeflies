@@ -1,14 +1,14 @@
 import { Reducer } from "redux";
-import { BattleAction } from "../../../action/game-action/battle-action";
 import { BattleDataMap } from '../../../BattleData';
-import { StageChangeAction } from '../../../stages/StageManager';
+import { stageChangeActionPayloadMatch, StageChangeAction } from '../../../stages/stage-actions';
 
-export const BattleReducer: Reducer<BattleDataMap | null, BattleAction> = (state = null, action) => {
+export const BattleReducer: Reducer<BattleDataMap | null, any> = (state = null, action) => {
 
     switch (action.type) {
-        case 'stage/change':
-            if (action.stageKey === 'battle') {
-                return (action as StageChangeAction<'battle'>).payload.battleData;
+        case StageChangeAction.type:
+            const { payload } = action as StageChangeAction;
+            if (stageChangeActionPayloadMatch('battle', payload)) {
+                return payload.data.battleData;
             }
             break;
     }

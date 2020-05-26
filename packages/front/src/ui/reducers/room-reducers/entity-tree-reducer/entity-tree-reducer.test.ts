@@ -1,18 +1,18 @@
 import { RoomServerAction } from '@timeflies/shared';
-import { ReceiveMessageAction } from '../../../../socket/WSClient';
-import { EntityTreeData, EntityTreeReducer } from './entity-tree-reducer';
-import { StageChangeAction } from '../../../../stages/StageManager';
+import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
+import { EntityTreeData, entityTreeReducer } from './entity-tree-reducer';
+import { StageChangeAction } from '../../../../stages/stage-actions';
 
 describe('# entity-tree-reducer', () => {
 
-    const getAction = (roomMessage: RoomServerAction): ReceiveMessageAction<RoomServerAction> => ({
+    const getAction = (roomMessage: RoomServerAction): ReceiveMessageAction => ({
         type: 'message/receive',
-        message: roomMessage
+        payload: roomMessage
     });
 
     it('should start with correct initial state', () => {
         expect(
-            EntityTreeReducer(undefined, { type: 'not-matter' } as any)
+            entityTreeReducer(undefined, { type: 'not-matter' } as any)
         ).toEqual<EntityTreeData>({
             playerList: [],
             teamList: []
@@ -24,7 +24,7 @@ describe('# entity-tree-reducer', () => {
         const action = { type: 'not-handled' };
 
         expect(
-            EntityTreeReducer({
+            entityTreeReducer({
                 playerList: [],
                 teamList: []
             }, action as any)
@@ -33,15 +33,15 @@ describe('# entity-tree-reducer', () => {
             teamList: []
         });
 
-        const messageAction: ReceiveMessageAction<any> = {
+        const messageAction: ReceiveMessageAction = {
             type: 'message/receive',
-            message: {
+            payload: {
                 type: 'not-handled'
-            }
+            } as any
         };
 
         expect(
-            EntityTreeReducer({
+            entityTreeReducer({
                 playerList: [],
                 teamList: []
             }, messageAction)
@@ -53,10 +53,9 @@ describe('# entity-tree-reducer', () => {
 
     it('should init state on stage change action', () => {
 
-        const action: StageChangeAction<'room'> = {
-            type: 'stage/change',
+        const action: StageChangeAction<'room'> = StageChangeAction({
             stageKey: 'room',
-            payload: {
+            data: {
                 roomState: {
                     type: 'room/state',
                     sendTime: -1,
@@ -77,10 +76,10 @@ describe('# entity-tree-reducer', () => {
                     } ]
                 }
             }
-        }
+        });
 
         expect(
-            EntityTreeReducer(undefined, action)
+            entityTreeReducer(undefined, action)
         ).toMatchObject<EntityTreeData>({
             playerList: [
                 {
@@ -126,7 +125,7 @@ describe('# entity-tree-reducer', () => {
         };
 
         expect(
-            EntityTreeReducer(state, action)
+            entityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
             playerList: [],
             teamList: [ {
@@ -180,7 +179,7 @@ describe('# entity-tree-reducer', () => {
         };
 
         expect(
-            EntityTreeReducer(state, action)
+            entityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
             playerList: [ {
                 id: 'p-2',
@@ -225,7 +224,7 @@ describe('# entity-tree-reducer', () => {
         };
 
         expect(
-            EntityTreeReducer(state, action)
+            entityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
             playerList: [ {
                 id: 'p-1',
@@ -269,7 +268,7 @@ describe('# entity-tree-reducer', () => {
         };
 
         expect(
-            EntityTreeReducer(state, action)
+            entityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
             playerList: [ {
                 id: 'p-1',
@@ -315,7 +314,7 @@ describe('# entity-tree-reducer', () => {
         };
 
         expect(
-            EntityTreeReducer(state, action)
+            entityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
             playerList: [ {
                 id: 'p-1',
@@ -361,7 +360,7 @@ describe('# entity-tree-reducer', () => {
         };
 
         expect(
-            EntityTreeReducer(state, action)
+            entityTreeReducer(state, action)
         ).toEqual<EntityTreeData>({
             playerList: [ {
                 id: 'p-1',

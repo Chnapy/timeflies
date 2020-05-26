@@ -3,10 +3,7 @@ import { IGameAction } from '../action/game-action/GameAction';
 import { envManager } from '../envManager';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
-
-export interface ReceiveMessageAction<A extends ServerAction = ServerAction> extends IGameAction<'message/receive'> {
-    message: A;
-}
+import { ReceiveMessageAction } from './wsclient-actions';
 
 export interface SendMessageAction<A extends ClientAction = ClientAction> extends IGameAction<'message/send'> {
     message: DistributiveOmit<A, 'sendTime'>;
@@ -35,10 +32,7 @@ export const WSClient = ({ websocketCreator }: Dependencies = {
     console.log('ws endpoint:', ENDPOINT);
 
     const { dispatchMessage } = serviceDispatch({
-        dispatchMessage: (message: ServerAction) => ({
-            type: 'message/receive',
-            message
-        })
+        dispatchMessage: (message: ServerAction) => ReceiveMessageAction(message) as any,
     });
 
     const { onAction } = serviceEvent();

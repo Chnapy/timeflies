@@ -1,6 +1,7 @@
 import { StoreTest } from '../StoreTest';
-import { StageManager, Stage, StageChangeAction } from './StageManager';
+import { StageManager, Stage } from './StageManager';
 import { Controller } from '../Controller';
+import { StageChangeAction } from './stage-actions';
 
 describe('# StageManager', () => {
 
@@ -66,11 +67,10 @@ describe('# StageManager', () => {
 
         await Controller.loader.newInstance().load();
 
-        StoreTest.dispatch<StageChangeAction<'room'>>({
-            type: 'stage/change',
+        StoreTest.dispatch(StageChangeAction({
             stageKey: 'room',
-            payload: { toto: 6 } as any
-        });
+            data: { toto: 6 } as any
+        }));
 
         await Controller.loader.newInstance().load();
 
