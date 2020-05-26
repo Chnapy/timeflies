@@ -1,6 +1,6 @@
-import { ConfirmSAction, NotifySAction, SpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { BattleDataCurrent, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
-import { ReceiveMessageAction } from '../../../socket/WSClient';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { StoreTest } from '../../../StoreTest';
 import { BStateSpellLaunchAction, BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -201,15 +201,12 @@ describe('# SpellActionManager', () => {
 
             const beforeRollbackList = [ ...spellActionSnapshotList ];
 
-            StoreTest.dispatch<ReceiveMessageAction<ConfirmSAction>>({
-                type: 'message/receive',
-                message: {
-                    type: 'confirm',
-                    sendTime: startTime,
-                    isOk: true,
-                    lastCorrectHash: 'not-matter'
-                }
-            });
+            StoreTest.dispatch(ReceiveMessageAction({
+                type: 'confirm',
+                sendTime: startTime,
+                isOk: true,
+                lastCorrectHash: 'not-matter'
+            }));
 
             expect(spellActionSnapshotList).toEqual(beforeRollbackList);
         });
@@ -220,15 +217,12 @@ describe('# SpellActionManager', () => {
 
             const beforeRollbackList = [ ...spellActionSnapshotList ];
 
-            StoreTest.dispatch<ReceiveMessageAction<ConfirmSAction>>({
-                type: 'message/receive',
-                message: {
-                    type: 'confirm',
-                    sendTime: startTime,
-                    isOk: false,
-                    lastCorrectHash: firstHash
-                }
-            });
+            StoreTest.dispatch(ReceiveMessageAction({
+                type: 'confirm',
+                sendTime: startTime,
+                isOk: false,
+                lastCorrectHash: firstHash
+            }));
 
             expect(spellActionSnapshotList).toEqual([
                 beforeRollbackList.find(s => s.battleHash === firstHash)
@@ -278,22 +272,19 @@ describe('# SpellActionManager', () => {
 
         const [ spell ] = futureCharacter.spells;
 
-        StoreTest.dispatch<ReceiveMessageAction<NotifySAction>>({
-            type: 'message/receive',
-            message: {
-                type: 'notify',
-                sendTime: -1,
-                spellActionSnapshot: {
-                    startTime,
-                    duration: spell.feature.duration,
-                    battleHash: '-hash-',
-                    characterId: '1',
-                    spellId: spell.id,
-                    position: { x: -1, y: -1 },
-                    actionArea: [ { x: -1, y: -1 } ],
-                }
+        StoreTest.dispatch(ReceiveMessageAction({
+            type: 'notify',
+            sendTime: -1,
+            spellActionSnapshot: {
+                startTime,
+                duration: spell.feature.duration,
+                battleHash: '-hash-',
+                characterId: '1',
+                spellId: spell.id,
+                position: { x: -1, y: -1 },
+                actionArea: [ { x: -1, y: -1 } ],
             }
-        });
+        }));
 
         expect(spellActionSnapshotList).toEqual<SpellActionSnapshot[]>([ {
             startTime,

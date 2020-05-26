@@ -1,7 +1,7 @@
 import { Controller } from '../../../Controller';
-import { ReceiveMessageAction } from '../../../socket/WSClient';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
+import { StageChangeAction } from '../../../stages/stage-actions';
 import { RoomData, RoomReducer } from './room-reducer';
-import { StageChangeAction } from '../../../stages/StageManager';
 
 // TODO refactor all reducer tests to be less 'duck', more 'user though'
 // Also use redux-act or other, 
@@ -29,12 +29,9 @@ describe('# room-reducer', () => {
             RoomReducer(null, { type: 'not-matter' } as any)
         ).toBe(null);
 
-        const actionMessage: ReceiveMessageAction<any> = {
-            type: 'message/receive',
-            message: {
-                type: 'not-matter'
-            }
-        };
+        const actionMessage: ReceiveMessageAction = ReceiveMessageAction({
+            type: 'not-matter'
+        } as any);
 
         expect(
             RoomReducer(null, actionMessage)
@@ -43,10 +40,9 @@ describe('# room-reducer', () => {
 
     it('should init state on stage change action', async () => {
 
-        const action: StageChangeAction<'room'> = {
-            type: 'stage/change',
+        const action: StageChangeAction<'room'> = StageChangeAction({
             stageKey: 'room',
-            payload: {
+            data: {
                 roomState: {
                     type: 'room/state',
                     sendTime: -1,
@@ -56,7 +52,7 @@ describe('# room-reducer', () => {
                     teamList: []
                 }
             }
-        };
+        });
 
         expect(
             RoomReducer(null, action)

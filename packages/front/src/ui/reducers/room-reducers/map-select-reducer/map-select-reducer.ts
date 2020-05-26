@@ -1,12 +1,10 @@
-import { assertIsDefined, assertIsNonNullable, MapConfig, MapPlacementTile, RoomServerAction, TiledManager, TiledMapAssets } from '@timeflies/shared';
+import { assertIsDefined, assertIsNonNullable, MapConfig, MapPlacementTile, RoomServerAction, TiledManager } from '@timeflies/shared';
 import { Reducer } from 'redux';
-import { GameAction, IGameAction } from '../../../../action/game-action/GameAction';
-import { StageChangeAction } from '../../../../stages/StageManager';
+import { GameAction } from '../../../../action/game-action/GameAction';
+import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
+import { StageChangeAction, stageChangeActionPayloadMatch } from '../../../../stages/stage-actions';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
-
-export interface MapLoadedAction extends IGameAction<'room/map/loaded'> {
-    assets: TiledMapAssets;
-}
+import { MapLoadedAction } from './map-select-actions';
 
 export interface MapSelectData {
     mapList: MapConfig[];
@@ -49,9 +47,13 @@ const handleMapSelect = (
     };
 };
 
-const reduceRoomState: SubReducer<StageChangeAction<'room'>> = (state, {
-    payload: { roomState: { mapSelected } }
-}) => {
+const reduceRoomState: SubReducer<StageChangeAction> = (state, { payload }) => {
+    if (!stageChangeActionPayloadMatch('room', payload)) {
+        return { ...state };
+    }
+
+    const { roomState: { mapSelected } } = payload.data;
+
     if (!mapSelected) {
         return handleMapSelect(state, null, []);
     }
@@ -63,6 +65,7 @@ const reduceRoomState: SubReducer<StageChangeAction<'room'>> = (state, {
 };
 
 const reduceMapList: SubReducer<RoomServerAction.MapList> = (state, { mapList }) => {
+    console.log('LIST', mapList)
     return {
         ...state,
         mapList
@@ -88,7 +91,7 @@ const reduceMapLoaded: SubReducer<MapLoadedAction> = (state, action) => {
     const { mapSelected } = state;
     assertIsNonNullable(mapSelected);
 
-    const { assets } = action;
+    const { assets } = action.payload;
 
     const tiledManager = TiledManager(assets);
 
@@ -110,23 +113,20 @@ const reduceMapLoaded: SubReducer<MapLoadedAction> = (state, action) => {
 export const MapSelectReducer: Reducer<MapSelectData, GameAction> = (state = initialData, action) => {
 
     switch (action.type) {
-        case 'stage/change':
-            if (action.stageKey === 'room') {
-                return reduceRoomState(state, action as StageChangeAction<'room'>);
-            }
-            break;
+        case StageChangeAction.type:
+            return reduceRoomState(state, action);
 
-        case 'message/receive':
+        case ReceiveMessageAction.type:
 
-            const { message } = action;
-
-            switch (message.type) {
+            const { payload } = action as ReceiveMessageAction;
+            
+            switch (payload.type) {
 
                 case 'room/map/list':
-                    return reduceMapList(state, message);
+                    return reduceMapList(state, payload);
 
                 case 'room/map/select':
-                    return reduceMapSelect(state, message);
+                    return reduceMapSelect(state, payload);
 
             }
             break;

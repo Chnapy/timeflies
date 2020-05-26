@@ -4,7 +4,8 @@ import { serviceDispatch } from '../../services/serviceDispatch';
 import { serviceEvent } from '../../services/serviceEvent';
 import { serviceNetwork } from '../../services/serviceNetwork';
 import { LoginSuccess } from '../../ui/reducers/current-player-reducer';
-import { StageChangeAction, StageCreator, StageParam } from '../StageManager';
+import { StageCreator, StageParam } from '../StageManager';
+import { StageChangeAction } from '../stage-actions';
 
 export type BootStageParam = StageParam<'boot', {}>;
 
@@ -23,10 +24,9 @@ export const BootStage: StageCreator<'boot', never> = () => {
                     type: 'login/success',
                     currentPlayer
                 }),
-                dispatchStageChangeToRoom: (roomState: RoomServerAction.RoomState): StageChangeAction<'room'> => ({
-                    type: 'stage/change',
+                dispatchStageChangeToRoom: (roomState: RoomServerAction.RoomState): StageChangeAction<'room'> => StageChangeAction({
                     stageKey: 'room',
-                    payload: {
+                    data: {
                         roomState
                     }
                 })

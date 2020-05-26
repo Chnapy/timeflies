@@ -1,7 +1,7 @@
 import { BRunGlobalTurnStartSAction, ConfirmSAction, Position, TimerTester } from '@timeflies/shared';
 import { BattleDataCurrent, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-import { ReceiveMessageAction, SendMessageAction } from '../../../socket/WSClient';
+import { SendMessageAction } from '../../../socket/WSClient';
 import { StoreTest } from '../../../StoreTest';
 import { BState, BStateTurnStartAction } from '../battleState/BattleStateSchema';
 import { BStateMachine } from '../battleState/BStateMachine';
@@ -13,6 +13,7 @@ import { seedTeam } from '../entities/team/Team.seed';
 import { seedMapManager } from '../map/MapManager.seed';
 import { SnapshotManager } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from '../spellAction/SpellActionManager';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 describe('Battleflow', () => {
 
@@ -216,24 +217,20 @@ describe('Battleflow', () => {
 
             expect(cycleBattleData.globalTurn?.state).toBe<GlobalTurnState>('ended');
 
-            StoreTest.dispatch<ReceiveMessageAction<BRunGlobalTurnStartSAction>>({
-                type: 'message/receive',
-
-                message: {
-                    type: 'battle-run/global-turn-start',
-                    sendTime: timerTester.now,
-                    globalTurnState: {
+            StoreTest.dispatch(ReceiveMessageAction({
+                type: 'battle-run/global-turn-start',
+                sendTime: timerTester.now,
+                globalTurnState: {
+                    id: 2,
+                    startTime: timerTester.now,
+                    order: [ characterCurrent.id ],
+                    currentTurn: {
                         id: 2,
                         startTime: timerTester.now,
-                        order: [ characterCurrent.id ],
-                        currentTurn: {
-                            id: 2,
-                            startTime: timerTester.now,
-                            characterId: characterCurrent.id
-                        }
+                        characterId: characterCurrent.id
                     }
                 }
-            });
+            }));
 
             expect(cycleBattleData.globalTurn?.id).toBe(2);
         });
@@ -360,15 +357,12 @@ describe('Battleflow', () => {
 
             await serviceNetwork({});
 
-            StoreTest.dispatch<ReceiveMessageAction<ConfirmSAction>>({
-                type: 'message/receive',
-                message: {
-                    type: 'confirm',
-                    sendTime: timerTester.now,
-                    isOk: false,
-                    lastCorrectHash: firstHash
-                }
-            });
+            StoreTest.dispatch(ReceiveMessageAction({
+                type: 'confirm',
+                sendTime: timerTester.now,
+                isOk: false,
+                lastCorrectHash: firstHash
+            }));
 
             expect(futureBattleData.battleHash).toBe(firstHash);
         });

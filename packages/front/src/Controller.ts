@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { applyMiddleware, createStore, Store } from 'redux';
+import { Store } from 'redux';
+import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
 import { ActionManager } from './action/ActionManager';
 import { GameAction, IGameAction } from './action/game-action/GameAction';
@@ -13,6 +14,7 @@ import { WebSocketCreator, WSClient } from './socket/WSClient';
 import { StageManager } from './stages/StageManager';
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
 import { RootReducer } from './ui/reducers/root-reducer';
+import { ReceiveMessageAction } from './socket/wsclient-actions';
 
 export interface AppResetAction extends IGameAction<'app/reset'> {
 }
@@ -95,8 +97,8 @@ export const Controller = {
                         case 'message/send':
                             action.type += ' > ' + action.message.type;
                             break;
-                        case 'message/receive':
-                            action.type += ' > ' + action.message.type;
+                        case ReceiveMessageAction.type:
+                            action.type += ' > ' + action.payload.type;
                             break;
                     }
                     return action;
@@ -106,11 +108,11 @@ export const Controller = {
             middlewareList.push(logger);
         }
 
-        resources.store = createStore<GameState, GameAction, {}, {}>(
-            RootReducer,
-            initialState,
-            applyMiddleware(...middlewareList)
-        );
+        resources.store = configureStore({
+            reducer: RootReducer,
+            middleware: [...getDefaultMiddleware(), ...middlewareList],
+            preloadedState: initialState
+        });
 
         resources.client = WSClient(websocketCreator && { websocketCreator });
         resources.loader = AssetLoader();

@@ -1,6 +1,6 @@
 import { ConfirmSAction, NotifySAction, SetIDCAction, SpellActionCAction } from '@timeflies/shared';
 import { BattleDataMap } from '../BattleData';
-import { ReceiveMessageAction, SendMessageAction } from '../socket/WSClient';
+import { SendMessageAction } from '../socket/WSClient';
 import { NotifyDeathsAction } from '../stages/battle/cycle/CycleManager';
 import { SpellActionTimerEndAction } from '../stages/battle/spellAction/SpellActionTimer';
 import { StoreTest } from '../StoreTest';
@@ -10,6 +10,7 @@ import { serviceDispatch } from './serviceDispatch';
 import { serviceEvent } from './serviceEvent';
 import { serviceNetwork } from './serviceNetwork';
 import { serviceSelector } from './serviceSelector';
+import { ReceiveMessageAction } from '../socket/wsclient-actions';
 
 describe('services', () => {
 
@@ -177,22 +178,16 @@ describe('services', () => {
         onMessageAction<NotifySAction>('notify', notifyFn);
 
         const { dispatchNotifyDeaths, dispatchSpellActionEnd } = serviceDispatch({
-            dispatchNotifyDeaths: (): ReceiveMessageAction<ConfirmSAction> => ({
-                type: 'message/receive',
-                message: {
-                    type: 'confirm',
-                    sendTime: -1,
-                    isOk: true,
-                    lastCorrectHash: ''
-                }
+            dispatchNotifyDeaths: () => ReceiveMessageAction({
+                type: 'confirm',
+                sendTime: -1,
+                isOk: true,
+                lastCorrectHash: ''
             }),
-            dispatchSpellActionEnd: (): ReceiveMessageAction<NotifySAction> => ({
-                type: 'message/receive',
-                message: {
-                    type: 'notify',
-                    sendTime: -1,
-                    spellActionSnapshot: null as any
-                }
+            dispatchSpellActionEnd: () => ReceiveMessageAction({
+                type: 'notify',
+                sendTime: -1,
+                spellActionSnapshot: null as any
             })
         });
 

@@ -3,14 +3,15 @@ import { Controller } from '../src/Controller';
 import { serviceBattleData } from '../src/services/serviceBattleData';
 import { serviceDispatch } from '../src/services/serviceDispatch';
 import { serviceEvent } from '../src/services/serviceEvent';
-import { ReceiveMessageAction, SendMessageAction, WebSocketCreator } from '../src/socket/WSClient';
+import { SendMessageAction, WebSocketCreator } from '../src/socket/WSClient';
 import { seedTeamSnapshot } from '../src/stages/battle/entities/team/Team.seed';
 import { GameState } from '../src/game-state';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { StageChangeAction } from '../src/stages/StageManager';
+import { StageChangeAction } from '../src/stages/stage-actions';
 import { GameAction } from '../src/action/game-action/GameAction';
 import { AssetManager } from '../src/assetManager/AssetManager';
+import { ReceiveMessageAction } from '../src/socket/wsclient-actions';
 
 class MockWebSocket implements WebSocket {
     prototype: any;
@@ -79,12 +80,9 @@ export const FakeBattleApi = () => {
         dispatch: <A extends GameAction>(action: A): A => action
     }).dispatch(action);
 
-    const receiveAction = <A extends ServerAction>(message: A) =>
+    const receiveAction = <A extends ServerAction>(payload: A) =>
         serviceDispatch({
-            dispatch: (): ReceiveMessageAction<A> => ({
-                type: 'message/receive',
-                message
-            })
+            dispatch: () => ReceiveMessageAction(payload)
         }).dispatch();
 
     const getTeamSnapshots = (): TeamSnapshot[] => {
@@ -224,10 +222,9 @@ export const FakeBattleApi = () => {
                 .addSpritesheet('characters', AssetManager.spritesheets.characters)
                 .load();
 
-            dispatch<StageChangeAction<'battle'>>({
-                type: 'stage/change',
+            dispatch(StageChangeAction({
                 stageKey: 'battle',
-                payload: {
+                data: {
                     mapConfig: {
                         id: 'm1',
                         schemaUrl: AssetManager.fake.mapSchema,
@@ -264,7 +261,7 @@ export const FakeBattleApi = () => {
                         }
                     }
                 }
-            });
+            }));
             isInBattle = true;
         });
 

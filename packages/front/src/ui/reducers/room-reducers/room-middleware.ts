@@ -1,12 +1,13 @@
+import { assertIsDefined, assertIsNonNullable, MapConfig } from '@timeflies/shared';
 import { Middleware } from 'redux';
 import { GameAction } from '../../../action/game-action/GameAction';
-import { GameState } from '../../../game-state';
-import { StageChangeAction } from '../../../stages/StageManager';
-import { assertIsNonNullable, assertIsDefined, MapConfig } from '@timeflies/shared';
-import { Controller } from '../../../Controller';
-import { MapLoadedAction } from './map-select-reducer/map-select-reducer';
-import { SendMessageAction } from '../../../socket/WSClient';
 import { AssetManager } from '../../../assetManager/AssetManager';
+import { Controller } from '../../../Controller';
+import { GameState } from '../../../game-state';
+import { SendMessageAction } from '../../../socket/WSClient';
+import { StageChangeAction } from '../../../stages/stage-actions';
+import { MapLoadedAction } from './map-select-reducer/map-select-actions';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
@@ -14,8 +15,8 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
         const { step } = api.getState();
 
-        if (action.type === 'message/receive') {
-            const { message } = action;
+        if (ReceiveMessageAction.match(action)) {
+            const message = action.payload;
 
             if (message.type === 'battle-run/launch' && step === 'room') {
                 const { battleSnapshot, globalTurnState } = message;
@@ -29,10 +30,9 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                 const mapConfig = mapList.find(m => m.id === mapSelected.id);
                 assertIsDefined(mapConfig);
 
-                next<StageChangeAction<'battle'>>({
-                    type: 'stage/change',
+                next(StageChangeAction({
                     stageKey: 'battle',
-                    payload: {
+                    data: {
                         mapConfig,
                         battleSnapshot,
                         battleData: {
@@ -55,7 +55,7 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                         },
                         globalTurnState,
                     }
-                });
+                }));
                 return;
             }
 
@@ -93,7 +93,9 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
                     api.dispatch<MapLoadedAction>({
                         type: 'room/map/loaded',
-                        assets: map
+                        payload: {
+                            assets: map
+                        }
                     });
 
                     await Controller.loader.newInstance()

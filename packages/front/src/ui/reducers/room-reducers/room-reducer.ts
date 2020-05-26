@@ -1,8 +1,8 @@
 import { Reducer } from 'redux';
 import { GameAction, IGameAction } from '../../../action/game-action/GameAction';
-import { EntityTreeData, EntityTreeReducer } from './entity-tree-reducer/entity-tree-reducer';
+import { stageChangeActionPayloadMatch } from '../../../stages/stage-actions';
+import { EntityTreeData, entityTreeReducer } from './entity-tree-reducer/entity-tree-reducer';
 import { MapSelectData, MapSelectReducer } from './map-select-reducer/map-select-reducer';
-import { StageChangeAction } from '../../../stages/StageManager';
 
 export interface RoomJoinAction extends IGameAction<'room/join'> {
     roomId: string;
@@ -24,13 +24,14 @@ export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, 
     switch (action.type) {
 
         case 'stage/change':
-            if (action.stageKey === 'room') {
-                const { roomState } = (action as StageChangeAction<'room'>).payload;
+            const { payload } = action;
+            if (stageChangeActionPayloadMatch('room', payload)) {
+                const { roomState } = payload.data;
 
                 return {
                     roomId: roomState.roomId,
                     map: MapSelectReducer(undefined, action),
-                    teamsTree: EntityTreeReducer(undefined, action),
+                    teamsTree: entityTreeReducer(undefined, action),
                     launchTime: null
                 };
             }
@@ -38,7 +39,7 @@ export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, 
             break;
 
         case 'message/receive':
-            const { message } = action;
+            const message = action.payload;
 
             if (message.type === 'room/battle-launch') {
                 const launchTime = message.action === 'launch'
@@ -57,6 +58,6 @@ export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, 
     return state && {
         ...state,
         map: MapSelectReducer(state.map, action),
-        teamsTree: EntityTreeReducer(state.teamsTree, action)
+        teamsTree: entityTreeReducer(state.teamsTree, action)
     };
 };

@@ -6,7 +6,7 @@ export const StepReducer: Reducer<GameStateStep, GameAction> = (state = 'boot', 
 
     switch (action.type) {
         case 'stage/change':
-            return action.stageKey;
+            return action.payload.stageKey;
     }
 
     return state;

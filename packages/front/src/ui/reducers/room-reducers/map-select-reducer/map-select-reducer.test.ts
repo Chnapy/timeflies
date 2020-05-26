@@ -1,19 +1,17 @@
 import { RoomServerAction, seedTiledMap } from '@timeflies/shared';
 import { TiledLayerTilelayer } from 'tiled-types';
 import { Controller } from '../../../../Controller';
-import { ReceiveMessageAction } from '../../../../socket/WSClient';
+import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
 import { seedMapConfig } from '../../../../stages/battle/map/MapManager.seed';
-import { StageChangeAction } from '../../../../stages/StageManager';
+import { StageChangeAction } from '../../../../stages/stage-actions';
 import { StoreTest } from '../../../../StoreTest';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
-import { MapLoadedAction, MapSelectData, MapSelectReducer } from './map-select-reducer';
+import { MapLoadedAction } from './map-select-actions';
+import { MapSelectData, MapSelectReducer } from './map-select-reducer';
 
 describe('# map-select-reducer', () => {
 
-    const getAction = (roomMessage: RoomServerAction): ReceiveMessageAction<RoomServerAction> => ({
-        type: 'message/receive',
-        message: roomMessage
-    });
+    const getAction = (roomMessage: RoomServerAction) => ReceiveMessageAction(roomMessage);
 
     beforeEach(() => {
         StoreTest.beforeTest();
@@ -48,12 +46,9 @@ describe('# map-select-reducer', () => {
             mapSelected: null
         });
 
-        const messageAction: ReceiveMessageAction<any> = {
-            type: 'message/receive',
-            message: {
-                type: 'not-handled'
-            }
-        };
+        const messageAction = ReceiveMessageAction({
+            type: 'not-handled'
+        } as any);
 
         expect(
             MapSelectReducer({
@@ -70,10 +65,9 @@ describe('# map-select-reducer', () => {
 
         const mapConfig = seedMapConfig('map_1');
 
-        const action: StageChangeAction<'room'> = {
-            type: 'stage/change',
+        const action = StageChangeAction({
             stageKey: 'room',
-            payload: {
+            data: {
                 roomState: {
                     type: 'room/state',
                     sendTime: -1,
@@ -89,7 +83,7 @@ describe('# map-select-reducer', () => {
                     teamList: []
                 }
             }
-        };
+        });
 
         expect(
             MapSelectReducer(undefined, action)
@@ -251,13 +245,12 @@ describe('# map-select-reducer', () => {
 
         const schema = seedTiledMap('map_1');
 
-        const action: MapLoadedAction = {
-            type: 'room/map/loaded',
+        const action = MapLoadedAction({
             assets: {
                 images: {},
                 schema
             }
-        };
+        });
 
         const state: MapSelectData = {
             mapList: [ {

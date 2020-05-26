@@ -1,7 +1,7 @@
-import { CurrentPlayer } from "../../CurrentPlayer";
-import { GameAction, IGameAction } from "../../action/game-action/GameAction";
 import { Reducer } from "redux";
-import { StageChangeAction } from '../../stages/StageManager';
+import { GameAction, IGameAction } from "../../action/game-action/GameAction";
+import { CurrentPlayer } from "../../CurrentPlayer";
+import { stageChangeActionPayloadMatch } from '../../stages/stage-actions';
 
 export interface LoginSuccess extends IGameAction<'login/success'> {
     currentPlayer: CurrentPlayer;
@@ -13,8 +13,9 @@ export const CurrentPlayerReducer: Reducer<CurrentPlayer | null, GameAction> = (
 
         // TODO temp for room, waiting for login page
         case 'stage/change':
-            if (action.stageKey === 'room') {
-                const { payload: { roomState: { playerList } } } = action as StageChangeAction<'room'>;
+            const { payload } = action;
+            if (stageChangeActionPayloadMatch('room', payload)) {
+                const { roomState: { playerList } } = payload.data;
                 const p = playerList[ playerList.length - 1 ];
 
                 return {
