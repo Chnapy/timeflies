@@ -1,22 +1,9 @@
 import { assertIsDefined, SpellActionSnapshot } from '@timeflies/shared';
-import { IGameAction } from '../../../action/game-action/GameAction';
-import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceBattleData } from '../../../services/serviceBattleData';
+import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceNetwork } from '../../../services/serviceNetwork';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-manager-actions';
 
-export interface SpellActionTimerStartAction extends IGameAction<'battle/spell-action/start'> {
-    spellActionSnapshot: SpellActionSnapshot;
-}
-
-export interface SpellActionTimerEndAction extends IGameAction<'battle/spell-action/end'> {
-    spellActionSnapshot: SpellActionSnapshot;
-    removed: boolean;
-    correctHash: string;    // may be not the same as the snapshot one
-}
-
-export type SpellActionTimerAction =
-    | SpellActionTimerStartAction
-    | SpellActionTimerEndAction;
 
 export interface SpellActionTimer {
     onAdd(snapshot: SpellActionSnapshot): void;
@@ -45,12 +32,10 @@ export const SpellActionTimer = (): SpellActionTimer => {
     const { spellActionSnapshotList } = serviceBattleData('future');
 
     const { dispatchStart, dispatchEnd } = serviceDispatch({
-        dispatchStart: (snapshot: SpellActionSnapshot): SpellActionTimerStartAction => ({
-            type: 'battle/spell-action/start',
+        dispatchStart: (snapshot: SpellActionSnapshot) => SpellActionTimerStartAction({
             spellActionSnapshot: snapshot
         }),
-        dispatchEnd: (snapshot: SpellActionSnapshot, removed: boolean, correctHash: string): SpellActionTimerEndAction => ({
-            type: 'battle/spell-action/end',
+        dispatchEnd: (snapshot: SpellActionSnapshot, removed: boolean, correctHash: string) => SpellActionTimerEndAction({
             spellActionSnapshot: snapshot,
             removed,
             correctHash

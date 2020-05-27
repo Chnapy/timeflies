@@ -1,6 +1,6 @@
 import { Position, TileType, getOrientationFromTo } from '@timeflies/shared'
 import { serviceDispatch } from '../../../../../services/serviceDispatch'
-import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
+import { BattleStateSpellLaunchAction } from '../../../battleState/battle-state-actions'
 import { Spell } from '../../../entities/spell/Spell'
 import { MapManager } from '../../../map/MapManager'
 import { SpellAction } from '../../../spellAction/SpellActionManager'
@@ -10,7 +10,7 @@ export const spellLaunchMove = ({ spell, position }: SpellAction) => {
     const { character } = spell;
 
     const orientation = getOrientationFromTo(character.position, position);
-    
+
     character.set({ position, orientation });
 };
 
@@ -29,12 +29,8 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
         let previousTile: { x: number; y: number; } | null = null;
 
         const { dispatchSpellLaunch } = serviceDispatch({
-            dispatchSpellLaunch: (spellActions: SpellAction[]): BStateSpellLaunchAction => ({
-                type: 'battle/state/event',
-                eventType: 'SPELL-LAUNCH',
-                payload: {
-                    spellActions
-                }
+            dispatchSpellLaunch: (spellActions: SpellAction[]) => BattleStateSpellLaunchAction({
+                spellActions
             })
         });
 
@@ -80,7 +76,7 @@ export const SpellPrepareMove: SpellPrepareSubEngineCreator<
                     position,
                     actionArea: [ position ]
                 })));
-                
+
                 return true;
             },
             stop() {

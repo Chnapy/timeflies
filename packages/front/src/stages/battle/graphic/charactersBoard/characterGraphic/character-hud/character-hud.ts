@@ -5,7 +5,7 @@ import { serviceEvent } from '../../../../../../services/serviceEvent';
 import { appTheme } from '../../../../../../ui/app-theme';
 import { UIIcon, UIIconProps } from '../../../../../../ui/battle-ui/spell-panel/spell-button/ui-icon';
 import { Character } from '../../../../entities/character/Character';
-import { SpellActionTimerEndAction } from '../../../../spellAction/SpellActionTimer';
+import { SpellActionTimerEndAction } from '../../../../spellAction/spell-action-manager-actions';
 import { GaugeGraphic } from '../../../gauge-graphic';
 import { ReactToGraphicSprite } from '../../../react-to-graphic-sprite';
 import { TeamIndicatorGraphic } from './team-indicator-graphic';
@@ -65,9 +65,7 @@ export const CharacterHud = (
 
     updateLifeGauge();
 
-    onAction<SpellActionTimerEndAction>('battle/spell-action/end', () => {
-        updateLifeGauge();
-    });
+    onAction(SpellActionTimerEndAction, updateLifeGauge);
 
     return {
         container

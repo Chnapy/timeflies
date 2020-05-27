@@ -7,7 +7,7 @@ import { StageChangeAction } from '../../../../stages/stage-actions';
 import { StoreTest } from '../../../../StoreTest';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
 import { MapLoadedAction } from './map-select-actions';
-import { MapSelectData, MapSelectReducer } from './map-select-reducer';
+import { MapSelectData, mapSelectReducer } from './map-select-reducer';
 
 describe('# map-select-reducer', () => {
 
@@ -24,7 +24,7 @@ describe('# map-select-reducer', () => {
     it('should return the good initial state', () => {
 
         expect(
-            MapSelectReducer(undefined, { type: 'not-matter' } as any)
+            mapSelectReducer(undefined, { type: 'not-matter' } as any)
         )
             .toEqual<MapSelectData>({
                 mapList: [],
@@ -37,7 +37,7 @@ describe('# map-select-reducer', () => {
         const action = { type: 'not-handled' };
 
         expect(
-            MapSelectReducer({
+            mapSelectReducer({
                 mapList: [],
                 mapSelected: null
             }, action as any)
@@ -51,7 +51,7 @@ describe('# map-select-reducer', () => {
         } as any);
 
         expect(
-            MapSelectReducer({
+            mapSelectReducer({
                 mapList: [],
                 mapSelected: null
             }, messageAction)
@@ -86,7 +86,7 @@ describe('# map-select-reducer', () => {
         });
 
         expect(
-            MapSelectReducer(undefined, action)
+            mapSelectReducer(undefined, action)
         ).toMatchObject<MapSelectData>({
             mapList: [ mapConfig ],
             mapSelected: {
@@ -126,7 +126,7 @@ describe('# map-select-reducer', () => {
         };
 
         expect(
-            MapSelectReducer(state, action)
+            mapSelectReducer(state, action)
         ).toEqual<MapSelectData>({
             mapList: [ {
                 id: 'm1',
@@ -162,7 +162,7 @@ describe('# map-select-reducer', () => {
         };
 
         expect(
-            MapSelectReducer(state, action)
+            mapSelectReducer(state, action)
         ).toEqual<MapSelectData>({
             mapList: [],
             mapSelected: null
@@ -203,7 +203,7 @@ describe('# map-select-reducer', () => {
         };
 
         expect(
-            MapSelectReducer(state, action)
+            mapSelectReducer(state, action)
         ).toEqual<MapSelectData>({
             mapList: [ {
                 id: 'm1',
@@ -278,7 +278,7 @@ describe('# map-select-reducer', () => {
             .find((l): l is TiledLayerTilelayer => l.name === 'obstacles')!
             .data!.filter(d => !!d).length;
 
-        const newState = MapSelectReducer(state, action);
+        const newState = mapSelectReducer(state, action);
 
         expect(newState).toEqual<MapSelectData>({
             mapList: [ {

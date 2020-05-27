@@ -1,6 +1,7 @@
 import { serviceEvent } from '../../../services/serviceEvent';
 import { MapManager } from '../map/MapManager';
-import { BState, BStateAction, BStateEngine, BStateSchemaRoot, BStateSchemaTrigger } from './BattleStateSchema';
+import { BattleStateAction, battleStateActionList } from './battle-state-actions';
+import { BState, BStateEngine, BStateSchemaRoot, BStateSchemaTrigger } from './BattleStateSchema';
 
 export interface BStateMachine {
     state: BState;
@@ -25,10 +26,10 @@ export const BStateMachine = (
         }
     });
 
-    const send = (event: BStateAction): void => {
+    const send = (type: string, payload: BattleStateAction[ 'payload' ]): void => {
         const stateSchema = schema.states[ state ];
-        
-        const triggers: BStateSchemaTrigger<any>[] = (stateSchema.on && stateSchema.on[ event.eventType ]) || [];
+
+        const triggers: BStateSchemaTrigger[] = (stateSchema.on && stateSchema.on[ type ]) || [];
 
         const trigger = triggers.find(t => !t.cond || t.cond());
         if (trigger) {
@@ -39,7 +40,7 @@ export const BStateMachine = (
             console.log('state', state);
             const { engineCreator } = schema.states[ state ];
             engine = engineCreator({
-                event: event,
+                event: { type, payload },
                 deps: {
                     mapManager
                 }
@@ -49,7 +50,9 @@ export const BStateMachine = (
 
     const { onAction } = serviceEvent();
 
-    onAction<BStateAction>('battle/state/event', send);
+    battleStateActionList.forEach(battleStateAction => {
+        onAction(battleStateAction, payload => send(battleStateAction.type, payload));
+    });
 
     return {
         get state() {

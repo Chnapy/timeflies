@@ -1,23 +1,21 @@
+import { configureStore } from '@reduxjs/toolkit';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Store } from 'redux';
-import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
+import { Action, Store } from 'redux';
 import { createLogger } from 'redux-logger';
 import { ActionManager } from './action/ActionManager';
-import { GameAction, IGameAction } from './action/game-action/GameAction';
 import { App } from './app';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
+import { AppResetAction } from './controller-actions';
 import { GameState } from './game-state';
 import { serviceDispatch } from './services/serviceDispatch';
 import { WebSocketCreator, WSClient } from './socket/WSClient';
+import { ReceiveMessageAction, SendMessageAction } from './socket/wsclient-actions';
 import { StageManager } from './stages/StageManager';
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
-import { RootReducer } from './ui/reducers/root-reducer';
-import { ReceiveMessageAction } from './socket/wsclient-actions';
+import { rootReducer } from './ui/reducers/root-reducer';
 
-export interface AppResetAction extends IGameAction<'app/reset'> {
-}
 
 export interface ControllerProps {
     websocketCreator?: WebSocketCreator;
@@ -29,7 +27,7 @@ export interface ControllerStarter {
 }
 
 interface ControllerResources {
-    store?: Store<GameState, GameAction>;
+    store?: Store<GameState, Action>;
     client?: WSClient;
     gameCanvas?: GameCanvas;
     actionManager?: ActionManager;
@@ -59,9 +57,7 @@ const reset = (): void => {
     checkEnv();
 
     const { dispatchReset } = serviceDispatch({
-        dispatchReset: (): AppResetAction => ({
-            type: 'app/reset'
-        })
+        dispatchReset: AppResetAction
     });
 
     dispatchReset();
@@ -89,18 +85,15 @@ export const Controller = {
         if (process.env.NODE_ENV === 'development') {
             const logger = createLogger({
                 collapsed: true,
-                actionTransformer: (action: GameAction) => {
-                    switch (action.type) {
-                        case 'battle/state/event':
-                            action.type += ' > ' + action.eventType;
-                            break;
-                        case 'message/send':
-                            action.type += ' > ' + action.message.type;
-                            break;
-                        case ReceiveMessageAction.type:
-                            action.type += ' > ' + action.payload.type;
-                            break;
+                actionTransformer: (action: Action) => {
+                    if (ReceiveMessageAction.match(action)) {
+                        action.type += ' > ' + action.payload.type;
+
+                    } else if (SendMessageAction.match(action)) {
+                        action.type += ' > ' + action.payload.type;
+
                     }
+
                     return action;
                 }
             });
@@ -109,8 +102,12 @@ export const Controller = {
         }
 
         resources.store = configureStore({
-            reducer: RootReducer,
-            middleware: [...getDefaultMiddleware(), ...middlewareList],
+            reducer: rootReducer,
+            middleware: [
+                // TODO uncomment this when battle state refactor will be made
+                // ...getDefaultMiddleware(), 
+                ...middlewareList
+            ],
             preloadedState: initialState
         });
 
@@ -144,7 +141,7 @@ export const Controller = {
         };
     },
 
-    getStore(): Store<GameState, GameAction> {
+    getStore(): Store<GameState, Action> {
         return getResource('store');
     },
 

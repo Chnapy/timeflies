@@ -1,17 +1,13 @@
-import { combineReducers, Reducer } from 'redux';
-import { GameAction } from '../../action/game-action/GameAction';
+import { combineReducers } from 'redux';
 import { GameState } from '../../game-state';
-import { BattleReducer } from './battle-reducers/battle-reducer';
-import { CurrentPlayerReducer } from './current-player-reducer';
+import { battleReducer } from './battle-reducers/battle-reducer';
+import { currentPlayerReducer } from './current-player-reducer';
 import { RoomReducer } from './room-reducers/room-reducer';
-import { StepReducer } from './step-reducer';
+import { stepReducer } from './step-reducer';
 
-export const RootReducer: Reducer<GameState, GameAction> = (state, action) => {
-    
-    return combineReducers<GameState>({
-        currentPlayer: CurrentPlayerReducer,
-        step: StepReducer,
-        room: RoomReducer,
-        battle: BattleReducer,
-    })(state, action);
-};
+export const rootReducer = combineReducers<GameState>({
+    currentPlayer: currentPlayerReducer,
+    step: stepReducer,
+    room: RoomReducer,
+    battle: battleReducer,
+});

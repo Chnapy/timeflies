@@ -1,23 +1,23 @@
-import { Orientation, Position, switchUtil, TiledManager, seedSpellActionSnapshot } from '@timeflies/shared';
+import { Orientation, Position, seedSpellActionSnapshot, switchUtil, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
+import { StoryProps } from '../../../../../../.storybook/preview';
 import { AssetLoader } from '../../../../../assetManager/AssetLoader';
+import { AssetManager } from '../../../../../assetManager/AssetManager';
+import { seedBattleData } from '../../../../../battle-data.seed';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
+import { seedGameState } from '../../../../../game-state.seed';
 import { serviceDispatch } from '../../../../../services/serviceDispatch';
-import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema';
+import { BattleStateSpellLaunchAction } from '../../../battleState/battle-state-actions';
 import { seedCharacter } from '../../../entities/character/Character.seed';
+import { seedPlayer } from '../../../entities/player/Player.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
+import { seedTeam } from '../../../entities/team/Team.seed';
 import { MapManager } from '../../../map/MapManager';
 import { Pathfinder } from '../../../map/Pathfinder';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/SpellActionTimer';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-manager-actions';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
-import { StoryProps } from '../../../../../../.storybook/preview';
-import { AssetManager } from '../../../../../assetManager/AssetManager';
-import { seedPlayer } from '../../../entities/player/Player.seed';
-import { seedTeam } from '../../../entities/team/Team.seed';
-import { seedGameState } from '../../../../../game-state.seed';
-import { seedBattleData } from '../../../../../battle-data.seed';
 
 export default {
     title: 'graphic/CharacterGraphic',
@@ -78,8 +78,7 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const waitByTime = (ms: number) => new Promise(r => setTimeout(r, ms));
 
         const { dispatchTimerStart, dispatchTimerEnd } = serviceDispatch({
-            dispatchTimerStart: (position: Position, duration: number): SpellActionTimerStartAction => ({
-                type: 'battle/spell-action/start',
+            dispatchTimerStart: (position: Position, duration: number) => SpellActionTimerStartAction({
                 spellActionSnapshot: seedSpellActionSnapshot(characterCurrent.defaultSpell.id, {
                     characterId: characterCurrent.id,
                     duration,
@@ -87,8 +86,7 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
                     startTime: Date.now(),
                 })
             }),
-            dispatchTimerEnd: (): SpellActionTimerEndAction => ({
-                type: 'battle/spell-action/end',
+            dispatchTimerEnd: () => SpellActionTimerEndAction({
                 correctHash: '',
                 removed: false,
                 spellActionSnapshot: seedSpellActionSnapshot(characterCurrent.defaultSpell.id, {
@@ -227,19 +225,15 @@ export const Future: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         app.stage.addChild(container);
 
         const { dispatchSpellLaunch } = serviceDispatch({
-            dispatchSpellLaunch: (): BStateSpellLaunchAction => ({
-                type: 'battle/state/event',
-                eventType: 'SPELL-LAUNCH',
-                payload: {
-                    spellActions: [ {
-                        spell: seedSpell('fake', {
-                            period: 'future',
-                            id: '1', type: 'move', character: null as any
-                        }),
-                        position: { x: -1, y: -1 },
-                        actionArea: []
-                    } ]
-                }
+            dispatchSpellLaunch: () => BattleStateSpellLaunchAction({
+                spellActions: [ {
+                    spell: seedSpell('fake', {
+                        period: 'future',
+                        id: '1', type: 'move', character: null as any
+                    }),
+                    position: { x: -1, y: -1 },
+                    actionArea: []
+                } ]
             })
         });
 

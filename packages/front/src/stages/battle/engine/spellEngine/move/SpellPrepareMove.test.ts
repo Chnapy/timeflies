@@ -4,7 +4,7 @@ import { seedCharacter } from '../../../entities/character/Character.seed';
 import { MapManager } from '../../../map/MapManager';
 import { seedMapManager } from '../../../map/MapManager.seed';
 import { SpellPrepareMove } from './SpellPrepareMove';
-import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema';
+import { BattleStateSpellLaunchAction } from '../../../battleState/battle-state-actions';
 import { SpellAction } from '../../../spellAction/SpellActionManager';
 
 describe('# SpellPrepareMove', () => {
@@ -127,18 +127,14 @@ describe('# SpellPrepareMove', () => {
 
         spellPrepareMove.onTileClick({ x: -1, y: -1 }, 'default');
 
-        expect(StoreTest.getActions()).toEqual<[ BStateSpellLaunchAction ]>([
-            {
-                type: 'battle/state/event',
-                eventType: 'SPELL-LAUNCH',
-                payload: {
-                    spellActions: expectedPath.map((position): SpellAction => ({
-                        spell: defaultSpell,
-                        position,
-                        actionArea: [position]
-                    }))
-                }
-            }
+        expect(StoreTest.getActions()).toEqual([
+            BattleStateSpellLaunchAction({
+                spellActions: expectedPath.map((position): SpellAction => ({
+                    spell: defaultSpell,
+                    position,
+                    actionArea: [ position ]
+                }))
+            })
         ]);
     });
 

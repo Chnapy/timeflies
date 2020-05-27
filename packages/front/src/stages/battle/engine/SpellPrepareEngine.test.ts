@@ -1,12 +1,13 @@
-import { StoreTest } from '../../../StoreTest';
-import { SpellPrepareEngine, SpellPrepareSubEngine } from './SpellPrepareEngine';
-import { seedCharacter } from '../entities/character/Character.seed';
 import { TimerTester } from '@timeflies/shared';
-import { SpellEngineBindAction } from './Engine';
 import { BattleDataCycle, BattleDataFuture } from '../../../BattleData';
-import { seedMapManager } from '../map/MapManager.seed';
+import { StoreTest } from '../../../StoreTest';
+import { BattleStateSpellPrepareAction } from '../battleState/battle-state-actions';
 import { seedGlobalTurn } from '../cycle/global-turn.seed';
 import { seedTurn } from '../cycle/turn.seed';
+import { seedCharacter } from '../entities/character/Character.seed';
+import { seedMapManager } from '../map/MapManager.seed';
+import { SpellEngineBindAction } from './engine-actions';
+import { SpellPrepareEngine, SpellPrepareSubEngine } from './SpellPrepareEngine';
 
 describe('# SpellPrepareEngine', () => {
 
@@ -85,13 +86,9 @@ describe('# SpellPrepareEngine', () => {
 
         SpellPrepareEngine(
             {
-                event: {
-                    type: 'battle/state/event',
-                    eventType: 'SPELL-PREPARE',
-                    payload: {
-                        spellType: spell.staticData.type
-                    }
-                },
+                event: BattleStateSpellPrepareAction({
+                    spellType: spell.staticData.type
+                }),
                 deps: {
                     mapManager: seedMapManager('fake')
                 }
@@ -109,14 +106,12 @@ describe('# SpellPrepareEngine', () => {
             }[ spellType ])
         );
 
-        const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
-            a.type === 'battle/spell-engine/bind'
-        )!;
+        const bindAction = StoreTest.getActions().find(SpellEngineBindAction.match)!;
 
-        bindAction.onTileHover({ x: -1, y: -1 });
+        bindAction.payload.onTileHover({ x: -1, y: -1 });
         expect(onTileHover).not.toHaveBeenCalled();
 
-        bindAction.onTileClick({ x: -1, y: -1 });
+        bindAction.payload.onTileClick({ x: -1, y: -1 });
         expect(onTileClick).not.toHaveBeenCalled();
     });
 
@@ -182,13 +177,9 @@ describe('# SpellPrepareEngine', () => {
 
         SpellPrepareEngine(
             {
-                event: {
-                    type: 'battle/state/event',
-                    eventType: 'SPELL-PREPARE',
-                    payload: {
-                        spellType: spell.staticData.type
-                    }
-                },
+                event: BattleStateSpellPrepareAction({
+                    spellType: spell.staticData.type
+                }),
                 deps: {
                     mapManager: seedMapManager('fake')
                 }
@@ -206,14 +197,12 @@ describe('# SpellPrepareEngine', () => {
             }[ spellType ])
         );
 
-        const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
-            a.type === 'battle/spell-engine/bind'
-        )!;
+        const bindAction = StoreTest.getActions().find(SpellEngineBindAction.match)!;
 
-        bindAction.onTileHover({ x: -1, y: -1 });
+        bindAction.payload.onTileHover({ x: -1, y: -1 });
         expect(onTileHover).toHaveBeenCalledTimes(1);
 
-        bindAction.onTileClick({ x: -1, y: -1 });
+        bindAction.payload.onTileClick({ x: -1, y: -1 });
         expect(onTileClick).toHaveBeenCalledTimes(1);
     });
 

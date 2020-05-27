@@ -1,8 +1,7 @@
 import { ClientAction, DistributiveOmit } from '@timeflies/shared';
-import { Controller } from '../../Controller';
 import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
-import { GameAction } from '../../action/game-action/GameAction';
+import { Controller } from '../../Controller';
+import { SendMessageAction } from '../../socket/wsclient-actions';
 
 type ClientActionWOSendTime<A extends ClientAction> = DistributiveOmit<A, 'sendTime'>;
 
@@ -16,7 +15,7 @@ type Return<P extends Params<A>, A extends ClientAction> = {
 
 export const useGameNetwork = <P extends Params<A>, A extends ClientAction>(map: P): Return<P, A> => {
 
-    const dispatch = useDispatch<Dispatch<GameAction>>();
+    const dispatch = useDispatch();
 
     return Object.entries(map)
         .reduce((arr, [ key, value ]) => {
@@ -27,10 +26,7 @@ export const useGameNetwork = <P extends Params<A>, A extends ClientAction>(map:
 
                 await Controller.waitConnect();
 
-                dispatch({
-                    type: 'message/send',
-                    message: value(...args)
-                });
+                dispatch(SendMessageAction(value(...args)));
             };
 
             return arr;

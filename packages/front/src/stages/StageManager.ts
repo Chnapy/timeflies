@@ -1,25 +1,16 @@
-import { IGameAction } from '../action/game-action/GameAction';
 import { AssetMap } from '../assetManager/AssetLoader';
+import { StageGraphicCreateParam } from '../canvas/GameCanvas';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
 import { BattleStage, BattleStageParam } from './battle/BattleStage';
 import { BootStage, BootStageParam } from './boot/BootStage';
-import { StageGraphicCreateParam } from '../canvas/GameCanvas';
-import { RoomStageParam, RoomStage } from './room/RoomStage';
-import { StageChangeAction } from './stage-actions';
+import { RoomStage, RoomStageParam } from './room/RoomStage';
+import { StageChangeAction, StageOnCreateGraphicAction } from './stage-actions';
 
-export interface StageOnCreateGraphicAction<K extends StageKey> extends IGameAction<'stage/onCreate/graphic'> {
-    param: StageGraphicCreateParam<K>;
-}
-
-export type StageAction =
-    | StageChangeAction<StageKey>
-    | StageOnCreateGraphicAction<StageKey>;
-
-export interface StageParam<K extends string, P extends {}> {
+export type StageParam<K extends string, P extends {}> = {
     stageKey: K;
     payload: P;
-}
+};
 
 export type ExtractPayload<K extends StageKey> = Extract<StageParams, { stageKey: K }>[ 'payload' ];
 
@@ -59,14 +50,11 @@ export const StageManager = ({ stageCreators }: Dependencies = {
         dispatchStageChange: (stageKey: StageKey, payload: ExtractPayload<StageKey>) => StageChangeAction({
             stageKey,
             data: payload
-        }) as any,
-        dispatchStageOnCreateGraphic: (param: StageGraphicCreateParam<any>): StageOnCreateGraphicAction<any> => ({
-            type: 'stage/onCreate/graphic',
-            param
-        })
+        }),
+        dispatchStageOnCreateGraphic: (param: StageGraphicCreateParam<any>) => StageOnCreateGraphicAction({ param })
     });
 
-    const goToStage = async ({ payload: { stageKey, data } }: StageChangeAction) => {
+    const goToStage = async ({ stageKey, data }: StageChangeAction[ 'payload' ]) => {
         currentStage = stageCreators[ stageKey ](data as any);
 
         console.log('Stage change:', stageKey);
@@ -78,7 +66,7 @@ export const StageManager = ({ stageCreators }: Dependencies = {
 
     const { onAction } = serviceEvent();
 
-    onAction<StageChangeAction>('stage/change', goToStage);
+    onAction(StageChangeAction, goToStage);
 
     dispatchStageChange('boot', {});
 

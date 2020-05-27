@@ -1,12 +1,13 @@
-import { StoreTest } from '../../../StoreTest';
-import { SnapshotManager, BattleCommitAction } from './SnapshotManager';
-import { Team } from '../entities/team/Team';
-import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester, TeamSnapshot } from '@timeflies/shared';
-import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { BattleSnapshot, getBattleSnapshotWithHash, TeamSnapshot, TimerTester } from '@timeflies/shared';
 import { BattleDataCurrent, BattleDataFuture } from '../../../BattleData';
-import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
+import { StoreTest } from '../../../StoreTest';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
+import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
-import { NotifyDeathsAction } from '../cycle/CycleManager';
+import { Team } from '../entities/team/Team';
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
+import { BattleCommitAction } from './snapshot-manager-actions';
+import { SnapshotManager } from './SnapshotManager';
 
 describe('# SnapshotManager', () => {
 
@@ -64,10 +65,9 @@ describe('# SnapshotManager', () => {
 
         SnapshotManager();
 
-        StoreTest.dispatch<BattleCommitAction>({
-            type: 'battle/commit',
+        StoreTest.dispatch(BattleCommitAction({
             time: timerTester.now
-        });
+        }));
 
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
             time: timerTester.now,
@@ -131,26 +131,23 @@ describe('# SnapshotManager', () => {
 
             SnapshotManager();
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now
-            });
+            }));
 
             const firstHash = futureBattleData.battleHash;
 
             teamColor = 'blue';
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now + 100
-            });
+            }));
 
-            StoreTest.dispatch<SpellActionTimerEndAction>({
-                type: 'battle/spell-action/end',
+            StoreTest.dispatch(SpellActionTimerEndAction({
                 removed: true,
                 correctHash: firstHash,
                 spellActionSnapshot: {} as any
-            });
+            }));
 
             expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
 
@@ -205,10 +202,9 @@ describe('# SnapshotManager', () => {
 
             SnapshotManager();
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now
-            });
+            }));
 
             const firstHash = futureBattleData.battleHash;
 
@@ -216,17 +212,15 @@ describe('# SnapshotManager', () => {
 
             teamColor = 'blue';
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now
-            });
+            }));
 
-            StoreTest.dispatch<SpellActionTimerEndAction>({
-                type: 'battle/spell-action/end',
+            StoreTest.dispatch(SpellActionTimerEndAction({
                 removed: true,
                 correctHash: firstHash,
                 spellActionSnapshot: {} as any
-            });
+            }));
 
             expect(futureBattleData.battleHash).toBe(firstHash);
             expect(currentBattleData.battleHash).toBe(firstHash);
@@ -291,19 +285,17 @@ describe('# SnapshotManager', () => {
 
             SnapshotManager();
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now
-            });
+            }));
 
             const lastHash = futureBattleData.battleHash;
 
-            StoreTest.dispatch<SpellActionTimerEndAction>({
-                type: 'battle/spell-action/end',
+            StoreTest.dispatch(SpellActionTimerEndAction({
                 removed: false,
                 correctHash: lastHash,
                 spellActionSnapshot: {} as any
-            });
+            }));
 
             expect(currentBattleData.battleHash).toBe(lastHash);
         });
@@ -379,23 +371,19 @@ describe('# SnapshotManager', () => {
 
             SnapshotManager();
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now
-            });
+            }));
 
             const lastHash = futureBattleData.battleHash;
 
-            StoreTest.dispatch<SpellActionTimerEndAction>({
-                type: 'battle/spell-action/end',
+            StoreTest.dispatch(SpellActionTimerEndAction({
                 removed: false,
                 correctHash: lastHash,
                 spellActionSnapshot: {} as any
-            });
+            }));
 
-            expect(StoreTest.getActions()).not.toContainEqual<NotifyDeathsAction>({
-                type: 'battle/notify-deaths'
-            });
+            expect(StoreTest.getActions()).not.toContainEqual(NotifyDeathsAction());
         });
 
         it('should notify for deaths on spell action end action if there is new deaths', () => {
@@ -484,23 +472,19 @@ describe('# SnapshotManager', () => {
 
             (futureCharacter.features.life as number) = 0;
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now
-            });
+            }));
 
             const lastHash = futureBattleData.battleHash;
 
-            StoreTest.dispatch<SpellActionTimerEndAction>({
-                type: 'battle/spell-action/end',
+            StoreTest.dispatch(SpellActionTimerEndAction({
                 removed: false,
                 correctHash: lastHash,
                 spellActionSnapshot: {} as any
-            });
+            }));
 
-            expect(StoreTest.getActions()).toContainEqual<NotifyDeathsAction>({
-                type: 'battle/notify-deaths'
-            });
+            expect(StoreTest.getActions()).toContainEqual(NotifyDeathsAction());
         });
     });
 
@@ -550,13 +534,9 @@ describe('# SnapshotManager', () => {
 
             expect(futureBattleData.battleHash).toBe('not-defined');
 
-            StoreTest.dispatch<BStateTurnStartAction>({
-                type: 'battle/state/event',
-                eventType: 'TURN-START',
-                payload: {
-                    characterId: 'not-matter'
-                }
-            });
+            StoreTest.dispatch(BattleStateTurnStartAction({
+                characterId: 'not-matter'
+            }));
 
             expect(futureBattleData.battleHash).not.toBe('not-defined');
             expect(currentBattleData.battleHash).not.toBe('not-defined');
@@ -621,28 +601,21 @@ describe('# SnapshotManager', () => {
 
             SnapshotManager();
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now - 100
-            });
+            }));
 
             const pastHash = futureBattleData.battleHash;
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now + 100
-            });
+            }));
 
-            StoreTest.dispatch<BattleCommitAction>({
-                type: 'battle/commit',
+            StoreTest.dispatch(BattleCommitAction({
                 time: timerTester.now + 200
-            });
+            }));
 
-            StoreTest.dispatch<BStateTurnEndAction>({
-                type: 'battle/state/event',
-                eventType: 'TURN-END',
-                payload: {}
-            });
+            StoreTest.dispatch(BattleStateTurnEndAction());
 
             expect(futureBattleData.battleHash).toBe(pastHash);
         });

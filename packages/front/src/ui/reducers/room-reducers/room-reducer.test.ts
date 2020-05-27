@@ -4,11 +4,7 @@ import { StageChangeAction } from '../../../stages/stage-actions';
 import { RoomData, RoomReducer } from './room-reducer';
 
 // TODO refactor all reducer tests to be less 'duck', more 'user though'
-// Also use redux-act or other, 
-// to improve reducer & action structure all over the app
 // https://dev.to/hbarcelos/a-better-approach-for-testing-your-redux-code-2ec9
-
-// TODO consider using redux-toolkit for mutable state problematic
 
 // TODO use redux state in pixi object
 

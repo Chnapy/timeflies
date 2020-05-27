@@ -1,23 +1,23 @@
-import { GameAction } from './game-action/GameAction';
 import { Middleware } from 'redux';
 import { GameState } from '../game-state';
+import { PayloadAction } from '@reduxjs/toolkit';
 
 export interface ActionManager {
     beginBattleSession(): void;
     endBattleSession(): void;
-    addActionListener(type: GameAction[ 'type' ], fn: ActionListener<GameAction>): ActionListenerObject;
+    addActionListener(type: string, fn: PayloadActionListener): ActionListenerObject;
     getMiddleware(): Middleware<{}, GameState>;
 }
 
-export interface ActionListener<A extends GameAction> {
-    (action: A): void;
+export interface PayloadActionListener<P = unknown> {
+    (payload: P): void;
 }
 
 export interface ActionListenerObject {
     removeActionListener: () => void;
 }
 
-type ListenerMap = Map<GameAction[ 'type' ], Set<ActionListener<GameAction>>>;
+type ListenerMap = Map<string, Set<PayloadActionListener>>;
 
 export const ActionManager = (): ActionManager => {
 
@@ -56,12 +56,12 @@ export const ActionManager = (): ActionManager => {
         },
 
         getMiddleware() {
-            return api => next => action => {
+            return api => next => (action: PayloadAction<unknown>) => {
 
                 const maps = getListenerMap();
-
+console.log('action payload', action.payload)
                 maps.forEach(map => {
-                    map.get(action.type)?.forEach(fn => fn(action));
+                    map.get(action.type)?.forEach(fn => fn(action.payload));
 
                     if (action.type === 'app/reset') {
                         map.clear();

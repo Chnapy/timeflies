@@ -1,17 +1,17 @@
-import { assertIsDefined, BattleLoadEndedCAction, BattleLoadSAction, BRunGlobalTurnStartSAction, BRunLaunchSAction, ClientAction, ConfirmSAction, GLOBALTURN_DELAY, MatchmakerClientAction, ServerAction, TeamSnapshot, TURN_DELAY, NotifySAction, Position, PlayerRoom, TeamRoom, seedSpellActionSnapshot } from '@timeflies/shared';
+import { PayloadAction } from '@reduxjs/toolkit';
+import { assertIsDefined, BattleLoadSAction, BRunGlobalTurnStartSAction, ClientAction, ConfirmSAction, GLOBALTURN_DELAY, MatchmakerClientAction, NotifySAction, Position, seedSpellActionSnapshot, ServerAction, TeamSnapshot, TURN_DELAY } from '@timeflies/shared';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { AssetManager } from '../src/assetManager/AssetManager';
 import { Controller } from '../src/Controller';
+import { GameState } from '../src/game-state';
 import { serviceBattleData } from '../src/services/serviceBattleData';
 import { serviceDispatch } from '../src/services/serviceDispatch';
 import { serviceEvent } from '../src/services/serviceEvent';
-import { SendMessageAction, WebSocketCreator } from '../src/socket/WSClient';
+import { WebSocketCreator } from '../src/socket/WSClient';
+import { ReceiveMessageAction, SendMessageAction } from '../src/socket/wsclient-actions';
 import { seedTeamSnapshot } from '../src/stages/battle/entities/team/Team.seed';
-import { GameState } from '../src/game-state';
-import React from 'react';
-import { Provider } from 'react-redux';
 import { StageChangeAction } from '../src/stages/stage-actions';
-import { GameAction } from '../src/action/game-action/GameAction';
-import { AssetManager } from '../src/assetManager/AssetManager';
-import { ReceiveMessageAction } from '../src/socket/wsclient-actions';
 
 class MockWebSocket implements WebSocket {
     prototype: any;
@@ -76,8 +76,8 @@ export const FakeBattleApi = () => {
 
     let isInBattle: boolean = false;
 
-    const dispatch = <A extends GameAction>(action: A) => serviceDispatch({
-        dispatch: <A extends GameAction>(action: A): A => action
+    const dispatch = (action: PayloadAction<any>) => serviceDispatch({
+        dispatch: (action: PayloadAction<any>) => action
     }).dispatch(action);
 
     const receiveAction = <A extends ServerAction>(payload: A) =>
@@ -168,11 +168,11 @@ export const FakeBattleApi = () => {
             sendFns[ type ] = (fn as any);
         };
 
-        onAction<SendMessageAction<ClientAction>>('message/send', ({ message }) => {
-            const fn = sendFns[ message.type ];
+        onAction(SendMessageAction, payload  => {
+            const fn = sendFns[ payload.type ];
 
             if (fn) {
-                setImmediate(() => fn(message));
+                setImmediate(() => fn(payload));
             }
         });
 

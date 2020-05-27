@@ -1,12 +1,12 @@
-import { ConfirmSAction, Position, SpellActionSnapshot, NotifySAction, assertIsDefined } from '@timeflies/shared';
+import { assertIsDefined, ConfirmSAction, NotifySAction, Position, SpellActionSnapshot } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
-import { BStateAction } from '../battleState/BattleStateSchema';
-import { Spell } from '../entities/spell/Spell';
-import { BattleCommitAction } from '../snapshot/SnapshotManager';
-import { SpellActionTimer } from './SpellActionTimer';
+import { BattleStateSpellLaunchAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn as GetterSpellLaunchFn } from '../engine/spellMapping';
+import { Spell } from '../entities/spell/Spell';
+import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
+import { SpellActionTimer } from './SpellActionTimer';
 
 export interface SpellAction {
     spell: Spell<'future'>;
@@ -45,8 +45,7 @@ export const SpellActionManager = (
 
     const { onAction, onMessageAction } = serviceEvent();
     const { dispatchCommit } = serviceDispatch({
-        dispatchCommit: (time: number): BattleCommitAction => ({
-            type: 'battle/commit',
+        dispatchCommit: (time: number) => BattleCommitAction({
             time
         })
     });
@@ -138,24 +137,11 @@ export const SpellActionManager = (
         spellActionTimer.onRemove(deletedList, battleHash);
     };
 
-    onAction<BStateAction>('battle/state/event', action => {
+    onAction(BattleStateSpellLaunchAction, payload => spellActionLaunch(payload.spellActions));
 
-        if (action.eventType === 'SPELL-LAUNCH') {
+    onAction(BattleStateTurnStartAction, clearSnapshotList);
 
-            const { spellActions } = action.payload;
-
-            spellActionLaunch(spellActions);
-
-        } else if (action.eventType === 'TURN-START') {
-
-            clearSnapshotList();
-
-        } else if (action.eventType === 'TURN-END') {
-
-            rollbackCurrentAndFuture();
-        }
-
-    });
+    onAction(BattleStateTurnEndAction, rollbackCurrentAndFuture);
 
     onMessageAction<ConfirmSAction>('confirm', ({ isOk, lastCorrectHash }) => {
         if (!isOk) {

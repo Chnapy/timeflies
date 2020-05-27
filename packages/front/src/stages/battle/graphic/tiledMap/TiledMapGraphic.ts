@@ -4,12 +4,12 @@ import { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceBattleData } from '../../../../services/serviceBattleData';
 import { serviceEvent } from '../../../../services/serviceEvent';
-import { BStateAction } from '../../battleState/BattleStateSchema';
-import { SpellEngineBindAction } from '../../engine/Engine';
+import { SpellEngineBindAction } from '../../engine/engine-actions';
 import { ExtractHoverReturn, getTiledMapSpellObject } from '../../engine/spellMapping';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../spellAction/SpellActionTimer';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../spellAction/spell-action-manager-actions';
 import { graphicTheme } from '../graphic-theme';
 import { TileGraphic } from './TileGraphic';
+import { BattleStateTurnEndAction } from '../../battleState/battle-state-actions';
 
 export interface TiledMapGraphic {
     readonly container: PIXI.Container;
@@ -144,7 +144,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
     const containerOver = new PIXI.Container();
     containerOver.addChild(layerContainerOver);
 
-    onAction<SpellEngineBindAction>('battle/spell-engine/bind', ({
+    onAction(SpellEngineBindAction, ({
         spell, rangeArea, onTileClick: otc, onTileHover: oth
     }) => {
 
@@ -204,7 +204,7 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         };
     });
 
-    onAction<SpellActionTimerStartAction>('battle/spell-action/start', ({
+    onAction(SpellActionTimerStartAction, ({
         spellActionSnapshot: { spellId, position, actionArea, startTime, duration }
     }) => {
 
@@ -225,24 +225,20 @@ export const TiledMapGraphic = (): TiledMapGraphic => {
         });
     });
 
-    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({
+    onAction(SpellActionTimerEndAction, ({
         spellActionSnapshot: { startTime }, removed
     }) => {
         layerTiles.forEach(t => t.clearPersist(startTime, removed));
     });
 
-    onAction<BStateAction>('battle/state/event', action => {
+    onAction(BattleStateTurnEndAction, () => {
+        triggerFn.onTileHover = () => { };
+        triggerFn.onTileClick = () => { };
 
-        if (action.eventType === 'TURN-END') {
-
-            triggerFn.onTileHover = () => { };
-            triggerFn.onTileClick = () => { };
-
-            layerTiles.forEach(t => {
-                t.reset();
-                t.clearPersist();
-            });
-        }
+        layerTiles.forEach(t => {
+            t.reset();
+            t.clearPersist();
+        });
     });
 
     return {

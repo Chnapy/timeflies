@@ -1,5 +1,5 @@
+import { Action } from '@reduxjs/toolkit';
 import configureStore, { MockStoreEnhanced } from 'redux-mock-store';
-import { GameAction } from "./action/game-action/GameAction";
 import { GameState } from "./game-state";
 jest.mock('./Controller');
 
@@ -7,9 +7,9 @@ if (process.env.NODE_ENV !== 'test') {
     throw new Error(`StoreTest should be used only in 'test' env, but you're in '${process.env.NODE_ENV}' env.`);
 }
 
-const mockStore = configureStore<GameState, GameAction>();
+const mockStore = configureStore<GameState, Action>();
 
-let store: MockStoreEnhanced<GameState, GameAction>;
+let store: MockStoreEnhanced<GameState, Action>;
 
 const initStore = (state?: Partial<GameState>): void => {
     store = mockStore({
@@ -36,13 +36,13 @@ export const StoreTest = {
     getStore() {
         return store;
     },
-    getActions(): GameAction[] {
+    getActions(): Action[] {
         return store.getActions();
     },
     clearActions(): void {
         store.clearActions();
     },
-    dispatch<A extends GameAction>(action: A): void {
+    dispatch(action: Action): void {
         store.dispatch(action);
     }
 } as const;

@@ -1,16 +1,8 @@
 import { Reducer } from 'redux';
-import { GameAction, IGameAction } from '../../../action/game-action/GameAction';
 import { stageChangeActionPayloadMatch } from '../../../stages/stage-actions';
 import { EntityTreeData, entityTreeReducer } from './entity-tree-reducer/entity-tree-reducer';
-import { MapSelectData, MapSelectReducer } from './map-select-reducer/map-select-reducer';
+import { MapSelectData, mapSelectReducer } from './map-select-reducer/map-select-reducer';
 
-export interface RoomJoinAction extends IGameAction<'room/join'> {
-    roomId: string;
-}
-
-export interface RoomCreateAction extends IGameAction<'room/create'> {
-
-}
 
 export interface RoomData {
     roomId: string;
@@ -19,7 +11,7 @@ export interface RoomData {
     launchTime: number | null;
 }
 
-export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, action) => {
+export const RoomReducer: Reducer<RoomData | null> = (state = null, action) => {
 
     switch (action.type) {
 
@@ -30,7 +22,7 @@ export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, 
 
                 return {
                     roomId: roomState.roomId,
-                    map: MapSelectReducer(undefined, action),
+                    map: mapSelectReducer(undefined, action),
                     teamsTree: entityTreeReducer(undefined, action),
                     launchTime: null
                 };
@@ -57,7 +49,7 @@ export const RoomReducer: Reducer<RoomData | null, GameAction> = (state = null, 
 
     return state && {
         ...state,
-        map: MapSelectReducer(state.map, action),
+        map: mapSelectReducer(state.map, action),
         teamsTree: entityTreeReducer(state.teamsTree, action)
     };
 };

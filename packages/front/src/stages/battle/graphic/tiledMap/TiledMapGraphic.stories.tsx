@@ -4,7 +4,7 @@ import React from 'react';
 import { AssetLoader } from '../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
-import { SpellEngineBindAction } from '../../engine/Engine';
+import { SpellEngineBindAction } from '../../engine/engine-actions';
 import { Spell } from '../../entities/spell/Spell';
 import { seedSpell } from '../../entities/spell/Spell.seed';
 import { TiledMapGraphic } from './TiledMapGraphic';
@@ -45,8 +45,7 @@ export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
         app.stage.addChild(tiledMap.container);
 
         const { dispatchBindAction } = serviceDispatch({
-            dispatchBindAction: (spell: Spell<'future'>): SpellEngineBindAction => ({
-                type: 'battle/spell-engine/bind',
+            dispatchBindAction: (spell: Spell<'future'>) => SpellEngineBindAction({
                 spell,
                 onTileHover: async () => {
                     return undefined;

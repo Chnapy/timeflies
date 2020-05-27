@@ -2,10 +2,10 @@ import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { BattleDataCurrent, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { StoreTest } from '../../../StoreTest';
-import { BStateSpellLaunchAction, BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
+import { BattleStateSpellLaunchAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
-import { BattleCommitAction } from '../snapshot/SnapshotManager';
+import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
 import { SpellActionManager } from './SpellActionManager';
 
 describe('# SpellActionManager', () => {
@@ -94,36 +94,28 @@ describe('# SpellActionManager', () => {
             }
         });
 
-        StoreTest.dispatch<BStateSpellLaunchAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-LAUNCH',
-            payload: {
-                spellActions: [
-                    {
-                        spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
-                    }
-                ]
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellLaunchAction({
+            spellActions: [
+                {
+                    spell,
+                    position: { x: -1, y: -1 },
+                    actionArea: [ { x: -1, y: -1 } ]
+                }
+            ]
+        }));
 
         const secondHash = 'secondHash';
         futureBattleData.battleHash = secondHash;
 
-        StoreTest.dispatch<BStateSpellLaunchAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-LAUNCH',
-            payload: {
-                spellActions: [
-                    {
-                        spell,
-                        position: { x: 0, y: -1 },
-                        actionArea: [ { x: 0, y: -1 } ]
-                    }
-                ]
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellLaunchAction({
+            spellActions: [
+                {
+                    spell,
+                    position: { x: 0, y: -1 },
+                    actionArea: [ { x: 0, y: -1 } ]
+                }
+            ]
+        }));
 
         return {
             startTime,
@@ -161,19 +153,15 @@ describe('# SpellActionManager', () => {
             }
         });
 
-        StoreTest.dispatch<BStateSpellLaunchAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-LAUNCH',
-            payload: {
-                spellActions: [
-                    {
-                        spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
-                    }
-                ]
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellLaunchAction({
+            spellActions: [
+                {
+                    spell,
+                    position: { x: -1, y: -1 },
+                    actionArea: [ { x: -1, y: -1 } ]
+                }
+            ]
+        }));
 
         expect(spellActionSnapshotList).toEqual<SpellActionSnapshot[]>([ {
             startTime,
@@ -186,10 +174,9 @@ describe('# SpellActionManager', () => {
         } ]);
 
         expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction ]>([
-            {
-                type: 'battle/commit',
+            BattleCommitAction({
                 time: timerTester.now + 200
-            }
+            })
         ]);
     });
 
@@ -238,11 +225,7 @@ describe('# SpellActionManager', () => {
 
         timerTester.advanceBy(250);
 
-        StoreTest.dispatch<BStateTurnEndAction>({
-            type: 'battle/state/event',
-            eventType: 'TURN-END',
-            payload: {}
-        });
+        StoreTest.dispatch(BattleStateTurnEndAction());
 
         expect(spellActionSnapshotList).toEqual([
             beforeRollbackList.find(s => s.battleHash === firstHash)
@@ -253,13 +236,9 @@ describe('# SpellActionManager', () => {
 
         const { spellActionSnapshotList } = rollbackInit();
 
-        StoreTest.dispatch<BStateTurnStartAction>({
-            type: 'battle/state/event',
-            eventType: 'TURN-START',
-            payload: {
-                characterId: 'not-matter'
-            }
-        });
+        StoreTest.dispatch(BattleStateTurnStartAction({
+            characterId: 'not-matter'
+        }));
 
         expect(spellActionSnapshotList).toHaveLength(0);
     });
@@ -297,10 +276,9 @@ describe('# SpellActionManager', () => {
         } ]);
 
         expect(StoreTest.getActions().slice(1)).toEqual<[ BattleCommitAction ]>([
-            {
-                type: 'battle/commit',
+            BattleCommitAction({
                 time: timerTester.now + spell.feature.duration
-            }
+            })
         ]);
     });
 });

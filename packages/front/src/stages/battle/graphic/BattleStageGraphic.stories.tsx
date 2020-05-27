@@ -1,23 +1,23 @@
-import { TiledManager, Position } from '@timeflies/shared';
+import { Position, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../.storybook/preview';
+import { AssetManager } from '../../../assetManager/AssetManager';
+import { seedBattleData } from '../../../battle-data.seed';
+import { BattleDataPeriod } from '../../../BattleData';
 import { Controller } from '../../../Controller';
-import { serviceDispatch } from '../../../services/serviceDispatch';
 import { GameState } from '../../../game-state';
-import { SpellEngineBindAction } from '../engine/Engine';
+import { seedGameState } from '../../../game-state.seed';
+import { serviceDispatch } from '../../../services/serviceDispatch';
+import { SpellEngineBindAction } from '../engine/engine-actions';
 import { SpellPrepareMove } from '../engine/spellEngine/move/SpellPrepareMove';
 import { seedCharacter } from '../entities/character/Character.seed';
+import { seedPlayer } from '../entities/player/Player.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
+import { seedTeam } from '../entities/team/Team.seed';
 import { MapManager } from '../map/MapManager';
 import { Pathfinder as Pathfinder_ } from '../map/Pathfinder';
 import { BattleStageGraphic } from './BattleStageGraphic';
-import { AssetManager } from '../../../assetManager/AssetManager';
-import { seedGameState } from '../../../game-state.seed';
-import { seedBattleData } from '../../../battle-data.seed';
-import { seedPlayer } from '../entities/player/Player.seed';
-import { seedTeam } from '../entities/team/Team.seed';
-import { BattleDataPeriod } from '../../../BattleData';
 
 export default {
     title: 'graphic/BattleStageGraphic',
@@ -39,13 +39,13 @@ const createCharacter = <P extends BattleDataPeriod>(id: string, period: P, posi
 export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const charactersCurrent = [
-        createCharacter('1', 'current', {x: 4, y: 3}),
-        createCharacter('2', 'current', {x: 6, y: 4}),
+        createCharacter('1', 'current', { x: 4, y: 3 }),
+        createCharacter('2', 'current', { x: 6, y: 4 }),
     ];
 
     const charactersFuture = [
-        createCharacter('1', 'future', {x: 4, y: 3}),
-        createCharacter('2', 'future', {x: 6, y: 4}),
+        createCharacter('1', 'future', { x: 4, y: 3 }),
+        createCharacter('2', 'future', { x: 6, y: 4 }),
     ];
 
     const initialState: GameState = seedGameState('p1', {
@@ -119,13 +119,13 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
 
     const charactersCurrent = [
-        createCharacter('1', 'current', {x: 4, y: 3}),
-        createCharacter('2', 'current', {x: 6, y: 4}),
+        createCharacter('1', 'current', { x: 4, y: 3 }),
+        createCharacter('2', 'current', { x: 6, y: 4 }),
     ];
 
     const charactersFuture = [
-        createCharacter('1', 'future', {x: 4, y: 3}),
-        createCharacter('2', 'future', {x: 6, y: 4}),
+        createCharacter('1', 'future', { x: 4, y: 3 }),
+        createCharacter('2', 'future', { x: 6, y: 4 }),
     ];
 
     const initialState: GameState = {
@@ -200,8 +200,7 @@ export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => 
         app.stage.addChild(battleStageGraphic.getContainer());
 
         const { dispatchBindAction } = serviceDispatch({
-            dispatchBindAction: (): SpellEngineBindAction => ({
-                type: 'battle/spell-engine/bind',
+            dispatchBindAction: () => SpellEngineBindAction({
                 spell: seedSpell('fake', {
                     period: 'future', id: '', type: 'move', character: null as any
                 }),

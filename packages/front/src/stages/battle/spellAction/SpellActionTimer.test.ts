@@ -1,8 +1,9 @@
-import { SpellActionCAction, SpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-import { SendMessageAction } from '../../../socket/WSClient';
+import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { StoreTest } from '../../../StoreTest';
-import { SpellActionTimer, SpellActionTimerEndAction, SpellActionTimerStartAction } from './SpellActionTimer';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-manager-actions';
+import { SpellActionTimer } from './SpellActionTimer';
 
 describe('# SpellActionTimer', () => {
 
@@ -64,20 +65,14 @@ describe('# SpellActionTimer', () => {
 
         await serviceNetwork({});
 
-        expect(StoreTest.getActions()).toEqual<[
-            SpellActionTimerStartAction, SendMessageAction<SpellActionCAction>
-        ]>([
-            {
-                type: 'battle/spell-action/start',
+        expect(StoreTest.getActions()).toEqual([
+            SpellActionTimerStartAction({
                 spellActionSnapshot: snapshot
-            },
-            {
-                type: 'message/send',
-                message: {
-                    type: 'battle/spellAction' as const,
-                    spellAction: snapshot
-                }
-            }
+            }),
+            SendMessageAction({
+                type: 'battle/spellAction',
+                spellAction: snapshot
+            })
         ]);
     });
 
@@ -103,12 +98,11 @@ describe('# SpellActionTimer', () => {
 
         expect(
             StoreTest.getActions()
-        ).toContainEqual<SpellActionTimerEndAction>({
-            type: 'battle/spell-action/end',
+        ).toContainEqual(SpellActionTimerEndAction({
             removed: false,
             correctHash: '-hash-',
             spellActionSnapshot: snapshot
-        });
+        }));
     });
 
     it('should remove current spell action on its end & launch the next one', () => {
@@ -139,10 +133,9 @@ describe('# SpellActionTimer', () => {
 
         expect(
             StoreTest.getActions()
-        ).toContainEqual<SpellActionTimerStartAction>({
-            type: 'battle/spell-action/start',
+        ).toContainEqual(SpellActionTimerStartAction({
             spellActionSnapshot: spellActionSnapshotList[ 1 ]
-        });
+        }));
     });
 
     it('should not end current spell action on future rollback', () => {
@@ -208,12 +201,11 @@ describe('# SpellActionTimer', () => {
 
         expect(
             StoreTest.getActions()
-        ).toContainEqual<SpellActionTimerEndAction>({
-            type: 'battle/spell-action/end',
+        ).toContainEqual(SpellActionTimerEndAction({
             removed: true,
             correctHash: '-hash0-',
             spellActionSnapshot: getSnapshot({ battleHash: '-hash1-' })
-        });
+        }));
     });
 
     it('should end passed spell action on delayed rollback', () => {
@@ -253,14 +245,13 @@ describe('# SpellActionTimer', () => {
 
         expect(
             StoreTest.getActions()
-        ).toContainEqual<SpellActionTimerEndAction>({
-            type: 'battle/spell-action/end',
+        ).toContainEqual(SpellActionTimerEndAction({
             removed: true,
             correctHash: '-hash0-',
             spellActionSnapshot: getSnapshot({
                 battleHash: '-hash1-',
                 startTime: timerTester.now - 300
             })
-        });
+        }));
     });
 });
