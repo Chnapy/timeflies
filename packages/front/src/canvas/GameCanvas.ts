@@ -4,8 +4,8 @@ import { serviceEvent } from '../services/serviceEvent';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
 import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
 import { RoomStageGraphic } from '../stages/room/graphic/RoomStageGraphic';
-import { StageKey, StageOnCreateGraphicAction } from '../stages/StageManager';
-import { StageChangeAction } from '../stages/stage-actions';
+import { StageKey } from '../stages/StageManager';
+import { StageChangeAction, StageOnCreateGraphicAction } from '../stages/stage-actions';
 import { CanvasContextMap } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
@@ -66,7 +66,7 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
 
     onResize();
 
-    onAction<StageChangeAction<any>>('stage/change', ({ payload: { stageKey } }) => {
+    onAction(StageChangeAction, ({  stageKey }) => {
         rootStage.removeChildren().forEach(c => c.destroy());
 
         stageGraphic = stageGraphicsMap[ stageKey ](renderer);
@@ -75,7 +75,7 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
         requestRender();
     });
 
-    onAction<StageOnCreateGraphicAction<any>>('stage/onCreate/graphic', ({ param }) => {
+    onAction(StageOnCreateGraphicAction, ({ param }) => {
 
         assertIsDefined(stageGraphic);
 

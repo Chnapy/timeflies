@@ -3,9 +3,9 @@ import * as PIXI from 'pixi.js';
 import { BattleDataPeriod } from '../../../../../BattleData';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../../services/serviceEvent';
-import { BStateAction } from '../../../battleState/BattleStateSchema';
+import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../../../battleState/battle-state-actions';
 import { Character } from '../../../entities/character/Character';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/SpellActionTimer';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-manager-actions';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
@@ -136,7 +136,7 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
         return previousState;
     };
 
-    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({
+    onAction(SpellActionTimerEndAction, ({
         spellActionSnapshot: { characterId }
     }) => {
         if (characterId !== character.id) {
@@ -161,7 +161,7 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
             .play();
     });
 
-    onAction<SpellActionTimerStartAction>('battle/spell-action/start', ({
+    onAction(SpellActionTimerStartAction, ({
         spellActionSnapshot,
         spellActionSnapshot: {
             characterId, spellId
@@ -210,24 +210,23 @@ const periodFuture: PeriodFn<'future'> = (character, tiledMapGraphic, spriteshee
     const sprite = new PIXI.Sprite(texture);
     sprite.alpha = 0.25;
 
-    onAction<BStateAction>('battle/state/event', action => {
+    onAction(BattleStateSpellLaunchAction, () => {
 
-        if (action.eventType === 'SPELL-LAUNCH') {
+        // be sure to run that after spell had touched the character
+        setImmediate(() => {
+            const idlePath = getAnimPath(character.staticData.type, 'idle', character.orientation);
+            const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
 
-            // be sure to run that after spell had touched the character
-            setImmediate(() => {
-                const idlePath = getAnimPath(character.staticData.type, 'idle', character.orientation);
-                const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
+            sprite.texture = texture;
+            const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
+            sprite.position.set(worldPos.x, worldPos.y);
+            sprite.visible = true;
+        });
+    });
 
-                sprite.texture = texture;
-                const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
-                sprite.position.set(worldPos.x, worldPos.y);
-                sprite.visible = true;
-            });
-        } else if (action.eventType === 'TURN-END') {
+    onAction(BattleStateTurnEndAction, () => {
 
-            sprite.visible = false;
-        }
+        sprite.visible = false;
     });
 
     return { sprite };

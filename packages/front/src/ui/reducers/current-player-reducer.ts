@@ -1,32 +1,17 @@
-import { Reducer } from "redux";
-import { GameAction, IGameAction } from "../../action/game-action/GameAction";
+import { createReducer } from '@reduxjs/toolkit';
 import { CurrentPlayer } from "../../CurrentPlayer";
-import { stageChangeActionPayloadMatch } from '../../stages/stage-actions';
+import { StageChangeAction, stageChangeActionPayloadMatch } from '../../stages/stage-actions';
 
-export interface LoginSuccess extends IGameAction<'login/success'> {
-    currentPlayer: CurrentPlayer;
-}
+export const currentPlayerReducer = createReducer(null as CurrentPlayer | null, {
+    [ StageChangeAction.type ]: (state, { payload }: StageChangeAction) => {
+        if (stageChangeActionPayloadMatch('room', payload)) {
+            const { roomState: { playerList } } = payload.data;
+            const p = playerList[ playerList.length - 1 ];
 
-export const CurrentPlayerReducer: Reducer<CurrentPlayer | null, GameAction> = (state = null, action) => {
-
-    switch (action.type) {
-
-        // TODO temp for room, waiting for login page
-        case 'stage/change':
-            const { payload } = action;
-            if (stageChangeActionPayloadMatch('room', payload)) {
-                const { roomState: { playerList } } = payload.data;
-                const p = playerList[ playerList.length - 1 ];
-
-                return {
-                    id: p.id,
-                    name: p.name
-                };
-            }
-            break;
-        case 'login/success':
-            return action.currentPlayer;
+            return {
+                id: p.id,
+                name: p.name
+            };
+        }
     }
-
-    return state && { ...state };
-};
+});

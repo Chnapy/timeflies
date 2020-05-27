@@ -1,21 +1,14 @@
 import { assertIsDefined, assertThenGet, BattleSnapshot, getBattleSnapshotWithHash, getId } from '@timeflies/shared';
-import { IGameAction } from '../../../action/game-action/GameAction';
 import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceEvent } from '../../../services/serviceEvent';
-import { BStateAction } from '../battleState/BattleStateSchema';
-import { NotifyDeathsAction } from '../cycle/CycleManager';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
+import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 import { PeriodicEntity } from '../entities/PeriodicEntity';
-import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
 import { Team } from '../entities/team/Team';
-
-export interface BattleCommitAction extends IGameAction<'battle/commit'> {
-    time: number;
-}
-
-export interface SnapshotManager {
-}
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
+import { BattleCommitAction } from './snapshot-manager-actions';
 
 export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
     entityList: PeriodicEntity<any, S>[],
@@ -39,16 +32,14 @@ const assertHashIsInSnapshotList = (
     }
 };
 
-export const SnapshotManager = (): SnapshotManager => {
+export const SnapshotManager = () => {
 
     const snapshotList: BattleSnapshot[] = [];
 
     const getLastSnapshot = (): BattleSnapshot | undefined => snapshotList[ snapshotList.length - 1 ];
 
     const { dispatchNotifyDeaths } = serviceDispatch({
-        dispatchNotifyDeaths: (): NotifyDeathsAction => ({
-            type: 'battle/notify-deaths'
-        })
+        dispatchNotifyDeaths: NotifyDeathsAction
     });
 
     const updateBattleDataFromSnapshot = (period: BattleDataPeriod, { battleHash, teamsSnapshots }: BattleSnapshot) => {
@@ -79,7 +70,7 @@ export const SnapshotManager = (): SnapshotManager => {
         updateBattleDataFromSnapshot('current', snapshot);
 
         const serializedDeathsAfter = serializeDeaths();
-        
+
         if (serializedDeathsBefore !== serializedDeathsAfter) {
             dispatchNotifyDeaths();
         }
@@ -147,15 +138,17 @@ export const SnapshotManager = (): SnapshotManager => {
 
     const { onAction } = serviceEvent();
 
-    onAction<BattleCommitAction>('battle/commit', ({ time }) => commit(time));
-    onAction<BStateAction>('battle/state/event', ({ eventType }) => {
-        if (eventType === 'TURN-END') {
-            rollbackFuture();
-        } else if (eventType === 'TURN-START') {
-            commit(Date.now());
-        }
+    onAction(BattleCommitAction, ({ time }) => commit(time));
+
+    onAction(BattleStateTurnStartAction, () => {
+        commit(Date.now());
     });
-    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({ removed, correctHash }) => {
+
+    onAction(BattleStateTurnEndAction, () => {
+        rollbackFuture();
+    });
+
+    onAction(SpellActionTimerEndAction, ({ removed, correctHash }) => {
 
         if (removed) {
             rollback(correctHash);

@@ -1,11 +1,12 @@
 import { assertIsDefined, assertThenGet, Position, TileType } from "@timeflies/shared";
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
-import { BStateResetAction, BStateSpellLaunchAction, BStateSpellPrepareAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
+import { BattleStateAction, BattleStateResetAction, BattleStateSpellLaunchAction, BattleStateSpellPrepareAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
 import { Spell } from '../entities/spell/Spell';
 import { MapManager } from '../map/MapManager';
-import { EngineCreator, SpellEngineBindAction } from './Engine';
+import { EngineCreator } from './Engine';
+import { SpellEngineBindAction } from './engine-actions';
 import { getSpellPrepareSubEngine } from './spellMapping';
 
 export interface SpellPrepareSubEngine<HR> {
@@ -19,63 +20,67 @@ export interface SpellPrepareSubEngineCreator<HR> {
     (spell: Spell<'future'>, mapManager: MapManager): SpellPrepareSubEngine<HR>;
 }
 
-type Event =
-    | BStateSpellPrepareAction
-    | BStateSpellLaunchAction
-    | BStateResetAction
-    | BStateTurnStartAction;
+type Event = Exclude<BattleStateAction, BattleStateTurnEndAction>;
 
-const extractDataFromEvent = (event: Event): { character: Character<'future'>; spell: Spell<'future'> } => {
+type ExtractFromEvent = { character: Character<'future'>; spell: Spell<'future'> };
+
+const extractDataFromEvent = (event: Event): ExtractFromEvent => {
     const { globalTurn } = serviceBattleData('cycle');
     const { characters } = serviceBattleData('future');
 
-    switch (event.eventType) {
-        case 'TURN-START':
-        case 'RESET':
+    const onTurnStartOrReset = ({ payload }: BattleStateTurnStartAction | BattleStateResetAction) => {
 
-            const character1 = assertThenGet(
-                characters.find(c => c.id === event.payload.characterId),
+        const character = assertThenGet(
+            characters.find(c => c.id === payload.characterId),
+            assertIsDefined
+        );
+
+        const spell = character.defaultSpell;
+
+        return {
+            character,
+            spell
+        };
+    };
+
+    const extractMap = {
+        [ BattleStateResetAction.type ]: onTurnStartOrReset,
+        [ BattleStateTurnStartAction.type ]: onTurnStartOrReset,
+        [ BattleStateSpellPrepareAction.type ]: ({ payload }: BattleStateSpellPrepareAction) => {
+            const currentChar = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const character = assertThenGet(
+                characters.find(c => c.id === currentChar.id),
                 assertIsDefined
             );
 
-            const spell1 = character1.defaultSpell;
+            const spell = assertThenGet(
+                character.spells.find(s => s.staticData.type === payload.spellType),
+                assertIsDefined
+            );
 
             return {
-                character: character1,
-                spell: spell1
+                character,
+                spell
             };
-        case 'SPELL-PREPARE':
+        },
+        [ BattleStateSpellLaunchAction.type ]: () => {
 
-            const currentChar1 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
-            const character2 = assertThenGet(
-                characters.find(c => c.id === currentChar1.id),
+            const currentChar = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
+            const character = assertThenGet(
+                characters.find(c => c.id === currentChar.id),
                 assertIsDefined
             );
 
-            const spell2 = assertThenGet(
-                character2.spells.find(s => s.staticData.type === event.payload.spellType),
-                assertIsDefined
-            );
+            const spell = character.defaultSpell;
 
             return {
-                character: character2,
-                spell: spell2
+                character,
+                spell
             };
-        case 'SPELL-LAUNCH':
+        }
+    } as const;
 
-            const currentChar2 = assertThenGet(globalTurn, assertIsDefined).currentTurn.character;
-            const character3 = assertThenGet(
-                characters.find(c => c.id === currentChar2.id),
-                assertIsDefined
-            );
-
-            const spell3 = character3.defaultSpell;
-
-            return {
-                character: character3,
-                spell: spell3
-            };
-    }
+    return extractMap[ event.type ](event as any);
 };
 
 export const SpellPrepareEngine: EngineCreator<Event, [ typeof getSpellPrepareSubEngine ]> = (
@@ -93,7 +98,7 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof getSpellPrepareSu
 
     assertIsDefined(globalTurn);
 
-    const engine = getSubEngine( spell.staticData.type )(spell, mapManager);
+    const engine = getSubEngine(spell.staticData.type)(spell, mapManager);
 
     const ifCanSpellBeUsed = <F extends SpellPrepareSubEngine<any>>(
         fct: F[ 'onTileHover' ]
@@ -104,12 +109,11 @@ export const SpellPrepareEngine: EngineCreator<Event, [ typeof getSpellPrepareSu
             const tileType = mapManager.tiledManager.getTileType(tilePos);
 
             return await fct(tilePos, tileType);
-        } 
+        }
     };
 
     const { dispatchBind } = serviceDispatch({
-        dispatchBind: (spell: Spell<'future'>, rangeArea: Position[]): SpellEngineBindAction => ({
-            type: 'battle/spell-engine/bind',
+        dispatchBind: (spell: Spell<'future'>, rangeArea: Position[]) => SpellEngineBindAction({
             spell,
             rangeArea,
             onTileHover: ifCanSpellBeUsed(engine.onTileHover),

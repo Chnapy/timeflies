@@ -2,7 +2,7 @@ import { SpellType, switchUtil, TurnSnapshot } from "@timeflies/shared";
 import { BattleDataPeriod } from '../../../BattleData';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from "../../../services/serviceDispatch";
-import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character } from "../entities/character/Character";
 
 export type TurnState = 'idle' | 'running' | 'ended';
@@ -24,18 +24,10 @@ export interface Turn {
 export const Turn = (id: number, startTime: number, character: Character<'current'>, onTurnEnd: () => void): Turn => {
 
     const { dispatchStart, dispatchEnd } = serviceDispatch({
-        dispatchStart: (): BStateTurnStartAction => ({
-            type: 'battle/state/event',
-            eventType: 'TURN-START',
-            payload: {
-                characterId: character.id
-            }
+        dispatchStart: () => BattleStateTurnStartAction({
+            characterId: character.id
         }),
-        dispatchEnd: (): BStateTurnEndAction => ({
-            type: 'battle/state/event',
-            eventType: 'TURN-END',
-            payload: {}
-        })
+        dispatchEnd: BattleStateTurnEndAction
     });
 
     const timedActionManager = (() => {
@@ -43,7 +35,7 @@ export const Turn = (id: number, startTime: number, character: Character<'curren
 
         return {
             set: (value: NodeJS.Timeout | undefined) => {
-                if(timedActionTimeout) {
+                if (timedActionTimeout) {
                     clearTimeout(timedActionTimeout);
                 }
                 timedActionTimeout = value;

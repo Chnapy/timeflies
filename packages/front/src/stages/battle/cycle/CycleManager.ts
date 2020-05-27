@@ -1,12 +1,9 @@
-import { assertIsDefined, assertThenGet, BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GlobalTurnSnapshot, TurnSnapshot, BRunEndSAction } from '@timeflies/shared';
+import { assertIsDefined, assertThenGet, BRunEndSAction, BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GlobalTurnSnapshot, TurnSnapshot } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { GlobalTurn } from './GlobalTurn';
-import { IGameAction } from '../../../action/game-action/GameAction';
-import { BStateSpellPrepareAction } from '../battleState/BattleStateSchema';
-
-export interface NotifyDeathsAction extends IGameAction<'battle/notify-deaths'> {
-}
+import { NotifyDeathsAction } from './cycle-manager-actions';
+import { BattleStateSpellPrepareAction } from '../battleState/battle-state-actions';
 
 export interface CycleManager {
     readonly isRunning: boolean;
@@ -62,18 +59,12 @@ export const CycleManager = (
 
     const { onAction, onMessageAction } = serviceEvent();
 
-    onAction<BStateSpellPrepareAction>(
-        'battle/state/event',
-        ({ payload: { spellType } }) => {
-            if (cycleData.globalTurn)
-                cycleData.globalTurn.currentTurn.currentSpellType = spellType;
-        }
-    );
+    onAction(BattleStateSpellPrepareAction, ({ spellType }) => {
+        if (cycleData.globalTurn)
+            cycleData.globalTurn.currentTurn.currentSpellType = spellType;
+    });;
 
-    onAction<NotifyDeathsAction>(
-        'battle/notify-deaths',
-        () => cycleData.globalTurn?.notifyDeaths()
-    );
+    onAction(NotifyDeathsAction, () => cycleData.globalTurn?.notifyDeaths());
 
     onMessageAction<BRunGlobalTurnStartSAction>(
         'battle-run/global-turn-start',

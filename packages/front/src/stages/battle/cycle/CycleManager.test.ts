@@ -1,13 +1,14 @@
-import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getId, TimerTester, BRunEndSAction } from "@timeflies/shared";
+import { getId, TimerTester } from "@timeflies/shared";
 import { ReceiveMessageAction } from "../../../socket/wsclient-actions";
 import { StoreTest } from "../../../StoreTest";
+import { Character } from '../entities/character/Character';
 import { seedCharacter } from "../entities/character/Character.seed";
-import { CycleManager, NotifyDeathsAction } from "./CycleManager";
+import { CycleManager } from "./CycleManager";
+import { seedGlobalTurn } from './global-turn.seed';
 import { GlobalTurn, GlobalTurnState } from "./GlobalTurn";
 import { TurnState } from "./Turn";
-import { Character } from '../entities/character/Character';
-import { seedGlobalTurn } from './global-turn.seed';
 import { seedTurn } from './turn.seed';
+import { NotifyDeathsAction } from './cycle-manager-actions';
 
 describe('# CycleManager', () => {
 
@@ -393,9 +394,7 @@ describe('# CycleManager', () => {
             }
         }));
 
-        StoreTest.dispatch<NotifyDeathsAction>({
-            type: 'battle/notify-deaths'
-        });
+        StoreTest.dispatch(NotifyDeathsAction());
 
         expect(notifyDeaths).toHaveBeenCalledTimes(1);
     });

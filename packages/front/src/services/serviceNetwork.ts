@@ -1,5 +1,6 @@
 import { ClientAction, DistributiveOmit } from "@timeflies/shared";
 import { Controller } from "../Controller";
+import { SendMessageAction } from '../socket/wsclient-actions';
 
 type ClientActionWOSendTime<A extends ClientAction> = DistributiveOmit<A, 'sendTime'>;
 
@@ -20,10 +21,7 @@ export const serviceNetwork = async <P extends Params<A>, A extends ClientAction
     return Object.entries(map)
         .reduce((arr, [ key, value ]) => {
 
-            arr[ key ] = (...args) => dispatch({
-                type: 'message/send',
-                message: value(...args)
-            });
+            arr[ key ] = (...args) => dispatch(SendMessageAction(value(...args)));
 
             return arr;
         }, {}) as Return<P, A>;

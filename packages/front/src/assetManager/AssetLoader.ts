@@ -4,7 +4,7 @@ import { Loader as _Loader, LoaderResource } from 'pixi.js';
 import { IAddOptions, ImageLoadStrategy, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
 import { TiledMap } from 'tiled-types';
-import { AppResetAction } from '../Controller';
+import { AppResetAction } from '../controller-actions';
 import { serviceEvent } from '../services/serviceEvent';
 
 export type AppLoader = Pick<_Loader,
@@ -173,7 +173,7 @@ export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Lo
 
     loader.use(mapLoaderMiddleware);
 
-    onAction<AppResetAction>('app/reset', () => {
+    onAction(AppResetAction, () => {
         loader.reset();
 
         for (const textureUrl in PIXI.utils.BaseTextureCache) {

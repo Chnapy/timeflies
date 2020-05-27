@@ -1,7 +1,7 @@
 import { equals, Position, TileType } from '@timeflies/shared'
 import { serviceBattleData } from '../../../../../services/serviceBattleData'
 import { serviceDispatch } from '../../../../../services/serviceDispatch'
-import { BStateSpellLaunchAction } from '../../../battleState/BattleStateSchema'
+import { BattleStateSpellLaunchAction } from '../../../battleState/battle-state-actions'
 import { Character } from '../../../entities/character/Character'
 import { Spell } from '../../../entities/spell/Spell'
 import { MapManager } from '../../../map/MapManager'
@@ -16,7 +16,7 @@ export const spellLaunchSimpleAttack = ({ actionArea, spell }: SpellAction, char
 };
 
 export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
-    undefined | { 
+    undefined | {
         tilePos: Position;
         actionArea: Position[];
     }
@@ -28,12 +28,8 @@ export const SpellPrepareSimpleAttack: SpellPrepareSubEngineCreator<
         const { characters } = serviceBattleData('future');
 
         const { dispatchSpellLaunch } = serviceDispatch({
-            dispatchSpellLaunch: (spellActions: SpellAction[]): BStateSpellLaunchAction => ({
-                type: 'battle/state/event',
-                eventType: 'SPELL-LAUNCH',
-                payload: {
-                    spellActions
-                }
+            dispatchSpellLaunch: (spellActions: SpellAction[]) => BattleStateSpellLaunchAction({
+                spellActions
             })
         });
 

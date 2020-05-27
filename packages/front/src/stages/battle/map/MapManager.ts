@@ -2,9 +2,9 @@ import { BresenhamPoint, equals, Position, TiledManager, TiledMapAssets } from '
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceEvent } from '../../../services/serviceEvent';
 import { Character } from '../entities/character/Character';
-import { BattleCommitAction } from '../snapshot/SnapshotManager';
+import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
 import { Pathfinder } from './Pathfinder';
-import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
 
 export interface MapManager extends Pick<Pathfinder, 'calculatePath'> {
     readonly tiledManager: TiledManager;
@@ -78,12 +78,9 @@ export const MapManager = (
         });
     };
 
-    onAction<BattleCommitAction>('battle/commit', action => {
+    onAction(BattleCommitAction, () => pathfinder.refreshGrid());
 
-        pathfinder.refreshGrid();
-    });
-
-    onAction<SpellActionTimerEndAction>('battle/spell-action/end', ({ removed }) => {
+    onAction(SpellActionTimerEndAction, ({ removed }) => {
 
         if (removed) {
             setImmediate(() => pathfinder.refreshGrid());

@@ -1,5 +1,7 @@
+import { PayloadAction } from '@reduxjs/toolkit';
 import { StoreTest } from '../StoreTest';
 import { ActionManager } from './ActionManager';
+import { AppResetAction } from '../controller-actions';
 
 describe('# ActionManager', () => {
 
@@ -8,7 +10,7 @@ describe('# ActionManager', () => {
 
         const middleware = manager.getMiddleware();
 
-        const middlewareDispatch = middleware(null as any)(a => a);
+        const middlewareDispatch: (action: PayloadAction<any>) => void = middleware(null as any)(a => a);
 
         return {
             manager,
@@ -29,19 +31,14 @@ describe('# ActionManager', () => {
 
         const listener = jest.fn();
 
-        manager.addActionListener('stage/change', listener);
+        manager.addActionListener('action/type', listener);
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
-        expect(listener).toHaveBeenNthCalledWith(1, {
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
-        });
+        expect(listener).toHaveBeenNthCalledWith(1, { v: 6 });
     });
 
     it('should launch multiple listeners on middleware dispatch', () => {
@@ -50,25 +47,16 @@ describe('# ActionManager', () => {
         const listener1 = jest.fn();
         const listener2 = jest.fn();
 
-        manager.addActionListener('stage/change', listener1);
-        manager.addActionListener('stage/change', listener2);
+        manager.addActionListener('action/type', listener1);
+        manager.addActionListener('action/type', listener2);
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
-        expect(listener1).toHaveBeenNthCalledWith(1, {
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
-        });
-        expect(listener2).toHaveBeenNthCalledWith(1, {
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
-        });
+        expect(listener1).toHaveBeenNthCalledWith(1, { v: 6 });
+        expect(listener2).toHaveBeenNthCalledWith(1, { v: 6 });
     });
 
     it('should do nothing on adding multiple times the same listener', () => {
@@ -76,20 +64,15 @@ describe('# ActionManager', () => {
 
         const listener = jest.fn();
 
-        manager.addActionListener('stage/change', listener);
-        manager.addActionListener('stage/change', listener);
+        manager.addActionListener('action/type', listener);
+        manager.addActionListener('action/type', listener);
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
-        expect(listener).toHaveBeenNthCalledWith(1, {
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
-        });
+        expect(listener).toHaveBeenNthCalledWith(1, { v: 6 });
     });
 
     it('should do nothing on dispatch with no listener concerned', () => {
@@ -100,9 +83,8 @@ describe('# ActionManager', () => {
         manager.addActionListener('battle/notify-deaths', listener);
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
         expect(listener).not.toHaveBeenCalled();
@@ -115,12 +97,11 @@ describe('# ActionManager', () => {
 
         const listener = jest.fn(() => nbCalls++);
 
-        const listenerCb = manager.addActionListener('stage/change', listener);
+        const listenerCb = manager.addActionListener('action/type', listener);
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
         expect(listener).toHaveBeenCalled();
@@ -130,9 +111,8 @@ describe('# ActionManager', () => {
         const nbCallsBefore = nbCalls;
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
         expect(nbCalls).toBe(nbCallsBefore);
@@ -145,13 +125,13 @@ describe('# ActionManager', () => {
         // const manager = ActionManager(storeDispatch);
 
         // manager.dispatch({
-        //     type: 'stage/change',
+        //     type: 'action/type',
         //     stageKey: 'boot',
         //     payload: {}
         // });
 
         // expect(storeDispatch).toHaveBeenNthCalledWith(1, {
-        //     type: 'stage/change',
+        //     type: 'action/type',
         //     stageKey: 'boot',
         //     payload: {}
         // });
@@ -164,26 +144,22 @@ describe('# ActionManager', () => {
 
         const listener = jest.fn(() => nbCalls++);
 
-        manager.addActionListener('stage/change', listener);
+        manager.addActionListener('action/type', listener);
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
         expect(listener).toHaveBeenCalled();
 
-        middlewareDispatch({
-            type: 'app/reset'
-        });
+        middlewareDispatch(AppResetAction());
 
         const nbCallsBefore = nbCalls;
 
         middlewareDispatch({
-            type: 'stage/change',
-            stageKey: 'boot',
-            payload: {}
+            type: 'action/type',
+            payload: { v: 6 }
         });
 
         expect(nbCalls).toBe(nbCallsBefore);
@@ -196,21 +172,16 @@ describe('# ActionManager', () => {
 
             const listener = jest.fn();
 
-            manager.addActionListener('stage/change', listener);
+            manager.addActionListener('action/type', listener);
 
             manager.beginBattleSession();
 
             middlewareDispatch({
-                type: 'stage/change',
-                stageKey: 'boot',
-                payload: {}
+                type: 'action/type',
+                payload: { v: 6 }
             });
 
-            expect(listener).toHaveBeenNthCalledWith(1, {
-                type: 'stage/change',
-                stageKey: 'boot',
-                payload: {}
-            });
+            expect(listener).toHaveBeenNthCalledWith(1, { v: 6 });
         });
 
         it('should call battle listeners on dispatch', () => {
@@ -220,19 +191,14 @@ describe('# ActionManager', () => {
 
             manager.beginBattleSession();
 
-            manager.addActionListener('stage/change', listener);
+            manager.addActionListener('action/type', listener);
 
             middlewareDispatch({
-                type: 'stage/change',
-                stageKey: 'boot',
-                payload: {}
+                type: 'action/type',
+                payload: { v: 6 }
             });
 
-            expect(listener).toHaveBeenNthCalledWith(1, {
-                type: 'stage/change',
-                stageKey: 'boot',
-                payload: {}
-            });
+            expect(listener).toHaveBeenNthCalledWith(1, { v: 6 });
         });
 
         it('should clear battle listeners on session end', () => {
@@ -242,12 +208,11 @@ describe('# ActionManager', () => {
 
             manager.beginBattleSession();
 
-            manager.addActionListener('stage/change', () => listener());
+            manager.addActionListener('action/type', () => listener());
 
             middlewareDispatch({
-                type: 'stage/change',
-                stageKey: 'boot',
-                payload: {}
+                type: 'action/type',
+                payload: { v: 6 }
             });
 
             expect(listener).toHaveBeenCalledTimes(1);
@@ -257,9 +222,8 @@ describe('# ActionManager', () => {
             listener = jest.fn();
 
             middlewareDispatch({
-                type: 'stage/change',
-                stageKey: 'boot',
-                payload: {}
+                type: 'action/type',
+                payload: { v: 6 }
             });
 
             expect(listener).not.toHaveBeenCalled();

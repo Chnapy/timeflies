@@ -1,8 +1,8 @@
 import { Position, TiledManager, TiledMapSeedKey, TimerTester } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
-import { BattleCommitAction } from '../snapshot/SnapshotManager';
-import { SpellActionTimerEndAction } from '../spellAction/SpellActionTimer';
+import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
 import { MapManager } from './MapManager';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';
@@ -127,10 +127,9 @@ describe('# MapManager', () => {
 
         const prevNbrCalls = nbrCalls;
 
-        StoreTest.dispatch<BattleCommitAction>({
-            type: 'battle/commit',
+        StoreTest.dispatch(BattleCommitAction({
             time: Date.now()
-        });
+        }));
 
         expect(nbrCalls).toBe(prevNbrCalls + 1);
 
@@ -151,12 +150,11 @@ describe('# MapManager', () => {
 
         const prevNbrCalls = nbrCalls;
 
-        StoreTest.dispatch<SpellActionTimerEndAction>({
-            type: 'battle/spell-action/end',
+        StoreTest.dispatch(SpellActionTimerEndAction({
             correctHash: '',
             removed: true,
             spellActionSnapshot: {} as any
-        });
+        }));
 
         jest.runAllImmediates();
 

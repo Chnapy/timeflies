@@ -4,7 +4,7 @@ import { assertIsDefined, switchUtil } from '@timeflies/shared';
 import React from 'react';
 import { BattleDataMap } from '../../../../BattleData';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
-import { BStateSpellPrepareAction } from '../../../../stages/battle/battleState/BattleStateSchema';
+import { BattleStateSpellPrepareAction } from '../../../../stages/battle/battleState/battle-state-actions';
 import { Turn } from '../../../../stages/battle/cycle/Turn';
 import { Character } from '../../../../stages/battle/entities/character/Character';
 import { Spell } from '../../../../stages/battle/entities/spell/Spell';
@@ -115,13 +115,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         }
 
         const { dispatchSpellPrepare } = serviceDispatch({
-            dispatchSpellPrepare: (): BStateSpellPrepareAction => ({
-                type: 'battle/state/event',
-                eventType: 'SPELL-PREPARE',
-                payload: {
-                    spellType
-                }
-            })
+            dispatchSpellPrepare: () => BattleStateSpellPrepareAction({ spellType })
         });
 
         dispatchSpellPrepare();

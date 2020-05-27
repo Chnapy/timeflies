@@ -1,6 +1,7 @@
 import { StoreTest } from '../../../StoreTest';
 import { seedMapManager } from '../map/MapManager.seed';
-import { BState, BStateSpellPrepareAction } from './BattleStateSchema';
+import { BattleStateSpellPrepareAction } from './battle-state-actions';
+import { BState } from './BattleStateSchema';
 import { BStateMachine } from './BStateMachine';
 
 
@@ -48,7 +49,7 @@ describe('# BStateMachine', () => {
                             stop() { }
                         }),
                         on: {
-                            "SPELL-PREPARE": [ {
+                            [BattleStateSpellPrepareAction.type]: [ {
                                 target: 'spellPrepare',
                             } ]
                         }
@@ -62,13 +63,9 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateSpellPrepareAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-PREPARE',
-            payload: {
-                spellType: 'move'
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellPrepareAction({
+            spellType: 'move'
+        }));
 
         expect(machine.state).toBe<BState>('spellPrepare');
     });
@@ -84,7 +81,7 @@ describe('# BStateMachine', () => {
                             stop() { }
                         }),
                         on: {
-                            "SPELL-PREPARE": [ {
+                            [BattleStateSpellPrepareAction.type]: [ {
                                 target: 'spellPrepare',
                                 cond: () => true
                             } ]
@@ -99,13 +96,9 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateSpellPrepareAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-PREPARE',
-            payload: {
-                spellType: 'move'
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellPrepareAction({
+            spellType: 'move'
+        }));
 
         expect(machine.state).toBe<BState>('spellPrepare');
     });
@@ -121,7 +114,7 @@ describe('# BStateMachine', () => {
                             stop() { }
                         }),
                         on: {
-                            "SPELL-PREPARE": [ {
+                            [BattleStateSpellPrepareAction.type]: [ {
                                 target: 'spellPrepare',
                                 cond: () => false
                             } ]
@@ -136,13 +129,9 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateSpellPrepareAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-PREPARE',
-            payload: {
-                spellType: 'move'
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellPrepareAction({
+            spellType: 'move'
+        }));
 
         expect(machine.state).toBe<BState>('watch');
     });
@@ -169,13 +158,9 @@ describe('# BStateMachine', () => {
             })
         });
 
-        StoreTest.dispatch<BStateSpellPrepareAction>({
-            type: 'battle/state/event',
-            eventType: 'SPELL-PREPARE',
-            payload: {
-                spellType: 'move'
-            }
-        });
+        StoreTest.dispatch(BattleStateSpellPrepareAction({
+            spellType: 'move'
+        }));
 
         expect(machine.state).toBe<BState>('watch');
     });

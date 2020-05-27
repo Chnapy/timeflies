@@ -1,8 +1,8 @@
-import { TimerTester, SpellActionSnapshot } from '@timeflies/shared';
+import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { StoreTest } from '../../../StoreTest';
-import { seedCharacter } from "../entities/character/Character.seed";
-import { BStateTurnEndAction, BStateTurnStartAction } from '../battleState/BattleStateSchema';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character } from "../entities/character/Character";
+import { seedCharacter } from "../entities/character/Character.seed";
 import { Turn, TurnState } from "./Turn";
 
 describe('# Turn', () => {
@@ -64,11 +64,9 @@ describe('# Turn', () => {
         turnIdle.refreshTimedActions();
 
         expect(StoreTest.getActions()).toHaveLength(1);
-        expect(StoreTest.getActions()).toEqual<[ BStateTurnStartAction ]>([ {
-            type: 'battle/state/event',
-            eventType: 'TURN-START',
-            payload: { characterId: character.id }
-        } ]);
+        expect(StoreTest.getActions()).toEqual([ BattleStateTurnStartAction({
+            characterId: character.id
+        }) ]);
     });
 
     it('should run callbacks at expected time', () => {
@@ -90,11 +88,9 @@ describe('# Turn', () => {
 
         // 1100
 
-        expect(StoreTest.getActions()).toEqual<[ BStateTurnStartAction ]>([ {
-            type: 'battle/state/event',
-            eventType: 'TURN-START',
-            payload: { characterId: character.id }
-        } ]);
+        expect(StoreTest.getActions()).toEqual([ BattleStateTurnStartAction({
+            characterId: character.id
+        }) ]);
 
         timerTester.advanceBy(1700);
 
@@ -110,20 +106,12 @@ describe('# Turn', () => {
 
         expect(endFn).toHaveBeenCalledTimes(1);
 
-        expect(StoreTest.getActions()).toEqual<[
-            BStateTurnStartAction,
-            BStateTurnEndAction ]>([
-                {
-                    type: 'battle/state/event',
-                    eventType: 'TURN-START',
-                    payload: { characterId: character.id }
-                },
-                {
-                    type: 'battle/state/event',
-                    eventType: 'TURN-END',
-                    payload: {}
-                }
-            ]);
+        expect(StoreTest.getActions()).toEqual([
+            BattleStateTurnStartAction({
+                characterId: character.id
+            }),
+            BattleStateTurnEndAction()
+        ]);
 
     });
 

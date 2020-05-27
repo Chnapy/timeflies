@@ -1,17 +1,15 @@
 import { assertIsDefined, assertIsNonNullable, MapConfig } from '@timeflies/shared';
-import { Middleware } from 'redux';
-import { GameAction } from '../../../action/game-action/GameAction';
+import { Action, Middleware } from 'redux';
 import { AssetManager } from '../../../assetManager/AssetManager';
 import { Controller } from '../../../Controller';
 import { GameState } from '../../../game-state';
-import { SendMessageAction } from '../../../socket/WSClient';
+import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { StageChangeAction } from '../../../stages/stage-actions';
 import { MapLoadedAction } from './map-select-reducer/map-select-actions';
-import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
-    return (action: GameAction) => {
+    return (action: Action) => {
 
         const { step } = api.getState();
 
@@ -78,14 +76,11 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
                 const loadResources = async (mapConfig: MapConfig) => {
 
-                    api.dispatch<SendMessageAction>({
-                        type: 'message/send',
-                        message: {
-                            type: 'room/player/state',
-                            isReady: false,
-                            isLoading: true
-                        }
-                    });
+                    api.dispatch(SendMessageAction({
+                        type: 'room/player/state',
+                        isReady: false,
+                        isLoading: true
+                    }));
 
                     const { map } = await Controller.loader.newInstance()
                         .add('map', mapConfig.schemaUrl)
@@ -103,14 +98,11 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                         .addSpritesheet('spells', AssetManager.spritesheets.spells)
                         .load();
 
-                    api.dispatch<SendMessageAction>({
-                        type: 'message/send',
-                        message: {
-                            type: 'room/player/state',
-                            isReady: false,
-                            isLoading: false
-                        }
-                    });
+                    api.dispatch(SendMessageAction({
+                        type: 'room/player/state',
+                        isReady: false,
+                        isLoading: false
+                    }));
                 };
 
                 const mapConfig = getMapConfig();

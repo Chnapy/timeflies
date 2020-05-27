@@ -1,19 +1,19 @@
-import { BRunGlobalTurnStartSAction, ConfirmSAction, Position, TimerTester } from '@timeflies/shared';
+import { Position, TimerTester } from '@timeflies/shared';
 import { BattleDataCurrent, BattleDataCycle, BattleDataFuture } from '../../../BattleData';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-import { SendMessageAction } from '../../../socket/WSClient';
+import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { StoreTest } from '../../../StoreTest';
-import { BState, BStateTurnStartAction } from '../battleState/BattleStateSchema';
+import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
+import { BState } from '../battleState/BattleStateSchema';
 import { BStateMachine } from '../battleState/BStateMachine';
 import { CycleManager } from '../cycle/CycleManager';
 import { GlobalTurnState } from '../cycle/GlobalTurn';
-import { SpellEngineBindAction } from '../engine/Engine';
+import { SpellEngineBindAction } from '../engine/engine-actions';
 import { seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { seedTeam } from '../entities/team/Team.seed';
 import { seedMapManager } from '../map/MapManager.seed';
 import { SnapshotManager } from '../snapshot/SnapshotManager';
 import { SpellActionManager } from '../spellAction/SpellActionManager';
-import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 describe('Battleflow', () => {
 
@@ -193,7 +193,7 @@ describe('Battleflow', () => {
 
             const firstHash = futureBattleData.battleHash;
 
-            const { onTileHover, onTileClick } = bindAction;
+            const { onTileHover, onTileClick } = bindAction.payload;
 
             await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
@@ -246,7 +246,7 @@ describe('Battleflow', () => {
 
             timerTester.advanceBy(characterCurrent.features.actionTime - 80);
 
-            const { onTileHover, onTileClick } = bindAction;
+            const { onTileHover, onTileClick } = bindAction.payload;
 
             await await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
@@ -263,7 +263,7 @@ describe('Battleflow', () => {
 
             const firstHash = futureBattleData.battleHash;
 
-            const { onTileHover, onTileClick } = bindAction;
+            const { onTileHover, onTileClick } = bindAction.payload;
 
             await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 
@@ -279,7 +279,7 @@ describe('Battleflow', () => {
 
             const { bindAction, posAvailables } = init();
 
-            const { onTileHover, onTileClick } = bindAction;
+            const { onTileHover, onTileClick } = bindAction.payload;
 
             await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]))
 
@@ -291,13 +291,10 @@ describe('Battleflow', () => {
 
             expect(StoreTest.getActions()).toEqual(
                 expect.arrayContaining<SendMessageAction>([
-                    expect.objectContaining<SendMessageAction>({
-                        type: 'message/send',
-                        message: {
-                            type: 'battle/spellAction',
-                            spellAction: expect.anything()
-                        }
-                    })
+                    expect.objectContaining<SendMessageAction>(SendMessageAction({
+                        type: 'battle/spellAction',
+                        spellAction: expect.anything()
+                    }))
                 ])
             );
         });
@@ -308,7 +305,7 @@ describe('Battleflow', () => {
 
             const firstPos = characterCurrent.position;
 
-            const { onTileHover, onTileClick } = bindAction;
+            const { onTileHover, onTileClick } = bindAction.payload;
 
             // first spell action
 
@@ -339,17 +336,13 @@ describe('Battleflow', () => {
 
             const { characterCurrent, futureBattleData, bindAction, posAvailables } = init();
 
-            StoreTest.dispatch<BStateTurnStartAction>({
-                type: 'battle/state/event',
-                eventType: 'TURN-START',
-                payload: {
-                    characterId: characterCurrent.id
-                }
-            });
+            StoreTest.dispatch(BattleStateTurnStartAction({
+                characterId: characterCurrent.id
+            }));
 
             const firstHash = futureBattleData.battleHash;
 
-            const { onTileHover, onTileClick } = bindAction;
+            const { onTileHover, onTileClick } = bindAction.payload;
 
             await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
 

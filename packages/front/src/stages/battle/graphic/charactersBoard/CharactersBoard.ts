@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js';
 import { BattleDataPeriod } from '../../../../BattleData';
-import { serviceBattleData } from '../../../../services/serviceBattleData';
-import { Character } from '../../entities/character/Character';
-import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
-import { serviceEvent } from '../../../../services/serviceEvent';
-import { SpellActionTimerEndAction } from '../../spellAction/SpellActionTimer';
 import { requestRender } from '../../../../canvas/GameCanvas';
+import { serviceBattleData } from '../../../../services/serviceBattleData';
+import { serviceEvent } from '../../../../services/serviceEvent';
+import { Character } from '../../entities/character/Character';
+import { SpellActionTimerEndAction } from '../../spellAction/spell-action-manager-actions';
+import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
 
 export interface CharactersBoard {
     readonly container: PIXI.Container;
@@ -22,7 +22,7 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
     const container = new PIXI.Container();
     container.addChild(...charactersGraphics.map(c => c.container));
 
-    onAction<SpellActionTimerEndAction>('battle/spell-action/end', () => {
+    onAction(SpellActionTimerEndAction, () => {
 
         charactersGraphics
             .filter(cg => !cg.character.isAlive)

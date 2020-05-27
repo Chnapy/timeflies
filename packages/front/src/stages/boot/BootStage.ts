@@ -1,9 +1,7 @@
 import { RoomServerAction } from '@timeflies/shared';
-import { CurrentPlayer } from '../../CurrentPlayer';
 import { serviceDispatch } from '../../services/serviceDispatch';
 import { serviceEvent } from '../../services/serviceEvent';
 import { serviceNetwork } from '../../services/serviceNetwork';
-import { LoginSuccess } from '../../ui/reducers/current-player-reducer';
 import { StageCreator, StageParam } from '../StageManager';
 import { StageChangeAction } from '../stage-actions';
 
@@ -20,10 +18,6 @@ export const BootStage: StageCreator<'boot', never> = () => {
             const { onMessageAction } = serviceEvent();
 
             const { dispatchStageChangeToRoom } = serviceDispatch({
-                dispatchCurrentPlayer: (currentPlayer: CurrentPlayer): LoginSuccess => ({
-                    type: 'login/success',
-                    currentPlayer
-                }),
                 dispatchStageChangeToRoom: (roomState: RoomServerAction.RoomState): StageChangeAction<'room'> => StageChangeAction({
                     stageKey: 'room',
                     data: {

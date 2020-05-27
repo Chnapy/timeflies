@@ -1,8 +1,8 @@
 import { ConfirmSAction, NotifySAction, SetIDCAction, SpellActionCAction } from '@timeflies/shared';
 import { BattleDataMap } from '../BattleData';
-import { SendMessageAction } from '../socket/WSClient';
-import { NotifyDeathsAction } from '../stages/battle/cycle/CycleManager';
-import { SpellActionTimerEndAction } from '../stages/battle/spellAction/SpellActionTimer';
+import { SendMessageAction } from '../socket/wsclient-actions';
+import { NotifyDeathsAction } from '../stages/battle/cycle/cycle-manager-actions';
+import { SpellActionTimerEndAction } from '../stages/battle/spellAction/spell-action-manager-actions';
 import { StoreTest } from '../StoreTest';
 import { serviceBattleData } from './serviceBattleData';
 import { serviceCurrentPlayer } from './serviceCurrentPlayer';
@@ -98,11 +98,8 @@ describe('services', () => {
         StoreTest.initStore();
 
         const { dispatchNotifyDeaths, dispatchSpellActionEnd } = serviceDispatch({
-            dispatchNotifyDeaths: (): NotifyDeathsAction => ({
-                type: 'battle/notify-deaths'
-            }),
-            dispatchSpellActionEnd: (): SpellActionTimerEndAction => ({
-                type: 'battle/spell-action/end',
+            dispatchNotifyDeaths: NotifyDeathsAction,
+            dispatchSpellActionEnd: () => SpellActionTimerEndAction({
                 removed: false,
                 correctHash: '',
                 spellActionSnapshot: {} as any
@@ -113,20 +110,17 @@ describe('services', () => {
 
         dispatchNotifyDeaths();
 
-        expect(StoreTest.getActions()).toEqual<[ NotifyDeathsAction ]>([ {
-            type: 'battle/notify-deaths'
-        } ]);
+        expect(StoreTest.getActions()).toEqual([ NotifyDeathsAction() ]);
 
         StoreTest.clearActions();
 
         dispatchSpellActionEnd();
 
-        expect(StoreTest.getActions()).toEqual<[ SpellActionTimerEndAction ]>([ {
-            type: 'battle/spell-action/end',
+        expect(StoreTest.getActions()).toEqual([ SpellActionTimerEndAction({
             removed: false,
             correctHash: '',
             spellActionSnapshot: {} as any
-        } ]);
+        }) ]);
     });
 
     it('serviceEvent should add correct action listener', () => {
@@ -136,15 +130,12 @@ describe('services', () => {
         const notifyDeathsFn = jest.fn();
         const spellActionEndFn = jest.fn();
 
-        onAction<NotifyDeathsAction>('battle/notify-deaths', notifyDeathsFn);
-        onAction<SpellActionTimerEndAction>('battle/spell-action/end', spellActionEndFn);
+        onAction(NotifyDeathsAction, notifyDeathsFn);
+        onAction(SpellActionTimerEndAction, spellActionEndFn);
 
         const { dispatchNotifyDeaths, dispatchSpellActionEnd } = serviceDispatch({
-            dispatchNotifyDeaths: (): NotifyDeathsAction => ({
-                type: 'battle/notify-deaths'
-            }),
-            dispatchSpellActionEnd: (): SpellActionTimerEndAction => ({
-                type: 'battle/spell-action/end',
+            dispatchNotifyDeaths: NotifyDeathsAction,
+            dispatchSpellActionEnd: () => SpellActionTimerEndAction({
                 removed: false,
                 correctHash: '',
                 spellActionSnapshot: {} as any
@@ -153,18 +144,15 @@ describe('services', () => {
 
         dispatchNotifyDeaths();
 
-        expect(notifyDeathsFn).toHaveBeenNthCalledWith<[ NotifyDeathsAction ]>(1, {
-            type: 'battle/notify-deaths'
-        });
+        expect(notifyDeathsFn).toHaveBeenNthCalledWith(1, NotifyDeathsAction().payload);
 
         dispatchSpellActionEnd();
 
-        expect(spellActionEndFn).toHaveBeenNthCalledWith<[ SpellActionTimerEndAction ]>(1, {
-            type: 'battle/spell-action/end',
+        expect(spellActionEndFn).toHaveBeenNthCalledWith(1, SpellActionTimerEndAction({
             removed: false,
             correctHash: '',
             spellActionSnapshot: {} as any
-        });
+        }).payload);
     });
 
     it('serviceEvent should add correct message listener', () => {
@@ -228,27 +216,21 @@ describe('services', () => {
 
         sendSpellAction();
 
-        expect(StoreTest.getActions()).toEqual<[ SendMessageAction<SpellActionCAction> ]>([ {
-            type: 'message/send',
-            message: {
-                type: 'battle/spellAction',
-                [ 'sendTime' as any ]: -1,
-                spellAction: {} as any
-            }
-        } ]);
+        expect(StoreTest.getActions()).toEqual([ SendMessageAction({
+            type: 'battle/spellAction',
+            [ 'sendTime' as any ]: -1,
+            spellAction: {} as any
+        }) ]);
 
         StoreTest.clearActions();
 
         sendSetID();
 
-        expect(StoreTest.getActions()).toEqual<[ SendMessageAction<SetIDCAction> ]>([ {
-            type: 'message/send',
-            message: {
-                type: 'set-id',
-                [ 'sendTime' as any ]: -1,
-                id: ''
-            }
-        } ]);
+        expect(StoreTest.getActions()).toEqual([ SendMessageAction({
+            type: 'set-id',
+            [ 'sendTime' as any ]: -1,
+            id: ''
+        }) ]);
     });
 
     it.todo('serviceEvent should remove listener on returned function call');

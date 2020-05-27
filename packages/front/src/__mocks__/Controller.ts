@@ -1,4 +1,4 @@
-import { GameAction } from "../action/game-action/GameAction";
+import { AnyAction } from '@reduxjs/toolkit';
 import { AssetLoader } from '../assetManager/AssetLoader';
 import { Controller as IController } from "../Controller";
 import { StoreTest } from '../StoreTest';
@@ -27,9 +27,9 @@ export const Controller: typeof IController = {
             StoreTest.getStore().subscribe(() => {
                 if (removed) return;
                 const actions = StoreTest.getStore().getActions();
-                const lastAction: GameAction | undefined = actions[ actions.length - 1 ];
+                const lastAction: AnyAction | undefined = actions[ actions.length - 1 ];
                 if (lastAction?.type === type) {
-                    fn(lastAction);
+                    fn(lastAction.payload);
                 }
             });
             return {

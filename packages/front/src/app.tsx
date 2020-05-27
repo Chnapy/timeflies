@@ -1,13 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { Store } from 'redux';
-import { GameAction } from './action/game-action/GameAction';
+import { Action, Store } from 'redux';
 import { GameState } from './game-state';
 import { GameUI } from './ui/game-ui';
 import { UIProvider } from './ui/ui-provider';
 
 export interface AppProps {
-    store: Store<GameState, GameAction>;
+    store: Store<GameState, Action>;
     onMount(gameWrapper: HTMLElement, canvas: HTMLCanvasElement);
 }
 

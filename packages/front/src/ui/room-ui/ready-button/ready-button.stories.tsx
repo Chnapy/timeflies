@@ -5,7 +5,7 @@ import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer
 import { ReadyButton } from './ready-button';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import { RootReducer } from '../../reducers/root-reducer';
+import { rootReducer } from '../../reducers/root-reducer';
 import { RoomData } from '../../reducers/room-reducers/room-reducer';
 import { Box } from '@material-ui/core';
 
@@ -31,7 +31,7 @@ const Wrapper: React.FC<{
 
     const ProviderComponent = fakeApi
         ? fakeApi.init({ initialState }).Provider
-        : props => <Provider store={createStore(RootReducer, initialState)} {...props} />;
+        : props => <Provider store={createStore(rootReducer, initialState)} {...props} />;
 
     return <Box display='inline-flex' flexDirection='column' mb={1} mr={1} width={400} flexShrink={0}>
         <ProviderComponent>

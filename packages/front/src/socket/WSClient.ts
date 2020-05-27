@@ -1,15 +1,8 @@
-import { ClientAction, DistributiveOmit, getEndpoint, ServerAction } from '@timeflies/shared';
-import { IGameAction } from '../action/game-action/GameAction';
+import { getEndpoint, ServerAction } from '@timeflies/shared';
 import { envManager } from '../envManager';
 import { serviceDispatch } from '../services/serviceDispatch';
 import { serviceEvent } from '../services/serviceEvent';
-import { ReceiveMessageAction } from './wsclient-actions';
-
-export interface SendMessageAction<A extends ClientAction = ClientAction> extends IGameAction<'message/send'> {
-    message: DistributiveOmit<A, 'sendTime'>;
-}
-
-export type MessageAction = ReceiveMessageAction | SendMessageAction;
+import { ReceiveMessageAction, SendMessageAction } from './wsclient-actions';
 
 export interface WSClient {
     readonly isOpen: boolean;
@@ -61,13 +54,11 @@ export const WSClient = ({ websocketCreator }: Dependencies = {
         // dispatchMessage(action);
     };
 
-    onAction<SendMessageAction>('message/send', ({
-        message
-    }) => {
+    onAction(SendMessageAction, payload => {
         // console.log('<-', message);
         socket.send(JSON.stringify([ {
             sendTime: Date.now(),
-            ...message
+            ...payload
         } ]));
     });
 

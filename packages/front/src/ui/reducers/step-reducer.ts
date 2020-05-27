@@ -1,13 +1,7 @@
-import { Reducer } from 'redux';
+import { createReducer } from '@reduxjs/toolkit';
 import { GameStateStep } from '../../game-state';
-import { GameAction } from '../../action/game-action/GameAction';
+import { StageChangeAction } from '../../stages/stage-actions';
 
-export const StepReducer: Reducer<GameStateStep, GameAction> = (state = 'boot', action) => {
-
-    switch (action.type) {
-        case 'stage/change':
-            return action.payload.stageKey;
-    }
-
-    return state;
-};
+export const stepReducer = createReducer('boot' as GameStateStep, {
+    [ StageChangeAction.type ]: (state, { payload }: StageChangeAction) => payload.stageKey
+});

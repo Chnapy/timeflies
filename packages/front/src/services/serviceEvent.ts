@@ -1,35 +1,29 @@
+import { PayloadActionCreator } from '@reduxjs/toolkit';
 import { ServerAction } from "@timeflies/shared";
-import { Action } from "redux";
-import { ActionListener, ActionListenerObject } from '../action/ActionManager';
-import { GameAction } from "../action/game-action/GameAction";
+import { PayloadActionListener, ActionListenerObject } from '../action/ActionManager';
 import { Controller } from "../Controller";
 import { ReceiveMessageAction } from "../socket/wsclient-actions";
 
-export interface OnAction<RA extends Action> {
-    <A extends RA>(type: A[ 'type' ], fn: ActionListener<A>): ActionListenerObject;
-}
+export type OnAction = {
+    <AC extends PayloadActionCreator<any>>(actionCreator: AC, fn: PayloadActionListener<ReturnType<AC>[ 'payload' ]>): ActionListenerObject;
+};
 
-export interface EventManager {
-    onAction: OnAction<GameAction>;
-    onMessageAction: OnAction<ServerAction>;
-}
-
-export const serviceEvent = (): EventManager => {
+export const serviceEvent = () => {
 
     const { actionManager } = Controller;
 
-    const onAction: OnAction<GameAction> = (type, fn) =>
-        actionManager.addActionListener(type, fn as ActionListener<GameAction>);
+    const onAction: OnAction = (actionCreator, fn) =>
+        actionManager.addActionListener(actionCreator.type, fn as any);
 
     return {
 
         onAction,
 
-        onMessageAction<A extends ServerAction>(type, fn) {
+        onMessageAction<A extends ServerAction>(type: A[ 'type' ], fn: PayloadActionListener<A>) {
 
-            onAction(ReceiveMessageAction.type, ({ payload }: ReceiveMessageAction) => {
+            onAction(ReceiveMessageAction, payload => {
                 if (type === payload.type) {
-                    fn(payload);
+                    fn(payload as A);
                 }
             });
 
