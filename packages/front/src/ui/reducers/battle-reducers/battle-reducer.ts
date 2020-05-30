@@ -1,4 +1,4 @@
-import { Reducer } from '@reduxjs/toolkit';
+import { Reducer, createReducer } from '@reduxjs/toolkit';
 import { BattleDataMap } from '../../../BattleData';
 import { StageChangeAction, stageChangeActionPayloadMatch } from '../../../stages/stage-actions';
 

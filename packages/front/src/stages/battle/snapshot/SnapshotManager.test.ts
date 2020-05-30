@@ -5,7 +5,7 @@ import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleS
 import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { Team } from '../entities/team/Team';
-import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { BattleCommitAction } from './snapshot-manager-actions';
 import { SnapshotManager } from './SnapshotManager';
 

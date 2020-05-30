@@ -2,7 +2,7 @@ import { ConfirmSAction, NotifySAction, SetIDCAction, SpellActionCAction } from 
 import { BattleDataMap } from '../BattleData';
 import { SendMessageAction } from '../socket/wsclient-actions';
 import { NotifyDeathsAction } from '../stages/battle/cycle/cycle-manager-actions';
-import { SpellActionTimerEndAction } from '../stages/battle/spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction } from '../stages/battle/spellAction/spell-action-actions';
 import { StoreTest } from '../StoreTest';
 import { serviceBattleData } from './serviceBattleData';
 import { serviceCurrentPlayer } from './serviceCurrentPlayer';

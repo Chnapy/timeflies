@@ -2,7 +2,7 @@ import { Position, TiledManager, TiledMapSeedKey, TimerTester } from '@timeflies
 import { StoreTest } from '../../../StoreTest';
 import { seedCharacter, seedCharacterInitialPosition } from '../entities/character/Character.seed';
 import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
-import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { MapManager } from './MapManager';
 import { seedMapManager } from './MapManager.seed';
 import { Pathfinder } from './Pathfinder';

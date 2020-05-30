@@ -2,7 +2,7 @@ import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { serviceNetwork } from '../../../services/serviceNetwork';
 import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { StoreTest } from '../../../StoreTest';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-manager-actions';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 import { SpellActionTimer } from './SpellActionTimer';
 
 describe('# SpellActionTimer', () => {

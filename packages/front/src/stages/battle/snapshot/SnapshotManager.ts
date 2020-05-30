@@ -7,7 +7,7 @@ import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleS
 import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 import { PeriodicEntity } from '../entities/PeriodicEntity';
 import { Team } from '../entities/team/Team';
-import { SpellActionTimerEndAction } from '../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { BattleCommitAction } from './snapshot-manager-actions';
 
 export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
