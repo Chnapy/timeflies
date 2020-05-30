@@ -4,7 +4,7 @@ import { requestRender } from '../../../../canvas/GameCanvas';
 import { serviceBattleData } from '../../../../services/serviceBattleData';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { Character } from '../../entities/character/Character';
-import { SpellActionTimerEndAction } from '../../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction } from '../../spellAction/spell-action-actions';
 import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
 
 export interface CharactersBoard {

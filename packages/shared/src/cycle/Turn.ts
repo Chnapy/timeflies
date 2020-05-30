@@ -1,8 +1,9 @@
 
 export interface TurnSnapshot {
     id: number;
-    startTime: number;
     characterId: string;
+    startTime: number;
+    duration: number;
 }
 
 export const TURN_DELAY = 1000;

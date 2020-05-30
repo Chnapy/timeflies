@@ -2,7 +2,7 @@ import { assertIsDefined, SpellActionSnapshot } from '@timeflies/shared';
 import { serviceBattleData } from '../../../services/serviceBattleData';
 import { serviceDispatch } from '../../../services/serviceDispatch';
 import { serviceNetwork } from '../../../services/serviceNetwork';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-manager-actions';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 
 
 export interface SpellActionTimer {
@@ -19,6 +19,7 @@ const assertSpellActionIsNotFuture = (snapshot: SpellActionSnapshot): void | nev
 
 export const SpellActionTimer = (): SpellActionTimer => {
 
+    // TODO remove
     let currentSpellAction: SpellActionSnapshot | undefined;
     let timeout: NodeJS.Timeout | undefined;
 

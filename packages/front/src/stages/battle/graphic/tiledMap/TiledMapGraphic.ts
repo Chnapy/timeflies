@@ -6,7 +6,7 @@ import { serviceBattleData } from '../../../../services/serviceBattleData';
 import { serviceEvent } from '../../../../services/serviceEvent';
 import { SpellEngineBindAction } from '../../engine/engine-actions';
 import { ExtractHoverReturn, getTiledMapSpellObject } from '../../engine/spellMapping';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../spellAction/spell-action-actions';
 import { graphicTheme } from '../graphic-theme';
 import { TileGraphic } from './TileGraphic';
 import { BattleStateTurnEndAction } from '../../battleState/battle-state-actions';

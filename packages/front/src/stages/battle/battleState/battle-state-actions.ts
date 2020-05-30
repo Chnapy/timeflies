@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { SpellType } from '@timeflies/shared';
+import { SpellType, TurnSnapshot } from '@timeflies/shared';
 import { SpellAction } from '../spellAction/SpellActionManager';
 
 export type BattleStateResetAction = ReturnType<typeof BattleStateResetAction>;
@@ -8,9 +8,7 @@ export const BattleStateResetAction = createAction<{
 }>('battle/state/reset');
 
 export type BattleStateTurnStartAction = ReturnType<typeof BattleStateTurnStartAction>;
-export const BattleStateTurnStartAction = createAction<{
-    characterId: string;
-}>('battle/state/turn-start');
+export const BattleStateTurnStartAction = createAction<TurnSnapshot>('battle/state/turn-start');
 
 export type BattleStateTurnEndAction = ReturnType<typeof BattleStateTurnEndAction>;
 export const BattleStateTurnEndAction = createAction('battle/state/turn-end');

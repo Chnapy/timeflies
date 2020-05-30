@@ -12,3 +12,13 @@ export const SpellActionTimerEndAction = createAction<{
     removed: boolean;
     correctHash: string;    // may be not the same as the snapshot one
 }>('battle/spell-action/end');
+
+export type SpellActionCancelAction = ReturnType<typeof SpellActionCancelAction>;
+export const SpellActionCancelAction = createAction<{
+    spellActionSnapshotsValids: SpellActionSnapshot[];
+}>('battle/spell-action/cancel');
+
+export type SpellActionLaunchAction = ReturnType<typeof SpellActionLaunchAction>;
+export const SpellActionLaunchAction = createAction<{
+    spellActionSnapshotList: SpellActionSnapshot[];
+}>('battle/spell-action/launch');

@@ -5,7 +5,7 @@ import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { serviceEvent } from '../../../../../services/serviceEvent';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../../../battleState/battle-state-actions';
 import { Character } from '../../../entities/character/Character';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-actions';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';

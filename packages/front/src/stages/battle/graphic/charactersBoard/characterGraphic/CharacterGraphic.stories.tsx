@@ -15,7 +15,7 @@ import { seedSpell } from '../../../entities/spell/Spell.seed';
 import { seedTeam } from '../../../entities/team/Team.seed';
 import { MapManager } from '../../../map/MapManager';
 import { Pathfinder } from '../../../map/Pathfinder';
-import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-manager-actions';
+import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-actions';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
 
