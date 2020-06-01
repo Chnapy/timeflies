@@ -10,15 +10,13 @@ describe('# snapshot-middleware', () => {
     it('should not notify for deaths on spell action end action if there is not new deaths', () => {
 
         const currentCharacters = [
-            seedCharacter('fake', {
+            seedCharacter({
                 period: 'current',
-                id: '1',
-                player: null
+                id: '1'
             }),
-            seedCharacter('fake', {
+            seedCharacter({
                 period: 'current',
-                id: '2',
-                player: null
+                id: '2'
             })
         ];
 
@@ -29,13 +27,15 @@ describe('# snapshot-middleware', () => {
                 battleHash: 'not-matter',
                 teams: [],
                 characters: currentCharacters,
-                players: []
+                players: [],
+                spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
                 teams: [],
-                characters: [ ],
-                players: []
+                characters: [],
+                players: [],
+                spells: []
             }
         };
 
@@ -55,7 +55,7 @@ describe('# snapshot-middleware', () => {
         snapshotMiddleware({
             extractState: () => initialState,
         })(api)(next)(action);
-        
+
         expect(next).toHaveBeenNthCalledWith(1, action);
         expect(api.dispatch).not.toHaveBeenCalled();
     });
@@ -63,15 +63,13 @@ describe('# snapshot-middleware', () => {
     it('should notify for deaths on spell action end action if there is new deaths', () => {
 
         const currentCharacters = [
-            seedCharacter('fake', {
+            seedCharacter({
                 period: 'current',
-                id: '1',
-                player: null
+                id: '1'
             }),
-            seedCharacter('fake', {
+            seedCharacter({
                 period: 'current',
-                id: '2',
-                player: null
+                id: '2'
             })
         ];
 
@@ -82,13 +80,15 @@ describe('# snapshot-middleware', () => {
                 battleHash: 'not-matter',
                 teams: [],
                 characters: currentCharacters,
-                players: []
+                players: [],
+                spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
                 teams: [],
-                characters: [ ],
-                players: []
+                characters: [],
+                players: [],
+                spells: []
             }
         };
 
@@ -98,7 +98,7 @@ describe('# snapshot-middleware', () => {
         };
 
         const next = jest.fn((): any => {
-            (initialState.battleDataCurrent.characters[0].isAlive as any) = false;
+            initialState.battleDataCurrent.characters[ 0 ].features.life = 0;
         });
 
         const action = SpellActionTimerEndAction({
@@ -110,7 +110,7 @@ describe('# snapshot-middleware', () => {
         snapshotMiddleware({
             extractState: () => initialState,
         })(api)(next)(action);
-        
+
         expect(next).toHaveBeenNthCalledWith(1, action);
         expect(api.dispatch).toHaveBeenNthCalledWith(1, NotifyDeathsAction());
     });

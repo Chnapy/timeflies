@@ -2,7 +2,7 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { equals, Position, TileType } from '@timeflies/shared';
 import { getArea } from '../../../battleState/battle-action-reducer';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
-import { Character } from '../../../entities/character/Character';
+import { Character, characterAlterLife } from '../../../entities/character/Character';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellEngineCreator } from '../spell-engine';
 
@@ -10,7 +10,7 @@ export const spellLaunchSimpleAttack = ({ actionArea, spell }: SpellAction, char
 
     const targets = characterList.filter(c => actionArea.some(p => equals(p)(c.position)));
 
-    targets.forEach(t => t.alterLife(-spell.feature.attack));
+    targets.forEach(t => characterAlterLife(t, -spell.feature.attack));
 };
 
 export const spellEngineSimpleAttack: SpellEngineCreator = ({

@@ -18,12 +18,13 @@ export interface StaticSpell {
     initialFeatures: SpellFeatures;
 }
 
-export interface SpellSnapshot {
-    readonly id: string;
-    readonly index: number;
-    readonly staticData: Readonly<StaticSpell>;
-    readonly features: SpellFeatures;
-}
+export type SpellSnapshot = {
+    id: string;
+    characterId: string;
+    index: number;
+    staticData: Readonly<StaticSpell>;
+    features: SpellFeatures;
+};
 
 export interface SpellActionSnapshot {
     startTime: number;

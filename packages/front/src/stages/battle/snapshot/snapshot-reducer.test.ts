@@ -1,6 +1,6 @@
 import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester } from '@timeflies/shared';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { Team } from '../entities/team/Team';
+import { Team, teamToSnapshot } from '../entities/team/Team';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { BattleCommitAction } from './snapshot-manager-actions';
 import { snapshotReducer, SnapshotState } from './snapshot-reducer';
@@ -17,19 +17,16 @@ describe('# snapshot-reducer', () => {
         timerTester.afterTest();
     });
 
+    it.todo('on battle start');
+
     it('should commit battle data future on commit action, then get the correct hash', () => {
 
         const teams: Team<any>[] = [
             {
-                getSnapshot() {
-                    return {
-                        id: 't1',
-                        color: 'red',
-                        name: '',
-                        playersSnapshots: []
-                    }
-                }
-            } as unknown as Team<any>
+                id: 't1',
+                period: '' as any,
+                letter: 'A',
+            }
         ];
 
         const initialState: SnapshotState = {
@@ -39,13 +36,15 @@ describe('# snapshot-reducer', () => {
                 battleHash: 'not-matter',
                 teams,
                 players: [],
-                characters: []
+                characters: [],
+                spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
                 teams,
                 players: [],
-                characters: []
+                characters: [],
+                spells: []
             }
         };
 
@@ -57,7 +56,10 @@ describe('# snapshot-reducer', () => {
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
             time: timerTester.now,
             launchTime: -1,
-            teamsSnapshots: teams.map(t => t.getSnapshot())
+            teamsSnapshots: teams.map(teamToSnapshot),
+            playersSnapshots: [],
+            charactersSnapshots: [],
+            spellsSnapshots: []
         };
 
         const { battleHash } = getBattleSnapshotWithHash(partialSnap);
@@ -70,23 +72,12 @@ describe('# snapshot-reducer', () => {
 
         it('should rollback on spell action removed', () => {
 
-            const updateFromSnapshot = jest.fn();
-
-            let teamColor = 'red';
-
             const teams: Team<any>[] = [
                 {
                     id: 't1',
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: teamColor,
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    },
-                    updateFromSnapshot
-                } as unknown as Team<any>
+                    period: '' as any,
+                    letter: 'A',
+                }
             ];
 
             const initialState: SnapshotState = {
@@ -96,13 +87,15 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-matter',
                     teams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
                     teams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 }
             };
 
@@ -112,8 +105,6 @@ describe('# snapshot-reducer', () => {
             }));
 
             const firstHash = state1.battleDataFuture.battleHash;
-
-            teamColor = 'blue';
 
             const state2 = snapshotReducer(state1, BattleCommitAction({
                 time: timerTester.now + 100,
@@ -126,30 +117,17 @@ describe('# snapshot-reducer', () => {
                 spellActionSnapshot: {} as any
             }));
 
-            expect(updateFromSnapshot).toHaveBeenCalledTimes(1);
-
             expect(state3.battleDataFuture.battleHash).toBe(firstHash);
         });
 
         it('should rollback on previous spell action removed and update current battle data', () => {
 
-            const updateFromSnapshot = jest.fn();
-
-            let teamColor = 'red';
-
             const teams: Team<any>[] = [
                 {
                     id: 't1',
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: teamColor,
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    },
-                    updateFromSnapshot
-                } as unknown as Team<any>
+                    period: '' as any,
+                    letter: 'A',
+                }
             ];
 
             const initialState: SnapshotState = {
@@ -159,13 +137,15 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-matter',
                     teams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
                     teams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 }
             };
 
@@ -177,8 +157,6 @@ describe('# snapshot-reducer', () => {
             const firstHash = state1.battleDataFuture.battleHash;
 
             timerTester.advanceBy(100);
-
-            teamColor = 'blue';
 
             const state2 = snapshotReducer(state1, BattleCommitAction({
                 time: timerTester.now,
@@ -200,31 +178,17 @@ describe('# snapshot-reducer', () => {
             const currentTeams: Team<'current'>[] = [
                 {
                     id: 't1',
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: 'red',
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    },
-                    updateFromSnapshot() { }
-                } as unknown as Team<'current'>
+                    period: 'current',
+                    letter: 'A',
+                }
             ];
 
             const futureTeams: Team<'future'>[] = [
                 {
                     id: 't1',
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: 'red',
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    },
-                    updateFromSnapshot() { }
-                } as unknown as Team<'future'>
+                    period: 'future',
+                    letter: 'A',
+                }
             ];
 
             const initialState: SnapshotState = {
@@ -234,13 +198,15 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-matter',
                     teams: currentTeams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
                     teams: futureTeams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 }
             };
 
@@ -267,15 +233,10 @@ describe('# snapshot-reducer', () => {
 
             const teams: Team<any>[] = [
                 {
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: 'red',
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    }
-                } as unknown as Team<any>
+                    id: 't1',
+                    period: '' as any,
+                    letter: 'A'
+                }
             ];
 
             const initialState: SnapshotState = {
@@ -285,13 +246,15 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-defined-current',
                     teams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
                     teams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 }
             };
 
@@ -314,31 +277,17 @@ describe('# snapshot-reducer', () => {
             const currentTeams: Team<'current'>[] = [
                 {
                     id: 't1',
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: 'red',
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    },
-                    updateFromSnapshot() { }
-                } as unknown as Team<'current'>
+                    period: 'current',
+                    letter: 'A'
+                }
             ];
 
             const futureTeams: Team<'future'>[] = [
                 {
                     id: 't1',
-                    getSnapshot() {
-                        return {
-                            id: 't1',
-                            color: 'red',
-                            name: '',
-                            playersSnapshots: []
-                        }
-                    },
-                    updateFromSnapshot() { }
-                } as unknown as Team<'future'>
+                    period: 'future',
+                    letter: 'A'
+                }
             ];
 
             const initialState: SnapshotState = {
@@ -348,13 +297,15 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-defined-current',
                     teams: currentTeams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
                     teams: futureTeams,
                     players: [],
-                    characters: []
+                    characters: [],
+                    spells: []
                 }
             };
 

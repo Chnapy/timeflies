@@ -1,48 +1,13 @@
-import { TeamSnapshot } from '@timeflies/shared';
-import { BattleDataPeriod } from '../../../../BattleData';
-import { seedPlayer, SeedPlayerProps, seedPlayerSnapshot } from '../player/Player.seed';
-import { SeedPeriodicProps } from '../PeriodicEntity';
+import { RequiredOnly } from '@timeflies/shared';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Team } from './Team';
 
-export interface SeedTeamProps {
-    id: string;
-    letter?: string;
-    seedPlayers: SeedPlayerProps[];
-}
+export type SeedTeamProps<P extends BattleDataPeriod> = RequiredOnly<Team<P>, 'id' | 'period'>
 
-export const seedTeamSnapshot = ({ id, letter, seedPlayers }: SeedTeamProps): TeamSnapshot => {
+export const seedTeam = <P extends BattleDataPeriod>(props: SeedTeamProps<P>): Team<P> => {
 
     return {
-        id,
-        letter: letter ?? id[0],
-        playersSnapshots: seedPlayers.map(seedPlayerSnapshot)
+        letter: 'A',
+        ...props
     };
-};
-
-export const seedTeam = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedTeamProps & SeedPeriodicProps<P>): Team<P> => {
-
-    const { period, id, letter, seedPlayers } = props;
-
-    if (type === 'real') {
-        return Team(period, seedTeamSnapshot(props));
-    }
-
-    const team: Team<P> = {
-        period,
-        id,
-        letter: letter ?? id[0],
-        get players() {
-            return players;
-        },
-        getSnapshot() { return seedTeamSnapshot(props); },
-        updateFromSnapshot(snapshot) { }
-    };
-
-    const players = seedPlayers.map(p => seedPlayer('fake', {
-        ...p,
-        period,
-        team
-    }));
-
-    return team;
 };

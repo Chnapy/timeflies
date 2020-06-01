@@ -28,16 +28,16 @@ interface SpellMapValue<ST extends SpellType, HR> {
     // prepareEngine: SpellPrepareSubEngineCreator<HR>;
 }
 
-interface SpellMapGraphicValue<ST extends SpellType, HR> {
-    tiledMapObject: TiledMapSpellObject<ST>;
-    characterObject?: {
-        onHoverFn: (props: {
-            engineProps: HR;
-        }) => void;
-    };
-}
+// interface SpellMapGraphicValue<ST extends SpellType, HR> {
+//     tiledMapObject: TiledMapSpellObject<ST>;
+//     characterObject?: {
+//         onHoverFn: (props: {
+//             engineProps: HR;
+//         }) => void;
+//     };
+// }
 
-type SpellMap = typeof spellMap;
+// type SpellMap = typeof spellMap;
 
 // export type ExtractHoverReturn<ST extends SpellType> = SpellMap[ ST ][ 'prepareEngine' ] extends
 //     SpellPrepareSubEngineCreator<infer HR> ? HR : never;

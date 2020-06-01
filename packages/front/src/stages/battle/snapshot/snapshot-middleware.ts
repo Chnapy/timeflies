@@ -1,7 +1,8 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
+import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
+import { characterIsAlive } from '../entities/character/Character';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { SnapshotState } from './snapshot-reducer';
-import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => SnapshotState;
@@ -16,7 +17,7 @@ export const snapshotMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
         if (SpellActionTimerEndAction.match(action)) {
 
             const serializeDeaths = () => extractState(api.getState).battleDataCurrent.characters
-                .filter(c => !c.isAlive)
+                .filter(c => !characterIsAlive(c))
                 .map(c => c.id).join('.');
 
             const serializedDeathsBefore = serializeDeaths();

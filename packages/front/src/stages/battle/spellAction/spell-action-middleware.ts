@@ -4,6 +4,7 @@ import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn } from '../engine/spellMapping';
 import { Character } from '../entities/character/Character';
+import { Spell } from '../entities/spell/Spell';
 import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { SpellAction, SpellActionState } from './spell-action-reducer';
@@ -12,6 +13,7 @@ import { SpellActionTimer } from './spell-action-timer';
 type Dependencies<S> = {
     extractState: (getState: () => S) => SpellActionState;
     extractFutureCharacters: (getState: () => S) => Character<'future'>[];
+    extractFutureSpells: (getState: () => S) => Spell<'future'>[];
     extractFutureHash: (getState: () => S) => string;
     extractCurrentHash: (getState: () => S) => string;
     createSpellActionTimer?: typeof SpellActionTimer;
@@ -22,6 +24,7 @@ const getSnapshotEndTime = ({ startTime, duration }: SpellActionSnapshot) => sta
 export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractState,
     extractFutureCharacters,
+    extractFutureSpells,
     extractFutureHash,
     extractCurrentHash,
     createSpellActionTimer = SpellActionTimer
@@ -51,7 +54,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
         return {
             startTime,
-            characterId: spell.character.id,
+            characterId: spell.characterId,
             duration,
             spellId: spell.id,
             position,
@@ -64,7 +67,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
         const { spellActionSnapshotList } = extractState(api.getState);
 
-        const spellActionSnapshotsValids = [...spellActionSnapshotList];
+        const spellActionSnapshotsValids = [ ...spellActionSnapshotList ];
 
         const toRemoveList: SpellActionSnapshot[] = [];
 
@@ -143,16 +146,12 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             } else if (payload.type === 'notify') {
 
                 const { spellActionSnapshot: {
-                    characterId, spellId, position, actionArea, startTime
+                    spellId, position, actionArea, startTime
                 } } = payload;
 
-                const futureCharacters = extractFutureCharacters(api.getState);
+                const futureSpells = extractFutureSpells(api.getState);
 
-                const character = futureCharacters.find(c => c.id === characterId);
-
-                assertIsDefined(character);
-
-                const spell = character.spells.find(s => s.id === spellId);
+                const spell = futureSpells.find(s => s.id === spellId);
 
                 assertIsDefined(spell);
 

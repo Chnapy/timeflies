@@ -2,7 +2,7 @@ import { CycleState } from './cycle-reducer';
 import { MiddlewareAPI } from '@reduxjs/toolkit';
 import { cycleMiddleware } from './cycle-middleware';
 import { seedCharacter } from '../entities/character/Character.seed';
-import { BattleStartAction } from '../map/map-reducer';
+import { BattleStartAction } from '../battle-actions';
 import { TimerTester, TURN_DELAY } from '@timeflies/shared';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
@@ -25,15 +25,13 @@ describe('# cycle-middleware', () => {
         it('should dispatch turn start action after some times', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
-                    id: '1',
-                    player: null
+                    id: '1'
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
-                    id: '2',
-                    player: null
+                    id: '2'
                 })
             ];
 
@@ -78,7 +76,10 @@ describe('# cycle-middleware', () => {
 
             timerTester.advanceBy(1050);
 
-            expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction(action.payload.globalTurnSnapshot.currentTurn));
+            expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
+                turnSnapshot: action.payload.globalTurnSnapshot.currentTurn,
+                isMine: expect.anything()
+            }));
         });
     })
 
@@ -87,18 +88,16 @@ describe('# cycle-middleware', () => {
         it('should update current turn if same id', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '1',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
-                    id: '2',
-                    player: null
+                    id: '2'
                 })
             ];
 
@@ -145,18 +144,16 @@ describe('# cycle-middleware', () => {
         it('should start it now if no current turn', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '1',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
-                    id: '2',
-                    player: null
+                    id: '2'
                 })
             ];
 
@@ -197,24 +194,25 @@ describe('# cycle-middleware', () => {
 
             timerTester.advanceBy(5);
 
-            expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction(turnState));
+            expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
+                turnSnapshot: turnState,
+                isMine: expect.anything()
+            }));
         });
 
         it('should add to queue if future, then start it at good time', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '1',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
-                    id: '2',
-                    player: null
+                    id: '2'
                 })
             ];
 
@@ -276,25 +274,26 @@ describe('# cycle-middleware', () => {
 
             timerTester.advanceBy(1150);
 
-            expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction(turnState));
+            expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
+                turnSnapshot: turnState,
+                isMine: expect.anything()
+            }));
         });
 
         it('should end after some time, then start a new turn', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '1',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '2',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 })
@@ -343,40 +342,40 @@ describe('# cycle-middleware', () => {
             timerTester.advanceBy(TURN_DELAY);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
-                id: 3,
-                characterId: '1',
-                startTime: expect.any(Number),
-                duration: 1000
+                turnSnapshot: {
+                    id: 3,
+                    characterId: '1',
+                    startTime: expect.any(Number),
+                    duration: 1000
+                },
+                isMine: expect.anything()
             }));
         });
 
         it('should ignore dead characters', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '1',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '2',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '3',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
-                    },
-                    isAlive: false
+                        life: 0
+                    }
                 })
             ];
 
@@ -423,10 +422,13 @@ describe('# cycle-middleware', () => {
             timerTester.advanceBy(TURN_DELAY);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
-                id: 3,
-                characterId: '1',
-                startTime: expect.any(Number),
-                duration: 1000
+                turnSnapshot: {
+                    id: 3,
+                    characterId: '1',
+                    startTime: expect.any(Number),
+                    duration: 1000
+                },
+                isMine: expect.anything()
             }));
         });
     });
@@ -436,19 +438,17 @@ describe('# cycle-middleware', () => {
         it('should end current turn if character died', () => {
 
             const currentCharacters = [
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '1',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter('fake', {
+                seedCharacter({
                     period: 'current',
                     id: '2',
-                    player: null,
-                    initialFeatures: {
+                    features: {
                         actionTime: 1000,
                     }
                 })
@@ -494,7 +494,7 @@ describe('# cycle-middleware', () => {
 
             timerTester.advanceBy(50);
 
-            (currentCharacters[ 1 ].isAlive as any) = false;
+            currentCharacters[ 1 ].features.life = 0;
 
             middleware(NotifyDeathsAction());
 

@@ -1,71 +1,34 @@
-import { SpellFeatures, SpellSnapshot, SpellType, StaticSpell } from '@timeflies/shared';
-import { Character } from '../character/Character';
+import { RequiredOnly, SpellType } from '@timeflies/shared';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Spell } from './Spell';
-import { BattleDataPeriod } from '../../../../BattleData';
-import { SeedPeriodicProps } from '../PeriodicEntity';
 
-export type SeedSpellProps<FK extends 'features' | 'initialFeatures' = 'initialFeatures'> = {
-    id: string;
-    index?: number;
-    type: SpellType;
-    name?: string;
-} & { [ k in FK ]?: Partial<SpellFeatures> };
-
-export const seedSpellFeatures = (features: Partial<SpellFeatures> = {}): SpellFeatures => ({
-    area: 1,
-    attack: -1,
-    duration: 200,
-    ...features
-});
-
-export const seedSpellStaticData = ({ id, type, name, initialFeatures }: SeedSpellProps): StaticSpell => {
-
-    return {
-        id,
-        type,
-        name: name ?? 'S-' + id,
-        initialFeatures: seedSpellFeatures(initialFeatures)
-    };
+export type SeedSpellProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Spell<P>, 'id' | 'period'>, 'feature'> & { 
+    type?: SpellType;
+    feature?: Partial<Spell<P>['feature']>;
 };
 
-export const seedSpellSnapshot = (props: SeedSpellProps<'features'>): SpellSnapshot => {
-    const { id, index, features } = props;
+export const seedSpell = <P extends BattleDataPeriod>({ type, feature, ...props }: SeedSpellProps<P>): Spell<P> => {
 
     return {
-        id,
-        index: index ?? 1,
-        features: seedSpellFeatures(features),
-        staticData: seedSpellStaticData({
-            ...props,
-            initialFeatures: features
-        })
-    };
-};
-
-export const seedSpell = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedSpellProps & SeedPeriodicProps<P> & Record<'character', Character<P>>): Spell<P> => {
-    const { id, index, character, initialFeatures } = props;
-
-    if (type === 'real') {
-        return Spell(props.period, seedSpellSnapshot({
-            ...props,
-            features: initialFeatures
-        }), character);
-    }
-
-    const spell: Spell<P> = {
-        period: props.period,
-        id,
-        index: index ?? 1,
-        character,
-        feature: seedSpellFeatures(initialFeatures),
-        staticData: seedSpellStaticData(props),
-        getSnapshot() {
-            return seedSpellSnapshot({
-                ...props,
-                features: spell.feature
-            });
+        characterId: '',
+        staticData: {
+            id: props.id,
+            name: 'name',
+            type: type ?? 'move',
+            initialFeatures: {
+                area: 3,
+                attack: 10,
+                duration: 1000,
+                ...feature
+            }
         },
-        updateFromSnapshot(snapshot) { }
+        index: 1,
+        feature: {
+            area: 3,
+            attack: 10,
+            duration: 1000,
+            ...feature
+        },
+        ...props
     };
-    return spell;
 };

@@ -1,123 +1,137 @@
-import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, equals, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
-import { BattleDataPeriod } from '../../../../BattleData';
-import { PeriodicEntity } from '../PeriodicEntity';
-import { Player } from '../player/Player';
-import { Spell } from '../spell/Spell';
+import { CharacterFeatures, CharacterSnapshot, Orientation, Position, StaticCharacter } from '@timeflies/shared';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
 
-export interface Character<P extends BattleDataPeriod> extends PeriodicEntity<P, CharacterSnapshot> {
-    readonly id: string;
-    readonly staticData: Readonly<StaticCharacter>;
-    readonly isMine: boolean;
-    readonly position: Readonly<Position>;
-    readonly orientation: Orientation;
-    readonly features: Readonly<CharacterFeatures>;
+export type Character<P extends BattleDataPeriod> = {
+    id: string;
+    period: P;
+    staticData: Readonly<StaticCharacter>;
+    position: Readonly<Position>;
+    orientation: Orientation;
+    features: CharacterFeatures;
 
-    readonly spells: readonly Spell<P>[];
-    readonly defaultSpell: Spell<P>;
+    defaultSpellId: string;
 
-    readonly isAlive: boolean;
+    playerId: string;
+};
 
-    readonly player: Player<P>;
-
-    set(o: { [ K in keyof Pick<Character<P>, 'position' | 'orientation'> ]?: Character<P>[ K ] }): void;
-
-    alterLife(add: number): void;
-
-    hasSpell(spellType: SpellType): boolean;
-}
-
-// TODO add test to ensure that given objects are copied
-export const Character = <P extends BattleDataPeriod>(period: P, {
-    staticData, orientation: _orientation, position: _position, features: _features, spellsSnapshots: _spellsSnapshots
-}: CharacterSnapshot, player: Player<P>): Character<P> => {
-
-    let position: Position = { ..._position };
-    let orientation: Orientation = _orientation;
-    let features: Readonly<CharacterFeatures> = { ..._features };
-
-    const _this: Character<P> = {
-        period,
-        get id(): string {
-            return staticData.id;
-        },
+export const characterToSnapshot = ({ id, playerId, staticData, position, orientation, features }: Character<BattleDataPeriod>): CharacterSnapshot => {
+    return {
+        id,
+        playerId,
         staticData,
-        get isMine(): boolean {
-            return player.itsMe;
-        },
-        get position(): Readonly<Position> {
-            return position;
-        },
-        get orientation(): Orientation {
-            return orientation;
-        },
-        get features(): Readonly<CharacterFeatures> {
-            return features;
-        },
-        get spells(): readonly Spell<P>[] {
-            return spells;
-        },
-        get defaultSpell(): Spell<P> {
-            return defaultSpell;
-        },
-        get isAlive(): boolean {
-            return features.life > 0;
-        },
-        player,
+        position,
+        orientation,
+        features,
+    };
+};
 
-        getSnapshot() {
-            return {
-                id: staticData.id,
-                staticData,
-                features: { ...features },
-                position,
-                orientation,
-                spellsSnapshots: spells.map(s => s.getSnapshot())
-            };
-        },
+export const characterAlterLife = ({ features }: Character<BattleDataPeriod>, value: number) => {
+    features.life = Math.max(features.life + value, 0);
+};
 
-        updateFromSnapshot(snapshot: CharacterSnapshot) {
-            position = { ...snapshot.position };
-            orientation = snapshot.orientation;
+export const characterIsAlive = (character: Character<BattleDataPeriod>) => character.features.life > 0;
 
-            // TODO do something about object ref issues
-            features = {
-                ...snapshot.features
-            };
+// TODO
+// export const characterIsMine = 
 
-            // assertEntitySnapshotConsistency(spells, snapshot.spellsSnapshots);
+export const Character = <P extends BattleDataPeriod>(period: P, {
+    id, staticData, orientation, position, features, playerId
+}: CharacterSnapshot): Character<P> => {
 
-            snapshot.spellsSnapshots.forEach(sSnap => {
-                spells.find(s => s.id === sSnap.id)!.updateFromSnapshot(sSnap);
-            });
-        },
-
-        set(o) {
-            if (equals(o)(_this)) {
-                return;
-            }
-
-            if (o.position) {
-                position = { ...o.position };
-            }
-            if (o.orientation) {
-                orientation = o.orientation;
-            }
-        },
-
-        alterLife(add: number): void {
-            const life = Math.max(features.life + add, 0);
-            features = { ...features, life };
-        },
-
-        hasSpell(spellType) {
-            return spells.some(s => s.staticData.type === spellType);
-        }
+    return {
+        id,
+        period,
+        staticData,
+        position,
+        orientation,
+        features,
+        defaultSpellId: staticData.defaultSpellId,
+        playerId
     };
 
-    const spells = _spellsSnapshots.map(snap => Spell(period, snap, _this));
-    const defaultSpell = assertThenGet(spells.find(s => s.id === staticData.defaultSpellId), assertIsDefined);
+    // const _this: Character<P> = {
+    //     period,
+    //     get id(): string {
+    //         return staticData.id;
+    //     },
+    //     staticData,
+    //     get isMine(): boolean {
+    //         return player.itsMe;
+    //     },
+    //     get position(): Readonly<Position> {
+    //         return position;
+    //     },
+    //     get orientation(): Orientation {
+    //         return orientation;
+    //     },
+    //     get features(): Readonly<CharacterFeatures> {
+    //         return features;
+    //     },
+    //     get spells(): readonly Spell<P>[] {
+    //         return spells;
+    //     },
+    //     get defaultSpell(): Spell<P> {
+    //         return defaultSpell;
+    //     },
+    //     get isAlive(): boolean {
+    //         return features.life > 0;
+    //     },
+    //     player,
 
-    return _this;
+    //     getSnapshot() {
+    //         return {
+    //             id: staticData.id,
+    //             staticData,
+    //             features: { ...features },
+    //             position,
+    //             orientation,
+    //             spellsSnapshots: spells.map(s => s.getSnapshot())
+    //         };
+    //     },
+
+    //     updateFromSnapshot(snapshot: CharacterSnapshot) {
+    //         position = { ...snapshot.position };
+    //         orientation = snapshot.orientation;
+
+    //         // TODO do something about object ref issues
+    //         features = {
+    //             ...snapshot.features
+    //         };
+
+    //         // assertEntitySnapshotConsistency(spells, snapshot.spellsSnapshots);
+
+    //         snapshot.spellsSnapshots.forEach(sSnap => {
+    //             spells.find(s => s.id === sSnap.id)!.updateFromSnapshot(sSnap);
+    //         });
+    //     },
+
+    //     set(o) {
+    //         if (equals(o)(_this)) {
+    //             return;
+    //         }
+
+    //         if (o.position) {
+    //             position = { ...o.position };
+    //         }
+    //         if (o.orientation) {
+    //             orientation = o.orientation;
+    //         }
+    //     },
+
+    //     alterLife(add: number): void {
+    //         const life = Math.max(features.life + add, 0);
+    //         features = { ...features, life };
+    //     },
+
+    //     hasSpell(spellType) {
+    //         return spells.some(s => s.staticData.type === spellType);
+    //     }
+    // };
+
+    // const spells = _spellsSnapshots.map(snap => Spell(period, snap, _this));
+    // const defaultSpell = assertThenGet(spells.find(s => s.id === staticData.defaultSpellId), assertIsDefined);
+
+    // return _this;
 };
 
 // export class Character2 implements WithSnapshot<CharacterSnapshot> {

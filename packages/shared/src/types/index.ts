@@ -20,3 +20,5 @@ export type DeepReadonly<T> = T extends Array<infer I>
             ? { readonly [ K in keyof T ]: DeepReadonly<T[ K ]> }
             : T)
     );
+
+export type RequiredOnly<O, K extends keyof O> = Required<Pick<O, K>> & Partial<Omit<O, K>>;

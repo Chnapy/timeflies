@@ -1,5 +1,5 @@
 import { CycleState, cycleReducer } from './cycle-reducer';
-import { BattleStartAction } from '../map/map-reducer';
+import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 
 describe('# cycle-reducer', () => {
@@ -59,10 +59,13 @@ describe('# cycle-reducer', () => {
             };
 
             const state1 = cycleReducer(initialState, BattleStateTurnStartAction({
-                id: 1,
-                characterId: '1',
-                startTime: 12,
-                duration: 1000
+                turnSnapshot: {
+                    id: 1,
+                    characterId: '1',
+                    startTime: 12,
+                    duration: 1000
+                },
+                isMine: true
             }));
 
             expect(state1).toEqual<CycleState>({

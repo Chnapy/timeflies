@@ -1,68 +1,13 @@
-import { PlayerSnapshot } from '@timeflies/shared';
-import { BattleDataPeriod } from '../../../../BattleData';
-import { seedCharacter, SeedCharacterProps, seedCharacterSnapshot } from '../character/Character.seed';
-import { SeedPeriodicProps } from '../PeriodicEntity';
-import { Team } from '../team/Team';
-import { Player, PlayerDependencies } from './Player';
+import { RequiredOnly } from '@timeflies/shared';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
+import { Player } from './Player';
 
-export interface SeedPlayerProps {
-    id: string;
-    name?: string;
-    seedCharacters?: SeedCharacterProps<'features'>[];
-}
+export type SeedPlayerProps<P extends BattleDataPeriod> = RequiredOnly<Player<P>, 'id' | 'period'>;
 
-export const seedInitialSeedCharactersSnapshot: SeedCharacterProps<'features'>[] = [ {
-    id: 'c-1',
-    seedSpells: [ { id: 's-1', type: 'move' } ]
-} ];
-
-export const seedPlayerSnapshot = ({ id, name, seedCharacters }: SeedPlayerProps): PlayerSnapshot => {
-
+export const seedPlayer = <P extends BattleDataPeriod>(props: SeedPlayerProps<P>): Player<P> => {
     return {
-        id,
-        name: name ?? 'P-' + id,
-        charactersSnapshots: (seedCharacters ?? seedInitialSeedCharactersSnapshot).map(seedCharacterSnapshot)
+        teamId: '',
+        name: 'name',
+        ...props
     };
-};
-
-export interface SeedPlayerFullProps<P extends BattleDataPeriod> extends SeedPlayerProps {
-    team: Team<P> | null;
-    itsMe?: boolean;
-    dependencies?: PlayerDependencies;
-}
-
-export const seedPlayer = <P extends BattleDataPeriod>(type: 'real' | 'fake', props: SeedPlayerFullProps<P> & SeedPeriodicProps<P>): Player<P> => {
-
-    const { period, id, name, itsMe, seedCharacters, team, dependencies } = props;
-
-    if (type === 'real') {
-        return Player(
-            period,
-            seedPlayerSnapshot(props),
-            team as Team<P>,
-            dependencies
-        );
-    }
-
-    const player: Player<P> = {
-        period,
-        id,
-        itsMe: itsMe ?? true,
-        name: name ?? 'P-' + id,
-        get characters() {
-            return characters_;
-        },
-        team: team as Team<P>,
-        getSnapshot() { return seedPlayerSnapshot(props); },
-        updateFromSnapshot(snapshot) { }
-    };
-
-    const characters_ = (seedCharacters ?? seedInitialSeedCharactersSnapshot).map(c => seedCharacter('fake', {
-        ...c,
-        period,
-        initialFeatures: c.features,
-        player
-    }));
-
-    return player;
 };

@@ -1,46 +1,57 @@
 import { TeamSnapshot } from '@timeflies/shared';
-import { Player } from '../player/Player';
-import { PeriodicEntity } from '../PeriodicEntity';
-import { BattleDataPeriod } from '../../../../BattleData';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
 
-export interface Team<P extends BattleDataPeriod> extends PeriodicEntity<P, TeamSnapshot> {
-    readonly id: string;
-    readonly letter: string;
-    readonly players: Player<P>[];
-}
+export type Team<P extends BattleDataPeriod> = {
+    id: string;
+    period: P;
+    letter: string;
+};
+
+export const teamToSnapshot = ({ id, letter }: Team<BattleDataPeriod>): TeamSnapshot => {
+    return {
+        id,
+        letter
+    };
+};
 
 export const Team = <P extends BattleDataPeriod>(
     period: P,
-    { id, letter, playersSnapshots }: TeamSnapshot
+    { id, letter }: TeamSnapshot
 ): Team<P> => {
 
-    const this_: Team<P> = {
-        period,
+    return {
         id,
-        letter,
-        get players() {
-            return players;
-        },
-
-        getSnapshot(): TeamSnapshot {
-            return {
-                id: this_.id,
-                letter: this_.letter,
-                playersSnapshots: this_.players.map(p => p.getSnapshot())
-            };
-        },
-
-        updateFromSnapshot(snapshot: TeamSnapshot): void {
-
-            // assertEntitySnapshotConsistency(this_.players, snapshot.playersSnapshots);
-
-            snapshot.playersSnapshots.forEach(pSnap => {
-                this_.players.find(p => p.id === pSnap.id)!.updateFromSnapshot(pSnap);
-            });
-        }
+        period,
+        letter
     };
 
-    const players = playersSnapshots.map(snap => Player(period, snap, this_));
+    // const this_: Team<P> = {
+    //     period,
+    //     id,
+    //     letter,
+    //     get players() {
+    //         return players;
+    //     },
 
-    return this_;
+    //     getSnapshot(): TeamSnapshot {
+    //         return {
+    //             id: this_.id,
+    //             letter: this_.letter,
+    //             playersSnapshots: this_.players.map(p => p.getSnapshot())
+    //         };
+    //     },
+
+    //     updateFromSnapshot(snapshot: TeamSnapshot): void {
+
+    //         // assertEntitySnapshotConsistency(this_.players, snapshot.playersSnapshots);
+
+    //         snapshot.playersSnapshots.forEach(pSnap => {
+    //             this_.players.find(p => p.id === pSnap.id)!.updateFromSnapshot(pSnap);
+    //         });
+    //     }
+    // };
+
+    // const players = playersSnapshots.map(snap => Player(period, snap, this_));
+
+    // return this_;
 };

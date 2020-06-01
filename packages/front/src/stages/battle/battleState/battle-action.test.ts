@@ -13,12 +13,12 @@ describe('# battle-action', () => {
 
     const getStore = (initialState: BattleActionState, deps: Partial<Parameters<typeof battleActionMiddleware>[ 0 ]> = {}): Store<BattleActionState> => {
 
-        const futureCharacter = seedCharacter('fake', {
-            id: '1', period: 'future', player: null
+        const futureCharacter = seedCharacter({
+            id: '1', period: 'future'
         });
 
-        const futureSpell = seedSpell('fake', {
-            id: 's1', period: 'future', type: 'move', character: futureCharacter
+        const futureSpell = seedSpell({
+            id: 's1', period: 'future', type: 'move'
         });
 
         const reducer: Reducer<BattleActionState, any> = (...args) => {
@@ -61,7 +61,8 @@ describe('# battle-action', () => {
                     imagesUrls: { toto: 'url' },
                 },
                 charactersPositionList: [ { x: 2, y: 8 } ],
-                globalTurnSnapshot: {} as any
+                globalTurnSnapshot: {} as any,
+                entitiesSnapshot: {} as any
             });
 
             store.dispatch(action);
@@ -108,8 +109,8 @@ describe('# battle-action', () => {
             const getSpellEngineFromType = jest.fn(() => spellEngine);
 
             const store = getStore(initialState, {
-                extractFutureSpell: () => seedSpell('fake', {
-                    id: 's1', period: 'future', type: 'move', character: null as any
+                extractFutureSpell: () => seedSpell({
+                    id: 's1', period: 'future', type: 'move'
                 }),
                 getSpellEngineFromType
             });

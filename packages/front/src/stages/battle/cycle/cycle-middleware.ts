@@ -1,7 +1,7 @@
 import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
-import { Character } from '../entities/character/Character';
+import { Character, characterIsAlive } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { BattleStartAction } from '../battle-actions';
 import { TurnSnapshot, TURN_DELAY } from '@timeflies/shared';
@@ -23,7 +23,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     const isCharacterDead = (characterId: string) => {
 
         const charactersDeadsIds = extractCurrentCharacters(api.getState)
-            .filter(c => !c.isAlive)
+            .filter(c => !characterIsAlive(c))
             .map(c => c.id);
 
         return charactersDeadsIds.includes(characterId);
