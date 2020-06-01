@@ -1,66 +1,69 @@
-import { assertIsNonNullable, assertThenGet, PlayerSnapshot } from '@timeflies/shared';
-import { serviceCurrentPlayer } from '../../../../services/serviceCurrentPlayer';
-import { Character } from '../character/Character';
-import { Team } from "../team/Team";
-import { PeriodicEntity } from '../PeriodicEntity';
-import { BattleDataPeriod } from '../../../../BattleData';
+import { PlayerSnapshot } from '@timeflies/shared';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
 
-export interface Player<P extends BattleDataPeriod> extends PeriodicEntity<P, PlayerSnapshot> {
-    readonly id: string;
-    readonly itsMe: boolean;
-    readonly name: string;
-    readonly team: Team<P>;
-    readonly characters: Character<P>[];
-}
+export type Player<P extends BattleDataPeriod> = {
+    id: string;
+    period: P;
+    name: string;
+    teamId: string;
+};
 
-export interface PlayerDependencies {
-    characterCreator: typeof Character;
-}
+export const playerToSnapshot = ({ id, name, teamId }: Player<BattleDataPeriod>): PlayerSnapshot => {
+    return {
+        id,
+        name,
+        teamId
+    };
+};
+
+// TODO
+// export const playerIsMine = 
 
 export const Player = <P extends BattleDataPeriod>(
     period: P,
     {
         id,
-        name,
-        charactersSnapshots
-    }: PlayerSnapshot,
-    team: Team<P>,
-    { characterCreator }: PlayerDependencies = { characterCreator: Character }
+        teamId,
+        name
+    }: PlayerSnapshot
 ): Player<P> => {
-    const itsMe = id === assertThenGet(
-        serviceCurrentPlayer(),
-        assertIsNonNullable
-    ).id;
 
-    const this_: Player<P> = {
-        period,
+    return {
         id,
+        period,
         name,
-        itsMe,
-        team,
-        get characters() {
-            return characters;
-        },
-
-        getSnapshot(): PlayerSnapshot {
-            return {
-                id,
-                name,
-                charactersSnapshots: characters.map(c => c.getSnapshot())
-            };
-        },
-
-        updateFromSnapshot(snapshot: PlayerSnapshot): void {
-
-            // assertEntitySnapshotConsistency(characters, snapshot.charactersSnapshots);
-
-            snapshot.charactersSnapshots.forEach(cSnap => {
-                characters.find(c => c.id === cSnap.id)!.updateFromSnapshot(cSnap);
-            });
-        }
+        teamId
     };
 
-    const characters = charactersSnapshots.map(snap => characterCreator(period, snap, this_));
+    // const this_: Player<P> = {
+    //     period,
+    //     id,
+    //     name,
+    //     itsMe,
+    //     team,
+    //     get characters() {
+    //         return characters;
+    //     },
 
-    return this_;
+    //     getSnapshot(): PlayerSnapshot {
+    //         return {
+    //             id,
+    //             name,
+    //             charactersSnapshots: characters.map(c => c.getSnapshot())
+    //         };
+    //     },
+
+    //     updateFromSnapshot(snapshot: PlayerSnapshot): void {
+
+    //         // assertEntitySnapshotConsistency(characters, snapshot.charactersSnapshots);
+
+    //         snapshot.charactersSnapshots.forEach(cSnap => {
+    //             characters.find(c => c.id === cSnap.id)!.updateFromSnapshot(cSnap);
+    //         });
+    //     }
+    // };
+
+    // const characters = charactersSnapshots.map(snap => characterCreator(period, snap, this_));
+
+    // return this_;
 };

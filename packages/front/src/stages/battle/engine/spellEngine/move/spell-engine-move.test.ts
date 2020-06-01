@@ -14,12 +14,12 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
         dispatchMock: jest.Mock;
     } => {
 
-        const futureCharacter = seedCharacter('fake', {
-            id: '1', period: 'future', player: null
+        const futureCharacter = seedCharacter({
+            id: '1', period: 'future'
         });
 
-        const futureSpell = seedSpell('fake', {
-            id: 's1', period: 'future', type: 'move', character: futureCharacter
+        const futureSpell = seedSpell({
+            id: 's1', period: 'future', type: 'move'
         });
 
         const reducer: Reducer<BattleActionState, any> = (...args) => {
@@ -82,8 +82,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             };
 
             const { store } = getStore(initialState, {
-                extractFutureCharacter: () => seedCharacter('fake', {
-                    id: '1', period: 'future', player: null, position: { x: 0, y: 0 }
+                extractFutureCharacter: () => seedCharacter({
+                    id: '1', period: 'future', position: { x: 0, y: 0 }
                 })
             });
 
@@ -133,8 +133,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             };
 
             const { store } = getStore(initialState, {
-                extractFutureCharacter: () => seedCharacter('fake', {
-                    id: '1', period: 'future', player: null, position: { x: 0, y: 0 }
+                extractFutureCharacter: () => seedCharacter({
+                    id: '1', period: 'future', position: { x: 0, y: 0 }
                 })
             });
 
@@ -191,8 +191,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             };
 
             const { store, dispatchMock } = getStore(initialState, {
-                extractFutureCharacter: () => seedCharacter('fake', {
-                    id: '1', period: 'future', player: null, position: { x: 0, y: 0 }
+                extractFutureCharacter: () => seedCharacter({
+                    id: '1', period: 'future', position: { x: 0, y: 0 }
                 })
             });
 
@@ -240,8 +240,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             };
 
             const { store, dispatchMock } = getStore(initialState, {
-                extractFutureCharacter: () => seedCharacter('fake', {
-                    id: '1', period: 'future', player: null, position: { x: 0, y: 0 }
+                extractFutureCharacter: () => seedCharacter({
+                    id: '1', period: 'future', position: { x: 0, y: 0 }
                 })
             });
 
@@ -295,13 +295,13 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
 
             const { store } = getStore(initialState, {
                 extractState: () => initialState,
-                extractFutureCharacter: () => seedCharacter('fake', {
-                    id: '1', period: 'future', player: null, position: { x: 0, y: 0 }
+                extractFutureCharacter: () => seedCharacter({
+                    id: '1', period: 'future', position: { x: 0, y: 0 }
                 })
             });
 
             initialState.easyStarGrid[ 0 ][ 1 ] = 1;
-            
+
             const action1 = BattleCommitAction({
                 time: -1,
                 charactersPositionList: []

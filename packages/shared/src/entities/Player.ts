@@ -1,15 +1,15 @@
-import { CharacterRoom, CharacterSnapshot } from "./Character";
+import { CharacterRoom } from "./Character";
 
 export interface PlayerInfos {
     id: string;
     name: string;
 }
 
-export interface PlayerSnapshot {
+export type PlayerSnapshot = {
     id: string;
+    teamId: string;
     name: string;
-    charactersSnapshots: CharacterSnapshot[];
-}
+};
 
 export interface PlayerRoom {
     id: string;

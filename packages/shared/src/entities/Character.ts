@@ -20,14 +20,14 @@ export interface StaticCharacter {
     defaultSpellId: string;
 }
 
-export interface CharacterSnapshot {
-    readonly id: string;
-    readonly staticData: Readonly<StaticCharacter>;
+export type CharacterSnapshot = {
+    id: string;
+    playerId: string;
+    staticData: Readonly<StaticCharacter>;
     position: Position;
     orientation: Orientation;
-    readonly features: CharacterFeatures;
-    spellsSnapshots: SpellSnapshot[];
-}
+    features: CharacterFeatures;
+};
 
 export interface CharacterRoom {
     readonly id: string;

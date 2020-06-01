@@ -1,42 +1,58 @@
 import { SpellFeatures, SpellSnapshot, StaticSpell } from '@timeflies/shared';
-import { Character } from '../character/Character';
-import { PeriodicEntity } from '../PeriodicEntity';
-import { BattleDataPeriod } from '../../../../BattleData';
+import { BattleDataPeriod } from '../../snapshot/battle-data';
 
-export interface Spell<P extends BattleDataPeriod> extends PeriodicEntity<P, SpellSnapshot> {
-    readonly id: string;
-    readonly index: number;
-    readonly staticData: Readonly<StaticSpell>;
-    readonly feature: Readonly<SpellFeatures>;
-    readonly character: Character<P>;
-}
+export type Spell<P extends BattleDataPeriod> = {
+    id: string;
+    period: P;
+    index: number;
+    staticData: Readonly<StaticSpell>;
+    feature: SpellFeatures;
+    characterId: string;
+};
 
-export const Spell = <P extends BattleDataPeriod>(period: P, { index, staticData, features: _features }: SpellSnapshot, character: Character<P>): Spell<P> => {
+export const spellToSnapshot = ({ id, characterId, staticData, index, feature: features }: Spell<BattleDataPeriod>): SpellSnapshot => {
+    return {
+        id,
+        characterId,
+        staticData,
+        index,
+        features
+    };
+};
 
-    let features: Readonly<SpellFeatures> = { ..._features };
+export const Spell = <P extends BattleDataPeriod>(period: P, { index, staticData, features, characterId }: SpellSnapshot): Spell<P> => {
 
     return {
+        id: staticData.id,
         period,
-        get id(): string {
-            return staticData.id;
-        },
         index,
         staticData,
-        get feature(): Readonly<SpellFeatures> {
-            return features;
-        },
-        character,
+        feature: features,
+        characterId
+    };
 
-        getSnapshot(): SpellSnapshot {
-            return {
-                id: staticData.id,
-                index,
-                staticData,
-                features: { ...features }
-            };
-        },
+    // return {
+    //     period,
+    //     get id(): string {
+    //         return staticData.id;
+    //     },
+    //     index,
+    //     staticData,
+    //     get feature(): Readonly<SpellFeatures> {
+    //         return features;
+    //     },
+    //     character,
 
-        updateFromSnapshot(snapshot: SpellSnapshot) {
-        }
-    }
+    //     getSnapshot(): SpellSnapshot {
+    //         return {
+    //             id: staticData.id,
+    //             index,
+    //             staticData,
+    //             features: { ...features }
+    //         };
+    //     },
+
+    //     updateFromSnapshot(snapshot: SpellSnapshot) {
+    //     }
+    // }
 };

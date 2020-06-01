@@ -1,19 +1,21 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { assertIsDefined, BattleSnapshot, getBattleSnapshotWithHash } from '@timeflies/shared';
-import { BattleDataPeriod } from '../../../BattleData';
+import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { Character } from '../entities/character/Character';
-import { PeriodicEntity } from '../entities/PeriodicEntity';
-import { Player } from '../entities/player/Player';
-import { Team } from '../entities/team/Team';
-import { BattleCommitAction } from './snapshot-manager-actions';
+import { Character, characterToSnapshot } from '../entities/character/Character';
+import { Player, playerToSnapshot } from '../entities/player/Player';
+import { Spell, spellToSnapshot } from '../entities/spell/Spell';
+import { Team, teamToSnapshot } from '../entities/team/Team';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
+import { BattleDataPeriod, periodList } from './battle-data';
+import { BattleCommitAction } from './snapshot-manager-actions';
 
 type BattleData<P extends BattleDataPeriod> = {
     battleHash: string;
     teams: Team<P>[];
     players: Player<P>[];
     characters: Character<P>[];
+    spells: Spell<P>[];
 };
 
 export type SnapshotState = {
@@ -23,17 +25,17 @@ export type SnapshotState = {
     battleDataFuture: BattleData<'future'>;
 };
 
-export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
-    entityList: PeriodicEntity<any, S>[],
-    snapshotList: S[]
-): void | never => {
-    const serialize = (list: { id: string; }[]) => list.map(i => i.id).sort().join('.');
+// export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
+//     entityList: PeriodicEntity<any, S>[],
+//     snapshotList: S[]
+// ): void | never => {
+//     const serialize = (list: { id: string; }[]) => list.map(i => i.id).sort().join('.');
 
-    if (serialize(entityList) !== serialize(snapshotList)) {
-        throw new Error(`Ids of entities differs from these snapshots [${serialize(entityList)}]<->[${serialize(snapshotList)}].
-        There is an inconsistence front<->back.`);
-    }
-}
+//     if (serialize(entityList) !== serialize(snapshotList)) {
+//         throw new Error(`Ids of entities differs from these snapshots [${serialize(entityList)}]<->[${serialize(snapshotList)}].
+//         There is an inconsistence front<->back.`);
+//     }
+// }
 
 const assertHashIsInSnapshotList = (
     hash: string,
@@ -47,6 +49,7 @@ const assertHashIsInSnapshotList = (
 
 const getInitialBattleData = (): BattleData<any> => ({
     battleHash: '',
+    spells: [],
     characters: [],
     players: [],
     teams: []
@@ -64,14 +67,17 @@ const getLastSnapshot = (snapshotList: BattleSnapshot[]): BattleSnapshot | undef
 const commit = (state: SnapshotState, time: number): void => {
 
     const { launchTime, snapshotList } = state;
-    const { teams } = state.battleDataFuture;
+    const { teams, players, characters, spells } = state.battleDataFuture;
 
     const isFirstSnapshot = !snapshotList.length;
 
     const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
         time,
         launchTime,
-        teamsSnapshots: teams.map(t => t.getSnapshot())
+        teamsSnapshots: teams.map(teamToSnapshot),
+        playersSnapshots: players.map(playerToSnapshot),
+        charactersSnapshots: characters.map(characterToSnapshot),
+        spellsSnapshots: spells.map(spellToSnapshot)
     };
 
     const snap: BattleSnapshot = getBattleSnapshotWithHash(partialSnap);
@@ -85,20 +91,34 @@ const commit = (state: SnapshotState, time: number): void => {
     }
 };
 
-const updateBattleDataFromSnapshot = (battleData: BattleData<any>, { battleHash, teamsSnapshots }: BattleSnapshot) => {
+const updateBattleDataFromSnapshot = (data: BattleData<any>, period: BattleDataPeriod, {
+    battleHash, teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
+}: BattleSnapshot) => {
 
-    battleData.battleHash = battleHash;
-
-    const teams: Team<BattleDataPeriod>[] = battleData.teams;
-
-    assertEntitySnapshotConsistency(teams, teamsSnapshots);
-
-    teamsSnapshots.forEach(snap =>
-        teams.find(t => t.id === snap.id)!.updateFromSnapshot(snap)
-    );
+    data.battleHash = battleHash;
+    data.spells = spellsSnapshots.map(snap => Spell(period, snap));
+    data.characters = charactersSnapshots.map(snap => Character(period, snap));
+    data.players = playersSnapshots.map(snap => Player(period, snap));
+    data.teams = teamsSnapshots.map(snap => Team(period, snap));
 };
 
 export const snapshotReducer = createReducer(initialState, {
+    [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
+        const { battleHash, spellsSnapshots, charactersSnapshots, playersSnapshots, teamsSnapshots } = payload.entitiesSnapshot;
+
+        periodList.forEach(period => {
+
+            const data: BattleData<typeof period> = period === 'current'
+                ? state.battleDataCurrent
+                : state.battleDataFuture;
+
+            data.battleHash = battleHash;
+            data.spells = spellsSnapshots.map(snap => Spell(period, snap));
+            data.characters = charactersSnapshots.map(snap => Character(period, snap));
+            data.players = playersSnapshots.map(snap => Player(period, snap));
+            data.teams = teamsSnapshots.map(snap => Team(period, snap));
+        });
+    },
     [ BattleCommitAction.type ]: (state, { payload: { time } }: BattleCommitAction) => {
         commit(state, time);
     },
@@ -116,8 +136,8 @@ export const snapshotReducer = createReducer(initialState, {
         const currentSnapshot = getLastSnapshot(state.snapshotList);
         assertIsDefined(currentSnapshot);
 
-        updateBattleDataFromSnapshot(state.battleDataFuture, currentSnapshot);
-        updateBattleDataFromSnapshot(state.battleDataCurrent, currentSnapshot);
+        updateBattleDataFromSnapshot(state.battleDataFuture, 'future', currentSnapshot);
+        updateBattleDataFromSnapshot(state.battleDataCurrent, 'current', currentSnapshot);
     },
     [ SpellActionTimerEndAction.type ]: (state, { payload: { removed, correctHash } }: SpellActionTimerEndAction) => {
 
@@ -129,10 +149,10 @@ export const snapshotReducer = createReducer(initialState, {
             }
 
             const currentSnapshot = getLastSnapshot(state.snapshotList)!;
-            updateBattleDataFromSnapshot(state.battleDataFuture, currentSnapshot);
+            updateBattleDataFromSnapshot(state.battleDataFuture, 'future', currentSnapshot);
 
             if (currentSnapshot.time < Date.now()) {
-                updateBattleDataFromSnapshot(state.battleDataCurrent, currentSnapshot);
+                updateBattleDataFromSnapshot(state.battleDataCurrent, 'current', currentSnapshot);
             }
         } else {
 
@@ -140,7 +160,7 @@ export const snapshotReducer = createReducer(initialState, {
 
             assertIsDefined(snapshot);
 
-            updateBattleDataFromSnapshot(state.battleDataCurrent, snapshot);
+            updateBattleDataFromSnapshot(state.battleDataCurrent, 'current', snapshot);
         }
     }
 });

@@ -1,5 +1,6 @@
 import { MiddlewareAPI } from '@reduxjs/toolkit';
 import { seedSpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
@@ -8,7 +9,6 @@ import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action
 import { spellActionMiddleware } from './spell-action-middleware';
 import { SpellActionState } from './spell-action-reducer';
 import { SpellActionTimer } from './spell-action-timer';
-import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 describe('# spell-action-middleware', () => {
 
@@ -24,18 +24,16 @@ describe('# spell-action-middleware', () => {
 
     const init = () => {
 
-        const futureCharacter = seedCharacter('fake', {
+        const futureCharacter = seedCharacter({
             period: 'future',
-            id: '1',
-            player: null
+            id: '1'
         });
 
-        const spell = seedSpell('fake', {
+        const spell = seedSpell({
             period: 'future',
             id: 's1',
-            character: futureCharacter,
             type: 'move',
-            initialFeatures: {
+            feature: {
                 duration: 200
             }
         });
@@ -85,6 +83,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -126,6 +125,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -158,6 +158,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -179,7 +180,7 @@ describe('# spell-action-middleware', () => {
 
         it('should return turn end action', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -193,6 +194,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -203,7 +205,7 @@ describe('# spell-action-middleware', () => {
 
         it('should dispatch spell canceled action with new snapshot list', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -227,6 +229,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -239,7 +242,7 @@ describe('# spell-action-middleware', () => {
 
         it('should notify timer of removed snapshots', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -263,6 +266,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -279,7 +283,7 @@ describe('# spell-action-middleware', () => {
 
         it('should return confirm action', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -298,6 +302,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -308,7 +313,7 @@ describe('# spell-action-middleware', () => {
 
         it('should not dispatch on OK', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -327,6 +332,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -337,7 +343,7 @@ describe('# spell-action-middleware', () => {
 
         it('should dispatch spell cancel on KO', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -366,6 +372,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -378,7 +385,7 @@ describe('# spell-action-middleware', () => {
 
         it('should notify timer of removed snapshots and correct hash', () => {
 
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
             state.spellActionSnapshotList.push(
                 seedSpellActionSnapshot('s1', {
@@ -407,6 +414,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -422,9 +430,9 @@ describe('# spell-action-middleware', () => {
     describe('on notify action', () => {
 
         it('should dispatch launch action with snapshot', () => {
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
-            const snapshot = seedSpellActionSnapshot(futureCharacter.spells[ 0 ].id, {
+            const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
                 startTime: timerTester.now,
                 duration: 200,
                 battleHash: '-hash-',
@@ -440,6 +448,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -453,9 +462,9 @@ describe('# spell-action-middleware', () => {
         });
 
         it('should dispatch commit', () => {
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
-            const snapshot = seedSpellActionSnapshot(futureCharacter.spells[ 0 ].id, {
+            const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
                 startTime: timerTester.now,
                 duration: 200,
                 battleHash: '-hash-',
@@ -471,6 +480,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -483,9 +493,9 @@ describe('# spell-action-middleware', () => {
         });
 
         it('should notify timer', () => {
-            const { futureCharacter, api, next, timer, state } = init();
+            const { futureCharacter, spell, api, next, timer, state } = init();
 
-            const snapshot = seedSpellActionSnapshot(futureCharacter.spells[ 0 ].id, {
+            const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
                 startTime: timerTester.now,
                 duration: 200,
                 battleHash: '-hash-',
@@ -501,6 +511,7 @@ describe('# spell-action-middleware', () => {
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
                 extractFutureCharacters: () => [ futureCharacter ],
+                extractFutureSpells: () => [ spell ],
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state

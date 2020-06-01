@@ -1,10 +1,8 @@
-import { PlayerSnapshot } from "./Player";
 
-export interface TeamSnapshot {
+export type TeamSnapshot = {
     id: string;
     letter: string;
-    playersSnapshots: PlayerSnapshot[];
-}
+};
 
 export interface TeamRoom {
     id: string;

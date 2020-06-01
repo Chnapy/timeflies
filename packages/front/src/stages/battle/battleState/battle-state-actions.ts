@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { SpellType, TurnSnapshot, Position } from '@timeflies/shared';
-import { SpellAction } from '../spellAction/SpellActionManager';
+import { SpellAction } from '../spellAction/spell-action-reducer';
 import { BattleActionState } from './battle-action-reducer';
 
 export type BattleStateResetAction = ReturnType<typeof BattleStateResetAction>;

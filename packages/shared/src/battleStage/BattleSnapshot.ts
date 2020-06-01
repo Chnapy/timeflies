@@ -1,11 +1,15 @@
 import { TeamSnapshot } from "../entities/Team";
 import objectHash from 'object-hash';
+import { PlayerSnapshot, CharacterSnapshot, SpellSnapshot } from '../entities';
 
 export interface BattleSnapshot {
     time: number;
     battleHash: string;
     launchTime: number;
     teamsSnapshots: TeamSnapshot[];
+    playersSnapshots: PlayerSnapshot[];
+    charactersSnapshots: CharacterSnapshot[];
+    spellsSnapshots: SpellSnapshot[];
 }
 
 export const getBattleSnapshotWithHash = ({
