@@ -1,6 +1,5 @@
 import { assertIsNonNullable, assertThenGet, PlayerSnapshot } from '@timeflies/shared';
 import { serviceCurrentPlayer } from '../../../../services/serviceCurrentPlayer';
-import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 import { Character } from '../character/Character';
 import { Team } from "../team/Team";
 import { PeriodicEntity } from '../PeriodicEntity';
@@ -53,7 +52,7 @@ export const Player = <P extends BattleDataPeriod>(
 
         updateFromSnapshot(snapshot: PlayerSnapshot): void {
 
-            assertEntitySnapshotConsistency(characters, snapshot.charactersSnapshots);
+            // assertEntitySnapshotConsistency(characters, snapshot.charactersSnapshots);
 
             snapshot.charactersSnapshots.forEach(cSnap => {
                 characters.find(c => c.id === cSnap.id)!.updateFromSnapshot(cSnap);

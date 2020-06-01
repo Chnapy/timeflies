@@ -7,7 +7,7 @@ import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { spellActionMiddleware } from './spell-action-middleware';
 import { SpellActionState } from './spell-action-reducer';
-import { SpellActionTimer } from './SpellActionTimer';
+import { SpellActionTimer } from './spell-action-timer';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 describe('# spell-action-middleware', () => {
@@ -132,7 +132,8 @@ describe('# spell-action-middleware', () => {
             })(api)(next)(action);
 
             expect(api.dispatch).toHaveBeenNthCalledWith(2, BattleCommitAction({
-                time: expect.any(Number)
+                time: expect.any(Number),
+                charactersPositionList: [ futureCharacter.position ]
             }));
         });
 
@@ -476,7 +477,8 @@ describe('# spell-action-middleware', () => {
             })(api)(next)(action);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleCommitAction({
-                time: expect.any(Number)
+                time: expect.any(Number),
+                charactersPositionList: [ futureCharacter.position ]
             }));
         });
 

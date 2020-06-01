@@ -1,9 +1,7 @@
 import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
-import { serviceNetwork } from '../../../services/serviceNetwork';
 import { SendMessageAction } from '../../../socket/wsclient-actions';
-import { StoreTest } from '../../../StoreTest';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
-import { SpellActionTimer } from './SpellActionTimer';
+import { SpellActionTimer } from './spell-action-timer';
 
 describe('# SpellActionTimer', () => {
 
@@ -22,71 +20,57 @@ describe('# SpellActionTimer', () => {
 
     beforeEach(() => {
         timerTester.beforeTest();
-        StoreTest.beforeTest();
     });
 
     afterEach(() => {
         timerTester.afterTest();
-        StoreTest.afterTest();
     });
 
     it('should not allow future spell action without current one playing', () => {
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList: [],
-                }
-            } as any
-        });
+        const dispatch = jest.fn();
 
-        const timer = SpellActionTimer();
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => [],
+            dispatch
+        });
 
         const snapshot = getSnapshot({ startTime: timerTester.now + 100 });
 
         expect(() => timer.onAdd(snapshot)).toThrowError();
     });
 
-    it('should launch current spell action and send message', async () => {
+    it('should launch current spell action and send message', () => {
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList: [],
-                }
-            } as any
+        const dispatch = jest.fn();
+
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => [],
+            dispatch
         });
-
-        const timer = SpellActionTimer();
 
         const snapshot = getSnapshot({ startTime: timerTester.now });
 
         timer.onAdd(snapshot);
 
-        await serviceNetwork({});
+        expect(dispatch).toHaveBeenNthCalledWith(1, SpellActionTimerStartAction({
+            spellActionSnapshot: snapshot
+        }));
 
-        expect(StoreTest.getActions()).toEqual([
-            SpellActionTimerStartAction({
-                spellActionSnapshot: snapshot
-            }),
-            SendMessageAction({
-                type: 'battle/spellAction',
-                spellAction: snapshot
-            })
-        ]);
+        expect(dispatch).toHaveBeenNthCalledWith(2, SendMessageAction({
+            type: 'battle/spellAction',
+            spellAction: snapshot
+        }));
     });
 
     it('should end current spell on its end', () => {
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList: []
-                }
-            } as any
-        });
+        const dispatch = jest.fn();
 
-        const timer = SpellActionTimer();
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => [],
+            dispatch
+        });
 
         const snapshot = getSnapshot({
             battleHash: '-hash-'
@@ -96,9 +80,7 @@ describe('# SpellActionTimer', () => {
 
         timerTester.advanceBy(200);
 
-        expect(
-            StoreTest.getActions()
-        ).toContainEqual(SpellActionTimerEndAction({
+        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerEndAction({
             removed: false,
             correctHash: '-hash-',
             spellActionSnapshot: snapshot
@@ -109,15 +91,12 @@ describe('# SpellActionTimer', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList
-                }
-            } as any
-        });
+        const dispatch = jest.fn();
 
-        const timer = SpellActionTimer();
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => spellActionSnapshotList,
+            dispatch
+        });
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -127,13 +106,11 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        spellActionSnapshotList.forEach(timer.onAdd);
+        timer.onAdd(spellActionSnapshotList[ 0 ]);
 
         timerTester.advanceBy(200);
 
-        expect(
-            StoreTest.getActions()
-        ).toContainEqual(SpellActionTimerStartAction({
+        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerStartAction({
             spellActionSnapshot: spellActionSnapshotList[ 1 ]
         }));
     });
@@ -142,15 +119,12 @@ describe('# SpellActionTimer', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList
-                }
-            } as any
-        });
+        const dispatch = jest.fn();
 
-        const timer = SpellActionTimer();
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => spellActionSnapshotList,
+            dispatch
+        });
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -160,30 +134,25 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        spellActionSnapshotList.forEach(timer.onAdd);
+        timer.onAdd(spellActionSnapshotList[ 0 ]);
 
         timer.onRemove([
             spellActionSnapshotList[ 1 ]
         ], '-hash1-');
 
-        expect(
-            StoreTest.getActions().map(a => a.type)
-        ).not.toContain<SpellActionTimerEndAction[ 'type' ]>('battle/spell-action/end');
+        expect(dispatch).not.toHaveBeenCalledWith(SpellActionTimerEndAction(expect.anything()));
     });
 
     it('should end current spell action on current rollback', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList
-                }
-            } as any
-        });
+        const dispatch = jest.fn();
 
-        const timer = SpellActionTimer();
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => spellActionSnapshotList,
+            dispatch
+        });
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -193,15 +162,13 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        spellActionSnapshotList.forEach(timer.onAdd);
+        timer.onAdd(spellActionSnapshotList[ 0 ]);
 
         timer.onRemove([
             spellActionSnapshotList[ 0 ]
         ], '-hash0-');
 
-        expect(
-            StoreTest.getActions()
-        ).toContainEqual(SpellActionTimerEndAction({
+        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerEndAction({
             removed: true,
             correctHash: '-hash0-',
             spellActionSnapshot: getSnapshot({ battleHash: '-hash1-' })
@@ -212,15 +179,12 @@ describe('# SpellActionTimer', () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
-        StoreTest.initStore({
-            battle: {
-                future: {
-                    spellActionSnapshotList
-                }
-            } as any
-        });
+        const dispatch = jest.fn();
 
-        const timer = SpellActionTimer();
+        const timer = SpellActionTimer({
+            extractSpellActionSnapshotList: () => spellActionSnapshotList,
+            dispatch
+        });
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -230,11 +194,9 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        spellActionSnapshotList.forEach(timer.onAdd);
+        timer.onAdd(spellActionSnapshotList[ 0 ]);
 
         timerTester.advanceBy(300);
-
-        StoreTest.clearActions();
 
         timer.onRemove([
             getSnapshot({
@@ -243,9 +205,7 @@ describe('# SpellActionTimer', () => {
             })
         ], '-hash0-');
 
-        expect(
-            StoreTest.getActions()
-        ).toContainEqual(SpellActionTimerEndAction({
+        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerEndAction({
             removed: true,
             correctHash: '-hash0-',
             spellActionSnapshot: getSnapshot({

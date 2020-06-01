@@ -3,11 +3,11 @@ import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { SnapshotState } from './snapshot-reducer';
 import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 
-type Dependencies = {
-    extractState: <S>(getState: () => S) => SnapshotState;
+type Dependencies<S> = {
+    extractState: (getState: () => S) => SnapshotState;
 };
 
-export const snapshotMiddleware: (deps: Dependencies) => Middleware = ({
+export const snapshotMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractState
 }) => api => next => {
 

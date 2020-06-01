@@ -2,11 +2,8 @@ import { Position } from '../geo/position';
 
 export type SpellType =
     | 'move'
-    | 'orientate'
-    | 'simpleAttack'
-    | 'sampleSpell1'
-    | 'sampleSpell2'
-    | 'sampleSpell3';
+    // | 'orientate'
+    | 'simpleAttack';
 
 export interface SpellFeatures {
     duration: number;

@@ -1,16 +1,10 @@
-import { BattleSnapshot, BRunEndSAction, GlobalTurnSnapshot, MapConfig } from '@timeflies/shared';
+import { BattleSnapshot, GlobalTurnSnapshot, MapConfig } from '@timeflies/shared';
 import { BattleDataMap, BattleDataPeriod } from '../../BattleData';
 import { Controller } from '../../Controller';
-import { serviceEvent } from '../../services/serviceEvent';
 import { StageCreator, StageParam } from '../StageManager';
-import { BStateMachine } from "./battleState/BStateMachine";
-import { CycleManager } from './cycle/CycleManager';
 import { Character } from './entities/character/Character';
 import { Player } from './entities/player/Player';
 import { Team } from './entities/team/Team';
-import { MapManager } from "./map/MapManager";
-import { SnapshotManager } from './snapshot/SnapshotManager';
-import { SpellActionManager } from './spellAction/SpellActionManager';
 
 export interface BattleSceneData {
     mapConfig: MapConfig;
@@ -49,27 +43,27 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
 
         async create({ map, characters: charactersSheet }, setupStageGraphic) {
 
-            Controller.actionManager.beginBattleSession();
+            // Controller.actionManager.beginBattleSession();
 
-            const { onMessageAction } = serviceEvent();
+            // const { onMessageAction } = serviceEvent();
 
-            SnapshotManager();
+            // SnapshotManager();
 
-            SpellActionManager();
+            // SpellActionManager();
 
-            const mapManager = MapManager(map);
+            // const mapManager = MapManager(map);
 
-            BStateMachine(mapManager);
+            // BStateMachine(mapManager);
 
-            const cycleManager = CycleManager();
+            // const cycleManager = CycleManager();
 
-            onMessageAction<BRunEndSAction>('battle-run/end', ({
-                winnerTeamId
-            }) => {
-                Controller.actionManager.endBattleSession();
+            // onMessageAction<BRunEndSAction>('battle-run/end', ({
+            //     winnerTeamId
+            // }) => {
+            //     Controller.actionManager.endBattleSession();
 
-                alert(`Battle ended. Team ${winnerTeamId} wins !`);
-            });
+            //     alert(`Battle ended. Team ${winnerTeamId} wins !`);
+            // });
 
             setupStageGraphic({
                 mapManager,
@@ -78,7 +72,7 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
                 }
             });
 
-            cycleManager.start(globalTurnState);
+            // cycleManager.start(globalTurnState);
         }
     };
 };

@@ -50,7 +50,8 @@ describe('# snapshot-reducer', () => {
         };
 
         const newState = snapshotReducer(initialState, BattleCommitAction({
-            time: timerTester.now
+            time: timerTester.now,
+            charactersPositionList: []
         }));
 
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
@@ -106,7 +107,8 @@ describe('# snapshot-reducer', () => {
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now
+                time: timerTester.now,
+                charactersPositionList: []
             }));
 
             const firstHash = state1.battleDataFuture.battleHash;
@@ -114,7 +116,8 @@ describe('# snapshot-reducer', () => {
             teamColor = 'blue';
 
             const state2 = snapshotReducer(state1, BattleCommitAction({
-                time: timerTester.now + 100
+                time: timerTester.now + 100,
+                charactersPositionList: []
             }));
 
             const state3 = snapshotReducer(state2, SpellActionTimerEndAction({
@@ -167,7 +170,8 @@ describe('# snapshot-reducer', () => {
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now
+                time: timerTester.now,
+                charactersPositionList: []
             }));
 
             const firstHash = state1.battleDataFuture.battleHash;
@@ -177,7 +181,8 @@ describe('# snapshot-reducer', () => {
             teamColor = 'blue';
 
             const state2 = snapshotReducer(state1, BattleCommitAction({
-                time: timerTester.now
+                time: timerTester.now,
+                charactersPositionList: []
             }));
 
             const state3 = snapshotReducer(state2, SpellActionTimerEndAction({
@@ -240,7 +245,8 @@ describe('# snapshot-reducer', () => {
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now
+                time: timerTester.now,
+                charactersPositionList: []
             }));
 
             const lastHash = state1.battleDataFuture.battleHash;
@@ -290,7 +296,13 @@ describe('# snapshot-reducer', () => {
             };
 
             const state1 = snapshotReducer(initialState, BattleStateTurnStartAction({
-                characterId: 'not-matter'
+                turnSnapshot: {
+                    id: 1,
+                    characterId: 'not-matter',
+                    duration: 1000,
+                    startTime: -1
+                },
+                isMine: true
             }));
 
             expect(state1.battleDataFuture.battleHash).not.toBe('not-defined-future');
@@ -347,17 +359,20 @@ describe('# snapshot-reducer', () => {
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now - 100
+                time: timerTester.now - 100,
+                charactersPositionList: []
             }));
 
             const pastHash = state1.battleDataFuture.battleHash;
 
             const state2 = snapshotReducer(state1, BattleCommitAction({
-                time: timerTester.now + 100
+                time: timerTester.now + 100,
+                charactersPositionList: []
             }));
 
             const state3 = snapshotReducer(state2, BattleCommitAction({
-                time: timerTester.now + 200
+                time: timerTester.now + 200,
+                charactersPositionList: []
             }));
 
             const state4 = snapshotReducer(state3, BattleStateTurnEndAction());

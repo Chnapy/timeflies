@@ -1,14 +1,19 @@
 import { createAction } from '@reduxjs/toolkit';
-import { SpellType, TurnSnapshot } from '@timeflies/shared';
+import { SpellType, TurnSnapshot, Position } from '@timeflies/shared';
 import { SpellAction } from '../spellAction/SpellActionManager';
+import { BattleActionState } from './battle-action-reducer';
 
 export type BattleStateResetAction = ReturnType<typeof BattleStateResetAction>;
 export const BattleStateResetAction = createAction<{
     characterId: string;
+    isMine: boolean;
 }>('battle/state/reset');
 
 export type BattleStateTurnStartAction = ReturnType<typeof BattleStateTurnStartAction>;
-export const BattleStateTurnStartAction = createAction<TurnSnapshot>('battle/state/turn-start');
+export const BattleStateTurnStartAction = createAction<{
+    turnSnapshot: TurnSnapshot;
+    isMine: boolean;
+}>('battle/state/turn-start');
 
 export type BattleStateTurnEndAction = ReturnType<typeof BattleStateTurnEndAction>;
 export const BattleStateTurnEndAction = createAction('battle/state/turn-end');
@@ -31,3 +36,18 @@ export const battleStateActionList = [
     BattleStateSpellPrepareAction,
     BattleStateSpellLaunchAction
 ] as const;
+
+export type TileHoverAction = ReturnType<typeof TileHoverAction>;
+export const TileHoverAction = createAction<{
+    position: Position;
+}>('battle/tile/hover');
+
+export type TileClickAction = ReturnType<typeof TileClickAction>;
+export const TileClickAction = createAction<{
+    position: Position;
+}>('battle/tile/click');
+
+export type BattleMapPathAction = ReturnType<typeof BattleMapPathAction>;
+export const BattleMapPathAction = createAction<
+    Partial<Pick<BattleActionState, 'path' | 'rangeArea' | 'actionArea'>>
+>('battle/map/path');
