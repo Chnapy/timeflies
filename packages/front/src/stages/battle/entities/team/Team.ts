@@ -1,7 +1,6 @@
 import { TeamSnapshot } from '@timeflies/shared';
 import { Player } from '../player/Player';
 import { PeriodicEntity } from '../PeriodicEntity';
-import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 import { BattleDataPeriod } from '../../../../BattleData';
 
 export interface Team<P extends BattleDataPeriod> extends PeriodicEntity<P, TeamSnapshot> {
@@ -33,7 +32,7 @@ export const Team = <P extends BattleDataPeriod>(
 
         updateFromSnapshot(snapshot: TeamSnapshot): void {
 
-            assertEntitySnapshotConsistency(this_.players, snapshot.playersSnapshots);
+            // assertEntitySnapshotConsistency(this_.players, snapshot.playersSnapshots);
 
             snapshot.playersSnapshots.forEach(pSnap => {
                 this_.players.find(p => p.id === pSnap.id)!.updateFromSnapshot(pSnap);

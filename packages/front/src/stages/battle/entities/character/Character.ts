@@ -1,6 +1,5 @@
 import { assertIsDefined, assertThenGet, CharacterFeatures, CharacterSnapshot, equals, Orientation, Position, SpellType, StaticCharacter } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../../../BattleData';
-import { assertEntitySnapshotConsistency } from '../../snapshot/SnapshotManager';
 import { PeriodicEntity } from '../PeriodicEntity';
 import { Player } from '../player/Player';
 import { Spell } from '../spell/Spell';
@@ -85,7 +84,7 @@ export const Character = <P extends BattleDataPeriod>(period: P, {
                 ...snapshot.features
             };
 
-            assertEntitySnapshotConsistency(spells, snapshot.spellsSnapshots);
+            // assertEntitySnapshotConsistency(spells, snapshot.spellsSnapshots);
 
             snapshot.spellsSnapshots.forEach(sSnap => {
                 spells.find(s => s.id === sSnap.id)!.updateFromSnapshot(sSnap);

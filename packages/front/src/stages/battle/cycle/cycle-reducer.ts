@@ -1,7 +1,8 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { BattleStartAction } from '../map/map-reducer';
-import { TurnState } from './Turn';
+import { BattleStartAction } from '../battle-actions';
+
+export type TurnState = 'idle' | 'running' | 'ended';
 
 export type CycleState = {
     globalTurnId: number;
@@ -55,7 +56,7 @@ export const cycleReducer = createReducer(initialState, {
         };
     },
     [ BattleStateTurnStartAction.type ]: (state, { payload }: BattleStateTurnStartAction) => {
-        const { id, characterId, startTime, duration } = payload;
+        const { id, characterId, startTime, duration } = payload.turnSnapshot;
 
         return {
             ...state,

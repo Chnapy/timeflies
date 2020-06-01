@@ -1,7 +1,6 @@
-import { assertIsDefined, SpellActionSnapshot } from '@timeflies/shared';
-import { serviceBattleData } from '../../../services/serviceBattleData';
-import { serviceDispatch } from '../../../services/serviceDispatch';
-import { serviceNetwork } from '../../../services/serviceNetwork';
+import { Dispatch } from '@reduxjs/toolkit';
+import { SpellActionSnapshot } from '@timeflies/shared';
+import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 
 
@@ -15,70 +14,69 @@ const assertSpellActionIsNotFuture = (snapshot: SpellActionSnapshot): void | nev
         throw new Error(`Spell action snapshot [${snapshot.spellId}] should not be future:
         [now:${Date.now()}]<->[startTime:${snapshot.startTime}]`);
     }
-}
+};
 
-export const SpellActionTimer = (): SpellActionTimer => {
+type Dependencies = {
+    extractSpellActionSnapshotList: () => SpellActionSnapshot[];
+    dispatch: Dispatch;
+};
 
-    // TODO remove
-    let currentSpellAction: SpellActionSnapshot | undefined;
+export const SpellActionTimer = ({
+    extractSpellActionSnapshotList,
+    dispatch
+}: Dependencies): SpellActionTimer => {
+
     let timeout: NodeJS.Timeout | undefined;
 
-    const network = serviceNetwork({
-        sendSpellAction: (spellAction: SpellActionSnapshot) => ({
-            type: 'battle/spellAction',
-            spellAction
-        })
-    });
+    const dispatchStart = (snapshot: SpellActionSnapshot) => dispatch(SpellActionTimerStartAction({
+        spellActionSnapshot: snapshot
+    }));
 
-    const { spellActionSnapshotList } = serviceBattleData('future');
+    const dispatchEnd = (snapshot: SpellActionSnapshot, removed: boolean, correctHash: string) => dispatch(SpellActionTimerEndAction({
+        spellActionSnapshot: snapshot,
+        removed,
+        correctHash
+    }));
 
-    const { dispatchStart, dispatchEnd } = serviceDispatch({
-        dispatchStart: (snapshot: SpellActionSnapshot) => SpellActionTimerStartAction({
-            spellActionSnapshot: snapshot
-        }),
-        dispatchEnd: (snapshot: SpellActionSnapshot, removed: boolean, correctHash: string) => SpellActionTimerEndAction({
-            spellActionSnapshot: snapshot,
-            removed,
-            correctHash
-        })
-    })
+    const sendSpellAction = (spellAction: SpellActionSnapshot) => dispatch(SendMessageAction({
+        type: 'battle/spellAction',
+        spellAction
+    }));
 
     const startSpellAction = (snapshot: SpellActionSnapshot) => {
 
         assertSpellActionIsNotFuture(snapshot);
 
-        currentSpellAction = snapshot;
+        // currentSpellAction = snapshot;
 
         const { startTime, duration } = snapshot;
 
         const delta = Math.max(Date.now() - startTime, 0);
 
-        timeout = setTimeout(endSpellAction, duration - delta);
+        timeout = setTimeout(() => endSpellAction(snapshot), duration - delta);
 
         dispatchStart(snapshot);
 
-        network.then(({ sendSpellAction }) => {
-            sendSpellAction(snapshot);
-        });
+        sendSpellAction(snapshot);
     };
 
-    const clearSpellAction = () => {
-        currentSpellAction = undefined;
+    const cancelTimeout = () => {
+        // currentSpellAction = undefined;
         if (timeout) {
             clearTimeout(timeout);
             timeout = undefined;
         }
     };
 
-    const endSpellAction = () => {
-
-        assertIsDefined(currentSpellAction);
+    const endSpellAction = (currentSpellAction: SpellActionSnapshot) => {
 
         dispatchEnd(currentSpellAction, false, currentSpellAction.battleHash);
 
+        const spellActionSnapshotList = extractSpellActionSnapshotList();
+
         const nextSnapshot = spellActionSnapshotList.find(s => s.startTime > currentSpellAction!.startTime);
 
-        clearSpellAction();
+        cancelTimeout();
 
         if (nextSnapshot) {
             startSpellAction(nextSnapshot);
@@ -89,15 +87,11 @@ export const SpellActionTimer = (): SpellActionTimer => {
 
         dispatchEnd(snapshot, true, correctHash);
 
-        clearSpellAction();
+        cancelTimeout();
     };
 
     return {
         onAdd(snapshot) {
-            if (currentSpellAction) {
-                return;
-            }
-
             startSpellAction(snapshot);
         },
         onRemove(snapshotDeletedList, correctHash) {

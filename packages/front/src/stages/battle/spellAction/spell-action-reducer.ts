@@ -1,7 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { SpellActionSnapshot } from '@timeflies/shared';
+import { SpellActionSnapshot, Position } from '@timeflies/shared';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction } from './spell-action-actions';
+import { Spell } from '../entities/spell/Spell';
+
+export interface SpellAction {
+    spell: Spell<'future'>;
+    position: Position;
+    actionArea: Position[];
+}
 
 export type SpellActionState = {
     spellActionSnapshotList: SpellActionSnapshot[];

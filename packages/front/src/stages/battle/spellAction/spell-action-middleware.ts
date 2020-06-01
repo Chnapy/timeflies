@@ -1,34 +1,36 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { getLast, SpellActionSnapshot, assertIsDefined } from '@timeflies/shared';
+import { assertIsDefined, getLast, SpellActionSnapshot } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn } from '../engine/spellMapping';
 import { Character } from '../entities/character/Character';
 import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
-import { SpellActionState } from './spell-action-reducer';
-import { SpellActionTimer } from './SpellActionTimer';
-import { SpellAction } from './SpellActionManager';
+import { SpellAction, SpellActionState } from './spell-action-reducer';
+import { SpellActionTimer } from './spell-action-timer';
 
-type Dependencies = {
-    createSpellActionTimer: typeof SpellActionTimer;
-    extractState: <S>(getState: () => S) => SpellActionState;
-    extractFutureCharacters: <S>(getState: () => S) => Character<'future'>[];
-    extractFutureHash: <S>(getState: () => S) => string;
-    extractCurrentHash: <S>(getState: () => S) => string;
+type Dependencies<S> = {
+    extractState: (getState: () => S) => SpellActionState;
+    extractFutureCharacters: (getState: () => S) => Character<'future'>[];
+    extractFutureHash: (getState: () => S) => string;
+    extractCurrentHash: (getState: () => S) => string;
+    createSpellActionTimer?: typeof SpellActionTimer;
 };
 
 const getSnapshotEndTime = ({ startTime, duration }: SpellActionSnapshot) => startTime + duration;
 
-export const spellActionMiddleware: (deps: Dependencies) => Middleware = ({
-    createSpellActionTimer,
+export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractState,
     extractFutureCharacters,
     extractFutureHash,
-    extractCurrentHash
+    extractCurrentHash,
+    createSpellActionTimer = SpellActionTimer
 }) => api => next => {
 
-    const spellActionTimer = createSpellActionTimer();
+    const spellActionTimer = createSpellActionTimer({
+        extractSpellActionSnapshotList: () => extractState(api.getState).spellActionSnapshotList,
+        dispatch: api.dispatch
+    });
 
     const onSpellAction = (spellAction: SpellAction, startTime: number): SpellActionSnapshot => {
 
@@ -41,7 +43,8 @@ export const spellActionMiddleware: (deps: Dependencies) => Middleware = ({
         spellLaunchFn(spellAction, extractFutureCharacters(api.getState));
 
         api.dispatch(BattleCommitAction({
-            time: startTime + duration
+            time: startTime + duration,
+            charactersPositionList: extractFutureCharacters(api.getState).map(c => c.position)
         }));
 
         const futureBattleHash = extractFutureHash(api.getState);

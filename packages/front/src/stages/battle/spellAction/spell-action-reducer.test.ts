@@ -92,10 +92,13 @@ describe('# spell-action-reducer', () => {
         };
 
         const state1 = spellActionReducer(initialState, BattleStateTurnStartAction({
-            id: 1,
-            characterId: '1',
-            startTime: -1,
-            duration: -1
+            turnSnapshot: {
+                id: 1,
+                characterId: '1',
+                startTime: -1,
+                duration: -1
+            },
+            isMine: true
         }));
 
         expect(state1.spellActionSnapshotList).toHaveLength(0);

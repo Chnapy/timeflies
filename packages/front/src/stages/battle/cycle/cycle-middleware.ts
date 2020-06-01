@@ -3,17 +3,16 @@ import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
-import { BattleStartAction } from '../map/map-reducer';
+import { BattleStartAction } from '../battle-actions';
 import { TurnSnapshot, TURN_DELAY } from '@timeflies/shared';
 import { CycleState, getTurnState } from './cycle-reducer';
 
-type Dependencies = {
-    extractState: <S>(getState: () => S) => CycleState;
-    extractCurrentCharacters: <S>(getState: () => S) => Character<'current'>[];
-    // extractCharactersDeadsIds: <S>(getState: () => S) => string[];
+type Dependencies<S> = {
+    extractState: (getState: () => S) => CycleState;
+    extractCurrentCharacters: (getState: () => S) => Character<'current'>[];
 };
 
-export const cycleMiddleware: (deps: Dependencies) => Middleware = ({
+export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractState,
     extractCurrentCharacters
 }) => api => next => {
@@ -62,7 +61,12 @@ export const cycleMiddleware: (deps: Dependencies) => Middleware = ({
 
         timeout = setTimeout(() => {
 
-            api.dispatch(BattleStateTurnStartAction(turnSnapshot));
+            api.dispatch(BattleStateTurnStartAction({
+                turnSnapshot,
+
+                // TODO
+                isMine: true
+            }));
 
             differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);
 
