@@ -138,5 +138,5 @@ export const seedTiledManager = (mapKey: TiledMapSeedKey): TiledManager => {
 
     const assets = seedTiledMapAssets(mapKey);
 
-    return TiledManager(assets);
+    return TiledManager(assets.schema);
 };

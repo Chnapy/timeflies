@@ -4,8 +4,6 @@ import { Loader as _Loader, LoaderResource } from 'pixi.js';
 import { IAddOptions, ImageLoadStrategy, Resource } from 'resource-loader';
 import { AbstractLoadStrategyCtor } from 'resource-loader/dist/load_strategies/AbstractLoadStrategy';
 import { TiledMap } from 'tiled-types';
-import { AppResetAction } from '../controller-actions';
-import { serviceEvent } from '../services/serviceEvent';
 
 export type AppLoader = Pick<_Loader,
     | 'resources'
@@ -104,12 +102,12 @@ const getTiledMapAssets = (resources: ResourceMap, keys: string[]): TiledMapAsse
     const schema: TiledMap = resources[ mapKey ]!.data;
 
     const mapImageKeys = keys.filter(k => mapStringUtil.isMapImage(k));
-    const images: Record<string, HTMLImageElement> = mapImageKeys.reduce((o, k) => {
+    const images: Record<string, string> = mapImageKeys.reduce((o, k) => {
 
-        const img = resources[ k ]!.data;
+        // const img: HTMLImageElement = resources[ k ]!.data;
         const imgKey = k.substr(k.indexOf(':') + 1);
 
-        o[ imgKey ] = img;
+        o[ imgKey ] = resources[ k ]!.url;
 
         return o;
     }, {});
@@ -165,24 +163,24 @@ const mapLoaderMiddleware = function (this: AppLoader, resource: Resource, next:
     });
 };
 
-export const AssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Loader.shared }): AssetLoader => {
-
-    const { onAction } = serviceEvent();
+export const createAssetLoader = ({ getLoader }: Dependencies = { getLoader: () => _Loader.shared }): AssetLoader => {
 
     const loader = getLoader();
 
     loader.use(mapLoaderMiddleware);
 
-    onAction(AppResetAction, () => {
-        loader.reset();
+    // TODO
 
-        for (const textureUrl in PIXI.utils.BaseTextureCache) {
-            delete PIXI.utils.BaseTextureCache[ textureUrl ];
-        }
-        for (const textureUrl in PIXI.utils.TextureCache) {
-            delete PIXI.utils.TextureCache[ textureUrl ];
-        }
-    });
+    // onAction(AppResetAction, () => {
+    //     loader.reset();
+
+    //     for (const textureUrl in PIXI.utils.BaseTextureCache) {
+    //         delete PIXI.utils.BaseTextureCache[ textureUrl ];
+    //     }
+    //     for (const textureUrl in PIXI.utils.TextureCache) {
+    //         delete PIXI.utils.TextureCache[ textureUrl ];
+    //     }
+    // });
 
     const addResource = (name: string, url: string) => !loader.resources[ name ]
         ? loader.add({

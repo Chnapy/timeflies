@@ -1,8 +1,9 @@
 import { Position } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
-import { TileTriggerFn } from './TiledMapGraphic';
-import { graphicTheme } from '../graphic-theme';
+import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../canvas/GameCanvas';
+import { TileClickAction, TileHoverAction } from '../../battleState/battle-state-actions';
+import { graphicTheme } from '../graphic-theme';
 
 export interface TileGraphicProps {
     texture: PIXI.Texture;
@@ -10,12 +11,6 @@ export interface TileGraphicProps {
     worldPos: Position;
     tilewidth: number;
     tileheight: number;
-
-    /**
-     * These functions may change on runtime,
-     * so do not extract them from this object on use
-     */
-    triggerFn: TileTriggerFn;
 }
 
 export interface TileGraphic {
@@ -34,18 +29,28 @@ export interface TileGraphic {
 }
 
 export const TileGraphic = ({
-    texture, tilePos, worldPos, tilewidth: tilesize, triggerFn
+    texture, tilePos, worldPos, tilewidth: tilesize
 }: TileGraphicProps): TileGraphic => {
+
+    const { storeEmitter } = CanvasContext.consumer('storeEmitter');
 
     const container = new PIXI.Container();
     container.x = worldPos.x;
     container.y = worldPos.y;
     container.interactive = true;
-    container.on('mouseover', () => triggerFn.onTileHover(tilePos, this_));
+
+    container.on('mouseover', () => {
+        storeEmitter.dispatch(TileHoverAction({
+            position: tilePos
+        }));
+    });
+
     container.on('click', (e: PIXI.interaction.InteractionEvent) => {
         // if left-click
         if (e.data.originalEvent.which === 1) {
-            triggerFn.onTileClick(tilePos);
+            storeEmitter.dispatch(TileClickAction({
+                position: tilePos
+            }));
         }
     });
 
@@ -156,7 +161,7 @@ export const TileGraphic = ({
         }
 
         drawTarget();
-        
+
         requestRender();
     };
 
@@ -193,7 +198,7 @@ export const TileGraphic = ({
         graphicsOverPersist.clear();
 
         drawTargetCurrent();
-        
+
         requestRender();
     };
 
@@ -228,7 +233,7 @@ export const TileGraphic = ({
                 graphicsOverPersistStart.drawRoundedRect(marginX + 1, marginTop + 1, barWidth, height - 2, 2);
                 graphicsOverPersistStart.endFill();
             }
-        
+
             requestRender();
         };
 
@@ -246,12 +251,12 @@ export const TileGraphic = ({
 
         ticker?.destroy();
         ticker = null;
-        
+
         requestRender();
 
         graphicsOverPersistStart.clear();
 
-        if(!startTime) {
+        if (!startTime) {
             graphicsOverPersist.clear();
             return;
         }

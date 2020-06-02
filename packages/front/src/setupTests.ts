@@ -1,4 +1,3 @@
-import './StoreTest';
 
 //
 // Mock Canvas / Context2D calls
@@ -43,4 +42,4 @@ window.HTMLCanvasElement.prototype.toDataURL = () => {
 
 
 
-export { }
+export { };

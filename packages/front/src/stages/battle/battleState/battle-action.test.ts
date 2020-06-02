@@ -60,9 +60,15 @@ describe('# battle-action', () => {
                     schema: seedTiledMapAssets('map_1').schema,
                     imagesUrls: { toto: 'url' },
                 },
-                charactersPositionList: [ { x: 2, y: 8 } ],
                 globalTurnSnapshot: {} as any,
-                entitiesSnapshot: {} as any
+                entitiesSnapshot: {
+                    charactersSnapshots: [
+                        {
+                            id: '',
+                            position: { x: 2, y: 8 }
+                        }
+                    ]
+                } as any
             });
 
             store.dispatch(action);

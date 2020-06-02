@@ -5,7 +5,7 @@ import { CharactersBoard } from './charactersBoard/CharactersBoard';
 import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
 import { requestRender } from '../../../canvas/GameCanvas';
 
-export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheets'> = (renderer) => {
+export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
 
     const viewport = new Viewport({
         screenWidth: renderer.screen.width,
@@ -38,37 +38,29 @@ export const BattleStageGraphic: StageGraphicCreator<'mapManager' | 'spritesheet
         viewport.on('moved', () => isDragging && requestRender());
     };
 
+    const tiledMapGraphic = TiledMapGraphic();
+
+    initViewport(tiledMapGraphic);
+
+    CanvasContext.provider({ tiledMapGraphic }, () => {
+
+        const charactersBoardCurrent = CharactersBoard('current');
+        const charactersBoardFuture = CharactersBoard('future');
+
+        viewport.addChild(
+            tiledMapGraphic.container,
+            charactersBoardCurrent.container,
+            charactersBoardFuture.container,
+            tiledMapGraphic.containerOver
+        );
+        requestRender();
+    });
+
     return {
-        onCreate(contextMap) {
-
-            CanvasContext.provider(contextMap, () => {
-
-                const tiledMapGraphic = TiledMapGraphic();
-
-                initViewport(tiledMapGraphic);
-
-                CanvasContext.provider({ tiledMapGraphic }, () => {
-
-                    const charactersBoardCurrent = CharactersBoard('current');
-                    const charactersBoardFuture = CharactersBoard('future');
-
-                    viewport.addChild(
-                        tiledMapGraphic.container,
-                        charactersBoardCurrent.container,
-                        charactersBoardFuture.container,
-                        tiledMapGraphic.containerOver
-                    );
-                    requestRender();
-                });
-            });
-        },
+        container: viewport,
 
         onResize(width, height) {
             viewport.resize(width, height);
         },
-
-        getContainer() {
-            return viewport;
-        }
     };
 };

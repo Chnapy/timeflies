@@ -7,7 +7,7 @@ import { TileGraphic } from '../graphic/tiledMap/TileGraphic';
 import { spellLaunchMove } from './spellEngine/move/spell-engine-move';
 import { spellLaunchSimpleAttack } from './spellEngine/simpleAttack/spell-engine-simpleAttack';
 
-type TiledMapHoverFn<ST extends SpellType> = (props: TileHoverFnProps<ST>) => (startTime: number) => void;
+type TiledMapHoverFn<ST extends SpellType> = (props: TileHoverFnProps) => (startTime: number) => void;
 
 type TiledMapStartFn = (props: Pick<SpellActionSnapshot,
     | 'startTime'

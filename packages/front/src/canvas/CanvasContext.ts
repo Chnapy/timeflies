@@ -1,9 +1,11 @@
 import * as PIXI from 'pixi.js';
+import { AssetLoader } from '../assetManager/AssetLoader';
 import { TiledMapGraphic } from '../stages/battle/graphic/tiledMap/TiledMapGraphic';
-import { MapManager } from '../stages/battle/map/MapManager';
+import { StoreEmitter } from '../store-manager';
 
 export interface CanvasContextMap {
-    readonly mapManager: MapManager;
+    readonly storeEmitter: StoreEmitter;
+    readonly assetLoader: AssetLoader;
     readonly tiledMapGraphic: TiledMapGraphic;
     readonly spritesheets: {
         readonly characters: PIXI.Spritesheet;

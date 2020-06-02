@@ -1,6 +1,6 @@
 import { ImageLoadStrategy } from 'resource-loader';
 import { seedTiledMapAssetsWithImg } from '../stages/battle/map/TiledMap.seed';
-import { AppLoader, AssetLoader } from './AssetLoader';
+import { AppLoader, createAssetLoader } from './AssetLoader';
 
 
 /**
@@ -8,7 +8,7 @@ import { AppLoader, AssetLoader } from './AssetLoader';
  */
 describe('# AssetLoader', () => {
 
-    const generateAssetLoader = (loader: Partial<AppLoader> = {}) => AssetLoader({
+    const generateAssetLoader = (loader: Partial<AppLoader> = {}) => createAssetLoader({
         getLoader: () => ({
             add() { return this as any; },
             use() { return this as any; },

@@ -1,5 +1,3 @@
-import { TiledMapGraphic } from '../stages/battle/graphic/tiledMap/TiledMapGraphic';
-import { seedMapManager } from '../stages/battle/map/MapManager.seed';
 import { StoreTest } from '../StoreTest';
 import { CanvasContext } from './CanvasContext';
 
@@ -15,41 +13,36 @@ describe('# CanvasContext', () => {
 
     it('should throw error on consumer use out of provider', () => {
 
-        expect(() => CanvasContext.consumer('mapManager')).toThrowError();
+        expect(() => CanvasContext.consumer('spritesheets')).toThrowError();
 
-        CanvasContext.provider({ mapManager: seedMapManager('fake') }, jest.fn());
+        CanvasContext.provider({ spritesheets: {} as any }, jest.fn());
 
-        expect(() => CanvasContext.consumer('mapManager')).toThrowError();
+        expect(() => CanvasContext.consumer('spritesheets')).toThrowError();
     });
 
     it('should return expected context on consumer use in provider', () => {
 
-        const mapManager = seedMapManager('fake');
-
-        const ret = CanvasContext.provider({ mapManager }, () =>
-            CanvasContext.consumer('mapManager')
+        const ret = CanvasContext.provider({ spritesheets: {} as any }, () =>
+            CanvasContext.consumer('spritesheets')
         );
 
-        expect(ret).toEqual({ mapManager });
+        expect(ret).toEqual({ spritesheets: {} });
     });
 
     it('should handle multiple providers', () => {
 
-        const mapManager = seedMapManager('fake');
-        const tiledMapGraphic: TiledMapGraphic = {
-            container: null as any
-        } as TiledMapGraphic;
+        const ret = CanvasContext.provider({ spritesheets: { toto: 8 } as any }, () => {
 
-        const ret = CanvasContext.provider({ mapManager }, () => {
+            return CanvasContext.provider({ assetLoader: { tata: 6 } as any }, () => {
 
-            return CanvasContext.provider({ tiledMapGraphic }, () => {
-
-                return CanvasContext.consumer('mapManager', 'tiledMapGraphic');
+                return CanvasContext.consumer('spritesheets', 'assetLoader');
             });
 
         });
 
-        expect(ret).toEqual({ mapManager, tiledMapGraphic });
+        expect(ret).toEqual({
+            spritesheets: { toto: 8 },
+            assetLoader: { tata: 6 }
+        });
     });
-
 });

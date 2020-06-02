@@ -1,24 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Action, Store } from 'redux';
 import { createLogger } from 'redux-logger';
-import { ActionManager } from './action/ActionManager';
 import { App } from './app';
-import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
 import { AppResetAction } from './controller-actions';
 import { GameState } from './game-state';
-import { serviceDispatch } from './services/serviceDispatch';
-import { WebSocketCreator, WSClient } from './socket/WSClient';
 import { ReceiveMessageAction, SendMessageAction } from './socket/wsclient-actions';
-import { StageManager } from './stages/StageManager';
+import { wsClientMiddleware } from './socket/wsclient-middleware';
+import { getBattleMiddlewareList } from './ui/reducers/battle-reducers/battle-middleware-list';
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
 import { rootReducer } from './ui/reducers/root-reducer';
 
 
 export interface ControllerProps {
-    websocketCreator?: WebSocketCreator;
     initialState?: GameState;
 }
 
@@ -28,10 +24,10 @@ export interface ControllerStarter {
 
 interface ControllerResources {
     store?: Store<GameState, Action>;
-    client?: WSClient;
+    // client?: WSClient;
     gameCanvas?: GameCanvas;
-    actionManager?: ActionManager;
-    loader?: AssetLoader;
+    // actionManager?: ActionManager;
+    // loader?: AssetLoader;
     stageManager?: StageManager;
 }
 
@@ -65,7 +61,7 @@ const reset = (): void => {
 
 export const Controller = {
 
-    init({ initialState, websocketCreator }: ControllerProps = {}): ControllerStarter {
+    init({ initialState }: ControllerProps = {}): ControllerStarter {
 
         checkEnv();
 
@@ -76,11 +72,16 @@ export const Controller = {
         const resources: ControllerResources = {};
         controllerResources = resources;
 
-        resources.actionManager = ActionManager();
+        // resources.actionManager = ActionManager();
 
-        const actionManagerMiddleware = getResource('actionManager').getMiddleware();
+        // const actionManagerMiddleware = getResource('actionManager').getMiddleware();
 
-        const middlewareList = [ roomMiddleware, actionManagerMiddleware ];
+        const middlewareList = [
+            wsClientMiddleware({}),
+            roomMiddleware,
+            // actionManagerMiddleware,
+            ...getBattleMiddlewareList()
+        ];
 
         if (process.env.NODE_ENV === 'development') {
             const logger = createLogger({
@@ -104,15 +105,14 @@ export const Controller = {
         resources.store = configureStore({
             reducer: rootReducer,
             middleware: [
-                // TODO uncomment this when battle state refactor will be made
-                // ...getDefaultMiddleware(), 
+                ...getDefaultMiddleware(),
                 ...middlewareList
             ],
             preloadedState: initialState
         });
 
-        resources.client = WSClient(websocketCreator && { websocketCreator });
-        resources.loader = AssetLoader();
+        // resources.client = WSClient(websocketCreator && { websocketCreator });
+        // resources.loader = AssetLoader();
 
         return {
             start(container: Element): Promise<void> {
@@ -145,15 +145,15 @@ export const Controller = {
         return getResource('store');
     },
 
-    waitConnect(): Promise<void> {
-        return getResource('client').waitConnect();
-    },
+    // waitConnect(): Promise<void> {
+    //     return getResource('client').waitConnect();
+    // },
 
-    get actionManager(): ActionManager {
-        return getResource('actionManager');
-    },
+    // get actionManager(): ActionManager {
+    //     return getResource('actionManager');
+    // },
 
-    get loader(): AssetLoader {
-        return getResource('loader');
-    },
+    // get loader(): AssetLoader {
+    //     return getResource('loader');
+    // },
 };

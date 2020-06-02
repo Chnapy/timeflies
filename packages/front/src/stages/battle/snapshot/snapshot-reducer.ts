@@ -25,6 +25,10 @@ export type SnapshotState = {
     battleDataFuture: BattleData<'future'>;
 };
 
+export const getBattleData = <P extends BattleDataPeriod>(state: SnapshotState, period: P): BattleData<P> => period === 'current'
+    ? state.battleDataCurrent as BattleData<P>
+    : state.battleDataFuture as BattleData<P>;
+
 // export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
 //     entityList: PeriodicEntity<any, S>[],
 //     snapshotList: S[]
@@ -108,9 +112,7 @@ export const snapshotReducer = createReducer(initialState, {
 
         periodList.forEach(period => {
 
-            const data: BattleData<typeof period> = period === 'current'
-                ? state.battleDataCurrent
-                : state.battleDataFuture;
+            const data = getBattleData(state, period);
 
             data.battleHash = battleHash;
             data.spells = spellsSnapshots.map(snap => Spell(period, snap));

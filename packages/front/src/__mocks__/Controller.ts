@@ -1,5 +1,5 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { AssetLoader } from '../assetManager/AssetLoader';
+import { createAssetLoader } from '../assetManager/AssetLoader';
 import { Controller as IController } from "../Controller";
 import { StoreTest } from '../StoreTest';
 

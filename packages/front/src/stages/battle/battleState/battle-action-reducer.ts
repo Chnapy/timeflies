@@ -85,7 +85,9 @@ const calculateGrid = (tiledSchema: TiledMap, charactersPositionList: Position[]
 
 export const battleActionReducer = createReducer(initialState, {
     [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
-        const { tiledMapAssets, charactersPositionList } = payload;
+        const { tiledMapAssets, entitiesSnapshot } = payload;
+
+        const charactersPositionList = entitiesSnapshot.charactersSnapshots.map(c => c.position);
 
         return {
             ...state,
