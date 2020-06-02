@@ -1,23 +1,26 @@
 import React from 'react';
-import { AssetMap } from '../assetManager/AssetLoader';
+import { AssetLoader, AssetMap } from '../assetManager/AssetLoader';
 import { AssetProvider } from '../assetManager/AssetProvider';
-import { Controller } from '../Controller';
 import { UIThemeProvider } from './ui-theme-provider';
 
-export const UIProvider: React.FC = ({ children }) => {
+type UIProviderProps = {
+    assetLoader: AssetLoader;
+};
 
-    const [loaderData, setLoaderData] = React.useState<Partial<AssetMap>>({});
+export const UIProvider: React.FC<UIProviderProps> = ({ assetLoader, children }) => {
+
+    const [ loaderData, setLoaderData ] = React.useState<Partial<AssetMap>>({});
 
     React.useEffect(() => {
-        const unsubscribe = Controller.loader.subscribeUnique(data => {
+        const unsubscribe = assetLoader.subscribeUnique(data => {
             setLoaderData(data);
 
-         });
+        });
 
         return () => {
             unsubscribe();
         };
-    }, []);
+    }, [ assetLoader ]);
 
     return (
         <AssetProvider value={loaderData}>
@@ -25,7 +28,7 @@ export const UIProvider: React.FC = ({ children }) => {
 
                 {children}
 
-                </UIThemeProvider>
+            </UIThemeProvider>
         </AssetProvider>
     );
 };

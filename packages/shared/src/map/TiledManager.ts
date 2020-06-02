@@ -13,8 +13,6 @@ export interface TiledManager {
     readonly width: number;
     readonly height: number;
 
-    readonly assets: TiledMapAssets;
-
     getRenderableLayer(): TiledLayerTilelayer;
 
     getTileType(position: Position): TileType;
@@ -36,7 +34,7 @@ export type TileTypeWithPlacement = TileType | 'placement';
 
 export type TiledMapAssets = {
     schema: TiledMap;
-    images: Record<string, HTMLImageElement>;
+    images: Record<string, string>;
 };
 
 export interface BresenhamPoint {
@@ -56,8 +54,7 @@ const tileLayerNames = Object.freeze({
     obstacles: 'obstacles'
 });
 
-export const TiledManager = (assets: TiledMapAssets): TiledManager => {
-    const { schema } = assets;
+export const TiledManager = (schema: TiledMap): TiledManager => {
 
     const getTilelayer = (name: string): TiledLayerTilelayer => {
         const layer = schema.layers.find((layer): layer is TiledLayerTilelayer =>
@@ -193,8 +190,6 @@ export const TiledManager = (assets: TiledMapAssets): TiledManager => {
         orientation,
         width,
         height,
-
-        assets,
 
         getRenderableLayer,
 

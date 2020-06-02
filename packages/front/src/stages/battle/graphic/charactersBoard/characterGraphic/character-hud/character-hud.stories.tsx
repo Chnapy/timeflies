@@ -2,7 +2,7 @@ import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../../../../.storybook/preview';
-import { AssetLoader } from '../../../../../../assetManager/AssetLoader';
+import { createAssetLoader } from '../../../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../../../assetManager/AssetManager';
 import { seedBattleData } from '../../../../../../battle-data.seed';
 import { CanvasContext } from '../../../../../../canvas/CanvasContext';
@@ -47,7 +47,7 @@ const InnerDefault: React.FC<StoryProps> = ({ fakeBattleApi }) => {
                 })
             });
 
-            const loader = AssetLoader();
+            const loader = createAssetLoader();
 
             const resources = await loader.newInstance()
                 .add('map', AssetManager.fake.mapSchema)

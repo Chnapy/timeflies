@@ -25,5 +25,5 @@ export const seedTiledManagerWithImg = (mapKey: TiledMapSeedKey): TiledManager =
 
     const assets = seedTiledMapAssetsWithImg(mapKey);
 
-    return TiledManager(assets);
+    return TiledManager(assets.schema);
 };

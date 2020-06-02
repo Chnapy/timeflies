@@ -6,6 +6,7 @@ import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { StageChangeAction } from '../../../stages/stage-actions';
 import { MapLoadedAction } from './map-select-reducer/map-select-actions';
+import { BattleStartAction } from '../../../stages/battle/battle-actions';
 
 export const roomMiddleware: Middleware<{}, GameState> = api => next => {
 
@@ -28,32 +29,24 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                 const mapConfig = mapList.find(m => m.id === mapSelected.id);
                 assertIsDefined(mapConfig);
 
+                const { schema, images } = Controller.loader.get('map')!;
+
+
+                // TODO make it single action, or batch them
                 next(StageChangeAction({
                     stageKey: 'battle',
-                    data: {
-                        mapConfig,
-                        battleSnapshot,
-                        battleData: {
-                            cycle: {
-                                launchTime: battleSnapshot.launchTime
-                            },
-                            current: {
-                                battleHash: '',
-                                teams: [],
-                                players: [],
-                                characters: []
-                            },
-                            future: {
-                                battleHash: '',
-                                teams: [],
-                                players: [],
-                                characters: [],
-                                spellActionSnapshotList: []
-                            }
-                        },
-                        globalTurnState,
-                    }
+                    data: {}
                 }));
+
+                api.dispatch(BattleStartAction({
+                    tiledMapAssets: {
+                        schema,
+                        imagesUrls: images
+                    },
+                    entitiesSnapshot: battleSnapshot,
+                    globalTurnSnapshot: globalTurnState
+                }));
+
                 return;
             }
 

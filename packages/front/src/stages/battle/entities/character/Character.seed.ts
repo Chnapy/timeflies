@@ -19,7 +19,16 @@ export const seedCharacter = <P extends BattleDataPeriod>({ features, ...props }
                 actionTime: 2000,
                 ...features
             },
-            staticSpells: [],
+            staticSpells: [ {
+                id: 's1',
+                type: 'move',
+                name: 'name',
+                initialFeatures: {
+                    area: 2,
+                    attack: 2,
+                    duration: 1000
+                }
+            } ],
             defaultSpellId: props.defaultSpellId ?? ''
         },
         position: { x: 4, y: 3 },

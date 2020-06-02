@@ -1,7 +1,7 @@
 import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
-import { AssetLoader } from '../../../../assetManager/AssetLoader';
+import { createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { serviceDispatch } from '../../../../services/serviceDispatch';
 import { SpellEngineBindAction } from '../../engine/engine-actions';
@@ -23,7 +23,7 @@ export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const loader = AssetLoader();
+        const loader = createAssetLoader();
 
         const { map } = await loader.newInstance()
             .add('map', AssetManager.fake.mapSchema)

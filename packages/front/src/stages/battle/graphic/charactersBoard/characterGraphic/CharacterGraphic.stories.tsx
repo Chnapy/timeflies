@@ -2,7 +2,7 @@ import { Orientation, Position, seedSpellActionSnapshot, switchUtil, TiledManage
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { StoryProps } from '../../../../../../.storybook/preview';
-import { AssetLoader } from '../../../../../assetManager/AssetLoader';
+import { createAssetLoader } from '../../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../../assetManager/AssetManager';
 import { seedBattleData } from '../../../../../battle-data.seed';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
@@ -37,7 +37,7 @@ export const Current: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const loader = AssetLoader();
+        const loader = createAssetLoader();
 
         const resources = await loader.newInstance()
             .add('map', AssetManager.fake.mapSchema)
@@ -186,7 +186,7 @@ export const Future: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
         const view = parent.firstElementChild as HTMLCanvasElement;
         const app = new PIXI.Application({ view, resizeTo: parent });
 
-        const loader = AssetLoader();
+        const loader = createAssetLoader();
 
         const resources = await loader.newInstance()
             .add('map', AssetManager.fake.mapSchema)

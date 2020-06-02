@@ -7,13 +7,15 @@ import { Spell } from '../../../entities/spell/Spell';
 import { BattleCommitAction } from '../../../snapshot/snapshot-manager-actions';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellEngineCreator } from '../spell-engine';
+import { Character } from '../../../entities/character/Character';
 
-export const spellLaunchMove = ({ spell, position }: SpellAction) => {
-    const { character } = spell;
+export const spellLaunchMove = ({ spell, position }: SpellAction, characterList: Character<'future'>[]) => {
+    const character = characterList.find(c => c.id === spell.characterId)!;
 
     const orientation = getOrientationFromTo(character.position, position);
 
-    character.set({ position, orientation });
+    character.position = position;
+    character.orientation = orientation;
 };
 
 export const spellEngineMove: SpellEngineCreator = ({

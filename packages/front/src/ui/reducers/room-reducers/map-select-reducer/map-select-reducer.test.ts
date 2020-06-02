@@ -2,9 +2,7 @@ import { RoomServerAction, seedTiledMap } from '@timeflies/shared';
 import { TiledLayerTilelayer } from 'tiled-types';
 import { Controller } from '../../../../Controller';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
-import { seedMapConfig } from '../../../../stages/battle/map/MapManager.seed';
 import { StageChangeAction } from '../../../../stages/stage-actions';
-import { StoreTest } from '../../../../StoreTest';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
 import { MapLoadedAction } from './map-select-actions';
 import { MapSelectData, mapSelectReducer } from './map-select-reducer';
@@ -12,14 +10,6 @@ import { MapSelectData, mapSelectReducer } from './map-select-reducer';
 describe('# map-select-reducer', () => {
 
     const getAction = (roomMessage: RoomServerAction) => ReceiveMessageAction(roomMessage);
-
-    beforeEach(() => {
-        StoreTest.beforeTest();
-    });
-
-    afterEach(() => {
-        StoreTest.afterTest();
-    });
 
     it('should return the good initial state', () => {
 

@@ -1,37 +1,32 @@
-import { BattleSnapshot, GlobalTurnSnapshot, MapConfig } from '@timeflies/shared';
-import { BattleDataMap, BattleDataPeriod } from '../../BattleData';
 import { Controller } from '../../Controller';
 import { StageCreator, StageParam } from '../StageManager';
-import { Character } from './entities/character/Character';
-import { Player } from './entities/player/Player';
-import { Team } from './entities/team/Team';
 
 export interface BattleSceneData {
-    mapConfig: MapConfig;
-    battleSnapshot: BattleSnapshot;
-    battleData: BattleDataMap;
-    globalTurnState: GlobalTurnSnapshot;
+    // mapConfig: MapConfig;
+    // battleSnapshot: BattleSnapshot;
+    // battleData: BattleDataMap;
+    // globalTurnState: GlobalTurnSnapshot;
 }
 
 export type BattleStageParam = StageParam<'battle', BattleSceneData>;
 
-export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapConfig, globalTurnState, battleData, battleSnapshot }) => {
+export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = () => {
 
-    const fillBattleData = (period: BattleDataPeriod): void => {
-        const data = battleData[ period ];
-        data.battleHash = battleSnapshot.battleHash;
+    // const fillBattleData = (period: BattleDataPeriod): void => {
+    //     const data = battleData[ period ];
+    //     data.battleHash = battleSnapshot.battleHash;
 
-        const teams: Team<BattleDataPeriod>[] = data.teams;
-        teams.push(...battleSnapshot.teamsSnapshots.map(snap => Team(period, snap)));
+    //     const teams: Team<BattleDataPeriod>[] = data.teams;
+    //     teams.push(...battleSnapshot.teamsSnapshots.map(snap => Team(period, snap)));
 
-        const players: Player<BattleDataPeriod>[] = data.players;
-        players.push(...teams.flatMap(t => t.players));
+    //     const players: Player<BattleDataPeriod>[] = data.players;
+    //     players.push(...teams.flatMap(t => t.players));
 
-        const characters: Character<BattleDataPeriod>[] = data.characters;
-        characters.push(...players.flatMap(p => p.characters));
-    };
+    //     const characters: Character<BattleDataPeriod>[] = data.characters;
+    //     characters.push(...players.flatMap(p => p.characters));
+    // };
 
-    new Array<BattleDataPeriod>('current', 'future').forEach(fillBattleData);
+    // new Array<BattleDataPeriod>('current', 'future').forEach(fillBattleData);
 
     return {
         preload() {
@@ -66,7 +61,7 @@ export const BattleStage: StageCreator<'battle', 'map' | 'characters'> = ({ mapC
             // });
 
             setupStageGraphic({
-                mapManager,
+                // mapManager,
                 spritesheets: {
                     characters: charactersSheet.spritesheet
                 }

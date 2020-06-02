@@ -1,26 +1,18 @@
-import { assertIsDefined } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
-import { serviceEvent } from '../services/serviceEvent';
+import { AssetLoader } from '../assetManager/AssetLoader';
+import { GameStateStep } from '../game-state';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
 import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
 import { RoomStageGraphic } from '../stages/room/graphic/RoomStageGraphic';
-import { StageKey } from '../stages/StageManager';
-import { StageChangeAction, StageOnCreateGraphicAction } from '../stages/stage-actions';
-import { CanvasContextMap } from './CanvasContext';
+import { StoreEmitter } from '../store-manager';
+import { CanvasContext } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
-const stageGraphicsMap = {
+const stageGraphicsMap: Record<GameStateStep, StageGraphicCreator> = {
     boot: BootStageGraphic,
     room: RoomStageGraphic,
     battle: BattleStageGraphic
 } as const;
-
-export type StageGraphicCreateParam<SK extends StageKey> = (typeof stageGraphicsMap)[ SK ] extends StageGraphicCreator<infer K>
-    ? Pick<CanvasContextMap, K>
-    : never;
-
-export interface GameCanvas {
-}
 
 let renderFn: () => void = () => { };
 
@@ -33,9 +25,7 @@ export const requestRender = () => {
     }
 };
 
-export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCanvas => {
-
-    const { onAction } = serviceEvent();
+export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement, storeEmitter: StoreEmitter, assetLoader: AssetLoader) => {
 
     const renderer = PIXI.autoDetectRenderer({
         view,
@@ -46,7 +36,7 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
 
     const rootStage = new PIXI.Container();
 
-    let stageGraphic: StageGraphic<any> | null = null;
+    let stageGraphic: StageGraphic | null = null;
 
     renderFn = () => {
         shouldRender = false;
@@ -66,21 +56,21 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement): GameCa
 
     onResize();
 
-    onAction(StageChangeAction, ({  stageKey }) => {
-        rootStage.removeChildren().forEach(c => c.destroy());
+    storeEmitter.onStateChange(
+        state => state.step,
+        step => {
+            rootStage.removeChildren().forEach(c => c.destroy());
 
-        stageGraphic = stageGraphicsMap[ stageKey ](renderer);
+            CanvasContext.provider({
+                storeEmitter,
+                assetLoader
+            }, () => {
+                stageGraphic = stageGraphicsMap[ step ](renderer);
 
-        rootStage.addChild(stageGraphic!.getContainer());
-        requestRender();
-    });
+                rootStage.addChild(stageGraphic!.container);
+            });
 
-    onAction(StageOnCreateGraphicAction, ({ param }) => {
-
-        assertIsDefined(stageGraphic);
-
-        stageGraphic!.onCreate(param);
-    });
-
-    return {};
+            requestRender();
+        }
+    );
 };

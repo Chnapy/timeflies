@@ -1,20 +1,17 @@
 import { assertIsDefined, getOrientationFromTo, Orientation, Position, SpellActionSnapshot, switchUtil } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
-import { BattleDataPeriod } from '../../../../../BattleData';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
-import { serviceEvent } from '../../../../../services/serviceEvent';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../../../battleState/battle-state-actions';
 import { Character } from '../../../entities/character/Character';
+import { BattleDataPeriod } from '../../../snapshot/battle-data';
+import { getBattleData } from '../../../snapshot/snapshot-reducer';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../../spellAction/spell-action-actions';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
 
 
-export interface CharacterGraphic {
-    readonly character: Readonly<Character<BattleDataPeriod>>;
-    readonly container: PIXI.Container;
-}
+export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
 
 interface PeriodFn<P extends BattleDataPeriod> {
     (
@@ -32,47 +29,53 @@ interface GeoState {
     orientation: Orientation;
 }
 
-export const CharacterGraphic = (
-    character: Readonly<Character<BattleDataPeriod>>
-): CharacterGraphic => {
+export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) => {
 
-    const { tiledMapGraphic, spritesheets: {
+    const { storeEmitter, tiledMapGraphic, spritesheets: {
         characters: charactersSheet
-    } } = CanvasContext.consumer('tiledMapGraphic', 'spritesheets');
+    } } = CanvasContext.consumer('storeEmitter', 'tiledMapGraphic', 'spritesheets');
 
     const container = new PIXI.Container();
 
-    const periodFn: PeriodFn<any> = character.period === 'current'
+    const periodFn: PeriodFn<any> = period === 'current'
         ? periodCurrent
         : periodFuture;
 
-    const { sprite, hud } = periodFn(
-        character,
-        tiledMapGraphic,
-        charactersSheet
-    );
-    sprite.interactiveChildren = false;
-    sprite.width = tiledMapGraphic.tilewidth;
-    sprite.height = tiledMapGraphic.tileheight;
+    storeEmitter.onStateChange(
+        state => getBattleData(state.battle.snapshotState, period).characters.find(c => c.id === characterId)!,
+        character => {
+            container.removeChildren().forEach(c => c.destroy());
 
-    container.addChild(sprite);
-    const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
-    sprite.position.set(worldPos.x, worldPos.y);
+            const { tilewidth, tileheight } = tiledMapGraphic.getTilesize();
 
-    if (hud) {
-        container.addChild(hud.container);
-        hud.container.position.set(worldPos.x, worldPos.y);
-    }
+            const { sprite, hud } = periodFn(
+                character,
+                tiledMapGraphic,
+                charactersSheet
+            );
+            sprite.interactiveChildren = false;
+            sprite.width = tilewidth;
+            sprite.height = tileheight;
+
+            container.addChild(sprite);
+            const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
+            sprite.position.set(worldPos.x, worldPos.y);
+
+            if (hud) {
+                container.addChild(hud.container);
+                hud.container.position.set(worldPos.x, worldPos.y);
+            }
+        }
+    )
+
 
     return {
-        character,
+        // character,
         container
     };
 };
 
 const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesheet) => {
-
-    const { onAction } = serviceEvent();
 
     const { staticData } = character;
 
@@ -136,63 +139,65 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
         return previousState;
     };
 
-    onAction(SpellActionTimerEndAction, ({
-        spellActionSnapshot: { characterId }
-    }) => {
-        if (characterId !== character.id) {
-            return;
-        }
+    // TODO
 
-        ticker.destroy();
+    // onAction(SpellActionTimerEndAction, ({
+    //     spellActionSnapshot: { characterId }
+    // }) => {
+    //     if (characterId !== character.id) {
+    //         return;
+    //     }
 
-        previousState = {
-            position: character.position,
-            orientation: character.orientation
-        };
+    //     ticker.destroy();
 
-        const { x, y } = tiledMapGraphic.getWorldFromTile(previousState.position);
+    //     previousState = {
+    //         position: character.position,
+    //         orientation: character.orientation
+    //     };
 
-        setPosition(x, y);
-        animatedSprite
-            .setProps({
-                characterState: 'idle',
-                orientation: previousState.orientation
-            })
-            .play();
-    });
+    //     const { x, y } = tiledMapGraphic.getWorldFromTile(previousState.position);
 
-    onAction(SpellActionTimerStartAction, ({
-        spellActionSnapshot,
-        spellActionSnapshot: {
-            characterId, spellId
-        }
-    }) => {
-        if (characterId !== character.id) {
-            return;
-        }
+    //     setPosition(x, y);
+    //     animatedSprite
+    //         .setProps({
+    //             characterState: 'idle',
+    //             orientation: previousState.orientation
+    //         })
+    //         .play();
+    // });
 
-        const spell = character.spells.find(s => s.id === spellId);
-        assertIsDefined(spell);
+    // onAction(SpellActionTimerStartAction, ({
+    //     spellActionSnapshot,
+    //     spellActionSnapshot: {
+    //         characterId, spellId
+    //     }
+    // }) => {
+    //     if (characterId !== character.id) {
+    //         return;
+    //     }
 
-        if (ticker?.started) {
-            throw new Error('Spell action received while ticker running');
-        }
+    //     const spell = character.spells.find(s => s.id === spellId);
+    //     assertIsDefined(spell);
 
-        ticker = new PIXI.Ticker();
+    //     if (ticker?.started) {
+    //         throw new Error('Spell action received while ticker running');
+    //     }
 
-        const actionFn: (snapshot: SpellActionSnapshot) => GeoState =
-            switchUtil(spell.staticData.type, {
-                move: onMoveAction,
-                orientate: () => ({} as any),
-                simpleAttack: onSimpleAttackAction,
-                sampleSpell1: () => ({} as any),
-                sampleSpell2: () => ({} as any),
-                sampleSpell3: () => ({} as any),
-            });
-        previousState = actionFn(spellActionSnapshot);
+    //     ticker = new PIXI.Ticker();
 
-        ticker.start();
-    });
+    //     const actionFn: (snapshot: SpellActionSnapshot) => GeoState =
+    //         switchUtil(spell.staticData.type, {
+    //             move: onMoveAction,
+    //             orientate: () => ({} as any),
+    //             simpleAttack: onSimpleAttackAction,
+    //             sampleSpell1: () => ({} as any),
+    //             sampleSpell2: () => ({} as any),
+    //             sampleSpell3: () => ({} as any),
+    //         });
+    //     previousState = actionFn(spellActionSnapshot);
+
+    //     ticker.start();
+    // });
 
     return {
         sprite: animatedSprite,
@@ -202,32 +207,32 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
 
 const periodFuture: PeriodFn<'future'> = (character, tiledMapGraphic, spritesheet) => {
 
-    const { onAction } = serviceEvent();
-
     const idlePath = getAnimPath(character.staticData.type, 'idle', character.orientation);
     const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
 
     const sprite = new PIXI.Sprite(texture);
     sprite.alpha = 0.25;
 
-    onAction(BattleStateSpellLaunchAction, () => {
+    // TODO
 
-        // be sure to run that after spell had touched the character
-        setImmediate(() => {
-            const idlePath = getAnimPath(character.staticData.type, 'idle', character.orientation);
-            const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
+    // onAction(BattleStateSpellLaunchAction, () => {
 
-            sprite.texture = texture;
-            const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
-            sprite.position.set(worldPos.x, worldPos.y);
-            sprite.visible = true;
-        });
-    });
+    //     // be sure to run that after spell had touched the character
+    //     setImmediate(() => {
+    //         const idlePath = getAnimPath(character.staticData.type, 'idle', character.orientation);
+    //         const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
 
-    onAction(BattleStateTurnEndAction, () => {
+    //         sprite.texture = texture;
+    //         const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
+    //         sprite.position.set(worldPos.x, worldPos.y);
+    //         sprite.visible = true;
+    //     });
+    // });
 
-        sprite.visible = false;
-    });
+    // onAction(BattleStateTurnEndAction, () => {
+
+    //     sprite.visible = false;
+    // });
 
     return { sprite };
 };

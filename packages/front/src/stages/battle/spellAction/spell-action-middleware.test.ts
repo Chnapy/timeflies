@@ -32,6 +32,7 @@ describe('# spell-action-middleware', () => {
         const spell = seedSpell({
             period: 'future',
             id: 's1',
+            characterId: '1',
             type: 'move',
             feature: {
                 duration: 200

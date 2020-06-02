@@ -1,11 +1,10 @@
 import * as PIXI from 'pixi.js';
 import React from 'react';
+import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../../../canvas/CanvasContext';
-import { serviceEvent } from '../../../../../../services/serviceEvent';
+import { GameState } from '../../../../../../game-state';
 import { appTheme } from '../../../../../../ui/app-theme';
 import { UIIcon, UIIconProps } from '../../../../../../ui/battle-ui/spell-panel/spell-button/ui-icon';
-import { Character } from '../../../../entities/character/Character';
-import { SpellActionTimerEndAction } from '../../../../spellAction/spell-action-actions';
 import { GaugeGraphic } from '../../../gauge-graphic';
 import { ReactToGraphicSprite } from '../../../react-to-graphic-sprite';
 import { TeamIndicatorGraphic } from './team-indicator-graphic';
@@ -13,17 +12,20 @@ import { TeamIndicatorGraphic } from './team-indicator-graphic';
 export type CharacterHud = ReturnType<typeof CharacterHud>;
 
 export const CharacterHud = (
-    character: Readonly<Character<'current'>>
+    characterId: string
 ) => {
 
-    const { onAction } = serviceEvent();
+    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters.find(c => c.id === characterId)!;
 
-    const { tiledMapGraphic: { tilewidth, tileheight } } = CanvasContext.consumer('tiledMapGraphic');
+    const container = new PIXI.Container();
+
+    const { tiledMapGraphic: { getTilesize }, storeEmitter } = CanvasContext.consumer('tiledMapGraphic', 'storeEmitter');
+
+    const { tilewidth, tileheight } = getTilesize();
 
     const { palette } = appTheme;
 
-    const teamIndicator = TeamIndicatorGraphic(character.player.team.letter);
-    teamIndicator.container.y = tileheight - teamIndicator.size;
+    const teamIndicatorContainer = new PIXI.Container();
 
     const lifeIconSize = 18;
 
@@ -51,21 +53,43 @@ export const CharacterHud = (
         height: 6
     });
 
-    const container = new PIXI.Container();
-    container.addChild(teamIndicator.container, lifeIconContainer, gauge.graphic);
+    container.addChild(teamIndicatorContainer, lifeIconContainer, gauge.graphic);
 
-    const updateLifeGauge = () => {
-        const { life: totalLife } = character.staticData.initialFeatures;
-        const { life } = character.features;
-
+    const updateLifeGauge = (totalLife: number, life: number) => {
         const ratio = life / totalLife;
 
         gauge.update(ratio);
     };
 
-    updateLifeGauge();
+    storeEmitter.onStateChange(
+        state => {
+            const { playerId } = selectCharacter(state);
+            const { teamId } = state.battle.snapshotState.battleDataCurrent.players.find(p => p.id === playerId)!;
+            return state.battle.snapshotState.battleDataCurrent.teams.find(t => t.id === teamId)!.letter;
+        },
+        letter => {
+            teamIndicatorContainer.removeChildren();
 
-    onAction(SpellActionTimerEndAction, updateLifeGauge);
+            const teamIndicator = TeamIndicatorGraphic(letter);
+            teamIndicator.container.y = tileheight - teamIndicator.size;
+
+            teamIndicatorContainer.addChild(teamIndicator.container);
+        }
+    );
+
+    storeEmitter.onStateChange(
+        state => {
+            const { staticData, features } = selectCharacter(state);
+            return {
+                totalLife: staticData.initialFeatures.life,
+                life: features.life
+            };
+        },
+        ({ totalLife, life }) => {
+            updateLifeGauge(totalLife, life);
+        },
+        shallowEqual
+    );
 
     return {
         container
