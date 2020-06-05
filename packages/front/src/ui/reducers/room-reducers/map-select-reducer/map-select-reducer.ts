@@ -1,8 +1,8 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { assertIsDefined, assertIsNonNullable, MapConfig, MapPlacementTile, RoomServerAction, TiledManager } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
-import { StageChangeAction, stageChangeActionPayloadMatch } from '../../../../stages/stage-actions';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
+import { RoomStartAction } from '../room-actions';
 import { MapLoadedAction } from './map-select-actions';
 
 export interface MapSelectData {
@@ -62,13 +62,9 @@ const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, { mapSel
 };
 
 export const mapSelectReducer = createReducer(initialState, {
-    [ StageChangeAction.type ]: (state, { payload }: StageChangeAction) => {
+    [ RoomStartAction.type ]: (state, { payload }: RoomStartAction) => {
 
-        if (!stageChangeActionPayloadMatch('room', payload)) {
-            return;
-        }
-
-        const { roomState: { mapSelected } } = payload.data;
+        const { mapSelected } = payload.roomState;
 
         if (!mapSelected) {
             handleMapSelect(state, null, []);
@@ -96,7 +92,7 @@ export const mapSelectReducer = createReducer(initialState, {
 
         const { assets } = payload;
 
-        const tiledManager = TiledManager(assets);
+        const tiledManager = TiledManager(assets.schema);
 
         const obstacleTiles = tiledManager.getAllTilesOfType('obstacle');
 

@@ -1,4 +1,5 @@
 import { GameState } from './game-state';
+import { battleReducer } from './ui/reducers/battle-reducers/battle-reducer';
 
 export const seedGameState = (playerId: string, initialState: Partial<GameState>): GameState => ({
     currentPlayer: {
@@ -7,6 +8,6 @@ export const seedGameState = (playerId: string, initialState: Partial<GameState>
     },
     step: 'boot',
     room: null,
-    battle: null,
+    battle: battleReducer(undefined, { type: 'any' }),
     ...initialState
 });

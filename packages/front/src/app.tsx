@@ -10,9 +10,12 @@ export interface AppProps {
     store: Store<GameState, Action>;
     assetLoader: AssetLoader;
     onMount(gameWrapper: HTMLElement, canvas: HTMLCanvasElement);
+    children?: React.ReactNode;
 }
 
-export const App: React.FC<AppProps> = ({ store, assetLoader, onMount }) => {
+const defaultChildren = () => <GameUI />;
+
+export const App: React.FC<AppProps> = ({ store, assetLoader, onMount, children = defaultChildren() }) => {
 
     const gameWrapperRef = React.useRef<HTMLDivElement>(null);
 
@@ -39,7 +42,7 @@ export const App: React.FC<AppProps> = ({ store, assetLoader, onMount }) => {
                         <canvas />
                     </div>
 
-                    <GameUI />
+                    {children}
 
                 </div>
             </UIProvider>

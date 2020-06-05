@@ -7,9 +7,10 @@ import { UIIcon } from '../../spell-panel/spell-button/ui-icon';
 import { UIGauge } from '../../spell-panel/spell-button/ui-gauge';
 import { useGameStep } from '../../../hooks/useGameStep';
 import { assertIsDefined, switchUtil } from '@timeflies/shared';
-import { BattleDataMap } from '../../../../BattleData';
 import { CharacterImage } from './character-image';
 import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
+import { BattleState } from '../../../reducers/battle-reducers/battle-reducer';
+import { getTurnRemainingTime } from '../../../../stages/battle/cycle/cycle-reducer';
 
 export type CharacterItemProps = {
     characterId: string;
@@ -68,11 +69,18 @@ const useStyles = makeStyles(({ palette }) => ({
     })
 }));
 
-const characterSelector = (battle: BattleDataMap, characterId: string) => {
-    const character = battle.current.characters.find(c => c.id === characterId);
+const characterSelector = ({ snapshotState }: BattleState, characterId: string) => {
+    const character = snapshotState.battleDataCurrent.characters.find(c => c.id === characterId);
     assertIsDefined(character);
 
     return character;
+};
+
+const playerSelector = ({ snapshotState }: BattleState, playerId: string) => {
+    const player = snapshotState.battleDataCurrent.players.find(p => p.id === playerId);
+    assertIsDefined(player);
+
+    return player;
 };
 
 type CharacterState = 'default' | 'disabled' | 'current';
@@ -81,26 +89,34 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
 
     const currentPlayerId = useGameCurrentPlayer(({ id }) => id);
 
+    const playerId = useGameStep('battle', battle => characterSelector(battle, characterId).playerId);
+
     const related: 'me' | 'ally' | 'ennemy' = useGameStep('battle', battle => {
 
-        const { player } = characterSelector(battle, characterId);
-
-        if (player.id === currentPlayerId) {
+        if (playerId === currentPlayerId) {
             return 'me';
         }
 
-        if (player.team.players.some(p => p.id === currentPlayerId)) {
+        const [ t1, t2 ] = battle.snapshotState.battleDataCurrent.players
+            .filter(p => p.id === playerId || p.id === currentPlayerId)
+            .map(p => p.teamId);
+
+        if (t1 === t2) {
             return 'ally';
         }
 
         return 'ennemy';
     });
 
-    const playerName = useGameStep('battle', battle =>
-        characterSelector(battle, characterId).player.name);
+    const playerName = useGameStep('battle', battle => playerSelector(battle, playerId).name);
 
-    const teamLetter = useGameStep('battle', battle =>
-        characterSelector(battle, characterId).player.team.letter);
+    const teamLetter = useGameStep('battle', battle => {
+
+        const { teamId } = playerSelector(battle, playerId);
+
+        return battle.snapshotState.battleDataCurrent.teams
+            .find(t => t.id === teamId)!.letter;
+    });
 
     const characterType = useGameStep('battle', battle =>
         characterSelector(battle, characterId).staticData.type);
@@ -114,11 +130,11 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
     const actionTime = useGameStep('battle', battle =>
         characterSelector(battle, characterId).features.actionTime);
 
-    const { startTime, turnDuration, getRemainingTimeRaw } = useGameStep('battle', ({ cycle }) => {
+    const { startTime, turnDuration, getRemainingTimeRaw } = useGameStep('battle', battle => {
 
-        const currentTurn = cycle.globalTurn?.currentTurn;
+        const { currentCharacterId, turnStartTime, turnDuration } = battle.cycleState;
 
-        if (currentTurn?.character.id !== characterId) {
+        if (currentCharacterId !== characterId) {
             return {
                 startTime: 0,
                 turnDuration: 0,
@@ -127,9 +143,9 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
         }
 
         return {
-            startTime: currentTurn.startTime,
-            turnDuration: currentTurn.turnDuration,
-            getRemainingTimeRaw: () => currentTurn.getRemainingTime('current')
+            startTime: turnStartTime,
+            turnDuration: turnDuration,
+            getRemainingTimeRaw: () => getTurnRemainingTime(battle, 'current')
         };
 
     }, (a, b) => a.startTime === b.startTime);

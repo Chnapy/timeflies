@@ -1,9 +1,8 @@
-import { RoomServerAction, seedTiledMap } from '@timeflies/shared';
+import { MapConfig, RoomServerAction, seedTiledMap } from '@timeflies/shared';
 import { TiledLayerTilelayer } from 'tiled-types';
-import { Controller } from '../../../../Controller';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
-import { StageChangeAction } from '../../../../stages/stage-actions';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
+import { RoomStartAction } from '../room-actions';
 import { MapLoadedAction } from './map-select-actions';
 import { MapSelectData, mapSelectReducer } from './map-select-reducer';
 
@@ -51,27 +50,33 @@ describe('# map-select-reducer', () => {
         });
     });
 
-    it('should init state on stage change action', async () => {
+    it('should init state on room start', () => {
 
-        const mapConfig = seedMapConfig('map_1');
+        const mapConfig: MapConfig = {
+            id: '',
+            schemaUrl: 'placeholder',
+            height: 10,
+            width: 10,
+            name: '',
+            nbrCharactersPerTeam: 1,
+            nbrTeams: 1,
+            previewUrl: '',
+        };
 
-        const action = StageChangeAction({
-            stageKey: 'room',
-            data: {
-                roomState: {
-                    type: 'room/state',
-                    sendTime: -1,
-                    roomId: '',
-                    mapSelected: {
-                        config: mapConfig,
-                        placementTileList: [ {
-                            teamId: 't1',
-                            position: { x: 0, y: 0 }
-                        } ]
-                    },
-                    playerList: [],
-                    teamList: []
-                }
+        const action = RoomStartAction({
+            roomState: {
+                type: 'room/state',
+                sendTime: -1,
+                roomId: '',
+                mapSelected: {
+                    config: mapConfig,
+                    placementTileList: [ {
+                        teamId: 't1',
+                        position: { x: 0, y: 0 }
+                    } ]
+                },
+                playerList: [],
+                teamList: []
             }
         });
 
@@ -89,8 +94,6 @@ describe('# map-select-reducer', () => {
                 } ]
             }
         });
-
-        await Controller.loader.newInstance().load();
     });
 
     it('should update tile list on map list action', () => {

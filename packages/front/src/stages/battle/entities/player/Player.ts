@@ -1,4 +1,5 @@
 import { PlayerSnapshot } from '@timeflies/shared';
+import { GameState } from '../../../../game-state';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 
 export type Player<P extends BattleDataPeriod> = {
@@ -16,8 +17,7 @@ export const playerToSnapshot = ({ id, name, teamId }: Player<BattleDataPeriod>)
     };
 };
 
-// TODO
-// export const playerIsMine = 
+export const playerIsMine = ({ currentPlayer }: GameState, playerId: string) => currentPlayer?.id === playerId;
 
 export const Player = <P extends BattleDataPeriod>(
     period: P,

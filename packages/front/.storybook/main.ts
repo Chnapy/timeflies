@@ -29,7 +29,7 @@ const webpackNoAssetsHashNorData64 = (webpackConfig: Configuration): Configurati
 };
 
 module.exports = {
-  stories: [ '../src/**/*.stories.tsx' ],
+  stories: [ '../src/**/react-to-*.stories.tsx' ], // TODO
   addons: [
     '@storybook/preset-create-react-app',
     '@storybook/addon-links',

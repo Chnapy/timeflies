@@ -26,7 +26,7 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
         charactersAliveIds => {
             container.removeChildren().forEach(c => c.destroy());
             charactersGraphics.splice(0, Infinity);
-
+            
             charactersGraphics.push(...charactersAliveIds
                 .map(id => CharacterGraphic(id, period)));
 

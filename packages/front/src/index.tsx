@@ -4,9 +4,9 @@ import './envManager';
 import { createStoreManager } from './store-manager';
 import { createView } from './view';
 
-const storeManager = createStoreManager();
-
 const assetLoader = createAssetLoader();
+
+const storeManager = createStoreManager(assetLoader);
 
 const view = createView({
     storeManager,

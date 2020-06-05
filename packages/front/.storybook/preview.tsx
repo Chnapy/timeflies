@@ -4,32 +4,30 @@ import { UIProvider } from '../src/ui/ui-provider';
 // deploy files for AssetLoader
 import '../src/_assets/map/map.png';
 import '../src/_assets/spritesheets/sokoban.png';
-import { FakeBattleApi } from './fake-battle-api';
 
 export interface StoryProps {
-    fakeBattleApi: ReturnType<typeof FakeBattleApi>;
+    // fakeBattleApi: ReturnType<typeof FakeBattleApi>;
 }
 
-addDecorator((storyFn, context) => {
+// addDecorator((storyFn, context) => {
 
-    const fakeBattleApi = FakeBattleApi();
+//     // const fakeBattleApi = FakeBattleApi();
 
-    const props: StoryProps = {
-        fakeBattleApi
-    };
+//     // const props: StoryProps = {
+//     //     fakeBattleApi
+//     // };
 
-    return (
+//     return (
 
-        <UIProvider>
+//         <UIProvider>
 
-            {storyFn({
-                ...context,
-                ...props
-            })}
+//             {storyFn({
+//                 ...context,
+//             })}
 
-        </UIProvider>
-    );
-});
+//         </UIProvider>
+//     );
+// });
 
 addParameters({
     options: {

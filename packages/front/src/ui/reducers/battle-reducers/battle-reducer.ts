@@ -18,18 +18,3 @@ export const battleReducer = combineReducers<BattleState>({
     snapshotState: snapshotReducer,
     spellActionState: spellActionReducer
 });
-
-// TODO use commented reducer
-// when battle state refactor will be made
-// export const battleReducer: Reducer<BattleDataMap | null, any> = (state = null, action) => {
-
-//     switch (action.type) {
-//         case StageChangeAction.type:
-//             const { payload } = action as StageChangeAction;
-//             if (stageChangeActionPayloadMatch('battle', payload)) {
-//                 return payload.data.battleData;
-//             }
-//     }
-
-//     return state && { ...state };
-// };

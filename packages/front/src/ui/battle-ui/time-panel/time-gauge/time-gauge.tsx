@@ -1,33 +1,37 @@
-import React from "react";
 import { Box } from '@material-ui/core';
+import React from "react";
+import { shallowEqual } from 'react-redux';
+import { getTurnRemainingTime } from '../../../../stages/battle/cycle/cycle-reducer';
 import { useGameStep } from '../../../hooks/useGameStep';
-import { UIGauge } from '../../spell-panel/spell-button/ui-gauge';
 import { SpellNumber } from '../../spell-panel/spell-button/spell-number';
+import { UIGauge } from '../../spell-panel/spell-button/ui-gauge';
 import { SpellTimeGauge } from './spell-time-gauge';
 
 
 export const TimeGauge: React.FC = () => {
 
-    const { turnDuration, remainingTime } = useGameStep('battle', ({ cycle }) => {
-        if (!cycle.globalTurn) {
-            return {
-                startTime: 0,
-                turnDuration: 0,
-                remainingTime: 0
-            };
-        }
+    const { turnDuration, remainingTime } = useGameStep('battle', battle => {
+        const { turnStartTime, turnDuration } = battle.cycleState;
+        // if (!cycle.globalTurn) {
+        //     return {
+        //         startTime: 0,
+        //         turnDuration: 0,
+        //         remainingTime: 0
+        //     };
+        // }
 
-        const { currentTurn } = cycle.globalTurn;
         return {
-            startTime: currentTurn.startTime,
-            turnDuration: currentTurn.turnDuration,
-            remainingTime: currentTurn.getRemainingTime('current')
+            startTime: turnStartTime,
+            turnDuration: turnDuration,
+            remainingTime: getTurnRemainingTime(battle, 'current')
         };
     }, (a, b) => a.startTime === b.startTime);
 
-    const spellActionStartTimeList = useGameStep('battle', ({ future }) =>
-        future.spellActionSnapshotList.map(spellAction => spellAction.startTime),
-        (a, b) => a.length === b.length);
+    const spellActionStartTimeList = useGameStep('battle',
+        ({ spellActionState }) =>
+            spellActionState.spellActionSnapshotList.map(spellAction => spellAction.startTime),
+        shallowEqual
+    );
 
 
     return <Box position='relative' display='flex' alignItems='center' flexGrow={1}>

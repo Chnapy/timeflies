@@ -1,31 +1,43 @@
-import { TeamIndicatorGraphic } from './team-indicator-graphic';
-import React from 'react';
 import * as PIXI from 'pixi.js';
-import { StoryProps } from '../../../../../../../.storybook/preview';
+import React from 'react';
+import { createAssetLoader } from '../../../../../../assetManager/AssetLoader';
+import { createStoreManager } from '../../../../../../store-manager';
+import { CreatePixiFn, createView } from '../../../../../../view';
+import { TeamIndicatorGraphic } from './team-indicator-graphic';
 
 export default {
     title: 'graphic/CharacterGraphic/Team indicator graphic',
     component: TeamIndicatorGraphic
 };
 
-export const Default: React.FC<StoryProps> = (props) => <InnerDefault {...props} />;
+export const Default: React.FC = () => {
 
-const InnerDefault: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+    const assetLoader = createAssetLoader();
 
-    const rootRef = React.useRef<any>();
+    const storeManager = createStoreManager({
+        assetLoader,
+        middlewareList: []
+    });
 
-    React.useEffect(() => {
-
-        fakeBattleApi.init({});
-
-        const view = rootRef.current;
-
-        const game = new PIXI.Application({ view, width: 100, height: 100, backgroundColor: 0xFFFFFF });
+    const createPixi: CreatePixiFn = async ({ canvas, parent }) => {
+        const app = new PIXI.Application({
+            view: canvas,
+            resizeTo: parent,
+            width: 100,
+            height: 100,
+            backgroundColor: 0xFFFFFF
+        });
 
         const indicator = TeamIndicatorGraphic('A');
-        game.stage.addChild(indicator.container);
+        app.stage.addChild(indicator.container);
+    };
 
-    }, [ fakeBattleApi ]);
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi,
+        gameUIChildren: null
+    });
 
-    return <canvas ref={rootRef} />;
+    return view;
 };

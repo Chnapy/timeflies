@@ -1,14 +1,6 @@
-import { StoreTest } from '../../../../StoreTest';
+import { } from './Character';
 
 describe('# Character', () => {
-
-    beforeEach(() => {
-        StoreTest.beforeTest();
-    });
-
-    afterEach(() => {
-        StoreTest.afterTest();
-    });
 
     it.todo('should be alive with life more than 0');
 

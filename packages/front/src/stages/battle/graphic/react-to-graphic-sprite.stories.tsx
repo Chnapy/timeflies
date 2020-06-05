@@ -1,32 +1,38 @@
-import React from 'react';
-import * as PIXI from 'pixi.js';
-import { StoryProps } from '../../../../.storybook/preview';
-import { ReactToGraphicSprite } from './react-to-graphic-sprite';
 import { Typography } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import * as PIXI from 'pixi.js';
+import React from 'react';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
+import { createStoreManager } from '../../../store-manager';
 import { UIIcon } from '../../../ui/battle-ui/spell-panel/spell-button/ui-icon';
+import { CreatePixiFn, createView } from '../../../view';
+import { ReactToGraphicSprite } from './react-to-graphic-sprite';
 
 export default {
     title: 'graphic/React to graphic sprite',
     component: ReactToGraphicSprite
 };
 
-export const Default: React.FC<StoryProps> = (props) => <InnerDefault {...props} />;
+export const Default: React.FC = () => {
 
-const InnerDefault: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+    const assetLoader = createAssetLoader();
 
-    const rootRef = React.useRef<any>();
+    const storeManager = createStoreManager({
+        assetLoader,
+        middlewareList: []
+    });
 
-    React.useEffect(() => {
-
-        fakeBattleApi.init({});
-
-        const view = rootRef.current;
-
-        const game = new PIXI.Application({ view, width: 1000, height: 100, backgroundColor: 0xFFFFFF });
+    const createPixi: CreatePixiFn = async ({ canvas, parent }) => {
+        const app = new PIXI.Application({
+            view: canvas,
+            resizeTo: parent,
+            width: 1000,
+            height: 100,
+            backgroundColor: 0xFFFFFF
+        });
 
         const graphic = new PIXI.Graphics();
-        game.stage.addChild(graphic);
+        app.stage.addChild(graphic);
 
         graphic.beginFill(0xFF666622);
         graphic.drawRect(0, 0, 500, 100);
@@ -37,16 +43,22 @@ const InnerDefault: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         const muiTypography = ReactToGraphicSprite(<Typography variant='h6'>Mui typography h6</Typography>, 100, 50);
         muiTypography.x = 100;
 
-        const muiIcon = ReactToGraphicSprite(<FavoriteIcon/>, 24, 24);
+        const muiIcon = ReactToGraphicSprite(<FavoriteIcon />, 24, 24);
         muiIcon.x = 200;
 
-        const muiUIIcon = ReactToGraphicSprite(<UIIcon icon='life' inPixiContext/>, 24, 24, 'color: white');
+        const muiUIIcon = ReactToGraphicSprite(<UIIcon icon='life' inPixiContext />, 24, 24, 'color: white');
         muiUIIcon.x = 300;
 
-        game.stage.addChild(someText, muiTypography, muiIcon, muiUIIcon);
+        app.stage.addChild(someText, muiTypography, muiIcon, muiUIIcon);
+    };
 
-    }, [ fakeBattleApi ]);
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi,
+        gameUIChildren: null
+    });
 
-    return <canvas ref={rootRef} />;
+    return view;
 };
 

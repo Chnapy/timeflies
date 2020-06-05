@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/game.ts",
   "scripts": {
-    "start": "REACT_APP_SERVER_URL=localhost:2567 react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "test-ci": "yarn test",

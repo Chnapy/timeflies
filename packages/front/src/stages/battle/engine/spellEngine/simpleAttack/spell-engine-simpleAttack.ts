@@ -1,6 +1,5 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { equals, Position, TileType } from '@timeflies/shared';
-import { getArea } from '../../../battleState/battle-action-reducer';
+import { equals, Position, TiledManager, TileType } from '@timeflies/shared';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { Character, characterAlterLife } from '../../../entities/character/Character';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
@@ -26,7 +25,9 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             return;
         }
 
-        const actionArea = getArea(tiledSchema!, tilePos, 1);
+        const tiledManager = TiledManager(tiledSchema!);
+
+        const actionArea = tiledManager.getArea(tilePos, 1);
 
         api.dispatch(BattleMapPathAction({
             actionArea
@@ -41,9 +42,11 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             return;
         }
 
+        const tiledManager = TiledManager(tiledSchema!);
+
         const spell = extractFutureSpell(api.getState)!;
 
-        const actionArea = getArea(tiledSchema!, tilePos, 1);
+        const actionArea = tiledManager.getArea(tilePos, 1);
 
         const spellAction: SpellAction = {
             spell,

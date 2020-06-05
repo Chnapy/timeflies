@@ -1,23 +1,36 @@
-import { Action, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { Action, configureStore, getDefaultMiddleware, Middleware } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
+import { AssetLoader } from './assetManager/AssetLoader';
+import { GameState } from './game-state';
 import { ReceiveMessageAction, SendMessageAction } from './socket/wsclient-actions';
 import { wsClientMiddleware } from './socket/wsclient-middleware';
 import { getBattleMiddlewareList } from './ui/reducers/battle-reducers/battle-middleware-list';
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
 import { rootReducer } from './ui/reducers/root-reducer';
-import { GameState } from './game-state';
 
 export type StoreManager = ReturnType<typeof createStoreManager>;
 
 export type StoreEmitter = Pick<StoreManager, 'onStateChange' | 'getState' | 'dispatch'>;
 
-export const createStoreManager = () => {
+type Props = {
+    assetLoader: AssetLoader;
+    initialState?: GameState;
+    middlewareList?: Middleware[];
+};
 
-    const middlewareList = [
-        wsClientMiddleware({}),
-        roomMiddleware,
-        ...getBattleMiddlewareList()
-    ];
+const defaultMiddlewareList = (assetLoader: AssetLoader): Middleware[] => [
+    wsClientMiddleware({}),
+    roomMiddleware({
+        assetLoader
+    }),
+    ...getBattleMiddlewareList()
+];
+
+export const createStoreManager = ({ 
+    assetLoader, 
+    initialState, 
+    middlewareList = defaultMiddlewareList(assetLoader),
+}: Props) => {
 
     if (process.env.NODE_ENV === 'development') {
         const logger = createLogger({
@@ -44,7 +57,7 @@ export const createStoreManager = () => {
             ...getDefaultMiddleware(),
             ...middlewareList
         ],
-        // preloadedState: initialState
+        preloadedState: initialState
     });
 
     const onStateChange = <R>(

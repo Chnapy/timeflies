@@ -5,13 +5,7 @@ import { Provider } from 'react-redux';
 import { AssetManager } from '../src/assetManager/AssetManager';
 import { Controller } from '../src/Controller';
 import { GameState } from '../src/game-state';
-import { serviceBattleData } from '../src/services/serviceBattleData';
-import { serviceDispatch } from '../src/services/serviceDispatch';
-import { serviceEvent } from '../src/services/serviceEvent';
-import { WebSocketCreator } from '../src/socket/WSClient';
 import { ReceiveMessageAction, SendMessageAction } from '../src/socket/wsclient-actions';
-import { seedTeamSnapshot } from '../src/stages/battle/entities/team/Team.seed';
-import { StageChangeAction } from '../src/stages/stage-actions';
 
 class MockWebSocket implements WebSocket {
     prototype: any;
@@ -70,335 +64,335 @@ export interface FakeBattleApiRunner {
     notify(): void;
 }
 
-export type FakeBattleApi = ReturnType<typeof FakeBattleApi>;
+// export type FakeBattleApi = ReturnType<typeof FakeBattleApi>;
 
-export const FakeBattleApi = () => {
+// export const FakeBattleApi = () => {
 
-    let isInBattle: boolean = false;
+//     let isInBattle: boolean = false;
 
-    const dispatch = (action: PayloadAction<any>) => serviceDispatch({
-        dispatch: (action: PayloadAction<any>) => action
-    }).dispatch(action);
+//     const dispatch = (action: PayloadAction<any>) => serviceDispatch({
+//         dispatch: (action: PayloadAction<any>) => action
+//     }).dispatch(action);
 
-    const receiveAction = <A extends ServerAction>(payload: A) =>
-        serviceDispatch({
-            dispatch: () => ReceiveMessageAction(payload)
-        }).dispatch();
+//     const receiveAction = <A extends ServerAction>(payload: A) =>
+//         serviceDispatch({
+//             dispatch: () => ReceiveMessageAction(payload)
+//         }).dispatch();
 
-    const getTeamSnapshots = (): TeamSnapshot[] => {
-        return [
-            seedTeamSnapshot({
-                id: 'A',
-                letter: 'A',
-                seedPlayers: [
-                    {
-                        id: 'p1',
-                        seedCharacters: [
-                            {
-                                id: 'C1',
-                                seedSpells: [
-                                    {
-                                        id: 'S1', index: 1, type: 'move', initialFeatures: {
-                                            duration: 200
-                                        }
-                                    },
-                                    {
-                                        id: 'S2', index: 2, type: 'simpleAttack', initialFeatures: {
-                                            duration: 10_000, attack: 20, area: 5
-                                        }
-                                    }
-                                ],
-                                features: {
-                                    actionTime: 42_000
-                                },
-                                position: { x: 4, y: 3 }
-                            }
-                        ]
-                    }
-                ]
-            }),
-            seedTeamSnapshot({
-                id: 'B',
-                letter: 'B',
-                seedPlayers: [
-                    {
-                        id: 'p2',
-                        seedCharacters: [
-                            {
-                                id: 'C2',
-                                seedSpells: [
-                                    { id: 'S2', type: 'move' }
-                                ],
-                                features: {
-                                    actionTime: 12_000
-                                },
-                                position: { x: 6, y: 3 }
-                            }
-                        ]
-                    }
-                ]
-            })
-        ];
-    };
+//     const getTeamSnapshots = (): TeamSnapshot[] => {
+//         return [
+//             seedTeamSnapshot({
+//                 id: 'A',
+//                 letter: 'A',
+//                 seedPlayers: [
+//                     {
+//                         id: 'p1',
+//                         seedCharacters: [
+//                             {
+//                                 id: 'C1',
+//                                 seedSpells: [
+//                                     {
+//                                         id: 'S1', index: 1, type: 'move', initialFeatures: {
+//                                             duration: 200
+//                                         }
+//                                     },
+//                                     {
+//                                         id: 'S2', index: 2, type: 'simpleAttack', initialFeatures: {
+//                                             duration: 10_000, attack: 20, area: 5
+//                                         }
+//                                     }
+//                                 ],
+//                                 features: {
+//                                     actionTime: 42_000
+//                                 },
+//                                 position: { x: 4, y: 3 }
+//                             }
+//                         ]
+//                     }
+//                 ]
+//             }),
+//             seedTeamSnapshot({
+//                 id: 'B',
+//                 letter: 'B',
+//                 seedPlayers: [
+//                     {
+//                         id: 'p2',
+//                         seedCharacters: [
+//                             {
+//                                 id: 'C2',
+//                                 seedSpells: [
+//                                     { id: 'S2', type: 'move' }
+//                                 ],
+//                                 features: {
+//                                     actionTime: 12_000
+//                                 },
+//                                 position: { x: 6, y: 3 }
+//                             }
+//                         ]
+//                     }
+//                 ]
+//             })
+//         ];
+//     };
 
-    const getGlobalState = (gtid: number, turnid: number) => ({
-        id: gtid,
-        startTime: Date.now(),
-        order: [ 'C1', 'C2' ],
-        currentTurn: {
-            id: turnid,
-            characterId: 'C1',
-            startTime: Date.now()
-        }
-    });
+//     const getGlobalState = (gtid: number, turnid: number) => ({
+//         id: gtid,
+//         startTime: Date.now(),
+//         order: [ 'C1', 'C2' ],
+//         currentTurn: {
+//             id: turnid,
+//             characterId: 'C1',
+//             startTime: Date.now()
+//         }
+//     });
 
-    const initWSActions = () => {
+//     const initWSActions = () => {
 
-        const sendFns: {
-            [ key in ClientAction[ 'type' ] ]?: (action: Omit<ClientAction, 'sendTime'>) => void
-        } = {};
+//         const sendFns: {
+//             [ key in ClientAction[ 'type' ] ]?: (action: Omit<ClientAction, 'sendTime'>) => void
+//         } = {};
 
-        const { onAction } = serviceEvent();
+//         const { onAction } = serviceEvent();
 
-        const onSendAction = <A extends ClientAction>(
-            type: A[ 'type' ],
-            fn: (action: Omit<A, 'sendTime'>
-            ) => void) => {
+//         const onSendAction = <A extends ClientAction>(
+//             type: A[ 'type' ],
+//             fn: (action: Omit<A, 'sendTime'>
+//             ) => void) => {
 
-            sendFns[ type ] = (fn as any);
-        };
+//             sendFns[ type ] = (fn as any);
+//         };
 
-        onAction(SendMessageAction, payload  => {
-            const fn = sendFns[ payload.type ];
+//         onAction(SendMessageAction, payload  => {
+//             const fn = sendFns[ payload.type ];
 
-            if (fn) {
-                setImmediate(() => fn(payload));
-            }
-        });
+//             if (fn) {
+//                 setImmediate(() => fn(payload));
+//             }
+//         });
 
-        return {
-            onSendAction
-        };
-    };
+//         return {
+//             onSendAction
+//         };
+//     };
 
-    const initController = (
-        initialState: GameState | undefined,
-        websocketCreator: WebSocketCreator
-    ) => {
-        const { start } = Controller.init({ initialState, websocketCreator });
+//     const initController = (
+//         initialState: GameState | undefined,
+//         websocketCreator: WebSocketCreator
+//     ) => {
+//         const { start } = Controller.init({ initialState, websocketCreator });
 
-        const { onSendAction } = initWSActions();
+//         const { onSendAction } = initWSActions();
 
-        const { onMessageAction } = serviceEvent();
+//         const { onMessageAction } = serviceEvent();
 
-        onSendAction<MatchmakerClientAction>('matchmaker/enter', () => {
+//         onSendAction<MatchmakerClientAction>('matchmaker/enter', () => {
 
-            receiveAction<BattleLoadSAction>({
-                type: 'battle-load',
-                sendTime: Date.now(),
-                payload: {
-                    mapConfig: {
-                        id: 'm1',
-                        schemaUrl: AssetManager.fake.mapSchema,
-                        name: 'm1',
-                        height: 10,
-                        width: 10,
-                        previewUrl: '',
-                        nbrCharactersPerTeam: 1,
-                        nbrTeams: 1
-                    },
-                    playerInfos: {
-                        id: 'P1',
-                        name: 'p1'
-                    }
-                }
-            });
-        });
+//             receiveAction<BattleLoadSAction>({
+//                 type: 'battle-load',
+//                 sendTime: Date.now(),
+//                 payload: {
+//                     mapConfig: {
+//                         id: 'm1',
+//                         schemaUrl: AssetManager.fake.mapSchema,
+//                         name: 'm1',
+//                         height: 10,
+//                         width: 10,
+//                         previewUrl: '',
+//                         nbrCharactersPerTeam: 1,
+//                         nbrTeams: 1
+//                     },
+//                     playerInfos: {
+//                         id: 'P1',
+//                         name: 'p1'
+//                     }
+//                 }
+//             });
+//         });
 
-        onMessageAction<BattleLoadSAction>('battle-load', async () => {
+//         onMessageAction<BattleLoadSAction>('battle-load', async () => {
 
-            await Controller.loader.newInstance()
-                .add('map', AssetManager.fake.mapSchema)
-                .addSpritesheet('characters', AssetManager.spritesheets.characters)
-                .load();
+//             await Controller.loader.newInstance()
+//                 .add('map', AssetManager.fake.mapSchema)
+//                 .addSpritesheet('characters', AssetManager.spritesheets.characters)
+//                 .load();
 
-            dispatch(StageChangeAction({
-                stageKey: 'battle',
-                data: {
-                    mapConfig: {
-                        id: 'm1',
-                        schemaUrl: AssetManager.fake.mapSchema,
-                        name: 'm1',
-                        height: 10,
-                        width: 10,
-                        previewUrl: '',
-                        nbrCharactersPerTeam: 1,
-                        nbrTeams: 1
-                    },
-                    battleSnapshot: {
-                        battleHash: 'hash',
-                        launchTime: Date.now(),
-                        time: Date.now(),
-                        teamsSnapshots: getTeamSnapshots()
-                    },
-                    globalTurnState: getGlobalState(1, 1),
-                    battleData: {
-                        cycle: {
-                            launchTime: Date.now()
-                        },
-                        current: {
-                            battleHash: '',
-                            teams: [],
-                            players: [],
-                            characters: []
-                        },
-                        future: {
-                            battleHash: '',
-                            teams: [],
-                            players: [],
-                            characters: [],
-                            spellActionSnapshotList: []
-                        }
-                    }
-                }
-            }));
-            isInBattle = true;
-        });
+//             dispatch(StageChangeAction({
+//                 stageKey: 'battle',
+//                 data: {
+//                     mapConfig: {
+//                         id: 'm1',
+//                         schemaUrl: AssetManager.fake.mapSchema,
+//                         name: 'm1',
+//                         height: 10,
+//                         width: 10,
+//                         previewUrl: '',
+//                         nbrCharactersPerTeam: 1,
+//                         nbrTeams: 1
+//                     },
+//                     battleSnapshot: {
+//                         battleHash: 'hash',
+//                         launchTime: Date.now(),
+//                         time: Date.now(),
+//                         teamsSnapshots: getTeamSnapshots()
+//                     },
+//                     globalTurnState: getGlobalState(1, 1),
+//                     battleData: {
+//                         cycle: {
+//                             launchTime: Date.now()
+//                         },
+//                         current: {
+//                             battleHash: '',
+//                             teams: [],
+//                             players: [],
+//                             characters: []
+//                         },
+//                         future: {
+//                             battleHash: '',
+//                             teams: [],
+//                             players: [],
+//                             characters: [],
+//                             spellActionSnapshotList: []
+//                         }
+//                     }
+//                 }
+//             }));
+//             isInBattle = true;
+//         });
 
-        return {
-            start,
-            onSendAction,
-            receiveAction
-        };
-    };
+//         return {
+//             start,
+//             onSendAction,
+//             receiveAction
+//         };
+//     };
 
-    const _initialState: GameState = {
-        step: 'boot',
-        currentPlayer: {
-            id: 'p1',
-            name: 'Player 1'
-        },
-        room: null,
-        battle: null
-    };
+//     const _initialState: GameState = {
+//         step: 'boot',
+//         currentPlayer: {
+//             id: 'p1',
+//             name: 'Player 1'
+//         },
+//         room: null,
+//         battle: null
+//     };
 
-    return {
+//     return {
 
-        init({ initialState = _initialState }: {
-            initialState?: GameState;
-        }): FakeBattleApiStarter {
+//         init({ initialState = _initialState }: {
+//             initialState?: GameState;
+//         }): FakeBattleApiStarter {
 
-            let socket!: MockWebSocket;
+//             let socket!: MockWebSocket;
 
-            const websocketCreator: WebSocketCreator = () => {
-                socket = new MockWebSocket();
-                return socket;
-            };
+//             const websocketCreator: WebSocketCreator = () => {
+//                 socket = new MockWebSocket();
+//                 return socket;
+//             };
 
-            const { start, receiveAction } = initController(initialState, websocketCreator);
+//             const { start, receiveAction } = initController(initialState, websocketCreator);
 
-            return {
+//             return {
 
-                Provider: ({ children }) => (
-                    <Provider store={Controller.getStore()}>
-                        {children}
-                    </Provider>
-                ),
+//                 Provider: ({ children }) => (
+//                     <Provider store={Controller.getStore()}>
+//                         {children}
+//                     </Provider>
+//                 ),
 
-                start: (container: Element) => start(container)
-                    .then(() => new Promise(r => {
-                        socket.onopen!(null as any);
+//                 start: (container: Element) => start(container)
+//                     .then(() => new Promise(r => {
+//                         socket.onopen!(null as any);
 
-                        const interval = setInterval(() => {
-                            if (isInBattle) {
-                                clearInterval(interval);
-                                r();
-                            }
-                        }, 50);
-                    }))
-                    .then((): FakeBattleApiRunner => {
+//                         const interval = setInterval(() => {
+//                             if (isInBattle) {
+//                                 clearInterval(interval);
+//                                 r();
+//                             }
+//                         }, 50);
+//                     }))
+//                     .then((): FakeBattleApiRunner => {
 
-                        let timeout: NodeJS.Timeout;
+//                         let timeout: NodeJS.Timeout;
 
-                        return {
-                            startCycleLoop() {
+//                         return {
+//                             startCycleLoop() {
 
-                                const { launchTime } = serviceBattleData('cycle');
-                                const delta = Date.now() - launchTime;
+//                                 const { launchTime } = serviceBattleData('cycle');
+//                                 const delta = Date.now() - launchTime;
 
-                                const { characters } = serviceBattleData('future');
+//                                 const { characters } = serviceBattleData('future');
 
-                                let timeToWait = GLOBALTURN_DELAY;
-                                characters.forEach(c => {
-                                    timeToWait += c.staticData.initialFeatures.actionTime + TURN_DELAY
-                                });
+//                                 let timeToWait = GLOBALTURN_DELAY;
+//                                 characters.forEach(c => {
+//                                     timeToWait += c.staticData.initialFeatures.actionTime + TURN_DELAY
+//                                 });
 
-                                const turnIncrement = characters.length;
-                                let gtid = 1;
-                                let turnid = 1;
+//                                 const turnIncrement = characters.length;
+//                                 let gtid = 1;
+//                                 let turnid = 1;
 
-                                const newGlobalTurn = () => {
+//                                 const newGlobalTurn = () => {
 
-                                    gtid++;
-                                    turnid += turnIncrement;
-                                    receiveAction<BRunGlobalTurnStartSAction>({
-                                        type: 'battle-run/global-turn-start',
-                                        sendTime: Date.now(),
-                                        globalTurnState: getGlobalState(gtid, turnid)
-                                    });
+//                                     gtid++;
+//                                     turnid += turnIncrement;
+//                                     receiveAction<BRunGlobalTurnStartSAction>({
+//                                         type: 'battle-run/global-turn-start',
+//                                         sendTime: Date.now(),
+//                                         globalTurnState: getGlobalState(gtid, turnid)
+//                                     });
 
-                                    timeout = setTimeout(newGlobalTurn, timeToWait);
-                                };
+//                                     timeout = setTimeout(newGlobalTurn, timeToWait);
+//                                 };
 
-                                timeout = setTimeout(newGlobalTurn, timeToWait - delta);
+//                                 timeout = setTimeout(newGlobalTurn, timeToWait - delta);
 
-                            },
+//                             },
 
-                            stopCycleLoop() {
-                                clearTimeout(timeout);
-                            },
+//                             stopCycleLoop() {
+//                                 clearTimeout(timeout);
+//                             },
 
-                            rollback() {
+//                             rollback() {
 
-                                const { battleHash } = serviceBattleData('current');
+//                                 const { battleHash } = serviceBattleData('current');
 
-                                receiveAction<ConfirmSAction>({
-                                    type: 'confirm',
-                                    sendTime: Date.now(),
-                                    isOk: false,
-                                    lastCorrectHash: battleHash
-                                });
-                            },
+//                                 receiveAction<ConfirmSAction>({
+//                                     type: 'confirm',
+//                                     sendTime: Date.now(),
+//                                     isOk: false,
+//                                     lastCorrectHash: battleHash
+//                                 });
+//                             },
 
-                            notify() {
+//                             notify() {
 
-                                const { globalTurn } = serviceBattleData('cycle');
-                                assertIsDefined(globalTurn);
+//                                 const { globalTurn } = serviceBattleData('cycle');
+//                                 assertIsDefined(globalTurn);
 
-                                const character = globalTurn.currentTurn.character;
-                                const { defaultSpell, position } = character;
+//                                 const character = globalTurn.currentTurn.character;
+//                                 const { defaultSpell, position } = character;
 
-                                const nextPosition: Position = {
-                                    x: position.x + 1,
-                                    y: position.y
-                                };
+//                                 const nextPosition: Position = {
+//                                     x: position.x + 1,
+//                                     y: position.y
+//                                 };
 
-                                receiveAction<NotifySAction>({
-                                    type: 'notify',
-                                    sendTime: Date.now(),
-                                    spellActionSnapshot: seedSpellActionSnapshot(defaultSpell.id, {
-                                        startTime: Date.now(),
-                                        battleHash: Date.now() + '',
-                                        characterId: character.id,
-                                        duration: defaultSpell.feature.duration,
-                                        position: nextPosition,
-                                        actionArea: [ nextPosition ],
-                                    })
-                                });
-                            }
-                        };
-                    })
-            }
-        },
-    };
-};
+//                                 receiveAction<NotifySAction>({
+//                                     type: 'notify',
+//                                     sendTime: Date.now(),
+//                                     spellActionSnapshot: seedSpellActionSnapshot(defaultSpell.id, {
+//                                         startTime: Date.now(),
+//                                         battleHash: Date.now() + '',
+//                                         characterId: character.id,
+//                                         duration: defaultSpell.feature.duration,
+//                                         position: nextPosition,
+//                                         actionArea: [ nextPosition ],
+//                                     })
+//                                 });
+//                             }
+//                         };
+//                     })
+//             }
+//         },
+//     };
+// };

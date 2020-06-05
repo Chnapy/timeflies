@@ -31,9 +31,6 @@ export const characterAlterLife = ({ features }: Character<BattleDataPeriod>, va
 
 export const characterIsAlive = (character: Character<BattleDataPeriod>) => character.features.life > 0;
 
-// TODO
-// export const characterIsMine = 
-
 export const Character = <P extends BattleDataPeriod>(period: P, {
     id, staticData, orientation, position, features, playerId
 }: CharacterSnapshot): Character<P> => {

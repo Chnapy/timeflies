@@ -1,8 +1,12 @@
-import { CharacterType, Orientation, assertIsDefined } from '@timeflies/shared';
+import { assertIsDefined, CharacterType, Orientation } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
+import { shallowEqual } from 'react-redux';
+import { CanvasContext } from '../../../../../canvas/CanvasContext';
+import { BattleDataPeriod } from '../../../snapshot/battle-data';
+import { getBattleData } from '../../../snapshot/snapshot-reducer';
 
 export interface CharacterSpriteProps {
-    readonly characterType: CharacterType;
+    characterType: CharacterType;
     characterState: CharacterSpriteState;
     orientation: Orientation;
 }
@@ -34,27 +38,31 @@ const getTextures = (
 
 export const CharacterSprite = class extends PIXI.AnimatedSprite {
 
-    private readonly spritesheet: PIXI.Spritesheet;
-    private readonly props: CharacterSpriteProps;
+    constructor(characterId: string, period: BattleDataPeriod) {
+        super([ PIXI.Texture.EMPTY ]);
 
-    constructor(spritesheet: PIXI.Spritesheet, initialProps: CharacterSpriteProps) {
-        super(getTextures(spritesheet, initialProps));
-        this.spritesheet = spritesheet;
-        this.props = { ...initialProps };
-    }
+        const { storeEmitter, spritesheets } = CanvasContext.consumer('storeEmitter', 'spritesheets');
 
-    setProps(props: Partial<CharacterSpriteMutableProps>): this {
-        if (props.characterState) {
-            this.props.characterState = props.characterState;
-        }
-        if (props.orientation) {
-            this.props.orientation = props.orientation;
-        }
-        this.textures = this.getTextures();
-        return this;
-    }
+        storeEmitter.onStateChange(
+            state => {
+                const { staticData, orientation } = getBattleData(state.battle.snapshotState, period).characters.find(c => c.id === characterId)!;
 
-    private getTextures(): PIXI.Texture[] {
-        return getTextures(this.spritesheet, this.props);
+                const spriteState: CharacterSpriteState = 'idle';   // TODO
+
+                return {
+                    type: staticData.type,
+                    orientation,
+                    spriteState
+                };
+            },
+            ({ type, orientation, spriteState }) => {
+                this.textures = getTextures(spritesheets.characters, {
+                    characterType: type,
+                    characterState: spriteState,
+                    orientation
+                });
+            },
+            shallowEqual
+        );
     }
 };

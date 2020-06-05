@@ -38,16 +38,10 @@ const initialState: BattleActionState = {
 
 export const ACCEPTABLE_TILES: number[] = [ 0 ];
 
-export const getArea = (tiledSchema: TiledMap, center: Position, r: number) => TiledManager({
-    schema: tiledSchema
-} as any).getArea(center, r);
-
-const getTileType = (tiledSchema: TiledMap, p: Position) => TiledManager({
-    schema: tiledSchema
-} as any).getTileType(p);
-
 const calculateGrid = (tiledSchema: TiledMap, charactersPositionList: Position[]): Pick<BattleActionState, 'easyStarGrid' | 'grid'> => {
     const { width, height } = tiledSchema;
+
+    const tiledManager = TiledManager(tiledSchema);
 
     const getTileID = (p: Position, tileType: TileType): number => {
         const obstacle = tileType === 'obstacle'
@@ -67,7 +61,7 @@ const calculateGrid = (tiledSchema: TiledMap, charactersPositionList: Position[]
         easyStarGrid[ y ] = [];
         for (let x = 0; x < width; x++) {
             const p: Position = { x, y };
-            const tileType = getTileType(tiledSchema, p);
+            const tileType = tiledManager.getTileType(p);
 
             grid.push({
                 position: p,

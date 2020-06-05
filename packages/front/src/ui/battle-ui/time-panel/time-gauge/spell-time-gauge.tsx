@@ -10,27 +10,31 @@ export type SpellTimeGaugeProps = {
 
 export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spellActionStartTime }) => {
 
-    const turnStartTime = useGameStep('battle', ({ cycle }) =>
-        cycle.globalTurn?.currentTurn.startTime ?? 0);
+    const turnStartTime = useGameStep('battle', ({ cycleState }) =>
+        cycleState.turnStartTime);
 
-    const turnDuration = useGameStep('battle', ({ cycle }) =>
-        cycle.globalTurn?.currentTurn.turnDuration ?? 0);
+    const turnDuration = useGameStep('battle', ({ cycleState }) =>
+        cycleState.turnDuration);
 
-    const { spellId, startTimeFromTurnStart, duration, finished } = useGameStep('battle', ({ future }) => {
+    const { startTimeFromTurnStart, duration, finished } = useGameStep('battle', ({ spellActionState }) => {
+        const { spellActionSnapshotList } = spellActionState;
 
-        const spellAction = future.spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime);
+        const spellAction = spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime);
         assertIsDefined(spellAction);
 
         return {
-            spellId: spellAction.spellId,
             startTimeFromTurnStart: spellAction.startTime - turnStartTime,
             duration: spellAction.duration,
             finished: spellAction.startTime + spellAction.duration < Date.now(),
         };
     }, (a, b) => (a.startTimeFromTurnStart === b.startTimeFromTurnStart) && (a.finished === b.finished));
 
-    const spellIndex = useGameStep('battle', ({ cycle }) =>
-        cycle.globalTurn?.currentTurn.character.spells.find(s => s.id === spellId)?.index ?? 0);
+    const spellIndex = useGameStep('battle', ({ cycleState, snapshotState }) => {
+        const { currentCharacterId } = cycleState;
+        const { index } = snapshotState.battleDataCurrent.spells.find(s => s.characterId === currentCharacterId)!;
+
+        return index;
+    });
 
     const paddingLeft = 2;
 

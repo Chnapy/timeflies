@@ -15,9 +15,7 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
         interaction: renderer.plugins.interaction
     });
 
-    const initViewport = ({ width, height, tilewidth, tileheight }: TiledMapGraphic) => {
-        viewport.worldWidth = tilewidth * width;
-        viewport.worldHeight = tileheight * height;
+    const initViewport = ({ getMapsize, getTilesize }: TiledMapGraphic) => {
         viewport
             .clamp({ direction: 'all' })
             .clampZoom({
@@ -36,6 +34,25 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
         viewport.on('drag-start', () => isDragging = true);
         viewport.on('drag-end', () => isDragging = false);
         viewport.on('moved', () => isDragging && requestRender());
+
+        const { storeEmitter } = CanvasContext.consumer('storeEmitter');
+
+        storeEmitter.onStateChange(
+            state => state.battle.battleActionState.tiledSchema,
+            schema => {
+                if (!schema) {
+                    viewport.worldWidth = 0;
+                    viewport.worldHeight = 0;
+                    return;
+                }
+
+                const { width, height } = getMapsize(schema);
+                const { tilewidth, tileheight } = getTilesize(schema);
+
+                viewport.worldWidth = tilewidth * width;
+                viewport.worldHeight = tileheight * height;
+            }
+        );
     };
 
     const tiledMapGraphic = TiledMapGraphic();

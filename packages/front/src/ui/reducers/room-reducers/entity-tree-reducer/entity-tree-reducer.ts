@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { PlayerRoom, RoomServerAction, TeamRoom, assertIsDefined } from '@timeflies/shared';
+import { assertIsDefined, PlayerRoom, RoomServerAction, TeamRoom } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
-import { StageChangeAction, stageChangeActionPayloadMatch } from '../../../../stages/stage-actions';
+import { RoomStartAction } from '../room-actions';
 
 export interface EntityTreeData {
     teamList: TeamRoom[];
@@ -16,15 +16,13 @@ const initialState: EntityTreeData = {
 type SubReducer<A> = (state: EntityTreeData, action: A) => EntityTreeData | void;
 
 export const entityTreeReducer = createReducer(initialState, {
-    [ StageChangeAction.type ]: (state, { payload }: StageChangeAction) => {
-        if (stageChangeActionPayloadMatch('room', payload)) {
-            const { roomState: { playerList, teamList } } = payload.data;
+    [ RoomStartAction.type ]: (state, { payload }: RoomStartAction) => {
+        const { playerList, teamList } = payload.roomState;
 
-            return {
-                playerList,
-                teamList
-            };
-        }
+        return {
+            playerList,
+            teamList
+        };
     },
     [ ReceiveMessageAction.type ]: (state, { payload }: ReceiveMessageAction) => {
 
@@ -74,7 +72,7 @@ const reducerCharacterSet: SubReducer<RoomServerAction.CharacterSet> = (state, m
     const player = state.playerList.find(p => p.id === message.playerId);
     assertIsDefined(player);
 
-    if(message.action === 'add') {
+    if (message.action === 'add') {
         player.characters.push(message.character);
     } else {
         player.characters = player.characters.filter(c => c.id !== message.characterId)

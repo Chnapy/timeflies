@@ -31,7 +31,11 @@ export const CanvasContext = {
 
         const ret = fn();
 
-        contextsBuffer.delete(id);
+        if (ret instanceof Promise) {
+            ret.then(() => contextsBuffer.delete(id));
+        } else {
+            contextsBuffer.delete(id);
+        };
 
         return ret;
     },
