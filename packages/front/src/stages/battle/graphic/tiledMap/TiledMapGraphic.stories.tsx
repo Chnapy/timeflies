@@ -1,73 +1,85 @@
-import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
-import React from 'react';
 import { createAssetLoader } from '../../../../assetManager/AssetLoader';
-import { CanvasContext } from '../../../../canvas/CanvasContext';
-import { serviceDispatch } from '../../../../services/serviceDispatch';
-import { SpellEngineBindAction } from '../../engine/engine-actions';
-import { Spell } from '../../entities/spell/Spell';
-import { seedSpell } from '../../entities/spell/Spell.seed';
-import { TiledMapGraphic } from './TiledMapGraphic';
-import { StoryProps } from '../../../../../.storybook/preview';
 import { AssetManager } from '../../../../assetManager/AssetManager';
+import { GameState } from '../../../../game-state';
+import { createStoreManager } from '../../../../store-manager';
+import { battleReducer } from '../../../../ui/reducers/battle-reducers/battle-reducer';
+import { CreatePixiFn, createView } from '../../../../view';
+import { BattleStartAction } from '../../battle-actions';
+import { TiledMapGraphic } from './TiledMapGraphic';
 
 export default {
     title: 'graphic/TiledMapGraphic'
 };
 
-export const Default = ({ fakeBattleApi: fakeApi }: StoryProps) => {
+export const Default = () => {
 
-    fakeApi.init({});
+    const initialState: GameState = {
+        currentPlayer: {
+            id: 'p1',
+            name: ''
+        },
+        step: 'battle',
+        room: null,
+        battle: battleReducer(undefined, { type: '' })
+    };
 
-    const onMount = async (parent: HTMLElement) => {
-        const view = parent.firstElementChild as HTMLCanvasElement;
-        const app = new PIXI.Application({ view, resizeTo: parent });
+    const assetLoader = createAssetLoader();
 
-        const loader = createAssetLoader();
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
 
-        const { map } = await loader.newInstance()
+    const createPixi: CreatePixiFn = async ({ canvas, parent }) => {
+        const app = new PIXI.Application({
+            view: canvas,
+            resizeTo: parent
+        });
+
+        const { map } = await assetLoader.newInstance()
             .add('map', AssetManager.fake.mapSchema)
             .load();
 
-        const tiledManager = TiledManager(map);
+        const tiledMap = TiledMapGraphic();
 
-        CanvasContext.provider({
-            mapManager: {
-                tiledManager
-            } as any
-        }, TiledMapGraphic);
-
-        const tiledMap = CanvasContext.provider({
-            mapManager: {
-                tiledManager
-            } as any
-        }, TiledMapGraphic);
-        app.stage.addChild(tiledMap.container);
-
-        const { dispatchBindAction } = serviceDispatch({
-            dispatchBindAction: (spell: Spell<'future'>) => SpellEngineBindAction({
-                spell,
-                onTileHover: async () => {
-                    return undefined;
-                },
-                onTileClick: async () => true,
-                rangeArea: []
-            })
-        });
-
-        dispatchBindAction(seedSpell('fake', {
-            period: 'future', id: '', type: 'move', character: null as any
+        storeManager.dispatch(BattleStartAction({
+            tiledMapAssets: {
+                schema: map.schema,
+                imagesUrls: map.images
+            },
+            globalTurnSnapshot: {
+                id: 1,
+                order: [],
+                startTime: Date.now(),
+                currentTurn: {
+                    id: 1,
+                    characterId: '1',
+                    duration: 0,
+                    startTime: Date.now()
+                }
+            },
+            entitiesSnapshot: {
+                battleHash: '',
+                charactersSnapshots: [],
+                launchTime: Date.now(),
+                playersSnapshots: [],
+                spellsSnapshots: [],
+                teamsSnapshots: [],
+                time: Date.now()
+            }
         }));
+
+        app.stage.addChild(tiledMap.container);
     };
 
-    return <div ref={el => el && onMount(el)} style={{
-        overflow: 'hidden',
-        position: 'absolute',
-        top: 8,
-        bottom: 8,
-        left: 0,
-        right: 0
-    }}>
-        <canvas />
-    </div>;
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi,
+        gameUIChildren: null
+    });
+
+    return view;
 };

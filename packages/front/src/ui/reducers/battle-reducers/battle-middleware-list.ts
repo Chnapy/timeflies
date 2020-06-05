@@ -18,13 +18,13 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
         extractState: getState => getState().battle.battleActionState,
         extractFutureCharacter,
         extractFutureSpell: getState => {
-            const character = extractFutureCharacter(getState);
+            const { snapshotState, spellActionState } = getState().battle;
 
-            const state = getState().battle;
+            const { currentSpellAction } = spellActionState;
 
-            const { currentSpellAction } = state.spellActionState;
+            const { spells } = snapshotState.battleDataFuture;
 
-            return character?.spells.find(s => s.id === currentSpellAction?.spellId);
+            return spells.find(s => s.id === currentSpellAction?.spellId);
         }
     }),
     cycleMiddleware<GameState>({
@@ -38,6 +38,7 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
         extractState: getState => getState().battle.spellActionState,
         extractCurrentHash: getState => getState().battle.snapshotState.battleDataCurrent.battleHash,
         extractFutureHash: getState => getState().battle.snapshotState.battleDataFuture.battleHash,
-        extractFutureCharacters: getState => getState().battle.snapshotState.battleDataFuture.characters
+        extractFutureCharacters: getState => getState().battle.snapshotState.battleDataFuture.characters,
+        extractFutureSpells: getState => getState().battle.snapshotState.battleDataFuture.spells
     })
 ];

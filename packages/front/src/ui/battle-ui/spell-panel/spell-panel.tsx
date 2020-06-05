@@ -1,6 +1,5 @@
-import { Paper, Box } from '@material-ui/core';
+import { Box, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { assertIsDefined } from '@timeflies/shared';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { SpellButton } from './spell-button/spell-button';
@@ -17,21 +16,24 @@ export const SpellPanel: React.FC = () => {
     const classes = useStyles();
 
     const { spellIdList } = useGameStep('battle',
-        ({ cycle }) => {
+        ({ cycleState, snapshotState }) => {
 
-            if (!cycle.globalTurn) {
-                return {
-                    characterId: null,
-                    spellIdList: [] as string[]
-                };
-            }
+            // if (!cycle.globalTurn) {
+            //     return {
+            //         characterId: null,
+            //         spellIdList: [] as string[]
+            //     };
+            // }
 
-            assertIsDefined(cycle.globalTurn);
-            const { character } = cycle.globalTurn.currentTurn;
+            const { currentCharacterId } = cycleState;
+
+            const spellIdList = snapshotState.battleDataCurrent.spells
+                .filter(s => s.characterId === currentCharacterId)
+                .map(s => s.id);
 
             return {
-                characterId: character.id,
-                spellIdList: character.spells.map(s => s.id)
+                characterId: currentCharacterId,
+                spellIdList
             };
         },
         (a, b) => a.characterId === b.characterId

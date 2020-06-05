@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
-import { stageChangeActionPayloadMatch } from '../../../stages/stage-actions';
 import { EntityTreeData, entityTreeReducer } from './entity-tree-reducer/entity-tree-reducer';
 import { MapSelectData, mapSelectReducer } from './map-select-reducer/map-select-reducer';
+import { RoomStartAction } from './room-actions';
 
 
 export interface RoomData {
@@ -15,20 +15,15 @@ export const RoomReducer: Reducer<RoomData | null> = (state = null, action) => {
 
     switch (action.type) {
 
-        case 'stage/change':
-            const { payload } = action;
-            if (stageChangeActionPayloadMatch('room', payload)) {
-                const { roomState } = payload.data;
+        case RoomStartAction.type:
+            const { roomState } = (action as RoomStartAction).payload;
 
-                return {
-                    roomId: roomState.roomId,
-                    map: mapSelectReducer(undefined, action),
-                    teamsTree: entityTreeReducer(undefined, action),
-                    launchTime: null
-                };
-            }
-
-            break;
+            return {
+                roomId: roomState.roomId,
+                map: mapSelectReducer(undefined, action),
+                teamsTree: entityTreeReducer(undefined, action),
+                launchTime: null
+            };
 
         case 'message/receive':
             const message = action.payload;

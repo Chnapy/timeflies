@@ -15,13 +15,11 @@ export const CharacterHud = (
     characterId: string
 ) => {
 
-    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters.find(c => c.id === characterId)!;
+    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters.find(c => c.id === characterId);
 
     const container = new PIXI.Container();
 
     const { tiledMapGraphic: { getTilesize }, storeEmitter } = CanvasContext.consumer('tiledMapGraphic', 'storeEmitter');
-
-    const { tilewidth, tileheight } = getTilesize();
 
     const { palette } = appTheme;
 
@@ -49,7 +47,6 @@ export const CharacterHud = (
     gauge.setGeo({
         x: 22,
         y: -12,
-        width: tilewidth - 22,
         height: 6
     });
 
@@ -63,23 +60,52 @@ export const CharacterHud = (
 
     storeEmitter.onStateChange(
         state => {
-            const { playerId } = selectCharacter(state);
-            const { teamId } = state.battle.snapshotState.battleDataCurrent.players.find(p => p.id === playerId)!;
-            return state.battle.snapshotState.battleDataCurrent.teams.find(t => t.id === teamId)!.letter;
+            const tiledSchema = state.battle.battleActionState.tiledSchema;
+
+            const playerId = selectCharacter(state)?.playerId;
+            if (!tiledSchema || !playerId) {
+                return null;
+            }
+
+            const { battleDataCurrent } = state.battle.snapshotState;
+            const { teamId } = battleDataCurrent.players.find(p => p.id === playerId)!;
+            const { letter } = battleDataCurrent.teams.find(t => t.id === teamId)!;
+
+            return { letter, tiledSchema };
         },
-        letter => {
+        letterAndSchema => {
             teamIndicatorContainer.removeChildren();
+
+            if (!letterAndSchema) {
+                return;
+            }
+
+            const { letter, tiledSchema } = letterAndSchema;
+
+            const { tilewidth, tileheight } = getTilesize(tiledSchema);
+            gauge.setGeo({
+                width: tilewidth - 22,
+            });
 
             const teamIndicator = TeamIndicatorGraphic(letter);
             teamIndicator.container.y = tileheight - teamIndicator.size;
 
             teamIndicatorContainer.addChild(teamIndicator.container);
-        }
+        },
+        shallowEqual
     );
 
     storeEmitter.onStateChange(
         state => {
-            const { staticData, features } = selectCharacter(state);
+            const character = selectCharacter(state);
+            if (!character) {
+                return {
+                    totalLife: 0,
+                    life: 0
+                };
+            }
+
+            const { staticData, features } = character;
             return {
                 totalLife: staticData.initialFeatures.life,
                 life: features.life

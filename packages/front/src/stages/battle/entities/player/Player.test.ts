@@ -1,14 +1,6 @@
-import { StoreTest } from '../../../../StoreTest';
+import { } from './Player';
 
 describe('# Player', () => {
-
-    beforeEach(() => {
-        StoreTest.beforeTest();
-    });
-
-    afterEach(() => {
-        StoreTest.afterTest();
-    });
 
     it.todo('should return correct snapshot');
 

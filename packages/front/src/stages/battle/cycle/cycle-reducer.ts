@@ -1,6 +1,9 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { BattleStartAction } from '../battle-actions';
+import { BattleDataPeriod } from '../snapshot/battle-data';
+import { switchUtil } from '@timeflies/shared';
+import { BattleState } from '../../../ui/reducers/battle-reducers/battle-reducer';
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
@@ -34,8 +37,33 @@ export const getTurnState = ({ turnStartTime, turnDuration }: Pick<CycleState, '
     if (now < turnStartTime + turnDuration) {
         return 'running';
     }
-    
+
     return 'ended';
+};
+
+export const getTurnRemainingTime = (battle: BattleState, period: BattleDataPeriod) => {
+    const { turnStartTime, turnDuration } = battle.cycleState;
+    const endTime = turnStartTime + turnDuration;
+
+    return switchUtil(period, {
+        current: (): number => Math.max(endTime - Date.now(), 0),
+
+        future: (): number => {
+            const { spellActionSnapshotList } = battle.spellActionState;
+
+            const lastSnapshot = spellActionSnapshotList[ spellActionSnapshotList.length - 1 ];
+
+            const currentRemainingTime = getTurnRemainingTime(battle, 'current');
+
+            if (!lastSnapshot) {
+                return currentRemainingTime;
+            }
+
+            const futureRemainingTime = endTime - lastSnapshot.startTime - lastSnapshot.duration;
+
+            return Math.min(futureRemainingTime, currentRemainingTime);
+        }
+    })();
 };
 
 export const cycleReducer = createReducer(initialState, {

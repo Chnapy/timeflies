@@ -1,5 +1,5 @@
 import { RoomServerAction } from '@timeflies/shared';
-import { StageChangeAction } from '../stage-actions';
+import { RoomStartAction } from '../../ui/reducers/room-reducers/room-actions';
 
 export type BootStageParam = StageParam<'boot', {}>;
 
@@ -14,11 +14,8 @@ export const BootStage: StageCreator<'boot', never> = () => {
             const { onMessageAction } = serviceEvent();
 
             const { dispatchStageChangeToRoom } = serviceDispatch({
-                dispatchStageChangeToRoom: (roomState: RoomServerAction.RoomState): StageChangeAction<'room'> => StageChangeAction({
-                    stageKey: 'room',
-                    data: {
-                        roomState
-                    }
+                dispatchStageChangeToRoom: (roomState: RoomServerAction.RoomState) => RoomStartAction({
+                    roomState
                 })
             });
 

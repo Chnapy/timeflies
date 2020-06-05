@@ -1,15 +1,6 @@
-import { StoreTest } from '../StoreTest';
 import { CanvasContext } from './CanvasContext';
 
 describe('# CanvasContext', () => {
-
-    beforeEach(() => {
-        StoreTest.beforeTest();
-    });
-
-    afterEach(() => {
-        StoreTest.afterTest();
-    });
 
     it('should throw error on consumer use out of provider', () => {
 

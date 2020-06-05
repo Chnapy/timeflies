@@ -5,6 +5,7 @@ import { TimeGauge } from './time-gauge/time-gauge';
 import { UIIcon } from '../spell-panel/spell-button/ui-icon';
 import { UIText, formatMsToSeconds } from '../spell-panel/spell-button/ui-text';
 import { useGameStep } from '../../hooks/useGameStep';
+import { getTurnRemainingTime } from '../../../stages/battle/cycle/cycle-reducer';
 
 const useStyles = makeStyles(({ spacing }) => ({
     root: {
@@ -21,7 +22,7 @@ export const TimePanel: React.FC = () => {
     const classes = useStyles();
 
     const getRemainingTime = useGameStep('battle',
-        ({ cycle }) => () => cycle.globalTurn?.currentTurn.getRemainingTime('current') ?? 0,
+        battle => () => getTurnRemainingTime(battle, 'current'),
         () => true);
 
     const remainingTimeSpan = React.useRef<HTMLSpanElement>(null);

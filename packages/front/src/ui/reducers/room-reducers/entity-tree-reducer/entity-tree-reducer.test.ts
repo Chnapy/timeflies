@@ -1,7 +1,7 @@
 import { RoomServerAction } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
+import { RoomStartAction } from '../room-actions';
 import { EntityTreeData, entityTreeReducer } from './entity-tree-reducer';
-import { StageChangeAction } from '../../../../stages/stage-actions';
 
 describe('# entity-tree-reducer', () => {
 
@@ -53,28 +53,25 @@ describe('# entity-tree-reducer', () => {
 
     it('should init state on stage change action', () => {
 
-        const action: StageChangeAction<'room'> = StageChangeAction({
-            stageKey: 'room',
-            data: {
-                roomState: {
-                    type: 'room/state',
-                    sendTime: -1,
-                    roomId: '',
-                    mapSelected: null,
-                    playerList: [ {
-                        id: 'p1',
-                        name: 'p1',
-                        isAdmin: true,
-                        isLoading: false,
-                        isReady: false,
-                        characters: []
-                    } ],
-                    teamList: [ {
-                        id: 't1',
-                        letter: 'A',
-                        playersIds: [ 'p1' ]
-                    } ]
-                }
+        const action = RoomStartAction({
+            roomState: {
+                type: 'room/state',
+                sendTime: -1,
+                roomId: '',
+                mapSelected: null,
+                playerList: [ {
+                    id: 'p1',
+                    name: 'p1',
+                    isAdmin: true,
+                    isLoading: false,
+                    isReady: false,
+                    characters: []
+                } ],
+                teamList: [ {
+                    id: 't1',
+                    letter: 'A',
+                    playersIds: [ 'p1' ]
+                } ]
             }
         });
 

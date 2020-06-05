@@ -9,13 +9,16 @@ import { SpellActionTimerEndAction, SpellActionTimerStartAction } from '../../..
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
+import { StoreEmitter } from '../../../../../store-manager';
+import { shallowEqual } from 'react-redux';
 
 
 export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
 
-interface PeriodFn<P extends BattleDataPeriod> {
+interface PeriodFn {
     (
-        character: Character<P>,
+        characterId: string,
+        storeEmitter: StoreEmitter,
         tiledMapGraphic: TiledMapGraphic,
         charactersSheet: PIXI.Spritesheet
     ): {
@@ -37,36 +40,52 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
 
     const container = new PIXI.Container();
 
-    const periodFn: PeriodFn<any> = period === 'current'
+    const periodFn: PeriodFn = period === 'current'
         ? periodCurrent
         : periodFuture;
 
+    const { sprite, hud } = periodFn(
+        characterId,
+        storeEmitter,
+        tiledMapGraphic,
+        charactersSheet
+    );
+    sprite.interactiveChildren = false;
+
+    container.addChild(sprite);
+
+    if (hud) {
+        container.addChild(hud.container);
+    }
+
     storeEmitter.onStateChange(
-        state => getBattleData(state.battle.snapshotState, period).characters.find(c => c.id === characterId)!,
-        character => {
-            container.removeChildren().forEach(c => c.destroy());
+        state => {
+            const { tiledSchema } = state.battle.battleActionState;
+            const { position } = getBattleData(state.battle.snapshotState, period).characters.find(c => c.id === characterId)!;
 
-            const { tilewidth, tileheight } = tiledMapGraphic.getTilesize();
+            return {
+                tiledSchema,
+                position
+            };
+        },
+        ({ tiledSchema, position }) => {
+            if(!tiledSchema) {
+                return;
+            }
 
-            const { sprite, hud } = periodFn(
-                character,
-                tiledMapGraphic,
-                charactersSheet
-            );
-            sprite.interactiveChildren = false;
+            const { tilewidth, tileheight } = tiledMapGraphic.getTilesize(tiledSchema);
             sprite.width = tilewidth;
             sprite.height = tileheight;
 
-            container.addChild(sprite);
-            const worldPos = tiledMapGraphic.getWorldFromTile(character.position);
+            const worldPos = tiledMapGraphic.getWorldFromTile(tiledSchema, position);
             sprite.position.set(worldPos.x, worldPos.y);
 
             if (hud) {
-                container.addChild(hud.container);
                 hud.container.position.set(worldPos.x, worldPos.y);
             }
-        }
-    )
+        },
+        shallowEqual
+    );
 
 
     return {
@@ -75,69 +94,63 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
     };
 };
 
-const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesheet) => {
+const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => {
 
-    const { staticData } = character;
-
-    const animatedSprite = new CharacterSprite(spritesheet, {
-        characterType: staticData.type,
-        characterState: 'idle',
-        orientation: character.orientation
-    });
+    const animatedSprite = new CharacterSprite(characterId, 'current');
     animatedSprite.animationSpeed = 0.4;
 
-    const hud = CharacterHud(character);
+    const hud = CharacterHud(characterId);
 
     const setPosition = (x: number, y: number) => {
         animatedSprite.position.set(x, y);
         hud.container.position.set(x, y);
     };
 
-    let previousState: GeoState = {
-        position: character.position,
-        orientation: character.orientation
-    };
+    // let previousState: GeoState = {
+    //     position: character.position,
+    //     orientation: character.orientation
+    // };
 
     let ticker: PIXI.Ticker;
 
-    const onMoveAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
+    // const onMoveAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
 
-        const orientation = getOrientationFromTo(character.position, endPosition);
+    // const orientation = getOrientationFromTo(character.position, endPosition);
 
-        animatedSprite
-            .setProps({
-                characterState: 'walk',
-                orientation
-            })
-            .play();
+    // animatedSprite
+    //     .setProps({
+    //         characterState: 'walk',
+    //         orientation
+    //     })
+    //     .play();
 
-        const startWorldPos: Position = tiledMapGraphic.getWorldFromTile(previousState.position);
-        const endWorldPos: Position = tiledMapGraphic.getWorldFromTile(endPosition);
-        const diffWorldPos: Position = {
-            x: endWorldPos.x - startWorldPos.x,
-            y: endWorldPos.y - startWorldPos.y,
-        };
+    // const startWorldPos: Position = tiledMapGraphic.getWorldFromTile(previousState.position);
+    // const endWorldPos: Position = tiledMapGraphic.getWorldFromTile(endPosition);
+    // const diffWorldPos: Position = {
+    //     x: endWorldPos.x - startWorldPos.x,
+    //     y: endWorldPos.y - startWorldPos.y,
+    // };
 
-        let now, ratio;
-        ticker.add(() => {
-            now = Date.now();
+    // let now, ratio;
+    // ticker.add(() => {
+    //     now = Date.now();
 
-            ratio = (now - startTime) / duration;
-            const x = startWorldPos.x + ratio * diffWorldPos.x;
-            const y = startWorldPos.y + ratio * diffWorldPos.y;
+    //     ratio = (now - startTime) / duration;
+    //     const x = startWorldPos.x + ratio * diffWorldPos.x;
+    //     const y = startWorldPos.y + ratio * diffWorldPos.y;
 
-            setPosition(x, y);
-        });
+    //     setPosition(x, y);
+    // });
 
-        return {
-            position: endPosition,
-            orientation
-        };
-    };
+    // return {
+    //     position: endPosition,
+    //     orientation
+    // };
+    // };
 
-    const onSimpleAttackAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
-        return previousState;
-    };
+    // const onSimpleAttackAction = ({ startTime, duration, position: endPosition }: SpellActionSnapshot): GeoState => {
+    //     return previousState;
+    // };
 
     // TODO
 
@@ -205,13 +218,28 @@ const periodCurrent: PeriodFn<'current'> = (character, tiledMapGraphic, spritesh
     };
 };
 
-const periodFuture: PeriodFn<'future'> = (character, tiledMapGraphic, spritesheet) => {
+const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet) => {
 
-    const idlePath = getAnimPath(character.staticData.type, 'idle', character.orientation);
-    const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
-
-    const sprite = new PIXI.Sprite(texture);
+    const sprite = new PIXI.Sprite();
     sprite.alpha = 0.25;
+
+    storeEmitter.onStateChange(
+        state => {
+            const { staticData, orientation } = state.battle.snapshotState.battleDataFuture.characters.find(c => c.id === characterId)!;
+
+            return {
+                type: staticData.type,
+                orientation
+            };
+        },
+        ({ type, orientation }) => {
+            const idlePath = getAnimPath(type, 'idle', orientation);
+            const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
+
+            sprite.texture = texture;
+        },
+        shallowEqual
+    );
 
     // TODO
 

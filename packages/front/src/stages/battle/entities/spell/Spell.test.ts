@@ -1,8 +1,6 @@
-import { StoreTest } from '../../../../StoreTest';
+import { } from './Spell';
 
 describe('# Spell', () => {
-
-    beforeEach(() => StoreTest.beforeTest());
 
     it.todo('should return correct snapshot');
 });

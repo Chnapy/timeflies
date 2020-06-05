@@ -1,17 +1,20 @@
-import { TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
-import { StoryProps } from '../../../../../../../.storybook/preview';
 import { createAssetLoader } from '../../../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../../../assetManager/AssetManager';
-import { seedBattleData } from '../../../../../../battle-data.seed';
 import { CanvasContext } from '../../../../../../canvas/CanvasContext';
-import { seedGameState } from '../../../../../../game-state.seed';
+import { GameState } from '../../../../../../game-state';
+import { createStoreManager } from '../../../../../../store-manager';
+import { battleReducer } from '../../../../../../ui/reducers/battle-reducers/battle-reducer';
+import { CreatePixiFn, createView } from '../../../../../../view';
+import { BattleStartAction } from '../../../../battle-actions';
+import { characterToSnapshot } from '../../../../entities/character/Character';
 import { seedCharacter } from '../../../../entities/character/Character.seed';
+import { playerToSnapshot } from '../../../../entities/player/Player';
 import { seedPlayer } from '../../../../entities/player/Player.seed';
+import { teamToSnapshot } from '../../../../entities/team/Team';
 import { seedTeam } from '../../../../entities/team/Team.seed';
-import { MapManager } from '../../../../map/MapManager';
-import { Pathfinder } from '../../../../map/Pathfinder';
+import { BattleDataPeriod } from '../../../../snapshot/battle-data';
 import { TiledMapGraphic } from '../../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud';
 
@@ -20,68 +23,93 @@ export default {
     component: CharacterHud
 };
 
-export const Default: React.FC<StoryProps> = (props) => <InnerDefault {...props} />;
+export const Default: React.FC = () => {
 
-const InnerDefault: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+    const initialState: GameState = {
+        currentPlayer: {
+            id: 'p1',
+            name: ''
+        },
+        step: 'battle',
+        room: null,
+        battle: battleReducer(undefined, { type: '' })
+    };
 
-    const rootRef = React.useRef<any>();
+    const assetLoader = createAssetLoader();
 
-    React.useEffect(() => {
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
 
-        const use = async () => {
+    const createPixi: CreatePixiFn = async ({ canvas, parent }) => {
+        const app = new PIXI.Application({
+            view: canvas,
+            resizeTo: parent,
+            width: 200,
+            height: 200,
+            backgroundColor: 0x888888
+        });
 
-            fakeBattleApi.init({
-                initialState: seedGameState('p1', {
-                    step: 'battle',
-                    battle: seedBattleData()
-                })
-            });
+        const period: BattleDataPeriod = 'current';
 
-            const view = rootRef.current;
+        const team = seedTeam({
+            id: 't1', period
+        });
 
-            const game = new PIXI.Application({ view, width: 200, height: 200, backgroundColor: 0x888888 });
+        const player = seedPlayer({
+            id: 'p1', period, teamId: 't1'
+        });
 
-            const character = seedCharacter('fake', {
-                id: 'c1', period: 'current', player: seedPlayer('fake', {
-                    id: 'p1', period: 'current', team: seedTeam('fake', { id: 't1', letter: 'A', period: 'current', seedPlayers: [] })
-                })
-            });
+        const character = seedCharacter({
+            id: 'c1', period, playerId: 'p1'
+        });
 
-            const loader = createAssetLoader();
+        const { map } = await assetLoader.newInstance()
+            .add('map', AssetManager.fake.mapSchema)
+            .load();
 
-            const resources = await loader.newInstance()
-                .add('map', AssetManager.fake.mapSchema)
-                .load();
+        const tiledMapGraphic = TiledMapGraphic();
 
-            const mapAssets = resources.map;
+        const hud = CanvasContext.provider({ tiledMapGraphic }, () => CharacterHud(character.id));
+        hud.container.y = 30;
+        app.stage.addChild(hud.container);
 
-            const mapManager = MapManager(mapAssets, {
-                getFutureCharacters: () => ([]),
-                pathfinderCreator: Pathfinder,
-                tiledManagerCreator: TiledManager
-            });
+        storeManager.dispatch(BattleStartAction({
+            tiledMapAssets: {
+                schema: map.schema,
+                imagesUrls: map.images
+            },
+            globalTurnSnapshot: {
+                id: 1,
+                order: [],
+                startTime: Date.now(),
+                currentTurn: {
+                    id: 1,
+                    characterId: '1',
+                    duration: 0,
+                    startTime: Date.now()
+                }
+            },
+            entitiesSnapshot: {
+                battleHash: '',
+                charactersSnapshots: [ characterToSnapshot(character) ],
+                launchTime: Date.now(),
+                playersSnapshots: [ playerToSnapshot(player) ],
+                spellsSnapshots: [],
+                teamsSnapshots: [ teamToSnapshot(team) ],
+                time: Date.now()
+            }
+        }));
+    };
 
-            const tiledMapGraphic = CanvasContext.provider({
-                mapManager
-            }, () => TiledMapGraphic());
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi,
+        gameUIChildren: null
+    });
 
-            const { container } = CanvasContext.provider({
-                tiledMapGraphic,
-            }, () => CharacterHud(character));
-
-            const graphic = new PIXI.Graphics();
-            graphic.beginFill(0xDDDDDD);
-            graphic.drawRect(0, 0, tiledMapGraphic.tilewidth, tiledMapGraphic.tileheight);
-            graphic.endFill();
-
-            game.stage.addChild(graphic, container);
-            game.stage.x = 50;
-            game.stage.y = 50;
-        };
-
-        use();
-
-    }, [ fakeBattleApi ]);
-
-    return <canvas ref={rootRef} />;
+    return view;
 };

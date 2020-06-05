@@ -1,7 +1,7 @@
 import { assertIsDefined, equals, Position, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
-import { TiledTileset } from 'tiled-types';
+import TiledMap, { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../canvas/GameCanvas';
 import { graphicTheme } from '../graphic-theme';
@@ -13,11 +13,6 @@ export interface TileHoverFnProps {
     tileGraphicList: TileGraphic[];
     rangeTiles: TileGraphic[];
     duration: number;
-}
-
-export interface TileTriggerFn {
-    onTileHover: (tilePos: Position, tileGraphic: TileGraphic) => void;
-    onTileClick: (tilePos: Position) => void;
 }
 
 export const TiledMapGraphic = () => {
@@ -32,8 +27,8 @@ export const TiledMapGraphic = () => {
 
     const { storeEmitter } = CanvasContext.consumer('storeEmitter');
 
-    const getTilesize = () => {
-        const { tilewidth, tileheight } = storeEmitter.getState().battle.battleActionState.tiledSchema!;
+    const getTilesize = (tiledSchema: TiledMap) => {
+        const { tilewidth, tileheight } = tiledSchema;
 
         return {
             tilewidth,
@@ -41,8 +36,17 @@ export const TiledMapGraphic = () => {
         };
     };
 
-    const getWorldFromTile = ({ x, y }: Position): Position => {
-        const { tilewidth, tileheight } = getTilesize();
+    const getMapsize = (tiledSchema: TiledMap) => {
+        const { width, height } = tiledSchema;
+
+        return {
+            width,
+            height
+        };
+    };
+
+    const getWorldFromTile = (tiledSchema: TiledMap, { x, y }: Position): Position => {
+        const { tilewidth, tileheight } = getTilesize(tiledSchema);
 
         return {
             x: x * tilewidth,
@@ -295,6 +299,7 @@ export const TiledMapGraphic = () => {
     return {
         container,
         containerOver,
+        getMapsize,
         getTilesize,
         getWorldFromTile
     };

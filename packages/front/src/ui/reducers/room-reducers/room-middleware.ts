@@ -1,14 +1,19 @@
 import { assertIsDefined, assertIsNonNullable, MapConfig } from '@timeflies/shared';
 import { Action, Middleware } from 'redux';
+import { AssetLoader } from '../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../assetManager/AssetManager';
-import { Controller } from '../../../Controller';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
-import { StageChangeAction } from '../../../stages/stage-actions';
-import { MapLoadedAction } from './map-select-reducer/map-select-actions';
 import { BattleStartAction } from '../../../stages/battle/battle-actions';
+import { MapLoadedAction } from './map-select-reducer/map-select-actions';
 
-export const roomMiddleware: Middleware<{}, GameState> = api => next => {
+type Dependencies = {
+    assetLoader: AssetLoader;
+};
+
+export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> = ({
+    assetLoader
+}) => api => next => {
 
     return (action: Action) => {
 
@@ -29,16 +34,9 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                 const mapConfig = mapList.find(m => m.id === mapSelected.id);
                 assertIsDefined(mapConfig);
 
-                const { schema, images } = Controller.loader.get('map')!;
+                const { schema, images } = assetLoader.get('map')!;
 
-
-                // TODO make it single action, or batch them
-                next(StageChangeAction({
-                    stageKey: 'battle',
-                    data: {}
-                }));
-
-                api.dispatch(BattleStartAction({
+                next(BattleStartAction({
                     tiledMapAssets: {
                         schema,
                         imagesUrls: images
@@ -75,7 +73,7 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                         isLoading: true
                     }));
 
-                    const { map } = await Controller.loader.newInstance()
+                    const { map } = await assetLoader.newInstance()
                         .add('map', mapConfig.schemaUrl)
                         .load();
 
@@ -86,7 +84,7 @@ export const roomMiddleware: Middleware<{}, GameState> = api => next => {
                         }
                     });
 
-                    await Controller.loader.newInstance()
+                    await assetLoader.newInstance()
                         .addSpritesheet('characters', AssetManager.spritesheets.characters)
                         .addSpritesheet('spells', AssetManager.spritesheets.spells)
                         .load();

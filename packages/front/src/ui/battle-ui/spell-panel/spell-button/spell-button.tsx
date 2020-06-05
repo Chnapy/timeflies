@@ -2,11 +2,7 @@ import { Box, Button, ButtonProps, Tooltip } from '@material-ui/core';
 import { Theme, useTheme } from '@material-ui/core/styles';
 import { assertIsDefined, switchUtil } from '@timeflies/shared';
 import React from 'react';
-import { BattleDataMap } from '../../../../BattleData';
-import { serviceDispatch } from '../../../../services/serviceDispatch';
 import { BattleStateSpellPrepareAction } from '../../../../stages/battle/battleState/battle-state-actions';
-import { Turn } from '../../../../stages/battle/cycle/Turn';
-import { Character } from '../../../../stages/battle/entities/character/Character';
 import { Spell } from '../../../../stages/battle/entities/spell/Spell';
 import { useGameStep } from '../../../hooks/useGameStep';
 import { SpellImage } from './spell-image';
@@ -14,6 +10,11 @@ import { SpellNumber } from './spell-number';
 import { UIIcon, UIIconValue } from './ui-icon';
 import { formatMsToSeconds, UIText } from './ui-text';
 import { UIGauge } from './ui-gauge';
+import { useGameDispatch } from '../../../hooks/useGameDispatch';
+import { BattleState } from '../../../reducers/battle-reducers/battle-reducer';
+import { getTurnRemainingTime } from '../../../../stages/battle/cycle/cycle-reducer';
+import { playerIsMine } from '../../../../stages/battle/entities/player/Player';
+import { useGameSelector } from '../../../hooks/useGameSelector';
 
 export interface SpellButtonProps {
     spellId: string;
@@ -21,20 +22,11 @@ export interface SpellButtonProps {
 
 export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) => {
 
-    const selectCurrentTurn = ({ cycle }: BattleDataMap): Turn => {
-        assertIsDefined(cycle.globalTurn);
-        return cycle.globalTurn.currentTurn;
-    };
+    const spellIndex = useGameStep('battle', ({ snapshotState }) =>
+        snapshotState.battleDataCurrent.spells.findIndex(s => s.id === spellId));
 
-    const selectCurrentCharacter = (battle: BattleDataMap): Character<'current'> =>
-        selectCurrentTurn(battle).character;
-
-    const spellIndex = useGameStep('battle', battle => selectCurrentCharacter(battle).spells
-        .findIndex(spell => spell.id === spellId)
-    );
-
-    const selectSpell = (battle: BattleDataMap): Spell<'current'> =>
-        selectCurrentCharacter(battle).spells[ spellIndex ];
+    const selectSpell = ({ snapshotState }: BattleState): Spell<'current'> =>
+        snapshotState.battleDataCurrent.spells[ spellIndex ];
 
     const now = Date.now();
 
@@ -47,7 +39,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     const spellType = useGameStep('battle', battle => selectSpell(battle).staticData.type);
 
     const nbrWaitingSpellAction: number = useGameStep('battle', battle => {
-        const { spellActionSnapshotList } = battle.future;
+        const { spellActionSnapshotList } = battle.spellActionState;
 
         return spellActionSnapshotList.filter(spellAction =>
             spellAction.spellId === spellId
@@ -56,7 +48,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     });
 
     const currentSpellActionStartTime = useGameStep('battle', battle => {
-        const { spellActionSnapshotList } = battle.future;
+        const { spellActionSnapshotList } = battle.spellActionState;
 
         const spellAction = spellActionSnapshotList.find(_spellAction =>
             _spellAction.spellId === spellId
@@ -75,7 +67,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
             return;
         }
 
-        const { spellActionSnapshotList } = battle.future;
+        const { spellActionSnapshotList } = battle.spellActionState;
 
         const spellAction = spellActionSnapshotList.find(_spellAction =>
             _spellAction.startTime === currentSpellActionStartTime
@@ -92,15 +84,20 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         }
         : null;
 
-    const isSelected = useGameStep('battle', battle => selectCurrentTurn(battle).currentSpellType === spellType);
+    const isSelected = useGameStep('battle', ({ spellActionState, snapshotState }) =>
+        spellActionState.currentSpellAction?.spellId === spellId);
 
-    const disableReason = useGameStep('battle', battle => {
+    const disableReason = useGameSelector(gameState => {
+        const { snapshotState, cycleState } = gameState.battle;
 
-        if (!selectCurrentCharacter(battle).isMine) {
+        const currentCharacter = snapshotState.battleDataCurrent.characters
+            .find(c => c.id === cycleState.currentCharacterId)!;
+
+        if (!playerIsMine(gameState, currentCharacter.playerId)) {
             return 'player';
         }
 
-        if (selectCurrentTurn(battle).getRemainingTime('future') < duration) {
+        if (getTurnRemainingTime(gameState.battle, 'future') < duration) {
             return 'time';
         }
 
@@ -109,17 +106,17 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const isDisabled = !!disableReason;
 
+    const { dispatchSpellPrepare } = useGameDispatch({
+        dispatchSpellPrepare: () => BattleStateSpellPrepareAction({ spellType })
+    });
+
     const onBtnClick = React.useCallback((): void => {
         if (isDisabled) {
             return;
         }
 
-        const { dispatchSpellPrepare } = serviceDispatch({
-            dispatchSpellPrepare: () => BattleStateSpellPrepareAction({ spellType })
-        });
-
         dispatchSpellPrepare();
-    }, [ spellType, isDisabled ]);
+    }, [ dispatchSpellPrepare, isDisabled ]);
 
     const renderAttribute = (icon: UIIconValue, value: React.ReactText) => (
         <Box display='flex' flexWrap='nowrap' alignItems='center'>

@@ -1,6 +1,5 @@
-import { Controller } from '../../../Controller';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
-import { StageChangeAction } from '../../../stages/stage-actions';
+import { RoomStartAction } from './room-actions';
 import { RoomData, RoomReducer } from './room-reducer';
 
 // TODO refactor all reducer tests to be less 'duck', more 'user though'
@@ -34,19 +33,16 @@ describe('# room-reducer', () => {
         ).toBe(null);
     });
 
-    it('should init state on stage change action', async () => {
+    it('should init state on room start', () => {
 
-        const action: StageChangeAction<'room'> = StageChangeAction({
-            stageKey: 'room',
-            data: {
-                roomState: {
-                    type: 'room/state',
-                    sendTime: -1,
-                    roomId: 'id',
-                    mapSelected: null,
-                    playerList: [],
-                    teamList: []
-                }
+        const action = RoomStartAction({
+            roomState: {
+                type: 'room/state',
+                sendTime: -1,
+                roomId: 'id',
+                mapSelected: null,
+                playerList: [],
+                teamList: []
             }
         });
 
@@ -58,7 +54,5 @@ describe('# room-reducer', () => {
             teamsTree: expect.any(Object),
             launchTime: null
         });
-
-        await Controller.loader.newInstance().load();
     });
 });
