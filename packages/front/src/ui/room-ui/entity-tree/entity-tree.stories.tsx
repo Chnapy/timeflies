@@ -1,6 +1,9 @@
 import React from 'react';
-import { StoryProps } from '../../../../.storybook/preview';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';
 import { EntityTree } from './entity-tree';
 
@@ -9,7 +12,7 @@ export default {
     component: EntityTree
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const entityTreeData: EntityTreeData = {
         playerList: [
@@ -89,7 +92,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             name: 'chnapy',
         },
         step: 'room',
-        battle: null,
+        battle: battleReducer(undefined, {type: ''}),
         room: {
             roomId: '',
             map: {
@@ -101,9 +104,20 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    const assetLoader = createAssetLoader();
 
-    return <Provider>
-        <EntityTree />
-    </Provider>;
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
+
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <EntityTree />
+    });
+
+    return view;
 };

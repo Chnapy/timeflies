@@ -14,7 +14,6 @@ export const UIProvider: React.FC<UIProviderProps> = ({ assetLoader, children })
     React.useEffect(() => {
         const unsubscribe = assetLoader.subscribeUnique(data => {
             setLoaderData(data);
-
         });
 
         return () => {

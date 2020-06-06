@@ -1,92 +1,111 @@
-import React from 'react';
-import { seedBattleData } from '../../../battle-data.seed';
-import { seedGameState } from '../../../game-state.seed';
-import { seedGlobalTurn } from '../../../stages/battle/cycle/global-turn.seed';
-import { seedTurn } from '../../../stages/battle/cycle/turn.seed';
-import { seedCharacter } from '../../../stages/battle/entities/character/Character.seed';
-import { SpellPanel } from './spell-panel';
-import { StoryProps } from '../../../../.storybook/preview';
 import { seedSpellActionSnapshot } from '@timeflies/shared';
+import React from 'react';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
+import { seedGameState } from '../../../game-state.seed';
+import { seedCharacter } from '../../../stages/battle/entities/character/Character.seed';
+import { seedSpell } from '../../../stages/battle/entities/spell/Spell.seed';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer, BattleState } from '../../reducers/battle-reducers/battle-reducer';
+import { SpellPanel } from './spell-panel';
 
 export default {
     title: 'Battle/Spell panel',
     component: SpellPanel
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const now = Date.now();
 
-    const initialState = seedGameState('p1', {
-        step: 'battle',
-        currentPlayer: {
-            id: 'p1',
-            name: 'p1'
-        },
-        battle: seedBattleData({
-            cycle: {
-                launchTime: -1,
-                globalTurn: seedGlobalTurn(1, {
-                    currentTurn: seedTurn(1, {
-                        character: seedCharacter('fake', {
-                            id: 'c1', period: 'current',
-                            player: null,
-                            seedSpells: [
-                                {
-                                    id: 's1',
-                                    type: 'simpleAttack',
-                                    initialFeatures: {
-                                        duration: 2800,
-                                        attack: 12,
-                                        area: 4
-                                    }
-                                },
-                                {
-                                    id: 's2',
-                                    type: 'simpleAttack',
-                                    initialFeatures: {
-                                        duration: 3800,
-                                        attack: 22,
-                                        area: 3
-                                    }
-                                },
-                                {
-                                    id: 's3',
-                                    type: 'simpleAttack',
-                                    initialFeatures: {
-                                        duration: 2200,
-                                        attack: 8,
-                                        area: 12
-                                    }
-                                }
-                            ]
-                        }),
-                        getRemainingTime() { return 3000 }
+    const preloadedState = battleReducer(undefined, { type: '' });
+
+    const battleState: BattleState = {
+        ...preloadedState,
+        snapshotState: {
+            ...preloadedState.snapshotState,
+            battleDataCurrent: {
+                ...preloadedState.snapshotState.battleDataCurrent,
+                characters: [
+                    seedCharacter({
+                        id: 'c1',
+                        period: 'current',
+                        playerId: 'p1'
                     })
-                })
-            },
-            future: {
-                battleHash: '',
-                characters: [],
-                players: [],
-                teams: [],
-                spellActionSnapshotList: [
-                    seedSpellActionSnapshot('s3', {
-                        startTime: now + 1000
+                ],
+                spells: [
+                    seedSpell({
+                        id: 's1',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 180000,
+                            attack: 12,
+                            area: 4
+                        },
+                        characterId: 'c1'
                     }),
-                    seedSpellActionSnapshot('s3', {
-                        startTime: now + 2000
+                    seedSpell({
+                        id: 's2',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 380000,
+                            attack: 22,
+                            area: 3
+                        },
+                        characterId: 'c1'
                     }),
+                    seedSpell({
+                        id: 's3',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 220000,
+                            attack: 8,
+                            area: 12
+                        },
+                        characterId: 'c1'
+                    })
                 ]
             }
-        })
+        },
+        cycleState: {
+            ...preloadedState.cycleState,
+            currentCharacterId: 'c1',
+            turnDuration: 300000,
+            turnStartTime: now
+        },
+        spellActionState: {
+            ...preloadedState.spellActionState,
+            spellActionSnapshotList: [
+                seedSpellActionSnapshot('s3', {
+                    startTime: now + 1000
+                }),
+                seedSpellActionSnapshot('s3', {
+                    startTime: now + 2000
+                })
+            ]
+        }
+    };
+
+    const assetLoader = createAssetLoader();
+
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState: seedGameState('p1', {
+            step: 'battle',
+            battle: battleState
+        }),
+        middlewareList: []
     });
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <SpellPanel />
+    });
 
-    return (
-        <Provider>
-            <SpellPanel />
-        </Provider>
-    )
+    return view;
 };

@@ -1,8 +1,11 @@
 import { Box } from '@material-ui/core';
 import { equals, MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { StoryProps } from '../../../../.storybook/preview';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { MapBoard } from './map-board';
 import { MapBoardTile, MapBoardTileInfos } from './map-board-tile/map-board-tile';
 
@@ -11,7 +14,7 @@ export default {
     component: MapBoard
 };
 
-export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const BoardTile: React.FC = () => {
 
     const initialState: GameState = {
         currentPlayer: {
@@ -19,7 +22,7 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             name: 'chnapy'
         },
         step: 'room',
-        battle: null,
+        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
@@ -72,8 +75,6 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    const { Provider } = fakeBattleApi.init({ initialState });
-
     const tileInfosList: MapBoardTileInfos[] = [
         {
             type: 'obstacle',
@@ -101,16 +102,31 @@ export const BoardTile: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     ];
 
-    return <Provider>
-        {tileInfosList.map((tileInfos, i) =>
-            <Box key={i} m={2}>
-                <MapBoardTile tileInfos={tileInfos} />
-            </Box>
-        )}
-    </Provider>;
+    const assetLoader = createAssetLoader();
+
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
+
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <>
+            {tileInfosList.map((tileInfos, i) =>
+                <Box key={i} m={2}>
+                    <MapBoardTile tileInfos={tileInfos} />
+                </Box>
+            )}
+        </>
+    });
+
+    return view;
 };
 
-export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Board: React.FC = () => {
 
     const map: MapConfig = {
         id: '1',
@@ -187,7 +203,7 @@ export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             name: 'chnapy'
         },
         step: 'room',
-        battle: null,
+        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
@@ -244,9 +260,20 @@ export const Board: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    const assetLoader = createAssetLoader();
 
-    return <Provider>
-        <MapBoard />
-    </Provider>;
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
+
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <MapBoard />
+    });
+
+    return view;
 };

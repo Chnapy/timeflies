@@ -3,6 +3,8 @@ import { Paper, Box } from '@material-ui/core';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { CharacterItem } from './character-item/character-item';
+import { shallowEqual } from 'react-redux';
+import { assertIsDefined } from '@timeflies/shared';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -27,8 +29,12 @@ export const CharacterListPanel: React.FC = () => {
         ({ snapshotState, cycleState }) => snapshotState.battleDataCurrent.characters
             .map(c => c.id)
             .sort((a, b) => cycleState.currentCharacterId === a ? -1 : 1),
-        (a, b) => a.join('.') === b.join('.')
+        shallowEqual
     );
+    
+    if(!current) {
+        return null;
+    }
 
     return <Paper className={classes.root} elevation={3}>
 

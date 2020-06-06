@@ -29,9 +29,12 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
         };
     }, (a, b) => (a.startTimeFromTurnStart === b.startTimeFromTurnStart) && (a.finished === b.finished));
 
-    const spellIndex = useGameStep('battle', ({ cycleState, snapshotState }) => {
-        const { currentCharacterId } = cycleState;
-        const { index } = snapshotState.battleDataCurrent.spells.find(s => s.characterId === currentCharacterId)!;
+    const spellIndex = useGameStep('battle', ({ spellActionState, snapshotState }) => {
+        const { spellActionSnapshotList } = spellActionState;
+
+        const spellAction = spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime)!;
+
+        const { index } = snapshotState.battleDataCurrent.spells.find(s => s.id === spellAction.spellId)!;
 
         return index;
     });
