@@ -1,6 +1,7 @@
 import { CycleState, cycleReducer } from './cycle-reducer';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
+import { seedCharacter } from '../entities/character/Character.seed';
 
 describe('# cycle-reducer', () => {
 
@@ -65,7 +66,7 @@ describe('# cycle-reducer', () => {
                     startTime: 12,
                     duration: 1000
                 },
-                isMine: true
+                currentCharacter: seedCharacter({ id: 'c1', period: 'current' })
             }));
 
             expect(state1).toEqual<CycleState>({

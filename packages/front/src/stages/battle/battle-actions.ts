@@ -4,6 +4,7 @@ import TiledMap from 'tiled-types/types';
 
 export type BattleStartAction = ReturnType<typeof BattleStartAction>;
 export const BattleStartAction = createAction<{
+    myPlayerId: string;
     tiledMapAssets: {
         schema: TiledMap;
         imagesUrls: Record<string, string>;

@@ -18,13 +18,13 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
         extractState: getState => getState().battle.battleActionState,
         extractFutureCharacter,
         extractFutureSpell: getState => {
-            const { snapshotState, spellActionState } = getState().battle;
+            const { snapshotState, battleActionState } = getState().battle;
 
-            const { currentSpellAction } = spellActionState;
+            const { selectedSpellId } = battleActionState;
 
             const { spells } = snapshotState.battleDataFuture;
 
-            return spells.find(s => s.id === currentSpellAction?.spellId);
+            return spells.find(s => s.id === selectedSpellId);
         }
     }),
     cycleMiddleware<GameState>({

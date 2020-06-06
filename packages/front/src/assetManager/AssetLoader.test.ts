@@ -57,6 +57,7 @@ describe('# AssetLoader', () => {
                         data: assets.schema
                     } as any,
                     'map:map': {
+                        url: 'http://placeholder.com/map.png',
                         data: document.createElement('img')
                     } as any
                 });
@@ -81,8 +82,9 @@ describe('# AssetLoader', () => {
 
         expect(map.schema).toHaveProperty('tilesets');
 
-        expect(map.images).toHaveProperty('map');
-        expect(map.images.map).toHaveProperty('src');
+        expect(map.images).toMatchObject({
+            map: 'http://placeholder.com/map.png'
+        });
     });
 
     it.todo('should correctly load a spritesheet');

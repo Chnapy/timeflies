@@ -8,15 +8,11 @@ import { createStoreManager } from '../../../store-manager';
 import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../view';
 import { BattleStartAction } from '../battle-actions';
-import { characterToSnapshot } from '../entities/character/Character';
-import { seedCharacter } from '../entities/character/Character.seed';
-import { playerToSnapshot } from '../entities/player/Player';
-import { seedPlayer } from '../entities/player/Player.seed';
-import { teamToSnapshot } from '../entities/team/Team';
-import { seedTeam } from '../entities/team/Team.seed';
+import { seedCharacterSnapshot } from '../entities/character/Character.seed';
+import { seedPlayerSnapshot } from '../entities/player/Player.seed';
+import { seedSpellSnapshot } from '../entities/spell/Spell.seed';
+import { seedTeamSnapshot } from '../entities/team/Team.seed';
 import { BattleStageGraphic } from '../graphic/BattleStageGraphic';
-import { seedSpell } from '../entities/spell/Spell.seed';
-import { spellToSnapshot } from '../entities/spell/Spell';
 
 export default {
     title: 'Battleflow'
@@ -47,29 +43,54 @@ export const Default: React.FC = () => {
             resizeTo: parent
         });
 
-        const period = 'current';
-
-        const team = seedTeam({
-            id: 't1', period
+        const t1 = seedTeamSnapshot({
+            id: 't1'
+        });
+        const t2 = seedTeamSnapshot({
+            id: 't2'
         });
 
-        const player = seedPlayer({
-            id: 'p1', period, teamId: 't1'
+        const p1 = seedPlayerSnapshot({
+            id: 'p1', teamId: 't1', name: 'chnapy'
+        });
+        const p2 = seedPlayerSnapshot({
+            id: 'p2', teamId: 't2', name: 'yoshi2oeuf'
         });
 
         const characterList = [
-            seedCharacter({
-                id: 'c1', period, playerId: 'p1', position: { x: 4, y: 3 }
+            seedCharacterSnapshot({
+                id: 'c1', playerId: 'p1', position: { x: 4, y: 3 },
+                staticData: {
+                    id: 'c1',
+                    name: 'toto',
+                    type: 'sampleChar1',
+                    defaultSpellId: 's1',
+                    initialFeatures: {
+                        life: 100,
+                        actionTime: 30000
+                    },
+                    staticSpells: []
+                }
             }),
-            seedCharacter({
-                id: 'c2', period, playerId: 'p1', position: { x: 6, y: 4 }
+            seedCharacterSnapshot({
+                id: 'c2', playerId: 'p2', position: { x: 6, y: 4 },
+                staticData: {
+                    id: 'c2',
+                    name: 'africa',
+                    type: 'sampleChar2',
+                    defaultSpellId: 's3',
+                    initialFeatures: {
+                        life: 120,
+                        actionTime: 25000
+                    },
+                    staticSpells: []
+                }
             })
         ];
 
         const spellList = [
-            seedSpell({
+            seedSpellSnapshot({
                 id: 's1',
-                period,
                 type: 'move',
                 characterId: 'c1',
                 index: 1,
@@ -77,9 +98,8 @@ export const Default: React.FC = () => {
                     duration: 300
                 }
             }),
-            seedSpell({
+            seedSpellSnapshot({
                 id: 's2',
-                period,
                 type: 'simpleAttack',
                 characterId: 'c1',
                 index: 2,
@@ -89,9 +109,8 @@ export const Default: React.FC = () => {
                     attack: 20
                 }
             }),
-            seedSpell({
+            seedSpellSnapshot({
                 id: 's3',
-                period,
                 type: 'move',
                 characterId: 'c2',
                 index: 1,
@@ -99,9 +118,8 @@ export const Default: React.FC = () => {
                     duration: 600
                 }
             }),
-            seedSpell({
+            seedSpellSnapshot({
                 id: 's4',
-                period,
                 type: 'simpleAttack',
                 characterId: 'c2',
                 index: 1,
@@ -119,6 +137,7 @@ export const Default: React.FC = () => {
             .load();
 
         storeManager.dispatch(BattleStartAction({
+            myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,
                 imagesUrls: map.images
@@ -129,18 +148,18 @@ export const Default: React.FC = () => {
                 startTime: Date.now(),
                 currentTurn: {
                     id: 1,
-                    characterId: '1',
-                    duration: 0,
+                    characterId: 'c1',
+                    duration: 30000,
                     startTime: Date.now()
                 }
             },
             entitiesSnapshot: {
                 battleHash: '',
-                charactersSnapshots: characterList.map(characterToSnapshot),
+                charactersSnapshots: characterList,
                 launchTime: Date.now(),
-                playersSnapshots: [ playerToSnapshot(player) ],
-                spellsSnapshots: spellList.map(spellToSnapshot),
-                teamsSnapshots: [ teamToSnapshot(team) ],
+                playersSnapshots: [ p1, p2 ],
+                spellsSnapshots: spellList,
+                teamsSnapshots: [ t1, t2 ],
                 time: Date.now()
             }
         }));

@@ -71,6 +71,7 @@ export const Current: React.FC = () => {
         const tiledMapGraphic = TiledMapGraphic();
 
         storeManager.dispatch(BattleStartAction({
+            myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,
                 imagesUrls: map.images
@@ -164,6 +165,7 @@ export const Future: React.FC = () => {
         const tiledMapGraphic = TiledMapGraphic();
 
         storeManager.dispatch(BattleStartAction({
+            myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,
                 imagesUrls: map.images

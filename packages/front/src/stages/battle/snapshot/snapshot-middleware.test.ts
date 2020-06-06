@@ -21,6 +21,7 @@ describe('# snapshot-middleware', () => {
         ];
 
         const initialState: SnapshotState = {
+            myPlayerId: 'p1',
             launchTime: -1,
             snapshotList: [],
             battleDataCurrent: {
@@ -74,6 +75,7 @@ describe('# snapshot-middleware', () => {
         ];
 
         const initialState: SnapshotState = {
+            myPlayerId: 'p1',
             launchTime: -1,
             snapshotList: [],
             battleDataCurrent: {

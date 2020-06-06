@@ -108,6 +108,7 @@ export const Default: React.FC = () => {
     });
 
     storeManager.dispatch(BattleStartAction({
+        myPlayerId: 'p1',
         tiledMapAssets: {
             schema: seedTiledMap('map_1'),
             imagesUrls: {}

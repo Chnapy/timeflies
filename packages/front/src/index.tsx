@@ -6,7 +6,7 @@ import { createView } from './view';
 
 const assetLoader = createAssetLoader();
 
-const storeManager = createStoreManager(assetLoader);
+const storeManager = createStoreManager({ assetLoader });
 
 const view = createView({
     storeManager,

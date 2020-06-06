@@ -7,6 +7,7 @@ import { TimerTester, TURN_DELAY } from '@timeflies/shared';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { NotifyDeathsAction } from './cycle-manager-actions';
+import { Character } from '../entities/character/Character';
 
 describe('# cycle-middleware', () => {
 
@@ -78,7 +79,9 @@ describe('# cycle-middleware', () => {
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: action.payload.globalTurnSnapshot.currentTurn,
-                isMine: expect.anything()
+                currentCharacter: expect.objectContaining<Partial<Character<'current'>>>({
+                    id: '1'
+                })
             }));
         });
     })
@@ -196,7 +199,7 @@ describe('# cycle-middleware', () => {
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: turnState,
-                isMine: expect.anything()
+                currentCharacter: expect.anything()
             }));
         });
 
@@ -276,7 +279,7 @@ describe('# cycle-middleware', () => {
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: turnState,
-                isMine: expect.anything()
+                currentCharacter: expect.anything()
             }));
         });
 
@@ -348,7 +351,7 @@ describe('# cycle-middleware', () => {
                     startTime: expect.any(Number),
                     duration: 1000
                 },
-                isMine: expect.anything()
+                currentCharacter: expect.anything()
             }));
         });
 
@@ -428,7 +431,7 @@ describe('# cycle-middleware', () => {
                     startTime: expect.any(Number),
                     duration: 1000
                 },
-                isMine: expect.anything()
+                currentCharacter: expect.anything()
             }));
         });
     });

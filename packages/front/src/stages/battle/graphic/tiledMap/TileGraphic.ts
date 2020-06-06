@@ -39,10 +39,13 @@ export const TileGraphic = ({
     container.y = worldPos.y;
     container.interactive = true;
 
-    container.on('mouseover', () => {
-        storeEmitter.dispatch(TileHoverAction({
-            position: tilePos
-        }));
+    container.on('mouseover', (e) => {
+        // if no click
+        if (e.data.originalEvent.buttons === 0) {
+            storeEmitter.dispatch(TileHoverAction({
+                position: tilePos
+            }));
+        }
     });
 
     container.on('click', (e: PIXI.interaction.InteractionEvent) => {

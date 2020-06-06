@@ -74,6 +74,7 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
         const tiledMapGraphic = TiledMapGraphic();
 
         storeManager.dispatch(BattleStartAction({
+            myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,
                 imagesUrls: map.images
