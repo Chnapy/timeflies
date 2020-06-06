@@ -1,19 +1,20 @@
-import { RequiredOnly, CharacterFeatures } from '@timeflies/shared';
+import { RequiredOnly, CharacterFeatures, CharacterType } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Character } from './Character';
 
 export type SeedCharacterProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Character<P>, 'id' | 'period'>, 'features'> & {
+    type?: CharacterType;
     features?: Partial<CharacterFeatures>;
 };
 
-export const seedCharacter = <P extends BattleDataPeriod>({ features, ...props }: SeedCharacterProps<P>): Character<P> => {
+export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...props }: SeedCharacterProps<P>): Character<P> => {
 
     return {
         playerId: '',
         staticData: {
             id: props.id,
             name: 'name',
-            type: 'sampleChar1',
+            type: type ?? 'sampleChar1',
             initialFeatures: {
                 life: 100,
                 actionTime: 2000,

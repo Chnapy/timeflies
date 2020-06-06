@@ -1,13 +1,13 @@
 import React from 'react';
 import { StoryProps } from '../../../../.storybook/preview';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';
-import { ReadyButton } from './ready-button';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import { rootReducer } from '../../reducers/root-reducer';
 import { RoomData } from '../../reducers/room-reducers/room-reducer';
-import { Box } from '@material-ui/core';
+import { ReadyButton } from './ready-button';
 
 export default {
     title: 'Room/Ready button',
@@ -16,8 +16,7 @@ export default {
 
 const Wrapper: React.FC<{
     roomState: RoomData;
-    fakeApi?: StoryProps[ 'fakeBattleApi' ];
-}> = ({ roomState, fakeApi }) => {
+}> = ({ roomState }) => {
 
     const initialState: GameState = {
         currentPlayer: {
@@ -25,19 +24,27 @@ const Wrapper: React.FC<{
             name: 'chnapy',
         },
         step: 'room',
-        battle: null,
+        battle: battleReducer(undefined, {type: ''}),
         room: roomState
     };
 
-    const ProviderComponent = fakeApi
-        ? fakeApi.init({ initialState }).Provider
-        : props => <Provider store={createStore(rootReducer, initialState)} {...props} />;
+    const assetLoader = createAssetLoader();
 
-    return <Box display='inline-flex' flexDirection='column' mb={1} mr={1} width={400} flexShrink={0}>
-        <ProviderComponent>
-            <ReadyButton />
-        </ProviderComponent>
-    </Box>;
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
+
+
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => {},
+        gameUIChildren: <ReadyButton />
+    });
+
+    return view;
 };
 
 const getWaitingOthersState = (): RoomData => {

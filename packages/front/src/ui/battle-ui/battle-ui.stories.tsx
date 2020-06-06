@@ -1,183 +1,205 @@
 import React from 'react';
-import { StoryProps } from '../../../.storybook/preview';
-import { seedBattleData } from '../../battle-data.seed';
+import { createAssetLoader } from '../../assetManager/AssetLoader';
 import { seedGameState } from '../../game-state.seed';
-import { seedGlobalTurn } from '../../stages/battle/cycle/global-turn.seed';
-import { seedTurn } from '../../stages/battle/cycle/turn.seed';
+import { characterAlterLife } from '../../stages/battle/entities/character/Character';
 import { seedCharacter } from '../../stages/battle/entities/character/Character.seed';
 import { seedPlayer } from '../../stages/battle/entities/player/Player.seed';
+import { seedSpell } from '../../stages/battle/entities/spell/Spell.seed';
 import { seedTeam } from '../../stages/battle/entities/team/Team.seed';
+import { createStoreManager } from '../../store-manager';
+import { createView } from '../../view';
+import { battleReducer, BattleState } from '../reducers/battle-reducers/battle-reducer';
 import { BattleUI } from './battle-ui';
-import { Controller } from '../../Controller';
-import { seedSpellActionSnapshot } from '@timeflies/shared';
 
 export default {
     title: 'Battle',
     component: BattleUI
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const now = Date.now();
 
-    const teamA = seedTeam('fake', {
+    const t1 = seedTeam({
         id: 't1',
         period: 'current',
-        letter: 'A',
-        seedPlayers: []
+        letter: 'A'
     });
 
-    const playerP1 = seedPlayer('fake', {
+    const t2 = seedTeam({
+        id: 't2',
+        period: 'current',
+        letter: 'B',
+    });
+
+    const p1 = seedPlayer({
         id: 'p1',
         period: 'current',
         name: 'chnapy',
-        team: teamA
+        teamId: t1.id
     });
 
-    teamA.players.push(playerP1);
+    const p2 = seedPlayer({
+        id: 'p2',
+        period: 'current',
+        name: 'yoshi2oeuf',
+        teamId: t1.id
+    });
 
-    const characterC5 = seedCharacter('fake', {
-        id: 'c5',
+    const p3 = seedPlayer({
+        id: 'p3',
+        period: 'current',
+        name: 'toto',
+        teamId: t2.id
+    });
+
+    const c1 = seedCharacter({
+        id: 'c1',
         period: 'current',
         type: 'sampleChar1',
-        initialFeatures: {
+        features: {
             life: 100,
             actionTime: 12400
         },
-        player: playerP1,
-        seedSpells: [
-            {
-                id: 's1',
-                type: 'move',
-            },
-            {
-                id: 's2',
-                type: 'simpleAttack',
-            },
-            {
-                id: 's3',
-                type: 'sampleSpell1',
-            },
-            {
-                id: 's4',
-                type: 'sampleSpell2',
-            }
-        ]
+        playerId: p1.id
+    });
+    characterAlterLife(c1, -20);
+
+    const c4 = seedCharacter({
+        id: 'c4',
+        period: 'current',
+        type: 'sampleChar1',
+        features: {
+            life: 100,
+            actionTime: 12400
+        },
+        playerId: p1.id
+    });
+    characterAlterLife(c4, -100);
+
+    const c5 = seedCharacter({
+        id: 'c5',
+        period: 'current',
+        type: 'sampleChar1',
+        features: {
+            life: 100,
+            actionTime: 12400
+        },
+        playerId: p1.id
     });
 
-    const initialState = seedGameState('p1', {
-        step: 'battle',
-        battle: seedBattleData({
-            current: {
-                battleHash: '',
-                players: [],
-                teams: [],
+    const preloadedState = battleReducer(undefined, { type: '' });
+
+    const battleState: BattleState = {
+        ...preloadedState,
+        snapshotState: {
+            ...preloadedState.snapshotState,
+            battleDataCurrent: {
+                ...preloadedState.snapshotState.battleDataCurrent,
+                teams: [ t1, t2 ],
+                players: [ p1, p2, p3 ],
                 characters: [
-                    seedCharacter('fake', {
-                        id: 'c1',
-                        period: 'current',
-                        type: 'sampleChar1',
-                        initialFeatures: {
-                            life: 100,
-                            actionTime: 12400
-                        },
-                        player: playerP1
-                    }),
-                    seedCharacter('fake', {
+                    c1,
+                    seedCharacter({
                         id: 'c2',
                         period: 'current',
                         type: 'sampleChar2',
-                        initialFeatures: {
+                        features: {
                             life: 100,
                             actionTime: 13400
                         },
-                        player: seedPlayer('fake', {
-                            id: 'p2',
-                            period: 'current',
-                            name: 'yoshi2oeuf',
-                            team: teamA
-                        })
+                        playerId: p2.id
                     }),
-                    seedCharacter('fake', {
+                    seedCharacter({
                         id: 'c3',
                         period: 'current',
                         type: 'sampleChar1',
-                        initialFeatures: {
+                        features: {
                             life: 110,
                             actionTime: 18100
                         },
-                        player: seedPlayer('fake', {
-                            id: 'p3',
-                            period: 'current',
-                            name: 'toto',
-                            team: seedTeam('fake', {
-                                id: 't2',
-                                period: 'current',
-                                letter: 'B',
-                                seedPlayers: []
-                            })
-                        })
+                        playerId: p3.id
                     }),
-                    seedCharacter('fake', {
-                        id: 'c4',
+                    c4,
+                    c5,
+                ],
+                spells: [
+                    seedSpell({
+                        id: 's1',
                         period: 'current',
-                        type: 'sampleChar1',
-                        initialFeatures: {
-                            life: 100,
-                            actionTime: 12400
+                        type: 'move',
+                        feature: {
+                            duration: 800,
+                            attack: 12,
+                            area: 4
                         },
-                        player: seedPlayer('fake', {
-                            id: 'p1',
-                            period: 'current',
-                            name: 'chnapy',
-                            team: teamA
-                        })
+                        index: 1,
+                        characterId: c5.id
                     }),
-                    characterC5,
-                ]
-            },
-            cycle: {
-                launchTime: -1,
-                globalTurn: seedGlobalTurn(1, {
-                    currentTurn: seedTurn(1, {
-                        character: characterC5,
-                        startTime: now,
-                        getRemainingTime() {
-                            return Math.max(12400 - (Date.now() - now), 0);
+                    seedSpell({
+                        id: 's2',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 1000,
+                            attack: 22,
+                            area: 3
                         },
-                        turnDuration: 12400
-                    })
-                })
+                        index: 2,
+                        characterId: c5.id
+                    }),
+                    seedSpell({
+                        id: 's3',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 1000,
+                            attack: 22,
+                            area: 3
+                        },
+                        index: 3,
+                        characterId: c5.id
+                    }),
+                    seedSpell({
+                        id: 's4',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 1000,
+                            attack: 22,
+                            area: 3
+                        },
+                        index: 4,
+                        characterId: c5.id
+                    }),
+                ]
             }
-        })
+        },
+        cycleState: {
+            ...preloadedState.cycleState,
+            currentCharacterId: c5.id,
+            turnDuration: 12400,
+            turnStartTime: now
+        }
+    };
+
+    const assetLoader = createAssetLoader();
+
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState: seedGameState('p1', {
+            step: 'battle',
+            battle: battleState
+        }),
+        middlewareList: []
     });
 
-    (initialState.battle!.current.characters[ 0 ].features.life as number) = 80;
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <BattleUI />
+    });
 
-    (initialState.battle!.current.characters[ 3 ].features.life as number) = 0;
-
-    const { Provider } = fakeBattleApi.init({ initialState });
-
-    return (
-        <Provider>
-            <BattleUI />
-
-            <button onClick={() => {
-                const { getState, dispatch } = Controller.getStore();
-
-                for (let i = 0; i < 1; i++) {
-                    (getState().battle!.current.characters[ 0 ].features.life as any) = Number.parseInt(Math.random() * 100 + '');
-
-                    dispatch({
-                        type: 'battle/spell-action/end',
-                        correctHash: '',
-                        removed: false,
-                        spellActionSnapshot: seedSpellActionSnapshot('s1')
-                    })
-                }
-            }}>
-                test performance
-            </button>
-        </Provider>
-    )
+    return view;
 };

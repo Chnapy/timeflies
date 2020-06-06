@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { AssetMap, AssetMapKey, SpritesheetMapKey } from './AssetLoader';
-import { Controller } from '../Controller';
+import { AssetLoader, AssetMap, AssetMapKey, SpritesheetMapKey } from './AssetLoader';
 
 const context = React.createContext<Partial<AssetMap>>({});
 
@@ -11,21 +10,21 @@ export const useAsset = <K extends AssetMapKey>(key: K) => useContext(context)[ 
 /**
  * Storybook context only
  */
-export const useAssetLoader = <K extends AssetMapKey>(key: K, path: string, isSpritesheet: boolean) => {
+export const useAssetLoader = <K extends AssetMapKey>(loader: AssetLoader, key: K, path: string, isSpritesheet: boolean) => {
 
     React.useEffect(() => {
 
         if (isSpritesheet) {
-            Controller.loader.newInstance()
+            loader.newInstance()
                 .addSpritesheet(key as SpritesheetMapKey, path)
                 .load();
         } else {
-            Controller.loader.newInstance()
+            loader.newInstance()
                 .add(key as any, path)
                 .load();
         }
 
-    }, [ isSpritesheet, key, path ]);
+    }, [ isSpritesheet, key, loader, path ]);
 
     return useAsset(key);
 };

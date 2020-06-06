@@ -5,6 +5,7 @@ import { AssetLoader } from './assetManager/AssetLoader';
 import { GameState } from './game-state';
 import { GameUI } from './ui/game-ui';
 import { UIProvider } from './ui/ui-provider';
+import { Box } from '@material-ui/core';
 
 export interface AppProps {
     store: Store<GameState, Action>;
@@ -30,7 +31,7 @@ export const App: React.FC<AppProps> = ({ store, assetLoader, onMount, children 
     return <React.StrictMode>
         <Provider store={store}>
             <UIProvider assetLoader={assetLoader}>
-                <div>
+                <Box position='relative' height='100%'>
 
                     <div ref={gameWrapperRef} style={{
                         position: 'absolute',
@@ -44,7 +45,7 @@ export const App: React.FC<AppProps> = ({ store, assetLoader, onMount, children 
 
                     {children}
 
-                </div>
+                </Box>
             </UIProvider>
         </Provider>
     </React.StrictMode>;

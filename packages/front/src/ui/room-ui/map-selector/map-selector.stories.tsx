@@ -1,9 +1,12 @@
 import { MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { StoryProps } from '../../../../.storybook/preview';
-import { GameState } from '../../../game-state';
-import { MapSelector } from './map-selector';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../assetManager/AssetManager';
+import { GameState } from '../../../game-state';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
+import { MapSelector } from './map-selector';
 
 export default {
     title: 'Room/Map Selector',
@@ -43,7 +46,7 @@ const getMapList = (): MapConfig[] => [
     },
 ];
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const mapList: MapConfig[] = getMapList();
 
@@ -53,18 +56,18 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             name: 'p1'
         },
         step: 'room',
-        battle: null,
+        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
-                playerList: [{
+                playerList: [ {
                     id: 'p1',
                     isAdmin: true,
                     isLoading: false,
                     isReady: false,
                     name: 'p1',
                     characters: []
-                }],
+                } ],
                 teamList: []
             },
             map: {
@@ -75,9 +78,20 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    const assetLoader = createAssetLoader();
 
-    return <Provider>
-        <MapSelector defaultOpen={true} />
-    </Provider>;
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
+
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <MapSelector defaultOpen={true} />
+    });
+
+    return view;
 };

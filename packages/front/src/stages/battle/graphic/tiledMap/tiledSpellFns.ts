@@ -1,20 +1,19 @@
 import { assertIsDefined, equals } from '@timeflies/shared';
 import { TiledMapSpellObject } from '../../engine/spellMapping';
-import { TileGraphic } from './TileGraphic';
 
 
-export const tiledMapSpellMove: TiledMapSpellObject<'move'> = {
-    onHoverFn: ({ engineProps, tileGraphicList }) => {
-        const { path } = engineProps;
+export const tiledMapSpellMove: TiledMapSpellObject = {
+    onHoverFn: ({ tileGraphicList }) => {
+        // const { path } = engineProps;
 
-        const tileGraphicPath = path
-            .slice(1)
-            .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
+        // const tileGraphicPath = path
+        //     .slice(1)
+        //     .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
 
-        tileGraphicPath.forEach((t, i) => t.showPath(i === tileGraphicPath.length - 1));
+        // tileGraphicPath.forEach((t, i) => t.showPath(i === tileGraphicPath.length - 1));
 
         return startTime => {
-            tileGraphicPath.forEach(t => t.persistAction(startTime));
+            // tileGraphicPath.forEach(t => t.persistAction(startTime));
         }
     },
     onSpellStartFn: ({
@@ -27,19 +26,19 @@ export const tiledMapSpellMove: TiledMapSpellObject<'move'> = {
     }
 };
 
-export const tiledMapSpellSimpleAttack: TiledMapSpellObject<'simpleAttack'> = {
-    onHoverFn: ({ engineProps, tileGraphicList, rangeTiles }) => {
-        const { actionArea } = engineProps;
+export const tiledMapSpellSimpleAttack: TiledMapSpellObject = {
+    onHoverFn: ({ tileGraphicList, rangeTiles }) => {
+        // const { actionArea } = engineProps;
 
-        const tileGraphicArea = actionArea
-            .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
+        // const tileGraphicArea = actionArea
+        //     .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
 
-        const isInRange = (tileGraphic: TileGraphic) => rangeTiles.includes(tileGraphic);
+        // const isInRange = (tileGraphic: TileGraphic) => rangeTiles.includes(tileGraphic);
 
-        tileGraphicArea.forEach(t => t.showAction(isInRange(t)));
+        // tileGraphicArea.forEach(t => t.showAction(isInRange(t)));
 
         return startTime => {
-            tileGraphicArea.forEach(t => t.persistAction(startTime));
+            // tileGraphicArea.forEach(t => t.persistAction(startTime));
         };
     },
     onSpellStartFn: ({

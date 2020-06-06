@@ -1,17 +1,20 @@
 import { equals, MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { StoryProps } from '../../../.storybook/preview';
+import { createAssetLoader } from '../../assetManager/AssetLoader';
+import { AssetManager } from '../../assetManager/AssetManager';
 import { GameState } from '../../game-state';
+import { createStoreManager } from '../../store-manager';
+import { createView } from '../../view';
+import { battleReducer } from '../reducers/battle-reducers/battle-reducer';
 import { MapBoardTileInfos } from './map-board/map-board-tile/map-board-tile';
 import { UIRoom } from './ui-room';
-import { AssetManager } from '../../assetManager/AssetManager';
 
 export default {
     title: 'Room',
     component: UIRoom
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const map: MapConfig = {
         id: '1',
@@ -87,7 +90,7 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
             name: 'chnapy'
         },
         step: 'room',
-        battle: null,
+        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
@@ -144,9 +147,20 @@ export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
         }
     };
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    const assetLoader = createAssetLoader();
 
-    return <Provider>
-        <UIRoom />
-    </Provider>;
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
+
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <UIRoom />
+    });
+
+    return view;
 };

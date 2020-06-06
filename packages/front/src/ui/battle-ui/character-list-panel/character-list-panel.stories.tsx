@@ -1,15 +1,20 @@
 import { Box } from '@material-ui/core';
+import { seedTiledMap } from '@timeflies/shared';
 import React from 'react';
-import { StoryProps } from '../../../../.storybook/preview';
+import { AssetLoader, createAssetLoader } from '../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../assetManager/AssetManager';
 import { useAssetLoader } from '../../../assetManager/AssetProvider';
-import { seedBattleData } from '../../../battle-data.seed';
 import { seedGameState } from '../../../game-state.seed';
-import { seedGlobalTurn } from '../../../stages/battle/cycle/global-turn.seed';
-import { seedTurn } from '../../../stages/battle/cycle/turn.seed';
+import { BattleStartAction } from '../../../stages/battle/battle-actions';
+import { characterAlterLife, characterToSnapshot } from '../../../stages/battle/entities/character/Character';
 import { seedCharacter } from '../../../stages/battle/entities/character/Character.seed';
+import { playerToSnapshot } from '../../../stages/battle/entities/player/Player';
 import { seedPlayer } from '../../../stages/battle/entities/player/Player.seed';
+import { teamToSnapshot } from '../../../stages/battle/entities/team/Team';
 import { seedTeam } from '../../../stages/battle/entities/team/Team.seed';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { CharacterListPanel } from './character-list-panel';
 
 export default {
@@ -17,141 +22,156 @@ export default {
     component: CharacterListPanel
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const now = Date.now();
 
-    const teamA = seedTeam('fake', {
+    const t1 = seedTeam({
         id: 't1',
         period: 'current',
-        letter: 'A',
-        seedPlayers: []
+        letter: 'A'
     });
 
-    const playerP1 = seedPlayer('fake', {
+    const t2 = seedTeam({
+        id: 't2',
+        period: 'current',
+        letter: 'B',
+    });
+
+    const p1 = seedPlayer({
         id: 'p1',
         period: 'current',
         name: 'chnapy',
-        team: teamA
+        teamId: t1.id
     });
 
-    teamA.players.push(playerP1);
+    const p2 = seedPlayer({
+        id: 'p2',
+        period: 'current',
+        name: 'yoshi2oeuf',
+        teamId: t1.id
+    });
 
-    const characterC5 = seedCharacter('fake', {
-        id: 'c5',
+    const p3 = seedPlayer({
+        id: 'p3',
+        period: 'current',
+        name: 'toto',
+        teamId: t2.id
+    });
+
+    const c1 = seedCharacter({
+        id: 'c1',
         period: 'current',
         type: 'sampleChar1',
-        initialFeatures: {
+        features: {
             life: 100,
             actionTime: 12400
         },
-        player: playerP1
+        playerId: p1.id
+    });
+    characterAlterLife(c1, -20);
+
+    const c4 = seedCharacter({
+        id: 'c4',
+        period: 'current',
+        type: 'sampleChar1',
+        features: {
+            life: 100,
+            actionTime: 12400
+        },
+        playerId: p1.id
+    });
+    characterAlterLife(c4, -100);
+
+    const c5 = seedCharacter({
+        id: 'c5',
+        period: 'current',
+        type: 'sampleChar1',
+        features: {
+            life: 100,
+            actionTime: 12400
+        },
+        playerId: p1.id
     });
 
     const initialState = seedGameState('p1', {
         step: 'battle',
-        battle: seedBattleData({
-            current: {
-                battleHash: '',
-                players: [],
-                teams: [],
-                characters: [
-                    seedCharacter('fake', {
-                        id: 'c1',
-                        period: 'current',
-                        type: 'sampleChar1',
-                        initialFeatures: {
-                            life: 100,
-                            actionTime: 12400
-                        },
-                        player: playerP1
-                    }),
-                    seedCharacter('fake', {
-                        id: 'c2',
-                        period: 'current',
-                        type: 'sampleChar2',
-                        initialFeatures: {
-                            life: 100,
-                            actionTime: 13400
-                        },
-                        player: seedPlayer('fake', {
-                            id: 'p2',
-                            period: 'current',
-                            name: 'yoshi2oeuf',
-                            team: teamA
-                        })
-                    }),
-                    seedCharacter('fake', {
-                        id: 'c3',
-                        period: 'current',
-                        type: 'sampleChar1',
-                        initialFeatures: {
-                            life: 110,
-                            actionTime: 18100
-                        },
-                        player: seedPlayer('fake', {
-                            id: 'p3',
-                            period: 'current',
-                            name: 'toto',
-                            team: seedTeam('fake', {
-                                id: 't2',
-                                period: 'current',
-                                letter: 'B',
-                                seedPlayers: []
-                            })
-                        })
-                    }),
-                    seedCharacter('fake', {
-                        id: 'c4',
-                        period: 'current',
-                        type: 'sampleChar1',
-                        initialFeatures: {
-                            life: 100,
-                            actionTime: 12400
-                        },
-                        player: seedPlayer('fake', {
-                            id: 'p1',
-                            period: 'current',
-                            name: 'chnapy',
-                            team: teamA
-                        })
-                    }),
-                    characterC5,
-                ]
-            },
-            cycle: {
-                launchTime: -1,
-                globalTurn: seedGlobalTurn(1, {
-                    currentTurn: seedTurn(1, {
-                        character: characterC5,
-                        startTime: now,
-                        getRemainingTime() {
-                            return Math.max(12400 - (Date.now() - now), 0);
-                        },
-                        turnDuration: 12400
-                    })
-                })
-            }
-        })
+        battle: battleReducer(undefined, { type: '' }),
     });
 
-    (initialState.battle!.current.characters[ 0 ].features.life as number) = 80;
+    const assetLoader = createAssetLoader();
 
-    (initialState.battle!.current.characters[ 3 ].features.life as number) = 0;
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState,
+        middlewareList: []
+    });
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    storeManager.dispatch(BattleStartAction({
+        tiledMapAssets: {
+            schema: seedTiledMap('map_1'),
+            imagesUrls: {}
+        },
+        globalTurnSnapshot: {
+            id: 1,
+            order: [],
+            startTime: now,
+            currentTurn: {
+                id: 1,
+                characterId: c5.id,
+                duration: 12400,
+                startTime: now
+            }
+        },
+        entitiesSnapshot: {
+            battleHash: '',
+            charactersSnapshots: [
+                c1,
+                seedCharacter({
+                    id: 'c2',
+                    period: 'current',
+                    type: 'sampleChar2',
+                    features: {
+                        life: 100,
+                        actionTime: 13400
+                    },
+                    playerId: p2.id
+                }),
+                seedCharacter({
+                    id: 'c3',
+                    period: 'current',
+                    type: 'sampleChar1',
+                    features: {
+                        life: 110,
+                        actionTime: 18100
+                    },
+                    playerId: p3.id
+                }),
+                c4,
+                c5,
+            ].map(characterToSnapshot),
+            launchTime: Date.now(),
+            playersSnapshots: [ p1, p2, p3 ].map(playerToSnapshot),
+            spellsSnapshots: [],
+            teamsSnapshots: [ t1, t2 ].map(teamToSnapshot),
+            time: Date.now()
+        }
+    }));
 
-    return <>
-        <Provider>
-            <Box maxHeight='100%' width={250}>
-                <InnerDefault/>
-            </Box>
-        </Provider>
-    </>;
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <Box maxHeight='100%' width={250}>
+            <InnerDefault loader={assetLoader} />
+        </Box>
+    });
+
+    return view;
 };
 
-const InnerDefault: React.FC = () => {
-    useAssetLoader('characters', AssetManager.spritesheets.characters, true);
+const InnerDefault: React.FC<{ loader: AssetLoader }> = ({ loader }) => {
+    useAssetLoader(loader, 'characters', AssetManager.spritesheets.characters, true);
 
     return (
         <CharacterListPanel />

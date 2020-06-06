@@ -1,12 +1,13 @@
 import { Box } from '@material-ui/core';
 import { seedSpellActionSnapshot } from '@timeflies/shared';
 import React from 'react';
-import { StoryProps } from '../../../../.storybook/preview';
-import { seedBattleData } from '../../../battle-data.seed';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { seedGameState } from '../../../game-state.seed';
-import { seedGlobalTurn } from '../../../stages/battle/cycle/global-turn.seed';
-import { seedTurn } from '../../../stages/battle/cycle/turn.seed';
 import { seedCharacter } from '../../../stages/battle/entities/character/Character.seed';
+import { seedSpell } from '../../../stages/battle/entities/spell/Spell.seed';
+import { createStoreManager } from '../../../store-manager';
+import { createView } from '../../../view';
+import { battleReducer, BattleState } from '../../reducers/battle-reducers/battle-reducer';
 import { TimePanel } from './time-panel';
 
 export default {
@@ -14,75 +15,103 @@ export default {
     component: TimePanel
 };
 
-export const Default: React.FC<StoryProps> = ({ fakeBattleApi }) => {
+export const Default: React.FC = () => {
 
     const now = Date.now();
 
-    const initialState = seedGameState('p1', {
-        step: 'battle',
-        battle: seedBattleData({
-            cycle: {
-                launchTime: -1,
-                globalTurn: seedGlobalTurn(1, {
-                    currentTurn: seedTurn(1, {
-                        state: 'running',
-                        character: seedCharacter('fake', {
-                            id: 'c1',
-                            period: 'current',
-                            player: null,
-                            seedSpells: [
-                                {
-                                    id: 's1',
-                                    type: 'move',
-                                },
-                                {
-                                    id: 's2',
-                                    type: 'simpleAttack'
-                                }
-                            ]
-                        }),
-                        turnDuration: 10000,
-                        startTime: now,
-                        getRemainingTime() { return Math.max(10000 - (Date.now() - now), 0); }
+    const preloadedState = battleReducer(undefined, { type: '' });
+
+    const battleState: BattleState = {
+        ...preloadedState,
+        snapshotState: {
+            ...preloadedState.snapshotState,
+            battleDataCurrent: {
+                ...preloadedState.snapshotState.battleDataCurrent,
+                characters: [
+                    seedCharacter({
+                        id: 'c1',
+                        period: 'current',
+                        playerId: 'p1'
                     })
-                })
-            },
-            future: {
-                battleHash: '',
-                characters: [],
-                players: [],
-                teams: [],
-                spellActionSnapshotList: [
-                    seedSpellActionSnapshot('sa0', {
-                        spellId: 's1',
-                        duration: 2000,
-                        startTime: now,
+                ],
+                spells: [
+                    seedSpell({
+                        id: 's1',
+                        period: 'current',
+                        type: 'move',
+                        feature: {
+                            duration: 800,
+                            attack: 12,
+                            area: 4
+                        },
+                        index: 1,
                         characterId: 'c1'
                     }),
-                    seedSpellActionSnapshot('sa1', {
-                        spellId: 's1',
-                        duration: 2000,
-                        startTime: now + 2000,
+                    seedSpell({
+                        id: 's2',
+                        period: 'current',
+                        type: 'simpleAttack',
+                        feature: {
+                            duration: 1000,
+                            attack: 22,
+                            area: 3
+                        },
+                        index: 2,
                         characterId: 'c1'
                     }),
-                    seedSpellActionSnapshot('sa1', {
-                        spellId: 's2',
-                        duration: 2000,
-                        startTime: now + 4000,
-                        characterId: 'c1'
-                    })
                 ]
             }
-        })
+        },
+        cycleState: {
+            ...preloadedState.cycleState,
+            currentCharacterId: 'c1',
+            turnDuration: 10000,
+            turnStartTime: now
+        },
+        spellActionState: {
+            ...preloadedState.spellActionState,
+            spellActionSnapshotList: [
+                seedSpellActionSnapshot('sa0', {
+                    spellId: 's1',
+                    duration: 2000,
+                    startTime: now,
+                    characterId: 'c1'
+                }),
+                seedSpellActionSnapshot('sa1', {
+                    spellId: 's1',
+                    duration: 2000,
+                    startTime: now + 2000,
+                    characterId: 'c1'
+                }),
+                seedSpellActionSnapshot('sa1', {
+                    spellId: 's2',
+                    duration: 2000,
+                    startTime: now + 4000,
+                    characterId: 'c1'
+                })
+            ]
+        }
+    };
+
+    const assetLoader = createAssetLoader();
+
+    const storeManager = createStoreManager({
+        assetLoader,
+        initialState: seedGameState('p1', {
+            step: 'battle',
+            battle: battleState
+        }),
+        middlewareList: []
     });
 
-    const { Provider } = fakeBattleApi.init({ initialState });
+    const view = createView({
+        storeManager,
+        assetLoader,
+        createPixi: async () => { },
+        gameUIChildren: <Box width={600}>
+            <TimePanel />
+        </Box>
+    });
 
-    return (
-        <Provider>
-            <Box width={600}>
-                <TimePanel />
-            </Box>
-        </Provider>
-    );
+    return view;
 };
