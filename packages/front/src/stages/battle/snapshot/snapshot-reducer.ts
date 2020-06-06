@@ -20,6 +20,7 @@ type BattleData<P extends BattleDataPeriod> = {
 
 export type SnapshotState = {
     snapshotList: BattleSnapshot[];
+    myPlayerId: string;
     launchTime: number;
     battleDataCurrent: BattleData<'current'>;
     battleDataFuture: BattleData<'future'>;
@@ -61,6 +62,7 @@ const getInitialBattleData = (): BattleData<any> => ({
 
 const initialState: SnapshotState = {
     snapshotList: [],
+    myPlayerId: '',
     launchTime: -1,
     battleDataCurrent: getInitialBattleData(),
     battleDataFuture: getInitialBattleData(),
@@ -95,28 +97,30 @@ const commit = (state: SnapshotState, time: number): void => {
     }
 };
 
-const updateBattleDataFromSnapshot = (data: BattleData<any>, period: BattleDataPeriod, {
+const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string, period: BattleDataPeriod, {
     battleHash, teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
 }: BattleSnapshot) => {
 
     data.battleHash = battleHash;
     data.spells = spellsSnapshots.map(snap => Spell(period, snap));
-    data.characters = charactersSnapshots.map(snap => Character(period, snap));
+    data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
     data.players = playersSnapshots.map(snap => Player(period, snap));
     data.teams = teamsSnapshots.map(snap => Team(period, snap));
 };
 
 export const snapshotReducer = createReducer(initialState, {
     [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
-        const { battleHash, spellsSnapshots, charactersSnapshots, playersSnapshots, teamsSnapshots } = payload.entitiesSnapshot;
+        const { myPlayerId, entitiesSnapshot } = payload;
+        const { battleHash, spellsSnapshots, charactersSnapshots, playersSnapshots, teamsSnapshots } = entitiesSnapshot;
 
+        state.myPlayerId = myPlayerId;
         periodList.forEach(period => {
 
             const data = getBattleData(state, period);
 
             data.battleHash = battleHash;
             data.spells = spellsSnapshots.map(snap => Spell(period, snap));
-            data.characters = charactersSnapshots.map(snap => Character(period, snap));
+            data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
             data.players = playersSnapshots.map(snap => Player(period, snap));
             data.teams = teamsSnapshots.map(snap => Team(period, snap));
         });
@@ -138,8 +142,8 @@ export const snapshotReducer = createReducer(initialState, {
         const currentSnapshot = getLastSnapshot(state.snapshotList);
         assertIsDefined(currentSnapshot);
 
-        updateBattleDataFromSnapshot(state.battleDataFuture, 'future', currentSnapshot);
-        updateBattleDataFromSnapshot(state.battleDataCurrent, 'current', currentSnapshot);
+        updateBattleDataFromSnapshot(state.battleDataFuture, state.myPlayerId, 'future', currentSnapshot);
+        updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', currentSnapshot);
     },
     [ SpellActionTimerEndAction.type ]: (state, { payload: { removed, correctHash } }: SpellActionTimerEndAction) => {
 
@@ -151,10 +155,10 @@ export const snapshotReducer = createReducer(initialState, {
             }
 
             const currentSnapshot = getLastSnapshot(state.snapshotList)!;
-            updateBattleDataFromSnapshot(state.battleDataFuture, 'future', currentSnapshot);
+            updateBattleDataFromSnapshot(state.battleDataFuture, state.myPlayerId, 'future', currentSnapshot);
 
             if (currentSnapshot.time < Date.now()) {
-                updateBattleDataFromSnapshot(state.battleDataCurrent, 'current', currentSnapshot);
+                updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', currentSnapshot);
             }
         } else {
 
@@ -162,7 +166,7 @@ export const snapshotReducer = createReducer(initialState, {
 
             assertIsDefined(snapshot);
 
-            updateBattleDataFromSnapshot(state.battleDataCurrent, 'current', snapshot);
+            updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', snapshot);
         }
     }
 });

@@ -1,5 +1,4 @@
 import React from 'react';
-import { StoryProps } from '../../../../.storybook/preview';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { createStoreManager } from '../../../store-manager';
@@ -411,7 +410,7 @@ const getLaunchState = (): RoomData => {
     };
 };
 
-export const Default: React.FC<StoryProps> = () => {
+export const Default: React.FC = () => {
 
     return <>
         <Wrapper roomState={getShouldPutCharactersState()} />

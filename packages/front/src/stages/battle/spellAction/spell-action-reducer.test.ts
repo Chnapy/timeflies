@@ -2,6 +2,7 @@ import { seedSpellActionSnapshot } from '@timeflies/shared';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { SpellActionLaunchAction, SpellActionTimerEndAction, SpellActionCancelAction } from './spell-action-actions';
 import { spellActionReducer, SpellActionState } from './spell-action-reducer';
+import { seedCharacter } from '../entities/character/Character.seed';
 
 describe('# spell-action-reducer', () => {
 
@@ -98,7 +99,7 @@ describe('# spell-action-reducer', () => {
                 startTime: -1,
                 duration: -1
             },
-            isMine: true
+            currentCharacter: seedCharacter({ id: '', period: 'current' })
         }));
 
         expect(state1.spellActionSnapshotList).toHaveLength(0);

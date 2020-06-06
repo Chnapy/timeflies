@@ -4,6 +4,7 @@ import { Team, teamToSnapshot } from '../entities/team/Team';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { BattleCommitAction } from './snapshot-manager-actions';
 import { snapshotReducer, SnapshotState } from './snapshot-reducer';
+import { seedCharacter } from '../entities/character/Character.seed';
 
 describe('# snapshot-reducer', () => {
 
@@ -30,6 +31,7 @@ describe('# snapshot-reducer', () => {
         ];
 
         const initialState: SnapshotState = {
+            myPlayerId: 'p1',
             launchTime: -1,
             snapshotList: [],
             battleDataCurrent: {
@@ -81,6 +83,7 @@ describe('# snapshot-reducer', () => {
             ];
 
             const initialState: SnapshotState = {
+                myPlayerId: 'p1',
                 launchTime: -1,
                 snapshotList: [],
                 battleDataCurrent: {
@@ -131,6 +134,7 @@ describe('# snapshot-reducer', () => {
             ];
 
             const initialState: SnapshotState = {
+                myPlayerId: 'p1',
                 launchTime: -1,
                 snapshotList: [],
                 battleDataCurrent: {
@@ -192,6 +196,7 @@ describe('# snapshot-reducer', () => {
             ];
 
             const initialState: SnapshotState = {
+                myPlayerId: 'p1',
                 launchTime: -1,
                 snapshotList: [],
                 battleDataCurrent: {
@@ -240,6 +245,7 @@ describe('# snapshot-reducer', () => {
             ];
 
             const initialState: SnapshotState = {
+                myPlayerId: 'p1',
                 launchTime: -1,
                 snapshotList: [],
                 battleDataCurrent: {
@@ -265,7 +271,7 @@ describe('# snapshot-reducer', () => {
                     duration: 1000,
                     startTime: -1
                 },
-                isMine: true
+                currentCharacter: seedCharacter({ id: '', period: 'current' })
             }));
 
             expect(state1.battleDataFuture.battleHash).not.toBe('not-defined-future');
@@ -291,6 +297,7 @@ describe('# snapshot-reducer', () => {
             ];
 
             const initialState: SnapshotState = {
+                myPlayerId: 'p1',
                 launchTime: -1,
                 snapshotList: [],
                 battleDataCurrent: {

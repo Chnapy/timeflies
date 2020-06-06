@@ -25,7 +25,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
             if (message.type === 'battle-run/launch' && step === 'room') {
                 const { battleSnapshot, globalTurnState } = message;
 
-                const { room } = api.getState();
+                const { room, currentPlayer } = api.getState();
                 assertIsNonNullable(room);
 
                 const { map: { mapSelected, mapList } } = room;
@@ -37,6 +37,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                 const { schema, images } = assetLoader.get('map')!;
 
                 next(BattleStartAction({
+                    myPlayerId: currentPlayer!.id,
                     tiledMapAssets: {
                         schema,
                         imagesUrls: images

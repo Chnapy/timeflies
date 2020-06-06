@@ -4,7 +4,6 @@ import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { CharacterItem } from './character-item/character-item';
 import { shallowEqual } from 'react-redux';
-import { assertIsDefined } from '@timeflies/shared';
 
 const useStyles = makeStyles(() => ({
     root: {

@@ -4,6 +4,7 @@ import { BattleDataPeriod } from '../../snapshot/battle-data';
 export type Character<P extends BattleDataPeriod> = {
     id: string;
     period: P;
+    isMine: boolean;
     staticData: Readonly<StaticCharacter>;
     position: Readonly<Position>;
     orientation: Orientation;
@@ -31,13 +32,14 @@ export const characterAlterLife = ({ features }: Character<BattleDataPeriod>, va
 
 export const characterIsAlive = (character: Character<BattleDataPeriod>) => character.features.life > 0;
 
-export const Character = <P extends BattleDataPeriod>(period: P, {
+export const Character = <P extends BattleDataPeriod>(period: P, myPlayerId: string, {
     id, staticData, orientation, position, features, playerId
 }: CharacterSnapshot): Character<P> => {
 
     return {
         id,
         period,
+        isMine: playerId === myPlayerId,
         staticData,
         position,
         orientation,

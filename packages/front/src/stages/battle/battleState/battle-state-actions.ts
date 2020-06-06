@@ -2,17 +2,12 @@ import { createAction } from '@reduxjs/toolkit';
 import { SpellType, TurnSnapshot, Position } from '@timeflies/shared';
 import { SpellAction } from '../spellAction/spell-action-reducer';
 import { BattleActionState } from './battle-action-reducer';
-
-export type BattleStateResetAction = ReturnType<typeof BattleStateResetAction>;
-export const BattleStateResetAction = createAction<{
-    characterId: string;
-    isMine: boolean;
-}>('battle/state/reset');
+import { Character } from '../entities/character/Character';
 
 export type BattleStateTurnStartAction = ReturnType<typeof BattleStateTurnStartAction>;
 export const BattleStateTurnStartAction = createAction<{
     turnSnapshot: TurnSnapshot;
-    isMine: boolean;
+    currentCharacter: Character<'current'>;
 }>('battle/state/turn-start');
 
 export type BattleStateTurnEndAction = ReturnType<typeof BattleStateTurnEndAction>;
@@ -30,7 +25,6 @@ export const BattleStateSpellLaunchAction = createAction<{
 
 export type BattleStateAction = ReturnType<(typeof battleStateActionList)[ number ]>;
 export const battleStateActionList = [
-    BattleStateResetAction,
     BattleStateTurnStartAction,
     BattleStateTurnEndAction,
     BattleStateSpellPrepareAction,

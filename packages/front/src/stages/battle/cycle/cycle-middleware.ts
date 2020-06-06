@@ -61,11 +61,12 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
         timeout = setTimeout(() => {
 
+            const currentCharacter = extractCurrentCharacters(api.getState)
+                .find(c => c.id === turnSnapshot.characterId)!;
+
             api.dispatch(BattleStateTurnStartAction({
                 turnSnapshot,
-
-                // TODO
-                isMine: true
+                currentCharacter
             }));
 
             differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);

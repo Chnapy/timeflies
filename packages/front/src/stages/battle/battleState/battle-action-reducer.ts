@@ -14,6 +14,7 @@ export type GridTile = {
 
 export type BattleActionState = {
     currentAction: BState;
+    selectedSpellId?: string;
     tiledSchema: TiledMap | null;
     tiledImagesUrls: Record<string, string>;
     charactersPositionList: Position[];
@@ -92,10 +93,11 @@ export const battleActionReducer = createReducer(initialState, {
         };
     },
     [ BattleStateTurnStartAction.type ]: (state, { payload }: BattleStateTurnStartAction) => {
+        const { currentCharacter } = payload;
 
         return {
             ...state,
-            currentAction: payload.isMine
+            currentAction: currentCharacter.isMine
                 ? 'spellPrepare'
                 : 'watch',
             path: [],
@@ -103,11 +105,12 @@ export const battleActionReducer = createReducer(initialState, {
             actionArea: []
         };
     },
-    [ BattleStateTurnEndAction.type ]: (state, action: BattleStateTurnStartAction) => {
+    [ BattleStateTurnEndAction.type ]: (state, action: BattleStateTurnEndAction) => {
 
         return {
             ...state,
             currentAction: 'watch',
+            selectedSpellId: undefined,
             path: [],
             rangeArea: [],
             actionArea: []

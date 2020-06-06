@@ -56,6 +56,7 @@ describe('# battle-action', () => {
             const store = getStore(initialState);
 
             const action = BattleStartAction({
+                myPlayerId: 'p1',
                 tiledMapAssets: {
                     schema: seedTiledMapAssets('map_1').schema,
                     imagesUrls: { toto: 'url' },
@@ -128,7 +129,7 @@ describe('# battle-action', () => {
                     duration: 1000,
                     startTime: Date.now()
                 },
-                isMine: true
+                currentCharacter: seedCharacter({ id: 'c1', period: 'current', isMine: true })
             });
 
             store.dispatch(action);

@@ -72,6 +72,7 @@ export const Default: React.FC = () => {
             .load();
 
         storeManager.dispatch(BattleStartAction({
+            myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,
                 imagesUrls: map.images
