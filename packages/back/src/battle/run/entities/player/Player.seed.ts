@@ -1,24 +1,18 @@
-import { PlayerData } from "../../../../PlayerData";
-import { WSSocket } from '../../../../transport/ws/WSSocket';
+import { PlayerRoom } from '@timeflies/shared';
+import { WSSocket, WSSocketPool } from '../../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../../transport/ws/WSSocket.seed';
-import { seedTeam } from "../team/Team.seed";
 import { Player } from "./Player";
 
 let id = 0;
-const SEED_PLAYER: () => PlayerData = () => {
+export const seedPlayer = (partialPlayer: Partial<PlayerRoom> = {}, teamId?: string, socket?: WSSocketPool): Player => {
     id++;
-    return {
-        id: id.toString(),
-        name: 'sample_player_' + id,
-        state: 'init',
-        staticCharacters: [],
-        socket: new WSSocket(seedWebSocket().ws).createPool()
-    };
-};
-
-export const seedPlayer = (partialPlayer: Partial<PlayerData> = {}): Player => {
-    return Player({
-        ...SEED_PLAYER(),
-        ...partialPlayer
-    }, seedTeam());
+    return Player(
+        {
+            id: id.toString(),
+            name: 'sample_player_' + id,
+            ...partialPlayer
+        },
+        teamId ?? 't1',
+        socket ?? new WSSocket(seedWebSocket().ws).createPool()
+    );
 };

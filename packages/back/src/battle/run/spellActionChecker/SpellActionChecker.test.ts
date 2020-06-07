@@ -25,7 +25,7 @@ describe('# SpellActionChecker', () => {
 
         const checker = SpellActionChecker(cycle, mapManager, { checkersCreators });
 
-        expect(checker.check({} as any, {} as any)).toEqual({ success: false, reason: 'spell' });
+        expect(checker.check({} as any, {} as any, {} as any)).toEqual({ success: false, reason: 'spell' });
         expect(nbrCalls).toBe(3);
     });
 
@@ -50,7 +50,7 @@ describe('# SpellActionChecker', () => {
 
         const checker = SpellActionChecker(cycle, mapManager, { checkersCreators });
 
-        expect(checker.check({} as any, {} as any)).toEqual({ success: true });
+        expect(checker.check({} as any, {} as any, {} as any)).toEqual({ success: true });
         expect(nbrCalls).toBe(5);
     });
 

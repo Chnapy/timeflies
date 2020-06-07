@@ -1,11 +1,12 @@
 import { CheckerCreator } from '../SpellActionChecker';
+import { characterIsAlive } from '../../entities/character/Character';
 
-export const checkerCharacter: CheckerCreator = (cycle, mapManager) => ({ spellAction }, player) => {
+export const checkerCharacter: CheckerCreator = (cycle, mapManager) => ({ spellAction }, player, {spells}) => {
     const { currentTurn: {
         character
     } } = cycle.globalTurn;
 
-    if (!character.isAlive) {
+    if (!characterIsAlive(character)) {
         console.log('check isAlive');
         return {
             success: false,
@@ -13,7 +14,7 @@ export const checkerCharacter: CheckerCreator = (cycle, mapManager) => ({ spellA
         };
     }
 
-    const spell = character.spells.find(s => s.staticData.id === spellAction.spellId);
+    const spell = spells.find(s => s.id === spellAction.spellId);
 
     if (!spell) {
         console.log('check spell');

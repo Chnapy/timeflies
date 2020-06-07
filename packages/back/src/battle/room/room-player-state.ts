@@ -95,7 +95,7 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
                         socket
                     };
                 })
-            };
+            } as any;
 
             assertIsNonNullable(roomState.mapSelected);
 

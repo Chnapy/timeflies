@@ -5,8 +5,8 @@ export interface PlayerData {
     id: string;
     name: string;
     socket: WSSocketPool;
-    staticCharacters: {
-        staticData: StaticCharacter;
-        initialPosition: Position;
-    }[];
+    // staticCharacters: {
+    //     staticData: StaticCharacter;
+    //     initialPosition: Position;
+    // }[];
 }

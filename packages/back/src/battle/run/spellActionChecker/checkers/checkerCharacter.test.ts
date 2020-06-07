@@ -4,34 +4,37 @@ import { seedPlayer } from '../../entities/player/Player.seed';
 import { seedMapManager } from '../../mapManager/MapManager.seed';
 import { CharActionCheckerResult } from '../SpellActionChecker';
 import { checkerCharacter } from './checkerCharacter';
+import { BattleState } from '../../battleStateManager/BattleStateManager';
+import { seedCharacter } from '../../entities/character/Character.seed';
 
 describe('# checkerCharacter', () => {
 
+    const getBattleState = (charLife: number = 100): BattleState => ({
+        battleHashList: [],
+        teams: [],
+        players: [ seedPlayer({ id: 'p1' }) ],
+        characters: [ seedCharacter({
+
+            alterFn: char => {
+                char.id = 'c1';
+                char.initialFeatures.life = charLife;
+            }
+        }, 'p1')[ 0 ] ],
+        spells: [ {
+            id: 's1', index: 1, staticData: {
+                id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
+            },
+            features: {} as any,
+            characterId: 'c1'
+        } ]
+    });
+
     it('should fail if character is dead', () => {
 
-        const player = seedPlayer({
-            staticCharacters: [ {
-                staticData: {
-                    id: 'test',
-                    defaultSpellId: 's1',
-                    initialFeatures: {
-                        life: 0,
-                        actionTime: 200,
-                    },
-                    name: '',
-                    staticSpells: [ {
-                        id: 's1',
-                        name: '',
-                        type: 'move',
-                        initialFeatures: {} as any
-                    } ],
-                    type: 'sampleChar1'
-                },
-                initialPosition: { x: 0, y: 0 }
-            } ]
-        });
+        const battleState = getBattleState(0);
 
-        const character = player.characters[ 0 ];
+        const player = battleState.players[0];
+        const character = battleState.characters[ 0 ];
 
         const cycle = seedCycle({ turn: { character } });
 
@@ -42,13 +45,13 @@ describe('# checkerCharacter', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: seedSpellActionSnapshot(character.spells[ 0 ].id, {
+            spellAction: seedSpellActionSnapshot(battleState.spells[ 0 ].id, {
                 characterId: 'other',
                 duration: 200,
             })
         };
 
-        expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'isAlive'
         });
@@ -56,29 +59,10 @@ describe('# checkerCharacter', () => {
 
     it('should fail on bad spell id', () => {
 
-        const player = seedPlayer({
-            staticCharacters: [ {
-                staticData: {
-                    id: 'test',
-                    defaultSpellId: 's1',
-                    initialFeatures: {
-                        life: 100,
-                        actionTime: 200,
-                    },
-                    name: '',
-                    staticSpells: [ {
-                        id: 's1',
-                        name: '',
-                        type: 'move',
-                        initialFeatures: {} as any
-                    } ],
-                    type: 'sampleChar1'
-                },
-                initialPosition: { x: 0, y: 0 }
-            } ]
-        });
+        const battleState = getBattleState();
 
-        const character = player.characters[ 0 ];
+        const player = battleState.players[0];
+        const character = battleState.characters[ 0 ];
 
         const cycle = seedCycle({ turn: { character } });
 
@@ -94,7 +78,7 @@ describe('# checkerCharacter', () => {
             })
         };
 
-        expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'spell'
         });
@@ -102,29 +86,11 @@ describe('# checkerCharacter', () => {
 
     it('should succeed else', () => {
 
-        const player = seedPlayer({
-            staticCharacters: [ {
-                staticData: {
-                    id: 'test',
-                    defaultSpellId: 's1',
-                    initialFeatures: {
-                        life: 100,
-                        actionTime: 200,
-                    },
-                    name: '',
-                    staticSpells: [ {
-                        id: 's1',
-                        name: '',
-                        type: 'move',
-                        initialFeatures: {} as any
-                    } ],
-                    type: 'sampleChar1'
-                },
-                initialPosition: { x: 0, y: 0 }
-            } ]
-        });
+        const battleState = getBattleState();
 
-        const character = player.characters[ 0 ];
+        const player = battleState.players[0];
+        const character = battleState.characters[ 0 ];
+        const spell = battleState.spells[0];
 
         const cycle = seedCycle({ turn: { character } });
 
@@ -135,12 +101,12 @@ describe('# checkerCharacter', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: seedSpellActionSnapshot(character.spells[ 0 ].id, {
+            spellAction: seedSpellActionSnapshot(spell.id, {
                 characterId: 'other',
             })
         };
 
-        expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({ success: true });
+        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({ success: true });
     });
 
 });

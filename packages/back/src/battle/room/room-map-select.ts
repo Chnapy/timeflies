@@ -38,10 +38,7 @@ export const getRoomMapSelect: RoomListener<RoomClientAction.MapSelect> = ({
 
     const schema = await readFileMap(schemaUrlServer);
 
-    const tiledManager = TiledManager({
-        schema,
-        images: {}
-    });
+    const tiledManager = TiledManager(schema);
 
     const placementTileList: MapPlacementTile[] = tiledManager.getPlacementTilesPositions()
         .flatMap((positionList, i) => {

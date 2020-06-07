@@ -19,11 +19,15 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
 
     const socket = websocketCreator(endpoint);
 
-    const send = ({ payload }: SendMessageAction) => {
+    const send = async (action: SendMessageAction) => {
+
+        if(socket.readyState === WebSocket.CONNECTING) {
+            return new Promise(r => setTimeout(() => send(action).then(r), 1000));
+        }
         // console.log('<-', message);
         socket.send(JSON.stringify([ {
             sendTime: Date.now(),
-            ...payload
+            ...action.payload
         } ]));
     };
 

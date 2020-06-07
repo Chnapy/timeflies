@@ -1,61 +1,29 @@
-import { assertIsDefined, BRunEndSAction, BRunLaunchSAction, SpellActionCAction, DeepReadonly } from '@timeflies/shared';
-import { PlayerData } from '../../PlayerData';
-import { TeamData } from '../../TeamData';
+import { BRunEndSAction, BRunLaunchSAction, SpellActionCAction } from '@timeflies/shared';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../room/room';
 import { RoomState } from '../room/room-state-manager';
 import { BattleStateManager } from './battleStateManager/BattleStateManager';
-import { createStaticCharacter } from './createStaticCharacter';
 import { Cycle } from "./cycle/Cycle";
 import { Team } from "./entities/team/Team";
 import { MapManager } from "./mapManager/MapManager";
 import { SpellActionReceiver } from './spellActionReceiver/SpellActionReceiver';
+import { characterIsAlive } from './entities/character/Character';
 
 const LAUNCH_DELAY = 5000; // TODO use config system
 
 type RoomKeys = keyof Pick<RoomState, 'id' | 'playerList' | 'teamList' | 'mapSelected'>;
 
-export type RoomStateReady = DeepReadonly<{
+export type RoomStateReady = {
     [ K in RoomKeys ]: Exclude<RoomState[ K ], null>;
 } & {
     playerDataList: IPlayerRoomData<WSSocket>[];
-}>;
+};
 
 export interface BattleRunRoom {
     start(): void;
 }
 
 export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerList }: RoomStateReady): BattleRunRoom => {
-
-    const teamsData: TeamData[] = teamList.map((t): TeamData => {
-
-        return {
-            id: t.id,
-            letter: t.letter,
-            players: t.playersIds.map((pid): PlayerData => {
-                const playerData = playerDataList.find(p => p.id === pid);
-                const player = playerList.find(p => p.id === pid);
-
-                assertIsDefined(playerData);
-                assertIsDefined(player);
-
-                const socket = playerData.socket.createPool();
-
-                return {
-                    id: pid,
-                    name: player.name,
-                    socket,
-                    staticCharacters: player.characters.map((c) => {
-
-                        return {
-                            staticData: createStaticCharacter(c.id, c.type),
-                            initialPosition: c.position
-                        };
-                    })
-                };
-            })
-        }
-    });
 
     const start = (): void => {
         const launchTime = Date.now() + LAUNCH_DELAY;
@@ -78,12 +46,22 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
     };
 
     const checkDeathsAndDisconnects = () => {
-        const teamsRemains = teams.filter(t =>
-            t.players.some(p => p.socket.isConnected)
-            && t.characters.some(c => c.isAlive)
-        );
-        if (teamsRemains.length === 1) {
-            endBattle(teamsRemains[ 0 ]);
+        const charactersAlivePlayerIds = characters
+            .filter(characterIsAlive)
+            .map(c => c.playerId);
+
+        const connectedPlayerTeamIds = players
+            .filter(p => p.socket.isConnected())
+            .filter(p => charactersAlivePlayerIds.includes(p.id))
+            .map(p => p.teamId);
+
+        const remainingTeams = new Set(connectedPlayerTeamIds);
+
+        if (remainingTeams.size === 1) {
+            const { value } = remainingTeams.values().next();
+            const teamWinner = teams.find(t => t.id === value)!;
+
+            endBattle(teamWinner);
         }
     };
 
@@ -101,11 +79,13 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
     };
 
     const stateManager = BattleStateManager(
-        teamsData.map(td => Team(td))
+        playerDataList,
+        teamList,
+        playerList
     );
 
     const { battleState } = stateManager;
-    const { teams, players } = battleState;
+    const { teams, players, characters } = battleState;
 
     const mapManager = MapManager(mapSelected.config);
 

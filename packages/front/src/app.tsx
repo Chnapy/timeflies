@@ -31,7 +31,7 @@ export const App: React.FC<AppProps> = ({ store, assetLoader, onMount, children 
     return <React.StrictMode>
         <Provider store={store}>
             <UIProvider assetLoader={assetLoader}>
-                <Box position='relative' height='100%'>
+                <Box position='relative' height='100vh'>
 
                     <div ref={gameWrapperRef} style={{
                         position: 'absolute',

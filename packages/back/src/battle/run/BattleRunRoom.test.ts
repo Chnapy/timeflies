@@ -1,10 +1,10 @@
-import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, MapConfig, NotifySAction, SpellActionCAction, TimerTester, seedSpellActionSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, MapConfig, NotifySAction, SpellActionCAction, TimerTester, seedSpellActionSnapshot, SpellSnapshot } from '@timeflies/shared';
 import { Server, WebSocket } from 'mock-socket';
 import path from 'path';
 import { PlayerService } from '../../PlayerService';
 import { TeamData } from '../../TeamData';
 import { WSSocket } from '../../transport/ws/WSSocket';
-import { BattleRunRoom } from './BattleRunRoom';
+import { BattleRunRoom, RoomStateReady } from './BattleRunRoom';
 
 describe.skip('BattleRunRoom', () => {
 
@@ -39,6 +39,16 @@ describe.skip('BattleRunRoom', () => {
         }
     ];
     let teams: TeamData[];
+    const roomState: RoomStateReady = {
+        id: '',
+        mapSelected: {
+            config: mapConfig,
+            placementTileList: []
+        },
+        playerDataList: [],
+        playerList: [],
+        teamList: []
+    };
 
     let server: Server;
 
@@ -55,26 +65,23 @@ describe.skip('BattleRunRoom', () => {
         c0OnConfirm?: (action: ConfirmSAction) => void,
         c1OnNotify?: (action: NotifySAction) => void
     }) => {
-        //@ts-ignore
-        battleRunRoom = BattleRunRoom(mapConfig, teams);
+        battleRunRoom = BattleRunRoom(roomState);
 
-        const onStart = (char: CharacterSnapshot) => {
+        const onStart = (char: CharacterSnapshot, spellMove: SpellSnapshot) => {
             const position = {
                 ...char.position,
                 y: char.position.y + 1
             };
 
-            const spell = char.spellsSnapshots.find(s => s.staticData.type === 'move');
-
-            assertIsDefined(spell);
+            assertIsDefined(spellMove);
 
             const initialAction: SpellActionCAction = {
                 type: 'battle/spellAction',
                 sendTime: Date.now() + 5000,
-                spellAction: seedSpellActionSnapshot(spell.id, {
+                spellAction: seedSpellActionSnapshot(spellMove.id, {
                     startTime: Date.now() + 5000,
                     characterId: char.id,
-                    duration: spell.features.duration,
+                    duration: spellMove.features.duration,
                     position,
                     actionArea: [ position ],
                 })
@@ -95,16 +102,15 @@ describe.skip('BattleRunRoom', () => {
 
                 switch (action.type) {
                     case 'battle-run/launch':
-                        const { teamsSnapshots } = action.battleSnapshot;
-                        const players = teamsSnapshots.flatMap(t => t.playersSnapshots);
-                        const characters = players.flatMap(p => p.charactersSnapshots);
+                        const { charactersSnapshots, spellsSnapshots } = action.battleSnapshot;
 
-                        const char = characters[ 0 ];
+                        const char = charactersSnapshots[ 0 ];
+                        const spellmove = spellsSnapshots.find(s => s.staticData.type === 'move')!;
 
                         if (c0OnStart)
                             c0OnStart();
 
-                        onStart(char);
+                        onStart(char, spellmove);
                         break;
 
                     case 'confirm':
@@ -143,15 +149,21 @@ describe.skip('BattleRunRoom', () => {
         server.on('connection', socket => {
             const wss = new WSSocket(socket as any);
             const player = playerService.getPlayer(wss, i);
+            roomState.playerDataList.push(player);
+            roomState.playerList.push({
+                id: player.id,
+                name: player.name,
+                isAdmin: false,
+                isLoading: false,
+                isReady: true,
+                characters: []
+            });
             i++;
-            if (teams[ 0 ].players.length) {
-                //@ts-ignore
-                teams[ 1 ].players.push(player);
-            } else {
-                //@ts-ignore
-                teams[ 0 ].players.push(player);
-            }
-
+            roomState.teamList.push({
+                id: 't' + i,
+                letter: '' + i,
+                playersIds: [ player.id ]
+            });
         });
 
         clients = [ 1, 2 ].map(_ => new WebSocket(URL));
@@ -170,7 +182,7 @@ describe.skip('BattleRunRoom', () => {
     });
 
     test.skip('should correctly init & start: parsing map, place characters, receive first actions', () => {
-        
+
         //@ts-ignore
         battleRunRoom = BattleRunRoom(mapConfig, teams);
 
@@ -195,12 +207,7 @@ describe.skip('BattleRunRoom', () => {
 
                     expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
 
-                    const positions = action.battleSnapshot.teamsSnapshots
-                        .flatMap(t => t.playersSnapshots
-                            .flatMap(p => p.charactersSnapshots
-                                .flatMap(c => c.position)
-                            )
-                        );
+                    const positions = action.battleSnapshot.charactersSnapshots.map(c => c.position)
                     expect(positions).not.toContain(undefined);
                     expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
                 }

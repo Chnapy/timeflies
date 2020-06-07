@@ -1,5 +1,5 @@
 import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY } from "@timeflies/shared";
-import { Character } from "../../entities/character/Character";
+import { Character, characterIsAlive } from "../../entities/character/Character";
 import { Turn } from "./Turn";
 
 export type GlobalTurnState = 'idle' | 'running';
@@ -36,7 +36,7 @@ export const GlobalTurn = (
     };
 
     const notifyDeaths = (): void => {
-        if (!currentTurn.character.isAlive) {
+        if (!characterIsAlive(currentTurn.character)) {
             onTurnEnd();
         }
     };
@@ -56,7 +56,7 @@ export const GlobalTurn = (
         }
         else {
             const currentCharacter = charactersOrdered[ nextCharacterIndex ];
-            if (currentCharacter.isAlive) {
+            if (characterIsAlive(currentCharacter)) {
                 console.log(`Wait ${TURN_DELAY}ms`);
                 const turnId = generateTurnId.next().value;
                 setCurrentTurn(Turn(turnId, currentTurn.endTime + TURN_DELAY, currentCharacter, onTurnStart, onTurnEnd));

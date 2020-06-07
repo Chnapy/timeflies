@@ -44,7 +44,7 @@ export const SpellActionReceiver = (
 
     const getOnReceive = (player: Player) => (action: SpellActionCAction): void => {
 
-        const isCheckSuccess = spellActionChecker.check(action, player).success;
+        const isCheckSuccess = spellActionChecker.check(action, player, stateManager.battleState).success;
 
         const sendConfirmAction = (isOk: boolean, lastCorrectHash: string): void => {
 
