@@ -7,6 +7,7 @@ import { wsClientMiddleware } from './socket/wsclient-middleware';
 import { getBattleMiddlewareList } from './ui/reducers/battle-reducers/battle-middleware-list';
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
 import { rootReducer } from './ui/reducers/root-reducer';
+import { bootMiddleware } from './stages/boot/boot-middleware';
 
 export type StoreManager = ReturnType<typeof createStoreManager>;
 
@@ -19,6 +20,7 @@ type Props = {
 };
 
 const defaultMiddlewareList = (assetLoader: AssetLoader): Middleware[] => [
+    bootMiddleware,
     wsClientMiddleware({}),
     roomMiddleware({
         assetLoader

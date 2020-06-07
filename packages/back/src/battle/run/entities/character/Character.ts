@@ -1,92 +1,107 @@
-import { CharacterFeatures, CharacterSnapshot, Orientation, Position, StaticCharacter } from '@timeflies/shared';
-import { Player } from "../player/Player";
-import { Spell } from "../spell/Spell";
-import { Entity } from '../Entity';
+import { CharacterFeatures, CharacterRoom, CharacterSnapshot, Orientation, Position, StaticCharacter } from '@timeflies/shared';
 
-export interface Character extends Entity<CharacterSnapshot> {
-    readonly staticData: Readonly<StaticCharacter>;
-    readonly player: Player;
+export type Character = {
+    id: string;
+    staticData: Readonly<StaticCharacter>;
     position: Readonly<Position>;
     orientation: Orientation;
-    features: Readonly<CharacterFeatures>;
-    readonly spells: readonly Spell[];
-    readonly isAlive: boolean;
-    alterLife(add: number): void;
-}
+    features: CharacterFeatures;
 
-interface Dependencies {
-    spellCreator: typeof Spell;
-}
+    playerId: string;
+};
+
+export const characterToSnapshot = ({ id, staticData, position, orientation, features, playerId }: Character): CharacterSnapshot => ({
+    id,
+    staticData,
+    position,
+    orientation,
+    features,
+    playerId
+});
+
+export const characterAlterLife = ({ features }: Character, value: number) => {
+    features.life = Math.max(features.life + value, 0);
+};
+
+export const characterIsAlive = (character: Character) => character.features.life > 0;
 
 export const Character = (
-    staticData: StaticCharacter, initialPosition: Position,
-    player: Player,
-    { spellCreator }: Dependencies = { spellCreator: Spell }
+    { id, position }: Pick<CharacterRoom, 'id' | 'position'>,
+    staticData: StaticCharacter,
+    playerId: string,
 ): Character => {
-
-    let features: Readonly<CharacterFeatures> = {
-        ...staticData.initialFeatures
-    };
-
-    let orientation: Orientation = 'bottom'; // should be calculated (?)
-    let position: Position = { ...initialPosition };
-
-    const this_: Character = {
-        get id(): string {
-            return staticData.id;
-        },
+    return {
+        id,
         staticData,
-        player,
-        get isAlive(): boolean {
-            return features.life > 0;
-        },
-        get features() {
-            return features;
-        },
-        set features(f) {
-            features = f;
-        },
-        get orientation() {
-            return orientation;
-        },
-        set orientation(o) {
-            orientation = o;
-        },
-        get position() {
-            return position;
-        },
-        set position(p) {
-            position = p;
-        },
-        get spells() {
-            return spells;
-        },
-        alterLife(add) {
-            const life = Math.max(features.life + add, 0);
-            features = { ...features, life };
-        },
-        toSnapshot() {
-            return {
-                id: staticData.id,
-                staticData,
-                features,
-                orientation,
-                position,
-                spellsSnapshots: this.spells.map(s => s.toSnapshot())
-            };
-        },
-        updateFromSnapshot(snapshot) {
-            features = { ...snapshot.features };
-            orientation = snapshot.orientation;
-            position = snapshot.position;
-
-            spells.forEach(spell => spell.updateFromSnapshot(
-                snapshot.spellsSnapshots.find(snap => snap.id === spell.id)!
-            ));
-        }
+        position,
+        orientation: 'bottom', // should be calculated (?)
+        features: { ...staticData.initialFeatures },
+        playerId
     };
 
-    const spells = staticData.staticSpells.map((s, i) => spellCreator(s, i + 1, this_));
+    // let features: Readonly<CharacterFeatures> = {
+    //     ...staticData.initialFeatures
+    // };
 
-    return this_;
+    // let orientation: Orientation = 'bottom'; // should be calculated (?)
+    // let position: Position = { ...initialPosition };
+
+    // const this_: Character = {
+    //     get id(): string {
+    //         return staticData.id;
+    //     },
+    //     staticData,
+    //     player,
+    //     get isAlive(): boolean {
+    //         return features.life > 0;
+    //     },
+    //     get features() {
+    //         return features;
+    //     },
+    //     set features(f) {
+    //         features = f;
+    //     },
+    //     get orientation() {
+    //         return orientation;
+    //     },
+    //     set orientation(o) {
+    //         orientation = o;
+    //     },
+    //     get position() {
+    //         return position;
+    //     },
+    //     set position(p) {
+    //         position = p;
+    //     },
+    //     get spells() {
+    //         return spells;
+    //     },
+    //     alterLife(add) {
+    //         const life = Math.max(features.life + add, 0);
+    //         features = { ...features, life };
+    //     },
+    //     toSnapshot() {
+    //         return {
+    //             id: staticData.id,
+    //             staticData,
+    //             features,
+    //             orientation,
+    //             position,
+    //             spellsSnapshots: this.spells.map(s => s.toSnapshot())
+    //         };
+    //     },
+    //     updateFromSnapshot(snapshot) {
+    //         features = { ...snapshot.features };
+    //         orientation = snapshot.orientation;
+    //         position = snapshot.position;
+
+    //         spells.forEach(spell => spell.updateFromSnapshot(
+    //             snapshot.spellsSnapshots.find(snap => snap.id === spell.id)!
+    //         ));
+    //     }
+    // };
+
+    // const spells = staticData.staticSpells.map((s, i) => spellCreator(s, i + 1, this_));
+
+    // return this_;
 }

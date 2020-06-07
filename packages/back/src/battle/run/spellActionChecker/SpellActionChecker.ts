@@ -5,6 +5,7 @@ import { MapManager } from '../mapManager/MapManager';
 import { checkerPlayer } from './checkers/checkerPlayer';
 import { checkerCharacter } from './checkers/checkerCharacter';
 import { checkerTime } from './checkers/checkerTime';
+import { BattleState } from '../battleStateManager/BattleStateManager';
 
 export type CharActionCheckerReason = 'player' | 'isAlive' | 'spell' | 'startTime' | 'duration' | 'isInArea' | 'bresenham' | 'specificType';
 
@@ -18,16 +19,14 @@ export type CharActionCheckerResult =
     };
 
 export interface Checker {
-    (action: SpellActionCAction, player: Player): CharActionCheckerResult;
+    (action: SpellActionCAction, player: Player, battleState: BattleState): CharActionCheckerResult;
 }
 
 export interface CheckerCreator {
     (cycle: Cycle, mapManager: MapManager): Checker;
 }
 
-export interface SpellActionChecker {
-    check: Checker;
-}
+export type SpellActionChecker = ReturnType<typeof SpellActionChecker>;
 
 interface Dependencies {
     checkersCreators: CheckerCreator[];
@@ -42,7 +41,7 @@ export const SpellActionChecker = (
             checkerTime,
         ]
     }
-): SpellActionChecker => {
+) => {
 
     // const checkPositions: Checker = ({ spellAction }) => {
     //     const { spellId, position } = spellAction;
@@ -148,10 +147,10 @@ export const SpellActionChecker = (
     const checkList: readonly Checker[] = checkersCreators.map(c => c(cycle, mapManager));
 
     return {
-        check: (action: SpellActionCAction, player: Player): CharActionCheckerResult => {
+        check: (action: SpellActionCAction, player: Player, battleState: BattleState): CharActionCheckerResult => {
 
             for (const c of checkList) {
-                const result = c(action, player);
+                const result = c(action, player, battleState);
                 if (!result.success) {
                     return result;
                 }

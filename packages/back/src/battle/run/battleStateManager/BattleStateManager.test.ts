@@ -1,38 +1,76 @@
-import { SpellActionSnapshot, seedSpellActionSnapshot } from '@timeflies/shared';
-import { seedStaticCharacter } from '../entities/seedStaticCharacter';
-import { seedTeam } from '../entities/team/Team.seed';
-import { BattleState, BattleStateManager } from './BattleStateManager';
+import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
 import util from 'util';
-import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { WSSocket } from '../../../transport/ws/WSSocket';
+import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
+import { IPlayerRoomData } from '../../room/room';
+import { BattleState, BattleStateManager } from './BattleStateManager';
 
 describe('# BattleStateManager', () => {
 
+    const getInitData = () => {
+        const playerDataList: IPlayerRoomData<WSSocket>[] = [
+            {
+                id: 'p1',
+                name: 'p1',
+                socket: new WSSocket(seedWebSocket().ws)
+            }
+        ];
+        const teamRoomList: TeamRoom[] = [ {
+            id: 't1',
+            letter: 'A',
+            playersIds: [ 'p1' ]
+        } ];
+        const playerRoomList: PlayerRoom[] = [ {
+            id: 'p1',
+            name: 'p1',
+            characters: [
+                {
+                    id: 'c1',
+                    type: 'sampleChar1',
+                    position: { x: 0, y: 0 }
+                }
+            ]
+        } as PlayerRoom ];
+
+        return { playerDataList, playerRoomList, teamRoomList };
+    };
+
     it('should correctly init battle state', () => {
+        const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-        const teams = [ seedTeam() ];
-        const players = teams.flatMap(t => t.players);
-        const characters = players.flatMap(p => p.characters);
-        const spells = characters.flatMap(c => c.spells);
-
-        const manager = BattleStateManager(teams);
+        const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList);
 
         expect(manager.battleState).toMatchObject<BattleState>({
-            teams, players, characters, spells,
+            teams: [ {
+                id: 't1',
+                letter: 'A'
+            } ],
+            players: [ {
+                id: 'p1',
+                name: 'p1',
+                teamId: 't1',
+                socket: expect.anything()
+            } ],
+            characters: [ expect.objectContaining({
+                id: 'c1'
+            }) ],
+            spells: expect.any(Array),
             battleHashList: []
         });
     });
 
     it('should return correct first snapshot', () => {
+        const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-        const teams = [ seedTeam() ];
-
-        const manager = BattleStateManager(teams, {
+        const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
             getBattleSnapshotWithHash: () => ({
                 launchTime: -1,
                 time: -1,
                 teamsSnapshots: [],
-                battleHash: 'hash'
+                battleHash: 'hash',
+                charactersSnapshots: [],
+                playersSnapshots: [],
+                spellsSnapshots: []
             })
         });
 
@@ -42,6 +80,9 @@ describe('# BattleStateManager', () => {
             launchTime: -1,
             time: -1,
             teamsSnapshots: [],
+            charactersSnapshots: [],
+            playersSnapshots: [],
+            spellsSnapshots: [],
             battleHash: 'hash'
         });
         expect(manager.battleState.battleHashList).toEqual([ 'hash' ]);
@@ -50,37 +91,26 @@ describe('# BattleStateManager', () => {
     describe('on spell action', () => {
 
         it('should not call callback on bad hash', () => {
+            const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-            const { ws } = seedWebSocket();
-
-            const teams = [ seedTeam({
-                players: [ {
-                    id: 'p1',
-                    name: '',
-                    socket: new WSSocket(ws).createPool(),
-                    staticCharacters: [ {
-                        staticData: seedStaticCharacter()[ 0 ],
-                        initialPosition: { x: 0, y: 0 }
-                    } ]
-                } ]
-            }) ];
-
-            const manager = BattleStateManager(teams, {
+            const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
                 getBattleSnapshotWithHash: () => ({
                     launchTime: -1,
                     time: -1,
                     teamsSnapshots: [],
+                    charactersSnapshots: [],
+                    playersSnapshots: [],
+                    spellsSnapshots: [],
                     battleHash: 'hash'
                 })
             });
 
             const firstState = util.inspect(manager.battleState);
-
-            const character = teams[ 0 ].characters[ 0 ];
-            const spell = character.spells[ 0 ];
+            
+            const spell = manager.battleState.spells[0];
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
-                characterId: character.id,
+                characterId: spell.characterId,
                 battleHash: 'bad-hash',
                 duration: 200,
             });
@@ -97,37 +127,26 @@ describe('# BattleStateManager', () => {
         });
 
         it('should call callback on correct hash', () => {
+            const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-            const { ws } = seedWebSocket();
-
-            const teams = [ seedTeam({
-                players: [ {
-                    id: 'p1',
-                    name: '',
-                    socket: new WSSocket(ws).createPool(),
-                    staticCharacters: [ {
-                        staticData: seedStaticCharacter()[ 0 ],
-                        initialPosition: { x: 0, y: 0 }
-                    } ]
-                } ]
-            }) ];
-
-            const manager = BattleStateManager(teams, {
+            const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
                 getBattleSnapshotWithHash: () => ({
                     launchTime: -1,
                     time: -1,
                     teamsSnapshots: [],
+                    charactersSnapshots: [],
+                    playersSnapshots: [],
+                    spellsSnapshots: [],
                     battleHash: 'hash'
                 })
             });
 
             const firstState = util.inspect(manager.battleState);
 
-            const character = teams[ 0 ].characters[ 0 ];
-            const spell = character.spells[ 0 ];
+            const spell = manager.battleState.spells[0];
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
-                characterId: character.id,
+                characterId: spell.characterId,
                 battleHash: 'hash',
                 actionArea: [ { x: -1, y: -1 } ],
                 duration: 200,
@@ -145,37 +164,26 @@ describe('# BattleStateManager', () => {
         });
 
         it('should change battle state on callback function called', () => {
+            const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-            const { ws } = seedWebSocket();
-
-            const teams = [ seedTeam({
-                players: [ {
-                    id: 'p1',
-                    name: '',
-                    socket: new WSSocket(ws).createPool(),
-                    staticCharacters: [ {
-                        staticData: seedStaticCharacter()[ 0 ],
-                        initialPosition: { x: 0, y: 0 }
-                    } ]
-                } ]
-            }) ];
-
-            const manager = BattleStateManager(teams, {
+            const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
                 getBattleSnapshotWithHash: () => ({
                     launchTime: -1,
                     time: -1,
                     teamsSnapshots: [],
+                    charactersSnapshots: [],
+                    playersSnapshots: [],
+                    spellsSnapshots: [],
                     battleHash: 'hash'
                 })
             });
 
             const firstState = util.inspect(manager.battleState);
 
-            const character = teams[ 0 ].characters[ 0 ];
-            const spell = character.spells[ 0 ];
+            const spell = manager.battleState.spells[0];
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
-                characterId: character.id,
+                characterId: spell.characterId,
                 battleHash: 'hash',
                 actionArea: [ { x: -1, y: -1 } ],
                 duration: 200,

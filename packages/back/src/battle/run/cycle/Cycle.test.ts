@@ -36,12 +36,13 @@ describe('# Cycle', () => {
             }).ws
         ];
 
-        players = sockets.map(s => seedPlayer({ socket: new WSSocket(s).createPool() }));
+        players = sockets.map(s => seedPlayer({}, undefined, new WSSocket(s).createPool()));
 
         characters = seedCharacter(
             { length: 3 },
-            i => i < 2 ? players[ 0 ] : players[ 1 ]
+            players[ 1 ].id
         );
+        characters[0].playerId = players[0].id;
 
         onSendFn1 = () => { };
         onSendFn2 = () => { };

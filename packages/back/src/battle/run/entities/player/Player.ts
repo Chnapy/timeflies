@@ -1,52 +1,58 @@
-import { PlayerSnapshot } from "@timeflies/shared";
-import { PlayerData } from "../../../../PlayerData";
+import { PlayerRoom, PlayerSnapshot } from '@timeflies/shared';
 import { WSSocketPool } from "../../../../transport/ws/WSSocket";
-import { Character } from "../character/Character";
-import { Entity } from '../Entity';
-import { Team } from "../team/Team";
 
-export interface Player extends Entity<PlayerSnapshot> {
-    readonly name: string;
-    readonly socket: WSSocketPool;
-    readonly team: Team;
-    readonly characters: Character[];
-}
+export type Player = {
+    id: string;
+    name: string;
+    socket: WSSocketPool;
+    teamId: string;
+};
 
-interface Dependencies {
-    characterCreator: typeof Character;
-}
+export const playerToSnapshot = ({ id, name, teamId }: Player): PlayerSnapshot => ({
+    id,
+    name,
+    teamId
+});
 
 export const Player = (
-    playerData: PlayerData, team: Team,
-    { characterCreator }: Dependencies = { characterCreator: Character }
+    { id, name }: Pick<PlayerRoom, 'id' | 'name'>,
+    teamId: string,
+    socket: WSSocketPool
 ): Player => {
 
-    const this_: Player = {
-        id: playerData.id,
-        name: playerData.name,
-        socket: playerData.socket,
-        team,
-        get characters() {
-            return characters;
-        },
-        toSnapshot(): PlayerSnapshot {
-            return {
-                id: this.id,
-                name: this.name,
-                charactersSnapshots: this.characters.map(c => c.toSnapshot())
-            };
-        },
-        updateFromSnapshot(snapshot) {
-
-            characters.forEach(character => character.updateFromSnapshot(
-                snapshot.charactersSnapshots.find(snap => snap.id === character.id)!
-            ));
-        }
+    return {
+        id,
+        name,
+        socket,
+        teamId
     };
 
-    const characters = playerData.staticCharacters.map(({ staticData, initialPosition }) =>
-        characterCreator(staticData, initialPosition, this_)
-    );
+    // const this_: Player = {
+    //     id: playerData.id,
+    //     name: playerData.name,
+    //     socket: playerData.socket,
+    //     teamId,
+    //     get characters() {
+    //         return characters;
+    //     },
+    //     toSnapshot(): PlayerSnapshot {
+    //         return {
+    //             id: this.id,
+    //             name: this.name,
+    //             charactersSnapshots: this.characters.map(c => c.toSnapshot())
+    //         };
+    //     },
+    //     updateFromSnapshot(snapshot) {
 
-    return this_;
+    //         characters.forEach(character => character.updateFromSnapshot(
+    //             snapshot.charactersSnapshots.find(snap => snap.id === character.id)!
+    //         ));
+    //     }
+    // };
+
+    // const characters = playerData.staticCharacters.map(({ staticData, initialPosition }) =>
+    //     characterCreator(staticData, initialPosition, this_)
+    // );
+
+    // return this_;
 };

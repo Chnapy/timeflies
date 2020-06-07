@@ -1,7 +1,7 @@
 import { CheckerCreator } from '../SpellActionChecker';
 import { assertIsDefined } from '@timeflies/shared';
 
-export const checkerTime: CheckerCreator = (cycle, mapManager) => ({ sendTime, spellAction }, player) => {
+export const checkerTime: CheckerCreator = (cycle, mapManager) => ({ sendTime, spellAction }, player, {spells}) => {
     const { currentTurn } = cycle.globalTurn;
 
     if (sendTime < currentTurn.startTime) {
@@ -12,9 +12,7 @@ export const checkerTime: CheckerCreator = (cycle, mapManager) => ({ sendTime, s
         };
     }
 
-    const { character } = currentTurn;
-
-    const spell = character.spells.find(s => s.staticData.id === spellAction.spellId);
+    const spell = spells.find(s => s.staticData.id === spellAction.spellId);
 
     assertIsDefined(spell);
 

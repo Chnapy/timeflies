@@ -1,21 +1,15 @@
+import { TeamRoom } from '@timeflies/shared';
 import { Team } from "./Team";
-import { TeamData } from "../../../../TeamData";
 
 const letterList = [ 'A', 'B', 'C', 'D', 'E' ] as const;
 
 let id = 0;
-const SEED_TEAM = (): TeamData => {
+
+export const seedTeam = (partialTeam: Partial<TeamRoom> = {}): Team => {
     id++;
-    return {
+    return Team({
         id: id.toString(),
         letter: letterList[ (id - 1) % letterList.length ],
-        players: []
-    };
-};
-
-export const seedTeam = (partialTeam: Partial<TeamData> = {}): Team => {
-    return Team({
-        ...SEED_TEAM(),
         ...partialTeam
     });
 };

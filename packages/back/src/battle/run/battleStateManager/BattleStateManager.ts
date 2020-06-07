@@ -1,8 +1,11 @@
-import { assertIsDefined, BattleSnapshot, equals, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, SpellActionSnapshot, OmitFn } from '@timeflies/shared';
-import { Character } from '../entities/character/Character';
-import { Player } from '../entities/player/Player';
-import { Spell } from '../entities/spell/Spell';
-import { Team } from '../entities/team/Team';
+import { assertIsDefined, BattleSnapshot, equals, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, OmitFn, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
+import { WSSocket } from '../../../transport/ws/WSSocket';
+import { IPlayerRoomData } from '../../room/room';
+import { Character, characterAlterLife, characterIsAlive, characterToSnapshot } from '../entities/character/Character';
+import { Player, playerToSnapshot } from '../entities/player/Player';
+import { Spell, spellToSnapshot } from '../entities/spell/Spell';
+import { Team, teamToSnapshot } from '../entities/team/Team';
+import { createStaticCharacter } from '../createStaticCharacter';
 
 interface InnerBattleState {
     battleHashList: string[];
@@ -34,19 +37,56 @@ interface Dependencies {
 }
 
 export const BattleStateManager = (
-    _teams: Team[],
+    playerDataList: IPlayerRoomData<WSSocket>[],
+    teamRoomList: TeamRoom[],
+    playerRoomList: PlayerRoom[],
     { getBattleSnapshotWithHash }: Dependencies = { getBattleSnapshotWithHash: _getBattleSnapshotWithHash }
 ): BattleStateManager => {
 
-    const generateBattleState = (teams: Team[]): InnerBattleState => {
-        const players = teams.flatMap(t => t.players);
-        const characters = players.flatMap(p => p.characters);
-        const spells = characters.flatMap(c => c.spells);
+    const generateBattleState = (teamRoomList: TeamRoom[]): InnerBattleState => {
 
-        const clone = () => generateBattleState(teams.map(t => t.clone()));
+        const teams: Team[] = [];
+        const players: Player[] = [];
+        const characters: Character[] = [];
+        const spells: Spell[] = [];
+
+        teamRoomList.forEach(t => {
+            teams.push(Team(t));
+
+            t.playersIds.forEach(pId => {
+                const { socket } = playerDataList.find(({ id }) => id === pId)!;
+                const p = playerRoomList.find(({ id }) => id === pId)!;
+
+                players.push(Player(
+                    p,
+                    t.id,
+                    socket.createPool()));
+
+                p.characters.forEach(c => {
+                    const staticData = createStaticCharacter(c.id, c.type);
+                    const character = Character(c, staticData, pId);
+                    characters.push(character);
+
+                    character.staticData.staticSpells.forEach((s, i) => {
+                        spells.push(Spell(s, i, c.id));
+                    });
+                });
+            });
+        });
+
+        const battleHashList: string[] = [];
+
+        const clone = (): InnerBattleState => ({
+            battleHashList: [ ...battleHashList ],
+            teams: teams.map(t => ({ ...t })),
+            players: players.map(p => ({ ...p })),
+            characters: characters.map(c => ({ ...c })),
+            spells: spells.map(s => ({ ...s })),
+            clone
+        });
 
         return {
-            battleHashList: [],
+            battleHashList,
             teams,
             players,
             characters,
@@ -55,12 +95,15 @@ export const BattleStateManager = (
         };
     };
 
-    const generateSnapshot = ({ teams, battleHashList }: InnerBattleState, launchTime: number, time: number): BattleSnapshot => {
+    const generateSnapshot = ({ teams, players, characters, spells, battleHashList }: InnerBattleState, launchTime: number, time: number): BattleSnapshot => {
 
         const snap = getBattleSnapshotWithHash({
             time,
             launchTime,
-            teamsSnapshots: teams.map(team => team.toSnapshot())
+            teamsSnapshots: teams.map(teamToSnapshot),
+            playersSnapshots: players.map(playerToSnapshot),
+            charactersSnapshots: characters.map(characterToSnapshot),
+            spellsSnapshots: spells.map(spellToSnapshot)
         });
 
         battleHashList.push(snap.battleHash);
@@ -69,8 +112,8 @@ export const BattleStateManager = (
     };
 
     // TODO share all these functions
-    const applyMoveAction = (spell: Spell, { position }: SpellActionSnapshot, battleState: InnerBattleState): Character[] => {
-        const { character } = spell;
+    const applyMoveAction = (spell: Spell, { position }: SpellActionSnapshot, { characters }: InnerBattleState): Character[] => {
+        const character = characters.find(c => c.id === spell.characterId)!;
 
         const orientation = getOrientationFromTo(character.position, position);
 
@@ -82,11 +125,11 @@ export const BattleStateManager = (
 
     const applySimpleAttack = (spell: Spell, { actionArea }: SpellActionSnapshot, { characters }: InnerBattleState): Character[] => {
 
-        const targets = characters.filter(c => c.isAlive && actionArea.some(p => equals(p)(c.position)));
+        const targets = characters.filter(c => characterIsAlive(c) && actionArea.some(p => equals(p)(c.position)));
 
-        targets.forEach(t => t.alterLife(-spell.features.attack));
+        targets.forEach(t => characterAlterLife(t, -spell.features.attack));
 
-        return targets.filter(t => !t.isAlive);
+        return targets.filter(t => !characterIsAlive(t));
     };
 
     // const applyDefaultAction = (spell: Spell, positions: Position[]) => {
@@ -162,7 +205,7 @@ export const BattleStateManager = (
         return generateSnapshot(currentBattleState, launchTime, launchTime);
     };
 
-    const currentBattleState = generateBattleState(_teams);
+    const currentBattleState = generateBattleState(teamRoomList);
 
     return {
         battleState: currentBattleState,

@@ -1,4 +1,4 @@
-import { ConfirmSAction, NotifySAction, SpellActionSnapshot, seedSpellActionSnapshot } from '@timeflies/shared';
+import { ConfirmSAction, NotifySAction, seedSpellActionSnapshot, SpellActionSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { BattleStateManager } from '../battleStateManager/BattleStateManager';
@@ -41,25 +41,19 @@ describe('# SpellActionReceiver', () => {
             onSendFn: () => sendFn
         });
 
-        const p = seedPlayer({
-            socket: new WSSocket(ws).createPool()
-        });
+        const p = seedPlayer({}, undefined, new WSSocket(ws).createPool());
 
         const sendFnP2 = jest.fn();
         const sendFnP3 = jest.fn();
 
         const players = [
             p,
-            seedPlayer({
-                socket: new WSSocket(seedWebSocket({
-                    onSendFn: () => sendFnP2
-                }).ws).createPool()
-            }),
-            seedPlayer({
-                socket: new WSSocket(seedWebSocket({
-                    onSendFn: () => sendFnP3
-                }).ws).createPool()
-            })
+            seedPlayer({}, undefined, new WSSocket(seedWebSocket({
+                onSendFn: () => sendFnP2
+            }).ws).createPool()),
+            seedPlayer({}, undefined, new WSSocket(seedWebSocket({
+                onSendFn: () => sendFnP3
+            }).ws).createPool())
         ];
 
         const characters = seedCharacter();

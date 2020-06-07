@@ -4,29 +4,35 @@ import { seedPlayer } from '../../entities/player/Player.seed';
 import { seedMapManager } from '../../mapManager/MapManager.seed';
 import { CharActionCheckerResult } from '../SpellActionChecker';
 import { checkerPlayer } from './checkerPlayer';
+import { BattleState } from '../../battleStateManager/BattleStateManager';
+import { seedCharacter } from '../../entities/character/Character.seed';
 
 describe('# checkerPlayer', () => {
 
-    const getPlayer = () => seedPlayer({
-        staticCharacters: [ {
-            staticData: {
-                id: 'test',
-                defaultSpellId: '',
-                initialFeatures: {
-                    life: 100,
-                    actionTime: 200,
-                },
-                name: '',
-                staticSpells: [],
-                type: 'sampleChar1'
+    const getBattleState = (): BattleState => ({
+        battleHashList: [],
+        teams: [],
+        players: [ seedPlayer({ id: 'p1' }), seedPlayer({ id: 'p2' }) ],
+        characters: [ seedCharacter({
+
+            alterFn: char => {
+                char.id = 'c1';
+            }
+        }, 'p1')[ 0 ] ],
+        spells: [ {
+            id: 's1', index: 1, staticData: {
+                id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
             },
-            initialPosition: { x: 0, y: 0 }
+            features: {} as any,
+            characterId: 'c1'
         } ]
     });
 
     it('should fail if not current turn', () => {
 
-        const player = getPlayer();
+        const battleState = getBattleState();
+
+        const player = battleState.players[1];
 
         const cycle = seedCycle();
 
@@ -42,7 +48,7 @@ describe('# checkerPlayer', () => {
             })
         };
 
-        expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'player'
         });
@@ -50,9 +56,10 @@ describe('# checkerPlayer', () => {
 
     it('should succeed else', () => {
 
-        const player = getPlayer();
+        const battleState = getBattleState();
 
-        const character = player.characters[ 0 ];
+        const player = battleState.players[0];
+        const character = battleState.characters[ 0 ];
 
         const cycle = seedCycle({
             turn: { character }
@@ -70,7 +77,7 @@ describe('# checkerPlayer', () => {
             })
         };
 
-        expect(checker(spellAction, player)).toEqual<CharActionCheckerResult>({ success: true });
+        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({ success: true });
     });
 
 });
