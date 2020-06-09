@@ -49,7 +49,7 @@ export const getTurnRemainingTime = (battle: BattleState, period: BattleDataPeri
         current: (): number => Math.max(endTime - Date.now(), 0),
 
         future: (): number => {
-            const { spellActionSnapshotList } = battle.spellActionState;
+            const { spellActionSnapshotList } = battle.snapshotState;
 
             const lastSnapshot = spellActionSnapshotList[ spellActionSnapshotList.length - 1 ];
 

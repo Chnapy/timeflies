@@ -2,19 +2,18 @@ import { combineReducers } from '@reduxjs/toolkit';
 import { battleActionReducer, BattleActionState } from '../../../stages/battle/battleState/battle-action-reducer';
 import { cycleReducer, CycleState } from '../../../stages/battle/cycle/cycle-reducer';
 import { snapshotReducer, SnapshotState } from '../../../stages/battle/snapshot/snapshot-reducer';
-import { spellActionReducer, SpellActionState } from '../../../stages/battle/spellAction/spell-action-reducer';
 
 export type BattleState = {
 
     battleActionState: BattleActionState;
     cycleState: CycleState;
     snapshotState: SnapshotState;
-    spellActionState: SpellActionState;
+    // spellActionState: SpellActionState;
 };
 
 export const battleReducer = combineReducers<BattleState>({
     battleActionState: battleActionReducer,
     cycleState: cycleReducer,
     snapshotState: snapshotReducer,
-    spellActionState: spellActionReducer
+    // spellActionState: spellActionReducer
 });

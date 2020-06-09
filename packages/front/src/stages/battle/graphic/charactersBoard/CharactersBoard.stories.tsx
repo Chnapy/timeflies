@@ -73,6 +73,14 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
 
         const tiledMapGraphic = TiledMapGraphic();
 
+        const hud = CanvasContext.provider({
+            tiledMapGraphic,
+            spritesheets: {
+                characters: characters.spritesheet
+            }
+        }, () => CharactersBoard(period));
+        app.stage.addChild(hud.container);
+
         storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
@@ -100,14 +108,6 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
                 time: Date.now()
             }
         }));
-
-        const hud = CanvasContext.provider({
-            tiledMapGraphic,
-            spritesheets: {
-                characters: characters.spritesheet
-            }
-        }, () => CharactersBoard(period));
-        app.stage.addChild(hud.container);
     };
 
     const view = createView({

@@ -5,7 +5,6 @@ import { battleActionReducer, BattleActionState } from '../../../battleState/bat
 import { BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
-import { BattleCommitAction } from '../../../snapshot/snapshot-manager-actions';
 
 describe('# spell-engine-move (depends on #battle-action)', () => {
 

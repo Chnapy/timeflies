@@ -15,6 +15,8 @@ import { BattleState } from '../../../reducers/battle-reducers/battle-reducer';
 import { getTurnRemainingTime } from '../../../../stages/battle/cycle/cycle-reducer';
 import { playerIsMine } from '../../../../stages/battle/entities/player/Player';
 import { useGameSelector } from '../../../hooks/useGameSelector';
+import { useStore } from 'react-redux';
+import { GameState } from '../../../../game-state';
 
 export interface SpellButtonProps {
     spellId: string;
@@ -39,7 +41,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     const spellType = useGameStep('battle', battle => selectSpell(battle).staticData.type);
 
     const nbrWaitingSpellAction: number = useGameStep('battle', battle => {
-        const { spellActionSnapshotList } = battle.spellActionState;
+        const { spellActionSnapshotList } = battle.snapshotState;
 
         return spellActionSnapshotList.filter(spellAction =>
             spellAction.spellId === spellId
@@ -48,7 +50,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     });
 
     const currentSpellActionStartTime = useGameStep('battle', battle => {
-        const { spellActionSnapshotList } = battle.spellActionState;
+        const { spellActionSnapshotList } = battle.snapshotState;
 
         const spellAction = spellActionSnapshotList.find(_spellAction =>
             _spellAction.spellId === spellId
@@ -67,7 +69,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
             return;
         }
 
-        const { spellActionSnapshotList } = battle.spellActionState;
+        const { spellActionSnapshotList } = battle.snapshotState;
 
         const spellAction = spellActionSnapshotList.find(_spellAction =>
             _spellAction.startTime === currentSpellActionStartTime
@@ -84,8 +86,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         }
         : null;
 
-    const isSelected = useGameStep('battle', ({ spellActionState, snapshotState }) =>
-        spellActionState.currentSpellAction?.spellId === spellId);
+    const isSelected = useGameStep('battle', ({ battleActionState }) =>
+        battleActionState.selectedSpellId === spellId);
 
     const disableReason = useGameSelector(gameState => {
         const { snapshotState, cycleState } = gameState.battle;
@@ -106,8 +108,20 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const isDisabled = !!disableReason;
 
+    const store = useStore<GameState>();
+
     const { dispatchSpellPrepare } = useGameDispatch({
-        dispatchSpellPrepare: () => BattleStateSpellPrepareAction({ spellType })
+        dispatchSpellPrepare: () => {
+            const { battleDataFuture } = store.getState().battle.snapshotState;
+
+            const futureSpell = battleDataFuture.spells.find(s => s.id === spellId)!;
+            const futureCharacter = battleDataFuture.characters.find(c => c.id === futureSpell.characterId)!;
+
+            return BattleStateSpellPrepareAction({
+                futureSpell,
+                futureCharacter
+            });
+        }
     });
 
     const onBtnClick = React.useCallback((): void => {

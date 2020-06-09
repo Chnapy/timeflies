@@ -5,7 +5,7 @@ import { TimeGauge } from './time-gauge/time-gauge';
 import { UIIcon } from '../spell-panel/spell-button/ui-icon';
 import { UIText, formatMsToSeconds } from '../spell-panel/spell-button/ui-text';
 import { useGameStep } from '../../hooks/useGameStep';
-import { getTurnRemainingTime } from '../../../stages/battle/cycle/cycle-reducer';
+import { shallowEqual } from 'react-redux';
 
 const useStyles = makeStyles(({ spacing }) => ({
     root: {
@@ -18,14 +18,21 @@ const useStyles = makeStyles(({ spacing }) => ({
     }
 }));
 
+const getRemainingTime = (turnStartTime: number, turnDuration: number) => Math.max(turnStartTime + turnDuration - Date.now(), 0);
+
 export const TimePanel: React.FC = () => {
     const classes = useStyles();
 
-    const getRemainingTime = useGameStep('battle',
-        battle => () => getTurnRemainingTime(battle, 'current'),
-        () => true);
+    const { turnStartTime, turnDuration } = useGameStep('battle',
+        ({ cycleState }) => ({
+            turnStartTime: cycleState.turnStartTime,
+            turnDuration: cycleState.turnDuration,
+        }),
+        shallowEqual);
 
     const remainingTimeSpan = React.useRef<HTMLSpanElement>(null);
+
+    const initialRemainingTime = getRemainingTime(turnStartTime, turnDuration);
 
     React.useEffect(() => {
 
@@ -34,7 +41,7 @@ export const TimePanel: React.FC = () => {
                 return;
             }
 
-            const remainingTime = getRemainingTime();
+            const remainingTime = getRemainingTime(turnStartTime, turnDuration);
 
             remainingTimeSpan.current.innerHTML = formatMsToSeconds(remainingTime);
 
@@ -45,7 +52,7 @@ export const TimePanel: React.FC = () => {
 
         requestAnimationFrame(updateRemainingTime);
 
-    }, [ getRemainingTime ]);
+    }, [ turnDuration, turnStartTime ]);
 
     return <Paper className={classes.root} elevation={3}>
 
@@ -53,7 +60,7 @@ export const TimePanel: React.FC = () => {
 
         <Box width='2.7rem' textAlign='right' mx={0.5}>
             <UIText variant='numeric'>
-                <span ref={remainingTimeSpan}>{formatMsToSeconds(getRemainingTime())}</span>
+                <span ref={remainingTimeSpan}>{formatMsToSeconds(initialRemainingTime)}</span>
                 s
                 </UIText>
         </Box>

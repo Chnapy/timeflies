@@ -1,8 +1,9 @@
 import { createAction } from '@reduxjs/toolkit';
-import { SpellType, TurnSnapshot, Position } from '@timeflies/shared';
+import { Position, TurnSnapshot } from '@timeflies/shared';
+import { Character } from '../entities/character/Character';
+import { Spell } from '../entities/spell/Spell';
 import { SpellAction } from '../spellAction/spell-action-reducer';
 import { BattleActionState } from './battle-action-reducer';
-import { Character } from '../entities/character/Character';
 
 export type BattleStateTurnStartAction = ReturnType<typeof BattleStateTurnStartAction>;
 export const BattleStateTurnStartAction = createAction<{
@@ -15,7 +16,8 @@ export const BattleStateTurnEndAction = createAction('battle/state/turn-end');
 
 export type BattleStateSpellPrepareAction = ReturnType<typeof BattleStateSpellPrepareAction>;
 export const BattleStateSpellPrepareAction = createAction<{
-    spellType: SpellType;
+    futureSpell: Spell<'future'>;
+    futureCharacter: Character<'future'>;
 }>('battle/state/spell-prepare');
 
 export type BattleStateSpellLaunchAction = ReturnType<typeof BattleStateSpellLaunchAction>;

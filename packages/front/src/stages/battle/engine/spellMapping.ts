@@ -1,9 +1,9 @@
-import { inferFn, SpellType, SpellActionSnapshot } from '@timeflies/shared';
+import { inferFn, SpellActionSnapshot, SpellType } from '@timeflies/shared';
 import { TileHoverFnProps } from '../graphic/tiledMap/TiledMapGraphic';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from '../graphic/tiledMap/tiledSpellFns';
-import { SpellAction } from '../spellAction/spell-action-reducer';
-import { Character } from '../entities/character/Character';
 import { TileGraphic } from '../graphic/tiledMap/TileGraphic';
+import { BattleData } from '../snapshot/battle-data';
+import { SpellAction } from '../spellAction/spell-action-reducer';
 import { spellLaunchMove } from './spellEngine/move/spell-engine-move';
 import { spellLaunchSimpleAttack } from './spellEngine/simpleAttack/spell-engine-simpleAttack';
 
@@ -23,8 +23,10 @@ export type TiledMapSpellObject = {
     onSpellStartFn: TiledMapStartFn;
 };
 
+export type SpellLaunchFn = (spellAction: SpellAction, battleData: BattleData<'future'>) => void;
+
 interface SpellMapValue<ST extends SpellType, HR> {
-    launchFn: (spellAction: SpellAction, characterList: Character<'future'>[]) => void;
+    launchFn: SpellLaunchFn;
     // prepareEngine: SpellPrepareSubEngineCreator<HR>;
 }
 

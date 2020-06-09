@@ -2,16 +2,15 @@ import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { assertIsDefined, getLast, SpellActionSnapshot } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
-import { getSpellLaunchFn } from '../engine/spellMapping';
 import { Character } from '../entities/character/Character';
 import { Spell } from '../entities/spell/Spell';
-import { BattleCommitAction } from '../snapshot/snapshot-manager-actions';
+import { SnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
-import { SpellAction, SpellActionState } from './spell-action-reducer';
+import { SpellAction } from './spell-action-reducer';
 import { SpellActionTimer } from './spell-action-timer';
 
 type Dependencies<S> = {
-    extractState: (getState: () => S) => SpellActionState;
+    extractState: (getState: () => S) => SnapshotState;
     extractFutureCharacters: (getState: () => S) => Character<'future'>[];
     extractFutureSpells: (getState: () => S) => Spell<'future'>[];
     extractFutureHash: (getState: () => S) => string;
@@ -34,34 +33,6 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         extractSpellActionSnapshotList: () => extractState(api.getState).spellActionSnapshotList,
         dispatch: api.dispatch
     });
-
-    const onSpellAction = (spellAction: SpellAction, startTime: number): SpellActionSnapshot => {
-
-        const { spell, position } = spellAction;
-
-        const { duration } = spell.feature;
-
-        const spellLaunchFn = getSpellLaunchFn(spell.staticData.type);
-
-        spellLaunchFn(spellAction, extractFutureCharacters(api.getState));
-
-        api.dispatch(BattleCommitAction({
-            time: startTime + duration,
-            charactersPositionList: extractFutureCharacters(api.getState).map(c => c.position)
-        }));
-
-        const futureBattleHash = extractFutureHash(api.getState);
-
-        return {
-            startTime,
-            characterId: spell.characterId,
-            duration,
-            spellId: spell.id,
-            position,
-            actionArea: spellAction.actionArea,
-            battleHash: futureBattleHash,
-        };
-    };
 
     const cancelCurrentAndNextSpells = (lastCorrectHash: string) => {
 
@@ -100,6 +71,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             const { spellActions } = action.payload;
 
             const spellActionState = extractState(api.getState);
+            const hadCurrentSpellAction = !!spellActionState.currentSpellAction;
 
             const lastSnapshot = getLast(spellActionState.spellActionSnapshotList);
             const now = Date.now();
@@ -108,24 +80,35 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 ? Math.max(getSnapshotEndTime(lastSnapshot), now)
                 : now;
 
-            const spellSnapshots: SpellActionSnapshot[] = [];
+            // const spellSnapshots: SpellActionSnapshot[] = [];
 
-            spellActions.forEach((spellAction, i) => {
+            const spellActList = spellActions.map((spellAction, i) => {
 
-                const snapshot = onSpellAction(spellAction, startTime);
+                // const spellActionSnapshot = onSpellAction(spellAction, startTime);
 
-                spellSnapshots.push(snapshot);
+                // spellSnapshots.push(spellActionSnapshot);
 
-                if (!i && !spellActionState.currentSpellAction) {
-                    spellActionTimer.onAdd(snapshot);
+                // if (!i && !hadCurrentSpellAction) {
+                //     spellActionTimer.onAdd(spellActionSnapshot);
+                // }
+
+                if (i) {
+                    startTime += spellAction.spell.feature.duration;
                 }
 
-                startTime += spellAction.spell.feature.duration;
+                return {
+                    spellAction,
+                    startTime
+                };
             });
 
             api.dispatch(SpellActionLaunchAction({
-                spellActionSnapshotList: spellSnapshots
+                spellActList
             }));
+
+            if (!hadCurrentSpellAction) {
+                spellActionTimer.onAdd(spellActList[ 0 ].startTime);
+            }
 
         } else if (BattleStateTurnEndAction.match(action)) {
 
@@ -161,18 +144,19 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                     actionArea
                 };
 
-                const snapshot = onSpellAction(spellAction, startTime);
+                // const spellAct = onSpellAction(spellAction, startTime);
 
                 const spellActionState = extractState(api.getState);
 
-                if (!spellActionState.currentSpellAction) {
-                    spellActionTimer.onAdd(snapshot);
-                }
+                const hadCurrentSpell = !!spellActionState.currentSpellAction;
 
                 api.dispatch(SpellActionLaunchAction({
-                    spellActionSnapshotList: [ snapshot ]
+                    spellActList: [ { spellAction, startTime } ]
                 }));
 
+                if (!hadCurrentSpell) {
+                    spellActionTimer.onAdd(startTime);
+                }
             }
         }
 

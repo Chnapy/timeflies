@@ -16,6 +16,7 @@ const extractFutureCharacter = (getState: () => GameState) => {
 export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
     battleActionMiddleware<GameState>({
         extractState: getState => getState().battle.battleActionState,
+        extractFutureCharacterPositionList: getState => getState().battle.snapshotState.battleDataFuture.characters.map(c => c.position),
         extractFutureCharacter,
         extractFutureSpell: getState => {
             const { snapshotState, battleActionState } = getState().battle;
@@ -35,7 +36,7 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
         extractState: getState => getState().battle.snapshotState
     }),
     spellActionMiddleware<GameState>({
-        extractState: getState => getState().battle.spellActionState,
+        extractState: getState => getState().battle.snapshotState,
         extractCurrentHash: getState => getState().battle.snapshotState.battleDataCurrent.battleHash,
         extractFutureHash: getState => getState().battle.snapshotState.battleDataFuture.battleHash,
         extractFutureCharacters: getState => getState().battle.snapshotState.battleDataFuture.characters,

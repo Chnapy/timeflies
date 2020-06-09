@@ -1,5 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { SpellActionSnapshot } from '@timeflies/shared';
+import { SpellAction } from './spell-action-reducer';
 
 export type SpellActionTimerStartAction = ReturnType<typeof SpellActionTimerStartAction>;
 export const SpellActionTimerStartAction = createAction<{
@@ -20,5 +21,8 @@ export const SpellActionCancelAction = createAction<{
 
 export type SpellActionLaunchAction = ReturnType<typeof SpellActionLaunchAction>;
 export const SpellActionLaunchAction = createAction<{
-    spellActionSnapshotList: SpellActionSnapshot[];
+    spellActList: {
+        spellAction: SpellAction;
+        startTime: number;
+    }[];
 }>('battle/spell-action/launch');

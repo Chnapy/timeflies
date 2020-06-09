@@ -37,7 +37,9 @@ describe('# snapshot-middleware', () => {
                 characters: [],
                 players: [],
                 spells: []
-            }
+            },
+            currentSpellAction: null,
+            spellActionSnapshotList: []
         };
 
         const api: MiddlewareAPI = {
@@ -91,7 +93,9 @@ describe('# snapshot-middleware', () => {
                 characters: [],
                 players: [],
                 spells: []
-            }
+            },
+            currentSpellAction: null,
+            spellActionSnapshotList: []
         };
 
         const api: MiddlewareAPI = {

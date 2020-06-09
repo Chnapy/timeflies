@@ -1,13 +1,14 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { equals, Position, TiledManager, TileType } from '@timeflies/shared';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
-import { Character, characterAlterLife } from '../../../entities/character/Character';
+import { characterAlterLife } from '../../../entities/character/Character';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
+import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
 
-export const spellLaunchSimpleAttack = ({ actionArea, spell }: SpellAction, characterList: Character<'future'>[]) => {
+export const spellLaunchSimpleAttack: SpellLaunchFn = ({ spell, actionArea }, { characters }) => {
 
-    const targets = characterList.filter(c => actionArea.some(p => equals(p)(c.position)));
+    const targets = characters.filter(c => actionArea.some(p => equals(p)(c.position)));
 
     targets.forEach(t => characterAlterLife(t, -spell.feature.attack));
 };

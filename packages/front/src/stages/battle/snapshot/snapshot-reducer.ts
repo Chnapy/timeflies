@@ -1,14 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { assertIsDefined, BattleSnapshot, getBattleSnapshotWithHash } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, getBattleSnapshotWithHash, SpellActionSnapshot } from '@timeflies/shared';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character, characterToSnapshot } from '../entities/character/Character';
 import { Player, playerToSnapshot } from '../entities/player/Player';
 import { Spell, spellToSnapshot } from '../entities/spell/Spell';
 import { Team, teamToSnapshot } from '../entities/team/Team';
-import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
+import { SpellActionTimerEndAction, SpellActionLaunchAction, SpellActionCancelAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleDataPeriod, periodList } from './battle-data';
-import { BattleCommitAction } from './snapshot-manager-actions';
+import { getSpellLaunchFn } from '../engine/spellMapping';
 
 type BattleData<P extends BattleDataPeriod> = {
     battleHash: string;
@@ -24,6 +24,8 @@ export type SnapshotState = {
     launchTime: number;
     battleDataCurrent: BattleData<'current'>;
     battleDataFuture: BattleData<'future'>;
+    spellActionSnapshotList: SpellActionSnapshot[];
+    currentSpellAction: SpellActionSnapshot | null;
 };
 
 export const getBattleData = <P extends BattleDataPeriod>(state: SnapshotState, period: P): BattleData<P> => period === 'current'
@@ -66,6 +68,8 @@ const initialState: SnapshotState = {
     launchTime: -1,
     battleDataCurrent: getInitialBattleData(),
     battleDataFuture: getInitialBattleData(),
+    spellActionSnapshotList: [],
+    currentSpellAction: null
 };
 
 const getLastSnapshot = (snapshotList: BattleSnapshot[]): BattleSnapshot | undefined => snapshotList[ snapshotList.length - 1 ];
@@ -125,10 +129,8 @@ export const snapshotReducer = createReducer(initialState, {
             data.teams = teamsSnapshots.map(snap => Team(period, snap));
         });
     },
-    [ BattleCommitAction.type ]: (state, { payload: { time } }: BattleCommitAction) => {
-        commit(state, time);
-    },
     [ BattleStateTurnStartAction.type ]: (state, action: BattleStateTurnStartAction) => {
+        state.spellActionSnapshotList = [];
         commit(state, Date.now());
     },
     [ BattleStateTurnEndAction.type ]: (state, action: BattleStateTurnEndAction) => {
@@ -146,6 +148,7 @@ export const snapshotReducer = createReducer(initialState, {
         updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', currentSnapshot);
     },
     [ SpellActionTimerEndAction.type ]: (state, { payload: { removed, correctHash } }: SpellActionTimerEndAction) => {
+        state.currentSpellAction = null;
 
         if (removed) {
             assertHashIsInSnapshotList(correctHash, state.snapshotList);
@@ -168,6 +171,48 @@ export const snapshotReducer = createReducer(initialState, {
 
             updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', snapshot);
         }
+    },
+    [ SpellActionLaunchAction.type ]: (state, { payload }: SpellActionLaunchAction) => {
+        const { spellActList } = payload;
+
+        spellActList.forEach(({ spellAction, startTime }) => {
+
+            const { spell } = spellAction;
+
+            const duration = spellAction.spell.feature.duration;
+
+            const commitTime = startTime + duration;
+
+            const spellLaunchFn = getSpellLaunchFn(spell.staticData.type);
+
+            spellLaunchFn(spellAction, state.battleDataFuture);
+
+            commit(state, commitTime);
+
+            const snapshot: SpellActionSnapshot = {
+                startTime,
+                characterId: spellAction.spell.characterId,
+                duration,
+                spellId: spellAction.spell.id,
+                position: spellAction.position,
+                actionArea: spellAction.actionArea,
+                battleHash: state.battleDataFuture.battleHash,
+            };
+
+            state.spellActionSnapshotList.push(snapshot);
+
+            if (!state.currentSpellAction) {
+                state.currentSpellAction = snapshot;
+            }
+        });
+
+    },
+    [SpellActionTimerStartAction.type]: (state, {payload}: SpellActionTimerStartAction) => {
+        state.currentSpellAction = payload.spellActionSnapshot;
+    },
+    [ SpellActionCancelAction.type ]: (state, { payload: { spellActionSnapshotsValids } }: SpellActionCancelAction) => {
+        state.spellActionSnapshotList = spellActionSnapshotsValids;
+        state.currentSpellAction = null;
     }
 });
 

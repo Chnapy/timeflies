@@ -1,16 +1,17 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { equals, Position, TileType, getOrientationFromTo } from '@timeflies/shared';
+import { equals, getOrientationFromTo, Position, TileType, TiledManager } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
 import { ACCEPTABLE_TILES } from '../../../battleState/battle-action-reducer';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { Spell } from '../../../entities/spell/Spell';
-import { BattleCommitAction } from '../../../snapshot/snapshot-manager-actions';
+import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actions';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
+import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
-import { Character } from '../../../entities/character/Character';
+import { TiledMap } from 'tiled-types';
 
-export const spellLaunchMove = ({ spell, position }: SpellAction, characterList: Character<'future'>[]) => {
-    const character = characterList.find(c => c.id === spell.characterId)!;
+export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
+    const character = characters.find(c => c.id === spell.characterId)!;
 
     const orientation = getOrientationFromTo(character.position, position);
 
@@ -20,19 +21,53 @@ export const spellLaunchMove = ({ spell, position }: SpellAction, characterList:
 
 export const spellEngineMove: SpellEngineCreator = ({
     extractState,
+    extractFutureCharacterPositionList,
     extractFutureCharacter,
     extractFutureSpell
 }) => api => {
 
     const finder = new EasyStar.js();
 
+    const calculateEasyStarGrid = (tiledSchema: TiledMap, charactersPositionList: Position[]): number[][] => {
+        const { width, height } = tiledSchema;
+
+        const tiledManager = TiledManager(tiledSchema);
+
+        const getTileID = (p: Position, tileType: TileType): number => {
+            const obstacle = tileType === 'obstacle'
+                || isSomeoneAtXY(p);
+
+            return obstacle ? 1 : ACCEPTABLE_TILES[ 0 ];
+        };
+
+        const isSomeoneAtXY = (p: Position): boolean => {
+            return charactersPositionList.some(equals(p));
+        };
+
+        const easyStarGrid: number[][] = [];
+
+        for (let y = 0; y < height; y++) {
+            easyStarGrid[ y ] = [];
+            for (let x = 0; x < width; x++) {
+                const p: Position = { x, y };
+                const tileType = tiledManager.getTileType(p);
+
+                easyStarGrid[ y ][ x ] = getTileID(p, tileType);
+            }
+        }
+
+        return easyStarGrid;
+    };
+
     const refreshGrid = () => {
 
         const state = extractState(api.getState);
 
-        const esGrid = state.easyStarGrid.map(arr => arr.map(v => v));
+        const characterPositionList = extractFutureCharacterPositionList(api.getState);
 
-        finder.setGrid(esGrid);
+        const easyStarGrid = calculateEasyStarGrid(state.tiledSchema!, characterPositionList);
+
+        finder.setGrid(easyStarGrid);
 
         finder.setAcceptableTiles(ACCEPTABLE_TILES);
     };
@@ -113,7 +148,7 @@ export const spellEngineMove: SpellEngineCreator = ({
 
             onMoveClick(position, tile.tileType, spell);
 
-        } else if (BattleCommitAction.match(action)) {
+        } else if (SpellActionLaunchAction.match(action)) {
 
             refreshGrid();
         }

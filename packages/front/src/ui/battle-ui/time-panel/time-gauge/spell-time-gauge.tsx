@@ -16,8 +16,8 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
     const turnDuration = useGameStep('battle', ({ cycleState }) =>
         cycleState.turnDuration);
 
-    const { startTimeFromTurnStart, duration, finished } = useGameStep('battle', ({ spellActionState }) => {
-        const { spellActionSnapshotList } = spellActionState;
+    const { startTimeFromTurnStart, duration, finished } = useGameStep('battle', ({ snapshotState }) => {
+        const { spellActionSnapshotList } = snapshotState;
 
         const spellAction = spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime);
         assertIsDefined(spellAction);
@@ -29,8 +29,8 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
         };
     }, (a, b) => (a.startTimeFromTurnStart === b.startTimeFromTurnStart) && (a.finished === b.finished));
 
-    const spellIndex = useGameStep('battle', ({ spellActionState, snapshotState }) => {
-        const { spellActionSnapshotList } = spellActionState;
+    const spellIndex = useGameStep('battle', ({ snapshotState }) => {
+        const { spellActionSnapshotList } = snapshotState;
 
         const spellAction = spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime)!;
 
