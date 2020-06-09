@@ -99,8 +99,8 @@ export const Default: React.FC = () => {
 
     const stateSelected: BattleState = {
         ...stateDefault,
-        spellActionState: {
-            ...stateDefault.spellActionState,
+        snapshotState: {
+            ...stateDefault.snapshotState,
             currentSpellAction: seedSpellActionSnapshot('s1')
         }
     };
@@ -132,8 +132,8 @@ export const Default: React.FC = () => {
 
     const getQueueGameState = (remainsTime: boolean, firstSpellActionStartTime: number): BattleState => ({
         ...stateDefault,
-        spellActionState: {
-            ...stateDefault.spellActionState,
+        snapshotState: {
+            ...stateDefault.snapshotState,
             spellActionSnapshotList: [
                 seedSpellActionSnapshot('s1', {
                     duration: 10000,

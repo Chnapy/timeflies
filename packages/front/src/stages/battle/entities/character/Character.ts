@@ -92,7 +92,6 @@ export const Character = <P extends BattleDataPeriod>(period: P, myPlayerId: str
     //         position = { ...snapshot.position };
     //         orientation = snapshot.orientation;
 
-    //         // TODO do something about object ref issues
     //         features = {
     //             ...snapshot.features
     //         };

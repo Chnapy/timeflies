@@ -60,16 +60,7 @@ export const Default: React.FC = () => {
                         characterId: 'c1'
                     }),
                 ]
-            }
-        },
-        cycleState: {
-            ...preloadedState.cycleState,
-            currentCharacterId: 'c1',
-            turnDuration: 10000,
-            turnStartTime: now
-        },
-        spellActionState: {
-            ...preloadedState.spellActionState,
+            },
             spellActionSnapshotList: [
                 seedSpellActionSnapshot('sa0', {
                     spellId: 's1',
@@ -90,6 +81,12 @@ export const Default: React.FC = () => {
                     characterId: 'c1'
                 })
             ]
+        },
+        cycleState: {
+            ...preloadedState.cycleState,
+            currentCharacterId: 'c1',
+            turnDuration: 10000,
+            turnStartTime: now
         }
     };
 

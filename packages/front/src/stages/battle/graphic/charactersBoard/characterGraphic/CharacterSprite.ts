@@ -1,4 +1,4 @@
-import { assertIsDefined, CharacterType, Orientation } from '@timeflies/shared';
+import { assertIsDefined, CharacterType, Orientation, getOrientationFromTo } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
@@ -44,15 +44,28 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
         const { storeEmitter, spritesheets } = CanvasContext.consumer('storeEmitter', 'spritesheets');
 
         storeEmitter.onStateChange(
-            state => {
-                const { staticData, orientation } = getBattleData(state.battle.snapshotState, period).characters.find(c => c.id === characterId)!;
+            ({ battle }) => {
+                const { snapshotState, } = battle;
+                const character = getBattleData(snapshotState, period).characters.find(c => c.id === characterId)!;
 
-                const spriteState: CharacterSpriteState = 'idle';   // TODO
+                const { currentSpellAction, battleDataFuture } = snapshotState;
 
+                if (currentSpellAction && currentSpellAction.characterId === characterId) {
+                    const spell = battleDataFuture.spells.find(s => s.id === currentSpellAction.spellId)!;
+
+                    const spriteState: CharacterSpriteState = spell.staticData.type === 'move' ? 'walk' : 'idle'
+
+                    return {
+                        type: character.staticData.type,
+                        orientation: getOrientationFromTo(character.position, currentSpellAction.position),
+                        spriteState
+                    };
+                }
+                
                 return {
-                    type: staticData.type,
-                    orientation,
-                    spriteState
+                    type: character.staticData.type,
+                    orientation: character.orientation,
+                    spriteState: 'idle' as CharacterSpriteState
                 };
             },
             ({ type, orientation, spriteState }) => {
@@ -61,6 +74,7 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                     characterState: spriteState,
                     orientation
                 });
+                this.play();
             },
             shallowEqual
         );

@@ -2,7 +2,7 @@ import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester } from '@timefli
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Team, teamToSnapshot } from '../entities/team/Team';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
-import { BattleCommitAction } from './snapshot-manager-actions';
+import { BattleCommitAction } from './snapshot-actions';
 import { snapshotReducer, SnapshotState } from './snapshot-reducer';
 import { seedCharacter } from '../entities/character/Character.seed';
 
@@ -47,7 +47,9 @@ describe('# snapshot-reducer', () => {
                 players: [],
                 characters: [],
                 spells: []
-            }
+            },
+            currentSpellAction: null,
+            spellActionSnapshotList: []
         };
 
         const newState = snapshotReducer(initialState, BattleCommitAction({
@@ -99,7 +101,9 @@ describe('# snapshot-reducer', () => {
                     players: [],
                     characters: [],
                     spells: []
-                }
+                },
+                currentSpellAction: null,
+                spellActionSnapshotList: []
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
@@ -150,7 +154,9 @@ describe('# snapshot-reducer', () => {
                     players: [],
                     characters: [],
                     spells: []
-                }
+                },
+                currentSpellAction: null,
+                spellActionSnapshotList: []
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
@@ -212,7 +218,9 @@ describe('# snapshot-reducer', () => {
                     players: [],
                     characters: [],
                     spells: []
-                }
+                },
+                currentSpellAction: null,
+                spellActionSnapshotList: []
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({
@@ -261,7 +269,9 @@ describe('# snapshot-reducer', () => {
                     players: [],
                     characters: [],
                     spells: []
-                }
+                },
+                currentSpellAction: null,
+                spellActionSnapshotList: []
             };
 
             const state1 = snapshotReducer(initialState, BattleStateTurnStartAction({
@@ -313,7 +323,9 @@ describe('# snapshot-reducer', () => {
                     players: [],
                     characters: [],
                     spells: []
-                }
+                },
+                currentSpellAction: null,
+                spellActionSnapshotList: []
             };
 
             const state1 = snapshotReducer(initialState, BattleCommitAction({

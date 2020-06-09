@@ -1,4 +1,4 @@
-import { SpellType } from '@timeflies/shared';
+import { SpellType, Position } from '@timeflies/shared';
 import { MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
 import { spellEngineMove } from './move/spell-engine-move';
 import { BattleActionState } from '../../battleState/battle-action-reducer';
@@ -8,6 +8,7 @@ import { spellEngineSimpleAttack } from './simpleAttack/spell-engine-simpleAttac
 
 export type SpellEngineDependencies<S> = {
     extractState: (getState: () => S) => BattleActionState;
+    extractFutureCharacterPositionList: (getState: () => S) => Position[];
     extractFutureCharacter: (getState: () => S) => Character<'future'> | undefined;
     extractFutureSpell: (getState: () => S) => Spell<'future'> | undefined;
 };

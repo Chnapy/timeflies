@@ -14,19 +14,30 @@ export interface BattleSnapshot {
 
 export const getBattleSnapshotWithHash = ({
     teamsSnapshots,
+    playersSnapshots,
+    charactersSnapshots,
+    spellsSnapshots,
     ...rest
 }: Omit<BattleSnapshot, 'battleHash'>): BattleSnapshot => {
 
     const battleHash = objectHash(
         // TODO workaround for https://github.com/puleos/object-hash/issues/62
         JSON.parse(JSON.stringify(
-            teamsSnapshots
+            {
+                teamsSnapshots,
+                playersSnapshots,
+                charactersSnapshots,
+                spellsSnapshots,
+            }
         )), {
         respectType: false
     });
 
     return {
         teamsSnapshots,
+        playersSnapshots,
+        charactersSnapshots,
+        spellsSnapshots,
         ...rest,
         battleHash
     };

@@ -8,6 +8,7 @@ import { getBattleMiddlewareList } from './ui/reducers/battle-reducers/battle-mi
 import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
 import { rootReducer } from './ui/reducers/root-reducer';
 import { bootMiddleware } from './stages/boot/boot-middleware';
+import { CanvasContext } from './canvas/CanvasContext';
 
 export type StoreManager = ReturnType<typeof createStoreManager>;
 
@@ -28,9 +29,9 @@ const defaultMiddlewareList = (assetLoader: AssetLoader): Middleware[] => [
     ...getBattleMiddlewareList()
 ];
 
-export const createStoreManager = ({ 
-    assetLoader, 
-    initialState, 
+export const createStoreManager = ({
+    assetLoader,
+    initialState,
     middlewareList = defaultMiddlewareList(assetLoader),
 }: Props) => {
 
@@ -68,12 +69,17 @@ export const createStoreManager = ({
         equalityFn: (a: R, b: R) => boolean = (a, b) => a === b
     ) => {
         let currentState;
+        const contextResources = CanvasContext.consumer();
 
         function handleChange() {
             const nextState = selector(store.getState());
             if (!equalityFn(nextState, currentState)) {
                 currentState = nextState;
-                onChange(currentState);
+                
+                CanvasContext.provider(
+                    contextResources,
+                    () => onChange(currentState)
+                );
             }
         }
 

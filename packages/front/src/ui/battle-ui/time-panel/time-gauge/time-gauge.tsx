@@ -28,8 +28,8 @@ export const TimeGauge: React.FC = () => {
     }, (a, b) => a.startTime === b.startTime);
 
     const spellActionStartTimeList = useGameStep('battle',
-        ({ spellActionState }) =>
-            spellActionState.spellActionSnapshotList.map(spellAction => spellAction.startTime),
+        ({ snapshotState }) =>
+            snapshotState.spellActionSnapshotList.map(spellAction => spellAction.startTime),
         shallowEqual
     );
 

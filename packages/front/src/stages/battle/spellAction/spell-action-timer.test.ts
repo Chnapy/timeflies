@@ -31,13 +31,13 @@ describe('# SpellActionTimer', () => {
         const dispatch = jest.fn();
 
         const timer = SpellActionTimer({
-            extractSpellActionSnapshotList: () => [],
+            extractSpellActionSnapshotList: () => [snapshot],
             dispatch
         });
 
         const snapshot = getSnapshot({ startTime: timerTester.now + 100 });
 
-        expect(() => timer.onAdd(snapshot)).toThrowError();
+        expect(() => timer.onAdd(snapshot.startTime)).toThrowError();
     });
 
     it('should launch current spell action and send message', () => {
@@ -45,13 +45,13 @@ describe('# SpellActionTimer', () => {
         const dispatch = jest.fn();
 
         const timer = SpellActionTimer({
-            extractSpellActionSnapshotList: () => [],
+            extractSpellActionSnapshotList: () => [snapshot],
             dispatch
         });
 
         const snapshot = getSnapshot({ startTime: timerTester.now });
 
-        timer.onAdd(snapshot);
+        timer.onAdd(snapshot.startTime);
 
         expect(dispatch).toHaveBeenNthCalledWith(1, SpellActionTimerStartAction({
             spellActionSnapshot: snapshot
@@ -68,7 +68,7 @@ describe('# SpellActionTimer', () => {
         const dispatch = jest.fn();
 
         const timer = SpellActionTimer({
-            extractSpellActionSnapshotList: () => [],
+            extractSpellActionSnapshotList: () => [snapshot],
             dispatch
         });
 
@@ -76,7 +76,7 @@ describe('# SpellActionTimer', () => {
             battleHash: '-hash-'
         });
 
-        timer.onAdd(snapshot);
+        timer.onAdd(snapshot.startTime);
 
         timerTester.advanceBy(200);
 
@@ -106,7 +106,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ]);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
 
         timerTester.advanceBy(200);
 
@@ -134,7 +134,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ]);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
 
         timer.onRemove([
             spellActionSnapshotList[ 1 ]
@@ -162,7 +162,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ]);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
 
         timer.onRemove([
             spellActionSnapshotList[ 0 ]
@@ -194,7 +194,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ]);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
 
         timerTester.advanceBy(300);
 

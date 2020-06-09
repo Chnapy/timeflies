@@ -1,6 +1,8 @@
 import { AnyAction, Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
 import { SpellType } from '@timeflies/shared';
 import { SpellEngine, SpellEngineDependencies, spellEngineMap } from '../engine/spellEngine/spell-engine';
+import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
+import { BattleStateSpellPrepareAction } from './battle-state-actions';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
     getSpellEngineFromType?: (spellType: SpellType, api: MiddlewareAPI) => SpellEngine;
@@ -16,7 +18,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
     getSpellEngineFromType = defaultGetSpellEngineFromType,
     ...deps
 }) => api => next => {
-    const { extractState, extractFutureSpell } = deps;
+    const { extractState, extractFutureSpell, extractFutureCharacter } = deps;
 
     const getSpellEngine = (): SpellEngine => {
         const state = extractState(api.getState);
@@ -49,5 +51,12 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
         }
 
         spellEngine(action);
+
+        if(SpellActionLaunchAction.match(action)) {
+            api.dispatch(BattleStateSpellPrepareAction({
+                futureSpell: nextSpell!,
+                futureCharacter: extractFutureCharacter(api.getState)!
+            }));
+        }
     };
 };

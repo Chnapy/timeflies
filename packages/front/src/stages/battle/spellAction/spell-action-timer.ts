@@ -4,10 +4,7 @@ import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 
 
-export interface SpellActionTimer {
-    onAdd(snapshot: SpellActionSnapshot): void;
-    onRemove(snapshotDeletedList: SpellActionSnapshot[], correctHash: string): void;
-}
+export type SpellActionTimer = ReturnType<typeof SpellActionTimer>;
 
 const assertSpellActionIsNotFuture = (snapshot: SpellActionSnapshot): void | never => {
     if (snapshot.startTime > Date.now()) {
@@ -24,7 +21,7 @@ type Dependencies = {
 export const SpellActionTimer = ({
     extractSpellActionSnapshotList,
     dispatch
-}: Dependencies): SpellActionTimer => {
+}: Dependencies) => {
 
     let timeout: NodeJS.Timeout | undefined;
 
@@ -91,10 +88,11 @@ export const SpellActionTimer = ({
     };
 
     return {
-        onAdd(snapshot) {
+        onAdd(startTime: number) {
+            const snapshot = extractSpellActionSnapshotList().find(s => s.startTime === startTime)!;
             startSpellAction(snapshot);
         },
-        onRemove(snapshotDeletedList, correctHash) {
+        onRemove(snapshotDeletedList: SpellActionSnapshot[], correctHash: string) {
 
             const currentOrPassedSnapshot = snapshotDeletedList.find(({ startTime }) =>
                 startTime <= Date.now()

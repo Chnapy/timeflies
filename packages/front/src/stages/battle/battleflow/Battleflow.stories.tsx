@@ -60,6 +60,10 @@ export const Default: React.FC = () => {
         const characterList = [
             seedCharacterSnapshot({
                 id: 'c1', playerId: 'p1', position: { x: 4, y: 3 },
+                features: {
+                    life: 100,
+                    actionTime: 30000
+                },
                 staticData: {
                     id: 'c1',
                     name: 'toto',
@@ -74,6 +78,10 @@ export const Default: React.FC = () => {
             }),
             seedCharacterSnapshot({
                 id: 'c2', playerId: 'p2', position: { x: 6, y: 4 },
+                features: {
+                    life: 120,
+                    actionTime: 25000
+                },
                 staticData: {
                     id: 'c2',
                     name: 'africa',
@@ -95,7 +103,8 @@ export const Default: React.FC = () => {
                 characterId: 'c1',
                 index: 1,
                 feature: {
-                    duration: 300
+                    duration: 300,
+                    area: -1
                 }
             }),
             seedSpellSnapshot({
@@ -115,7 +124,8 @@ export const Default: React.FC = () => {
                 characterId: 'c2',
                 index: 1,
                 feature: {
-                    duration: 600
+                    duration: 600,
+                    area: -1
                 }
             }),
             seedSpellSnapshot({
@@ -136,6 +146,8 @@ export const Default: React.FC = () => {
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
+            const startTime = Date.now() + 1000;
+
         storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
@@ -144,23 +156,23 @@ export const Default: React.FC = () => {
             },
             globalTurnSnapshot: {
                 id: 1,
-                order: [],
-                startTime: Date.now(),
+                order: ['c1', 'c2'],
+                startTime,
                 currentTurn: {
                     id: 1,
                     characterId: 'c1',
                     duration: 30000,
-                    startTime: Date.now()
+                    startTime
                 }
             },
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: characterList,
-                launchTime: Date.now(),
+                launchTime: startTime,
                 playersSnapshots: [ p1, p2 ],
                 spellsSnapshots: spellList,
                 teamsSnapshots: [ t1, t2 ],
-                time: Date.now()
+                time: startTime
             }
         }));
 

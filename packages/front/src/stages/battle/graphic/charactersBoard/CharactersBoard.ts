@@ -26,28 +26,18 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
         charactersAliveIds => {
             container.removeChildren().forEach(c => c.destroy());
             charactersGraphics.splice(0, Infinity);
-            
-            charactersGraphics.push(...charactersAliveIds
-                .map(id => CharacterGraphic(id, period)));
 
-            container.addChild(...charactersGraphics.map(c => c.container));
+            if (charactersAliveIds.length) {
+                charactersGraphics.push(...charactersAliveIds
+                    .map(id => CharacterGraphic(id, period)));
+                    
+                container.addChild(...charactersGraphics.map(c => c.container));
+            }
 
             requestRender();
         },
         shallowEqual
     );
-
-    // onAction(SpellActionTimerEndAction, () => {
-
-    //     charactersGraphics
-    //         .filter(cg => !cg.character.isAlive)
-    //         .forEach(({ container: characterContainer }) => {
-    //             // TODO handle risk of memory leaks
-    //             // because of graphics retained by 'onAction' callbacks 
-    //             container.removeChild(characterContainer);
-    //         });
-    //     requestRender();
-    // });
 
     return {
         container
