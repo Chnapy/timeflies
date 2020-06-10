@@ -1,5 +1,6 @@
-import { Position } from '@timeflies/shared';
+import { equals, Position } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
+import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../canvas/GameCanvas';
 import { TileClickAction, TileHoverAction } from '../../battleState/battle-state-actions';
@@ -23,9 +24,9 @@ export interface TileGraphic {
     showPath(isLast: boolean): void;
     showRange(): void;
     showAction(inRange: boolean): void;
-    persistAction(startTime: number): void;
+    persistAction(): void;
     persistActionStart(duration: number, startTime: number): void;
-    clearPersist(startTime?: number, removed?: boolean): void;
+    clearPersist(): void;
 }
 
 export const TileGraphic = ({
@@ -80,8 +81,6 @@ export const TileGraphic = ({
         graphicsOverPersist,
         graphicsOverPersistStart
     );
-
-    const startTimeList: number[] = [];
 
     let ticker: PIXI.Ticker | null = null;
 
@@ -195,9 +194,7 @@ export const TileGraphic = ({
         graphicsOverPersist.lineStyle();
     };
 
-    const persistAction = (startTime: number) => {
-        startTimeList.push(startTime);
-
+    const persistAction = () => {
         graphicsOverPersist.clear();
 
         drawTargetCurrent();
@@ -250,7 +247,7 @@ export const TileGraphic = ({
             .start();
     };
 
-    const clearPersist = (startTime?: number, removed?: boolean) => {
+    const clearPersist = () => {
 
         ticker?.destroy();
         ticker = null;
@@ -259,20 +256,7 @@ export const TileGraphic = ({
 
         graphicsOverPersistStart.clear();
 
-        if (!startTime) {
-            graphicsOverPersist.clear();
-            return;
-        }
-
-        const index = startTimeList.indexOf(startTime);
-        if (index !== -1) {
-
-            startTimeList.splice(index, removed ? Infinity : 1);
-
-            if (!startTimeList.length) {
-                graphicsOverPersist.clear();
-            }
-        }
+        graphicsOverPersist.clear();
     };
 
     const this_: TileGraphic = {
@@ -288,7 +272,53 @@ export const TileGraphic = ({
         clearPersist
     };
 
-    reset();
+    storeEmitter.onStateChange(
+        ({ battle: { battleActionState } }) => {
+
+            const pathIndex = battleActionState.path.findIndex(p => equals(p)(tilePos));
+
+            const path = pathIndex !== -1;
+
+            const pathLastPos = pathIndex === battleActionState.path.length - 1;
+
+            return {
+                path,
+                pathLastPos,
+                rangeArea: battleActionState.rangeArea.some(p => equals(p)(tilePos)),
+                actionArea: battleActionState.actionArea.some(p => equals(p)(tilePos)),
+            };
+        },
+        ({ path, pathLastPos, rangeArea, actionArea }) => {
+            reset();
+
+            if (rangeArea) {
+                showRange();
+            }
+
+            if (path) {
+                showPath(pathLastPos);
+            }
+
+            if (actionArea) {
+                showAction(rangeArea);
+            }
+        },
+        shallowEqual
+    );
+
+    storeEmitter.onStateChange(
+        ({ battle: { snapshotState } }) => snapshotState.spellActionSnapshotList.some(s =>
+            s.startTime + s.duration > Date.now()
+            && s.actionArea.some(p => equals(p)(tilePos))),
+        futureAction => {
+            if (futureAction) {
+                persistAction();
+            } else {
+                clearPersist();
+            }
+        },
+        shallowEqual
+    );
 
     return this_;
 };
