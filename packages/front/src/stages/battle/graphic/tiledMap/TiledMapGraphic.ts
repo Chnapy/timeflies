@@ -1,10 +1,11 @@
-import { assertIsDefined, equals, Position, TiledManager } from '@timeflies/shared';
+import { Position, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap, { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../canvas/GameCanvas';
 import { graphicTheme } from '../graphic-theme';
+import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from './tiledSpellFns';
 import { TileGraphic } from './TileGraphic';
 
 export type TiledMapGraphic = ReturnType<typeof TiledMapGraphic>;
@@ -165,136 +166,37 @@ export const TiledMapGraphic = () => {
     );
 
     storeEmitter.onStateChange(
-        ({ battle: { battleActionState } }) => ({
-            path: battleActionState.path,
-            rangeArea: battleActionState.rangeArea,
-            actionArea: battleActionState.actionArea
-        }),
-        ({ path, rangeArea, actionArea }) => {
-            layerTiles.forEach(t => t.reset());
+        ({ battle: { snapshotState } }) => {
+            const currentSpellAction = snapshotState.spellActionSnapshotList.find(s =>
+                s.startTime <= Date.now() && s.startTime + s.duration > Date.now());
 
-            const rangeTiles = rangeArea.map(pos => {
-                const tile = layerTiles.find(t => equals(t.tilePos)(pos));
-                assertIsDefined(tile);
-                tile.showRange();
-                return tile;
-            });
+            if (!currentSpellAction) {
+                return null;
+            }
 
-            path.forEach((pos, i) => {
-                const tile = layerTiles.find(t => equals(t.tilePos)(pos));
-                assertIsDefined(tile);
-                tile.showPath(i === path.length - 1);
-            });
+            const spellType = snapshotState.battleDataFuture.spells.find(s => s.id === currentSpellAction.spellId)!.staticData.type;
 
-            actionArea.forEach(pos => {
-                const tile = layerTiles.find(t => equals(t.tilePos)(pos));
-                assertIsDefined(tile);
-                tile.showAction(
-                    rangeTiles.some(t => t === tile)
-                );
-            });
+            return {
+                currentSpellAction,
+                spellType
+            };
+        },
+        spellActionInfos => {
+            if (spellActionInfos) {
+                const { currentSpellAction, spellType } = spellActionInfos;
 
-            requestRender();
+                const startFn = spellType === 'move'
+                    ? tiledMapSpellMove
+                    : tiledMapSpellSimpleAttack;
+
+                startFn.onSpellStartFn({
+                    ...currentSpellAction,
+                    tileGraphicList: layerTiles,
+                });
+            }
         },
         shallowEqual
     );
-
-    // onAction(SpellEngineBindAction, ({
-    //     spell, rangeArea, onTileClick: otc, onTileHover: oth
-    // }) => {
-
-    //     layerTiles.forEach(t => t.reset());
-
-    //     const rangeTiles = rangeArea.map(pos => {
-    //         const tile = layerTiles.find(t => equals(t.tilePos)(pos));
-    //         assertIsDefined(tile);
-    //         tile.showRange();
-    //         return tile;
-    //     });
-
-    //     triggerFn.onTileClick = otc;
-
-    //     triggerFn.onTileHover = async (tilePos, tileGraphicTarget) => {
-
-    //         const engineProps = await oth(tilePos);
-
-    //         layerTiles.forEach(t => t.reset());
-
-    //         if (spell.staticData.type === 'move') {
-
-    //         } else {
-
-    //             rangeTiles.forEach(t => t.showRange());
-
-    //             const isInArea = rangeTiles.some(t => equals(tileGraphicTarget.tilePos)(t.tilePos));
-    //             if (!isInArea) {
-    //                 return;
-    //             }
-    //         }
-
-    //         if (engineProps) {
-    //             const { onHoverFn } = getTiledMapSpellObject(spell.staticData.type);
-
-    //             const afterClick = onHoverFn({
-    //                 engineProps: engineProps as any,
-    //                 tileGraphicList: layerTiles,
-    //                 rangeTiles,
-    //                 duration: spell.feature.duration
-    //             });
-
-    //             triggerFn.onTileClick = async tilePos => {
-    //                 const isTargetable = await otc(tilePos);
-
-    //                 if (!isTargetable) {
-    //                     return;
-    //                 }
-
-    //                 const { spellActionSnapshotList } = serviceBattleData('future');
-
-    //                 const { startTime } = spellActionSnapshotList[ spellActionSnapshotList.length - 1 ]
-
-    //                 afterClick(startTime);
-    //             };
-    //         }
-    //     };
-    // });
-
-    // onAction(SpellActionTimerStartAction, ({
-    //     spellActionSnapshot: { spellId, position, actionArea, startTime, duration }
-    // }) => {
-
-    //     const { globalTurn } = serviceBattleData('cycle');
-    //     assertIsDefined(globalTurn);
-
-    //     const spell = globalTurn.currentTurn.character.spells.find(s => s.id === spellId);
-    //     assertIsDefined(spell);
-
-    //     const { onSpellStartFn } = getTiledMapSpellObject(spell.staticData.type);
-
-    //     onSpellStartFn({
-    //         tileGraphicList: layerTiles,
-    //         startTime,
-    //         position,
-    //         actionArea,
-    //         duration
-    //     });
-    // });
-
-    // onAction(SpellActionTimerEndAction, ({
-    //     spellActionSnapshot: { startTime }, removed
-    // }) => {
-    //     layerTiles.forEach(t => t.clearPersist(startTime, removed));
-    // });
-
-    // onAction(BattleStateTurnEndAction, () => {
-    //     triggerFn.onTileHover = () => { };
-    //     triggerFn.onTileClick = () => { };
-
-    //     layerTiles.forEach(t => {
-    //         t.reset();
-    //         t.clearPersist();
-    //     });
-    // });
 
     return {
         container,
