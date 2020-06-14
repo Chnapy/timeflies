@@ -5,7 +5,7 @@ import { GameState } from '../../game-state';
 
 export const bootMiddleware: Middleware<{}, GameState> = api => next => {
 
-    setImmediate(() => {
+    setTimeout(() => {
         if (api.getState().step === 'boot') {
             api.dispatch(SendMessageAction({
                 type: 'set-id',
@@ -20,6 +20,8 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
 
     return action => {
 
+        next(action);
+
         if (ReceiveMessageAction.match(action)) {
             const { payload } = action;
 
@@ -29,7 +31,5 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
                 }));
             }
         }
-
-        next(action);
     };
 };

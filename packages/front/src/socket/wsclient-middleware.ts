@@ -24,7 +24,7 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
         if (socket.readyState === WebSocket.CONNECTING) {
             return new Promise(r => setTimeout(() => send(action).then(r), 1000));
         }
-        // console.log('<-', message);
+        // console.log('<-', action.payload);
 
         setTimeout(() =>
             socket.send(JSON.stringify([ {
@@ -58,11 +58,10 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
 
     return (action: AnyAction) => {
 
+        next(action);
+
         if (SendMessageAction.match(action)) {
             send(action);
-            return;
         }
-
-        next(action);
     };
 };
