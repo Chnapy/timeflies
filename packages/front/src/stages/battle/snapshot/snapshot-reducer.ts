@@ -101,15 +101,20 @@ const commit = (state: SnapshotState, time: number): void => {
     }
 };
 
+// TODO merge objects instead
 const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string, period: BattleDataPeriod, {
     battleHash, teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
 }: BattleSnapshot) => {
 
     data.battleHash = battleHash;
-    data.spells = spellsSnapshots.map(snap => Spell(period, snap));
-    data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
-    data.players = playersSnapshots.map(snap => Player(period, snap));
-    data.teams = teamsSnapshots.map(snap => Team(period, snap));
+    data.spells.forEach((s, i) => Object.assign(s, Spell(period, spellsSnapshots[ i ])));
+    data.characters.forEach((s, i) => Object.assign(s, Character(period, myPlayerId, charactersSnapshots[ i ])));
+    data.players.forEach((s, i) => Object.assign(s, Player(period, playersSnapshots[ i ])));
+    data.teams.forEach((s, i) => Object.assign(s, Team(period, teamsSnapshots[ i ])));
+    // data.spells = spellsSnapshots.map(snap => Spell(period, snap));
+    // data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
+    // data.players = playersSnapshots.map(snap => Player(period, snap));
+    // data.teams = teamsSnapshots.map(snap => Team(period, snap));
 };
 
 export const snapshotReducer = createReducer(initialState, {

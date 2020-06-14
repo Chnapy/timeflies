@@ -118,6 +118,8 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
     return (action: AnyAction) => {
 
+        next(action);
+
         if (BattleStartAction.match(action)) {
 
             const { globalTurnSnapshot } = action.payload;
@@ -159,7 +161,9 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
                 cancelTimeout();
 
-                api.dispatch(BattleStateTurnEndAction());
+                setTimeout(() =>
+                    api.dispatch(BattleStateTurnEndAction())
+                );
             }
 
         } else if (NotifyDeathsAction.match(action)) {
@@ -170,7 +174,5 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 differTurnEnd(currentCharacterId);
             }
         }
-
-        next(action);
     };
 };

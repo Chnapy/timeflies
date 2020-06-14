@@ -21,21 +21,24 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
 
     const send = async (action: SendMessageAction) => {
 
-        if(socket.readyState === WebSocket.CONNECTING) {
+        if (socket.readyState === WebSocket.CONNECTING) {
             return new Promise(r => setTimeout(() => send(action).then(r), 1000));
         }
         // console.log('<-', message);
-        socket.send(JSON.stringify([ {
-            sendTime: Date.now(),
-            ...action.payload
-        } ]));
+
+        setTimeout(() =>
+            socket.send(JSON.stringify([ {
+                sendTime: Date.now(),
+                ...action.payload
+            } ]))
+        );
     };
 
     socket.onmessage = ({ data }: MessageEvent) => {
 
         if (typeof data !== 'string') {
             throw new TypeError(`typeof message not handled: ${typeof data}`);
-        }
+        } 
 
         let actionList;
         try {
@@ -48,7 +51,9 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
             throw new Error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
         }
 
-        actionList.forEach(action => api.dispatch(ReceiveMessageAction(action)));
+        setTimeout(() =>
+            actionList.forEach(action => api.dispatch(ReceiveMessageAction(action)))
+        );
     };
 
     return (action: AnyAction) => {

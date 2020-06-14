@@ -30,7 +30,7 @@ const createSampleChar1 = (id: string): StaticCharacter => {
                 type: 'move',
                 initialFeatures: {
                     duration: 200,
-                    area: 1,
+                    area: -1,
                     attack: -1
                 }
             },
@@ -66,7 +66,7 @@ const createSampleChar2 = (id: string): StaticCharacter => {
                 type: 'move',
                 initialFeatures: {
                     duration: 600,
-                    area: 1,
+                    area: -1,
                     attack: -1
                 }
             },
@@ -101,7 +101,7 @@ const createSampleChar3 = (id: string): StaticCharacter => {
                 name: 'MOVE',
                 type: 'move',
                 initialFeatures: {
-                    area: 1,
+                    area: -1,
                     duration: 300,
                     attack: -1
                 }

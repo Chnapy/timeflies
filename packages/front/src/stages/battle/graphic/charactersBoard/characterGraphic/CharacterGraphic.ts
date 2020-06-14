@@ -183,7 +183,15 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
 
             ticker.start();
         },
-        shallowEqual
+        (a, b) => {
+            if(!a || !b) {
+                return false;
+            }
+            const {character, ...rest1} = a;
+            const {character: c2, ...rest2} = b;
+
+            return shallowEqual(rest1, rest2);
+        }
     );
 
     return {

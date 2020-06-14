@@ -25,11 +25,11 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
 
         if (state.currentAction === 'spellPrepare') {
             const spell = extractFutureSpell(api.getState)!;
-            
+
             return getSpellEngineFromType(spell.staticData.type, api, deps);
         }
 
-        return () => { };
+        return async () => { };
     };
 
     let spellEngine = getSpellEngine();
@@ -50,13 +50,17 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             spellEngine = getSpellEngine();
         }
 
-        spellEngine(action);
+        spellEngine(action)
+            .then(() => {
 
-        if(SpellActionLaunchAction.match(action)) {
-            api.dispatch(BattleStateSpellPrepareAction({
-                futureSpell: nextSpell!,
-                futureCharacter: extractFutureCharacter(api.getState)!
-            }));
-        }
+                if (nextState.currentAction === 'spellPrepare') {
+                    if (SpellActionLaunchAction.match(action)) {
+                        api.dispatch(BattleStateSpellPrepareAction({
+                            futureSpell: nextSpell!,
+                            futureCharacter: extractFutureCharacter(api.getState)!
+                        }));
+                    }
+                }
+            });
     };
 };

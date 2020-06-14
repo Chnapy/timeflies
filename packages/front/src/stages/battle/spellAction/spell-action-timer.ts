@@ -40,32 +40,31 @@ export const SpellActionTimer = ({
         spellAction
     }));
 
-    const startSpellAction = (snapshot: SpellActionSnapshot) => {
+    const startSpellAction = (snapshot: SpellActionSnapshot, fromNotify: boolean) => {
 
         assertSpellActionIsNotFuture(snapshot);
-
-        // currentSpellAction = snapshot;
 
         const { startTime, duration } = snapshot;
 
         const delta = Math.max(Date.now() - startTime, 0);
 
-        timeout = setTimeout(() => endSpellAction(snapshot), duration - delta);
+        timeout = setTimeout(() => endSpellAction(snapshot, fromNotify), duration - delta);
 
         dispatchStart(snapshot);
 
-        sendSpellAction(snapshot);
+        if (!fromNotify) {
+            sendSpellAction(snapshot);
+        }
     };
 
     const cancelTimeout = () => {
-        // currentSpellAction = undefined;
         if (timeout) {
             clearTimeout(timeout);
             timeout = undefined;
         }
     };
 
-    const endSpellAction = (currentSpellAction: SpellActionSnapshot) => {
+    const endSpellAction = (currentSpellAction: SpellActionSnapshot, fromNotify: boolean) => {
 
         dispatchEnd(currentSpellAction, false, currentSpellAction.battleHash);
 
@@ -76,7 +75,7 @@ export const SpellActionTimer = ({
         cancelTimeout();
 
         if (nextSnapshot) {
-            startSpellAction(nextSnapshot);
+            startSpellAction(nextSnapshot, fromNotify);
         }
     };
 
@@ -88,9 +87,9 @@ export const SpellActionTimer = ({
     };
 
     return {
-        onAdd(startTime: number) {
+        onAdd(startTime: number, fromNotify: boolean) {
             const snapshot = extractSpellActionSnapshotList().find(s => s.startTime === startTime)!;
-            startSpellAction(snapshot);
+            startSpellAction(snapshot, fromNotify);
         },
         onRemove(snapshotDeletedList: SpellActionSnapshot[], correctHash: string) {
 

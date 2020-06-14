@@ -1,5 +1,5 @@
 import { Orientation, Position } from '../geo';
-import { SpellSnapshot, StaticSpell } from "./Spell";
+import { StaticSpell } from "./Spell";
 
 export type CharacterType =
     | 'sampleChar1'

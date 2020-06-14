@@ -1,5 +1,5 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { assertIsDefined, getLast, SpellActionSnapshot } from '@timeflies/shared';
+import { assertIsDefined, getLast, SpellActionSnapshot, ConfirmSAction } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
@@ -8,6 +8,8 @@ import { SnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { SpellAction } from './spell-action-reducer';
 import { SpellActionTimer } from './spell-action-timer';
+import diffDefault from 'jest-diff';
+import { GameState } from '../../../game-state';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => SnapshotState;
@@ -28,6 +30,27 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
     extractCurrentHash,
     createSpellActionTimer = SpellActionTimer
 }) => api => next => {
+
+    const logSnapshotDiff = ({ debug, sendHash }: ConfirmSAction) => {
+        if (!debug) {
+            return;
+        }
+
+        const { correctBattleSnapshot } = debug;
+
+        const { teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList.find(s => s.battleHash === sendHash)!;
+
+        setTimeout(() => {
+            const diffLog = diffDefault(
+                correctBattleSnapshot,
+                {
+                    teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
+                }
+            );
+
+            console.log(diffLog);
+        });
+    };
 
     const spellActionTimer = createSpellActionTimer({
         extractSpellActionSnapshotList: () => extractState(api.getState).spellActionSnapshotList,
@@ -56,9 +79,11 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         }
 
         if (toRemoveList.length) {
-            api.dispatch(SpellActionCancelAction({
-                spellActionSnapshotsValids
-            }));
+            setTimeout(() =>
+                api.dispatch(SpellActionCancelAction({
+                    spellActionSnapshotsValids
+                }))
+            );
         }
 
         spellActionTimer.onRemove(toRemoveList, lastCorrectHash);
@@ -80,17 +105,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 ? Math.max(getSnapshotEndTime(lastSnapshot), now)
                 : now;
 
-            // const spellSnapshots: SpellActionSnapshot[] = [];
-
             const spellActList = spellActions.map((spellAction, i) => {
-
-                // const spellActionSnapshot = onSpellAction(spellAction, startTime);
-
-                // spellSnapshots.push(spellActionSnapshot);
-
-                // if (!i && !hadCurrentSpellAction) {
-                //     spellActionTimer.onAdd(spellActionSnapshot);
-                // }
 
                 if (i) {
                     startTime += spellAction.spell.feature.duration;
@@ -102,13 +117,15 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 };
             });
 
-            api.dispatch(SpellActionLaunchAction({
-                spellActList
-            }));
+            setTimeout(() => {
+                api.dispatch(SpellActionLaunchAction({
+                    spellActList
+                }));
 
-            if (!hadCurrentSpellAction) {
-                spellActionTimer.onAdd(spellActList[ 0 ].startTime);
-            }
+                if (!hadCurrentSpellAction) {
+                    spellActionTimer.onAdd(spellActList[ 0 ].startTime, false);
+                }
+            });
 
         } else if (BattleStateTurnEndAction.match(action)) {
 
@@ -122,6 +139,8 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             if (payload.type === 'confirm') {
                 const { isOk, lastCorrectHash } = payload;
                 if (!isOk) {
+
+                    logSnapshotDiff(payload)
 
                     cancelCurrentAndNextSpells(lastCorrectHash);
                 }
@@ -144,18 +163,16 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                     actionArea
                 };
 
-                // const spellAct = onSpellAction(spellAction, startTime);
-
                 const spellActionState = extractState(api.getState);
 
                 const hadCurrentSpell = !!spellActionState.currentSpellAction;
 
                 api.dispatch(SpellActionLaunchAction({
-                    spellActList: [ { spellAction, startTime } ]
+                    spellActList: [ { spellAction, startTime } ],
                 }));
 
                 if (!hadCurrentSpell) {
-                    spellActionTimer.onAdd(startTime);
+                    spellActionTimer.onAdd(startTime, true);
                 }
             }
         }

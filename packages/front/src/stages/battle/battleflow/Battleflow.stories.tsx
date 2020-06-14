@@ -13,6 +13,7 @@ import { seedPlayerSnapshot } from '../entities/player/Player.seed';
 import { seedSpellSnapshot } from '../entities/spell/Spell.seed';
 import { seedTeamSnapshot } from '../entities/team/Team.seed';
 import { BattleStageGraphic } from '../graphic/BattleStageGraphic';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 
 export default {
     title: 'Battleflow'
@@ -146,7 +147,7 @@ export const Default: React.FC = () => {
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-            const startTime = Date.now() + 1000;
+        const startTime = Date.now() + 1000;
 
         storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
@@ -156,7 +157,7 @@ export const Default: React.FC = () => {
             },
             globalTurnSnapshot: {
                 id: 1,
-                order: ['c1', 'c2'],
+                order: [ 'c1', 'c2' ],
                 startTime,
                 currentTurn: {
                     id: 1,
@@ -188,8 +189,39 @@ export const Default: React.FC = () => {
         storeManager,
         assetLoader,
         createPixi,
-        // gameUIChildren: null
     });
 
-    return view;
+    const notifyFn = () => {
+
+        const { position } = storeManager.getState().battle.snapshotState.battleDataCurrent.characters.find(c => c.id === 'c2')!;
+
+        const newPosition = {
+            ...position,
+            x: position.x + 1
+        };
+
+        storeManager.dispatch(ReceiveMessageAction({
+            type: 'notify',
+            sendTime: -1,
+            spellActionSnapshot: {
+                spellId: 's3',
+                characterId: 'c2',
+                actionArea: [ newPosition ],
+                position: newPosition,
+                startTime: Date.now() - 100,
+                duration: 600,
+                battleHash: ''
+            }
+        }))
+    };
+
+    return <>
+        {view}
+
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+
+            <button onClick={notifyFn}>notify</button>
+
+        </div>
+    </>;
 };
