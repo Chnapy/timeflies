@@ -40,24 +40,19 @@ export const createStoreManager = ({
             collapsed: true,
             actionTransformer: (action: Action) => {
                 if (ReceiveMessageAction.match(action)) {
-                    action.type += ' > ' + action.payload.type;
+                    return {
+                        ...action,
+                        type: action.type + ' > ' + action.payload.type
+                    };
 
                 } else if (SendMessageAction.match(action)) {
-                    action.type += ' > ' + action.payload.type;
+                    return {
+                        ...action,
+                        type: action.type + ' > ' + action.payload.type
+                    };
                 }
 
                 return action;
-            },
-            level: action => {
-
-                if (ReceiveMessageAction.match(action)) {
-                    const { payload } = action;
-                    if (payload.type === 'confirm' && !payload.isOk) {
-                        return 'error';
-                    }
-                }
-
-                return 'log';
             }
         });
 

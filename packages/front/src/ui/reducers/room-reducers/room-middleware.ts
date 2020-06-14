@@ -17,6 +17,8 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
     return (action: Action) => {
 
+        next(action);
+
         const { step } = api.getState();
 
         if (ReceiveMessageAction.match(action)) {
@@ -36,7 +38,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
                 const { schema, images } = assetLoader.get('map')!;
 
-                next(BattleStartAction({
+                api.dispatch(BattleStartAction({
                     myPlayerId: currentPlayer!.id,
                     tiledMapAssets: {
                         schema,
@@ -46,10 +48,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                     globalTurnSnapshot: globalTurnState
                 }));
 
-                return;
-            }
-
-            if (message.type === 'room/map/select' || message.type === 'room/state') {
+            } else if (message.type === 'room/map/select' || message.type === 'room/state') {
 
                 const getMapConfig = (): MapConfig | undefined => {
 
@@ -106,7 +105,5 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
             }
         }
-
-        next(action);
     };
 };

@@ -4,12 +4,12 @@ import { shallowEqual } from 'react-redux';
 import TiledMap from 'tiled-types/types';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { StoreEmitter } from '../../../../../store-manager';
-import { Character } from '../../../entities/character/Character';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
+import { requestRender } from '../../../../../canvas/GameCanvas';
 
 
 export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
@@ -103,15 +103,17 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
     const setPosition = (x: number, y: number) => {
         animatedSprite.position.set(x, y);
         hud.container.position.set(x, y);
+
+        requestRender();
     };
 
     let ticker: PIXI.Ticker | null = null;
 
-    type SpellFn = (spellActionSnapshot: SpellActionSnapshot, character: Character<'current'>, tiledSchema: TiledMap) => void;
+    type SpellFn = (spellActionSnapshot: SpellActionSnapshot, characterPosition: Position, tiledSchema: TiledMap) => void;
 
-    const onMoveAction: SpellFn = ({ startTime, duration, position: endPosition }, character, tiledSchema) => {
+    const onMoveAction: SpellFn = ({ startTime, duration, position: endPosition }, characterPosition, tiledSchema) => {
 
-        const startWorldPos: Position = tiledMapGraphic.getWorldFromTile(tiledSchema, character.position);
+        const startWorldPos: Position = tiledMapGraphic.getWorldFromTile(tiledSchema, characterPosition);
         const endWorldPos: Position = tiledMapGraphic.getWorldFromTile(tiledSchema, endPosition);
         const diffWorldPos: Position = {
             x: endWorldPos.x - startWorldPos.x,
@@ -134,11 +136,11 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
         ({ battle }) => {
             const { tiledSchema } = battle.battleActionState;
             const { currentSpellAction, battleDataCurrent } = battle.snapshotState;
-            const character = battleDataCurrent.characters.find(c => c.id === characterId)!;
+            const characterPosition = battleDataCurrent.characters.find(c => c.id === characterId)!.position;
             if (!tiledSchema || currentSpellAction?.characterId !== characterId) {
                 return {
                     state: 'no-spell' as const,
-                    character,
+                    characterPosition,
                     tiledSchema
                 };
             }
@@ -148,7 +150,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             return {
                 state: 'current-spell' as const,
                 tiledSchema,
-                character,
+                characterPosition,
                 currentSpellAction,
                 spellType
             };
@@ -156,14 +158,14 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
         payload => {
             if (payload.state === 'no-spell') {
                 if (payload.tiledSchema) {
-                    const p = tiledMapGraphic.getWorldFromTile(payload.tiledSchema, payload.character.position);
+                    const p = tiledMapGraphic.getWorldFromTile(payload.tiledSchema, payload.characterPosition);
                     setPosition(p.x, p.y);
                 }
                 ticker?.destroy();
                 ticker = null;
                 return;
             }
-            const { tiledSchema, character, currentSpellAction, spellType } = payload;
+            const { tiledSchema, characterPosition, currentSpellAction, spellType } = payload;
 
             if (ticker?.started) {
                 throw new Error('Spell action received while ticker running');
@@ -179,19 +181,11 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
                 sampleSpell2: () => { },
                 sampleSpell3: () => { },
             });
-            actionFn(currentSpellAction, character, tiledSchema);
+            actionFn(currentSpellAction, characterPosition, tiledSchema);
 
             ticker.start();
         },
-        (a, b) => {
-            if(!a || !b) {
-                return false;
-            }
-            const {character, ...rest1} = a;
-            const {character: c2, ...rest2} = b;
-
-            return shallowEqual(rest1, rest2);
-        }
+        shallowEqual
     );
 
     return {
