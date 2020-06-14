@@ -131,7 +131,8 @@ describe('# SpellActionReceiver', () => {
                 type: 'confirm',
                 sendTime: expect.anything(),
                 isOk: false,
-                lastCorrectHash: 'firstHash'
+                lastCorrectHash: 'firstHash',
+                debug: expect.anything()
             } ]);
         });
 
@@ -160,7 +161,8 @@ describe('# SpellActionReceiver', () => {
                 type: 'confirm',
                 sendTime: expect.anything(),
                 isOk: false,
-                lastCorrectHash: 'firstHash'
+                lastCorrectHash: 'firstHash',
+                debug: expect.anything()
             } ]);
         });
 

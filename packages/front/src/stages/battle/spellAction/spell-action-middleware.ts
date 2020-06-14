@@ -31,14 +31,15 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
     createSpellActionTimer = SpellActionTimer
 }) => api => next => {
 
-    const logSnapshotDiff = ({ debug, sendHash }: ConfirmSAction) => {
+    const logSnapshotDiff = ({ debug }: ConfirmSAction) => {
         if (!debug) {
             return;
         }
 
         const { correctBattleSnapshot } = debug;
 
-        const { teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList.find(s => s.battleHash === sendHash)!;
+        const { teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList
+            .find(s => s.battleHash === debug.sendHash)!;
 
         setTimeout(() => {
             const diffLog = diffDefault(

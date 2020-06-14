@@ -56,10 +56,10 @@ export const SpellActionReceiver = (
                 type: 'confirm',
                 isOk,
                 lastCorrectHash,
-                sendHash: action.spellAction.battleHash,
                 debug: isOk
                     ? undefined
                     : {
+                        sendHash: action.spellAction.battleHash,
                         correctBattleSnapshot: {
                             teamsSnapshots: teams.map(teamToSnapshot),
                             playersSnapshots: players.map(playerToSnapshot),

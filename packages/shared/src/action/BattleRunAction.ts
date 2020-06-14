@@ -24,8 +24,8 @@ export interface BRunTurnStartSAction extends TAction<'battle-run/turn-start'> {
 export interface ConfirmSAction extends TAction<'confirm'> {
     isOk: boolean;
     lastCorrectHash: string;
-    sendHash: string;
     debug?: {
+        sendHash: string;
         correctBattleSnapshot: Omit<BattleSnapshot, 'battleHash' | 'time' | 'launchTime'>;
     };
 }
