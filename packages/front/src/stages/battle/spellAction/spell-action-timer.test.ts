@@ -37,7 +37,7 @@ describe('# SpellActionTimer', () => {
 
         const snapshot = getSnapshot({ startTime: timerTester.now + 100 });
 
-        expect(() => timer.onAdd(snapshot.startTime)).toThrowError();
+        expect(() => timer.onAdd(snapshot.startTime, false)).toThrowError();
     });
 
     it('should launch current spell action and send message', () => {
@@ -51,7 +51,7 @@ describe('# SpellActionTimer', () => {
 
         const snapshot = getSnapshot({ startTime: timerTester.now });
 
-        timer.onAdd(snapshot.startTime);
+        timer.onAdd(snapshot.startTime, false);
 
         expect(dispatch).toHaveBeenNthCalledWith(1, SpellActionTimerStartAction({
             spellActionSnapshot: snapshot
@@ -76,7 +76,7 @@ describe('# SpellActionTimer', () => {
             battleHash: '-hash-'
         });
 
-        timer.onAdd(snapshot.startTime);
+        timer.onAdd(snapshot.startTime, false);
 
         timerTester.advanceBy(200);
 
@@ -106,7 +106,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime, false);
 
         timerTester.advanceBy(200);
 
@@ -134,7 +134,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime, false);
 
         timer.onRemove([
             spellActionSnapshotList[ 1 ]
@@ -162,7 +162,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime, false);
 
         timer.onRemove([
             spellActionSnapshotList[ 0 ]
@@ -194,7 +194,7 @@ describe('# SpellActionTimer', () => {
             })
         );
 
-        timer.onAdd(spellActionSnapshotList[ 0 ].startTime);
+        timer.onAdd(spellActionSnapshotList[ 0 ].startTime, false);
 
         timerTester.advanceBy(300);
 

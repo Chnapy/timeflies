@@ -30,7 +30,7 @@ describe('# battle-action', () => {
             extractFutureCharacterPositionList: () => [ futureCharacter.position ],
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
-            getSpellEngineFromType: () => () => { },
+            getSpellEngineFromType: () => async () => { },
             ...deps
         });
 
@@ -48,7 +48,8 @@ describe('# battle-action', () => {
                 grid: [],
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null,
             };
 
             const store = getStore(initialState);
@@ -82,7 +83,8 @@ describe('# battle-action', () => {
                 } ]),
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             });
         });
     });
@@ -102,10 +104,11 @@ describe('# battle-action', () => {
                 grid: [],
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
-            const spellEngine = jest.fn();
+            const spellEngine = jest.fn(async () => {});
 
             const getSpellEngineFromType = jest.fn(() => spellEngine);
 
@@ -144,7 +147,8 @@ describe('# battle-action', () => {
                 grid: [],
                 path: [ { x: 2, y: 2 } ],
                 rangeArea: [ { x: 3, y: 3 } ],
-                actionArea: [ { x: 1, y: 1 } ]
+                actionArea: [ { x: 1, y: 1 } ],
+                futureCharacterPosition: null
             };
 
             const store = getStore(initialState);
@@ -170,7 +174,8 @@ describe('# battle-action', () => {
                 grid: [],
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const getSpellEngineFromType = jest.fn(() => jest.fn());
@@ -198,7 +203,8 @@ describe('# battle-action', () => {
                 grid: [],
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const store = getStore(initialState);
@@ -231,7 +237,8 @@ describe('# battle-action', () => {
                 grid: [],
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const store = getStore(initialState);

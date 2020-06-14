@@ -7,6 +7,8 @@ import { SnapshotState } from './snapshot-reducer';
 
 describe('# snapshot-middleware', () => {
 
+    jest.useFakeTimers();
+
     it('should not notify for deaths on spell action end action if there is not new deaths', () => {
 
         const currentCharacters = [
@@ -116,6 +118,8 @@ describe('# snapshot-middleware', () => {
         snapshotMiddleware({
             extractState: () => initialState,
         })(api)(next)(action);
+
+        jest.runOnlyPendingTimers();
 
         expect(next).toHaveBeenNthCalledWith(1, action);
         expect(api.dispatch).toHaveBeenNthCalledWith(1, NotifyDeathsAction());

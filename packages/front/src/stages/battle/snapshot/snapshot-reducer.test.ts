@@ -1,10 +1,11 @@
-import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester } from '@timeflies/shared';
+import { TimerTester, getBattleSnapshotWithHash, BattleSnapshot } from '@timeflies/shared';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { Team, teamToSnapshot } from '../entities/team/Team';
-import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
-import { BattleCommitAction } from './snapshot-actions';
+import { Team } from '../entities/team/Team';
+import { SpellActionTimerEndAction, SpellActionLaunchAction } from '../spellAction/spell-action-actions';
 import { snapshotReducer, SnapshotState } from './snapshot-reducer';
 import { seedCharacter } from '../entities/character/Character.seed';
+import { seedSpell } from '../entities/spell/Spell.seed';
+import { characterToSnapshot } from '../entities/character/Character';
 
 describe('# snapshot-reducer', () => {
 
@@ -20,15 +21,9 @@ describe('# snapshot-reducer', () => {
 
     it.todo('on battle start');
 
-    it('should commit battle data future on commit action, then get the correct hash', () => {
+    it('should commit battle data future on spell action, then get the correct hash', () => {
 
-        const teams: Team<any>[] = [
-            {
-                id: 't1',
-                period: '' as any,
-                letter: 'A',
-            }
-        ];
+        const character = seedCharacter({ id: 'c1', period: 'future' });
 
         const initialState: SnapshotState = {
             myPlayerId: 'p1',
@@ -36,40 +31,48 @@ describe('# snapshot-reducer', () => {
             snapshotList: [],
             battleDataCurrent: {
                 battleHash: 'not-matter',
-                teams,
+                teams: [],
                 players: [],
                 characters: [],
                 spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
-                teams,
+                teams: [],
                 players: [],
-                characters: [],
+                characters: [ character ],
                 spells: []
             },
             currentSpellAction: null,
             spellActionSnapshotList: []
         };
 
-        const newState = snapshotReducer(initialState, BattleCommitAction({
-            time: timerTester.now,
-            charactersPositionList: []
+        const state1 = snapshotReducer({
+            getSpellLaunchFn: () => () => { }
+        })(initialState, SpellActionLaunchAction({
+            spellActList: [ {
+                startTime: timerTester.now,
+                spellAction: {
+                    spell: seedSpell({ id: 's1', period: 'future' }),
+                    position: { x: 0, y: 0 },
+                    actionArea: [ { x: 0, y: 0 } ]
+                }
+            } ]
         }));
 
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
             time: timerTester.now,
             launchTime: -1,
-            teamsSnapshots: teams.map(teamToSnapshot),
+            teamsSnapshots: [],
             playersSnapshots: [],
-            charactersSnapshots: [],
+            charactersSnapshots: [ characterToSnapshot(character) ],
             spellsSnapshots: []
         };
 
         const { battleHash } = getBattleSnapshotWithHash(partialSnap);
 
-        expect(newState.battleDataFuture.battleHash).toBe(battleHash);
-        expect(newState.battleDataCurrent.battleHash).toBe(battleHash);
+        expect(state1.battleDataFuture.battleHash).toBe(battleHash);
+        expect(state1.battleDataCurrent.battleHash).toBe(battleHash);
     });
 
     describe('spell action actions:', () => {
@@ -84,6 +87,8 @@ describe('# snapshot-reducer', () => {
                 }
             ];
 
+            const character = seedCharacter({ id: 'c1', period: 'future' });
+
             const initialState: SnapshotState = {
                 myPlayerId: 'p1',
                 launchTime: -1,
@@ -99,32 +104,55 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-matter',
                     teams,
                     players: [],
-                    characters: [],
+                    characters: [ character ],
                     spells: []
                 },
                 currentSpellAction: null,
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now,
-                charactersPositionList: []
+            const state1 = snapshotReducer({
+                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                    characters[ 0 ].features.life = 50;
+                }
+            })(initialState, SpellActionLaunchAction({
+                spellActList: [ {
+                    startTime: timerTester.now,
+                    spellAction: {
+                        spell: seedSpell({ id: 's1', period: 'future' }),
+                        position: { x: 0, y: 0 },
+                        actionArea: [ { x: 0, y: 0 } ]
+                    }
+                } ]
             }));
 
             const firstHash = state1.battleDataFuture.battleHash;
 
-            const state2 = snapshotReducer(state1, BattleCommitAction({
-                time: timerTester.now + 100,
-                charactersPositionList: []
+            timerTester.advanceBy(100);
+
+            const state2 = snapshotReducer({
+                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                    characters[ 0 ].features.life = 20;
+                }
+            })(state1, SpellActionLaunchAction({
+                spellActList: [ {
+                    startTime: timerTester.now,
+                    spellAction: {
+                        spell: seedSpell({ id: 's1', period: 'future' }),
+                        position: { x: 0, y: 0 },
+                        actionArea: [ { x: 0, y: 0 } ]
+                    }
+                } ]
             }));
 
-            const state3 = snapshotReducer(state2, SpellActionTimerEndAction({
+            const state3 = snapshotReducer()(state2, SpellActionTimerEndAction({
                 removed: true,
                 correctHash: firstHash,
                 spellActionSnapshot: {} as any
             }));
 
             expect(state3.battleDataFuture.battleHash).toBe(firstHash);
+            expect(state3.battleDataFuture.characters[ 0 ].features.life).toBe(50);
         });
 
         it('should rollback on previous spell action removed and update current battle data', () => {
@@ -137,6 +165,8 @@ describe('# snapshot-reducer', () => {
                 }
             ];
 
+            const character = seedCharacter({ id: 'c1', period: 'future' });
+
             const initialState: SnapshotState = {
                 myPlayerId: 'p1',
                 launchTime: -1,
@@ -152,28 +182,48 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-matter',
                     teams,
                     players: [],
-                    characters: [],
+                    characters: [ character ],
                     spells: []
                 },
                 currentSpellAction: null,
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now,
-                charactersPositionList: []
+            const state1 = snapshotReducer({
+                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                    characters[ 0 ].features.life = 50;
+                }
+            })(initialState, SpellActionLaunchAction({
+                spellActList: [ {
+                    startTime: timerTester.now,
+                    spellAction: {
+                        spell: seedSpell({ id: 's1', period: 'future' }),
+                        position: { x: 0, y: 0 },
+                        actionArea: [ { x: 0, y: 0 } ]
+                    }
+                } ]
             }));
 
             const firstHash = state1.battleDataFuture.battleHash;
 
             timerTester.advanceBy(100);
 
-            const state2 = snapshotReducer(state1, BattleCommitAction({
-                time: timerTester.now,
-                charactersPositionList: []
+            const state2 = snapshotReducer({
+                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                    characters[ 0 ].features.life = 20;
+                }
+            })(state1, SpellActionLaunchAction({
+                spellActList: [ {
+                    startTime: timerTester.now,
+                    spellAction: {
+                        spell: seedSpell({ id: 's1', period: 'future' }),
+                        position: { x: 0, y: 0 },
+                        actionArea: [ { x: 0, y: 0 } ]
+                    }
+                } ]
             }));
 
-            const state3 = snapshotReducer(state2, SpellActionTimerEndAction({
+            const state3 = snapshotReducer()(state2, SpellActionTimerEndAction({
                 removed: true,
                 correctHash: firstHash,
                 spellActionSnapshot: {} as any
@@ -201,6 +251,8 @@ describe('# snapshot-reducer', () => {
                 }
             ];
 
+            const character = seedCharacter({ id: 'c1', period: 'future' });
+
             const initialState: SnapshotState = {
                 myPlayerId: 'p1',
                 launchTime: -1,
@@ -216,21 +268,31 @@ describe('# snapshot-reducer', () => {
                     battleHash: 'not-matter',
                     teams: futureTeams,
                     players: [],
-                    characters: [],
+                    characters: [ character ],
                     spells: []
                 },
                 currentSpellAction: null,
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now,
-                charactersPositionList: []
+            const state1 = snapshotReducer({
+                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                    characters[ 0 ].features.life = 50;
+                }
+            })(initialState, SpellActionLaunchAction({
+                spellActList: [ {
+                    startTime: timerTester.now,
+                    spellAction: {
+                        spell: seedSpell({ id: 's1', period: 'future' }),
+                        position: { x: 0, y: 0 },
+                        actionArea: [ { x: 0, y: 0 } ]
+                    }
+                } ]
             }));
 
             const lastHash = state1.battleDataFuture.battleHash;
 
-            const state2 = snapshotReducer(state1, SpellActionTimerEndAction({
+            const state2 = snapshotReducer()(state1, SpellActionTimerEndAction({
                 removed: false,
                 correctHash: lastHash,
                 spellActionSnapshot: {} as any
@@ -274,7 +336,7 @@ describe('# snapshot-reducer', () => {
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, BattleStateTurnStartAction({
+            const state1 = snapshotReducer()(initialState, BattleStateTurnStartAction({
                 turnSnapshot: {
                     id: 1,
                     characterId: 'not-matter',
@@ -290,36 +352,48 @@ describe('# snapshot-reducer', () => {
 
         it('should rollback to before now on turn end', () => {
 
-            const currentTeams: Team<'current'>[] = [
-                {
-                    id: 't1',
-                    period: 'current',
-                    letter: 'A'
-                }
-            ];
-
-            const futureTeams: Team<'future'>[] = [
-                {
-                    id: 't1',
-                    period: 'future',
-                    letter: 'A'
-                }
-            ];
-
             const initialState: SnapshotState = {
                 myPlayerId: 'p1',
                 launchTime: -1,
-                snapshotList: [],
+                snapshotList: [
+                    {
+                        battleHash: 'past-hash',
+                        launchTime: -1,
+                        time: timerTester.now - 100,
+                        charactersSnapshots: [],
+                        playersSnapshots: [],
+                        spellsSnapshots: [],
+                        teamsSnapshots: []
+                    },
+                    {
+                        battleHash: 'future-hash-1',
+                        launchTime: -1,
+                        time: timerTester.now + 100,
+                        charactersSnapshots: [],
+                        playersSnapshots: [],
+                        spellsSnapshots: [],
+                        teamsSnapshots: []
+                    },
+                    {
+                        battleHash: 'future-hash-2',
+                        launchTime: -1,
+                        time: timerTester.now + 200,
+                        charactersSnapshots: [],
+                        playersSnapshots: [],
+                        spellsSnapshots: [],
+                        teamsSnapshots: []
+                    }
+                ],
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    teams: currentTeams,
+                    teams: [],
                     players: [],
                     characters: [],
                     spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    teams: futureTeams,
+                    teams: [],
                     players: [],
                     characters: [],
                     spells: []
@@ -328,26 +402,9 @@ describe('# snapshot-reducer', () => {
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, BattleCommitAction({
-                time: timerTester.now - 100,
-                charactersPositionList: []
-            }));
+            const state1 = snapshotReducer()(initialState, BattleStateTurnEndAction());
 
-            const pastHash = state1.battleDataFuture.battleHash;
-
-            const state2 = snapshotReducer(state1, BattleCommitAction({
-                time: timerTester.now + 100,
-                charactersPositionList: []
-            }));
-
-            const state3 = snapshotReducer(state2, BattleCommitAction({
-                time: timerTester.now + 200,
-                charactersPositionList: []
-            }));
-
-            const state4 = snapshotReducer(state3, BattleStateTurnEndAction());
-
-            expect(state4.battleDataFuture.battleHash).toBe(pastHash);
+            expect(state1.battleDataFuture.battleHash).toBe('past-hash');
         });
     });
 });
