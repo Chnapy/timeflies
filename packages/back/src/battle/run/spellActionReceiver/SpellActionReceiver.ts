@@ -1,10 +1,12 @@
 import { ConfirmSAction, NotifySAction, SpellActionCAction } from '@timeflies/shared';
 import { BattleStateManager } from '../battleStateManager/BattleStateManager';
 import { Cycle } from '../cycle/Cycle';
-import { Character } from '../entities/character/Character';
-import { Player } from '../entities/player/Player';
+import { Character, characterToSnapshot } from '../entities/character/Character';
+import { Player, playerToSnapshot } from '../entities/player/Player';
 import { MapManager } from '../mapManager/MapManager';
 import { SpellActionChecker } from '../spellActionChecker/SpellActionChecker';
+import { teamToSnapshot } from '../entities/team/Team';
+import { spellToSnapshot } from '../entities/spell/Spell';
 
 export interface SpellActionReceiver {
     getOnReceive(player: Player): (action: SpellActionCAction) => void;
@@ -48,10 +50,23 @@ export const SpellActionReceiver = (
 
         const sendConfirmAction = (isOk: boolean, lastCorrectHash: string): void => {
 
+            const { teams, players, characters, spells } = stateManager.battleState;
+
             player.socket.send<ConfirmSAction>({
                 type: 'confirm',
                 isOk,
-                lastCorrectHash
+                lastCorrectHash,
+                sendHash: action.spellAction.battleHash,
+                debug: isOk
+                    ? undefined
+                    : {
+                        correctBattleSnapshot: {
+                            teamsSnapshots: teams.map(teamToSnapshot),
+                            playersSnapshots: players.map(playerToSnapshot),
+                            charactersSnapshots: characters.map(characterToSnapshot),
+                            spellsSnapshots: spells.map(spellToSnapshot)
+                        }
+                    }
             });
         };
 

@@ -8,12 +8,10 @@ export type BattleState = {
     battleActionState: BattleActionState;
     cycleState: CycleState;
     snapshotState: SnapshotState;
-    // spellActionState: SpellActionState;
 };
 
 export const battleReducer = combineReducers<BattleState>({
     battleActionState: battleActionReducer,
     cycleState: cycleReducer,
     snapshotState: snapshotReducer,
-    // spellActionState: spellActionReducer
 });

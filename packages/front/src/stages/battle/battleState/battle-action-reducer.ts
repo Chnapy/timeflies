@@ -104,19 +104,15 @@ export const battleActionReducer = createReducer(initialState, {
             actionArea: []
         };
     },
-    [ BattleStateSpellPrepareAction.type ]: (state, { payload }: BattleStateSpellPrepareAction): BattleActionState => {
+    [ BattleStateSpellPrepareAction.type ]: (state, { payload }: BattleStateSpellPrepareAction) => {
         const { futureSpell, futureCharacter } = payload;
-
-        const tiledManager = TiledManager(state.tiledSchema!);
-
-        const rangeArea = tiledManager.getArea(state.futureCharacterPosition!, futureSpell.feature.area);
 
         return {
             ...state,
             selectedSpellId: futureSpell.id,
             futureCharacterPosition: futureCharacter.position,
             path: [],
-            rangeArea,
+            rangeArea: [],
             actionArea: []
         };
     },

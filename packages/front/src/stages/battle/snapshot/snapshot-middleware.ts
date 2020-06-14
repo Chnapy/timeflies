@@ -27,7 +27,9 @@ export const snapshotMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
             const serializedDeathsAfter = serializeDeaths();
 
             if (serializedDeathsBefore !== serializedDeathsAfter) {
-                api.dispatch(NotifyDeathsAction());
+                setTimeout(() =>
+                    api.dispatch(NotifyDeathsAction())
+                );
             }
         } else {
             next(action);

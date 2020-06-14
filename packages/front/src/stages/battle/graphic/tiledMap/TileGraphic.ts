@@ -279,7 +279,7 @@ export const TileGraphic = ({
 
             const path = pathIndex !== -1;
 
-            const pathLastPos = pathIndex === battleActionState.path.length - 1;
+            const pathLastPos = path && (pathIndex === battleActionState.path.length - 1);
 
             return {
                 path,

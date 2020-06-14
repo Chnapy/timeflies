@@ -13,7 +13,7 @@ export type SpellEngineDependencies<S> = {
     extractFutureSpell: (getState: () => S) => Spell<'future'> | undefined;
 };
 
-export type SpellEngine = (action: AnyAction) => void;
+export type SpellEngine = (action: AnyAction) => Promise<void>;
 
 export type SpellEngineCreator = <S>(deps: SpellEngineDependencies<S>) => (api: MiddlewareAPI) => SpellEngine;
 

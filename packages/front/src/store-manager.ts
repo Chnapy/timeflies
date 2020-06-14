@@ -44,10 +44,20 @@ export const createStoreManager = ({
 
                 } else if (SendMessageAction.match(action)) {
                     action.type += ' > ' + action.payload.type;
-
                 }
 
                 return action;
+            },
+            level: action => {
+
+                if (ReceiveMessageAction.match(action)) {
+                    const { payload } = action;
+                    if (payload.type === 'confirm' && !payload.isOk) {
+                        return 'error';
+                    }
+                }
+
+                return 'log';
             }
         });
 
@@ -75,7 +85,7 @@ export const createStoreManager = ({
             const nextState = selector(store.getState());
             if (!equalityFn(nextState, currentState)) {
                 currentState = nextState;
-                
+
                 CanvasContext.provider(
                     contextResources,
                     () => onChange(currentState)

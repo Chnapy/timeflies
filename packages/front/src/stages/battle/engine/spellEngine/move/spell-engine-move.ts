@@ -128,7 +128,7 @@ export const spellEngineMove: SpellEngineCreator = ({
 
     refreshGrid();
 
-    return (action: AnyAction) => {
+    return async (action: AnyAction) => {
 
         if (TileHoverAction.match(action)) {
             const state = extractState(api.getState);
@@ -136,7 +136,7 @@ export const spellEngineMove: SpellEngineCreator = ({
             const { position } = action.payload;
             const tile = state.grid.find(t => equals(t.position)(position))!;
 
-            onMoveHover(position, tile.tileType);
+            await onMoveHover(position, tile.tileType);
 
         } else if (TileClickAction.match(action)) {
             const state = extractState(api.getState);
@@ -146,7 +146,7 @@ export const spellEngineMove: SpellEngineCreator = ({
             const { position } = action.payload;
             const tile = state.grid.find(t => equals(t.position)(position))!;
 
-            onMoveClick(position, tile.tileType, spell);
+            await onMoveClick(position, tile.tileType, spell);
 
         } else if (SpellActionLaunchAction.match(action)) {
 

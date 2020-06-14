@@ -1,6 +1,6 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { equals, Position, TiledManager, TileType } from '@timeflies/shared';
-import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
+import { equals, Position, TiledManager, TileType, BresenhamPoint } from '@timeflies/shared';
+import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction, BattleStateSpellPrepareAction } from '../../../battleState/battle-state-actions';
 import { characterAlterLife } from '../../../entities/character/Character';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
@@ -15,7 +15,9 @@ export const spellLaunchSimpleAttack: SpellLaunchFn = ({ spell, actionArea }, { 
 
 export const spellEngineSimpleAttack: SpellEngineCreator = ({
     extractState,
-    extractFutureSpell
+    extractFutureSpell,
+    extractFutureCharacter,
+    extractFutureCharacterPositionList
 }) => api => {
 
     const onTileHover = (tilePos: Position, tileType: TileType) => {
@@ -60,7 +62,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
         }));
     };
 
-    return (action: AnyAction) => {
+    return async (action: AnyAction) => {
 
         if (TileHoverAction.match(action)) {
             const state = extractState(api.getState);
@@ -68,7 +70,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const { position } = action.payload;
             const tile = state.grid.find(t => equals(t.position)(position))!;
 
-            onTileHover(position, tile.tileType);
+            await onTileHover(position, tile.tileType);
 
         } else if (TileClickAction.match(action)) {
             const state = extractState(api.getState);
@@ -76,8 +78,50 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const { position } = action.payload;
             const tile = state.grid.find(t => equals(t.position)(position))!;
 
-            onTileClick(position, tile.tileType);
+            await onTileClick(position, tile.tileType);
 
+        } else if (BattleStateSpellPrepareAction.match(action)) {
+
+            const { tiledSchema } = extractState(api.getState);
+
+            const futureCharacterPosition = extractFutureCharacter(api.getState)!.position;
+            const spellArea = extractFutureSpell(api.getState)!.feature.area;
+            const charactersPos = extractFutureCharacterPositionList(api.getState)
+                .filter(p => !equals(futureCharacterPosition)(p));
+
+            const tiledManager = TiledManager(tiledSchema!);
+
+            const isPositionTargetable = ({ position, tileType }: BresenhamPoint): 'yes' | 'no' | 'last' => {
+
+                if (tileType === 'obstacle') {
+                    return 'no';
+                }
+
+                if (charactersPos.some(equals(position))) {
+                    return 'last';
+                }
+
+                return 'yes';
+            };
+
+            const rangeArea = tiledManager.getArea(futureCharacterPosition, spellArea)
+                .filter(p => {
+
+                    const points = tiledManager.getBresenhamLine(futureCharacterPosition, p);
+
+                    for (let i = 0; i < points.length; i++) {
+                        const check = isPositionTargetable(points[ i ]);
+                        if (check === 'no'
+                            || (check === 'last' && i < points.length - 1)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+            api.dispatch(BattleMapPathAction({
+                rangeArea
+            }));
         }
     };
 };

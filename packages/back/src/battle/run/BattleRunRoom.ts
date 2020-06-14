@@ -99,7 +99,7 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
     });
 
     players.forEach(p => p.socket.onDisconnect(() => {
-        console.log('Player disconnect:', p.id, p.socket.isConnected);
+        console.log('Player disconnect:', p.id, p.socket.isConnected());
         checkDeathsAndDisconnects();
     }));
 

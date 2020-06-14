@@ -4,6 +4,7 @@ import { StageGraphicCreator } from '../../../canvas/StageGraphic';
 import { CharactersBoard } from './charactersBoard/CharactersBoard';
 import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
 import { requestRender } from '../../../canvas/GameCanvas';
+import { assertIsDefined } from '@timeflies/shared';
 
 export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
 
@@ -40,7 +41,7 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
 
     const tiledMapGraphic = TiledMapGraphic();
 
-    const { storeEmitter } = CanvasContext.consumer('storeEmitter');
+    const { storeEmitter, assetLoader } = CanvasContext.consumer('storeEmitter', 'assetLoader');
 
     storeEmitter.onStateChange(
         state => state.battle.battleActionState.tiledSchema,
@@ -48,7 +49,7 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
             if (!schema) {
                 return;
             }
-            
+
             const { width, height } = tiledMapGraphic.getMapsize(schema);
             const { tilewidth, tileheight } = tiledMapGraphic.getTilesize(schema);
 
@@ -61,7 +62,13 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
         }
     );
 
-    CanvasContext.provider({ tiledMapGraphic }, () => {
+    const charactersSpritesheet = assetLoader.get('characters')!;
+    assertIsDefined(charactersSpritesheet);
+
+    CanvasContext.provider({
+        tiledMapGraphic,
+        spritesheets: { characters: charactersSpritesheet.spritesheet }
+    }, () => {
 
         const charactersBoardCurrent = CharactersBoard('current');
         const charactersBoardFuture = CharactersBoard('future');
