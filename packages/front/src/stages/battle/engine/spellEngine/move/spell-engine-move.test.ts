@@ -1,10 +1,11 @@
 import { applyMiddleware, createStore, Middleware, Reducer, Store } from '@reduxjs/toolkit';
-import { seedTiledMapAssets, waitTimeout } from '@timeflies/shared';
+import { seedTiledMapAssets, waitTimeout, seedTiledMap } from '@timeflies/shared';
 import { battleActionMiddleware } from '../../../battleState/battle-action-middleware';
 import { battleActionReducer, BattleActionState } from '../../../battleState/battle-action-reducer';
 import { BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
+import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actions';
 
 describe('# spell-engine-move (depends on #battle-action)', () => {
 
@@ -30,6 +31,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             extractState: () => initialState,
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
+            extractFutureCharacterPositionList: () => [],
             ...deps
         });
 
@@ -51,13 +53,9 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
         it('should clear state path when no path found (async)', async () => {
 
             const initialState: BattleActionState = {
-                tiledSchema: null,
+                tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                charactersPositionList: [],
-                easyStarGrid: [
-                    [ 0, 1, 0 ]
-                ],
                 grid: [
                     {
                         tileType: 'default',
@@ -77,7 +75,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                     { x: 2, y: 0 }
                 ],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const { store } = getStore(initialState, {
@@ -105,40 +104,37 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
         it('should define state path when path found (async)', async () => {
 
             const initialState: BattleActionState = {
-                tiledSchema: null,
+                tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                charactersPositionList: [],
-                easyStarGrid: [
-                    [ 0, 0, 0 ]
-                ],
                 grid: [
                     {
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
+                        position: { x: 8, y: 6 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
+                        position: { x: 9, y: 6 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
+                        position: { x: 10, y: 6 }
                     }
                 ],
                 path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const { store } = getStore(initialState, {
                 extractFutureCharacter: () => seedCharacter({
-                    id: '1', period: 'future', position: { x: 0, y: 0 }
+                    id: '1', period: 'future', position: { x: 8, y: 6 }
                 })
             });
 
             const action = TileHoverAction({
-                position: { x: 2, y: 0 }
+                position: { x: 10, y: 6 }
             });
 
             store.dispatch(action);
@@ -148,8 +144,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
                 path: [
-                    { x: 1, y: 0 },
-                    { x: 2, y: 0 }
+                    { x: 9, y: 6 },
+                    { x: 10, y: 6 }
                 ]
             });
         });
@@ -160,25 +156,21 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
         it('should not dispatch on disable tile (async)', async () => {
 
             const initialState: BattleActionState = {
-                tiledSchema: null,
+                tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                charactersPositionList: [],
-                easyStarGrid: [
-                    [ 0, 1, 0 ]
-                ],
                 grid: [
                     {
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
+                        position: { x: 7, y: 5 }
                     },
                     {
                         tileType: 'obstacle',
-                        position: { x: 1, y: 0 }
+                        position: { x: 8, y: 5 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
+                        position: { x: 9, y: 5 }
                     }
                 ],
                 path: [
@@ -186,7 +178,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                     { x: 2, y: 0 }
                 ],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const { store, dispatchMock } = getStore(initialState, {
@@ -196,7 +189,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             });
 
             const action = TileClickAction({
-                position: { x: 2, y: 0 }
+                position: { x: 8, y: 5 }
             });
 
             store.dispatch(action);
@@ -209,25 +202,21 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
         it('should dispatch spell launch on available tile (async)', async () => {
 
             const initialState: BattleActionState = {
-                tiledSchema: null,
+                tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                charactersPositionList: [],
-                easyStarGrid: [
-                    [ 0, 0, 0 ]
-                ],
                 grid: [
                     {
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
+                        position: { x: 7, y: 6 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
+                        position: { x: 8, y: 6 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
+                        position: { x: 9, y: 6 }
                     }
                 ],
                 path: [
@@ -235,17 +224,18 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                     { x: 2, y: 0 }
                 ],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
 
             const { store, dispatchMock } = getStore(initialState, {
                 extractFutureCharacter: () => seedCharacter({
-                    id: '1', period: 'future', position: { x: 0, y: 0 }
+                    id: '1', period: 'future', position: { x: 7, y: 6 }
                 })
             });
 
             const action = TileClickAction({
-                position: { x: 2, y: 0 }
+                position: { x: 9, y: 6 }
             });
 
             store.dispatch(action);
@@ -266,50 +256,53 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMapAssets('map_1').schema,
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                charactersPositionList: [],
-                easyStarGrid: [
-                    [ 0, 0, 0 ]
-                ],
                 grid: [
                     {
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
+                        position: { x: 4, y: 3 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
+                        position: { x: 4, y: 4 }
                     },
                     {
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
+                        position: { x: 5, y: 4 }
                     }
                 ],
-                path: [
-                    { x: 1, y: 0 },
-                    { x: 2, y: 0 }
-                ],
+                path: [],
                 rangeArea: [],
-                actionArea: []
+                actionArea: [],
+                futureCharacterPosition: null
             };
+
+            const characterList = [
+                seedCharacter({
+                    id: '1', period: 'future', position: { x: 4, y: 3 }
+                })
+            ];
 
             const { store } = getStore(initialState, {
                 extractState: () => initialState,
-                extractFutureCharacter: () => seedCharacter({
-                    id: '1', period: 'future', position: { x: 0, y: 0 }
-                })
+                extractFutureCharacter: () => characterList[ 0 ],
+                extractFutureCharacterPositionList: () => characterList.map(c => c.position)
             });
 
-            initialState.easyStarGrid[ 0 ][ 1 ] = 1;
+            characterList.push(seedCharacter({ id: '2', period: 'future', position: { x: 4, y: 4 } }))
 
-            const action1 = BattleCommitAction({
-                time: -1,
-                charactersPositionList: []
-            });
-
-            store.dispatch(action1);
+            store.dispatch(SpellActionLaunchAction({
+                spellActList: [ {
+                    startTime: Date.now(),
+                    spellAction: {
+                        spell: seedSpell({ id: 's1', period: 'future' }),
+                        actionArea: [ { x: 0, y: 0 } ],
+                        position: { x: 0, y: 0 }
+                    }
+                } ]
+            }))
 
             const action2 = TileHoverAction({
-                position: { x: 2, y: 0 }
+                position: { x: 5, y: 4 }
             });
 
             store.dispatch(action2);

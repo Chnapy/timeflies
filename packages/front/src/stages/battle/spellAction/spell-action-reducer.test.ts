@@ -42,7 +42,7 @@ describe('# spell-action-reducer', () => {
 
             const now = Date.now();
 
-            const state1 = snapshotReducer(initialState, SpellActionLaunchAction({
+            const state1 = snapshotReducer()(initialState, SpellActionLaunchAction({
                 spellActList: [
                     {
                         spellAction: {
@@ -107,7 +107,7 @@ describe('# spell-action-reducer', () => {
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, SpellActionLaunchAction({
+            const state1 = snapshotReducer()(initialState, SpellActionLaunchAction({
                 spellActList: [
                     {
                         spellAction: {
@@ -156,7 +156,7 @@ describe('# spell-action-reducer', () => {
 
             const now = Date.now();
 
-            const state1 = snapshotReducer(initialState, SpellActionLaunchAction({
+            const state1 = snapshotReducer()(initialState, SpellActionLaunchAction({
                 spellActList: [
                     {
                         spellAction: {
@@ -223,7 +223,7 @@ describe('# spell-action-reducer', () => {
             spellActionSnapshotList: []
         };
 
-        const state1 = snapshotReducer(initialState, SpellActionTimerEndAction({
+        const state1 = snapshotReducer()(initialState, SpellActionTimerEndAction({
             removed: false,
             correctHash: 'correct-hash',
             spellActionSnapshot: initialState.currentSpellAction!
@@ -259,7 +259,7 @@ describe('# spell-action-reducer', () => {
             ]
         };
 
-        const state1 = snapshotReducer(initialState, BattleStateTurnStartAction({
+        const state1 = snapshotReducer()(initialState, BattleStateTurnStartAction({
             turnSnapshot: {
                 id: 1,
                 characterId: '1',
@@ -298,7 +298,7 @@ describe('# spell-action-reducer', () => {
                 spellActionSnapshotList: []
             };
 
-            const state1 = snapshotReducer(initialState, SpellActionCancelAction({
+            const state1 = snapshotReducer()(initialState, SpellActionCancelAction({
                 spellActionSnapshotsValids: []
             }));
 
@@ -332,7 +332,7 @@ describe('# spell-action-reducer', () => {
                 ]
             };
 
-            const state1 = snapshotReducer(initialState, SpellActionCancelAction({
+            const state1 = snapshotReducer()(initialState, SpellActionCancelAction({
                 spellActionSnapshotsValids: initialState.spellActionSnapshotList.slice(0, 1)
             }));
 

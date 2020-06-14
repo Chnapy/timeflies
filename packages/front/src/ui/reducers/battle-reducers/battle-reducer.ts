@@ -13,5 +13,5 @@ export type BattleState = {
 export const battleReducer = combineReducers<BattleState>({
     battleActionState: battleActionReducer,
     cycleState: cycleReducer,
-    snapshotState: snapshotReducer,
+    snapshotState: snapshotReducer(),
 });

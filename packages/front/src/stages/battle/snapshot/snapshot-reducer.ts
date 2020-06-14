@@ -8,7 +8,7 @@ import { Spell, spellToSnapshot } from '../entities/spell/Spell';
 import { Team, teamToSnapshot } from '../entities/team/Team';
 import { SpellActionTimerEndAction, SpellActionLaunchAction, SpellActionCancelAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleDataPeriod, periodList } from './battle-data';
-import { getSpellLaunchFn } from '../engine/spellMapping';
+import { getSpellLaunchFn as spellLaunchFnGetter } from '../engine/spellMapping';
 
 type BattleData<P extends BattleDataPeriod> = {
     battleHash: string;
@@ -117,7 +117,11 @@ const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string,
     // data.teams = teamsSnapshots.map(snap => Team(period, snap));
 };
 
-export const snapshotReducer = createReducer(initialState, {
+type Dependencies = {
+    getSpellLaunchFn: typeof spellLaunchFnGetter;
+};
+
+export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellLaunchFn: spellLaunchFnGetter }) => createReducer(initialState, {
     [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
         const { myPlayerId, entitiesSnapshot } = payload;
         const { battleHash, spellsSnapshots, charactersSnapshots, playersSnapshots, teamsSnapshots } = entitiesSnapshot;
@@ -212,7 +216,7 @@ export const snapshotReducer = createReducer(initialState, {
         });
 
     },
-    [SpellActionTimerStartAction.type]: (state, {payload}: SpellActionTimerStartAction) => {
+    [ SpellActionTimerStartAction.type ]: (state, { payload }: SpellActionTimerStartAction) => {
         state.currentSpellAction = payload.spellActionSnapshot;
     },
     [ SpellActionCancelAction.type ]: (state, { payload: { spellActionSnapshotsValids } }: SpellActionCancelAction) => {

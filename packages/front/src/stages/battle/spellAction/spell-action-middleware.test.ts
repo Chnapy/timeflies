@@ -107,6 +107,8 @@ describe('# spell-action-middleware', () => {
                 extractState: () => state
             })(api)(next)(action);
 
+            jest.runOnlyPendingTimers();
+
             expect(api.dispatch).toHaveBeenCalledWith(
                 SpellActionLaunchAction({
                     spellActList: [ {
@@ -181,7 +183,9 @@ describe('# spell-action-middleware', () => {
                 extractState: () => state
             })(api)(next)(action);
 
-            expect(timer.onAdd).toHaveBeenNthCalledWith(1, timerTester.now);
+            jest.runOnlyPendingTimers();
+
+            expect(timer.onAdd).toHaveBeenNthCalledWith(1, timerTester.now, false);
         });
     });
 
@@ -244,6 +248,8 @@ describe('# spell-action-middleware', () => {
                 extractState: () => state
             })(api)(next)(action);
 
+            jest.runOnlyPendingTimers();
+
             expect(api.dispatch).toHaveBeenNthCalledWith(1, SpellActionCancelAction({
                 spellActionSnapshotsValids: state.spellActionSnapshotList.slice(0, 1)
             }));
@@ -304,6 +310,7 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: true,
+                sendHash: '',
                 lastCorrectHash: '',
                 sendTime: -1
             });
@@ -334,6 +341,7 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: true,
+                sendHash: '',
                 lastCorrectHash: '',
                 sendTime: -1
             });
@@ -374,6 +382,7 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: false,
+                sendHash: '',
                 lastCorrectHash: '-correct-hash-',
                 sendTime: -1
             });
@@ -387,6 +396,8 @@ describe('# spell-action-middleware', () => {
                 extractState: () => state
             })(api)(next)(action);
 
+            jest.runOnlyPendingTimers();
+            
             expect(api.dispatch).toHaveBeenNthCalledWith(1, SpellActionCancelAction({
                 spellActionSnapshotsValids: state.spellActionSnapshotList.slice(0, 1)
             }));
@@ -416,6 +427,7 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: false,
+                sendHash: '',
                 lastCorrectHash: '-correct-hash-',
                 sendTime: -1
             });
@@ -535,7 +547,7 @@ describe('# spell-action-middleware', () => {
                 extractState: () => state
             })(api)(next)(action);
 
-            expect(timer.onAdd).toHaveBeenNthCalledWith(1, snapshot.startTime);
+            expect(timer.onAdd).toHaveBeenNthCalledWith(1, snapshot.startTime, true);
         });
     });
 });
