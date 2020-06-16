@@ -1,138 +1,140 @@
-import { Position, TimerTester } from '@timeflies/shared';
-import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
-import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { seedTeam } from '../entities/team/Team.seed';
+import { seedTiledMap, TimerTester, seedSpellActionSnapshot } from '@timeflies/shared';
+import { createAssetLoader } from '../../../assetManager/AssetLoader';
+import { GameState } from '../../../game-state';
+import { createStoreManager } from '../../../store-manager';
+import { battleActionReducer } from '../battleState/battle-action-reducer';
+import { TileClickAction } from '../battleState/battle-state-actions';
+import { seedCharacter } from '../entities/character/Character.seed';
+import { seedSpell } from '../entities/spell/Spell.seed';
+import { BattleDataPeriod } from '../snapshot/battle-data';
+import { SendMessageAction, ReceiveMessageAction } from '../../../socket/wsclient-actions';
+import { rootReducer } from '../../../ui/reducers/root-reducer';
+import { AnyAction } from '@reduxjs/toolkit';
+import { characterToSnapshot } from '../entities/character/Character';
 
 describe('Battleflow', () => {
 
     const timerTester = new TimerTester();
 
-    // const init = () => {
+    const init = () => {
 
-    //     const initialPos: Position = seedCharacterInitialPosition;
+        // const promiseList: Promise<any>[] = [];
 
-    //     const currentBattleData: BattleDataCurrent = {
-    //         battleHash: 'not-defined',
-    //         teams: [],
-    //         players: [],
-    //         characters: [],
-    //     };
+        // global.Promise = class extends Promise<any> {
+        //     constructor(e) {
+        //         super(e);
+        //         promiseList.push(this);
+        //     }
+        // };
 
-    //     const futureBattleData: BattleDataFuture = {
-    //         battleHash: 'not-defined',
-    //         teams: [],
-    //         players: [],
-    //         characters: [],
-    //         spellActionSnapshotList: []
-    //     };
+        const getSpell = <P extends BattleDataPeriod>(period: P) => seedSpell<P>({
+            id: 's1',
+            period,
+            characterId: 'c1',
+            type: 'simpleAttack',
+            feature: {
+                area: 999,
+                attack: 10,
+                duration: 1500
+            }
+        });
 
-    //     const cycleBattleData: BattleDataCycle = {
-    //         launchTime: timerTester.now
-    //     };
+        const getCharacter = <P extends BattleDataPeriod>(period: P) => seedCharacter<P>({
+            id: 'c1',
+            period,
+            position: { x: 8, y: 6 },
+            isMine: true,
+            playerId: 'p1',
+            features: {
+                actionTime: 9000
+            }
+        });
 
-    //     StoreTest.initStore({
-    //         currentPlayer: {
-    //             id: 'p1',
-    //             name: 'p1'
-    //         },
-    //         battle: {
-    //             cycle: cycleBattleData,
-    //             current: currentBattleData,
-    //             future: futureBattleData
-    //         }
-    //     });
+        const initialState: GameState = {
+            step: 'battle',
+            currentPlayer: {
+                id: 'p1',
+                name: 'p1'
+            },
+            room: null,
+            battle: {
+                battleActionState: {
+                    ...battleActionReducer(undefined, { type: '' }),
+                    tiledSchema: seedTiledMap('map_1'),
+                    futureCharacterPosition: { x: 8, y: 6 },
+                    currentAction: 'spellPrepare',
+                    selectedSpellId: 's1',
+                    grid: [
+                        {
+                            position: { x: 8, y: 6 },
+                            tileType: 'default'
+                        },
+                        {
+                            position: { x: 9, y: 6 },
+                            tileType: 'default'
+                        }
+                    ],
+                    rangeArea: [ { x: 9, y: 6 } ]
+                },
+                cycleState: {
+                    currentCharacterId: 'c1',
+                    globalTurnId: 1,
+                    globalTurnOrder: [ 'c1' ],
+                    globalTurnStartTime: timerTester.now,
+                    turnId: 1,
+                    turnDuration: 9000,
+                    turnStartTime: timerTester.now
+                },
+                snapshotState: {
+                    myPlayerId: 'p1',
+                    launchTime: -1,
+                    battleDataCurrent: {
+                        battleHash: '',
+                        teams: [],
+                        players: [],
+                        characters: [ getCharacter('current') ],
+                        spells: [ getSpell('current') ]
+                    },
+                    battleDataFuture: {
+                        battleHash: '',
+                        teams: [],
+                        players: [],
+                        characters: [ getCharacter('future') ],
+                        spells: [ getSpell('future') ]
+                    },
+                    currentSpellAction: null,
+                    snapshotList: [],
+                    spellActionSnapshotList: []
+                }
+            }
+        };
 
-    //     currentBattleData.teams.push(
-    //         seedTeam('real', {
-    //             id: 't1', period: 'current', seedPlayers: [ {
-    //                 id: 'p1', seedCharacters: [ {
-    //                     id: '1',
-    //                     position: initialPos,
-    //                     seedSpells: [ {
-    //                         id: 's1',
-    //                         type: 'move',
-    //                     } ]
-    //                 } ]
-    //             } ]
-    //         })
-    //     );
-    //     currentBattleData.players.push(currentBattleData.teams[ 0 ].players[ 0 ]);
-    //     currentBattleData.characters.push(currentBattleData.players[ 0 ].characters[ 0 ]);
-    //     const characterCurrent = currentBattleData.characters[ 0 ];
+        const assetLoader = createAssetLoader();
 
-    //     futureBattleData.teams.push(
-    //         seedTeam('real', {
-    //             id: 't1', period: 'future', seedPlayers: [ {
-    //                 id: 'p1', seedCharacters: [ {
-    //                     id: '1',
-    //                     position: initialPos,
-    //                     seedSpells: [ {
-    //                         id: 's1',
-    //                         type: 'move',
-    //                     } ]
-    //                 } ]
-    //             } ]
-    //         })
-    //     );
-    //     futureBattleData.players.push(futureBattleData.teams[ 0 ].players[ 0 ]);
-    //     futureBattleData.characters.push(futureBattleData.players[ 0 ].characters[ 0 ]);
-    //     const characterFuture = futureBattleData.characters[ 0 ];
+        const createStore = () => {
+            const { store } = createStoreManager({
+                assetLoader,
+                initialState,
+            });
 
-    //     const mapManager = seedMapManager('real', 'map_1');
+            const actionList: AnyAction[] = [];
 
-    //     mapManager.refreshPathfinder();
+            store.replaceReducer((state, action) => {
+                actionList.push(action);
 
-    //     // from x:4 y:3
-    //     const posAvailables: readonly Position[] = [
-    //         { x: 4, y: 4 },
-    //         { x: 5, y: 4 },
-    //         { x: 6, y: 4 },
-    //     ];
+                return rootReducer(state, action);
+            });
 
-    //     const cycle = CycleManager();
+            return {
+                store,
+                actionList
+            };
+        };
 
-    //     const snapshotManager = SnapshotManager();
-
-    //     const spellActionManager = SpellActionManager();
-
-    //     const bState = BStateMachine(mapManager);
-
-    //     const battleHash = futureBattleData.battleHash;
-
-    //     cycle.start({
-    //         id: 1,
-    //         order: [ characterCurrent.id ],
-    //         startTime: timerTester.now,
-    //         currentTurn: {
-    //             id: 1,
-    //             characterId: characterCurrent.id,
-    //             startTime: timerTester.now
-    //         }
-    //     });
-
-    //     const bindAction = StoreTest.getActions().find((a): a is SpellEngineBindAction =>
-    //         a.type === 'battle/spell-engine/bind'
-    //     )!;
-
-    //     return {
-    //         cycleBattleData,
-    //         currentBattleData,
-    //         futureBattleData,
-    //         characterCurrent,
-    //         characterFuture,
-    //         cycle,
-    //         snapshotManager,
-    //         spellActionManager,
-    //         bState,
-    //         battleHash,
-    //         bindAction,
-    //         posAvailables
-    //     };
-    // };
-
-    const awaitAndAdvance10 = async (promise: Promise<any>) => {
-        timerTester.advanceBy(10);
-        return await promise;
+        return {
+            initialState,
+            createStore
+        };
     };
 
     beforeEach(() => {
@@ -145,14 +147,14 @@ describe('Battleflow', () => {
 
     describe('on turn action:', () => {
 
-        it('should change battle state to "spellPrepare" on turn start', () => {
+        it.skip('should change battle state to "spellPrepare" on turn start', () => {
 
             // const { bState } = init();
 
             // expect(bState.state).toBe<BState>('spellPrepare');
         });
 
-        it('should change battle state to "watch" on turn end', () => {
+        it.skip('should change battle state to "watch" on turn end', () => {
 
             // const { bState, characterCurrent } = init();
 
@@ -163,7 +165,7 @@ describe('Battleflow', () => {
             // expect(bState.state).toBe<BState>('watch');
         });
 
-        it('should commit on turn start', () => {
+        it.skip('should commit on turn start', () => {
 
             // const { currentBattleData, futureBattleData, battleHash } = init();
 
@@ -171,7 +173,7 @@ describe('Battleflow', () => {
             // expect(futureBattleData.battleHash).not.toBe(battleHash);
         });
 
-        it('should rollback on turn end', async () => {
+        it.skip('should rollback on turn end', async () => {
 
             // const { currentBattleData, futureBattleData, bindAction, characterCurrent, posAvailables } = init();
 
@@ -193,7 +195,7 @@ describe('Battleflow', () => {
             // expect(currentBattleData.battleHash).toBe(firstHash);
         });
 
-        it('should start a new global turn after previous one ends', () => {
+        it.skip('should start a new global turn after previous one ends', () => {
 
             // const { cycleBattleData, characterCurrent } = init();
 
@@ -224,68 +226,80 @@ describe('Battleflow', () => {
 
     describe('on spell action:', () => {
 
-        it('should not allow to launch spell with not enough time to use it', async () => {
+        it.skip('should not allow to launch spell with not enough time to use it', async () => {
 
-            // const { characterCurrent, futureBattleData, bindAction, posAvailables } = init();
+            const { initialState, createStore } = init();
 
-            // const firstHash = futureBattleData.battleHash;
+            const { store } = createStore();
 
-            // timerTester.advanceBy(characterCurrent.features.actionTime - 80);
+            store.dispatch(TileClickAction({
+                position: { x: 9, y: 6 }
+            }));
 
-            // const { onTileHover, onTileClick } = bindAction.payload;
+            jest.runOnlyPendingTimers();
 
-            // await await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
+            const state1 = store.getState();
 
-            // await onTileClick(posAvailables[ 0 ]);
-
-            // await serviceNetwork({});
-
-            // expect(futureBattleData.battleHash).toBe(firstHash);
+            expect(state1).toEqual(initialState);
         });
 
-        it('should commit after spell action', async () => {
+        it('should commit after spell action', () => {
 
-            // const { currentBattleData, futureBattleData, bindAction, posAvailables } = init();
+            const { initialState, createStore } = init();
 
-            // const firstHash = futureBattleData.battleHash;
+            initialState.battle.snapshotState.snapshotList = [ {
+                battleHash: 'first-hash',
+                launchTime: -1,
+                time: -1,
+                teamsSnapshots: [],
+                playersSnapshots: [],
+                charactersSnapshots: [],
+                spellsSnapshots: []
+            } ];
 
-            // const { onTileHover, onTileClick } = bindAction.payload;
+            const { store } = createStore();
 
-            // await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
+            store.dispatch(TileClickAction({
+                position: { x: 9, y: 6 }
+            }));
 
-            // await onTileClick(posAvailables[ 0 ]);
+            jest.runOnlyPendingTimers();
 
-            // await serviceNetwork({});
+            const state1 = store.getState();
 
-            // expect(futureBattleData.battleHash).not.toBe(firstHash);
-            // expect(currentBattleData.battleHash).toBe(firstHash);
+            expect(state1.battle.snapshotState.battleDataFuture).not.toBe(initialState.battle.snapshotState.battleDataFuture);
+            expect(state1.battle.snapshotState.battleDataCurrent).toBe(initialState.battle.snapshotState.battleDataCurrent);
         });
 
-        it('should send message after spell action', async () => {
+        it('should send message after spell action', () => {
 
-            // const { bindAction, posAvailables } = init();
+            const { initialState, createStore } = init();
 
-            // const { onTileHover, onTileClick } = bindAction.payload;
+            initialState.battle.snapshotState.snapshotList = [ {
+                battleHash: 'first-hash',
+                launchTime: -1,
+                time: -1,
+                teamsSnapshots: [],
+                playersSnapshots: [],
+                charactersSnapshots: [],
+                spellsSnapshots: []
+            } ];
 
-            // await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]))
+            const { store, actionList } = createStore();
 
-            // StoreTest.clearActions();
+            store.dispatch(TileClickAction({
+                position: { x: 9, y: 6 }
+            }));
 
-            // await onTileClick(posAvailables[ 0 ]);
+            jest.runOnlyPendingTimers();
 
-            // await serviceNetwork({});
-
-            // expect(StoreTest.getActions()).toEqual(
-            //     expect.arrayContaining<SendMessageAction>([
-            //         expect.objectContaining<SendMessageAction>(SendMessageAction({
-            //             type: 'battle/spellAction',
-            //             spellAction: expect.anything()
-            //         }))
-            //     ])
-            // );
+            expect(actionList).toContainEqual(SendMessageAction({
+                type: 'battle/spellAction',
+                spellAction: expect.anything()
+            }));
         });
 
-        it('should change future battle data against current one after two spell actions', async () => {
+        it.skip('should change future battle data against current one after two spell actions', async () => {
 
             // const { characterCurrent, bindAction, currentBattleData, futureBattleData, posAvailables } = init();
 
@@ -320,30 +334,52 @@ describe('Battleflow', () => {
 
         it('should rollback on confirm KO', async () => {
 
-            // const { characterCurrent, futureBattleData, bindAction, posAvailables } = init();
+            const { initialState, createStore } = init();
 
-            // StoreTest.dispatch(BattleStateTurnStartAction({
-            //     characterId: characterCurrent.id
-            // }));
+            const { snapshotState } = initialState.battle;
 
-            // const firstHash = futureBattleData.battleHash;
+            snapshotState.battleDataCurrent.battleHash = 'second-hash';
+            snapshotState.battleDataFuture.battleHash = 'second-hash';
+            snapshotState.currentSpellAction = seedSpellActionSnapshot('s1', {
+                startTime: timerTester.now - 100,
+                duration: 1000
+            });
+            snapshotState.spellActionSnapshotList = [ snapshotState.currentSpellAction ];
+            snapshotState.snapshotList = [ {
+                battleHash: 'first-hash',
+                launchTime: -1,
+                time: -1,
+                teamsSnapshots: [],
+                playersSnapshots: [],
+                charactersSnapshots: snapshotState.battleDataCurrent.characters.map(characterToSnapshot),
+                spellsSnapshots: [{
+                    ...snapshotState.battleDataCurrent.spells[0],
+                    features: {
+                        area: -1,
+                        attack: 10,
+                        duration: 1234
+                    }
+                }]
+            } ];
 
-            // const { onTileHover, onTileClick } = bindAction.payload;
+            const { store } = createStore();
 
-            // await awaitAndAdvance10(onTileHover(posAvailables[ 0 ]));
+            store.dispatch(ReceiveMessageAction({
+                type: 'confirm',
+                sendTime: timerTester.now,
+                isOk: false,
+                lastCorrectHash: 'first-hash'
+            }));
 
-            // await onTileClick(posAvailables[ 0 ]);
+            jest.runOnlyPendingTimers();
 
-            // await serviceNetwork({});
+            const state1 = store.getState();
 
-            // StoreTest.dispatch(ReceiveMessageAction({
-            //     type: 'confirm',
-            //     sendTime: timerTester.now,
-            //     isOk: false,
-            //     lastCorrectHash: firstHash
-            // }));
-
-            // expect(futureBattleData.battleHash).toBe(firstHash);
+            expect(state1.battle.snapshotState.battleDataCurrent.battleHash).toEqual('first-hash');
+            expect(state1.battle.snapshotState.battleDataFuture.battleHash).toEqual('first-hash');
+            expect(state1.battle.snapshotState.battleDataCurrent.spells[0].feature).toEqual(snapshotState.snapshotList[0].spellsSnapshots[0].features);
+            expect(state1.battle.snapshotState.currentSpellAction).toEqual(null);
+            expect(state1.battle.snapshotState.spellActionSnapshotList).toEqual([]);
         });
 
     });
