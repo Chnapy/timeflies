@@ -15,7 +15,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
     assetLoader
 }) => api => next => {
 
-    return (action: Action) => {
+    return async (action: Action) => {
 
         next(action);
 
@@ -65,7 +65,9 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                     return message.mapSelected?.config;
                 };
 
-                const loadResources = async (mapConfig: MapConfig) => {
+                const mapConfig = getMapConfig();
+
+                if (message.mapSelected && mapConfig) {
 
                     api.dispatch(SendMessageAction({
                         type: 'room/player/state',
@@ -94,13 +96,6 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                         isReady: false,
                         isLoading: false
                     }));
-                };
-
-                const mapConfig = getMapConfig();
-
-                if (message.mapSelected && mapConfig) {
-
-                    loadResources(mapConfig);
                 }
 
             }
