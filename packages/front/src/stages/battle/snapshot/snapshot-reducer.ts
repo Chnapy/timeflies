@@ -102,6 +102,7 @@ const commit = (state: SnapshotState, time: number): void => {
 };
 
 // TODO merge objects instead
+// consider using immer
 const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string, period: BattleDataPeriod, {
     battleHash, teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
 }: BattleSnapshot) => {

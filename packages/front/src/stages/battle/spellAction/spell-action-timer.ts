@@ -81,9 +81,9 @@ export const SpellActionTimer = ({
 
     const removeSpellAction = (snapshot: SpellActionSnapshot, correctHash: string) => {
 
-        dispatchEnd(snapshot, true, correctHash);
-
         cancelTimeout();
+
+        dispatchEnd(snapshot, true, correctHash);
     };
 
     return {
@@ -92,6 +92,8 @@ export const SpellActionTimer = ({
             startSpellAction(snapshot, fromNotify);
         },
         onRemove(snapshotDeletedList: SpellActionSnapshot[], correctHash: string) {
+
+            cancelTimeout();
 
             const currentOrPassedSnapshot = snapshotDeletedList.find(({ startTime }) =>
                 startTime <= Date.now()

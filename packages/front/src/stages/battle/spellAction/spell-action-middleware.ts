@@ -41,16 +41,14 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         const { teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList
             .find(s => s.battleHash === debug.sendHash)!;
 
-        setTimeout(() => {
-            const diffLog = diffDefault(
-                correctBattleSnapshot,
-                {
-                    teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
-                }
-            );
+        const diffLog = diffDefault(
+            correctBattleSnapshot,
+            {
+                teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
+            }
+        );
 
-            console.log(diffLog);
-        });
+        console.log(diffLog);
     };
 
     const spellActionTimer = createSpellActionTimer({
@@ -58,9 +56,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         dispatch: api.dispatch
     });
 
-    const cancelCurrentAndNextSpells = (lastCorrectHash: string) => {
-
-        const { spellActionSnapshotList } = extractState(api.getState);
+    const cancelCurrentAndNextSpells = (lastCorrectHash: string, { spellActionSnapshotList }: SnapshotState) => {
 
         const spellActionSnapshotsValids = [ ...spellActionSnapshotList ];
 
@@ -80,17 +76,20 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         }
 
         if (toRemoveList.length) {
-            setTimeout(() =>
-                api.dispatch(SpellActionCancelAction({
-                    spellActionSnapshotsValids
-                }))
-            );
+            api.dispatch(SpellActionCancelAction({
+                spellActionSnapshotsValids
+            }))
         }
 
         spellActionTimer.onRemove(toRemoveList, lastCorrectHash);
     };
 
     return (action: AnyAction) => {
+
+        const previousState = api.getState();
+        const getPreviousState = () => previousState;
+
+        next(action);
 
         if (BattleStateSpellLaunchAction.match(action)) {
 
@@ -118,21 +117,20 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 };
             });
 
-            setTimeout(() => {
-                api.dispatch(SpellActionLaunchAction({
-                    spellActList
-                }));
+            api.dispatch(SpellActionLaunchAction({
+                spellActList
+            }));
 
-                if (!hadCurrentSpellAction) {
-                    spellActionTimer.onAdd(spellActList[ 0 ].startTime, false);
-                }
-            });
+            if (!hadCurrentSpellAction) {
+                spellActionTimer.onAdd(spellActList[ 0 ].startTime, false);
+            }
 
         } else if (BattleStateTurnEndAction.match(action)) {
 
-            const currentBattleHash = extractCurrentHash(api.getState);
+            const state = extractState(getPreviousState);
+            const currentBattleHash = extractCurrentHash(getPreviousState);
 
-            cancelCurrentAndNextSpells(currentBattleHash);
+            cancelCurrentAndNextSpells(currentBattleHash, state);
 
         } else if (ReceiveMessageAction.match(action)) {
             const { payload } = action;
@@ -143,7 +141,8 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
                     logSnapshotDiff(payload)
 
-                    cancelCurrentAndNextSpells(lastCorrectHash);
+                    const state = extractState(api.getState);
+                    cancelCurrentAndNextSpells(lastCorrectHash, state);
                 }
 
             } else if (payload.type === 'notify') {
@@ -178,6 +177,5 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             }
         }
 
-        next(action);
     };
 };
