@@ -310,7 +310,6 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: true,
-                sendHash: '',
                 lastCorrectHash: '',
                 sendTime: -1
             });
@@ -341,7 +340,6 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: true,
-                sendHash: '',
                 lastCorrectHash: '',
                 sendTime: -1
             });
@@ -382,7 +380,6 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: false,
-                sendHash: '',
                 lastCorrectHash: '-correct-hash-',
                 sendTime: -1
             });
@@ -427,7 +424,6 @@ describe('# spell-action-middleware', () => {
             const action = ReceiveMessageAction({
                 type: 'confirm',
                 isOk: false,
-                sendHash: '',
                 lastCorrectHash: '-correct-hash-',
                 sendTime: -1
             });
