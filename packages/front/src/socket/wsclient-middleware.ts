@@ -49,9 +49,7 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
             throw new Error(`message is not an array of Action: ${JSON.stringify(actionList)}`);
         }
 
-        setTimeout(() =>
-            actionList.forEach(action => api.dispatch(ReceiveMessageAction(action)))
-        );
+        actionList.forEach(action => api.dispatch(ReceiveMessageAction(action)))
     };
 
     return async (action: AnyAction) => {

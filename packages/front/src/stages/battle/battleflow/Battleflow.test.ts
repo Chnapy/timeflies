@@ -122,6 +122,7 @@ describe('Battleflow', () => {
 
             store.replaceReducer((state, action) => {
                 actionList.push(action);
+                // console.log('action', action);
 
                 return rootReducer(state, action);
             });
@@ -264,8 +265,6 @@ describe('Battleflow', () => {
                 position: { x: 9, y: 6 }
             }));
 
-            jest.runOnlyPendingTimers();
-
             const state1 = store.getState();
 
             expect(state1.battle.snapshotState.battleDataFuture).not.toBe(initialState.battle.snapshotState.battleDataFuture);
@@ -378,7 +377,7 @@ describe('Battleflow', () => {
 
     describe('on confirm message:', () => {
 
-        it('should rollback on confirm KO', async () => {
+        it('should rollback on confirm KO', () => {
 
             const { initialState, createStore } = init();
 
