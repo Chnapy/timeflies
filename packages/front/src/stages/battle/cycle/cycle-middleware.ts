@@ -161,9 +161,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
                 cancelTimeout();
 
-                setTimeout(() =>
-                    api.dispatch(BattleStateTurnEndAction())
-                );
+                api.dispatch(BattleStateTurnEndAction());
             }
 
         } else if (NotifyDeathsAction.match(action)) {

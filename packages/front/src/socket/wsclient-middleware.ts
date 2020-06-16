@@ -26,19 +26,17 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
         }
         // console.log('<-', action.payload);
 
-        setTimeout(() =>
-            socket.send(JSON.stringify([ {
-                sendTime: Date.now(),
-                ...action.payload
-            } ]))
-        );
+        socket.send(JSON.stringify([ {
+            sendTime: Date.now(),
+            ...action.payload
+        } ]));
     };
 
     socket.onmessage = ({ data }: MessageEvent) => {
 
         if (typeof data !== 'string') {
             throw new TypeError(`typeof message not handled: ${typeof data}`);
-        } 
+        }
 
         let actionList;
         try {
@@ -56,12 +54,12 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
         );
     };
 
-    return (action: AnyAction) => {
+    return async (action: AnyAction) => {
 
         next(action);
 
         if (SendMessageAction.match(action)) {
-            send(action);
+            await send(action);
         }
     };
 };

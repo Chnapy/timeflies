@@ -29,11 +29,10 @@ export const wsClientMiddlewareMock: () => Middleware = () => api => next => {
 
     return (action: AnyAction) => {
 
+        next(action);
+
         if (SendMessageAction.match(action)) {
             send(action);
-            return;
         }
-
-        next(action);
     };
 };

@@ -1,4 +1,4 @@
-import { seedTiledMap, TimerTester, seedSpellActionSnapshot } from '@timeflies/shared';
+import { seedTiledMap, TimerTester, seedSpellActionSnapshot, BattleSnapshot, getBattleSnapshotWithHash, SpellActionSnapshot } from '@timeflies/shared';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { createStoreManager } from '../../../store-manager';
@@ -11,6 +11,7 @@ import { SendMessageAction, ReceiveMessageAction } from '../../../socket/wsclien
 import { rootReducer } from '../../../ui/reducers/root-reducer';
 import { AnyAction } from '@reduxjs/toolkit';
 import { characterToSnapshot } from '../entities/character/Character';
+import { spellToSnapshot } from '../entities/spell/Spell';
 
 describe('Battleflow', () => {
 
@@ -243,7 +244,7 @@ describe('Battleflow', () => {
             expect(state1).toEqual(initialState);
         });
 
-        it('should commit after spell action', () => {
+        it('should commit', () => {
 
             const { initialState, createStore } = init();
 
@@ -271,9 +272,28 @@ describe('Battleflow', () => {
             expect(state1.battle.snapshotState.battleDataCurrent).toBe(initialState.battle.snapshotState.battleDataCurrent);
         });
 
-        it('should send message after spell action', () => {
+        it('should send message with correct hash', () => {
 
             const { initialState, createStore } = init();
+
+            const { battleActionState, snapshotState } = initialState.battle;
+
+            const getSpell = <P extends BattleDataPeriod>(period: P) => seedSpell<P>({
+                id: 's2',
+                period,
+                type: 'simpleAttack',
+                characterId: 'c1',
+                feature: {
+                    area: 999,
+                    attack: 20,
+                    duration: 100
+                }
+            });
+
+            snapshotState.battleDataCurrent.spells.push(getSpell('current'));
+            snapshotState.battleDataFuture.spells.push(getSpell('future'));
+            battleActionState.selectedSpellId = 's2';
+            battleActionState.currentAction = 'spellPrepare';
 
             initialState.battle.snapshotState.snapshotList = [ {
                 battleHash: 'first-hash',
@@ -285,6 +305,28 @@ describe('Battleflow', () => {
                 spellsSnapshots: []
             } ];
 
+            const characterSnapshot = characterToSnapshot(initialState.battle.snapshotState.battleDataCurrent.characters[ 0 ]);
+            const spellsSnapshots = initialState.battle.snapshotState.battleDataCurrent.spells.map(spellToSnapshot);
+
+            const expectedSnapshot: Omit<BattleSnapshot, 'battleHash'> = {
+                launchTime: -1,
+                time: -1,
+                teamsSnapshots: [],
+                playersSnapshots: [],
+                charactersSnapshots: [
+                    {
+                        ...characterSnapshot,
+                        features: {
+                            ...characterSnapshot.features,
+                            life: 80
+                        }
+                    }
+                ],
+                spellsSnapshots
+            };
+
+            const { battleHash } = getBattleSnapshotWithHash(expectedSnapshot);
+
             const { store, actionList } = createStore();
 
             store.dispatch(TileClickAction({
@@ -293,9 +335,13 @@ describe('Battleflow', () => {
 
             jest.runOnlyPendingTimers();
 
+            expect(store.getState().battle.snapshotState.battleDataFuture.characters[ 0 ].features.life).toBe(80);
+
             expect(actionList).toContainEqual(SendMessageAction({
                 type: 'battle/spellAction',
-                spellAction: expect.anything()
+                spellAction: expect.objectContaining<Partial<SpellActionSnapshot>>({
+                    battleHash
+                })
             }));
         });
 
@@ -352,14 +398,14 @@ describe('Battleflow', () => {
                 teamsSnapshots: [],
                 playersSnapshots: [],
                 charactersSnapshots: snapshotState.battleDataCurrent.characters.map(characterToSnapshot),
-                spellsSnapshots: [{
-                    ...snapshotState.battleDataCurrent.spells[0],
+                spellsSnapshots: [ {
+                    ...snapshotState.battleDataCurrent.spells[ 0 ],
                     features: {
                         area: -1,
                         attack: 10,
                         duration: 1234
                     }
-                }]
+                } ]
             } ];
 
             const { store } = createStore();
@@ -377,7 +423,7 @@ describe('Battleflow', () => {
 
             expect(state1.battle.snapshotState.battleDataCurrent.battleHash).toEqual('first-hash');
             expect(state1.battle.snapshotState.battleDataFuture.battleHash).toEqual('first-hash');
-            expect(state1.battle.snapshotState.battleDataCurrent.spells[0].feature).toEqual(snapshotState.snapshotList[0].spellsSnapshots[0].features);
+            expect(state1.battle.snapshotState.battleDataCurrent.spells[ 0 ].feature).toEqual(snapshotState.snapshotList[ 0 ].spellsSnapshots[ 0 ].features);
             expect(state1.battle.snapshotState.currentSpellAction).toEqual(null);
             expect(state1.battle.snapshotState.spellActionSnapshotList).toEqual([]);
         });
