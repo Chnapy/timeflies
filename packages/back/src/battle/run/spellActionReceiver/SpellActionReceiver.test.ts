@@ -1,7 +1,7 @@
 import { ConfirmSAction, NotifySAction, seedSpellActionSnapshot, SpellActionSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
-import { BattleStateManager } from '../battleStateManager/BattleStateManager';
+import { BattleStateManager, BattleState } from '../battleStateManager/BattleStateManager';
 import { Cycle } from '../cycle/Cycle';
 import { Character } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -60,14 +60,16 @@ describe('# SpellActionReceiver', () => {
 
         const checkDeathsAndDisconnects = jest.fn();
 
+        const battleState: BattleState = {
+            battleHashList,
+            players,
+            teams: [],
+            characters: [],
+            spells: []
+        };
+
         const stateManager: BattleStateManager = {
-            battleState: {
-                battleHashList,
-                players,
-                teams: [],
-                characters: [],
-                spells: []
-            },
+            get: key => battleState[key],
             generateFirstSnapshot: jest.fn(),
             useSpellAction: () => ({
                 onClone: () => ({

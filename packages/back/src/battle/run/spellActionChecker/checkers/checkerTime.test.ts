@@ -1,5 +1,5 @@
 import { seedSpellActionSnapshot, SpellActionCAction } from '@timeflies/shared';
-import { BattleState } from '../../battleStateManager/BattleStateManager';
+import { BattleState, EntitiesGetter } from '../../battleStateManager/BattleStateManager';
 import { seedCycle } from '../../cycle/Cycle.seed';
 import { seedCharacter } from '../../entities/character/Character.seed';
 import { seedPlayer } from '../../entities/player/Player.seed';
@@ -36,10 +36,12 @@ describe('# checkerTime', () => {
         const character = battleState.characters[ 0 ];
         const spell = battleState.spells[ 0 ];
 
+        const get: EntitiesGetter = key => battleState[ key ];
+
         const cycle = seedCycle({
             turn: {
                 startTime: 200,
-                character
+                getCharacter: () => character
             }
         });
 
@@ -56,7 +58,7 @@ describe('# checkerTime', () => {
             })
         };
 
-        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, get)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'startTime'
         });
@@ -70,12 +72,14 @@ describe('# checkerTime', () => {
         const character = battleState.characters[ 0 ];
         const spell = battleState.spells[ 0 ];
 
+        const get: EntitiesGetter = key => battleState[ key ];
+
         const cycle = seedCycle({
             turn: {
                 startTime: 200,
                 turnDuration: 900,
                 endTime: 1100,
-                character
+                getCharacter: () => character
             }
         });
 
@@ -91,7 +95,7 @@ describe('# checkerTime', () => {
             })
         };
 
-        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, get)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'duration'
         });
@@ -105,12 +109,14 @@ describe('# checkerTime', () => {
         const character = battleState.characters[ 0 ];
         const spell = battleState.spells[ 0 ];
 
+        const get: EntitiesGetter = key => battleState[ key ];
+
         const cycle = seedCycle({
             turn: {
                 startTime: 200,
                 turnDuration: 1100,
                 endTime: 1300,
-                character
+                getCharacter: () => character
             }
         });
 
@@ -126,6 +132,6 @@ describe('# checkerTime', () => {
             })
         };
 
-        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({ success: true });
+        expect(checker(spellAction, player, get)).toEqual<CharActionCheckerResult>({ success: true });
     });
 });

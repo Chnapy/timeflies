@@ -24,7 +24,7 @@ describe('# Turn', () => {
     it('should not have timed actions on init', () => {
         const callback = jest.fn();
 
-        const turnIdle = Turn(1, timerTester.now - 100000, character, callback, callback);
+        Turn(1, timerTester.now - 100000, () => character, callback, callback);
 
         expect(callback).not.toHaveBeenCalled();
     });
@@ -37,9 +37,9 @@ describe('# Turn', () => {
             wayBefore: timerTester.now - 5000
         };
 
-        const turnIdle = Turn(1, startTimes.future, character, () => null, () => null);
-        const turnRunning = Turn(1, startTimes.past, character, () => null, () => null);
-        const turnEnded = Turn(1, startTimes.wayBefore, character, () => null, () => null);
+        const turnIdle = Turn(1, startTimes.future, () => character, () => null, () => null);
+        const turnRunning = Turn(1, startTimes.past, () => character, () => null, () => null);
+        const turnEnded = Turn(1, startTimes.wayBefore, () => character, () => null, () => null);
 
         const states: TurnState[] = [ 'idle', 'running', 'ended' ];
 
@@ -54,7 +54,7 @@ describe('# Turn', () => {
 
         const startFn = jest.fn();
 
-        const turnIdle = Turn(1, startTime, character, startFn, () => { });
+        const turnIdle = Turn(1, startTime, () => character, startFn, () => { });
         turnIdle.refreshTimedActions();
 
         expect(startFn).toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe('# Turn', () => {
         const startFn = jest.fn();
         const endFn = jest.fn();
 
-        const turnIdle = Turn(1, startTime, character, startFn, endFn);
+        const turnIdle = Turn(1, startTime, () => character, startFn, endFn);
         turnIdle.refreshTimedActions();
 
         timerTester.advanceBy(900);
