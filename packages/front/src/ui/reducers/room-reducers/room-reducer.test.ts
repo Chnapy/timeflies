@@ -5,8 +5,6 @@ import { RoomData, RoomReducer } from './room-reducer';
 // TODO refactor all reducer tests to be less 'duck', more 'user though'
 // https://dev.to/hbarcelos/a-better-approach-for-testing-your-redux-code-2ec9
 
-// TODO use redux state in pixi object
-
 // TODO also handle promises to totally avoid free-promises
 
 describe('# room-reducer', () => {

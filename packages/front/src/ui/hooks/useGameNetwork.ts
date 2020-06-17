@@ -9,7 +9,7 @@ type Params<A extends ClientAction> = {
 };
 
 type Return<P extends Params<A>, A extends ClientAction> = {
-    [ K in keyof P ]: (...args: Parameters<P[ K ]>) => Promise<void>;
+    [ K in keyof P ]: (...args: Parameters<P[ K ]>) => void;
 };
 
 export const useGameNetwork = <P extends Params<A>, A extends ClientAction>(map: P): Return<P, A> => {
@@ -19,12 +19,7 @@ export const useGameNetwork = <P extends Params<A>, A extends ClientAction>(map:
     return Object.entries(map)
         .reduce((arr, [ key, value ]) => {
 
-            arr[ key ] = async (...args) => {
-
-                // TODO do the same in serviceNetwork
-
-                // await Controller.waitConnect();
-
+            arr[ key ] = (...args) => {
                 dispatch(SendMessageAction(value(...args)));
             };
 
