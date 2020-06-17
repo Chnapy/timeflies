@@ -38,19 +38,19 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
             globalTurnState: cycle.globalTurn.toSnapshot()
         };
 
-        players.forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
+        get('players').forEach(p => p.socket.send<BRunLaunchSAction>(launchAction));
 
-        players.forEach(p => {
+        get('players').forEach(p => {
             p.socket.on<SpellActionCAction>('battle/spellAction', spellActionReceiver.getOnReceive(p));
         });
     };
 
     const checkDeathsAndDisconnects = () => {
-        const charactersAlivePlayerIds = characters
+        const charactersAlivePlayerIds = get('characters')
             .filter(characterIsAlive)
             .map(c => c.playerId);
 
-        const connectedPlayerTeamIds = players
+        const connectedPlayerTeamIds = get('players')
             .filter(p => p.socket.isConnected())
             .filter(p => charactersAlivePlayerIds.includes(p.id))
             .map(p => p.teamId);
@@ -59,7 +59,7 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
 
         if (remainingTeams.size === 1) {
             const { value } = remainingTeams.values().next();
-            const teamWinner = teams.find(t => t.id === value)!;
+            const teamWinner = get('teams').find(t => t.id === value)!;
 
             endBattle(teamWinner);
         }
@@ -67,11 +67,11 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
 
     const endBattle = (team: Team): void => {
         cycle.stop();
-        players.forEach(p => p.socket.send<BRunEndSAction>({
+        get('players').forEach(p => p.socket.send<BRunEndSAction>({
             type: 'battle-run/end',
             winnerTeamId: team.id
         }));
-        players.forEach(p => p.socket.close());
+        get('players').forEach(p => p.socket.close());
 
         console.log('\n---');
         console.log(`Battle ended. Team ${team.letter} wins !`);
@@ -84,12 +84,11 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
         playerList
     );
 
-    const { battleState } = stateManager;
-    const { teams, players, characters } = battleState;
+    const { get } = stateManager;
 
     const mapManager = MapManager(mapSelected.config);
 
-    const cycle = Cycle(battleState);
+    const cycle = Cycle(get);
 
     const spellActionReceiver = SpellActionReceiver({
         stateManager,
@@ -98,7 +97,7 @@ export const BattleRunRoom = ({ mapSelected, teamList, playerDataList, playerLis
         checkDeathsAndDisconnects
     });
 
-    players.forEach(p => p.socket.onDisconnect(() => {
+    get('players').forEach(p => p.socket.onDisconnect(() => {
         console.log('Player disconnect:', p.id, p.socket.isConnected());
         checkDeathsAndDisconnects();
     }));

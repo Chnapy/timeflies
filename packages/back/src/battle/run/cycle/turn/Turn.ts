@@ -1,11 +1,12 @@
 import { TurnSnapshot } from "@timeflies/shared";
+import { Immutable } from 'immer';
 import { Character } from "../../entities/character/Character";
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
 export interface Turn {
     readonly id: number;
-    readonly character: Character;
+    readonly getCharacter: () => Immutable<Character>;
     readonly state: TurnState;
     readonly startTime: number;
     readonly turnDuration: number;
@@ -16,7 +17,7 @@ export interface Turn {
 }
 
 export const Turn = (
-    id: number, startTime: number, character: Character,
+    id: number, startTime: number, getCharacter: () => Immutable<Character>,
     onTurnStart: () => void, onTurnEnd: () => void
 ): Turn => {
 
@@ -35,7 +36,7 @@ export const Turn = (
             id,
             startTime,
             duration: this_.turnDuration,
-            characterId: character.id
+            characterId: getCharacter().id
         };
     };
 
@@ -67,7 +68,7 @@ export const Turn = (
     }
 
     const start = (): void => {
-        console.log('TURN-START', id, `${this_.turnDuration}ms`, character.playerId);
+        console.log('TURN-START', id, `${this_.turnDuration}ms`, getCharacter().playerId);
         lastCallback = 'start';
         onTurnStart();
         refreshTimedActions();
@@ -82,7 +83,7 @@ export const Turn = (
     const this_: Turn = {
         id,
         startTime,
-        character,
+        getCharacter,
         get state(): TurnState {
             const now = Date.now();
             if (now < this_.startTime) {
@@ -94,7 +95,7 @@ export const Turn = (
             return 'ended';
         },
         get turnDuration(): number {
-            return character.features.actionTime;
+            return getCharacter().features.actionTime;
         },
         get endTime(): number {
             return startTime + this_.turnDuration;

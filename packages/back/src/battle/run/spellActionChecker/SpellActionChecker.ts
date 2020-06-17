@@ -1,11 +1,11 @@
 import { SpellActionCAction } from "@timeflies/shared";
+import { EntitiesGetter } from '../battleStateManager/BattleStateManager';
 import { Cycle } from '../cycle/Cycle';
 import { Player } from "../entities/player/Player";
 import { MapManager } from '../mapManager/MapManager';
-import { checkerPlayer } from './checkers/checkerPlayer';
 import { checkerCharacter } from './checkers/checkerCharacter';
+import { checkerPlayer } from './checkers/checkerPlayer';
 import { checkerTime } from './checkers/checkerTime';
-import { BattleState } from '../battleStateManager/BattleStateManager';
 
 export type CharActionCheckerReason = 'player' | 'isAlive' | 'spell' | 'startTime' | 'duration' | 'isInArea' | 'bresenham' | 'specificType';
 
@@ -19,7 +19,7 @@ export type CharActionCheckerResult =
     };
 
 export interface Checker {
-    (action: SpellActionCAction, player: Player, battleState: BattleState): CharActionCheckerResult;
+    (action: SpellActionCAction, player: Player, get: EntitiesGetter): CharActionCheckerResult;
 }
 
 export interface CheckerCreator {
@@ -147,10 +147,10 @@ export const SpellActionChecker = (
     const checkList: readonly Checker[] = checkersCreators.map(c => c(cycle, mapManager));
 
     return {
-        check: (action: SpellActionCAction, player: Player, battleState: BattleState): CharActionCheckerResult => {
+        check: (action: SpellActionCAction, player: Player, get: EntitiesGetter): CharActionCheckerResult => {
 
             for (const c of checkList) {
-                const result = c(action, player, battleState);
+                const result = c(action, player, get);
                 if (!result.success) {
                     return result;
                 }

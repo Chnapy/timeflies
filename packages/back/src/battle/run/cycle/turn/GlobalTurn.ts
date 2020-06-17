@@ -1,5 +1,6 @@
 import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY } from "@timeflies/shared";
-import { Character, characterIsAlive } from "../../entities/character/Character";
+import { EntitiesGetter } from '../../battleStateManager/BattleStateManager';
+import { characterIsAlive } from "../../entities/character/Character";
 import { Turn } from "./Turn";
 
 export type GlobalTurnState = 'idle' | 'running';
@@ -7,7 +8,7 @@ export type GlobalTurnState = 'idle' | 'running';
 export interface GlobalTurn {
     readonly id: number;
     readonly startTime: number;
-    readonly charactersOrdered: readonly Character[];
+    // readonly charactersOrdered: readonly Character[];
     readonly state: GlobalTurnState;
     readonly currentTurn: Turn;
     notifyDeaths(): void;
@@ -16,12 +17,12 @@ export interface GlobalTurn {
 }
 
 export const GlobalTurn = (
-    id: number, startTime: number, charactersOrdered: readonly Character[],
+    id: number, startTime: number, get: EntitiesGetter<'characters'>,
     generateTurnId: IndexGenerator,
     onGlobalTurnEnd: (endTime: number) => void, onTurnStart: () => void
 ) => {
 
-    charactersOrdered = [ ...charactersOrdered ];
+    const getCharacters = () => get('characters');
 
     let currentTurn: Turn;
 
@@ -36,7 +37,7 @@ export const GlobalTurn = (
     };
 
     const notifyDeaths = (): void => {
-        if (!characterIsAlive(currentTurn.character)) {
+        if (!characterIsAlive(currentTurn.getCharacter())) {
             onTurnEnd();
         }
     };
@@ -51,15 +52,16 @@ export const GlobalTurn = (
 
     const runNextTurn = (nextCharacterIndex: number): void => {
 
-        if (nextCharacterIndex >= charactersOrdered.length) {
+        if (nextCharacterIndex >= getCharacters().length) {
             onGlobalTurnEnd(currentTurn.endTime);
         }
         else {
-            const currentCharacter = charactersOrdered[ nextCharacterIndex ];
-            if (characterIsAlive(currentCharacter)) {
+            const getCurrentCharacter = () => getCharacters()[ nextCharacterIndex ];
+
+            if (characterIsAlive(getCurrentCharacter())) {
                 console.log(`Wait ${TURN_DELAY}ms`);
                 const turnId = generateTurnId.next().value;
-                setCurrentTurn(Turn(turnId, currentTurn.endTime + TURN_DELAY, currentCharacter, onTurnStart, onTurnEnd));
+                setCurrentTurn(Turn(turnId, currentTurn.endTime + TURN_DELAY, getCurrentCharacter, onTurnStart, onTurnEnd));
             } else {
                 runNextTurn(nextCharacterIndex + 1);
             }
@@ -67,14 +69,14 @@ export const GlobalTurn = (
     };
 
     const getCurrentCharacterIndex = (): number => {
-        return charactersOrdered.findIndex(c => c.id === currentTurn.character.id);
+        return getCharacters().findIndex(c => c.id === currentTurn.getCharacter().id);
     };
 
     const toSnapshot = (): GlobalTurnSnapshot => {
         return {
             id,
             startTime,
-            order: charactersOrdered.map(c => c.staticData.id),
+            order: getCharacters().map(c => c.staticData.id),
             currentTurn: currentTurn.toSnapshot()
         };
     };
@@ -83,12 +85,12 @@ export const GlobalTurn = (
         currentTurn.clearTimedActions();
     };
 
-    setCurrentTurn(Turn(turnId, startTime, charactersOrdered[ 0 ], () => null, onTurnEnd));
+    setCurrentTurn(Turn(turnId, startTime, () => getCharacters()[ 0 ], () => null, onTurnEnd));
 
     const this_: GlobalTurn = {
         id,
         startTime,
-        charactersOrdered,
+        // charactersOrdered,
         get state(): GlobalTurnState {
             const now = Date.now();
             if (now >= startTime) {

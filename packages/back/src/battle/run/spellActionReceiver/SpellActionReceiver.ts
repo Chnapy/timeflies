@@ -30,7 +30,7 @@ export const SpellActionReceiver = (
     }
 ): SpellActionReceiver => {
 
-    const { battleHashList, players } = stateManager.battleState;
+    const { get } = stateManager;
 
     const spellActionChecker = spellActionCheckerCreator(cycle, mapManager);
 
@@ -46,11 +46,9 @@ export const SpellActionReceiver = (
 
     const getOnReceive = (player: Player) => (action: SpellActionCAction): void => {
 
-        const isCheckSuccess = spellActionChecker.check(action, player, stateManager.battleState).success;
+        const isCheckSuccess = spellActionChecker.check(action, player, get).success;
 
         const sendConfirmAction = (isOk: boolean, lastCorrectHash: string): void => {
-
-            const { teams, players, characters, spells } = stateManager.battleState;
 
             player.socket.send<ConfirmSAction>({
                 type: 'confirm',
@@ -61,10 +59,10 @@ export const SpellActionReceiver = (
                     : {
                         sendHash: action.spellAction.battleHash,
                         correctBattleSnapshot: {
-                            teamsSnapshots: teams.map(teamToSnapshot),
-                            playersSnapshots: players.map(playerToSnapshot),
-                            charactersSnapshots: characters.map(characterToSnapshot),
-                            spellsSnapshots: spells.map(spellToSnapshot)
+                            teamsSnapshots: get('teams').map(teamToSnapshot),
+                            playersSnapshots: get('players').map(playerToSnapshot),
+                            charactersSnapshots: get('characters').map(characterToSnapshot),
+                            spellsSnapshots: get('spells').map(spellToSnapshot)
                         }
                     }
             });
@@ -82,7 +80,7 @@ export const SpellActionReceiver = (
 
                     sendConfirmAction(true, hash);
 
-                    players
+                    get('players')
                         .filter(p => p.id !== player.id)
                         .forEach(p => p.socket.send<NotifySAction>({
                             type: 'notify',
@@ -97,7 +95,7 @@ export const SpellActionReceiver = (
             }
         }
 
-        const lastCorrectHash = battleHashList[ battleHashList.length - 1 ];
+        const lastCorrectHash = get('battleHashList')[ get('battleHashList').length - 1 ];
 
         sendConfirmAction(false, lastCorrectHash);
     };

@@ -7,6 +7,7 @@ import { Player } from '../entities/player/Player';
 import { seedPlayer } from '../entities/player/Player.seed';
 import { Cycle } from './Cycle';
 import { GlobalTurn, GlobalTurnState } from './turn/GlobalTurn';
+import { EntitiesGetter } from '../battleStateManager/BattleStateManager';
 import WebSocket = require('ws');
 
 describe('# Cycle', () => {
@@ -21,6 +22,8 @@ describe('# Cycle', () => {
     let players: Player[];
 
     let characters: Character[];
+
+    const getter: EntitiesGetter<'players' | 'characters'> = key => ({ players, characters } as any)[ key ];
 
     let cycle: Cycle;
 
@@ -42,7 +45,7 @@ describe('# Cycle', () => {
             { length: 3 },
             players[ 1 ].id
         );
-        characters[0].playerId = players[0].id;
+        characters[ 0 ].playerId = players[ 0 ].id;
 
         onSendFn1 = () => { };
         onSendFn2 = () => { };
@@ -62,7 +65,7 @@ describe('# Cycle', () => {
 
     it('should not start on init', () => {
 
-        const cycle = Cycle({ players, characters });
+        const cycle = Cycle(getter);
 
         expect(cycle.globalTurn).toBeUndefined();
     });
@@ -73,7 +76,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle({ players, characters });
+        cycle = Cycle(getter);
         cycle.start(launchTime);
 
         expect(cycle.globalTurn).toMatchObject<Partial<GlobalTurn>>({
@@ -99,7 +102,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle({ players, characters });
+        cycle = Cycle(getter);
         cycle.start(launchTime);
 
         expect(on).not.toHaveBeenCalled();
@@ -132,7 +135,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle({ players, characters });
+        cycle = Cycle(getter);
         cycle.start(launchTime);
 
         let advance = 0;

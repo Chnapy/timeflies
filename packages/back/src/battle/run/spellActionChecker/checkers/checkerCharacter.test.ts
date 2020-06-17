@@ -1,11 +1,11 @@
-import { SpellActionCAction, seedSpellActionSnapshot } from '@timeflies/shared';
+import { seedSpellActionSnapshot, SpellActionCAction } from '@timeflies/shared';
+import { BattleState, EntitiesGetter } from '../../battleStateManager/BattleStateManager';
 import { seedCycle } from '../../cycle/Cycle.seed';
+import { seedCharacter } from '../../entities/character/Character.seed';
 import { seedPlayer } from '../../entities/player/Player.seed';
 import { seedMapManager } from '../../mapManager/MapManager.seed';
 import { CharActionCheckerResult } from '../SpellActionChecker';
 import { checkerCharacter } from './checkerCharacter';
-import { BattleState } from '../../battleStateManager/BattleStateManager';
-import { seedCharacter } from '../../entities/character/Character.seed';
 
 describe('# checkerCharacter', () => {
 
@@ -33,10 +33,12 @@ describe('# checkerCharacter', () => {
 
         const battleState = getBattleState(0);
 
-        const player = battleState.players[0];
+        const player = battleState.players[ 0 ];
         const character = battleState.characters[ 0 ];
 
-        const cycle = seedCycle({ turn: { character } });
+        const get: EntitiesGetter = key => battleState[ key ];
+
+        const cycle = seedCycle({ turn: { getCharacter: () => character } });
 
         const mapManager = seedMapManager();
 
@@ -51,7 +53,7 @@ describe('# checkerCharacter', () => {
             })
         };
 
-        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, get)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'isAlive'
         });
@@ -61,10 +63,12 @@ describe('# checkerCharacter', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[0];
+        const player = battleState.players[ 0 ];
         const character = battleState.characters[ 0 ];
 
-        const cycle = seedCycle({ turn: { character } });
+        const get: EntitiesGetter = key => battleState[ key ];
+
+        const cycle = seedCycle({ turn: { getCharacter: () => character } });
 
         const mapManager = seedMapManager();
 
@@ -78,7 +82,7 @@ describe('# checkerCharacter', () => {
             })
         };
 
-        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({
+        expect(checker(spellAction, player, get)).toEqual<CharActionCheckerResult>({
             success: false,
             reason: 'spell'
         });
@@ -88,11 +92,13 @@ describe('# checkerCharacter', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[0];
+        const player = battleState.players[ 0 ];
         const character = battleState.characters[ 0 ];
-        const spell = battleState.spells[0];
+        const spell = battleState.spells[ 0 ];
 
-        const cycle = seedCycle({ turn: { character } });
+        const get: EntitiesGetter = key => battleState[ key ];
+
+        const cycle = seedCycle({ turn: { getCharacter: () => character } });
 
         const mapManager = seedMapManager();
 
@@ -106,7 +112,7 @@ describe('# checkerCharacter', () => {
             })
         };
 
-        expect(checker(spellAction, player, battleState)).toEqual<CharActionCheckerResult>({ success: true });
+        expect(checker(spellAction, player, get)).toEqual<CharActionCheckerResult>({ success: true });
     });
 
 });

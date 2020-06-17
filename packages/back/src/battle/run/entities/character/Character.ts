@@ -1,4 +1,5 @@
 import { CharacterFeatures, CharacterRoom, CharacterSnapshot, Orientation, Position, StaticCharacter } from '@timeflies/shared';
+import { Immutable } from 'immer';
 
 export type Character = {
     id: string;
@@ -10,12 +11,12 @@ export type Character = {
     playerId: string;
 };
 
-export const characterToSnapshot = ({ id, staticData, position, orientation, features, playerId }: Character): CharacterSnapshot => ({
+export const characterToSnapshot = ({ id, staticData, position, orientation, features, playerId }: Immutable<Character>): CharacterSnapshot => ({
     id,
-    staticData,
-    position,
+    staticData: staticData as StaticCharacter,
+    position: { ...position },
     orientation,
-    features,
+    features: { ...features },
     playerId
 });
 
@@ -23,7 +24,7 @@ export const characterAlterLife = ({ features }: Character, value: number) => {
     features.life = Math.max(features.life + value, 0);
 };
 
-export const characterIsAlive = (character: Character) => character.features.life > 0;
+export const characterIsAlive = (character: Immutable<Character>) => character.features.life > 0;
 
 export const Character = (
     { id, position }: Pick<CharacterRoom, 'id' | 'position'>,

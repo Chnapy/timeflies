@@ -35,12 +35,26 @@ describe('# BattleStateManager', () => {
         return { playerDataList, playerRoomList, teamRoomList };
     };
 
+    const extractState = (manager: BattleStateManager): BattleState => ({
+        battleHashList: manager.get('battleHashList'),
+        teams: manager.get('teams'),
+        players: manager.get('players'),
+        characters: manager.get('characters'),
+        spells: manager.get('spells')
+    });
+
+    const expectStateIs = (manager: BattleStateManager, expectedState: BattleState) => {
+        for (const key of Object.keys(expectedState)) {
+            expect(manager.get(key as any)).toEqual((expectedState as any)[ key ]);
+        }
+    };
+
     it('should correctly init battle state', () => {
         const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
         const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList);
 
-        expect(manager.battleState).toMatchObject<BattleState>({
+        const expected: BattleState = {
             teams: [ {
                 id: 't1',
                 letter: 'A'
@@ -56,7 +70,9 @@ describe('# BattleStateManager', () => {
             }) ],
             spells: expect.any(Array),
             battleHashList: []
-        });
+        };
+
+        expectStateIs(manager, expected);
     });
 
     it('should return correct first snapshot', () => {
@@ -85,7 +101,7 @@ describe('# BattleStateManager', () => {
             spellsSnapshots: [],
             battleHash: 'hash'
         });
-        expect(manager.battleState.battleHashList).toEqual([ 'hash' ]);
+        expect(manager.get('battleHashList')).toEqual([ 'hash' ]);
     });
 
     describe('on spell action', () => {
@@ -105,9 +121,9 @@ describe('# BattleStateManager', () => {
                 })
             });
 
-            const firstState = util.inspect(manager.battleState);
-            
-            const spell = manager.battleState.spells[0];
+            const firstState = util.inspect(extractState(manager));
+
+            const spell = manager.get('spells')[ 0 ];
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
@@ -123,7 +139,7 @@ describe('# BattleStateManager', () => {
 
             expect(callback).not.toHaveBeenCalled();
             expect(succeed).toBe(false);
-            expect(util.inspect(manager.battleState)).toBe(firstState);
+            expect(util.inspect(extractState(manager))).toEqual(firstState);
         });
 
         it('should call callback on correct hash', () => {
@@ -141,9 +157,9 @@ describe('# BattleStateManager', () => {
                 })
             });
 
-            const firstState = util.inspect(manager.battleState);
+            const firstState = util.inspect(extractState(manager));
 
-            const spell = manager.battleState.spells[0];
+            const spell = manager.get('spells')[ 0 ];
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
@@ -160,7 +176,7 @@ describe('# BattleStateManager', () => {
 
             expect(callback).toHaveBeenNthCalledWith(1, 'hash', expect.any(Function));
             expect(succeed).toBe(true);
-            expect(util.inspect(manager.battleState)).toBe(firstState);
+            expect(util.inspect(extractState(manager))).toBe(firstState);
         });
 
         it('should change battle state on callback function called', () => {
@@ -178,9 +194,9 @@ describe('# BattleStateManager', () => {
                 })
             });
 
-            const firstState = util.inspect(manager.battleState);
+            const firstState = util.inspect(extractState(manager));
 
-            const spell = manager.battleState.spells[0];
+            const spell = manager.get('spells')[ 0 ];
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
@@ -200,7 +216,7 @@ describe('# BattleStateManager', () => {
                 });
 
             expect(applyReturn).toEqual({ deaths: expect.any(Array) });
-            expect(util.inspect(manager.battleState)).not.toBe(firstState);
+            expect(util.inspect(extractState(manager))).not.toBe(firstState);
         });
 
     });
