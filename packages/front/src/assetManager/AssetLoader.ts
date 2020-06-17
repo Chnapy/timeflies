@@ -91,11 +91,11 @@ const getAssets = (resources: ResourceMap, keys: string[], key: string): AssetMa
     if (res.spritesheet) {
         return {
             spritesheet: res.spritesheet,
-            resource: res.children[0]
+            resource: res.children[ 0 ]
         };
     }
 
-    return res.data as BaseAssetMap[BaseAssetMapKey];
+    return res.data as BaseAssetMap[ BaseAssetMapKey ];
 };
 
 const getTiledMapAssets = (resources: ResourceMap, keys: string[]): TiledMapAssets => {
@@ -167,20 +167,16 @@ export const createAssetLoader = ({ getLoader }: Dependencies = { getLoader: () 
 
     const loader = getLoader();
 
+    loader.reset();
+
+    for (const textureUrl in PIXI.utils.BaseTextureCache) {
+        delete PIXI.utils.BaseTextureCache[ textureUrl ];
+    }
+    for (const textureUrl in PIXI.utils.TextureCache) {
+        delete PIXI.utils.TextureCache[ textureUrl ];
+    }
+
     loader.use(mapLoaderMiddleware);
-
-    // TODO
-
-    // onAction(AppResetAction, () => {
-    //     loader.reset();
-
-    //     for (const textureUrl in PIXI.utils.BaseTextureCache) {
-    //         delete PIXI.utils.BaseTextureCache[ textureUrl ];
-    //     }
-    //     for (const textureUrl in PIXI.utils.TextureCache) {
-    //         delete PIXI.utils.TextureCache[ textureUrl ];
-    //     }
-    // });
 
     const addResource = (name: string, url: string) => !loader.resources[ name ]
         ? loader.add({
