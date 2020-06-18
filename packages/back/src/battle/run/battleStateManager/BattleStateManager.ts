@@ -178,7 +178,6 @@ export const BattleStateManager = (
                 // });
 
                 // const snapshotClone = generateSnapshot(cloneBattleState, -1, -1);
-                console.log('characters life', ...snapshotClone.charactersSnapshots.map(c => c.features.life))
 
                 return {
                     ifCorrectHash: (fn: (hash: string, applyOnCurrentState: () => { deaths: Character[] }) => void) => {
@@ -197,6 +196,7 @@ export const BattleStateManager = (
                         console.log('BAD HASH !');
                         console.log('expected:', snapshotClone.battleHash);
                         console.log('received:', spellAction.battleHash);
+                        // console.log('characters life/position', ...snapshotClone.charactersSnapshots.flatMap(c => [ c.features.life, c.position.x, c.position.y, ' | ' ]))
                         return false;
                     }
                 };

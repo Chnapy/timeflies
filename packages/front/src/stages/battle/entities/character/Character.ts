@@ -19,10 +19,10 @@ export const characterToSnapshot = ({ id, playerId, staticData, position, orient
     return {
         id,
         playerId,
-        staticData,
-        position,
+        staticData: { ...staticData },
+        position: { ...position },
         orientation,
-        features,
+        features: { ...features },
     };
 };
 
@@ -40,10 +40,10 @@ export const Character = <P extends BattleDataPeriod>(period: P, myPlayerId: str
         id,
         period,
         isMine: playerId === myPlayerId,
-        staticData,
-        position,
+        staticData: { ...staticData },
+        position: { ...position },
         orientation,
-        features,
+        features: { ...features },
         defaultSpellId: staticData.defaultSpellId,
         playerId
     };
