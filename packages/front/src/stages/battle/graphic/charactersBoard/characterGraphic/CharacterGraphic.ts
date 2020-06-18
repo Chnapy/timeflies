@@ -168,7 +168,8 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             const { tiledSchema, characterPosition, currentSpellAction, spellType } = payload;
 
             if (ticker?.started) {
-                throw new Error('Spell action received while ticker running');
+                ticker?.destroy();
+                ticker = null;
             }
 
             ticker = new PIXI.Ticker();

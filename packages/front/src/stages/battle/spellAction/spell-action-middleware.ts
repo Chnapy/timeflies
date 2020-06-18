@@ -139,7 +139,9 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 const { isOk, lastCorrectHash } = payload;
                 if (!isOk) {
 
-                    logSnapshotDiff(payload)
+                    try {
+                        logSnapshotDiff(payload);
+                    } catch (e) { console.warn(e); }
 
                     const state = extractState(api.getState);
                     cancelCurrentAndNextSpells(lastCorrectHash, state);
