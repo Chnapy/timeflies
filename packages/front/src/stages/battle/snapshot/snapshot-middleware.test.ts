@@ -3,7 +3,7 @@ import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { snapshotMiddleware } from './snapshot-middleware';
-import { SnapshotState } from './snapshot-reducer';
+import { getInitialSnapshotState } from './snapshot-reducer';
 
 describe('# snapshot-middleware', () => {
 
@@ -22,27 +22,19 @@ describe('# snapshot-middleware', () => {
             })
         ];
 
-        const initialState: SnapshotState = {
+        const initialState = getInitialSnapshotState({
             myPlayerId: 'p1',
-            launchTime: -1,
-            snapshotList: [],
             battleDataCurrent: {
                 battleHash: 'not-matter',
-                teams: [],
                 characters: currentCharacters,
-                players: [],
                 spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
-                teams: [],
                 characters: [],
-                players: [],
                 spells: []
             },
-            currentSpellAction: null,
-            spellActionSnapshotList: []
-        };
+        });
 
         const api: MiddlewareAPI = {
             dispatch: jest.fn(),
@@ -78,27 +70,19 @@ describe('# snapshot-middleware', () => {
             })
         ];
 
-        const initialState: SnapshotState = {
+        const initialState = getInitialSnapshotState({
             myPlayerId: 'p1',
-            launchTime: -1,
-            snapshotList: [],
             battleDataCurrent: {
                 battleHash: 'not-matter',
-                teams: [],
                 characters: currentCharacters,
-                players: [],
                 spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
-                teams: [],
                 characters: [],
-                players: [],
                 spells: []
             },
-            currentSpellAction: null,
-            spellActionSnapshotList: []
-        };
+        });
 
         const api: MiddlewareAPI = {
             dispatch: jest.fn(),

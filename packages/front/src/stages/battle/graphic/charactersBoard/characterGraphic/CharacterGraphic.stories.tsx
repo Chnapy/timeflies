@@ -52,11 +52,11 @@ export const Current: React.FC = () => {
         const period: BattleDataPeriod = 'current';
 
         const team = seedTeam({
-            id: 't1', period
+            id: 't1'
         });
 
         const player = seedPlayer({
-            id: 'p1', period, teamId: 't1'
+            id: 'p1', teamId: 't1'
         });
 
         const character = seedCharacter({
@@ -87,18 +87,18 @@ export const Current: React.FC = () => {
                     startTime: Date.now()
                 }
             },
+            teamSnapshotList: [ teamToSnapshot(team) ],
+            playerSnapshotList: [ playerToSnapshot(player) ],
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: [ characterToSnapshot(character) ],
                 launchTime: Date.now(),
-                playersSnapshots: [ playerToSnapshot(player) ],
                 spellsSnapshots: [],
-                teamsSnapshots: [ teamToSnapshot(team) ],
                 time: Date.now()
             }
         }));
 
-        const hud = CanvasContext.provider({ 
+        const hud = CanvasContext.provider({
             tiledMapGraphic,
             spritesheets: {
                 characters: characters.spritesheet
@@ -146,11 +146,11 @@ export const Future: React.FC = () => {
         const period: BattleDataPeriod = 'future';
 
         const team = seedTeam({
-            id: 't1', period
+            id: 't1'
         });
 
         const player = seedPlayer({
-            id: 'p1', period, teamId: 't1'
+            id: 'p1', teamId: 't1'
         });
 
         const character = seedCharacter({
@@ -181,18 +181,18 @@ export const Future: React.FC = () => {
                     startTime: Date.now()
                 }
             },
+            teamSnapshotList: [ teamToSnapshot(team) ],
+            playerSnapshotList: [ playerToSnapshot(player) ],
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: [ characterToSnapshot(character) ],
                 launchTime: Date.now(),
-                playersSnapshots: [ playerToSnapshot(player) ],
                 spellsSnapshots: [],
-                teamsSnapshots: [ teamToSnapshot(team) ],
                 time: Date.now()
             }
         }));
 
-        const hud = CanvasContext.provider({ 
+        const hud = CanvasContext.provider({
             tiledMapGraphic,
             spritesheets: {
                 characters: characters.spritesheet

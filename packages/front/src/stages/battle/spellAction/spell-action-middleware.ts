@@ -38,13 +38,13 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
         const { correctBattleSnapshot } = debug;
 
-        const { teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList
+        const { charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList
             .find(s => s.battleHash === debug.sendHash)!;
 
         const diffLog = diffDefault(
             correctBattleSnapshot,
             {
-                teamsSnapshots, playersSnapshots, charactersSnapshots, spellsSnapshots
+                charactersSnapshots, spellsSnapshots
             }
         );
 

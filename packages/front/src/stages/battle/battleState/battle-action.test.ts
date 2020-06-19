@@ -60,6 +60,8 @@ describe('# battle-action', () => {
                     schema: seedTiledMapAssets('map_1').schema,
                     imagesUrls: { toto: 'url' },
                 },
+                teamSnapshotList: [],
+                playerSnapshotList: [],
                 globalTurnSnapshot: {} as any,
                 entitiesSnapshot: {
                     charactersSnapshots: [

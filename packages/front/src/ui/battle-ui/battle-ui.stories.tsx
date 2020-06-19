@@ -10,6 +10,7 @@ import { createStoreManager } from '../../store-manager';
 import { createView } from '../../view';
 import { battleReducer, BattleState } from '../reducers/battle-reducers/battle-reducer';
 import { BattleUI } from './battle-ui';
+import { getInitialSnapshotState } from '../../stages/battle/snapshot/snapshot-reducer';
 
 export default {
     title: 'Battle',
@@ -22,33 +23,28 @@ export const Default: React.FC = () => {
 
     const t1 = seedTeam({
         id: 't1',
-        period: 'current',
         letter: 'A'
     });
 
     const t2 = seedTeam({
         id: 't2',
-        period: 'current',
         letter: 'B',
     });
 
     const p1 = seedPlayer({
         id: 'p1',
-        period: 'current',
         name: 'chnapy',
         teamId: t1.id
     });
 
     const p2 = seedPlayer({
         id: 'p2',
-        period: 'current',
         name: 'yoshi2oeuf',
         teamId: t1.id
     });
 
     const p3 = seedPlayer({
         id: 'p3',
-        period: 'current',
         name: 'toto',
         teamId: t2.id
     });
@@ -92,12 +88,12 @@ export const Default: React.FC = () => {
 
     const battleState: BattleState = {
         ...preloadedState,
-        snapshotState: {
+        snapshotState: getInitialSnapshotState({
             ...preloadedState.snapshotState,
+            teamList: [ t1, t2 ],
+            playerList: [ p1, p2, p3 ],
             battleDataCurrent: {
                 ...preloadedState.snapshotState.battleDataCurrent,
-                teams: [ t1, t2 ],
-                players: [ p1, p2, p3 ],
                 characters: [
                     c1,
                     seedCharacter({
@@ -174,7 +170,7 @@ export const Default: React.FC = () => {
                     }),
                 ]
             }
-        },
+        }),
         cycleState: {
             ...preloadedState.cycleState,
             currentCharacterId: c5.id,

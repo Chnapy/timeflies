@@ -67,9 +67,9 @@ export const CharacterHud = (
                 return null;
             }
 
-            const { battleDataCurrent } = state.battle.snapshotState;
-            const { teamId } = battleDataCurrent.players.find(p => p.id === playerId)!;
-            const { letter } = battleDataCurrent.teams.find(t => t.id === teamId)!;
+            const { playerList, teamList } = state.battle.snapshotState;
+            const { teamId } = playerList.find(p => p.id === playerId)!;
+            const { letter } = teamList.find(t => t.id === teamId)!;
 
             return { letter, tiledSchema };
         },

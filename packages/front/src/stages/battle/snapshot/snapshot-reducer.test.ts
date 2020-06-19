@@ -1,11 +1,11 @@
-import { TimerTester, getBattleSnapshotWithHash, BattleSnapshot } from '@timeflies/shared';
+import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester } from '@timeflies/shared';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { Team } from '../entities/team/Team';
-import { SpellActionTimerEndAction, SpellActionLaunchAction } from '../spellAction/spell-action-actions';
-import { snapshotReducer, SnapshotState } from './snapshot-reducer';
+import { characterToSnapshot } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
-import { characterToSnapshot } from '../entities/character/Character';
+import { Team } from '../entities/team/Team';
+import { SpellActionLaunchAction, SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
+import { snapshotReducer, SnapshotState, getInitialSnapshotState } from './snapshot-reducer';
 
 describe('# snapshot-reducer', () => {
 
@@ -25,27 +25,19 @@ describe('# snapshot-reducer', () => {
 
         const character = seedCharacter({ id: 'c1', period: 'future' });
 
-        const initialState: SnapshotState = {
+        const initialState = getInitialSnapshotState({
             myPlayerId: 'p1',
-            launchTime: -1,
-            snapshotList: [],
             battleDataCurrent: {
                 battleHash: 'not-matter',
-                teams: [],
-                players: [],
                 characters: [],
                 spells: []
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
-                teams: [],
-                players: [],
                 characters: [ character ],
                 spells: []
-            },
-            currentSpellAction: null,
-            spellActionSnapshotList: []
-        };
+            }
+        });
 
         const state1 = snapshotReducer({
             getSpellLaunchFn: () => () => { }
@@ -63,8 +55,6 @@ describe('# snapshot-reducer', () => {
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
             time: timerTester.now,
             launchTime: -1,
-            teamsSnapshots: [],
-            playersSnapshots: [],
             charactersSnapshots: [ characterToSnapshot(character) ],
             spellsSnapshots: []
         };
@@ -79,37 +69,29 @@ describe('# snapshot-reducer', () => {
 
         it('should rollback on spell action removed', () => {
 
-            const teams: Team<any>[] = [
+            const teams: Team[] = [
                 {
                     id: 't1',
-                    period: '' as any,
                     letter: 'A',
                 }
             ];
 
             const character = seedCharacter({ id: 'c1', period: 'future' });
 
-            const initialState: SnapshotState = {
+            const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
-                launchTime: -1,
-                snapshotList: [],
+                teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-matter',
-                    teams,
-                    players: [],
                     characters: [],
                     spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
-                    teams,
-                    players: [],
                     characters: [ character ],
                     spells: []
                 },
-                currentSpellAction: null,
-                spellActionSnapshotList: []
-            };
+            });
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
@@ -157,37 +139,29 @@ describe('# snapshot-reducer', () => {
 
         it('should rollback on previous spell action removed and update current battle data', () => {
 
-            const teams: Team<any>[] = [
+            const teams: Team[] = [
                 {
                     id: 't1',
-                    period: '' as any,
                     letter: 'A',
                 }
             ];
 
             const character = seedCharacter({ id: 'c1', period: 'future' });
 
-            const initialState: SnapshotState = {
+            const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
-                launchTime: -1,
-                snapshotList: [],
+                teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-matter',
-                    teams,
-                    players: [],
                     characters: [],
                     spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
-                    teams,
-                    players: [],
                     characters: [ character ],
                     spells: []
                 },
-                currentSpellAction: null,
-                spellActionSnapshotList: []
-            };
+            });
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
@@ -235,45 +209,29 @@ describe('# snapshot-reducer', () => {
 
         it('should update current battle data from future on spell action end action', () => {
 
-            const currentTeams: Team<'current'>[] = [
+            const teams: Team[] = [
                 {
                     id: 't1',
-                    period: 'current',
-                    letter: 'A',
-                }
-            ];
-
-            const futureTeams: Team<'future'>[] = [
-                {
-                    id: 't1',
-                    period: 'future',
                     letter: 'A',
                 }
             ];
 
             const character = seedCharacter({ id: 'c1', period: 'future' });
 
-            const initialState: SnapshotState = {
+            const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
-                launchTime: -1,
-                snapshotList: [],
+                teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-matter',
-                    teams: currentTeams,
-                    players: [],
                     characters: [],
                     spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
-                    teams: futureTeams,
-                    players: [],
                     characters: [ character ],
                     spells: []
                 },
-                currentSpellAction: null,
-                spellActionSnapshotList: []
-            };
+            });
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
@@ -306,35 +264,27 @@ describe('# snapshot-reducer', () => {
 
         it('should commit on turn start with date now', () => {
 
-            const teams: Team<any>[] = [
+            const teams: Team[] = [
                 {
                     id: 't1',
-                    period: '' as any,
                     letter: 'A'
                 }
             ];
 
-            const initialState: SnapshotState = {
+            const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
-                launchTime: -1,
-                snapshotList: [],
+                teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    teams,
-                    players: [],
                     characters: [],
                     spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    teams,
-                    players: [],
                     characters: [],
                     spells: []
                 },
-                currentSpellAction: null,
-                spellActionSnapshotList: []
-            };
+            });
 
             const state1 = snapshotReducer()(initialState, BattleStateTurnStartAction({
                 turnSnapshot: {
@@ -352,55 +302,42 @@ describe('# snapshot-reducer', () => {
 
         it('should rollback to before now on turn end', () => {
 
-            const initialState: SnapshotState = {
+            const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
-                launchTime: -1,
                 snapshotList: [
                     {
                         battleHash: 'past-hash',
                         launchTime: -1,
                         time: timerTester.now - 100,
                         charactersSnapshots: [],
-                        playersSnapshots: [],
                         spellsSnapshots: [],
-                        teamsSnapshots: []
                     },
                     {
                         battleHash: 'future-hash-1',
                         launchTime: -1,
                         time: timerTester.now + 100,
                         charactersSnapshots: [],
-                        playersSnapshots: [],
                         spellsSnapshots: [],
-                        teamsSnapshots: []
                     },
                     {
                         battleHash: 'future-hash-2',
                         launchTime: -1,
                         time: timerTester.now + 200,
                         charactersSnapshots: [],
-                        playersSnapshots: [],
                         spellsSnapshots: [],
-                        teamsSnapshots: []
                     }
                 ],
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    teams: [],
-                    players: [],
                     characters: [],
                     spells: []
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    teams: [],
-                    players: [],
                     characters: [],
                     spells: []
                 },
-                currentSpellAction: null,
-                spellActionSnapshotList: []
-            };
+            });
 
             const state1 = snapshotReducer()(initialState, BattleStateTurnEndAction());
 
