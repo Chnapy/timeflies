@@ -17,7 +17,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
     extractState,
     extractFutureSpell,
     extractFutureCharacter,
-    extractFutureCharacterPositionList
+    extractFutureAliveCharacterPositionList
 }) => api => {
 
     const onTileHover = (tilePos: Position, tileType: TileType) => {
@@ -86,7 +86,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
 
             const futureCharacterPosition = extractFutureCharacter(api.getState)!.position;
             const spellArea = extractFutureSpell(api.getState)!.feature.area;
-            const charactersPos = extractFutureCharacterPositionList(api.getState)
+            const charactersPos = extractFutureAliveCharacterPositionList(api.getState)
                 .filter(p => !equals(futureCharacterPosition)(p));
 
             const tiledManager = TiledManager(tiledSchema!);

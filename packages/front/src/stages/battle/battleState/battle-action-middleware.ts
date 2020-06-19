@@ -5,10 +5,10 @@ import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
 import { BattleStateSpellPrepareAction } from './battle-state-actions';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
-    getSpellEngineFromType?: (spellType: SpellType, api: MiddlewareAPI) => SpellEngine;
+    getSpellEngineFromType?: (spellType: SpellType, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
 };
 
-const defaultGetSpellEngineFromType = <S>(spellType: SpellType, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => {
+const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType' ] = (spellType, api, deps) => {
     const spellEngineCreator = spellEngineMap[ spellType ];
 
     return spellEngineCreator(deps)(api);

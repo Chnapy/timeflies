@@ -1,4 +1,3 @@
-import { AnyAction } from '@reduxjs/toolkit';
 import { equals, getOrientationFromTo, Position, TileType, TiledManager } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
 import { ACCEPTABLE_TILES } from '../../../battleState/battle-action-reducer';
@@ -19,11 +18,24 @@ export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters
     character.orientation = orientation;
 };
 
-export const spellEngineMove: SpellEngineCreator = ({
+export type CreateTileTypeGetter = (tiledSchema: TiledMap) => (position: Position) => TileType;
+
+type Dependencies = {
+    createTileTypeGetter?: CreateTileTypeGetter;
+};
+
+const defaultCreateTileTypeGetter: CreateTileTypeGetter = tiledSchema => {
+    const tiledManager = TiledManager(tiledSchema);
+
+    return tiledManager.getTileType;
+};
+
+export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
     extractState,
-    extractFutureCharacterPositionList,
+    extractFutureAliveCharacterPositionList,
     extractFutureCharacter,
-    extractFutureSpell
+    extractFutureSpell,
+    createTileTypeGetter = defaultCreateTileTypeGetter
 }) => api => {
 
     const finder = new EasyStar.js();
@@ -31,7 +43,7 @@ export const spellEngineMove: SpellEngineCreator = ({
     const calculateEasyStarGrid = (tiledSchema: TiledMap, charactersPositionList: Position[]): number[][] => {
         const { width, height } = tiledSchema;
 
-        const tiledManager = TiledManager(tiledSchema);
+        const getTileType = createTileTypeGetter(tiledSchema);
 
         const getTileID = (p: Position, tileType: TileType): number => {
             const obstacle = tileType === 'obstacle'
@@ -50,7 +62,7 @@ export const spellEngineMove: SpellEngineCreator = ({
             easyStarGrid[ y ] = [];
             for (let x = 0; x < width; x++) {
                 const p: Position = { x, y };
-                const tileType = tiledManager.getTileType(p);
+                const tileType = getTileType(p);
 
                 easyStarGrid[ y ][ x ] = getTileID(p, tileType);
             }
@@ -63,7 +75,7 @@ export const spellEngineMove: SpellEngineCreator = ({
 
         const state = extractState(api.getState);
 
-        const characterPositionList = extractFutureCharacterPositionList(api.getState);
+        const characterPositionList = extractFutureAliveCharacterPositionList(api.getState);
 
         const easyStarGrid = calculateEasyStarGrid(state.tiledSchema!, characterPositionList);
 
@@ -128,7 +140,7 @@ export const spellEngineMove: SpellEngineCreator = ({
 
     refreshGrid();
 
-    return async (action: AnyAction) => {
+    return async action => {
 
         if (TileHoverAction.match(action)) {
             const state = extractState(api.getState);

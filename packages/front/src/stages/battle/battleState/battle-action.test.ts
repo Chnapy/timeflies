@@ -27,7 +27,7 @@ describe('# battle-action', () => {
 
         const middleware = battleActionMiddleware({
             extractState: () => initialState,
-            extractFutureCharacterPositionList: () => [ futureCharacter.position ],
+            extractFutureAliveCharacterPositionList: () => [ futureCharacter.position ],
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
             getSpellEngineFromType: () => async () => { },
