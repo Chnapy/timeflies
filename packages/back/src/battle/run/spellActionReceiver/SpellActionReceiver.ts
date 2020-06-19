@@ -2,11 +2,10 @@ import { ConfirmSAction, NotifySAction, SpellActionCAction } from '@timeflies/sh
 import { BattleStateManager } from '../battleStateManager/BattleStateManager';
 import { Cycle } from '../cycle/Cycle';
 import { Character, characterToSnapshot } from '../entities/character/Character';
-import { Player, playerToSnapshot } from '../entities/player/Player';
+import { Player } from '../entities/player/Player';
+import { spellToSnapshot } from '../entities/spell/Spell';
 import { MapManager } from '../mapManager/MapManager';
 import { SpellActionChecker } from '../spellActionChecker/SpellActionChecker';
-import { teamToSnapshot } from '../entities/team/Team';
-import { spellToSnapshot } from '../entities/spell/Spell';
 
 export interface SpellActionReceiver {
     getOnReceive(player: Player): (action: SpellActionCAction) => void;
@@ -30,7 +29,7 @@ export const SpellActionReceiver = (
     }
 ): SpellActionReceiver => {
 
-    const { get } = stateManager;
+    const { playerList, get } = stateManager;
 
     const spellActionChecker = spellActionCheckerCreator(cycle, mapManager);
 
@@ -59,8 +58,6 @@ export const SpellActionReceiver = (
                     : {
                         sendHash: action.spellAction.battleHash,
                         correctBattleSnapshot: {
-                            teamsSnapshots: get('teams').map(teamToSnapshot),
-                            playersSnapshots: get('players').map(playerToSnapshot),
                             charactersSnapshots: get('characters').map(characterToSnapshot),
                             spellsSnapshots: get('spells').map(spellToSnapshot)
                         }
@@ -80,7 +77,7 @@ export const SpellActionReceiver = (
 
                     sendConfirmAction(true, hash);
 
-                    get('players')
+                    playerList
                         .filter(p => p.id !== player.id)
                         .forEach(p => p.socket.send<NotifySAction>({
                             type: 'notify',

@@ -1,10 +1,13 @@
 import { BattleSnapshot } from "../battleStage/BattleSnapshot";
 import { GlobalTurnSnapshot } from "../cycle/GlobalTurn";
 import { TurnSnapshot } from "../cycle/Turn";
+import { PlayerSnapshot, TeamSnapshot } from '../entities';
 import { SpellActionSnapshot } from '../entities/Spell';
 import { TAction } from "./TAction";
 
 export interface BRunLaunchSAction extends TAction<'battle-run/launch'> {
+    teamSnapshotList: TeamSnapshot[];
+    playerSnapshotList: PlayerSnapshot[];
     battleSnapshot: BattleSnapshot;
     globalTurnState: GlobalTurnSnapshot;
 }

@@ -1,6 +1,8 @@
 import { BRunGlobalTurnStartSAction, BRunTurnStartSAction, getIndexGenerator, GLOBALTURN_DELAY, IndexGenerator } from "@timeflies/shared";
 import { EntitiesGetter } from '../battleStateManager/BattleStateManager';
 import { GlobalTurn } from "./turn/GlobalTurn";
+import { Player } from '../entities/player/Player';
+import { Immutable } from 'immer';
 
 export interface Cycle {
     readonly globalTurn: GlobalTurn;
@@ -8,7 +10,7 @@ export interface Cycle {
     stop(): void;
 }
 
-export const Cycle = (get: EntitiesGetter<'players' | 'characters'>): Cycle => {
+export const Cycle = (playerList: Immutable<Player[]>, get: EntitiesGetter<'characters'>): Cycle => {
 
     const generateGlobalTurnId: IndexGenerator = getIndexGenerator();
     const generateTurnId: IndexGenerator = getIndexGenerator();
@@ -26,7 +28,7 @@ export const Cycle = (get: EntitiesGetter<'players' | 'characters'>): Cycle => {
 
         if (send) {
             const snapshot = globalTurn.toSnapshot();
-            get('players').forEach(p => {
+            playerList.forEach(p => {
                 p.socket.send<BRunGlobalTurnStartSAction>({
                     type: 'battle-run/global-turn-start',
                     globalTurnState: snapshot
@@ -40,7 +42,7 @@ export const Cycle = (get: EntitiesGetter<'players' | 'characters'>): Cycle => {
     const onTurnStart = (): void => {
 
         const snapshot = globalTurn.currentTurn.toSnapshot();
-        get('players').forEach(p => {
+        playerList.forEach(p => {
             p.socket.send<BRunTurnStartSAction>({
                 type: 'battle-run/turn-start',
                 turnState: snapshot

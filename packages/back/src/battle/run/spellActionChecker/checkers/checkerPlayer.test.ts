@@ -11,8 +11,6 @@ describe('# checkerPlayer', () => {
 
     const getBattleState = (): BattleState => ({
         battleHashList: [],
-        teams: [],
-        players: [ seedPlayer({ id: 'p1' }), seedPlayer({ id: 'p2' }) ],
         characters: [ seedCharacter({
 
             alterFn: char => {
@@ -32,7 +30,7 @@ describe('# checkerPlayer', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[ 1 ];
+        const player = seedPlayer({ id: 'p2' });
 
         const get: EntitiesGetter = key => battleState[ key ];
 
@@ -60,7 +58,7 @@ describe('# checkerPlayer', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[ 0 ];
+        const player = seedPlayer({ id: 'p1' });
         const character = battleState.characters[ 0 ];
 
         const get: EntitiesGetter = key => battleState[ key ];

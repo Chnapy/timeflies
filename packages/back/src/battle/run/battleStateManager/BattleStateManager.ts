@@ -4,14 +4,12 @@ import { WSSocket } from '../../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../../room/room';
 import { createStaticCharacter } from '../createStaticCharacter';
 import { Character, characterAlterLife, characterIsAlive, characterToSnapshot } from '../entities/character/Character';
-import { Player, playerToSnapshot } from '../entities/player/Player';
+import { Player } from '../entities/player/Player';
 import { Spell, spellToSnapshot } from '../entities/spell/Spell';
-import { Team, teamToSnapshot } from '../entities/team/Team';
+import { Team } from '../entities/team/Team';
 
 export type BattleState = Immutable<{
     battleHashList: string[];
-    teams: Team[];
-    players: Player[];
     characters: Character[];
     spells: Spell[];
 }>;
@@ -19,7 +17,8 @@ export type BattleState = Immutable<{
 export type EntitiesGetter<K extends keyof BattleState = keyof BattleState> = <K2 extends K>(key: K2) => BattleState[ K2 ];
 
 export type BattleStateManager = {
-    // battleState: BattleState;
+    playerList: Player[];
+    teamList: Team[];
     generateFirstSnapshot(launchTime: number): BattleSnapshot;
     useSpellAction(spellAction: SpellActionSnapshot): {
         onClone(): {
@@ -34,69 +33,56 @@ interface Dependencies {
 }
 
 export const BattleStateManager = (
-    playerDataList: IPlayerRoomData<WSSocket>[],
-    teamRoomList: TeamRoom[],
+    playerDataList: Immutable<IPlayerRoomData<WSSocket>[]>,
+    teamRoomList: Immutable<TeamRoom[]>,
     playerRoomList: PlayerRoom[],
     { getBattleSnapshotWithHash }: Dependencies = { getBattleSnapshotWithHash: _getBattleSnapshotWithHash }
 ): BattleStateManager => {
 
-    const generateBattleState = (teamRoomList: TeamRoom[]): BattleState => {
+    const teamList = teamRoomList.map(({ id, letter }): Team => ({
+        id, letter
+    }));
 
-        const teams: Team[] = [];
-        const players: Player[] = [];
-        const characters: Character[] = [];
-        const spells: Spell[] = [];
+    const playerList = teamRoomList.flatMap(t => t.playersIds.map(pId => {
+        const { socket } = playerDataList.find(({ id }) => id === pId)!;
+        const p = playerRoomList.find(({ id }) => id === pId)!;
 
-        teamRoomList.forEach(t => {
-            teams.push(Team(t));
+        return Player(
+            p,
+            t.id,
+            socket.createPool());
+    }));
 
-            t.playersIds.forEach(pId => {
-                const { socket } = playerDataList.find(({ id }) => id === pId)!;
-                const p = playerRoomList.find(({ id }) => id === pId)!;
+    const generateBattleState = (): BattleState => {
 
-                players.push(Player(
-                    p,
-                    t.id,
-                    socket.createPool()));
+        const characters: Character[] = playerList.flatMap(({ id: pId }) => {
+            const p = playerRoomList.find(({ id }) => id === pId)!;
 
-                p.characters.forEach(c => {
-                    const staticData = createStaticCharacter(c.id, c.type);
-                    const character = Character(c, staticData, pId);
-                    characters.push(character);
+            return p.characters.map(c => {
+                const staticData = createStaticCharacter(c.id, c.type);
 
-                    character.staticData.staticSpells.forEach((s, i) => {
-                        spells.push(Spell(s, i, c.id));
-                    });
-                });
+                return Character(c, staticData, pId);
             });
         });
 
-        const battleHashList: string[] = [];
+        const spells: Spell[] = characters.flatMap(({ id: cId, staticData }) =>
+            staticData.staticSpells.map((s, i) => Spell(s, i, cId))
+        );
 
-        // const clone = (): InnerBattleState => ({
-        //     battleHashList: [ ...battleHashList ],
-        //     teams: teams.map(t => ({ ...t })),
-        //     players: players.map(p => ({ ...p })),
-        //     characters: characters.map(c => ({ ...c })),
-        //     spells: spells.map(s => ({ ...s }))
-        // });
+        const battleHashList: string[] = [];
 
         return {
             battleHashList,
-            teams,
-            players,
             characters,
             spells
         };
     };
 
-    const generateSnapshot = ({ teams, players, characters, spells }: Immutable<BattleState>, launchTime: number, time: number): BattleSnapshot => {
+    const generateSnapshot = ({ characters, spells }: Immutable<BattleState>, launchTime: number, time: number): BattleSnapshot => {
 
         return getBattleSnapshotWithHash({
             time,
             launchTime,
-            teamsSnapshots: teams.map(teamToSnapshot),
-            playersSnapshots: players.map(playerToSnapshot),
             charactersSnapshots: characters.map(characterToSnapshot),
             spellsSnapshots: spells.map(spellToSnapshot)
         });
@@ -173,12 +159,6 @@ export const BattleStateManager = (
                     return generateSnapshot(draftBattleState, -1, -1);
                 });
 
-                // const nextBattleState = produce(tempNextBattleState, draftBattleState => {
-                //     draftBattleState.battleHashList.push(snapshotClone.battleHash);
-                // });
-
-                // const snapshotClone = generateSnapshot(cloneBattleState, -1, -1);
-
                 return {
                     ifCorrectHash: (fn: (hash: string, applyOnCurrentState: () => { deaths: Character[] }) => void) => {
                         if (snapshotClone.battleHash === spellAction.battleHash) {
@@ -214,10 +194,11 @@ export const BattleStateManager = (
         return snapshot;
     };
 
-    let currentBattleState = generateBattleState(teamRoomList);
+    let currentBattleState = generateBattleState();
 
     return {
-        // get battleState() { return currentBattleState },
+        teamList,
+        playerList,
         generateFirstSnapshot,
         useSpellAction,
         get: (key) => currentBattleState[ key ]
