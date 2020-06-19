@@ -23,7 +23,7 @@ describe('# Cycle', () => {
 
     let characters: Character[];
 
-    const getter: EntitiesGetter<'players' | 'characters'> = key => ({ players, characters } as any)[ key ];
+    const getter: EntitiesGetter<'characters'> = () => characters;
 
     let cycle: Cycle;
 
@@ -65,7 +65,7 @@ describe('# Cycle', () => {
 
     it('should not start on init', () => {
 
-        const cycle = Cycle(getter);
+        const cycle = Cycle(players, getter);
 
         expect(cycle.globalTurn).toBeUndefined();
     });
@@ -76,7 +76,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle(getter);
+        cycle = Cycle(players, getter);
         cycle.start(launchTime);
 
         expect(cycle.globalTurn).toMatchObject<Partial<GlobalTurn>>({
@@ -102,7 +102,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle(getter);
+        cycle = Cycle(players, getter);
         cycle.start(launchTime);
 
         expect(on).not.toHaveBeenCalled();
@@ -135,7 +135,7 @@ describe('# Cycle', () => {
 
         const launchTime = timerTester.now;
 
-        cycle = Cycle(getter);
+        cycle = Cycle(players, getter);
         cycle.start(launchTime);
 
         let advance = 0;

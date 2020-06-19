@@ -11,10 +11,7 @@ describe('# checkerTime', () => {
 
     const getBattleState = (): BattleState => ({
         battleHashList: [],
-        teams: [],
-        players: [ seedPlayer({ id: 'p1' }) ],
         characters: [ seedCharacter({
-
             alterFn: char => {
                 char.id = 'c1';
             }
@@ -32,7 +29,7 @@ describe('# checkerTime', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[ 0 ];
+        const player = seedPlayer({ id: 'p1' });
         const character = battleState.characters[ 0 ];
         const spell = battleState.spells[ 0 ];
 
@@ -68,7 +65,7 @@ describe('# checkerTime', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[ 0 ];
+        const player = seedPlayer({ id: 'p1' });
         const character = battleState.characters[ 0 ];
         const spell = battleState.spells[ 0 ];
 
@@ -105,7 +102,7 @@ describe('# checkerTime', () => {
 
         const battleState = getBattleState();
 
-        const player = battleState.players[ 0 ];
+        const player = seedPlayer({ id: 'p1' });
         const character = battleState.characters[ 0 ];
         const spell = battleState.spells[ 0 ];
 

@@ -62,13 +62,13 @@ describe('# SpellActionReceiver', () => {
 
         const battleState: BattleState = {
             battleHashList,
-            players,
-            teams: [],
             characters: [],
             spells: []
         };
 
         const stateManager: BattleStateManager = {
+            playerList: players,
+            teamList: [],
             get: key => battleState[key],
             generateFirstSnapshot: jest.fn(),
             useSpellAction: () => ({

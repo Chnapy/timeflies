@@ -1,9 +1,11 @@
-import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
+import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom, BattleSnapshot } from '@timeflies/shared';
 import util from 'util';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { IPlayerRoomData } from '../../room/room';
 import { BattleState, BattleStateManager } from './BattleStateManager';
+import { Team } from '../entities/team/Team';
+import { Player } from '../entities/player/Player';
 
 describe('# BattleStateManager', () => {
 
@@ -37,8 +39,6 @@ describe('# BattleStateManager', () => {
 
     const extractState = (manager: BattleStateManager): BattleState => ({
         battleHashList: manager.get('battleHashList'),
-        teams: manager.get('teams'),
-        players: manager.get('players'),
         characters: manager.get('characters'),
         spells: manager.get('spells')
     });
@@ -55,16 +55,6 @@ describe('# BattleStateManager', () => {
         const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList);
 
         const expected: BattleState = {
-            teams: [ {
-                id: 't1',
-                letter: 'A'
-            } ],
-            players: [ {
-                id: 'p1',
-                name: 'p1',
-                teamId: 't1',
-                socket: expect.anything()
-            } ],
             characters: [ expect.objectContaining({
                 id: 'c1'
             }) ],
@@ -72,6 +62,20 @@ describe('# BattleStateManager', () => {
             battleHashList: []
         };
 
+        const expectedTeamList: Team[] = [ {
+            id: 't1',
+            letter: 'A'
+        } ];
+
+        const expectedPlayerList: Player[] = [ {
+            id: 'p1',
+            name: 'p1',
+            teamId: 't1',
+            socket: expect.anything()
+        } ];
+
+        expect(manager.teamList).toEqual(expectedTeamList);
+        expect(manager.playerList).toEqual(expectedPlayerList);
         expectStateIs(manager, expected);
     });
 
@@ -79,25 +83,21 @@ describe('# BattleStateManager', () => {
         const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
         const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
-            getBattleSnapshotWithHash: () => ({
+            getBattleSnapshotWithHash: (): BattleSnapshot => ({
                 launchTime: -1,
                 time: -1,
-                teamsSnapshots: [],
                 battleHash: 'hash',
                 charactersSnapshots: [],
-                playersSnapshots: [],
                 spellsSnapshots: []
             })
         });
 
         const snap = manager.generateFirstSnapshot(100);
 
-        expect(snap).toEqual({
+        expect(snap).toEqual<BattleSnapshot>({
             launchTime: -1,
             time: -1,
-            teamsSnapshots: [],
             charactersSnapshots: [],
-            playersSnapshots: [],
             spellsSnapshots: [],
             battleHash: 'hash'
         });
@@ -110,12 +110,10 @@ describe('# BattleStateManager', () => {
             const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
             const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
-                getBattleSnapshotWithHash: () => ({
+                getBattleSnapshotWithHash: (): BattleSnapshot => ({
                     launchTime: -1,
                     time: -1,
-                    teamsSnapshots: [],
                     charactersSnapshots: [],
-                    playersSnapshots: [],
                     spellsSnapshots: [],
                     battleHash: 'hash'
                 })
@@ -146,12 +144,10 @@ describe('# BattleStateManager', () => {
             const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
             const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
-                getBattleSnapshotWithHash: () => ({
+                getBattleSnapshotWithHash: (): BattleSnapshot => ({
                     launchTime: -1,
                     time: -1,
-                    teamsSnapshots: [],
                     charactersSnapshots: [],
-                    playersSnapshots: [],
                     spellsSnapshots: [],
                     battleHash: 'hash'
                 })
@@ -183,12 +179,10 @@ describe('# BattleStateManager', () => {
             const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
             const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
-                getBattleSnapshotWithHash: () => ({
+                getBattleSnapshotWithHash: (): BattleSnapshot => ({
                     launchTime: -1,
                     time: -1,
-                    teamsSnapshots: [],
                     charactersSnapshots: [],
-                    playersSnapshots: [],
                     spellsSnapshots: [],
                     battleHash: 'hash'
                 })

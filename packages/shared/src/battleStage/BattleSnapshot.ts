@@ -1,20 +1,15 @@
-import { TeamSnapshot } from "../entities/Team";
 import objectHash from 'object-hash';
-import { PlayerSnapshot, CharacterSnapshot, SpellSnapshot } from '../entities';
+import { CharacterSnapshot, SpellSnapshot } from '../entities';
 
 export interface BattleSnapshot {
     time: number;
     battleHash: string;
     launchTime: number;
-    teamsSnapshots: TeamSnapshot[];
-    playersSnapshots: PlayerSnapshot[];
     charactersSnapshots: CharacterSnapshot[];
     spellsSnapshots: SpellSnapshot[];
 }
 
 export const getBattleSnapshotWithHash = ({
-    teamsSnapshots,
-    playersSnapshots,
     charactersSnapshots,
     spellsSnapshots,
     ...rest
@@ -24,8 +19,6 @@ export const getBattleSnapshotWithHash = ({
         // TODO workaround for https://github.com/puleos/object-hash/issues/62
         JSON.parse(JSON.stringify(
             {
-                teamsSnapshots,
-                playersSnapshots,
                 charactersSnapshots,
                 spellsSnapshots,
             }
@@ -34,8 +27,6 @@ export const getBattleSnapshotWithHash = ({
     });
 
     return {
-        teamsSnapshots,
-        playersSnapshots,
         charactersSnapshots,
         spellsSnapshots,
         ...rest,
