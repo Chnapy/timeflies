@@ -8,14 +8,14 @@ import { spellEngineSimpleAttack } from './simpleAttack/spell-engine-simpleAttac
 
 export type SpellEngineDependencies<S> = {
     extractState: (getState: () => S) => BattleActionState;
-    extractFutureCharacterPositionList: (getState: () => S) => Position[];
+    extractFutureAliveCharacterPositionList: (getState: () => S) => Position[];
     extractFutureCharacter: (getState: () => S) => Character<'future'> | undefined;
     extractFutureSpell: (getState: () => S) => Spell<'future'> | undefined;
 };
 
 export type SpellEngine = (action: AnyAction) => Promise<void>;
 
-export type SpellEngineCreator = <S>(deps: SpellEngineDependencies<S>) => (api: MiddlewareAPI) => SpellEngine;
+export type SpellEngineCreator<D = {}> = <S>(deps: SpellEngineDependencies<S> & D) => (api: MiddlewareAPI) => SpellEngine;
 
 export const spellEngineMap: {
     readonly [ K in SpellType ]: SpellEngineCreator;
