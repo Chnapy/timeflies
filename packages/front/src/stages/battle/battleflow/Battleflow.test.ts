@@ -12,6 +12,7 @@ import { rootReducer } from '../../../ui/reducers/root-reducer';
 import { AnyAction } from '@reduxjs/toolkit';
 import { characterToSnapshot } from '../entities/character/Character';
 import { spellToSnapshot } from '../entities/spell/Spell';
+import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
 
 describe('Battleflow', () => {
 
@@ -86,27 +87,19 @@ describe('Battleflow', () => {
                     turnDuration: 9000,
                     turnStartTime: timerTester.now
                 },
-                snapshotState: {
+                snapshotState: getInitialSnapshotState({
                     myPlayerId: 'p1',
-                    launchTime: -1,
                     battleDataCurrent: {
                         battleHash: '',
-                        teams: [],
-                        players: [],
                         characters: [ getCharacter('current') ],
                         spells: [ getSpell('current') ]
                     },
                     battleDataFuture: {
                         battleHash: '',
-                        teams: [],
-                        players: [],
                         characters: [ getCharacter('future') ],
                         spells: [ getSpell('future') ]
                     },
-                    currentSpellAction: null,
-                    snapshotList: [],
-                    spellActionSnapshotList: []
-                }
+                })
             }
         };
 
@@ -253,8 +246,6 @@ describe('Battleflow', () => {
                 battleHash: 'first-hash',
                 launchTime: -1,
                 time: -1,
-                teamsSnapshots: [],
-                playersSnapshots: [],
                 charactersSnapshots: [],
                 spellsSnapshots: []
             } ];
@@ -298,8 +289,6 @@ describe('Battleflow', () => {
                 battleHash: 'first-hash',
                 launchTime: -1,
                 time: -1,
-                teamsSnapshots: [],
-                playersSnapshots: [],
                 charactersSnapshots: [],
                 spellsSnapshots: []
             } ];
@@ -310,8 +299,6 @@ describe('Battleflow', () => {
             const expectedSnapshot: Omit<BattleSnapshot, 'battleHash'> = {
                 launchTime: -1,
                 time: -1,
-                teamsSnapshots: [],
-                playersSnapshots: [],
                 charactersSnapshots: [
                     {
                         ...characterSnapshot,
@@ -394,8 +381,6 @@ describe('Battleflow', () => {
                 battleHash: 'first-hash',
                 launchTime: -1,
                 time: -1,
-                teamsSnapshots: [],
-                playersSnapshots: [],
                 charactersSnapshots: snapshotState.battleDataCurrent.characters.map(characterToSnapshot),
                 spellsSnapshots: [ {
                     ...snapshotState.battleDataCurrent.spells[ 0 ],

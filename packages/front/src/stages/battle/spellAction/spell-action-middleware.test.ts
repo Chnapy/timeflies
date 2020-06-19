@@ -5,7 +5,7 @@ import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battl
 import { seedCharacter } from '../entities/character/Character.seed';
 import { Spell } from '../entities/spell/Spell';
 import { seedSpell } from '../entities/spell/Spell.seed';
-import { SnapshotState } from '../snapshot/snapshot-reducer';
+import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { spellActionMiddleware } from './spell-action-middleware';
 import { SpellActionTimer } from './spell-action-timer';
@@ -51,27 +51,9 @@ describe('# spell-action-middleware', () => {
             onRemove: jest.fn()
         };
 
-        const state: SnapshotState = {
-            myPlayerId: 'p1',
-            launchTime: -1,
-            snapshotList: [],
-            battleDataCurrent: {
-                battleHash: 'not-matter',
-                teams: [],
-                characters: [],
-                players: [],
-                spells: []
-            },
-            battleDataFuture: {
-                battleHash: 'not-matter',
-                teams: [],
-                characters: [],
-                players: [],
-                spells: []
-            },
-            spellActionSnapshotList: [],
-            currentSpellAction: null
-        };
+        const state = getInitialSnapshotState({
+            myPlayerId: 'p1'
+        });
 
         return {
             futureCharacter,

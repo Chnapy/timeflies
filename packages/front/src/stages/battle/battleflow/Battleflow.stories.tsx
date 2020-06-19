@@ -166,13 +166,13 @@ export const Default: React.FC = () => {
                     startTime
                 }
             },
+            teamSnapshotList: [ t1, t2 ],
+            playerSnapshotList: [ p1, p2 ],
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: characterList,
                 launchTime: startTime,
-                playersSnapshots: [ p1, p2 ],
                 spellsSnapshots: spellList,
-                teamsSnapshots: [ t1, t2 ],
                 time: startTime
             }
         }));

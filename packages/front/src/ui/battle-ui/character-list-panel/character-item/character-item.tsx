@@ -77,7 +77,7 @@ const characterSelector = ({ snapshotState }: BattleState, characterId: string) 
 };
 
 const playerSelector = ({ snapshotState }: BattleState, playerId: string) => {
-    const player = snapshotState.battleDataCurrent.players.find(p => p.id === playerId);
+    const player = snapshotState.playerList.find(p => p.id === playerId);
     assertIsDefined(player);
 
     return player;
@@ -97,7 +97,7 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
             return 'me';
         }
 
-        const [ t1, t2 ] = battle.snapshotState.battleDataCurrent.players
+        const [ t1, t2 ] = battle.snapshotState.playerList
             .filter(p => p.id === playerId || p.id === currentPlayerId)
             .map(p => p.teamId);
 
@@ -114,7 +114,7 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
 
         const { teamId } = playerSelector(battle, playerId);
 
-        return battle.snapshotState.battleDataCurrent.teams
+        return battle.snapshotState.teamList
             .find(t => t.id === teamId)!.letter;
     });
 

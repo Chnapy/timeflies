@@ -25,7 +25,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
             const message = action.payload;
 
             if (message.type === 'battle-run/launch' && step === 'room') {
-                const { battleSnapshot, globalTurnState } = message;
+                const { teamSnapshotList, playerSnapshotList, battleSnapshot, globalTurnState } = message;
 
                 const { room, currentPlayer } = api.getState();
                 assertIsNonNullable(room);
@@ -44,6 +44,8 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                         schema,
                         imagesUrls: images
                     },
+                    teamSnapshotList,
+                    playerSnapshotList,
                     entitiesSnapshot: battleSnapshot,
                     globalTurnSnapshot: globalTurnState
                 }));

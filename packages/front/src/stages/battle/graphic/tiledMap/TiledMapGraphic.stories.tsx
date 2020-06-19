@@ -61,13 +61,13 @@ export const Default = () => {
                     startTime: Date.now()
                 }
             },
+            teamSnapshotList: [],
+            playerSnapshotList: [],
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: [],
                 launchTime: Date.now(),
-                playersSnapshots: [],
                 spellsSnapshots: [],
-                teamsSnapshots: [],
                 time: Date.now()
             }
         }));

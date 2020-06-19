@@ -28,33 +28,28 @@ export const Default: React.FC = () => {
 
     const t1 = seedTeam({
         id: 't1',
-        period: 'current',
         letter: 'A'
     });
 
     const t2 = seedTeam({
         id: 't2',
-        period: 'current',
         letter: 'B',
     });
 
     const p1 = seedPlayer({
         id: 'p1',
-        period: 'current',
         name: 'chnapy',
         teamId: t1.id
     });
 
     const p2 = seedPlayer({
         id: 'p2',
-        period: 'current',
         name: 'yoshi2oeuf',
         teamId: t1.id
     });
 
     const p3 = seedPlayer({
         id: 'p3',
-        period: 'current',
         name: 'toto',
         teamId: t2.id
     });
@@ -124,6 +119,8 @@ export const Default: React.FC = () => {
                 startTime: now
             }
         },
+        teamSnapshotList: [ t1, t2 ].map(teamToSnapshot),
+        playerSnapshotList: [ p1, p2, p3 ].map(playerToSnapshot),
         entitiesSnapshot: {
             battleHash: '',
             charactersSnapshots: [
@@ -152,9 +149,7 @@ export const Default: React.FC = () => {
                 c5,
             ].map(characterToSnapshot),
             launchTime: Date.now(),
-            playersSnapshots: [ p1, p2, p3 ].map(playerToSnapshot),
             spellsSnapshots: [],
-            teamsSnapshots: [ t1, t2 ].map(teamToSnapshot),
             time: Date.now()
         }
     }));

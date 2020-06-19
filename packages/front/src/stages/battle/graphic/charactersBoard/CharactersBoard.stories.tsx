@@ -50,11 +50,11 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
         });
 
         const team = seedTeam({
-            id: 't1', period
+            id: 't1'
         });
 
         const player = seedPlayer({
-            id: 'p1', period, teamId: 't1'
+            id: 'p1', teamId: 't1'
         });
 
         const characterList = [
@@ -98,13 +98,13 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
                     startTime: Date.now()
                 }
             },
+            playerSnapshotList: [ playerToSnapshot(player) ],
+            teamSnapshotList: [ teamToSnapshot(team) ],
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: characterList.map(characterToSnapshot),
                 launchTime: Date.now(),
-                playersSnapshots: [ playerToSnapshot(player) ],
                 spellsSnapshots: [],
-                teamsSnapshots: [ teamToSnapshot(team) ],
                 time: Date.now()
             }
         }));
