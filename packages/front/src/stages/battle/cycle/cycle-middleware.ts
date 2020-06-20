@@ -118,7 +118,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
     return (action: AnyAction) => {
 
-        next(action);
+        const ret = next(action);
 
         if (BattleStartAction.match(action)) {
 
@@ -174,5 +174,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 differTurnEnd(currentCharacterId);
             }
         }
+
+        return ret;
     };
 };

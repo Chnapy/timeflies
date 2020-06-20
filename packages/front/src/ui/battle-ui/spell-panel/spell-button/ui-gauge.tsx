@@ -60,7 +60,7 @@ export const UIGauge: React.FC<UIGaugeProps> = React.memo(({ className, variant,
 
                 setAnimation(anim);
             } catch (e) {
-                console.error(e);
+                console.warn(e);
             }
         }
 

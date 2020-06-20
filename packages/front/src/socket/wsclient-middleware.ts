@@ -54,10 +54,12 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
 
     return async (action: AnyAction) => {
 
-        next(action);
+        const ret = next(action);
 
         if (SendMessageAction.match(action)) {
             await send(action);
         }
+
+        return ret;
     };
 };

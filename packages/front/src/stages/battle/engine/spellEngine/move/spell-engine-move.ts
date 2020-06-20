@@ -72,7 +72,6 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
     };
 
     const refreshGrid = () => {
-
         const state = extractState(api.getState);
 
         const characterPositionList = extractFutureAliveCharacterPositionList(api.getState);
@@ -84,11 +83,15 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         finder.setAcceptableTiles(ACCEPTABLE_TILES);
     };
 
-    const calculatePath = async (
+    /**
+     * Important note for testing:
+     * finder.calculate() run a setTimeout(),
+     * so jest.runOnlyPendingTimers() may have to be used !
+     */
+    const calculatePath = (
         { x: startX, y: startY }: Position,
         { x: endX, y: endY }: Position
     ): Promise<Position[]> => new Promise(resolve => {
-
         finder.findPath(startX, startY, endX, endY, path => {
             resolve(path ?? []);
         });

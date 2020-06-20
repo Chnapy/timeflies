@@ -17,7 +17,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
     return async (action: Action) => {
 
-        next(action);
+        const ret = next(action);
 
         const { step } = api.getState();
 
@@ -102,5 +102,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
             }
         }
+
+        return ret;
     };
 };
