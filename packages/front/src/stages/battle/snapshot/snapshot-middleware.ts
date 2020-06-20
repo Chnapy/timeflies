@@ -22,15 +22,17 @@ export const snapshotMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
             const serializedDeathsBefore = serializeDeaths();
 
-            next(action);
+            const ret = next(action);
 
             const serializedDeathsAfter = serializeDeaths();
 
             if (serializedDeathsBefore !== serializedDeathsAfter) {
                 api.dispatch(NotifyDeathsAction());
             }
-        } else {
-            next(action);
+
+            return ret;
         }
+
+        return next(action);
     };
 };

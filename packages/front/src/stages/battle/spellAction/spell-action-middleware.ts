@@ -89,7 +89,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         const previousState = api.getState();
         const getPreviousState = () => previousState;
 
-        next(action);
+        const ret = next(action);
 
         if (BattleStateSpellLaunchAction.match(action)) {
 
@@ -179,5 +179,6 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             }
         }
 
+        return ret;
     };
 };

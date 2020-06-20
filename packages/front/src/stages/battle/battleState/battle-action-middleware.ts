@@ -39,7 +39,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
         const prevState = extractState(api.getState);
         const prevSpell = extractFutureSpell(api.getState);
 
-        next(action);
+        const ret = next(action);
 
         const nextState = extractState(api.getState);
         const nextSpell = extractFutureSpell(api.getState);
@@ -60,5 +60,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
                 }));
             }
         }
+
+        return ret;
     };
 };

@@ -20,7 +20,7 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
 
     return action => {
 
-        next(action);
+        const ret = next(action);
 
         if (ReceiveMessageAction.match(action)) {
             const { payload } = action;
@@ -31,5 +31,7 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
                 }));
             }
         }
+
+        return ret;
     };
 };
