@@ -77,24 +77,28 @@ const initStore = () => {
             },
             snapshotState: getInitialSnapshotState({
                 myPlayerId: 'p1',
-                teamList: [ {
-                    id: 't1',
-                    letter: 'A'
-                } ],
-                playerList: [ {
-                    id: 'p1',
-                    name: '',
-                    teamId: 't1'
-                } ],
+                teamList: {
+                    t1: {
+                        id: 't1',
+                        letter: 'A'
+                    }
+                },
+                playerList: {
+                    p1: {
+                        id: 'p1',
+                        name: '',
+                        teamId: 't1'
+                    }
+                },
                 battleDataCurrent: {
                     battleHash: '',
-                    characters: [ getCharacter('current') ],
-                    spells: [ getSpell('current') ]
+                    characters: { c1: getCharacter('current') },
+                    spells: { s1: getSpell('current') }
                 },
                 battleDataFuture: {
                     battleHash: '',
-                    characters: [ getCharacter('future') ],
-                    spells: [ getSpell('future') ]
+                    characters: { c1: getCharacter('future') },
+                    spells: { s1: getSpell('future') }
                 },
             })
         }

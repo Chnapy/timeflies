@@ -174,7 +174,7 @@ export const TiledMapGraphic = () => {
                 return null;
             }
 
-            const spellType = snapshotState.battleDataFuture.spells.find(s => s.id === currentSpellAction.spellId)!.staticData.type;
+            const spellType = snapshotState.battleDataFuture.spells[currentSpellAction.spellId].staticData.type;
 
             return {
                 currentSpellAction,

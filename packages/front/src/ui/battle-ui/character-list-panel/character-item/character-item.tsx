@@ -70,14 +70,14 @@ const useStyles = makeStyles(({ palette }) => ({
 }));
 
 const characterSelector = ({ snapshotState }: BattleState, characterId: string) => {
-    const character = snapshotState.battleDataCurrent.characters.find(c => c.id === characterId);
+    const character = snapshotState.battleDataCurrent.characters[characterId];
     assertIsDefined(character);
 
     return character;
 };
 
 const playerSelector = ({ snapshotState }: BattleState, playerId: string) => {
-    const player = snapshotState.playerList.find(p => p.id === playerId);
+    const player = snapshotState.playerList[playerId];
     assertIsDefined(player);
 
     return player;
@@ -97,9 +97,8 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
             return 'me';
         }
 
-        const [ t1, t2 ] = battle.snapshotState.playerList
-            .filter(p => p.id === playerId || p.id === currentPlayerId)
-            .map(p => p.teamId);
+        const t1 = battle.snapshotState.playerList[playerId].teamId;
+        const t2 = battle.snapshotState.playerList[currentPlayerId].teamId;
 
         if (t1 === t2) {
             return 'ally';
@@ -114,8 +113,7 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
 
         const { teamId } = playerSelector(battle, playerId);
 
-        return battle.snapshotState.teamList
-            .find(t => t.id === teamId)!.letter;
+        return battle.snapshotState.teamList[teamId].letter;
     });
 
     const characterType = useGameStep('battle', battle =>

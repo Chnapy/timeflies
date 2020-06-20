@@ -8,6 +8,7 @@ import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleS
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { Character } from '../entities/character/Character';
+import { Normalized } from '../entities/normalize';
 
 describe('# cycle-middleware', () => {
 
@@ -25,16 +26,16 @@ describe('# cycle-middleware', () => {
 
         it('should dispatch turn start action after some times', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1'
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2'
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -90,19 +91,19 @@ describe('# cycle-middleware', () => {
 
         it('should update current turn if same id', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2'
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -146,19 +147,19 @@ describe('# cycle-middleware', () => {
 
         it('should start it now if no current turn', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2'
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -205,19 +206,19 @@ describe('# cycle-middleware', () => {
 
         it('should add to queue if future, then start it at good time', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2'
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -285,22 +286,22 @@ describe('# cycle-middleware', () => {
 
         it('should end after some time, then start a new turn', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2',
                     features: {
                         actionTime: 1000,
                     }
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -357,22 +358,22 @@ describe('# cycle-middleware', () => {
 
         it('should ignore dead characters', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '3': seedCharacter({
                     period: 'current',
                     id: '3',
                     features: {
@@ -380,7 +381,7 @@ describe('# cycle-middleware', () => {
                         life: 0
                     }
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -440,22 +441,22 @@ describe('# cycle-middleware', () => {
 
         it('should end current turn if character died', () => {
 
-            const currentCharacters = [
-                seedCharacter({
+            const currentCharacters: Normalized<Character<'current'>> = {
+                '1': seedCharacter({
                     period: 'current',
                     id: '1',
                     features: {
                         actionTime: 1000,
                     }
                 }),
-                seedCharacter({
+                '2': seedCharacter({
                     period: 'current',
                     id: '2',
                     features: {
                         actionTime: 1000,
                     }
                 })
-            ];
+            };
 
             const api: MiddlewareAPI = {
                 dispatch: jest.fn(),
@@ -497,7 +498,7 @@ describe('# cycle-middleware', () => {
 
             timerTester.advanceBy(50);
 
-            currentCharacters[ 1 ].features.life = 0;
+            currentCharacters[ '2' ].features.life = 0;
 
             middleware(NotifyDeathsAction());
 

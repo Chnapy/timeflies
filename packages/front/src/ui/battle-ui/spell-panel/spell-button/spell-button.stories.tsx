@@ -72,21 +72,21 @@ export const Default: React.FC = () => {
             ...initialState.snapshotState,
             battleDataCurrent: {
                 ...initialState.snapshotState.battleDataCurrent,
-                characters: [
-                    seedCharacter({
+                characters: {
+                    c1: seedCharacter({
                         id: 'c1',
                         period: 'current',
                         playerId: 'p1'
                     })
-                ],
-                spells: [
-                    seedSpell({
+                },
+                spells: {
+                    s1: seedSpell({
                         id: 's1',
                         period: 'current',
                         type: 'simpleAttack',
                         characterId: 'c1'
                     })
-                ]
+                }
             }
         },
         cycleState: {
@@ -119,13 +119,13 @@ export const Default: React.FC = () => {
             ...stateDefault.snapshotState,
             battleDataCurrent: {
                 ...stateDefault.snapshotState.battleDataCurrent,
-                characters: [
-                    seedCharacter({
+                characters: {
+                    c1: seedCharacter({
                         id: 'c1',
                         period: 'current',
                         playerId: 'p2'
                     })
-                ],
+                },
             }
         }
     };

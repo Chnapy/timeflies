@@ -5,10 +5,11 @@ import { characterAlterLife } from '../../../entities/character/Character';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
+import { denormalize } from '../../../entities/normalize';
 
 export const spellLaunchSimpleAttack: SpellLaunchFn = ({ spell, actionArea }, { characters }) => {
 
-    const targets = characters.filter(c => actionArea.some(p => equals(p)(c.position)));
+    const targets = denormalize(characters).filter(c => actionArea.some(p => equals(p)(c.position)));
 
     targets.forEach(t => characterAlterLife(t, -spell.feature.attack));
 };

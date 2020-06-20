@@ -46,12 +46,12 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
         storeEmitter.onStateChange(
             ({ battle }) => {
                 const { snapshotState, } = battle;
-                const character = getBattleData(snapshotState, period).characters.find(c => c.id === characterId)!;
+                const character = getBattleData(snapshotState, period).characters[characterId];
 
                 const { currentSpellAction, battleDataFuture } = snapshotState;
 
                 if (currentSpellAction && currentSpellAction.characterId === characterId) {
-                    const spell = battleDataFuture.spells.find(s => s.id === currentSpellAction.spellId)!;
+                    const spell = battleDataFuture.spells[currentSpellAction.spellId];
 
                     const spriteState: CharacterSpriteState = spell.staticData.type === 'move' ? 'walk' : 'idle'
 

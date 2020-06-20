@@ -1,20 +1,21 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { assertIsDefined, getLast, SpellActionSnapshot, ConfirmSAction } from '@timeflies/shared';
+import { assertIsDefined, ConfirmSAction, getLast, SpellActionSnapshot } from '@timeflies/shared';
+import diffDefault from 'jest-diff';
+import { GameState } from '../../../game-state';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
+import { Normalized } from '../entities/normalize';
 import { Spell } from '../entities/spell/Spell';
 import { SnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { SpellAction } from './spell-action-reducer';
 import { SpellActionTimer } from './spell-action-timer';
-import diffDefault from 'jest-diff';
-import { GameState } from '../../../game-state';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => SnapshotState;
-    extractFutureCharacters: (getState: () => S) => Character<'future'>[];
-    extractFutureSpells: (getState: () => S) => Spell<'future'>[];
+    extractFutureCharacters: (getState: () => S) => Normalized<Character<'future'>>;
+    extractFutureSpells: (getState: () => S) => Normalized<Spell<'future'>>;
     extractFutureHash: (getState: () => S) => string;
     extractCurrentHash: (getState: () => S) => string;
     createSpellActionTimer?: typeof SpellActionTimer;
@@ -155,7 +156,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
                 const futureSpells = extractFutureSpells(api.getState);
 
-                const spell = futureSpells.find(s => s.id === spellId);
+                const spell = futureSpells[spellId];
 
                 assertIsDefined(spell);
 

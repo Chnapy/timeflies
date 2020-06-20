@@ -15,7 +15,7 @@ export const CharacterHud = (
     characterId: string
 ) => {
 
-    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters.find(c => c.id === characterId);
+    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters[characterId];
 
     const container = new PIXI.Container();
 
@@ -68,8 +68,8 @@ export const CharacterHud = (
             }
 
             const { playerList, teamList } = state.battle.snapshotState;
-            const { teamId } = playerList.find(p => p.id === playerId)!;
-            const { letter } = teamList.find(t => t.id === teamId)!;
+            const { teamId } = playerList[playerId];
+            const { letter } = teamList[teamId];
 
             return { letter, tiledSchema };
         },

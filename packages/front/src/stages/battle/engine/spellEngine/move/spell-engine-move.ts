@@ -10,7 +10,7 @@ import { SpellEngineCreator } from '../spell-engine';
 import { TiledMap } from 'tiled-types';
 
 export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
-    const character = characters.find(c => c.id === spell.characterId)!;
+    const character = characters[spell.characterId];
 
     const orientation = getOrientationFromTo(character.position, position);
 

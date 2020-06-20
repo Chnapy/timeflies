@@ -6,6 +6,7 @@ import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { getBattleData } from '../../snapshot/snapshot-reducer';
 import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
 import { shallowEqual } from 'react-redux';
+import { denormalize } from '../../entities/normalize';
 
 export interface CharactersBoard {
     readonly container: PIXI.Container;
@@ -20,7 +21,7 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
     const container = new PIXI.Container();
 
     storeEmitter.onStateChange(
-        state => getBattleData(state.battle.snapshotState, period).characters
+        state => denormalize(getBattleData(state.battle.snapshotState, period).characters)
             .filter(c => characterIsAlive(c))
             .map(c => c.id),
         charactersAliveIds => {
@@ -30,7 +31,7 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
             if (charactersAliveIds.length) {
                 charactersGraphics.push(...charactersAliveIds
                     .map(id => CharacterGraphic(id, period)));
-                    
+
                 container.addChild(...charactersGraphics.map(c => c.container));
             }
 

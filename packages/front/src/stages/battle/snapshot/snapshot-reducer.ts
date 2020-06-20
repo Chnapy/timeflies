@@ -9,13 +9,14 @@ import { Spell, spellToSnapshot } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleData, BattleDataPeriod, periodList } from './battle-data';
+import { Normalized, normalize, denormalize } from '../entities/normalize';
 
 export type SnapshotState = {
     snapshotList: BattleSnapshot[];
     myPlayerId: string;
     launchTime: number;
-    teamList: Team[];
-    playerList: Player[];
+    teamList: Normalized<Team>;
+    playerList: Normalized<Player>;
     battleDataCurrent: BattleData<'current'>;
     battleDataFuture: BattleData<'future'>;
     spellActionSnapshotList: SpellActionSnapshot[];
@@ -50,16 +51,16 @@ const assertHashIsInSnapshotList = (
 
 const getInitialBattleData = (): BattleData<any> => ({
     battleHash: '',
-    spells: [],
-    characters: [],
+    spells: {},
+    characters: {},
 });
 
 export const getInitialSnapshotState = (partial: Partial<SnapshotState> = {}): SnapshotState => ({
     snapshotList: [],
     myPlayerId: '',
     launchTime: -1,
-    teamList: [],
-    playerList: [],
+    teamList: {},
+    playerList: {},
     battleDataCurrent: getInitialBattleData(),
     battleDataFuture: getInitialBattleData(),
     spellActionSnapshotList: [],
@@ -79,8 +80,8 @@ const commit = (state: SnapshotState, time: number): void => {
     const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
         time,
         launchTime,
-        charactersSnapshots: characters.map(characterToSnapshot),
-        spellsSnapshots: spells.map(spellToSnapshot)
+        charactersSnapshots: denormalize(characters).map(characterToSnapshot),
+        spellsSnapshots: denormalize(spells).map(spellToSnapshot)
     };
 
     const snap: BattleSnapshot = getBattleSnapshotWithHash(partialSnap);
@@ -101,8 +102,21 @@ const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string,
 }: BattleSnapshot) => {
 
     data.battleHash = battleHash;
-    data.spells.forEach((s, i) => Object.assign(s, Spell(period, spellsSnapshots[ i ])));
-    data.characters.forEach((s, i) => Object.assign(s, Character(period, myPlayerId, charactersSnapshots[ i ])));
+
+    spellsSnapshots.forEach(snap => {
+        const spell = data.spells[snap.id];
+        if(spell)
+        Object.assign(spell, Spell(period, snap));
+    });
+
+    charactersSnapshots.forEach(snap => {
+        const character = data.characters[snap.id];
+        if(character)
+        Object.assign(character, Character(period, myPlayerId, snap));
+    });
+
+    // data.spells.forEach((s, i) => Object.assign(s, Spell(period, spellsSnapshots[ i ])));
+    // data.characters.forEach((s, i) => Object.assign(s, Character(period, myPlayerId, charactersSnapshots[ i ])));
     // data.spells = spellsSnapshots.map(snap => Spell(period, snap));
     // data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
 };
@@ -119,15 +133,15 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
             const { battleHash, spellsSnapshots, charactersSnapshots } = entitiesSnapshot;
 
             state.myPlayerId = myPlayerId;
-            state.teamList = teamSnapshotList.map(Team);
-            state.playerList = playerSnapshotList.map(Player);
+            state.teamList = normalize(teamSnapshotList.map(Team));
+            state.playerList = normalize(playerSnapshotList.map(Player));
             periodList.forEach(period => {
 
                 const data = getBattleData(state, period);
 
                 data.battleHash = battleHash;
-                data.spells = spellsSnapshots.map(snap => Spell(period, snap));
-                data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
+                data.spells = normalize(spellsSnapshots.map(snap => Spell(period, snap)));
+                data.characters = normalize(charactersSnapshots.map(snap => Character(period, myPlayerId, snap)));
             });
         },
         [ BattleStateTurnStartAction.type ]: (state, action: BattleStateTurnStartAction) => {

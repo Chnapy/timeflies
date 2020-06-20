@@ -4,6 +4,7 @@ import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { CharacterItem } from './character-item/character-item';
 import { shallowEqual } from 'react-redux';
+import { denormalize } from '../../../stages/battle/entities/normalize';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -25,13 +26,13 @@ export const CharacterListPanel: React.FC = () => {
 
     const [ current, ...charactersIds ] = useGameStep(
         'battle',
-        ({ snapshotState, cycleState }) => snapshotState.battleDataCurrent.characters
+        ({ snapshotState, cycleState }) => denormalize(snapshotState.battleDataCurrent.characters)
             .map(c => c.id)
             .sort((a, b) => cycleState.currentCharacterId === a ? -1 : 1),
         shallowEqual
     );
-    
-    if(!current) {
+
+    if (!current) {
         return null;
     }
 

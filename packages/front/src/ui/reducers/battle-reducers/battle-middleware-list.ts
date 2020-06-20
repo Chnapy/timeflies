@@ -3,6 +3,7 @@ import { GameState } from '../../../game-state';
 import { battleActionMiddleware } from '../../../stages/battle/battleState/battle-action-middleware';
 import { cycleMiddleware } from '../../../stages/battle/cycle/cycle-middleware';
 import { characterIsAlive } from '../../../stages/battle/entities/character/Character';
+import { denormalize } from '../../../stages/battle/entities/normalize';
 import { snapshotMiddleware } from '../../../stages/battle/snapshot/snapshot-middleware';
 import { spellActionMiddleware } from '../../../stages/battle/spellAction/spell-action-middleware';
 
@@ -10,14 +11,13 @@ const extractFutureCharacter = (getState: () => GameState) => {
     const state = getState().battle;
     const { currentCharacterId } = state.cycleState;
 
-    return state.snapshotState.battleDataFuture.characters
-        .find(c => c.id === currentCharacterId);
+    return state.snapshotState.battleDataFuture.characters[ currentCharacterId ];
 };
 
 export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
     battleActionMiddleware<GameState>({
         extractState: getState => getState().battle.battleActionState,
-        extractFutureAliveCharacterPositionList: getState => getState().battle.snapshotState.battleDataFuture.characters
+        extractFutureAliveCharacterPositionList: getState => denormalize(getState().battle.snapshotState.battleDataFuture.characters)
             .filter(characterIsAlive)
             .map(c => c.position),
         extractFutureCharacter,
@@ -28,7 +28,7 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
 
             const { spells } = snapshotState.battleDataFuture;
 
-            return spells.find(s => s.id === selectedSpellId);
+            return selectedSpellId ? spells[ selectedSpellId ] : undefined;
         }
     }),
     cycleMiddleware<GameState>({
