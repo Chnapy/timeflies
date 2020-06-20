@@ -90,13 +90,13 @@ export const Default: React.FC = () => {
         ...preloadedState,
         snapshotState: getInitialSnapshotState({
             ...preloadedState.snapshotState,
-            teamList: [ t1, t2 ],
-            playerList: [ p1, p2, p3 ],
+            teamList: { t1, t2 },
+            playerList: { p1, p2, p3 },
             battleDataCurrent: {
                 ...preloadedState.snapshotState.battleDataCurrent,
-                characters: [
+                characters: {
                     c1,
-                    seedCharacter({
+                    c2: seedCharacter({
                         id: 'c2',
                         period: 'current',
                         type: 'sampleChar2',
@@ -106,7 +106,7 @@ export const Default: React.FC = () => {
                         },
                         playerId: p2.id
                     }),
-                    seedCharacter({
+                    c3: seedCharacter({
                         id: 'c3',
                         period: 'current',
                         type: 'sampleChar1',
@@ -118,9 +118,9 @@ export const Default: React.FC = () => {
                     }),
                     c4,
                     c5,
-                ],
-                spells: [
-                    seedSpell({
+                },
+                spells: {
+                    s1: seedSpell({
                         id: 's1',
                         period: 'current',
                         type: 'move',
@@ -132,7 +132,7 @@ export const Default: React.FC = () => {
                         index: 1,
                         characterId: c5.id
                     }),
-                    seedSpell({
+                    s2: seedSpell({
                         id: 's2',
                         period: 'current',
                         type: 'simpleAttack',
@@ -144,7 +144,7 @@ export const Default: React.FC = () => {
                         index: 2,
                         characterId: c5.id
                     }),
-                    seedSpell({
+                    s3: seedSpell({
                         id: 's3',
                         period: 'current',
                         type: 'simpleAttack',
@@ -156,7 +156,7 @@ export const Default: React.FC = () => {
                         index: 3,
                         characterId: c5.id
                     }),
-                    seedSpell({
+                    s4: seedSpell({
                         id: 's4',
                         period: 'current',
                         type: 'simpleAttack',
@@ -168,7 +168,7 @@ export const Default: React.FC = () => {
                         index: 4,
                         characterId: c5.id
                     }),
-                ]
+                }
             }
         }),
         cycleState: {

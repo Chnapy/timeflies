@@ -60,7 +60,7 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
     storeEmitter.onStateChange(
         state => {
             const { tiledSchema } = state.battle.battleActionState;
-            const { position } = getBattleData(state.battle.snapshotState, period).characters.find(c => c.id === characterId)!;
+            const { position } = getBattleData(state.battle.snapshotState, period).characters[characterId];
 
             return {
                 tiledSchema,
@@ -136,7 +136,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
         ({ battle }) => {
             const { tiledSchema } = battle.battleActionState;
             const { currentSpellAction, battleDataCurrent } = battle.snapshotState;
-            const characterPosition = battleDataCurrent.characters.find(c => c.id === characterId)!.position;
+            const characterPosition = battleDataCurrent.characters[characterId].position;
             if (!tiledSchema || currentSpellAction?.characterId !== characterId) {
                 return {
                     state: 'no-spell' as const,
@@ -145,7 +145,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
                 };
             }
 
-            const spellType = battleDataCurrent.spells.find(s => s.id === currentSpellAction.spellId)!.staticData.type;
+            const spellType = battleDataCurrent.spells[currentSpellAction.spellId].staticData.type;
 
             return {
                 state: 'current-spell' as const,
@@ -205,7 +205,7 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
             if (state.battle.cycleState.currentCharacterId !== characterId) {
                 return null;
             }
-            const { staticData, orientation } = state.battle.snapshotState.battleDataFuture.characters.find(c => c.id === characterId)!;
+            const { staticData, orientation } = state.battle.snapshotState.battleDataFuture.characters[characterId];
 
             return {
                 type: staticData.type,

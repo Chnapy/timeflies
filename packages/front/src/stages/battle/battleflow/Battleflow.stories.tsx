@@ -193,7 +193,7 @@ export const Default: React.FC = () => {
 
     const notifyFn = () => {
 
-        const { position } = storeManager.getState().battle.snapshotState.battleDataCurrent.characters.find(c => c.id === 'c2')!;
+        const { position } = storeManager.getState().battle.snapshotState.battleDataCurrent.characters.c2;
 
         const newPosition = {
             ...position,

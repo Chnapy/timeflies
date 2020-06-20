@@ -82,8 +82,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -125,8 +125,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -158,8 +158,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -188,8 +188,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -223,8 +223,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -262,8 +262,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -298,8 +298,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -328,8 +328,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -368,15 +368,15 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
             })(api)(next)(action);
 
             jest.runOnlyPendingTimers();
-            
+
             expect(api.dispatch).toHaveBeenNthCalledWith(1, SpellActionCancelAction({
                 spellActionSnapshotsValids: state.spellActionSnapshotList.slice(0, 1)
             }));
@@ -412,8 +412,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
@@ -446,8 +446,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -487,8 +487,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
@@ -518,8 +518,8 @@ describe('# spell-action-middleware', () => {
 
             spellActionMiddleware({
                 createSpellActionTimer: () => timer,
-                extractFutureCharacters: () => [ futureCharacter ],
-                extractFutureSpells: () => [ spell ],
+                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+                extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state

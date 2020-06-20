@@ -24,11 +24,8 @@ export interface SpellButtonProps {
 
 export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) => {
 
-    const spellIndex = useGameStep('battle', ({ snapshotState }) =>
-        snapshotState.battleDataCurrent.spells.findIndex(s => s.id === spellId));
-
     const selectSpell = ({ snapshotState }: BattleState): Spell<'current'> =>
-        snapshotState.battleDataCurrent.spells[ spellIndex ];
+        snapshotState.battleDataCurrent.spells[ spellId ];
 
     const now = Date.now();
 
@@ -92,8 +89,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     const disableReason = useGameSelector(gameState => {
         const { snapshotState, cycleState } = gameState.battle;
 
-        const currentCharacter = snapshotState.battleDataCurrent.characters
-            .find(c => c.id === cycleState.currentCharacterId)!;
+        const currentCharacter = snapshotState.battleDataCurrent.characters[ cycleState.currentCharacterId ];
 
         if (!playerIsMine(gameState, currentCharacter.playerId)) {
             return 'player';
@@ -114,8 +110,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         dispatchSpellPrepare: () => {
             const { battleDataFuture } = store.getState().battle.snapshotState;
 
-            const futureSpell = battleDataFuture.spells.find(s => s.id === spellId)!;
-            const futureCharacter = battleDataFuture.characters.find(c => c.id === futureSpell.characterId)!;
+            const futureSpell = battleDataFuture.spells[ spellId ];
+            const futureCharacter = battleDataFuture.characters[ futureSpell.characterId ];
 
             return BattleStateSpellPrepareAction({
                 futureSpell,

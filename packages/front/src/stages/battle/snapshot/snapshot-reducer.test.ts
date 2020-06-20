@@ -5,7 +5,8 @@ import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { Team } from '../entities/team/Team';
 import { SpellActionLaunchAction, SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
-import { snapshotReducer, SnapshotState, getInitialSnapshotState } from './snapshot-reducer';
+import { snapshotReducer, getInitialSnapshotState } from './snapshot-reducer';
+import { Normalized } from '../entities/normalize';
 
 describe('# snapshot-reducer', () => {
 
@@ -29,13 +30,13 @@ describe('# snapshot-reducer', () => {
             myPlayerId: 'p1',
             battleDataCurrent: {
                 battleHash: 'not-matter',
-                characters: [],
-                spells: []
+                characters: {},
+                spells: {}
             },
             battleDataFuture: {
                 battleHash: 'not-matter',
-                characters: [ character ],
-                spells: []
+                characters: { [ character.id ]: character },
+                spells: {}
             }
         });
 
@@ -69,12 +70,12 @@ describe('# snapshot-reducer', () => {
 
         it('should rollback on spell action removed', () => {
 
-            const teams: Team[] = [
-                {
+            const teams: Normalized<Team> = {
+                t1: {
                     id: 't1',
                     letter: 'A',
                 }
-            ];
+            };
 
             const character = seedCharacter({ id: 'c1', period: 'future' });
 
@@ -83,19 +84,19 @@ describe('# snapshot-reducer', () => {
                 teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-matter',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
-                    characters: [ character ],
-                    spells: []
+                    characters: { [ character.id ]: character },
+                    spells: {}
                 },
             });
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters[ 0 ].features.life = 50;
+                    characters['c1'].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
@@ -114,7 +115,7 @@ describe('# snapshot-reducer', () => {
 
             const state2 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters[ 0 ].features.life = 20;
+                    characters['c1'].features.life = 20;
                 }
             })(state1, SpellActionLaunchAction({
                 spellActList: [ {
@@ -134,17 +135,17 @@ describe('# snapshot-reducer', () => {
             }));
 
             expect(state3.battleDataFuture.battleHash).toBe(firstHash);
-            expect(state3.battleDataFuture.characters[ 0 ].features.life).toBe(50);
+            expect(state3.battleDataFuture.characters['c1'].features.life).toBe(50);
         });
 
         it('should rollback on previous spell action removed and update current battle data', () => {
 
-            const teams: Team[] = [
-                {
+            const teams: Normalized<Team> = {
+                t1: {
                     id: 't1',
                     letter: 'A',
                 }
-            ];
+            };
 
             const character = seedCharacter({ id: 'c1', period: 'future' });
 
@@ -153,19 +154,19 @@ describe('# snapshot-reducer', () => {
                 teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-matter',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
-                    characters: [ character ],
-                    spells: []
+                    characters: { [ character.id ]: character },
+                    spells: {}
                 },
             });
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters[ 0 ].features.life = 50;
+                    characters['c1'].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
@@ -184,7 +185,7 @@ describe('# snapshot-reducer', () => {
 
             const state2 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters[ 0 ].features.life = 20;
+                    characters['c1'].features.life = 20;
                 }
             })(state1, SpellActionLaunchAction({
                 spellActList: [ {
@@ -209,33 +210,34 @@ describe('# snapshot-reducer', () => {
 
         it('should update current battle data from future on spell action end action', () => {
 
-            const teams: Team[] = [
-                {
+            const teams: Normalized<Team> = {
+                t1: {
                     id: 't1',
                     letter: 'A',
                 }
-            ];
+            };
 
-            const character = seedCharacter({ id: 'c1', period: 'future' });
+            const characterFuture = seedCharacter({ id: 'c1', period: 'future' });
+            const characterCurrent = seedCharacter({ id: 'c1', period: 'current' });
 
             const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
                 teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-matter',
-                    characters: [],
-                    spells: []
+                    characters: { [ characterCurrent.id ]: characterCurrent },
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-matter',
-                    characters: [ character ],
-                    spells: []
+                    characters: { [ characterFuture.id ]: characterFuture },
+                    spells: {}
                 },
             });
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters[ 0 ].features.life = 50;
+                    characters['c1'].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
@@ -264,25 +266,25 @@ describe('# snapshot-reducer', () => {
 
         it('should commit on turn start with date now', () => {
 
-            const teams: Team[] = [
-                {
+            const teams: Normalized<Team> = {
+                t1: {
                     id: 't1',
                     letter: 'A'
                 }
-            ];
+            };
 
             const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
                 teamList: teams,
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
             });
 
@@ -329,13 +331,13 @@ describe('# snapshot-reducer', () => {
                 ],
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
             });
 

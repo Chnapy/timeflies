@@ -13,6 +13,7 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { characterToSnapshot } from '../entities/character/Character';
 import { spellToSnapshot } from '../entities/spell/Spell';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
+import { denormalize } from '../entities/normalize';
 
 describe('Battleflow', () => {
 
@@ -91,13 +92,13 @@ describe('Battleflow', () => {
                     myPlayerId: 'p1',
                     battleDataCurrent: {
                         battleHash: '',
-                        characters: [ getCharacter('current') ],
-                        spells: [ getSpell('current') ]
+                        characters: { c1: getCharacter('current') },
+                        spells: { s1: getSpell('current') }
                     },
                     battleDataFuture: {
                         battleHash: '',
-                        characters: [ getCharacter('future') ],
-                        spells: [ getSpell('future') ]
+                        characters: { c1: getCharacter('future') },
+                        spells: { s1: getSpell('future') }
                     },
                 })
             }
@@ -280,8 +281,8 @@ describe('Battleflow', () => {
                 }
             });
 
-            snapshotState.battleDataCurrent.spells.push(getSpell('current'));
-            snapshotState.battleDataFuture.spells.push(getSpell('future'));
+            snapshotState.battleDataCurrent.spells.s2 = getSpell('current');
+            snapshotState.battleDataFuture.spells.s2 = getSpell('future');
             battleActionState.selectedSpellId = 's2';
             battleActionState.currentAction = 'spellPrepare';
 
@@ -293,8 +294,8 @@ describe('Battleflow', () => {
                 spellsSnapshots: []
             } ];
 
-            const characterSnapshot = characterToSnapshot(initialState.battle.snapshotState.battleDataCurrent.characters[ 0 ]);
-            const spellsSnapshots = initialState.battle.snapshotState.battleDataCurrent.spells.map(spellToSnapshot);
+            const characterSnapshot = characterToSnapshot(initialState.battle.snapshotState.battleDataCurrent.characters.c1);
+            const spellsSnapshots = denormalize(initialState.battle.snapshotState.battleDataCurrent.spells).map(spellToSnapshot);
 
             const expectedSnapshot: Omit<BattleSnapshot, 'battleHash'> = {
                 launchTime: -1,
@@ -321,7 +322,7 @@ describe('Battleflow', () => {
 
             jest.runOnlyPendingTimers();
 
-            expect(store.getState().battle.snapshotState.battleDataFuture.characters[ 0 ].features.life).toBe(80);
+            expect(store.getState().battle.snapshotState.battleDataFuture.characters.c1.features.life).toBe(80);
 
             expect(actionList).toContainEqual(SendMessageAction({
                 type: 'battle/spellAction',
@@ -381,9 +382,9 @@ describe('Battleflow', () => {
                 battleHash: 'first-hash',
                 launchTime: -1,
                 time: -1,
-                charactersSnapshots: snapshotState.battleDataCurrent.characters.map(characterToSnapshot),
+                charactersSnapshots: denormalize(snapshotState.battleDataCurrent.characters).map(characterToSnapshot),
                 spellsSnapshots: [ {
-                    ...snapshotState.battleDataCurrent.spells[ 0 ],
+                    ...snapshotState.battleDataCurrent.spells.s1,
                     features: {
                         area: -1,
                         attack: 10,
@@ -407,7 +408,7 @@ describe('Battleflow', () => {
 
             expect(state1.battle.snapshotState.battleDataCurrent.battleHash).toEqual('first-hash');
             expect(state1.battle.snapshotState.battleDataFuture.battleHash).toEqual('first-hash');
-            expect(state1.battle.snapshotState.battleDataCurrent.spells[ 0 ].feature).toEqual(snapshotState.snapshotList[ 0 ].spellsSnapshots[ 0 ].features);
+            expect(state1.battle.snapshotState.battleDataCurrent.spells.s1.feature).toEqual(snapshotState.snapshotList[ 0 ].spellsSnapshots[ 0 ].features);
             expect(state1.battle.snapshotState.currentSpellAction).toEqual(null);
             expect(state1.battle.snapshotState.spellActionSnapshotList).toEqual([]);
         });

@@ -34,7 +34,7 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
 
         const spellAction = spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime)!;
 
-        const { index } = snapshotState.battleDataCurrent.spells.find(s => s.id === spellAction.spellId)!;
+        const { index } = snapshotState.battleDataCurrent.spells[spellAction.spellId];
 
         return index;
     });

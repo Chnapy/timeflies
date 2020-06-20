@@ -6,10 +6,11 @@ import { NotifyDeathsAction } from './cycle-manager-actions';
 import { BattleStartAction } from '../battle-actions';
 import { TurnSnapshot, TURN_DELAY } from '@timeflies/shared';
 import { CycleState, getTurnState } from './cycle-reducer';
+import { Normalized } from '../entities/normalize';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => CycleState;
-    extractCurrentCharacters: (getState: () => S) => Character<'current'>[];
+    extractCurrentCharacters: (getState: () => S) => Normalized<Character<'current'>>;
 };
 
 export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
@@ -17,16 +18,11 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractCurrentCharacters
 }) => api => next => {
 
-    const getCharacter = (characterId: string): Character<'current'> => extractCurrentCharacters(api.getState)
-        .find(c => c.id === characterId)!;
+    const getCharacter = (characterId: string): Character<'current'> => extractCurrentCharacters(api.getState)[characterId];
 
     const isCharacterDead = (characterId: string) => {
 
-        const charactersDeadsIds = extractCurrentCharacters(api.getState)
-            .filter(c => !characterIsAlive(c))
-            .map(c => c.id);
-
-        return charactersDeadsIds.includes(characterId);
+        return !characterIsAlive(extractCurrentCharacters(api.getState)[characterId]);
     };
 
     const getNextCharacterInfos = (currentCharacterId: string, index: number = 0): {
@@ -61,8 +57,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
         timeout = setTimeout(() => {
 
-            const currentCharacter = extractCurrentCharacters(api.getState)
-                .find(c => c.id === turnSnapshot.characterId)!;
+            const currentCharacter = extractCurrentCharacters(api.getState)[turnSnapshot.characterId];
 
             api.dispatch(BattleStateTurnStartAction({
                 turnSnapshot,

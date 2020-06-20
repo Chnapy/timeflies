@@ -4,6 +4,8 @@ import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { getInitialSnapshotState, snapshotReducer } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction } from './spell-action-actions';
+import { Normalized } from '../entities/normalize';
+import { Spell } from '../entities/spell/Spell';
 
 describe('# spell-action-reducer', () => {
 
@@ -11,23 +13,23 @@ describe('# spell-action-reducer', () => {
 
         it('should store snapshot list', () => {
 
-            const spells = [
-                seedSpell({ id: 's1', period: 'future', characterId: 'c1' }),
-                seedSpell({ id: 's2', period: 'future', characterId: 'c1' })
-            ];
+            const spells: Normalized<Spell<'future'>> = {
+                s1: seedSpell({ id: 's1', period: 'future', characterId: 'c1' }),
+                s2: seedSpell({ id: 's2', period: 'future', characterId: 'c1' })
+            };
 
             const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    characters: [
-                        seedCharacter({ id: 'c1', period: 'future' })
-                    ],
+                    characters: {
+                        c1: seedCharacter({ id: 'c1', period: 'future' })
+                    },
                     spells
                 },
             });
@@ -38,7 +40,7 @@ describe('# spell-action-reducer', () => {
                 spellActList: [
                     {
                         spellAction: {
-                            spell: spells[ 0 ],
+                            spell: spells.s1,
                             position: { x: 0, y: 0 },
                             actionArea: []
                         },
@@ -46,7 +48,7 @@ describe('# spell-action-reducer', () => {
                     },
                     {
                         spellAction: {
-                            spell: spells[ 1 ],
+                            spell: spells.s2,
                             position: { x: 0, y: 0 },
                             actionArea: []
                         },
@@ -71,22 +73,22 @@ describe('# spell-action-reducer', () => {
 
         it('should not set current spell if already defined', () => {
 
-            const spells = [
-                seedSpell({ id: 's1', period: 'future', characterId: 'c1' })
-            ];
+            const spells: Normalized<Spell<'future'>> = {
+                s1: seedSpell({ id: 's1', period: 'future', characterId: 'c1' })
+            };
 
             const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    characters: [
-                        seedCharacter({ id: 'c1', period: 'future' })
-                    ],
+                    characters: {
+                        c1: seedCharacter({ id: 'c1', period: 'future' })
+                    },
                     spells
                 },
                 currentSpellAction: seedSpellActionSnapshot('s0'),
@@ -96,7 +98,7 @@ describe('# spell-action-reducer', () => {
                 spellActList: [
                     {
                         spellAction: {
-                            spell: spells[ 0 ],
+                            spell: spells.s1,
                             position: { x: 0, y: 0 },
                             actionArea: []
                         },
@@ -110,23 +112,23 @@ describe('# spell-action-reducer', () => {
 
         it('should set current spell if not defined', () => {
 
-            const spells = [
-                seedSpell({ id: 's1', period: 'future', characterId: 'c1' }),
-                seedSpell({ id: 's2', period: 'future', characterId: 'c1' })
-            ];
+            const spells: Normalized<Spell<'future'>> = {
+                s1: seedSpell({ id: 's1', period: 'future', characterId: 'c1' }),
+                s2: seedSpell({ id: 's2', period: 'future', characterId: 'c1' })
+            };
 
             const initialState = getInitialSnapshotState({
                 myPlayerId: 'p1',
                 battleDataCurrent: {
                     battleHash: 'not-defined-current',
-                    characters: [],
-                    spells: []
+                    characters: {},
+                    spells: {}
                 },
                 battleDataFuture: {
                     battleHash: 'not-defined-future',
-                    characters: [
-                        seedCharacter({ id: 'c1', period: 'future' })
-                    ],
+                    characters: {
+                        c1: seedCharacter({ id: 'c1', period: 'future' })
+                    },
                     spells
                 },
             });
@@ -137,7 +139,7 @@ describe('# spell-action-reducer', () => {
                 spellActList: [
                     {
                         spellAction: {
-                            spell: spells[ 0 ],
+                            spell: spells.s1,
                             position: { x: 0, y: 0 },
                             actionArea: []
                         },
@@ -145,7 +147,7 @@ describe('# spell-action-reducer', () => {
                     },
                     {
                         spellAction: {
-                            spell: spells[ 1 ],
+                            spell: spells.s2,
                             position: { x: 0, y: 0 },
                             actionArea: []
                         },
@@ -163,10 +165,10 @@ describe('# spell-action-reducer', () => {
 
     it('should reset current spell on spell timer end action', () => {
 
-        const spells = [
-            seedSpell({ id: 's1', period: 'future', characterId: 'c1' }),
-            seedSpell({ id: 's2', period: 'future', characterId: 'c1' })
-        ];
+        const spells: Normalized<Spell<'future'>> = {
+            s1: seedSpell({ id: 's1', period: 'future', characterId: 'c1' }),
+            s2: seedSpell({ id: 's2', period: 'future', characterId: 'c1' })
+        };
 
         const initialState = getInitialSnapshotState({
             myPlayerId: 'p1',
@@ -179,14 +181,14 @@ describe('# spell-action-reducer', () => {
             } ],
             battleDataCurrent: {
                 battleHash: 'not-defined-current',
-                characters: [],
-                spells: []
+                characters: {},
+                spells: {}
             },
             battleDataFuture: {
                 battleHash: 'not-defined-future',
-                characters: [
-                    seedCharacter({ id: 'c1', period: 'future' })
-                ],
+                characters: {
+                    c1: seedCharacter({ id: 'c1', period: 'future' })
+                },
                 spells
             },
             currentSpellAction: seedSpellActionSnapshot('s1'),

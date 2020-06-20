@@ -26,15 +26,15 @@ export const Default: React.FC = () => {
             ...preloadedState.snapshotState,
             battleDataCurrent: {
                 ...preloadedState.snapshotState.battleDataCurrent,
-                characters: [
-                    seedCharacter({
+                characters: {
+                    c1: seedCharacter({
                         id: 'c1',
                         period: 'current',
                         playerId: 'p1'
                     })
-                ],
-                spells: [
-                    seedSpell({
+                },
+                spells: {
+                    s1: seedSpell({
                         id: 's1',
                         period: 'current',
                         type: 'simpleAttack',
@@ -45,7 +45,7 @@ export const Default: React.FC = () => {
                         },
                         characterId: 'c1'
                     }),
-                    seedSpell({
+                    s2: seedSpell({
                         id: 's2',
                         period: 'current',
                         type: 'simpleAttack',
@@ -56,7 +56,7 @@ export const Default: React.FC = () => {
                         },
                         characterId: 'c1'
                     }),
-                    seedSpell({
+                    s3: seedSpell({
                         id: 's3',
                         period: 'current',
                         type: 'simpleAttack',
@@ -67,7 +67,7 @@ export const Default: React.FC = () => {
                         },
                         characterId: 'c1'
                     })
-                ]
+                }
             },
             spellActionSnapshotList: [
                 seedSpellActionSnapshot('s3', {

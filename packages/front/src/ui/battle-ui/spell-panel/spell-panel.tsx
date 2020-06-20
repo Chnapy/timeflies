@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { SpellButton } from './spell-button/spell-button';
+import { denormalize } from '../../../stages/battle/entities/normalize';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -27,7 +28,7 @@ export const SpellPanel: React.FC = () => {
 
             const { currentCharacterId } = cycleState;
 
-            const spellIdList = snapshotState.battleDataCurrent.spells
+            const spellIdList = denormalize(snapshotState.battleDataCurrent.spells)
                 .filter(s => s.characterId === currentCharacterId)
                 .map(s => s.id);
 
