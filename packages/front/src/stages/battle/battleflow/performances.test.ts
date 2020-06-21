@@ -1,6 +1,6 @@
 import { runBenchmark } from './benchmark-redux';
 
-describe('[LOCAL] performances', () => {
+describe.skip('[LOCAL] performances', () => {
     jest.setTimeout(1000000);
 
     it('move actions', async () => {

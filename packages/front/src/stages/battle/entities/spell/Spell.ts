@@ -30,29 +30,4 @@ export const Spell = <P extends BattleDataPeriod>(period: P, { index, staticData
         feature: features,
         characterId
     };
-
-    // return {
-    //     period,
-    //     get id(): string {
-    //         return staticData.id;
-    //     },
-    //     index,
-    //     staticData,
-    //     get feature(): Readonly<SpellFeatures> {
-    //         return features;
-    //     },
-    //     character,
-
-    //     getSnapshot(): SpellSnapshot {
-    //         return {
-    //             id: staticData.id,
-    //             index,
-    //             staticData,
-    //             features: { ...features }
-    //         };
-    //     },
-
-    //     updateFromSnapshot(snapshot: SpellSnapshot) {
-    //     }
-    // }
 };

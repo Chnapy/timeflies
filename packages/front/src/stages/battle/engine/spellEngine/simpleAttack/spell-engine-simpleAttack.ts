@@ -1,15 +1,15 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { equals, Position, TiledManager, TileType, BresenhamPoint } from '@timeflies/shared';
-import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction, BattleStateSpellPrepareAction } from '../../../battleState/battle-state-actions';
+import { BresenhamPoint, Position, TiledManager, TileType } from '@timeflies/shared';
+import { BattleMapPathAction, BattleStateSpellLaunchAction, BattleStateSpellPrepareAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { characterAlterLife } from '../../../entities/character/Character';
+import { denormalize, normalize } from '../../../entities/normalize';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
-import { denormalize } from '../../../entities/normalize';
 
 export const spellLaunchSimpleAttack: SpellLaunchFn = ({ spell, actionArea }, { characters }) => {
 
-    const targets = denormalize(characters).filter(c => actionArea.some(p => equals(p)(c.position)));
+    const targets = denormalize(characters).filter(c => !!actionArea[ c.position.id ]);
 
     targets.forEach(t => characterAlterLife(t, -spell.feature.attack));
 };
@@ -24,14 +24,14 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
     const onTileHover = (tilePos: Position, tileType: TileType) => {
         const { tiledSchema, rangeArea } = extractState(api.getState);
 
-        const isInArea = rangeArea.some(equals(tilePos));
+        const isInArea = rangeArea[ tilePos.id ];
         if (!isInArea) {
             return;
         }
 
         const tiledManager = TiledManager(tiledSchema!);
 
-        const actionArea = tiledManager.getArea(tilePos, 1);
+        const actionArea = normalize(tiledManager.getArea(tilePos, 1));
 
         api.dispatch(BattleMapPathAction({
             actionArea
@@ -41,7 +41,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
     const onTileClick = (tilePos: Position, tileType: TileType) => {
         const { tiledSchema, rangeArea } = extractState(api.getState);
 
-        const isInArea = rangeArea.some(equals(tilePos));
+        const isInArea = !!rangeArea[ tilePos.id ];
         if (!isInArea) {
             return;
         }
@@ -50,7 +50,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
 
         const spell = extractFutureSpell(api.getState)!;
 
-        const actionArea = tiledManager.getArea(tilePos, 1);
+        const actionArea = normalize(tiledManager.getArea(tilePos, 1));
 
         const spellAction: SpellAction = {
             spell,
@@ -69,7 +69,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const state = extractState(api.getState);
 
             const { position } = action.payload;
-            const tile = state.grid.find(t => equals(t.position)(position))!;
+            const tile = state.grid[ position.id ];
 
             await onTileHover(position, tile.tileType);
 
@@ -77,7 +77,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const state = extractState(api.getState);
 
             const { position } = action.payload;
-            const tile = state.grid.find(t => equals(t.position)(position))!;
+            const tile = state.grid[ position.id ];
 
             await onTileClick(position, tile.tileType);
 
@@ -88,7 +88,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const futureCharacterPosition = extractFutureCharacter(api.getState)!.position;
             const spellArea = extractFutureSpell(api.getState)!.feature.area;
             const charactersPos = extractFutureAliveCharacterPositionList(api.getState)
-                .filter(p => !equals(futureCharacterPosition)(p));
+                .filter(p => p.id !== futureCharacterPosition.id);
 
             const tiledManager = TiledManager(tiledSchema!);
 
@@ -98,14 +98,14 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
                     return 'no';
                 }
 
-                if (charactersPos.some(equals(position))) {
+                if (charactersPos.some(p => p.id === position.id)) {
                     return 'last';
                 }
 
                 return 'yes';
             };
 
-            const rangeArea = tiledManager.getArea(futureCharacterPosition, spellArea)
+            const rangeArea = normalize(tiledManager.getArea(futureCharacterPosition, spellArea)
                 .filter(p => {
 
                     const points = tiledManager.getBresenhamLine(futureCharacterPosition, p);
@@ -118,7 +118,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
                         }
                     }
                     return true;
-                });
+                }));
 
             api.dispatch(BattleMapPathAction({
                 rangeArea

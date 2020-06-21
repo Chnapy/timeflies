@@ -1,11 +1,12 @@
 import { Position } from '@timeflies/shared';
 import { Spell } from '../entities/spell/Spell';
+import { Normalized } from '../entities/normalize';
 
-export interface SpellAction {
+export type SpellAction = {
     spell: Spell<'future'>;
     position: Position;
-    actionArea: Position[];
-}
+    actionArea: Normalized<Position>;
+};
 
 // export type SpellActionState = {
 //     spellActionSnapshotList: SpellActionSnapshot[];

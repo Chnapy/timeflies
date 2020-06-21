@@ -1,4 +1,4 @@
-import { seedTiledMap } from '@timeflies/shared';
+import { seedTiledMap, createPosition } from '@timeflies/shared';
 import Benchmark from 'benchmark';
 import b from 'benny';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
@@ -12,6 +12,7 @@ import { BattleDataPeriod } from '../snapshot/battle-data';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
 import { createView } from '../../../view';
 import { render } from '@testing-library/react';
+import { normalize } from '../entities/normalize';
 
 Benchmark.support.browser = false;
 
@@ -32,7 +33,7 @@ const initStore = () => {
     const getCharacter = <P extends BattleDataPeriod>(period: P) => seedCharacter<P>({
         id: 'c1',
         period,
-        position: { x: 8, y: 6 },
+        position: createPosition(8, 6),
         isMine: true,
         playerId: 'p1',
         features: {
@@ -51,20 +52,20 @@ const initStore = () => {
             battleActionState: {
                 ...battleActionReducer(undefined, { type: '' }),
                 tiledSchema: seedTiledMap('map_1'),
-                futureCharacterPosition: { x: 8, y: 6 },
+                futureCharacterPosition: createPosition(8, 6),
                 currentAction: 'spellPrepare',
                 selectedSpellId: 's1',
-                grid: [
-                    {
-                        position: { x: 8, y: 6 },
+                grid: {
+                    '8:6': {
+                        ...createPosition(8, 6),
                         tileType: 'default'
                     },
-                    {
-                        position: { x: 9, y: 6 },
+                    '9:6': {
+                        ...createPosition(9, 6),
                         tileType: 'default'
                     }
-                ],
-                rangeArea: [ { x: 9, y: 6 } ]
+                },
+                rangeArea: normalize([ createPosition(9, 6) ])
             },
             cycleState: {
                 currentCharacterId: 'c1',
@@ -146,7 +147,7 @@ export const runBenchmark = () => {
 
             return async () => {
                 await storeManager.dispatch(TileHoverAction({
-                    position: { x: 8, y: 6 }
+                    position: createPosition(8, 6)
                 }));
             };
         }),
@@ -157,7 +158,7 @@ export const runBenchmark = () => {
 
             return async () => {
                 await storeManager.dispatch(TileHoverAction({
-                    position: { x: 9, y: 6 }
+                    position: createPosition(9, 6)
                 }));
             };
         }),
@@ -168,7 +169,7 @@ export const runBenchmark = () => {
 
             return async () => {
                 await storeManager.dispatch(TileClickAction({
-                    position: { x: 9, y: 6 }
+                    position: createPosition(9, 6)
                 }));
             };
         }),

@@ -6,6 +6,7 @@ import { BattleData } from '../snapshot/battle-data';
 import { SpellAction } from '../spellAction/spell-action-reducer';
 import { spellLaunchMove } from './spellEngine/move/spell-engine-move';
 import { spellLaunchSimpleAttack } from './spellEngine/simpleAttack/spell-engine-simpleAttack';
+import { Normalized } from '../entities/normalize';
 
 type TiledMapHoverFn = (props: TileHoverFnProps) => (startTime: number) => void;
 
@@ -15,7 +16,7 @@ type TiledMapStartFn = (props: Pick<SpellActionSnapshot,
     | 'actionArea'
     | 'duration'
 > & {
-    tileGraphicList: TileGraphic[];
+    tileGraphicList: Normalized<TileGraphic>;
 }) => void;
 
 export type TiledMapSpellObject = {

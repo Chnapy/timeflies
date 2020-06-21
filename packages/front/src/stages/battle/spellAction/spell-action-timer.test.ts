@@ -1,4 +1,4 @@
-import { SpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { SpellActionSnapshot, TimerTester, createPosition } from '@timeflies/shared';
 import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 import { SpellActionTimer } from './spell-action-timer';
@@ -10,8 +10,8 @@ describe('# SpellActionTimer', () => {
     const getSnapshot = (partial: Partial<SpellActionSnapshot> = {}): SpellActionSnapshot => ({
         battleHash: '',
         duration: 200,
-        position: { x: -1, y: -1 },
-        actionArea: [ { x: -1, y: -1 } ],
+        position: createPosition(-1, -1),
+        actionArea: [ createPosition(-1, -1) ],
         characterId: '1',
         spellId: '',
         startTime: timerTester.now,
@@ -31,7 +31,7 @@ describe('# SpellActionTimer', () => {
         const dispatch = jest.fn();
 
         const timer = SpellActionTimer({
-            extractSpellActionSnapshotList: () => [snapshot],
+            extractSpellActionSnapshotList: () => [ snapshot ],
             dispatch
         });
 
@@ -45,7 +45,7 @@ describe('# SpellActionTimer', () => {
         const dispatch = jest.fn();
 
         const timer = SpellActionTimer({
-            extractSpellActionSnapshotList: () => [snapshot],
+            extractSpellActionSnapshotList: () => [ snapshot ],
             dispatch
         });
 
@@ -68,7 +68,7 @@ describe('# SpellActionTimer', () => {
         const dispatch = jest.fn();
 
         const timer = SpellActionTimer({
-            extractSpellActionSnapshotList: () => [snapshot],
+            extractSpellActionSnapshotList: () => [ snapshot ],
             dispatch
         });
 

@@ -1,13 +1,13 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { Position, TiledManager, TileType } from '@timeflies/shared';
+import { Position, TiledManager, TileType, createPosition } from '@timeflies/shared';
 import TiledMap from 'tiled-types/types';
 import { BattleStartAction } from '../battle-actions';
 import { BattleMapPathAction, BattleStateSpellPrepareAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
+import { Normalized, normalize } from '../entities/normalize';
 
 export type BState = 'watch' | 'spellPrepare';
 
-export type GridTile = {
-    position: Position;
+export type GridTile = Position & {
     tileType: TileType;
 };
 
@@ -17,10 +17,12 @@ export type BattleActionState = {
     tiledSchema: TiledMap | null;
     tiledImagesUrls: Record<string, string>;
     futureCharacterPosition: Position | null;
-    grid: GridTile[];
+    grid: Normalized<GridTile>;
+
+    // TODO consider normalize
     path: Position[];
-    rangeArea: Position[];
-    actionArea: Position[];
+    rangeArea: Normalized<Position>;
+    actionArea: Normalized<Position>;
 };
 
 const initialState: BattleActionState = {
@@ -28,15 +30,15 @@ const initialState: BattleActionState = {
     tiledSchema: null,
     tiledImagesUrls: {},
     futureCharacterPosition: null,
-    grid: [],
+    grid: {},
     path: [],
-    rangeArea: [],
-    actionArea: []
+    rangeArea: {},
+    actionArea: {}
 };
 
 export const ACCEPTABLE_TILES: number[] = [ 0 ];
 
-const calculateGrid = (tiledSchema: TiledMap): GridTile[] => {
+const calculateGrid = (tiledSchema: TiledMap): Normalized<GridTile> => {
     const { width, height } = tiledSchema;
 
     const tiledManager = TiledManager(tiledSchema);
@@ -45,17 +47,17 @@ const calculateGrid = (tiledSchema: TiledMap): GridTile[] => {
 
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-            const p: Position = { x, y };
+            const p = createPosition(x, y);
             const tileType = tiledManager.getTileType(p);
 
             grid.push({
-                position: p,
+                ...p,
                 tileType
             });
         }
     }
 
-    return grid;
+    return normalize(grid);
 };
 
 export const battleActionReducer = createReducer(initialState, {
@@ -88,8 +90,8 @@ export const battleActionReducer = createReducer(initialState, {
             ...state,
             ...partialState,
             path: [],
-            rangeArea: [],
-            actionArea: []
+            rangeArea: {},
+            actionArea: {}
         };
     },
     [ BattleStateTurnEndAction.type ]: (state, action: BattleStateTurnEndAction) => {
@@ -100,8 +102,8 @@ export const battleActionReducer = createReducer(initialState, {
             selectedSpellId: undefined,
             futureCharacterPosition: null,
             path: [],
-            rangeArea: [],
-            actionArea: []
+            rangeArea: {},
+            actionArea: {}
         };
     },
     [ BattleStateSpellPrepareAction.type ]: (state, { payload }: BattleStateSpellPrepareAction) => {
@@ -112,8 +114,8 @@ export const battleActionReducer = createReducer(initialState, {
             selectedSpellId: futureSpell.id,
             futureCharacterPosition: futureCharacter.position,
             path: [],
-            rangeArea: [],
-            actionArea: []
+            rangeArea: {},
+            actionArea: {}
         };
     },
     [ BattleMapPathAction.type ]: (state, { payload }: BattleMapPathAction) => {

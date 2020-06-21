@@ -1,5 +1,5 @@
 import { applyMiddleware, createStore, Middleware, Reducer, Store } from '@reduxjs/toolkit';
-import { seedTiledMapAssets, seedTiledMap } from '@timeflies/shared';
+import { seedTiledMapAssets, seedTiledMap, createPosition } from '@timeflies/shared';
 import { battleActionMiddleware } from '../../../battleState/battle-action-middleware';
 import { battleActionReducer, BattleActionState } from '../../../battleState/battle-action-reducer';
 import { BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
@@ -7,6 +7,7 @@ import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
 import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actions';
 import { spellEngineMove, CreateTileTypeGetter } from './spell-engine-move';
+import { normalize } from '../../../entities/normalize';
 
 describe('# spell-engine-move (depends on #battle-action)', () => {
 
@@ -65,26 +66,26 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: [
+                grid: normalize([
                     {
+                        ...createPosition(0, 0),
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
                     },
                     {
+                        ...createPosition(1, 0),
                         tileType: 'obstacle',
-                        position: { x: 1, y: 0 }
                     },
                     {
+                        ...createPosition(2, 0),
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
                     }
-                ],
+                ]),
                 path: [
-                    { x: 1, y: 0 },
-                    { x: 2, y: 0 }
+                    createPosition(1, 0),
+                    createPosition(2, 0)
                 ],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
@@ -92,12 +93,12 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 () => () => 'obstacle',
                 {
                     extractFutureCharacter: () => seedCharacter({
-                        id: '1', period: 'future', position: { x: 0, y: 0 }
+                        id: '1', period: 'future', position: createPosition(0, 0)
                     })
                 });
 
             const action = TileHoverAction({
-                position: { x: 2, y: 0 }
+                position: createPosition(2, 0)
             });
 
             await store.dispatch(action);
@@ -114,23 +115,23 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: [
+                grid: normalize([
                     {
+                        ...createPosition(0, 0),
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
                     },
                     {
+                        ...createPosition(1, 0),
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
                     },
                     {
+                        ...createPosition(2, 0),
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
                     }
-                ],
+                ]),
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
@@ -138,12 +139,12 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 () => () => 'default',
                 {
                     extractFutureCharacter: () => seedCharacter({
-                        id: '1', period: 'future', position: { x: 0, y: 0 }
+                        id: '1', period: 'future', position: createPosition(0, 0)
                     })
                 });
 
             const action = TileHoverAction({
-                position: { x: 2, y: 0 }
+                position: createPosition(2, 0)
             });
 
             await store.dispatch(action);
@@ -151,8 +152,8 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
                 path: [
-                    { x: 1, y: 0 },
-                    { x: 2, y: 0 }
+                    createPosition(1, 0),
+                    createPosition(2, 0)
                 ]
             });
         });
@@ -163,28 +164,28 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: [
+                grid: normalize([
                     {
+                        ...createPosition(0, 0),
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
                     },
                     {
+                        ...createPosition(1, 0),
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
                     },
                     {
+                        ...createPosition(2, 0),
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
                     }
-                ],
+                ]),
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
             const mainCharacter = seedCharacter({
-                id: '1', period: 'future', position: { x: 0, y: 0 }
+                id: '1', period: 'future', position: createPosition(0, 0)
             });
 
             const { store } = getStore(initialState,
@@ -193,12 +194,12 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                     extractFutureCharacter: () => mainCharacter,
                     extractFutureAliveCharacterPositionList: () => [
                         mainCharacter.position,
-                        { x: 1, y: 0 }
+                        createPosition(1, 0)
                     ]
                 });
 
             const action = TileHoverAction({
-                position: { x: 2, y: 0 }
+                position: createPosition(2, 0)
             });
 
             await store.dispatch(action);
@@ -218,26 +219,26 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: [
+                grid: normalize([
                     {
+                        ...createPosition(0, 0),
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
                     },
                     {
+                        ...createPosition(1, 0),
                         tileType: 'obstacle',
-                        position: { x: 1, y: 0 }
                     },
                     {
+                        ...createPosition(2, 0),
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
                     }
-                ],
+                ]),
                 path: [
-                    { x: 1, y: 0 },
-                    { x: 2, y: 0 }
+                    createPosition(1, 0),
+                    createPosition(2, 0)
                 ],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
@@ -245,12 +246,12 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 () => ({ x, y }) => y || x === 1 ? 'obstacle' : 'default',
                 {
                     extractFutureCharacter: () => seedCharacter({
-                        id: '1', period: 'future', position: { x: 0, y: 0 }
+                        id: '1', period: 'future', position: createPosition(0, 0)
                     })
                 });
 
             const action = TileClickAction({
-                position: { x: 2, y: 0 }
+                position: createPosition(2, 0)
             });
 
             await store.dispatch(action);
@@ -264,26 +265,26 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: [
+                grid: normalize([
                     {
+                        ...createPosition(0, 0),
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
                     },
                     {
+                        ...createPosition(1, 0),
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
                     },
                     {
+                        ...createPosition(2, 0),
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
                     }
-                ],
+                ]),
                 path: [
-                    { x: 1, y: 0 },
-                    { x: 2, y: 0 }
+                    createPosition(1, 0),
+                    createPosition(2, 0)
                 ],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
@@ -291,12 +292,12 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 () => () => 'default',
                 {
                     extractFutureCharacter: () => seedCharacter({
-                        id: '1', period: 'future', position: { x: 0, y: 0 }
+                        id: '1', period: 'future', position: createPosition(0, 0)
                     })
                 });
 
             const action = TileClickAction({
-                position: { x: 2, y: 0 }
+                position: createPosition(2, 0)
             });
 
             await store.dispatch(action);
@@ -315,29 +316,29 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMapAssets('map_1').schema,
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: [
+                grid: normalize([
                     {
+                        ...createPosition(0, 0),
                         tileType: 'default',
-                        position: { x: 0, y: 0 }
                     },
                     {
+                        ...createPosition(1, 0),
                         tileType: 'default',
-                        position: { x: 1, y: 0 }
                     },
                     {
+                        ...createPosition(2, 0),
                         tileType: 'default',
-                        position: { x: 2, y: 0 }
                     }
-                ],
+                ]),
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
             const characterList = [
                 seedCharacter({
-                    id: '1', period: 'future', position: { x: 0, y: 0 }
+                    id: '1', period: 'future', position: createPosition(0, 0)
                 })
             ];
 
@@ -349,21 +350,21 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                     extractFutureAliveCharacterPositionList: () => characterList.map(c => c.position)
                 });
 
-            characterList.push(seedCharacter({ id: '2', period: 'future', position: { x: 1, y: 0 } }))
+            characterList.push(seedCharacter({ id: '2', period: 'future', position: createPosition(1, 0) }));
 
             await store.dispatch(SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: Date.now(),
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        actionArea: [ { x: 0, y: 0 } ],
-                        position: { x: 0, y: 0 }
+                        actionArea: [ createPosition(0, 0) ],
+                        position: createPosition(0, 0)
                     }
                 } ]
             }))
 
             const action2 = TileHoverAction({
-                position: { x: 2, y: 0 }
+                position: createPosition(2, 0)
             });
 
             await store.dispatch(action2);

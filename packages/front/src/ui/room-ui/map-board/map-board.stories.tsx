@@ -1,5 +1,5 @@
 import { Box } from '@material-ui/core';
-import { equals, MapConfig } from '@timeflies/shared';
+import { equals, MapConfig, createPosition } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
@@ -36,7 +36,7 @@ export const BoardTile: React.FC = () => {
                         characters: [
                             {
                                 id: 'c1',
-                                position: { x: 2, y: 0 },
+                                position: createPosition(2, 0),
                                 type: 'sampleChar1'
                             }
                         ]
@@ -50,7 +50,7 @@ export const BoardTile: React.FC = () => {
                         characters: [ {
                             id: 'c2',
                             type: 'sampleChar2',
-                            position: { x: 4, y: 0 }
+                            position: createPosition(4, 0)
                         } ]
                     }
                 ],
@@ -78,26 +78,26 @@ export const BoardTile: React.FC = () => {
     const tileInfosList: MapBoardTileInfos[] = [
         {
             type: 'obstacle',
-            position: { x: 0, y: 0 }
+            position: createPosition(0, 0)
         },
         {
             type: 'placement',
-            position: { x: 1, y: 0 },
+            position: createPosition(1, 0),
             teamId: 't1',
         },
         {
             type: 'placement',
-            position: { x: 2, y: 0 },
+            position: createPosition(2, 0),
             teamId: 't1',
         },
         {
             type: 'placement',
-            position: { x: 3, y: 0 },
+            position: createPosition(3, 0),
             teamId: 't2',
         },
         {
             type: 'placement',
-            position: { x: 4, y: 0 },
+            position: createPosition(4, 0),
             teamId: 't2',
         }
     ];
@@ -145,32 +145,32 @@ export const Board: React.FC = () => {
         {
             type: 'placement',
             teamId: 't1',
-            position: { x: 3, y: 2 }
+            position: createPosition(3, 2)
         },
         {
             type: 'placement',
             teamId: 't1',
-            position: { x: 5, y: 2 }
+            position: createPosition(5, 2)
         },
         {
             type: 'placement',
             teamId: 't1',
-            position: { x: 7, y: 2 }
+            position: createPosition(7, 2)
         },
         {
             type: 'placement',
             teamId: 't2',
-            position: { x: 3, y: 5 }
+            position: createPosition(3, 5)
         },
         {
             type: 'placement',
             teamId: 't2',
-            position: { x: 5, y: 5 }
+            position: createPosition(5, 5)
         },
         {
             type: 'placement',
             teamId: 't2',
-            position: { x: 7, y: 5 }
+            position: createPosition(7, 5)
         },
     ];
 
@@ -178,7 +178,9 @@ export const Board: React.FC = () => {
     for (let y = 0; y < map.height; y++) {
         for (let x = 0; x < map.width; x++) {
 
-            const placement = placementPos.find(ip => equals(ip.position)({ x, y }));
+            const p = createPosition(x, y);
+
+            const placement = placementPos.find(ip => ip.position.id === p.id);
 
             if (placement) {
                 tileList.push(placement);
@@ -188,7 +190,7 @@ export const Board: React.FC = () => {
 
                 if (mod) {
                     tileList.push({
-                        position: { x, y },
+                        position: p,
                         type: 'obstacle'
                     });
                 }
@@ -217,7 +219,7 @@ export const Board: React.FC = () => {
                         characters: [
                             {
                                 id: 'c1',
-                                position: { x: 5, y: 2 },
+                                position: createPosition(5, 2),
                                 type: 'sampleChar1'
                             }
                         ]
@@ -231,7 +233,7 @@ export const Board: React.FC = () => {
                         characters: [ {
                             id: 'c2',
                             type: 'sampleChar2',
-                            position: { x: 3, y: 5 }
+                            position: createPosition(3, 5)
                         } ]
                     }
                 ],

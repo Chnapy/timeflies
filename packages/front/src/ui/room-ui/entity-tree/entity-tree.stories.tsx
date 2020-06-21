@@ -6,6 +6,7 @@ import { createView } from '../../../view';
 import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';
 import { EntityTree } from './entity-tree';
+import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'Room/Entity Tree',
@@ -26,9 +27,7 @@ export const Default: React.FC = () => {
                     {
                         id: 'c1',
                         type: 'sampleChar1',
-                        position: {
-                            x: 4, y: 8
-                        }
+                        position: createPosition(4, 8)
                     }
                 ]
             },
@@ -42,16 +41,12 @@ export const Default: React.FC = () => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     },
                     {
                         id: 'c3',
                         type: 'sampleChar2',
-                        position: {
-                            x: 10, y: 8
-                        }
+                        position: createPosition(10, 8)
                     }
                 ]
             },
@@ -65,9 +60,7 @@ export const Default: React.FC = () => {
                     {
                         id: 'c4',
                         type: 'sampleChar2',
-                        position: {
-                            x: 6, y: 2
-                        }
+                        position: createPosition(6, 2)
                     }
                 ]
             }
@@ -92,7 +85,7 @@ export const Default: React.FC = () => {
             name: 'chnapy',
         },
         step: 'room',
-        battle: battleReducer(undefined, {type: ''}),
+        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             map: {

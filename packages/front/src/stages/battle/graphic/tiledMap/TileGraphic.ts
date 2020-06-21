@@ -1,4 +1,4 @@
-import { equals, Position } from '@timeflies/shared';
+import { Position } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
@@ -15,6 +15,7 @@ export interface TileGraphicProps {
 }
 
 export interface TileGraphic {
+    id: string;
     readonly container: PIXI.Container;
     readonly containerOver: PIXI.Container;
 
@@ -260,6 +261,7 @@ export const TileGraphic = ({
     };
 
     const this_: TileGraphic = {
+        id: tilePos.id,
         container,
         containerOver,
         tilePos,
@@ -275,7 +277,7 @@ export const TileGraphic = ({
     storeEmitter.onStateChange(
         ({ battle: { battleActionState } }) => {
 
-            const pathIndex = battleActionState.path.findIndex(p => equals(p)(tilePos));
+            const pathIndex = battleActionState.path.findIndex(p => p.id === tilePos.id);
 
             const path = pathIndex !== -1;
 
@@ -284,8 +286,8 @@ export const TileGraphic = ({
             return {
                 path,
                 pathLastPos,
-                rangeArea: battleActionState.rangeArea.some(p => equals(p)(tilePos)),
-                actionArea: battleActionState.actionArea.some(p => equals(p)(tilePos)),
+                rangeArea: !!battleActionState.rangeArea[ tilePos.id ],
+                actionArea: !!battleActionState.actionArea[ tilePos.id ],
             };
         },
         ({ path, pathLastPos, rangeArea, actionArea }) => {
@@ -309,7 +311,7 @@ export const TileGraphic = ({
     storeEmitter.onStateChange(
         ({ battle: { snapshotState } }) => snapshotState.spellActionSnapshotList.some(s =>
             s.startTime + s.duration > Date.now()
-            && s.actionArea.some(p => equals(p)(tilePos))),
+            && s.actionArea.some(p => p.id === tilePos.id)),
         futureAction => {
             if (futureAction) {
                 persistAction();

@@ -17,6 +17,7 @@ import { seedTeam } from '../../entities/team/Team.seed';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
+import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'graphic/CharactersBoard',
@@ -59,10 +60,10 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
 
         const characterList = [
             seedCharacter({
-                id: 'c1', period, playerId: 'p1', position: { x: 2, y: 3 }
+                id: 'c1', period, playerId: 'p1', position: createPosition(2, 3)
             }),
             seedCharacter({
-                id: 'c2', period, playerId: 'p1', position: { x: 4, y: 2 }
+                id: 'c2', period, playerId: 'p1', position: createPosition(4, 2)
             })
         ];
 

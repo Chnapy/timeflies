@@ -1,4 +1,4 @@
-import { seedTiledMap, TimerTester, seedSpellActionSnapshot, BattleSnapshot, getBattleSnapshotWithHash, SpellActionSnapshot } from '@timeflies/shared';
+import { seedTiledMap, TimerTester, seedSpellActionSnapshot, BattleSnapshot, getBattleSnapshotWithHash, SpellActionSnapshot, createPosition } from '@timeflies/shared';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { createStoreManager } from '../../../store-manager';
@@ -13,7 +13,7 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { characterToSnapshot } from '../entities/character/Character';
 import { spellToSnapshot } from '../entities/spell/Spell';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
-import { denormalize } from '../entities/normalize';
+import { denormalize, normalize } from '../entities/normalize';
 
 describe('Battleflow', () => {
 
@@ -45,7 +45,7 @@ describe('Battleflow', () => {
         const getCharacter = <P extends BattleDataPeriod>(period: P) => seedCharacter<P>({
             id: 'c1',
             period,
-            position: { x: 8, y: 6 },
+            position: createPosition(8, 6),
             isMine: true,
             playerId: 'p1',
             features: {
@@ -64,20 +64,20 @@ describe('Battleflow', () => {
                 battleActionState: {
                     ...battleActionReducer(undefined, { type: '' }),
                     tiledSchema: seedTiledMap('map_1'),
-                    futureCharacterPosition: { x: 8, y: 6 },
+                    futureCharacterPosition: createPosition(8, 6),
                     currentAction: 'spellPrepare',
                     selectedSpellId: 's1',
-                    grid: [
+                    grid: normalize([
                         {
-                            position: { x: 8, y: 6 },
+                            ...createPosition(8, 6),
                             tileType: 'default'
                         },
                         {
-                            position: { x: 9, y: 6 },
+                            ...createPosition(9, 6),
                             tileType: 'default'
                         }
-                    ],
-                    rangeArea: [ { x: 9, y: 6 } ]
+                    ]),
+                    rangeArea: normalize([ createPosition(9, 6) ])
                 },
                 cycleState: {
                     currentCharacterId: 'c1',
@@ -229,7 +229,7 @@ describe('Battleflow', () => {
             const { store } = createStore();
 
             store.dispatch(TileClickAction({
-                position: { x: 9, y: 6 }
+                position: createPosition(9, 6)
             }));
 
             jest.runOnlyPendingTimers();
@@ -254,7 +254,7 @@ describe('Battleflow', () => {
             const { store } = createStore();
 
             store.dispatch(TileClickAction({
-                position: { x: 9, y: 6 }
+                position: createPosition(9, 6)
             }));
 
             const state1 = store.getState();
@@ -317,7 +317,7 @@ describe('Battleflow', () => {
             const { store, actionList } = createStore();
 
             store.dispatch(TileClickAction({
-                position: { x: 9, y: 6 }
+                position: createPosition(9, 6)
             }));
 
             jest.runOnlyPendingTimers();

@@ -1,4 +1,4 @@
-import { seedSpellActionSnapshot, SpellActionSnapshot } from '@timeflies/shared';
+import { seedSpellActionSnapshot, SpellActionSnapshot, createPosition } from '@timeflies/shared';
 import { BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
@@ -41,7 +41,7 @@ describe('# spell-action-reducer', () => {
                     {
                         spellAction: {
                             spell: spells.s1,
-                            position: { x: 0, y: 0 },
+                            position: createPosition(0, 0),
                             actionArea: []
                         },
                         startTime: now
@@ -49,7 +49,7 @@ describe('# spell-action-reducer', () => {
                     {
                         spellAction: {
                             spell: spells.s2,
-                            position: { x: 0, y: 0 },
+                            position: createPosition(0, 0),
                             actionArea: []
                         },
                         startTime: now + 100
@@ -60,12 +60,12 @@ describe('# spell-action-reducer', () => {
             expect(state1.spellActionSnapshotList).toEqual([
                 expect.objectContaining<Partial<SpellActionSnapshot>>({
                     spellId: 's1',
-                    position: { x: 0, y: 0 },
+                    position: createPosition(0, 0),
                     startTime: now
                 }),
                 expect.objectContaining<Partial<SpellActionSnapshot>>({
                     spellId: 's2',
-                    position: { x: 0, y: 0 },
+                    position: createPosition(0, 0),
                     startTime: now + 100
                 }),
             ]);
@@ -99,7 +99,7 @@ describe('# spell-action-reducer', () => {
                     {
                         spellAction: {
                             spell: spells.s1,
-                            position: { x: 0, y: 0 },
+                            position: createPosition(0, 0),
                             actionArea: []
                         },
                         startTime: Date.now()
@@ -140,7 +140,7 @@ describe('# spell-action-reducer', () => {
                     {
                         spellAction: {
                             spell: spells.s1,
-                            position: { x: 0, y: 0 },
+                            position: createPosition(0, 0),
                             actionArea: []
                         },
                         startTime: now
@@ -148,7 +148,7 @@ describe('# spell-action-reducer', () => {
                     {
                         spellAction: {
                             spell: spells.s2,
-                            position: { x: 0, y: 0 },
+                            position: createPosition(0, 0),
                             actionArea: []
                         },
                         startTime: now + 100

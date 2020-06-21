@@ -1,4 +1,4 @@
-import { equals, MapConfig } from '@timeflies/shared';
+import { createPosition, MapConfig } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../assetManager/AssetLoader';
 import { AssetManager } from '../../assetManager/AssetManager';
@@ -33,32 +33,32 @@ export const Default: React.FC = () => {
         {
             type: 'placement',
             teamId: 't1',
-            position: { x: 3, y: 2 }
+            position: createPosition(3, 2)
         },
         {
             type: 'placement',
             teamId: 't1',
-            position: { x: 5, y: 2 }
+            position: createPosition(5, 2)
         },
         {
             type: 'placement',
             teamId: 't1',
-            position: { x: 7, y: 2 }
+            position: createPosition(7, 2)
         },
         {
             type: 'placement',
             teamId: 't2',
-            position: { x: 3, y: 5 }
+            position: createPosition(3, 5)
         },
         {
             type: 'placement',
             teamId: 't2',
-            position: { x: 5, y: 5 }
+            position: createPosition(5, 5)
         },
         {
             type: 'placement',
             teamId: 't2',
-            position: { x: 7, y: 5 }
+            position: createPosition(7, 5)
         },
     ];
 
@@ -66,7 +66,9 @@ export const Default: React.FC = () => {
     for (let y = 0; y < map.height; y++) {
         for (let x = 0; x < map.width; x++) {
 
-            const placement = placementPos.find(ip => equals(ip.position)({ x, y }));
+            const p = createPosition(x, y);
+
+            const placement = placementPos.find(ip => ip.position.id === p.id);
 
             if (placement) {
                 tileList.push(placement);
@@ -76,7 +78,7 @@ export const Default: React.FC = () => {
 
                 if (mod) {
                     tileList.push({
-                        position: { x, y },
+                        position: p,
                         type: 'obstacle'
                     });
                 }
@@ -104,7 +106,7 @@ export const Default: React.FC = () => {
                         characters: [
                             {
                                 id: 'c1',
-                                position: { x: 5, y: 2 },
+                                position: createPosition(5, 2),
                                 type: 'sampleChar1'
                             }
                         ]
@@ -118,7 +120,7 @@ export const Default: React.FC = () => {
                         characters: [ {
                             id: 'c2',
                             type: 'sampleChar2',
-                            position: { x: 3, y: 5 }
+                            position: createPosition(3, 5)
                         } ]
                     }
                 ],

@@ -1,25 +1,16 @@
-import { assertIsDefined, equals } from '@timeflies/shared';
+import { assertIsDefined } from '@timeflies/shared';
 import { TiledMapSpellObject } from '../../engine/spellMapping';
 
 
 export const tiledMapSpellMove: TiledMapSpellObject = {
     onHoverFn: ({ tileGraphicList }) => {
-        // const { path } = engineProps;
-
-        // const tileGraphicPath = path
-        //     .slice(1)
-        //     .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
-
-        // tileGraphicPath.forEach((t, i) => t.showPath(i === tileGraphicPath.length - 1));
-
         return startTime => {
-            // tileGraphicPath.forEach(t => t.persistAction(startTime));
         }
     },
     onSpellStartFn: ({
         tileGraphicList, startTime, duration, position
     }) => {
-        const tilePos = tileGraphicList.find(t => equals(t.tilePos)(position));
+        const tilePos = tileGraphicList[ position.id ];
         assertIsDefined(tilePos);
 
         tilePos.persistActionStart(duration, startTime);
@@ -28,23 +19,13 @@ export const tiledMapSpellMove: TiledMapSpellObject = {
 
 export const tiledMapSpellSimpleAttack: TiledMapSpellObject = {
     onHoverFn: ({ tileGraphicList, rangeTiles }) => {
-        // const { actionArea } = engineProps;
-
-        // const tileGraphicArea = actionArea
-        //     .map(p => tileGraphicList.find(tile => equals(p)(tile.tilePos))!);
-
-        // const isInRange = (tileGraphic: TileGraphic) => rangeTiles.includes(tileGraphic);
-
-        // tileGraphicArea.forEach(t => t.showAction(isInRange(t)));
-
         return startTime => {
-            // tileGraphicArea.forEach(t => t.persistAction(startTime));
         };
     },
     onSpellStartFn: ({
         tileGraphicList, startTime, duration, position
     }) => {
-        const tilePos = tileGraphicList.find(t => equals(t.tilePos)(position));
+        const tilePos = tileGraphicList[ position.id ];
         assertIsDefined(tilePos);
 
         tilePos.persistActionStart(duration, startTime);

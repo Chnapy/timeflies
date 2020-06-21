@@ -1,4 +1,4 @@
-import { RoomServerAction } from '@timeflies/shared';
+import { RoomServerAction, createPosition } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
 import { RoomStartAction } from '../room-actions';
 import { EntityTreeData, entityTreeReducer } from './entity-tree-reducer';
@@ -300,7 +300,7 @@ describe('# entity-tree-reducer', () => {
                 characters: [ {
                     id: 'c-1',
                     type: 'sampleChar1',
-                    position: { x: -1, y: -1 }
+                    position: createPosition(-1, -1)
                 } ]
             } ],
             teamList: [ {
@@ -335,7 +335,7 @@ describe('# entity-tree-reducer', () => {
             character: {
                 id: 'c-1',
                 type: 'sampleChar1',
-                position: { x: -1, y: -1 }
+                position: createPosition(-1, -1)
             },
             teamList: []
         });
@@ -368,7 +368,7 @@ describe('# entity-tree-reducer', () => {
                 characters: [ {
                     id: 'c-1',
                     type: 'sampleChar1',
-                    position: { x: -1, y: -1 }
+                    position: createPosition(-1, -1)
                 } ]
             } ],
             teamList: []

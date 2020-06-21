@@ -1,6 +1,6 @@
 import bresenham from 'bresenham';
 import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
-import { Position } from '../geo';
+import { Position, createPosition } from '../geo';
 import { assertIsDefined } from '../util';
 
 export interface TilePositioned<T extends TileTypeWithPlacement> {
@@ -78,7 +78,7 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
     const getTilePositionFromIndex = (index: number): Position => {
         const y = Number.parseInt(index / width + '');
         const x = (index % width);
-        return { x, y };
+        return createPosition(x, y);
     };
 
     const getTileIdFromPosition = ({ data, width }: TiledLayerTilelayer, { x, y }: Position): number => {
@@ -111,7 +111,7 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                const position: Position = { x, y };
+                const position = createPosition(x, y);
                 const type = getTileTypeWithPlacement(position);
 
                 if (types.includes(type as T)) {
@@ -132,7 +132,7 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
 
-                const position = { x, y };
+                const position = createPosition(x, y);
                 const id = getTileIdFromPosition(placementTilelayer, position);
 
                 if (id) {
@@ -159,10 +159,10 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
         for (let i = 0; i <= r * 2; i++) {
             for (let k = 0; k <= (i - sum) * 2; k++) {
 
-                const pos: Position = {
-                    x: center.x - i + sum + k,
-                    y: center.y - r + i
-                };
+                const pos: Position = createPosition(
+                    center.x - i + sum + k,
+                    center.y - r + i
+                );
 
                 if (getTileType(pos) === 'default') {
                     area.push(pos);
@@ -178,12 +178,14 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
 
     const getBresenhamLine = (start: Position, end: Position): BresenhamPoint[] => {
 
-        const path: Position[] = bresenham(start.x, start.y, end.x, end.y);
+        const path = bresenham(start.x, start.y, end.x, end.y);
 
-        return path.map((position): BresenhamPoint => ({
-            position,
-            tileType: getTileType(position)
-        }));
+        return path
+            .map(({ x, y }) => createPosition(x, y))
+            .map((position): BresenhamPoint => ({
+                position,
+                tileType: getTileType(position)
+            }));
     };
 
     return {
