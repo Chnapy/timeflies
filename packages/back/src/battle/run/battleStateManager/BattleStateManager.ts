@@ -1,4 +1,4 @@
-import { assertIsDefined, BattleSnapshot, equals, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
 import { Draft, Immutable, produce } from 'immer';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../../room/room';
@@ -102,7 +102,7 @@ export const BattleStateManager = (
 
     const applySimpleAttack = (spell: Spell, { actionArea }: SpellActionSnapshot, { characters }: Draft<BattleState>): Character[] => {
 
-        const targets = characters.filter(c => characterIsAlive(c) && actionArea.some(p => equals(p)(c.position)));
+        const targets = characters.filter(c => characterIsAlive(c) && !!actionArea[c.position.id]);
 
         targets.forEach(t => characterAlterLife(t, -spell.features.attack));
 

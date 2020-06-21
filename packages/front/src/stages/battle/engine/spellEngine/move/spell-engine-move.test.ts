@@ -1,13 +1,12 @@
 import { applyMiddleware, createStore, Middleware, Reducer, Store } from '@reduxjs/toolkit';
-import { seedTiledMapAssets, seedTiledMap, createPosition } from '@timeflies/shared';
+import { createPosition, normalize, seedTiledMap, seedTiledMapAssets } from '@timeflies/shared';
 import { battleActionMiddleware } from '../../../battleState/battle-action-middleware';
 import { battleActionReducer, BattleActionState } from '../../../battleState/battle-action-reducer';
 import { BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
 import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actions';
-import { spellEngineMove, CreateTileTypeGetter } from './spell-engine-move';
-import { normalize } from '../../../entities/normalize';
+import { CreateTileTypeGetter, spellEngineMove } from './spell-engine-move';
 
 describe('# spell-engine-move (depends on #battle-action)', () => {
 
@@ -357,7 +356,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                     startTime: Date.now(),
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        actionArea: [ createPosition(0, 0) ],
+                        actionArea: normalize([ createPosition(0, 0) ]),
                         position: createPosition(0, 0)
                     }
                 } ]

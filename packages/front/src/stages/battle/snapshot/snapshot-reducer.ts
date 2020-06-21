@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { assertIsDefined, BattleSnapshot, getBattleSnapshotWithHash, SpellActionSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, denormalize, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot } from '@timeflies/shared';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn as spellLaunchFnGetter } from '../engine/spellMapping';
@@ -9,7 +9,6 @@ import { Spell, spellToSnapshot } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleData, BattleDataPeriod, periodList } from './battle-data';
-import { Normalized, normalize, denormalize } from '../entities/normalize';
 
 export type SnapshotState = {
     // TODO consider normalize it

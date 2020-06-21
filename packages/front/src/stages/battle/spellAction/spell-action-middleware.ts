@@ -1,11 +1,10 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { assertIsDefined, ConfirmSAction, getLast, SpellActionSnapshot } from '@timeflies/shared';
+import { assertIsDefined, ConfirmSAction, getLast, Normalized, SpellActionSnapshot } from '@timeflies/shared';
 import diffDefault from 'jest-diff';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
-import { Normalized, normalize } from '../entities/normalize';
 import { Spell } from '../entities/spell/Spell';
 import { SnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
@@ -163,7 +162,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 const spellAction: SpellAction = {
                     spell,
                     position,
-                    actionArea: normalize(actionArea)
+                    actionArea
                 };
 
                 const spellActionState = extractState(api.getState);

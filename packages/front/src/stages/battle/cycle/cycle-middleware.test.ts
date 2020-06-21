@@ -3,12 +3,11 @@ import { MiddlewareAPI } from '@reduxjs/toolkit';
 import { cycleMiddleware } from './cycle-middleware';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { BattleStartAction } from '../battle-actions';
-import { TimerTester, TURN_DELAY } from '@timeflies/shared';
+import { Normalized, TimerTester, TURN_DELAY } from '@timeflies/shared';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { Character } from '../entities/character/Character';
-import { Normalized } from '../entities/normalize';
 
 describe('# cycle-middleware', () => {
 

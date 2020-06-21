@@ -6,3 +6,4 @@ export * from './indexGenerator';
 export * from './inferFn';
 export * from './clone';
 export * from './assign-keep-get-set';
+export * from './normalize';

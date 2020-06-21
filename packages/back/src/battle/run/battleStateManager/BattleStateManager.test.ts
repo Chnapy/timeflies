@@ -1,4 +1,4 @@
-import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom, BattleSnapshot } from '@timeflies/shared';
+import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom, BattleSnapshot, createPosition } from '@timeflies/shared';
 import util from 'util';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
@@ -6,6 +6,7 @@ import { IPlayerRoomData } from '../../room/room';
 import { BattleState, BattleStateManager } from './BattleStateManager';
 import { Team } from '../entities/team/Team';
 import { Player } from '../entities/player/Player';
+import { normalize } from '@timeflies/shared';
 
 describe('# BattleStateManager', () => {
 
@@ -160,7 +161,7 @@ describe('# BattleStateManager', () => {
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
                 battleHash: 'hash',
-                actionArea: [ { x: -1, y: -1 } ],
+                actionArea: normalize([ createPosition(-1, -1) ]),
                 duration: 200,
             });
 
@@ -195,7 +196,7 @@ describe('# BattleStateManager', () => {
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
                 battleHash: 'hash',
-                actionArea: [ { x: -1, y: -1 } ],
+                actionArea: normalize([ createPosition(-1, -1) ]),
                 duration: 200,
             });
 

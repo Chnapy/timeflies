@@ -1,11 +1,11 @@
 import { MiddlewareAPI } from '@reduxjs/toolkit';
+import { Normalized } from '@timeflies/shared';
 import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
+import { Character } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { snapshotMiddleware } from './snapshot-middleware';
 import { getInitialSnapshotState } from './snapshot-reducer';
-import { Normalized } from '../entities/normalize';
-import { Character } from '../entities/character/Character';
 
 describe('# snapshot-middleware', () => {
 

@@ -1,19 +1,18 @@
-import { seedTiledMap, TimerTester, seedSpellActionSnapshot, BattleSnapshot, getBattleSnapshotWithHash, SpellActionSnapshot, createPosition } from '@timeflies/shared';
+import { AnyAction } from '@reduxjs/toolkit';
+import { BattleSnapshot, createPosition, denormalize, getBattleSnapshotWithHash, normalize, seedSpellActionSnapshot, seedTiledMap, SpellActionSnapshot, TimerTester } from '@timeflies/shared';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
+import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { createStoreManager } from '../../../store-manager';
+import { rootReducer } from '../../../ui/reducers/root-reducer';
 import { battleActionReducer } from '../battleState/battle-action-reducer';
 import { TileClickAction } from '../battleState/battle-state-actions';
+import { characterToSnapshot } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
+import { spellToSnapshot } from '../entities/spell/Spell';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { BattleDataPeriod } from '../snapshot/battle-data';
-import { SendMessageAction, ReceiveMessageAction } from '../../../socket/wsclient-actions';
-import { rootReducer } from '../../../ui/reducers/root-reducer';
-import { AnyAction } from '@reduxjs/toolkit';
-import { characterToSnapshot } from '../entities/character/Character';
-import { spellToSnapshot } from '../entities/spell/Spell';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
-import { denormalize, normalize } from '../entities/normalize';
 
 describe('Battleflow', () => {
 

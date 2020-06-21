@@ -311,7 +311,7 @@ export const TileGraphic = ({
     storeEmitter.onStateChange(
         ({ battle: { snapshotState } }) => snapshotState.spellActionSnapshotList.some(s =>
             s.startTime + s.duration > Date.now()
-            && s.actionArea.some(p => p.id === tilePos.id)),
+            && !!s.actionArea[tilePos.id]),
         futureAction => {
             if (futureAction) {
                 persistAction();

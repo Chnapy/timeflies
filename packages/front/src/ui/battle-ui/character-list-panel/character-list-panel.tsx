@@ -1,10 +1,10 @@
-import { useTheme, Theme, makeStyles } from '@material-ui/core/styles';
-import { Paper, Box } from '@material-ui/core';
+import { Box, Paper } from '@material-ui/core';
+import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
+import { denormalize } from '@timeflies/shared';
 import React from 'react';
+import { shallowEqual } from 'react-redux';
 import { useGameStep } from '../../hooks/useGameStep';
 import { CharacterItem } from './character-item/character-item';
-import { shallowEqual } from 'react-redux';
-import { denormalize } from '../../../stages/battle/entities/normalize';
 
 const useStyles = makeStyles(() => ({
     root: {

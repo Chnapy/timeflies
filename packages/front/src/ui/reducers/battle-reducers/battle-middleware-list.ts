@@ -1,9 +1,9 @@
 import { Middleware } from '@reduxjs/toolkit';
+import { denormalize } from '@timeflies/shared';
 import { GameState } from '../../../game-state';
 import { battleActionMiddleware } from '../../../stages/battle/battleState/battle-action-middleware';
 import { cycleMiddleware } from '../../../stages/battle/cycle/cycle-middleware';
 import { characterIsAlive } from '../../../stages/battle/entities/character/Character';
-import { denormalize } from '../../../stages/battle/entities/normalize';
 import { snapshotMiddleware } from '../../../stages/battle/snapshot/snapshot-middleware';
 import { spellActionMiddleware } from '../../../stages/battle/spellAction/spell-action-middleware';
 

@@ -1,4 +1,4 @@
-import { SpellActionSnapshot, TimerTester, createPosition } from '@timeflies/shared';
+import { SpellActionSnapshot, TimerTester, createPosition, normalize } from '@timeflies/shared';
 import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 import { SpellActionTimer } from './spell-action-timer';
@@ -11,7 +11,7 @@ describe('# SpellActionTimer', () => {
         battleHash: '',
         duration: 200,
         position: createPosition(-1, -1),
-        actionArea: [ createPosition(-1, -1) ],
+        actionArea: normalize([ createPosition(-1, -1) ]),
         characterId: '1',
         spellId: '',
         startTime: timerTester.now,
