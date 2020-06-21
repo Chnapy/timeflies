@@ -1,0 +1,41 @@
+
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use node ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Build shared
+      run: yarn workspace @timeflies/shared build
+
+    - name: Test all
+      run: yarn workspaces run test-ci --ci
+      env:
+        CI: true
+
+    - name: Build backend
+      run: yarn workspace @timeflies/back build
+
+    - name: Build frontend
+      run: yarn workspace @timeflies/front build
