@@ -1,16 +1,16 @@
 import { normalize, seedTiledMap, createPosition } from '@timeflies/shared';
 import Benchmark from 'benchmark';
 import b from 'benny';
-import { createAssetLoader } from '../../../assetManager/AssetLoader';
-import { GameState } from '../../../game-state';
-import { createStoreManager } from '../../../store-manager';
-import { battleActionReducer } from '../battleState/battle-action-reducer';
-import { TileClickAction, TileHoverAction } from '../battleState/battle-state-actions';
-import { seedCharacter } from '../entities/character/Character.seed';
-import { seedSpell } from '../entities/spell/Spell.seed';
-import { BattleDataPeriod } from '../snapshot/battle-data';
-import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
-import { createView } from '../../../view';
+import { createAssetLoader } from '../assetManager/AssetLoader';
+import { GameState } from '../game-state';
+import { createStoreManager } from '../store-manager';
+import { battleActionReducer } from '../stages/battle/battleState/battle-action-reducer';
+import { TileClickAction, TileHoverAction } from '../stages/battle/battleState/battle-state-actions';
+import { seedCharacter } from '../stages/battle/entities/character/Character.seed';
+import { seedSpell } from '../stages/battle/entities/spell/Spell.seed';
+import { BattleDataPeriod } from '../stages/battle/snapshot/battle-data';
+import { getInitialSnapshotState } from '../stages/battle/snapshot/snapshot-reducer';
+import { createView } from '../view';
 import { render } from '@testing-library/react';
 
 Benchmark.support.browser = false;
@@ -152,26 +152,26 @@ export const runBenchmark = () => {
         }),
 
         // 910ms
-        b.add('allowed tile hover action (move)', () => {
-            const { storeManager } = initStore();
+        // b.add('allowed tile hover action (move)', () => {
+        //     const { storeManager } = initStore();
 
-            return async () => {
-                await storeManager.dispatch(TileHoverAction({
-                    position: createPosition(9, 6)
-                }));
-            };
-        }),
+        //     return async () => {
+        //         await storeManager.dispatch(TileHoverAction({
+        //             position: createPosition(9, 6)
+        //         }));
+        //     };
+        // }),
 
-        // 1250ms
-        b.add('allowed tile click action (move)', () => {
-            const { storeManager } = initStore();
+        // // 1250ms
+        // b.add('allowed tile click action (move)', () => {
+        //     const { storeManager } = initStore();
 
-            return async () => {
-                await storeManager.dispatch(TileClickAction({
-                    position: createPosition(9, 6)
-                }));
-            };
-        }),
+        //     return async () => {
+        //         await storeManager.dispatch(TileClickAction({
+        //             position: createPosition(9, 6)
+        //         }));
+        //     };
+        // }),
 
         b.cycle(),
         b.complete(summary => {
@@ -181,5 +181,10 @@ export const runBenchmark = () => {
 
             return summary;
         }),
+        b.save({
+            file: 'benchmark-results',
+            format: 'json',
+            folder: 'benchmark'
+        })
     );
 };
