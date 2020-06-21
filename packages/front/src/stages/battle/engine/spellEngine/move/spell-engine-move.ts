@@ -1,5 +1,6 @@
-import { equals, getOrientationFromTo, Position, TileType, TiledManager } from '@timeflies/shared';
+import { createPosition, getOrientationFromTo, Position, TiledManager, TileType } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
+import { TiledMap } from 'tiled-types';
 import { ACCEPTABLE_TILES } from '../../../battleState/battle-action-reducer';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { Spell } from '../../../entities/spell/Spell';
@@ -7,10 +8,10 @@ import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actio
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
-import { TiledMap } from 'tiled-types';
+import { normalize } from '../../../entities/normalize';
 
 export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
-    const character = characters[spell.characterId];
+    const character = characters[ spell.characterId ];
 
     const orientation = getOrientationFromTo(character.position, position);
 
@@ -53,7 +54,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         };
 
         const isSomeoneAtXY = (p: Position): boolean => {
-            return charactersPositionList.some(equals(p));
+            return charactersPositionList.some(cp => cp.id === p.id);
         };
 
         const easyStarGrid: number[][] = [];
@@ -61,7 +62,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         for (let y = 0; y < height; y++) {
             easyStarGrid[ y ] = [];
             for (let x = 0; x < width; x++) {
-                const p: Position = { x, y };
+                const p = createPosition(x, y);
                 const tileType = getTileType(p);
 
                 easyStarGrid[ y ][ x ] = getTileID(p, tileType);
@@ -93,7 +94,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         { x: endX, y: endY }: Position
     ): Promise<Position[]> => new Promise(resolve => {
         finder.findPath(startX, startY, endX, endY, path => {
-            resolve(path ?? []);
+            resolve((path ?? []).map(({ x, y }) => createPosition(x, y)));
         });
         finder.calculate();
     });
@@ -132,7 +133,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
             const spellActions = path.map((position): SpellAction => ({
                 spell,
                 position,
-                actionArea: [ position ]
+                actionArea: normalize([ position ])
             }));
 
             api.dispatch(BattleStateSpellLaunchAction({
@@ -149,7 +150,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
             const state = extractState(api.getState);
 
             const { position } = action.payload;
-            const tile = state.grid.find(t => equals(t.position)(position))!;
+            const tile = state.grid[ position.id ]
 
             await onMoveHover(position, tile.tileType);
 
@@ -159,7 +160,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
             const spell = extractFutureSpell(api.getState)!;
 
             const { position } = action.payload;
-            const tile = state.grid.find(t => equals(t.position)(position))!;
+            const tile = state.grid[ position.id ]
 
             await onMoveClick(position, tile.tileType, spell);
 

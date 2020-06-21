@@ -1,4 +1,4 @@
-import { RequiredOnly, CharacterFeatures, CharacterType, CharacterSnapshot } from '@timeflies/shared';
+import { RequiredOnly, CharacterFeatures, CharacterType, CharacterSnapshot, createPosition } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Character } from './Character';
 
@@ -35,7 +35,7 @@ export const seedCharacterSnapshot = ({ type, features, ...props }: SeedCharacte
         } ],
         defaultSpellId: 's1'
     },
-    position: { x: 4, y: 3 },
+    position: createPosition(4, 3),
     orientation: 'bottom',
     features: {
         life: 100,
@@ -71,7 +71,7 @@ export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...p
             } ],
             defaultSpellId: props.defaultSpellId ?? 's1'
         },
-        position: { x: 4, y: 3 },
+        position: createPosition(4, 3),
         orientation: 'bottom',
         defaultSpellId: '',
         features: {

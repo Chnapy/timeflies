@@ -1,12 +1,13 @@
 import { applyMiddleware, createStore, Store } from '@reduxjs/toolkit';
-import { seedTiledMapAssets } from '@timeflies/shared';
+import { seedTiledMapAssets, createPosition } from '@timeflies/shared';
 import { Reducer } from 'react';
 import { BattleStartAction } from '../battle-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { battleActionMiddleware } from './battle-action-middleware';
-import { battleActionReducer, BattleActionState, GridTile } from './battle-action-reducer';
+import { battleActionReducer, BattleActionState } from './battle-action-reducer';
 import { BattleMapPathAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
+import { normalize } from '../entities/normalize';
 
 describe('# battle-action', () => {
 
@@ -45,10 +46,10 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: [],
+                grid: {},
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null,
             };
 
@@ -67,7 +68,7 @@ describe('# battle-action', () => {
                     charactersSnapshots: [
                         {
                             id: '',
-                            position: { x: 2, y: 8 }
+                            position: createPosition(2, 8)
                         }
                     ]
                 } as any
@@ -79,13 +80,10 @@ describe('# battle-action', () => {
                 tiledSchema: action.payload.tiledMapAssets.schema,
                 tiledImagesUrls: { toto: 'url' },
                 currentAction: 'watch',
-                grid: expect.arrayContaining<GridTile>([ {
-                    tileType: expect.any(String),
-                    position: expect.any(Object)
-                } ]),
+                grid: expect.any(Object),
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             });
         });
@@ -103,14 +101,14 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: [],
+                grid: {},
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
-            const spellEngine = jest.fn(async () => {});
+            const spellEngine = jest.fn(async () => { });
 
             const getSpellEngineFromType = jest.fn(() => spellEngine);
 
@@ -146,10 +144,10 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: [],
-                path: [ { x: 2, y: 2 } ],
-                rangeArea: [ { x: 3, y: 3 } ],
-                actionArea: [ { x: 1, y: 1 } ],
+                grid: {},
+                path: [ createPosition(2, 2) ],
+                rangeArea: normalize([ createPosition(3, 3) ]),
+                actionArea: normalize([ createPosition(1, 1) ]),
                 futureCharacterPosition: null
             };
 
@@ -162,8 +160,8 @@ describe('# battle-action', () => {
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
                 path: [],
-                rangeArea: [],
-                actionArea: []
+                rangeArea: {},
+                actionArea: {}
             });
         });
 
@@ -173,10 +171,10 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: [],
+                grid: {},
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
@@ -202,28 +200,28 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: [],
+                grid: {},
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
             const store = getStore(initialState);
 
             const action = BattleMapPathAction({
-                path: [ { x: 2, y: 3 } ],
-                rangeArea: [ { x: 8, y: 7 } ],
-                actionArea: [ { x: 1, y: 1 } ]
+                path: [ createPosition(2, 3) ],
+                rangeArea: normalize([ createPosition(8, 7) ]),
+                actionArea: normalize([ createPosition(1, 1) ])
             });
 
             store.dispatch(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
-                path: [ { x: 2, y: 3 } ],
-                rangeArea: [ { x: 8, y: 7 } ],
-                actionArea: [ { x: 1, y: 1 } ]
+                path: [ createPosition(2, 3) ],
+                rangeArea: normalize([ createPosition(8, 7) ]),
+                actionArea: normalize([ createPosition(1, 1) ])
             });
         });
     });
@@ -236,10 +234,10 @@ describe('# battle-action', () => {
                 tiledSchema: seedTiledMapAssets('map_1').schema,
                 tiledImagesUrls: { toto: 'url' },
                 currentAction: 'watch',
-                grid: [],
+                grid: {},
                 path: [],
-                rangeArea: [],
-                actionArea: [],
+                rangeArea: {},
+                actionArea: {},
                 futureCharacterPosition: null
             };
 
@@ -254,10 +252,7 @@ describe('# battle-action', () => {
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
-                grid: expect.arrayContaining<GridTile>([ {
-                    tileType: expect.any(String),
-                    position: expect.any(Object)
-                } ])
+                grid: expect.any(Object)
             })
         });
     });

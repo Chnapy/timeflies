@@ -7,6 +7,7 @@ import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';
 import { RoomData } from '../../reducers/room-reducers/room-reducer';
 import { ReadyButton } from './ready-button';
+import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'Room/Ready button',
@@ -23,7 +24,7 @@ const Wrapper: React.FC<{
             name: 'chnapy',
         },
         step: 'room',
-        battle: battleReducer(undefined, {type: ''}),
+        battle: battleReducer(undefined, { type: '' }),
         room: roomState
     };
 
@@ -39,7 +40,7 @@ const Wrapper: React.FC<{
     const view = createView({
         storeManager,
         assetLoader,
-        createPixi: async () => {},
+        createPixi: async () => { },
         gameUIChildren: <ReadyButton />
     });
 
@@ -60,9 +61,7 @@ const getWaitingOthersState = (): RoomData => {
                     {
                         id: 'c1',
                         type: 'sampleChar1',
-                        position: {
-                            x: 4, y: 8
-                        }
+                        position: createPosition(4, 8)
                     }
                 ]
             },
@@ -76,9 +75,7 @@ const getWaitingOthersState = (): RoomData => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     }
                 ]
             }
@@ -130,9 +127,7 @@ const getShouldPutCharactersState = (): RoomData => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     }
                 ]
             }
@@ -176,9 +171,7 @@ const getTeamsEnoughState = (): RoomData => {
                     {
                         id: 'c1',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 1
-                        }
+                        position: createPosition(0, 1)
                     }
                 ]
             },
@@ -192,9 +185,7 @@ const getTeamsEnoughState = (): RoomData => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     },
                 ]
             }
@@ -238,9 +229,7 @@ const getNotReadyState = (): RoomData => {
                     {
                         id: 'c1',
                         type: 'sampleChar1',
-                        position: {
-                            x: 4, y: 8
-                        }
+                        position: createPosition(4, 8)
                     }
                 ]
             },
@@ -254,9 +243,7 @@ const getNotReadyState = (): RoomData => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     }
                 ]
             }
@@ -300,9 +287,7 @@ const getIsLoadingState = (): RoomData => {
                     {
                         id: 'c1',
                         type: 'sampleChar1',
-                        position: {
-                            x: 4, y: 8
-                        }
+                        position: createPosition(4, 8)
                     }
                 ]
             },
@@ -316,9 +301,7 @@ const getIsLoadingState = (): RoomData => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     }
                 ]
             }
@@ -362,9 +345,7 @@ const getLaunchState = (): RoomData => {
                     {
                         id: 'c1',
                         type: 'sampleChar1',
-                        position: {
-                            x: 4, y: 8
-                        }
+                        position: createPosition(4, 8)
                     }
                 ]
             },
@@ -378,9 +359,7 @@ const getLaunchState = (): RoomData => {
                     {
                         id: 'c2',
                         type: 'sampleChar1',
-                        position: {
-                            x: 0, y: 2
-                        }
+                        position: createPosition(0, 2)
                     }
                 ]
             }

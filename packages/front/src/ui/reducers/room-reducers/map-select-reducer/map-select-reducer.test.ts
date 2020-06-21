@@ -1,4 +1,4 @@
-import { MapConfig, RoomServerAction, seedTiledMap } from '@timeflies/shared';
+import { MapConfig, RoomServerAction, seedTiledMap, createPosition } from '@timeflies/shared';
 import { TiledLayerTilelayer } from 'tiled-types';
 import { ReceiveMessageAction } from '../../../../socket/wsclient-actions';
 import { MapBoardTileInfos } from '../../../room-ui/map-board/map-board-tile/map-board-tile';
@@ -72,7 +72,7 @@ describe('# map-select-reducer', () => {
                     config: mapConfig,
                     placementTileList: [ {
                         teamId: 't1',
-                        position: { x: 0, y: 0 }
+                        position: createPosition(0, 0)
                     } ]
                 },
                 playerList: [],
@@ -90,7 +90,7 @@ describe('# map-select-reducer', () => {
                 tileList: [ {
                     type: 'placement',
                     teamId: 't1',
-                    position: { x: 0, y: 0 }
+                    position: createPosition(0, 0)
                 } ]
             }
         });
@@ -171,10 +171,10 @@ describe('# map-select-reducer', () => {
                 id: 'm1',
                 placementTileList: [ {
                     teamId: 't1',
-                    position: { x: 1, y: 1 }
+                    position: createPosition(1, 1)
                 }, {
                     teamId: 't2',
-                    position: { x: 2, y: 2 }
+                    position: createPosition(2, 2)
                 } ]
             },
             teamList: [],
@@ -215,12 +215,12 @@ describe('# map-select-reducer', () => {
                     {
                         type: 'placement',
                         teamId: 't1',
-                        position: { x: 1, y: 1 }
+                        position: createPosition(1, 1)
                     },
                     {
                         type: 'placement',
                         teamId: 't2',
-                        position: { x: 2, y: 2 }
+                        position: createPosition(2, 2)
                     }
                 ]
             }
@@ -262,7 +262,7 @@ describe('# map-select-reducer', () => {
                 tileList: [ {
                     type: 'placement',
                     teamId: 't1',
-                    position: { x: 0, y: 0 }
+                    position: createPosition(0, 0)
                 } ]
             }
         };
@@ -290,7 +290,7 @@ describe('# map-select-reducer', () => {
                 tileList: expect.arrayContaining<MapBoardTileInfos>([ {
                     type: 'placement',
                     teamId: 't1',
-                    position: { x: 0, y: 0 }
+                    position: createPosition(0, 0)
                 }, {
                     type: 'obstacle',
                     position: expect.any(Object)

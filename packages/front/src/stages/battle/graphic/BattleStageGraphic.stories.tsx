@@ -15,6 +15,7 @@ import { teamToSnapshot } from '../entities/team/Team';
 import { seedTeam } from '../entities/team/Team.seed';
 import { BattleStageGraphic } from './BattleStageGraphic';
 import { CanvasContext } from '../../../canvas/CanvasContext';
+import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'graphic/BattleStageGraphic',
@@ -59,10 +60,10 @@ export const Default: React.FC = () => {
 
         const characterList = [
             seedCharacter({
-                id: 'c1', period, playerId: 'p1', position: { x: 4, y: 3 }
+                id: 'c1', period, playerId: 'p1', position: createPosition(4, 3)
             }),
             seedCharacter({
-                id: 'c2', period, playerId: 'p1', position: { x: 6, y: 4 }
+                id: 'c2', period, playerId: 'p1', position: createPosition(6, 4)
             })
         ];
 
@@ -116,122 +117,3 @@ export const Default: React.FC = () => {
 
     return view;
 };
-
-// export const Pathfinder: React.FC<StoryProps> = ({ fakeBattleApi: fakeApi }) => {
-
-//     const charactersCurrent = [
-//         createCharacter('1', 'current', { x: 4, y: 3 }),
-//         createCharacter('2', 'current', { x: 6, y: 4 }),
-//     ];
-
-//     const charactersFuture = [
-//         createCharacter('1', 'future', { x: 4, y: 3 }),
-//         createCharacter('2', 'future', { x: 6, y: 4 }),
-//     ];
-
-//     const initialState: GameState = {
-//         currentPlayer: null,
-//         room: null,
-//         step: 'battle',
-//         battle: {
-//             cycle: {
-//                 launchTime: -1
-//             },
-//             current: {
-//                 characters: charactersCurrent,
-//                 battleHash: '',
-//                 players: [],
-//                 teams: []
-//             },
-//             future: {
-//                 characters: charactersFuture,
-//                 battleHash: '',
-//                 players: [],
-//                 teams: [],
-//                 spellActionSnapshotList: []
-//             }
-//         }
-//     };
-
-//     fakeApi.init({
-//         initialState
-//     });
-
-//     const onMount = async (parent: HTMLElement) => {
-//         const view = parent.firstElementChild as HTMLCanvasElement;
-//         const app = new PIXI.Application({ view, resizeTo: parent });
-
-//         const loader = Controller.loader;
-
-//         const resources = await loader.newInstance()
-//             .add('map', AssetManager.fake.mapSchema)
-//             .addSpritesheet('characters', AssetManager.spritesheets.characters)
-//             .load();
-
-//         const charactersSheet = resources.characters.spritesheet;
-
-//         const mapAssets = resources.map;
-
-//         const mapManager = MapManager(mapAssets, {
-//             getFutureCharacters: () => charactersFuture,
-//             pathfinderCreator: Pathfinder_,
-//             tiledManagerCreator: TiledManager
-//         });
-
-//         const spell = seedSpell('fake', {
-//             period: 'future',
-//             id: '1',
-//             type: 'move',
-//             character: charactersFuture[ 0 ],
-//         });
-
-//         const tiledMapManager = TiledManager(mapAssets);
-
-//         const spellPrepareEngine = SpellPrepareMove(spell, mapManager);
-
-//         const battleStageGraphic = BattleStageGraphic(app.renderer);
-
-//         battleStageGraphic.onCreate({
-//             mapManager,
-//             spritesheets: {
-//                 characters: charactersSheet
-//             }
-//         });
-
-//         app.stage.addChild(battleStageGraphic.getContainer());
-
-//         const { dispatchBindAction } = serviceDispatch({
-//             dispatchBindAction: () => SpellEngineBindAction({
-//                 spell: seedSpell('fake', {
-//                     period: 'future', id: '', type: 'move', character: null as any
-//                 }),
-//                 onTileHover: async (tilePos) => {
-//                     return await spellPrepareEngine.onTileHover(
-//                         tilePos,
-//                         tiledMapManager.getTileType(tilePos)
-//                     );
-//                 },
-//                 onTileClick: async (tilePos) => {
-//                     return await spellPrepareEngine.onTileClick(
-//                         tilePos,
-//                         tiledMapManager.getTileType(tilePos)
-//                     );
-//                 },
-//                 rangeArea: []
-//             })
-//         });
-
-//         dispatchBindAction();
-//     };
-
-//     return <div ref={el => el && onMount(el)} style={{
-//         overflow: 'hidden',
-//         position: 'absolute',
-//         top: 8,
-//         bottom: 8,
-//         left: 0,
-//         right: 0
-//     }}>
-//         <canvas />
-//     </div>;
-// };

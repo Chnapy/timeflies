@@ -1,4 +1,4 @@
-import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester } from '@timeflies/shared';
+import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester, createPosition } from '@timeflies/shared';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { characterToSnapshot } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -47,8 +47,8 @@ describe('# snapshot-reducer', () => {
                 startTime: timerTester.now,
                 spellAction: {
                     spell: seedSpell({ id: 's1', period: 'future' }),
-                    position: { x: 0, y: 0 },
-                    actionArea: [ { x: 0, y: 0 } ]
+                    position: createPosition(0, 0),
+                    actionArea: [ createPosition(0, 0) ]
                 }
             } ]
         }));
@@ -96,15 +96,15 @@ describe('# snapshot-reducer', () => {
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters['c1'].features.life = 50;
+                    characters[ 'c1' ].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: timerTester.now,
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: { x: 0, y: 0 },
-                        actionArea: [ { x: 0, y: 0 } ]
+                        position: createPosition(0, 0),
+                        actionArea: [ createPosition(0, 0) ]
                     }
                 } ]
             }));
@@ -115,15 +115,15 @@ describe('# snapshot-reducer', () => {
 
             const state2 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters['c1'].features.life = 20;
+                    characters[ 'c1' ].features.life = 20;
                 }
             })(state1, SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: timerTester.now,
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: { x: 0, y: 0 },
-                        actionArea: [ { x: 0, y: 0 } ]
+                        position: createPosition(0, 0),
+                        actionArea: [ createPosition(0, 0) ]
                     }
                 } ]
             }));
@@ -135,7 +135,7 @@ describe('# snapshot-reducer', () => {
             }));
 
             expect(state3.battleDataFuture.battleHash).toBe(firstHash);
-            expect(state3.battleDataFuture.characters['c1'].features.life).toBe(50);
+            expect(state3.battleDataFuture.characters[ 'c1' ].features.life).toBe(50);
         });
 
         it('should rollback on previous spell action removed and update current battle data', () => {
@@ -166,15 +166,15 @@ describe('# snapshot-reducer', () => {
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters['c1'].features.life = 50;
+                    characters[ 'c1' ].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: timerTester.now,
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: { x: 0, y: 0 },
-                        actionArea: [ { x: 0, y: 0 } ]
+                        position: createPosition(0, 0),
+                        actionArea: [ createPosition(0, 0) ]
                     }
                 } ]
             }));
@@ -185,15 +185,15 @@ describe('# snapshot-reducer', () => {
 
             const state2 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters['c1'].features.life = 20;
+                    characters[ 'c1' ].features.life = 20;
                 }
             })(state1, SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: timerTester.now,
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: { x: 0, y: 0 },
-                        actionArea: [ { x: 0, y: 0 } ]
+                        position: createPosition(0, 0),
+                        actionArea: [ createPosition(0, 0) ]
                     }
                 } ]
             }));
@@ -237,15 +237,15 @@ describe('# snapshot-reducer', () => {
 
             const state1 = snapshotReducer({
                 getSpellLaunchFn: spellType => (spellAction, { characters }) => {
-                    characters['c1'].features.life = 50;
+                    characters[ 'c1' ].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: timerTester.now,
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: { x: 0, y: 0 },
-                        actionArea: [ { x: 0, y: 0 } ]
+                        position: createPosition(0, 0),
+                        actionArea: [ createPosition(0, 0) ]
                     }
                 } ]
             }));

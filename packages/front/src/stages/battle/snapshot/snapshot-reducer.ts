@@ -12,6 +12,7 @@ import { BattleData, BattleDataPeriod, periodList } from './battle-data';
 import { Normalized, normalize, denormalize } from '../entities/normalize';
 
 export type SnapshotState = {
+    // TODO consider normalize it
     snapshotList: BattleSnapshot[];
     myPlayerId: string;
     launchTime: number;
@@ -19,6 +20,8 @@ export type SnapshotState = {
     playerList: Normalized<Player>;
     battleDataCurrent: BattleData<'current'>;
     battleDataFuture: BattleData<'future'>;
+
+    // TODO consider normalize it
     spellActionSnapshotList: SpellActionSnapshot[];
     currentSpellAction: SpellActionSnapshot | null;
 };

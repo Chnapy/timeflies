@@ -1,4 +1,4 @@
-import { Position, TiledManager } from '@timeflies/shared';
+import { Position, TiledManager, createPosition } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap, { TiledTileset } from 'tiled-types';
@@ -7,6 +7,7 @@ import { requestRender } from '../../../../canvas/GameCanvas';
 import { graphicTheme } from '../graphic-theme';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from './tiledSpellFns';
 import { TileGraphic } from './TileGraphic';
+import { Normalized, normalize } from '../../entities/normalize';
 
 export type TiledMapGraphic = ReturnType<typeof TiledMapGraphic>;
 
@@ -25,6 +26,7 @@ export const TiledMapGraphic = () => {
     const containerOver = new PIXI.Container();
 
     const layerTiles: TileGraphic[] = [];
+    const layerTilesMap: Normalized<TileGraphic> = {};
 
     const { storeEmitter } = CanvasContext.consumer('storeEmitter');
 
@@ -49,10 +51,10 @@ export const TiledMapGraphic = () => {
     const getWorldFromTile = (tiledSchema: TiledMap, { x, y }: Position): Position => {
         const { tilewidth, tileheight } = getTilesize(tiledSchema);
 
-        return {
-            x: x * tilewidth,
-            y: y * tileheight
-        };
+        return createPosition(
+            x * tilewidth,
+            y * tileheight
+        );
     };
 
     storeEmitter.onStateChange(
@@ -64,6 +66,9 @@ export const TiledMapGraphic = () => {
             container.removeChildren().forEach(c => c.destroy());
             containerOver.removeChildren().forEach(c => c.destroy());
             layerTiles.splice(0, Infinity);
+            for (const k in layerTilesMap) {
+                delete layerTilesMap[ k ];
+            }
 
             if (!schema || !images) {
                 return;
@@ -100,10 +105,11 @@ export const TiledMapGraphic = () => {
 
             const getWorldPositionFromIndex = (index: number, { tilewidth, tileheight }: TiledTileset): Position => {
                 const tilePos = tiledManager.getTilePositionFromIndex(index);
-                return {
-                    x: tilePos.x * tilewidth,
-                    y: tilePos.y * tileheight
-                };
+
+                return createPosition(
+                    tilePos.x * tilewidth,
+                    tilePos.y * tileheight
+                );
             };
 
             const getTileGraphic = (id: number, index: number): TileGraphic | null => {
@@ -136,6 +142,8 @@ export const TiledMapGraphic = () => {
                     .map(getTileGraphic)
                     .filter((tile): tile is TileGraphic => tile !== null)
             );
+
+            Object.assign(layerTilesMap, normalize(layerTiles));
 
             const layerContainer = new PIXI.Container();
             layerContainer.addChild(...layerTiles.map(t => t.container));
@@ -174,7 +182,7 @@ export const TiledMapGraphic = () => {
                 return null;
             }
 
-            const spellType = snapshotState.battleDataFuture.spells[currentSpellAction.spellId].staticData.type;
+            const spellType = snapshotState.battleDataFuture.spells[ currentSpellAction.spellId ].staticData.type;
 
             return {
                 currentSpellAction,
@@ -191,7 +199,7 @@ export const TiledMapGraphic = () => {
 
                 startFn.onSpellStartFn({
                     ...currentSpellAction,
-                    tileGraphicList: layerTiles,
+                    tileGraphicList: layerTilesMap,
                 });
             }
         },

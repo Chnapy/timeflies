@@ -14,6 +14,7 @@ import { seedSpellSnapshot } from '../entities/spell/Spell.seed';
 import { seedTeamSnapshot } from '../entities/team/Team.seed';
 import { BattleStageGraphic } from '../graphic/BattleStageGraphic';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
+import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'Battleflow'
@@ -60,7 +61,7 @@ export const Default: React.FC = () => {
 
         const characterList = [
             seedCharacterSnapshot({
-                id: 'c1', playerId: 'p1', position: { x: 4, y: 3 },
+                id: 'c1', playerId: 'p1', position: createPosition(4, 3),
                 features: {
                     life: 100,
                     actionTime: 30000
@@ -78,7 +79,7 @@ export const Default: React.FC = () => {
                 }
             }),
             seedCharacterSnapshot({
-                id: 'c2', playerId: 'p2', position: { x: 6, y: 4 },
+                id: 'c2', playerId: 'p2', position: createPosition(6, 4),
                 features: {
                     life: 120,
                     actionTime: 25000

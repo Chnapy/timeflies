@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import { Theme, useTheme } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import { assertIsDefined, CharacterRoom, CharacterType, equals, PlayerRoom, Position, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, CharacterRoom, CharacterType, PlayerRoom, Position, TeamRoom } from '@timeflies/shared';
 import React from 'react';
 import { CharacterImage } from '../../../battle-ui/character-list-panel/character-item/character-image';
 import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
@@ -19,7 +19,7 @@ export interface MapBoardTilePlacementProps {
 
 const findCharacter = ([ player, ...rest ]: PlayerRoom[], position: Position): CharacterRoom | undefined => {
     return player
-        ? (player.characters.find(c => equals(c.position)(position)) ?? findCharacter(rest, position))
+        ? (player.characters.find(c => c.position.id === position.id) ?? findCharacter(rest, position))
         : undefined;
 };
 

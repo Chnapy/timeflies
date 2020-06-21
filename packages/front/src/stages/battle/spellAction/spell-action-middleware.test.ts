@@ -1,5 +1,5 @@
 import { MiddlewareAPI } from '@reduxjs/toolkit';
-import { seedSpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { seedSpellActionSnapshot, TimerTester, createPosition } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -9,6 +9,7 @@ import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { spellActionMiddleware } from './spell-action-middleware';
 import { SpellActionTimer } from './spell-action-timer';
+import { normalize } from '../entities/normalize';
 
 describe('# spell-action-middleware', () => {
 
@@ -74,8 +75,8 @@ describe('# spell-action-middleware', () => {
                 spellActions: [
                     {
                         spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
+                        position: createPosition(-1, -1),
+                        actionArea: normalize([ createPosition(-1, -1) ])
                     }
                 ]
             });
@@ -97,8 +98,8 @@ describe('# spell-action-middleware', () => {
                         startTime: timerTester.now,
                         spellAction: {
                             spell,
-                            position: { x: -1, y: -1 },
-                            actionArea: [ { x: -1, y: -1 } ]
+                            position: createPosition(-1, -1),
+                            actionArea: normalize([ createPosition(-1, -1) ])
                         }
                     } ]
                 })
@@ -112,13 +113,13 @@ describe('# spell-action-middleware', () => {
                 spellActions: [
                     {
                         spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
+                        position: createPosition(-1, -1),
+                        actionArea: normalize([ createPosition(-1, -1) ])
                     },
                     {
                         spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
+                        position: createPosition(-1, -1),
+                        actionArea: normalize([ createPosition(-1, -1) ])
                     }
                 ]
             });
@@ -145,13 +146,13 @@ describe('# spell-action-middleware', () => {
                 spellActions: [
                     {
                         spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
+                        position: createPosition(-1, -1),
+                        actionArea: normalize([ createPosition(-1, -1) ])
                     },
                     {
                         spell,
-                        position: { x: -1, y: -1 },
-                        actionArea: [ { x: -1, y: -1 } ]
+                        position: createPosition(-1, -1),
+                        actionArea: normalize([ createPosition(-1, -1) ])
                     }
                 ]
             });
@@ -462,7 +463,7 @@ describe('# spell-action-middleware', () => {
                                 id: snapshot.spellId,
                             }),
                             position: snapshot.position,
-                            actionArea: snapshot.actionArea
+                            actionArea: normalize(snapshot.actionArea)
                         }
                     } ]
                 })
