@@ -4,9 +4,8 @@ import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleS
 import { Character, characterIsAlive } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { BattleStartAction } from '../battle-actions';
-import { TurnSnapshot, TURN_DELAY } from '@timeflies/shared';
+import { Normalized, TurnSnapshot, TURN_DELAY } from '@timeflies/shared';
 import { CycleState, getTurnState } from './cycle-reducer';
-import { Normalized } from '../entities/normalize';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => CycleState;

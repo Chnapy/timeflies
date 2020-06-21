@@ -1,4 +1,5 @@
 import { Position } from '../geo/position';
+import { Normalized } from '../util/normalize';
 
 export type SpellType =
     | 'move'
@@ -32,6 +33,6 @@ export interface SpellActionSnapshot {
     duration: number;
     spellId: string;
     position: Position;
-    actionArea: Position[];
+    actionArea: Normalized<Position>;
     battleHash: string;
 }

@@ -1,12 +1,11 @@
-import { BattleSnapshot, getBattleSnapshotWithHash, TimerTester, createPosition } from '@timeflies/shared';
+import { BattleSnapshot, createPosition, getBattleSnapshotWithHash, normalize, Normalized, TimerTester } from '@timeflies/shared';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { characterToSnapshot } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { Team } from '../entities/team/Team';
 import { SpellActionLaunchAction, SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
-import { snapshotReducer, getInitialSnapshotState } from './snapshot-reducer';
-import { Normalized } from '../entities/normalize';
+import { getInitialSnapshotState, snapshotReducer } from './snapshot-reducer';
 
 describe('# snapshot-reducer', () => {
 
@@ -48,7 +47,7 @@ describe('# snapshot-reducer', () => {
                 spellAction: {
                     spell: seedSpell({ id: 's1', period: 'future' }),
                     position: createPosition(0, 0),
-                    actionArea: [ createPosition(0, 0) ]
+                    actionArea: normalize([ createPosition(0, 0) ])
                 }
             } ]
         }));
@@ -104,7 +103,7 @@ describe('# snapshot-reducer', () => {
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
                         position: createPosition(0, 0),
-                        actionArea: [ createPosition(0, 0) ]
+                        actionArea: normalize([ createPosition(0, 0) ])
                     }
                 } ]
             }));
@@ -123,7 +122,7 @@ describe('# snapshot-reducer', () => {
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
                         position: createPosition(0, 0),
-                        actionArea: [ createPosition(0, 0) ]
+                        actionArea: normalize([ createPosition(0, 0) ])
                     }
                 } ]
             }));
@@ -174,7 +173,7 @@ describe('# snapshot-reducer', () => {
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
                         position: createPosition(0, 0),
-                        actionArea: [ createPosition(0, 0) ]
+                        actionArea: normalize([ createPosition(0, 0) ])
                     }
                 } ]
             }));
@@ -193,7 +192,7 @@ describe('# snapshot-reducer', () => {
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
                         position: createPosition(0, 0),
-                        actionArea: [ createPosition(0, 0) ]
+                        actionArea: normalize([ createPosition(0, 0) ])
                     }
                 } ]
             }));
@@ -245,7 +244,7 @@ describe('# snapshot-reducer', () => {
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
                         position: createPosition(0, 0),
-                        actionArea: [ createPosition(0, 0) ]
+                        actionArea: normalize([ createPosition(0, 0) ])
                     }
                 } ]
             }));

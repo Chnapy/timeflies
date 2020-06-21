@@ -1,10 +1,11 @@
-import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, MapConfig, NotifySAction, SpellActionCAction, TimerTester, seedSpellActionSnapshot, SpellSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleRunSAction, CharacterSnapshot, ConfirmSAction, MapConfig, NotifySAction, SpellActionCAction, TimerTester, seedSpellActionSnapshot, SpellSnapshot, createPosition } from '@timeflies/shared';
 import { Server, WebSocket } from 'mock-socket';
 import path from 'path';
 import { PlayerService } from '../../PlayerService';
 import { TeamData } from '../../TeamData';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { BattleRunRoom, RoomStateReady } from './BattleRunRoom';
+import { normalize } from '@timeflies/shared';
 
 describe.skip('BattleRunRoom', () => {
 
@@ -68,10 +69,7 @@ describe.skip('BattleRunRoom', () => {
         battleRunRoom = BattleRunRoom(roomState);
 
         const onStart = (char: CharacterSnapshot, spellMove: SpellSnapshot) => {
-            const position = {
-                ...char.position,
-                y: char.position.y + 1
-            };
+            const position = createPosition(char.position.x, char.position.y + 1);
 
             assertIsDefined(spellMove);
 
@@ -83,7 +81,7 @@ describe.skip('BattleRunRoom', () => {
                     characterId: char.id,
                     duration: spellMove.features.duration,
                     position,
-                    actionArea: [ position ],
+                    actionArea: normalize([ position ]),
                 })
             };
             const action: SpellActionCAction = c0GetCharActionCAction

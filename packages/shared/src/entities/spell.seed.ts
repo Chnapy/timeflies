@@ -3,7 +3,7 @@ import { createPosition } from '../geo';
 
 export const seedSpellActionSnapshot = (spellId: string, partial: Partial<SpellActionSnapshot> = {}): SpellActionSnapshot => ({
     spellId,
-    actionArea: [],
+    actionArea: {},
     battleHash: '',
     characterId: '',
     duration: -1,

@@ -1,9 +1,9 @@
 import { Box, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { denormalize } from '@timeflies/shared';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { SpellButton } from './spell-button/spell-button';
-import { denormalize } from '../../../stages/battle/entities/normalize';
 
 const useStyles = makeStyles(() => ({
     root: {

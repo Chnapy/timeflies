@@ -1,4 +1,4 @@
-import { seedTiledMap, createPosition } from '@timeflies/shared';
+import { normalize, seedTiledMap, createPosition } from '@timeflies/shared';
 import Benchmark from 'benchmark';
 import b from 'benny';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
@@ -12,7 +12,6 @@ import { BattleDataPeriod } from '../snapshot/battle-data';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
 import { createView } from '../../../view';
 import { render } from '@testing-library/react';
-import { normalize } from '../entities/normalize';
 
 Benchmark.support.browser = false;
 

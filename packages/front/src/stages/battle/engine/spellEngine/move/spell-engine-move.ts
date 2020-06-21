@@ -1,4 +1,4 @@
-import { createPosition, getOrientationFromTo, Position, TiledManager, TileType } from '@timeflies/shared';
+import { createPosition, getOrientationFromTo, normalize, Position, TiledManager, TileType } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
 import { TiledMap } from 'tiled-types';
 import { ACCEPTABLE_TILES } from '../../../battleState/battle-action-reducer';
@@ -8,7 +8,6 @@ import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actio
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
-import { normalize } from '../../../entities/normalize';
 
 export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
     const character = characters[ spell.characterId ];

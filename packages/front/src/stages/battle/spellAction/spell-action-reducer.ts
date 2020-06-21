@@ -1,6 +1,5 @@
-import { Position } from '@timeflies/shared';
+import { Normalized, Position } from '@timeflies/shared';
 import { Spell } from '../entities/spell/Spell';
-import { Normalized } from '../entities/normalize';
 
 export type SpellAction = {
     spell: Spell<'future'>;

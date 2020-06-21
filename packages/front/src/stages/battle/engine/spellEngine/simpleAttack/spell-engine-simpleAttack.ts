@@ -1,8 +1,7 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { BresenhamPoint, Position, TiledManager, TileType } from '@timeflies/shared';
+import { BresenhamPoint, denormalize, normalize, Position, TiledManager, TileType } from '@timeflies/shared';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, BattleStateSpellPrepareAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
 import { characterAlterLife } from '../../../entities/character/Character';
-import { denormalize, normalize } from '../../../entities/normalize';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';

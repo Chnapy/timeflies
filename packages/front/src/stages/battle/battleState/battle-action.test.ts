@@ -1,5 +1,5 @@
 import { applyMiddleware, createStore, Store } from '@reduxjs/toolkit';
-import { seedTiledMapAssets, createPosition } from '@timeflies/shared';
+import { normalize, seedTiledMapAssets, createPosition } from '@timeflies/shared';
 import { Reducer } from 'react';
 import { BattleStartAction } from '../battle-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -7,7 +7,6 @@ import { seedSpell } from '../entities/spell/Spell.seed';
 import { battleActionMiddleware } from './battle-action-middleware';
 import { battleActionReducer, BattleActionState } from './battle-action-reducer';
 import { BattleMapPathAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
-import { normalize } from '../entities/normalize';
 
 describe('# battle-action', () => {
 

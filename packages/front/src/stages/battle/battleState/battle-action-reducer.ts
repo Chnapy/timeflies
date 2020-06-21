@@ -1,9 +1,8 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { Position, TiledManager, TileType, createPosition } from '@timeflies/shared';
+import { createPosition, normalize, Normalized, Position, TiledManager, TileType } from '@timeflies/shared';
 import TiledMap from 'tiled-types/types';
 import { BattleStartAction } from '../battle-actions';
 import { BattleMapPathAction, BattleStateSpellPrepareAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
-import { Normalized, normalize } from '../entities/normalize';
 
 export type BState = 'watch' | 'spellPrepare';
 

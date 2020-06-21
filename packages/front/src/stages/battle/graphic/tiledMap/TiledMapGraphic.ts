@@ -1,4 +1,4 @@
-import { Position, TiledManager, createPosition } from '@timeflies/shared';
+import { createPosition, normalize, Normalized, Position, TiledManager } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap, { TiledTileset } from 'tiled-types';
@@ -7,7 +7,6 @@ import { requestRender } from '../../../../canvas/GameCanvas';
 import { graphicTheme } from '../graphic-theme';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from './tiledSpellFns';
 import { TileGraphic } from './TileGraphic';
-import { Normalized, normalize } from '../../entities/normalize';
 
 export type TiledMapGraphic = ReturnType<typeof TiledMapGraphic>;
 

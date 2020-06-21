@@ -1,4 +1,4 @@
-import { inferFn, SpellActionSnapshot, SpellType } from '@timeflies/shared';
+import { inferFn, Normalized, SpellActionSnapshot, SpellType } from '@timeflies/shared';
 import { TileHoverFnProps } from '../graphic/tiledMap/TiledMapGraphic';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from '../graphic/tiledMap/tiledSpellFns';
 import { TileGraphic } from '../graphic/tiledMap/TileGraphic';
@@ -6,7 +6,6 @@ import { BattleData } from '../snapshot/battle-data';
 import { SpellAction } from '../spellAction/spell-action-reducer';
 import { spellLaunchMove } from './spellEngine/move/spell-engine-move';
 import { spellLaunchSimpleAttack } from './spellEngine/simpleAttack/spell-engine-simpleAttack';
-import { Normalized } from '../entities/normalize';
 
 type TiledMapHoverFn = (props: TileHoverFnProps) => (startTime: number) => void;
 

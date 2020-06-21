@@ -1,9 +1,11 @@
+import { createPosition, normalize } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../assetManager/AssetManager';
 import { CanvasContext } from '../../../canvas/CanvasContext';
 import { GameState } from '../../../game-state';
+import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { createStoreManager } from '../../../store-manager';
 import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../view';
@@ -13,8 +15,6 @@ import { seedPlayerSnapshot } from '../entities/player/Player.seed';
 import { seedSpellSnapshot } from '../entities/spell/Spell.seed';
 import { seedTeamSnapshot } from '../entities/team/Team.seed';
 import { BattleStageGraphic } from '../graphic/BattleStageGraphic';
-import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
-import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'Battleflow'
@@ -196,10 +196,7 @@ export const Default: React.FC = () => {
 
         const { position } = storeManager.getState().battle.snapshotState.battleDataCurrent.characters.c2;
 
-        const newPosition = {
-            ...position,
-            x: position.x + 1
-        };
+        const newPosition = createPosition(position.x + 1, position.y);
 
         storeManager.dispatch(ReceiveMessageAction({
             type: 'notify',
@@ -207,7 +204,7 @@ export const Default: React.FC = () => {
             spellActionSnapshot: {
                 spellId: 's3',
                 characterId: 'c2',
-                actionArea: [ newPosition ],
+                actionArea: normalize([ newPosition ]),
                 position: newPosition,
                 startTime: Date.now() - 100,
                 duration: 600,
