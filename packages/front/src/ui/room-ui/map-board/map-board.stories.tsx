@@ -1,5 +1,5 @@
 import { Box } from '@material-ui/core';
-import { equals, MapConfig, createPosition } from '@timeflies/shared';
+import { MapConfig, createPosition } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
