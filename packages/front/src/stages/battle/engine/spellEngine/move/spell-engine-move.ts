@@ -124,9 +124,9 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         }
     };
 
-    const onMoveClick = async (tilePos: Position, tileType: TileType, spell: Spell<'future'>) => {
+    const onMoveClick = (spell: Spell<'future'>) => {
 
-        const path = await getPath(tilePos, tileType);
+        const path = extractState(api.getState).path;
 
         if (path.length) {
             const spellActions = path.map((position): SpellAction => ({
@@ -154,14 +154,9 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
             await onMoveHover(position, tile.tileType);
 
         } else if (TileClickAction.match(action)) {
-            const state = extractState(api.getState);
-
             const spell = extractFutureSpell(api.getState)!;
 
-            const { position } = action.payload;
-            const tile = state.grid[ position.id ]
-
-            await onMoveClick(position, tile.tileType, spell);
+            onMoveClick(spell);
 
         } else if (SpellActionLaunchAction.match(action)) {
 

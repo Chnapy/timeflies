@@ -62,7 +62,11 @@ export const createStoreManager = ({
     const store = configureStore({
         reducer: rootReducer,
         middleware: [
-            ...getDefaultMiddleware(),
+            ...getDefaultMiddleware({
+                thunk: false,
+                // immutableCheck: false,
+                // serializableCheck: false
+            }),
             ...middlewareList
         ],
         preloadedState: initialState
