@@ -13,7 +13,8 @@
     "test-coverage": "yarn test * --coverage --collectCoverageFrom=src/**/*.{ts,tsx} --collectCoverageFrom=!src/**/*.stories.{ts,tsx} --collectCoverageFrom=!src/**/*.seed.{ts,tsx}",
     "storybook": "STORYBOOK_CONTEXT=true start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
-    "check-type": "tsc --noEmit"
+    "check-type": "tsc --noEmit",
+    "check-performance": "REACT_APP_SERVER_URL=foo jest --config benchmark/jest.config.js"
   },
   "dependencies": {
     "@material-ui/core": "^4.9.11",

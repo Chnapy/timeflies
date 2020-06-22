@@ -43,7 +43,7 @@ jobs:
       run: yarn workspace @timeflies/shared build
 
     - name: Run benchmark
-      run: cd packages/front && yarn test performance
+      run: cd packages/front && yarn check-performance
       env:
         CI: true
 
@@ -63,14 +63,10 @@ jobs:
         # Where the previous data file is stored
         external-data-json-path: ./cache/benchmark-data.json
 
-        output-file-path: packages/front/benchmark/results.txt
+        output-file-path: packages/front/benchmark/temp/results.txt
 
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
-        # auto-push: true
         comment-always: true
-
-        # Show alert with commit comment on detecting possible performance regression
         alert-threshold: '150%'
-        # comment-on-alert: true
         fail-on-alert: true
