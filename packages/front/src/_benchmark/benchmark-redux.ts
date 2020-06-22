@@ -12,6 +12,12 @@ import { BattleDataPeriod } from '../stages/battle/snapshot/battle-data';
 import { getInitialSnapshotState } from '../stages/battle/snapshot/snapshot-reducer';
 import { createView } from '../view';
 import { render } from '@testing-library/react';
+import path from 'path';
+import fs from 'fs';
+import { promisify } from 'util';
+
+const mkdir = promisify(fs.mkdir);
+const writeFile = promisify(fs.writeFile);
 
 Benchmark.support.browser = false;
 
@@ -180,11 +186,27 @@ export const runBenchmark = () => {
             console.error = error;
 
             return summary;
-        }),
-        b.save({
-            file: 'benchmark-results',
-            format: 'json',
-            folder: 'benchmark'
         })
-    );
+    ).then(async summary => {
+
+        let fileContent = '';
+
+        for (const r of summary.results)
+            fileContent += `${r.name} x ${r.ops} ops/sec ±${r.margin}% (${r.samples} runs sampled)
+`;
+
+        const folder = 'benchmark';
+        const fileName = 'results.txt';
+
+        const fullPath = path.join(folder, fileName);
+
+        try {
+            await mkdir(folder);
+        } catch (e) { }
+
+        await writeFile(fullPath, fileContent);
+
+        console.log('Benchmark results wrote to ' + fullPath + ':');
+        console.log(fileContent);
+    });
 };
