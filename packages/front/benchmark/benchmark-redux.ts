@@ -1,16 +1,16 @@
 import { normalize, seedTiledMap, createPosition } from '@timeflies/shared';
 import Benchmark from 'benchmark';
 import b from 'benny';
-import { createAssetLoader } from '../assetManager/AssetLoader';
-import { GameState } from '../game-state';
-import { createStoreManager } from '../store-manager';
-import { battleActionReducer } from '../stages/battle/battleState/battle-action-reducer';
-import { TileClickAction, TileHoverAction } from '../stages/battle/battleState/battle-state-actions';
-import { seedCharacter } from '../stages/battle/entities/character/Character.seed';
-import { seedSpell } from '../stages/battle/entities/spell/Spell.seed';
-import { BattleDataPeriod } from '../stages/battle/snapshot/battle-data';
-import { getInitialSnapshotState } from '../stages/battle/snapshot/snapshot-reducer';
-import { createView } from '../view';
+import { createAssetLoader } from '../src/assetManager/AssetLoader';
+import { GameState } from '../src/game-state';
+import { createStoreManager } from '../src/store-manager';
+import { battleActionReducer } from '../src/stages/battle/battleState/battle-action-reducer';
+import { TileClickAction, TileHoverAction } from '../src/stages/battle/battleState/battle-state-actions';
+import { seedCharacter } from '../src/stages/battle/entities/character/Character.seed';
+import { seedSpell } from '../src/stages/battle/entities/spell/Spell.seed';
+import { BattleDataPeriod } from '../src/stages/battle/snapshot/battle-data';
+import { getInitialSnapshotState } from '../src/stages/battle/snapshot/snapshot-reducer';
+import { createView } from '../src/view';
 import { render } from '@testing-library/react';
 import path from 'path';
 import fs from 'fs';
@@ -195,7 +195,7 @@ export const runBenchmark = () => {
             fileContent += `${r.name} x ${r.ops} ops/sec ±${r.margin}% (${r.samples} runs sampled)
 `;
 
-        const folder = 'benchmark';
+        const folder = path.join('benchmark', 'temp');
         const fileName = 'results.txt';
 
         const fullPath = path.join(folder, fileName);
@@ -208,5 +208,7 @@ export const runBenchmark = () => {
 
         console.log('Benchmark results wrote to ' + fullPath + ':');
         console.log(fileContent);
+
+        return summary;
     });
 };

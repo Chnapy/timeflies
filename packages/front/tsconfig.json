@@ -20,7 +20,8 @@
   },
   "include": [
     "src/**/*",
-    ".storybook/*"
+    ".storybook/*",
+    "benchmark/*"
   ],
   "exclude": [
     "**/node_modules"
