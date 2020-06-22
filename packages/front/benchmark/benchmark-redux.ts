@@ -158,26 +158,26 @@ export const runBenchmark = () => {
         }),
 
         // 910ms
-        // b.add('allowed tile hover action (move)', () => {
-        //     const { storeManager } = initStore();
+        b.add('allowed tile hover action (move)', () => {
+            const { storeManager } = initStore();
 
-        //     return async () => {
-        //         await storeManager.dispatch(TileHoverAction({
-        //             position: createPosition(9, 6)
-        //         }));
-        //     };
-        // }),
+            return async () => {
+                await storeManager.dispatch(TileHoverAction({
+                    position: createPosition(9, 6)
+                }));
+            };
+        }),
 
-        // // 1250ms
-        // b.add('allowed tile click action (move)', () => {
-        //     const { storeManager } = initStore();
+        // 1250ms
+        b.add('allowed tile click action (move)', () => {
+            const { storeManager } = initStore();
 
-        //     return async () => {
-        //         await storeManager.dispatch(TileClickAction({
-        //             position: createPosition(9, 6)
-        //         }));
-        //     };
-        // }),
+            return async () => {
+                await storeManager.dispatch(TileClickAction({
+                    position: createPosition(9, 6)
+                }));
+            };
+        }),
 
         b.cycle(),
         b.complete(summary => {
