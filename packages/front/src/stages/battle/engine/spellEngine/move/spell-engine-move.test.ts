@@ -232,10 +232,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                         tileType: 'default',
                     }
                 ]),
-                path: [
-                    createPosition(1, 0),
-                    createPosition(2, 0)
-                ],
+                path: [],
                 rangeArea: {},
                 actionArea: {},
                 futureCharacterPosition: null
