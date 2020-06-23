@@ -2,7 +2,7 @@ import React from 'react';
 import { App } from './app';
 import { AssetLoader } from './assetManager/AssetLoader';
 import { GameCanvas } from './canvas/GameCanvas';
-import { StoreManager } from './store-manager';
+import { StoreManager } from './store/store-manager';
 import { CanvasContext } from './canvas/CanvasContext';
 
 type ViewProps = {

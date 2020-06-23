@@ -1,14 +1,16 @@
 import { Action, configureStore, getDefaultMiddleware, Middleware } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
-import { AssetLoader } from './assetManager/AssetLoader';
-import { GameState } from './game-state';
-import { ReceiveMessageAction, SendMessageAction } from './socket/wsclient-actions';
-import { wsClientMiddleware } from './socket/wsclient-middleware';
-import { getBattleMiddlewareList } from './ui/reducers/battle-reducers/battle-middleware-list';
-import { roomMiddleware } from './ui/reducers/room-reducers/room-middleware';
-import { rootReducer } from './ui/reducers/root-reducer';
-import { bootMiddleware } from './stages/boot/boot-middleware';
-import { CanvasContext } from './canvas/CanvasContext';
+import { AssetLoader } from '../assetManager/AssetLoader';
+import { GameState } from '../game-state';
+import { ReceiveMessageAction, SendMessageAction } from '../socket/wsclient-actions';
+import { wsClientMiddleware } from '../socket/wsclient-middleware';
+import { getBattleMiddlewareList } from '../ui/reducers/battle-reducers/battle-middleware-list';
+import { roomMiddleware } from '../ui/reducers/room-reducers/room-middleware';
+import { rootReducer } from '../ui/reducers/root-reducer';
+import { bootMiddleware } from '../stages/boot/boot-middleware';
+import { CanvasContext } from '../canvas/CanvasContext';
+import { batchReducer } from './batch-reducer';
+import { batchMiddleware } from './batch-middleware';
 
 export type StoreManager = ReturnType<typeof createStoreManager>;
 
@@ -35,6 +37,10 @@ export const createStoreManager = ({
     middlewareList = defaultMiddlewareList(assetLoader),
 }: Props) => {
 
+    middlewareList.push(
+        batchMiddleware
+    );
+
     if (process.env.NODE_ENV === 'development') {
         const logger = createLogger({
             collapsed: true,
@@ -60,7 +66,7 @@ export const createStoreManager = ({
     }
 
     const store = configureStore({
-        reducer: rootReducer,
+        reducer: batchReducer(rootReducer),
         middleware: [
             ...getDefaultMiddleware({
                 thunk: false,

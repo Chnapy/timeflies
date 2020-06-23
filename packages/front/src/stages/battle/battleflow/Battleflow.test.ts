@@ -3,7 +3,7 @@ import { BattleSnapshot, createPosition, denormalize, getBattleSnapshotWithHash,
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
-import { createStoreManager } from '../../../store-manager';
+import { createStoreManager } from '../../../store/store-manager';
 import { rootReducer } from '../../../ui/reducers/root-reducer';
 import { battleActionReducer } from '../battleState/battle-action-reducer';
 import { TileClickAction } from '../battleState/battle-state-actions';

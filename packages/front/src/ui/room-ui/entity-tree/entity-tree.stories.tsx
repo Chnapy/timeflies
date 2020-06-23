@@ -1,7 +1,7 @@
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
-import { createStoreManager } from '../../../store-manager';
+import { createStoreManager } from '../../../store/store-manager';
 import { createView } from '../../../view';
 import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';

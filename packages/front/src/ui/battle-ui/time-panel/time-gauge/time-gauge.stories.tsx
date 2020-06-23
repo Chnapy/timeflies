@@ -5,7 +5,7 @@ import { createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { seedGameState } from '../../../../game-state.seed';
 import { seedCharacter } from '../../../../stages/battle/entities/character/Character.seed';
 import { seedSpell } from '../../../../stages/battle/entities/spell/Spell.seed';
-import { createStoreManager } from '../../../../store-manager';
+import { createStoreManager } from '../../../../store/store-manager';
 import { createView } from '../../../../view';
 import { battleReducer, BattleState } from '../../../reducers/battle-reducers/battle-reducer';
 import { TimeGauge } from './time-gauge';

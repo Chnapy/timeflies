@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { GameState } from '../../../../game-state';
-import { createStoreManager } from '../../../../store-manager';
+import { createStoreManager } from '../../../../store/store-manager';
 import { battleReducer } from '../../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../../view';
 import { BattleStartAction } from '../../battle-actions';
