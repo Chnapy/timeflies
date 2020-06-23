@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { AssetLoader } from '../assetManager/AssetLoader';
 import { TiledMapGraphic } from '../stages/battle/graphic/tiledMap/TiledMapGraphic';
-import { StoreEmitter } from '../store-manager';
+import { StoreEmitter } from '../store/store-manager';
 
 export interface CanvasContextMap {
     readonly storeEmitter: StoreEmitter;

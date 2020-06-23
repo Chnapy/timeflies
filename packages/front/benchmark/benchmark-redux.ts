@@ -3,7 +3,7 @@ import Benchmark from 'benchmark';
 import b from 'benny';
 import { createAssetLoader } from '../src/assetManager/AssetLoader';
 import { GameState } from '../src/game-state';
-import { createStoreManager } from '../src/store-manager';
+import { createStoreManager } from '../src/store/store-manager';
 import { battleActionReducer } from '../src/stages/battle/battleState/battle-action-reducer';
 import { TileClickAction, TileHoverAction } from '../src/stages/battle/battleState/battle-state-actions';
 import { seedCharacter } from '../src/stages/battle/entities/character/Character.seed';

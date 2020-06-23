@@ -3,7 +3,7 @@ import { MapConfig, createPosition } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
-import { createStoreManager } from '../../../store-manager';
+import { createStoreManager } from '../../../store/store-manager';
 import { createView } from '../../../view';
 import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { MapBoard } from './map-board';

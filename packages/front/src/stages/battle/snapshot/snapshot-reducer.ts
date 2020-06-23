@@ -106,15 +106,15 @@ const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string,
     data.battleHash = battleHash;
 
     spellsSnapshots.forEach(snap => {
-        const spell = data.spells[snap.id];
-        if(spell)
-        Object.assign(spell, Spell(period, snap));
+        const spell = data.spells[ snap.id ];
+        if (spell)
+            Object.assign(spell, Spell(period, snap));
     });
 
     charactersSnapshots.forEach(snap => {
-        const character = data.characters[snap.id];
-        if(character)
-        Object.assign(character, Character(period, myPlayerId, snap));
+        const character = data.characters[ snap.id ];
+        if (character)
+            Object.assign(character, Character(period, myPlayerId, snap));
     });
 
     // data.spells.forEach((s, i) => Object.assign(s, Spell(period, spellsSnapshots[ i ])));

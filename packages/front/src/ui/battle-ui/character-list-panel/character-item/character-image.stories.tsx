@@ -3,7 +3,7 @@ import { AssetLoader, createAssetLoader } from '../../../../assetManager/AssetLo
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { useAssetLoader } from '../../../../assetManager/AssetProvider';
 import { seedGameState } from '../../../../game-state.seed';
-import { createStoreManager } from '../../../../store-manager';
+import { createStoreManager } from '../../../../store/store-manager';
 import { createView } from '../../../../view';
 import { battleReducer } from '../../../reducers/battle-reducers/battle-reducer';
 import { CharacterImage } from './character-image';

@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { createAssetLoader } from '../../../../../../assetManager/AssetLoader';
-import { createStoreManager } from '../../../../../../store-manager';
+import { createStoreManager } from '../../../../../../store/store-manager';
 import { CreatePixiFn, createView } from '../../../../../../view';
 import { TeamIndicatorGraphic } from './team-indicator-graphic';
 

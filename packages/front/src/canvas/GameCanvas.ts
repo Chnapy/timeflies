@@ -4,7 +4,7 @@ import { GameStateStep } from '../game-state';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
 import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
 import { RoomStageGraphic } from '../stages/room/graphic/RoomStageGraphic';
-import { StoreEmitter } from '../store-manager';
+import { StoreEmitter } from '../store/store-manager';
 import { CanvasContext } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 

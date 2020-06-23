@@ -3,7 +3,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
-import { createStoreManager } from '../../../store-manager';
+import { createStoreManager } from '../../../store/store-manager';
 import { UIIcon } from '../../../ui/battle-ui/spell-panel/spell-button/ui-icon';
 import { CreatePixiFn, createView } from '../../../view';
 import { ReactToGraphicSprite } from './react-to-graphic-sprite';

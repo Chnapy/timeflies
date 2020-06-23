@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap from 'tiled-types/types';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
-import { StoreEmitter } from '../../../../../store-manager';
+import { StoreEmitter } from '../../../../../store/store-manager';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';

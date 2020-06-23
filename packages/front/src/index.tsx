@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { createAssetLoader } from './assetManager/AssetLoader';
 import './envManager';
-import { createStoreManager } from './store-manager';
+import { createStoreManager } from './store/store-manager';
 import { createView } from './view';
 
 const assetLoader = createAssetLoader();

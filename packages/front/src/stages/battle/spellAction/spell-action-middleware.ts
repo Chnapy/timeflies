@@ -155,7 +155,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
                 const futureSpells = extractFutureSpells(api.getState);
 
-                const spell = futureSpells[spellId];
+                const spell = futureSpells[ spellId ];
 
                 assertIsDefined(spell);
 

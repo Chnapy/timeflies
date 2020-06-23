@@ -12,7 +12,7 @@ import { playerToSnapshot } from '../../../stages/battle/entities/player/Player'
 import { seedPlayer } from '../../../stages/battle/entities/player/Player.seed';
 import { teamToSnapshot } from '../../../stages/battle/entities/team/Team';
 import { seedTeam } from '../../../stages/battle/entities/team/Team.seed';
-import { createStoreManager } from '../../../store-manager';
+import { createStoreManager } from '../../../store/store-manager';
 import { createView } from '../../../view';
 import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { CharacterListPanel } from './character-list-panel';
