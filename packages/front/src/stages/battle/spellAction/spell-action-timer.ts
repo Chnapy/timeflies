@@ -1,6 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import { SpellActionSnapshot } from '@timeflies/shared';
 import { SendMessageAction } from '../../../socket/wsclient-actions';
+import { Batch, createActionBatch } from '../../../store/create-action-batch';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 
 
@@ -25,73 +26,101 @@ export const SpellActionTimer = ({
 
     let timeout: NodeJS.Timeout | undefined;
 
-    const dispatchStart = (snapshot: SpellActionSnapshot) => dispatch(SpellActionTimerStartAction({
-        spellActionSnapshot: snapshot
-    }));
-
-    const dispatchEnd = (snapshot: SpellActionSnapshot, removed: boolean, correctHash: string) => dispatch(SpellActionTimerEndAction({
-        spellActionSnapshot: snapshot,
-        removed,
-        correctHash
-    }));
-
-    const sendSpellAction = (spellAction: SpellActionSnapshot) => dispatch(SendMessageAction({
-        type: 'battle/spellAction',
-        spellAction
-    }));
-
-    const startSpellAction = (snapshot: SpellActionSnapshot, fromNotify: boolean) => {
-
-        assertSpellActionIsNotFuture(snapshot);
+    const differEndSpell = (snapshot: SpellActionSnapshot, fromNotify: boolean): void => {
 
         const { startTime, duration } = snapshot;
 
         const delta = Math.max(Date.now() - startTime, 0);
 
-        timeout = setTimeout(() => endSpellAction(snapshot, fromNotify), duration - delta);
+        timeout = setTimeout(() => {
 
-        dispatchStart(snapshot);
+            const batcher = createActionBatch();
 
-        if (!fromNotify) {
-            sendSpellAction(snapshot);
-        }
+            const { endSpellAction } = prepareBatch(batcher.batch);
+
+            endSpellAction(snapshot, fromNotify);
+
+            batcher.dispatchWith(dispatch);
+
+        }, duration - delta);
     };
 
-    const cancelTimeout = () => {
-        if (timeout) {
-            clearTimeout(timeout);
-            timeout = undefined;
-        }
+    const prepareBatch = (batch: Batch) => {
+
+        const startSpellAction = (snapshot: SpellActionSnapshot, fromNotify: boolean) => {
+
+            assertSpellActionIsNotFuture(snapshot);
+
+            differEndSpell(snapshot, fromNotify);
+
+            batch(SpellActionTimerStartAction({
+                spellActionSnapshot: snapshot
+            }));
+
+            if (!fromNotify) {
+                batch(SendMessageAction({
+                    type: 'battle/spellAction',
+                    spellAction: snapshot
+                }));
+            }
+        };
+
+        const cancelTimeout = () => {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = undefined;
+            }
+        };
+
+        const endSpellAction = (currentSpellAction: SpellActionSnapshot, fromNotify: boolean) => {
+
+            batch(SpellActionTimerEndAction({
+                spellActionSnapshot: currentSpellAction,
+                removed: false,
+                correctHash: currentSpellAction.battleHash
+            }));
+
+            const spellActionSnapshotList = extractSpellActionSnapshotList();
+
+            const nextSnapshot = spellActionSnapshotList.find(s => s.startTime > currentSpellAction!.startTime);
+
+            cancelTimeout();
+
+            if (nextSnapshot) {
+                startSpellAction(nextSnapshot, fromNotify);
+            }
+        };
+
+        const removeSpellAction = (snapshot: SpellActionSnapshot, correctHash: string) => {
+
+            cancelTimeout();
+
+            batch(SpellActionTimerEndAction({
+                spellActionSnapshot: snapshot,
+                removed: true,
+                correctHash
+            }));
+        };
+
+        return {
+            startSpellAction,
+            cancelTimeout,
+            endSpellAction,
+            removeSpellAction
+        };
     };
 
-    const endSpellAction = (currentSpellAction: SpellActionSnapshot, fromNotify: boolean) => {
-
-        dispatchEnd(currentSpellAction, false, currentSpellAction.battleHash);
-
-        const spellActionSnapshotList = extractSpellActionSnapshotList();
-
-        const nextSnapshot = spellActionSnapshotList.find(s => s.startTime > currentSpellAction!.startTime);
-
-        cancelTimeout();
-
-        if (nextSnapshot) {
-            startSpellAction(nextSnapshot, fromNotify);
-        }
-    };
-
-    const removeSpellAction = (snapshot: SpellActionSnapshot, correctHash: string) => {
-
-        cancelTimeout();
-
-        dispatchEnd(snapshot, true, correctHash);
-    };
-
-    return {
+    return (batch: Batch) => ({
         onAdd(startTime: number, fromNotify: boolean) {
             const snapshot = extractSpellActionSnapshotList().find(s => s.startTime === startTime)!;
+
+            const { startSpellAction } = prepareBatch(batch);
+
             startSpellAction(snapshot, fromNotify);
         },
         onRemove(snapshotDeletedList: SpellActionSnapshot[], correctHash: string) {
+
+            const { cancelTimeout, removeSpellAction } = prepareBatch(batch);
 
             cancelTimeout();
 
@@ -103,5 +132,5 @@ export const SpellActionTimer = ({
                 removeSpellAction(currentOrPassedSnapshot, correctHash);
             }
         }
-    };
+    });
 };

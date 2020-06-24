@@ -2,6 +2,7 @@ import { SpellActionSnapshot, TimerTester, createPosition, normalize } from '@ti
 import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
 import { SpellActionTimer } from './spell-action-timer';
+import { BatchActions } from '../../../store/batch-middleware';
 
 describe('# SpellActionTimer', () => {
 
@@ -33,7 +34,7 @@ describe('# SpellActionTimer', () => {
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => [ snapshot ],
             dispatch
-        });
+        })(jest.fn());
 
         const snapshot = getSnapshot({ startTime: timerTester.now + 100 });
 
@@ -44,20 +45,22 @@ describe('# SpellActionTimer', () => {
 
         const dispatch = jest.fn();
 
+        const batch = jest.fn();
+
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => [ snapshot ],
             dispatch
-        });
+        })(batch);
 
         const snapshot = getSnapshot({ startTime: timerTester.now });
 
         timer.onAdd(snapshot.startTime, false);
 
-        expect(dispatch).toHaveBeenNthCalledWith(1, SpellActionTimerStartAction({
+        expect(batch).toHaveBeenNthCalledWith(1, SpellActionTimerStartAction({
             spellActionSnapshot: snapshot
         }));
 
-        expect(dispatch).toHaveBeenNthCalledWith(2, SendMessageAction({
+        expect(batch).toHaveBeenNthCalledWith(2, SendMessageAction({
             type: 'battle/spellAction',
             spellAction: snapshot
         }));
@@ -67,10 +70,12 @@ describe('# SpellActionTimer', () => {
 
         const dispatch = jest.fn();
 
+        const batch = jest.fn();
+
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => [ snapshot ],
             dispatch
-        });
+        })(batch);
 
         const snapshot = getSnapshot({
             battleHash: '-hash-'
@@ -93,10 +98,12 @@ describe('# SpellActionTimer', () => {
 
         const dispatch = jest.fn();
 
+        const batch = jest.fn();
+
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => spellActionSnapshotList,
             dispatch
-        });
+        })(batch);
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -110,9 +117,13 @@ describe('# SpellActionTimer', () => {
 
         timerTester.advanceBy(200);
 
-        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerStartAction({
-            spellActionSnapshot: spellActionSnapshotList[ 1 ]
-        }));
+        expect(dispatch).toHaveBeenCalledWith(BatchActions(
+            expect.arrayContaining([
+                SpellActionTimerStartAction({
+                    spellActionSnapshot: spellActionSnapshotList[ 1 ]
+                })
+            ])
+        ));
     });
 
     it('should not end current spell action on future rollback', () => {
@@ -121,10 +132,12 @@ describe('# SpellActionTimer', () => {
 
         const dispatch = jest.fn();
 
+        const batch = jest.fn();
+
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => spellActionSnapshotList,
             dispatch
-        });
+        })(batch);
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -140,6 +153,7 @@ describe('# SpellActionTimer', () => {
             spellActionSnapshotList[ 1 ]
         ], '-hash1-');
 
+        expect(batch).not.toHaveBeenCalledWith(SpellActionTimerEndAction(expect.anything()));
         expect(dispatch).not.toHaveBeenCalledWith(SpellActionTimerEndAction(expect.anything()));
     });
 
@@ -149,10 +163,12 @@ describe('# SpellActionTimer', () => {
 
         const dispatch = jest.fn();
 
+        const batch = jest.fn();
+
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => spellActionSnapshotList,
             dispatch
-        });
+        })(batch);
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -168,7 +184,7 @@ describe('# SpellActionTimer', () => {
             spellActionSnapshotList[ 0 ]
         ], '-hash0-');
 
-        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerEndAction({
+        expect(batch).toHaveBeenCalledWith(SpellActionTimerEndAction({
             removed: true,
             correctHash: '-hash0-',
             spellActionSnapshot: getSnapshot({ battleHash: '-hash1-' })
@@ -181,10 +197,12 @@ describe('# SpellActionTimer', () => {
 
         const dispatch = jest.fn();
 
+        const batch = jest.fn();
+
         const timer = SpellActionTimer({
             extractSpellActionSnapshotList: () => spellActionSnapshotList,
             dispatch
-        });
+        })(batch);
 
         spellActionSnapshotList.push(
             getSnapshot({ battleHash: '-hash1-' }),
@@ -205,7 +223,7 @@ describe('# SpellActionTimer', () => {
             })
         ], '-hash0-');
 
-        expect(dispatch).toHaveBeenCalledWith(SpellActionTimerEndAction({
+        expect(batch).toHaveBeenCalledWith(SpellActionTimerEndAction({
             removed: true,
             correctHash: '-hash0-',
             spellActionSnapshot: getSnapshot({

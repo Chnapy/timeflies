@@ -46,7 +46,7 @@ describe('# spell-action-middleware', () => {
 
         const next = jest.fn();
 
-        const timer: SpellActionTimer = {
+        const timer: ReturnType<SpellActionTimer> = {
             onAdd: jest.fn(),
             onRemove: jest.fn()
         };
@@ -67,7 +67,7 @@ describe('# spell-action-middleware', () => {
 
     describe('on spell action', () => {
 
-        it('should dispatch launch action with spell action list', () => {
+        it('should dispatch launch action with spell action list', async () => {
             const { futureCharacter, spell, api, next, timer, state } = init();
 
             const action = BattleStateSpellLaunchAction({
@@ -80,16 +80,14 @@ describe('# spell-action-middleware', () => {
                 ]
             });
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+            await spellActionMiddleware({
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
             })(api)(next)(action);
-
-            jest.runOnlyPendingTimers();
 
             expect(api.dispatch).toHaveBeenCalledWith(
                 SpellActionLaunchAction({
@@ -124,7 +122,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
@@ -138,7 +136,7 @@ describe('# spell-action-middleware', () => {
             // }));
         });
 
-        it('should notify timer to first spell added', () => {
+        it('should notify timer to first spell added', async () => {
             const { futureCharacter, spell, api, next, timer, state } = init();
 
             const action = BattleStateSpellLaunchAction({
@@ -156,16 +154,14 @@ describe('# spell-action-middleware', () => {
                 ]
             });
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+            await spellActionMiddleware({
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
                 extractCurrentHash: () => '-hash-',
                 extractState: () => state
             })(api)(next)(action);
-
-            jest.runOnlyPendingTimers();
 
             expect(timer.onAdd).toHaveBeenNthCalledWith(1, timerTester.now, false);
         });
@@ -187,7 +183,7 @@ describe('# spell-action-middleware', () => {
             const action = BattleStateTurnEndAction();
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
@@ -198,7 +194,7 @@ describe('# spell-action-middleware', () => {
             expect(next).toHaveBeenNthCalledWith(1, BattleStateTurnEndAction());
         });
 
-        it('should dispatch spell canceled action with new snapshot list', () => {
+        it('should dispatch spell canceled action with new snapshot list', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -221,16 +217,14 @@ describe('# spell-action-middleware', () => {
 
             const action = BattleStateTurnEndAction();
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+            await spellActionMiddleware({
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
             })(api)(next)(action);
-
-            jest.runOnlyPendingTimers();
 
             expect(api.dispatch).toHaveBeenNthCalledWith(1, SpellActionCancelAction({
                 spellActionSnapshotsValids: state.spellActionSnapshotList.slice(0, 1)
@@ -261,7 +255,7 @@ describe('# spell-action-middleware', () => {
             const action = BattleStateTurnEndAction();
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
@@ -297,7 +291,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
@@ -327,7 +321,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
@@ -338,7 +332,7 @@ describe('# spell-action-middleware', () => {
             expect(api.dispatch).not.toHaveBeenCalled();
         });
 
-        it('should dispatch spell cancel on KO', () => {
+        it('should dispatch spell cancel on KO', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -366,16 +360,14 @@ describe('# spell-action-middleware', () => {
                 sendTime: -1
             });
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+            await spellActionMiddleware({
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
                 extractCurrentHash: () => '-hash-current-',
                 extractState: () => state
             })(api)(next)(action);
-
-            jest.runOnlyPendingTimers();
 
             expect(api.dispatch).toHaveBeenNthCalledWith(1, SpellActionCancelAction({
                 spellActionSnapshotsValids: state.spellActionSnapshotList.slice(0, 1)
@@ -411,7 +403,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-future-',
@@ -445,7 +437,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
@@ -486,7 +478,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',
@@ -517,7 +509,7 @@ describe('# spell-action-middleware', () => {
             });
 
             spellActionMiddleware({
-                createSpellActionTimer: () => timer,
+                createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
                 extractFutureHash: () => '-hash-',

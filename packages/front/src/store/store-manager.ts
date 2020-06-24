@@ -31,11 +31,7 @@ const defaultMiddlewareList = (assetLoader: AssetLoader): Middleware[] => [
     ...getBattleMiddlewareList()
 ];
 
-export const createStoreManager = ({
-    assetLoader,
-    initialState,
-    middlewareList = defaultMiddlewareList(assetLoader),
-}: Props) => {
+export const getFullStoreMiddlewareList = (assetLoader: AssetLoader, middlewareList: Middleware[] = defaultMiddlewareList(assetLoader)) => {
 
     middlewareList.push(
         batchMiddleware
@@ -65,16 +61,25 @@ export const createStoreManager = ({
         middlewareList.push(logger);
     }
 
+    return [
+        ...getDefaultMiddleware({
+            thunk: false,
+            // immutableCheck: false,
+            // serializableCheck: false
+        }),
+        ...middlewareList
+    ];
+}
+
+export const createStoreManager = ({
+    assetLoader,
+    initialState,
+    middlewareList
+}: Props) => {
+
     const store = configureStore({
         reducer: batchReducer(rootReducer),
-        middleware: [
-            ...getDefaultMiddleware({
-                thunk: false,
-                // immutableCheck: false,
-                // serializableCheck: false
-            }),
-            ...middlewareList
-        ],
+        middleware: getFullStoreMiddlewareList(assetLoader, middlewareList),
         preloadedState: initialState
     });
 

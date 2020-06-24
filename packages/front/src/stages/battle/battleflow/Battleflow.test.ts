@@ -3,8 +3,7 @@ import { BattleSnapshot, createPosition, denormalize, getBattleSnapshotWithHash,
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
-import { createStoreManager } from '../../../store/store-manager';
-import { rootReducer } from '../../../ui/reducers/root-reducer';
+import { createStoreManager, getFullStoreMiddlewareList } from '../../../store/store-manager';
 import { battleActionReducer } from '../battleState/battle-action-reducer';
 import { TileClickAction } from '../battleState/battle-state-actions';
 import { characterToSnapshot } from '../entities/character/Character';
@@ -106,18 +105,19 @@ describe('Battleflow', () => {
         const assetLoader = createAssetLoader();
 
         const createStore = () => {
-            const { store } = createStoreManager({
-                assetLoader,
-                initialState,
-            });
 
             const actionList: AnyAction[] = [];
 
-            store.replaceReducer((state, action) => {
-                actionList.push(action);
-                // console.log('action', action);
-
-                return rootReducer(state, action);
+            const { store } = createStoreManager({
+                assetLoader,
+                initialState,
+                middlewareList: [
+                    api => next => action => {
+                        actionList.push(action);
+                        return next(action);
+                    },
+                    ...getFullStoreMiddlewareList(assetLoader)
+                ]
             });
 
             return {
@@ -227,7 +227,7 @@ describe('Battleflow', () => {
 
             const { store } = createStore();
 
-            store.dispatch(TileClickAction({
+            await store.dispatch(TileClickAction({
                 position: createPosition(9, 6)
             }));
 
@@ -238,7 +238,7 @@ describe('Battleflow', () => {
             expect(state1).toEqual(initialState);
         });
 
-        it('should commit', () => {
+        it('should commit', async () => {
 
             const { initialState, createStore } = init();
 
@@ -252,7 +252,7 @@ describe('Battleflow', () => {
 
             const { store } = createStore();
 
-            store.dispatch(TileClickAction({
+            await store.dispatch(TileClickAction({
                 position: createPosition(9, 6)
             }));
 
@@ -262,7 +262,7 @@ describe('Battleflow', () => {
             expect(state1.battle.snapshotState.battleDataCurrent).toBe(initialState.battle.snapshotState.battleDataCurrent);
         });
 
-        it('should send message with correct hash', () => {
+        it('should send message with correct hash', async () => {
 
             const { initialState, createStore } = init();
 
@@ -315,7 +315,7 @@ describe('Battleflow', () => {
 
             const { store, actionList } = createStore();
 
-            store.dispatch(TileClickAction({
+            await store.dispatch(TileClickAction({
                 position: createPosition(9, 6)
             }));
 
@@ -323,12 +323,12 @@ describe('Battleflow', () => {
 
             expect(store.getState().battle.snapshotState.battleDataFuture.characters.c1.features.life).toBe(80);
 
-            expect(actionList).toContainEqual(SendMessageAction({
+            expect(actionList).toContainEqual(expect.objectContaining(SendMessageAction({
                 type: 'battle/spellAction',
                 spellAction: expect.objectContaining<Partial<SpellActionSnapshot>>({
                     battleHash
                 })
-            }));
+            })));
         });
 
         it.skip('should change future battle data against current one after two spell actions', async () => {
@@ -364,7 +364,7 @@ describe('Battleflow', () => {
 
     describe('on confirm message:', () => {
 
-        it('should rollback on confirm KO', () => {
+        it('should rollback on confirm KO', async () => {
 
             const { initialState, createStore } = init();
 
@@ -394,7 +394,7 @@ describe('Battleflow', () => {
 
             const { store } = createStore();
 
-            store.dispatch(ReceiveMessageAction({
+            await store.dispatch(ReceiveMessageAction({
                 type: 'confirm',
                 sendTime: timerTester.now,
                 isOk: false,
