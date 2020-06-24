@@ -10,7 +10,7 @@ import { rootReducer } from '../ui/reducers/root-reducer';
 import { bootMiddleware } from '../stages/boot/boot-middleware';
 import { CanvasContext } from '../canvas/CanvasContext';
 import { batchReducer } from './batch-reducer';
-import { batchMiddleware } from './batch-middleware';
+import { batchMiddleware, BatchActions } from './batch-middleware';
 
 export type StoreManager = ReturnType<typeof createStoreManager>;
 
@@ -51,6 +51,12 @@ export const getFullStoreMiddlewareList = (assetLoader: AssetLoader, middlewareL
                     return {
                         ...action,
                         type: action.type + ' > ' + action.payload.type
+                    };
+
+                } else if(BatchActions.match(action)) {
+                    return {
+                        ...action,
+                        type: action.type + ' [ ' + action.payload.map(a => a.type).join(' - ') + ' ]'
                     };
                 }
 
