@@ -57,7 +57,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             actionArea
         };
 
-        api.dispatch(BattleStateSpellLaunchAction({
+        return api.dispatch(BattleStateSpellLaunchAction({
             spellActions: [ spellAction ]
         }));
     };

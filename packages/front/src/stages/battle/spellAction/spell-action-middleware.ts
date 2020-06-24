@@ -10,6 +10,7 @@ import { SnapshotState } from '../snapshot/snapshot-reducer';
 import { SpellActionCancelAction, SpellActionLaunchAction } from './spell-action-actions';
 import { SpellAction } from './spell-action-reducer';
 import { SpellActionTimer } from './spell-action-timer';
+import { createActionBatch } from '../../../store/create-action-batch';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => SnapshotState;
@@ -30,6 +31,8 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
     extractCurrentHash,
     createSpellActionTimer = SpellActionTimer
 }) => api => next => {
+
+    const batcher = createActionBatch();
 
     const logSnapshotDiff = ({ debug }: ConfirmSAction) => {
         if (!debug) {
@@ -54,7 +57,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
     const spellActionTimer = createSpellActionTimer({
         extractSpellActionSnapshotList: () => extractState(api.getState).spellActionSnapshotList,
         dispatch: api.dispatch
-    });
+    })(batcher.batch);
 
     const cancelCurrentAndNextSpells = (lastCorrectHash: string, { spellActionSnapshotList }: SnapshotState) => {
 
@@ -76,7 +79,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         }
 
         if (toRemoveList.length) {
-            api.dispatch(SpellActionCancelAction({
+            batcher.batch(SpellActionCancelAction({
                 spellActionSnapshotsValids
             }))
         }
@@ -84,7 +87,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         spellActionTimer.onRemove(toRemoveList, lastCorrectHash);
     };
 
-    return (action: AnyAction) => {
+    return async (action: AnyAction) => {
 
         const previousState = api.getState();
         const getPreviousState = () => previousState;
@@ -178,6 +181,8 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 }
             }
         }
+
+        await batcher.dispatchWith(api.dispatch);
 
         return ret;
     };
