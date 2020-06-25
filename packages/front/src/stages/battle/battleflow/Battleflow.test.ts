@@ -1,5 +1,5 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { BattleSnapshot, createPosition, denormalize, getBattleSnapshotWithHash, normalize, seedSpellActionSnapshot, seedTiledMap, SpellActionSnapshot, TimerTester } from '@timeflies/shared';
+import { BattleSnapshot, createPosition, denormalize, getBattleSnapshotWithHash, normalize, seedSpellActionSnapshot, seedTiledMap, SpellActionSnapshot, TimerTester, SpellSnapshot } from '@timeflies/shared';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
@@ -394,11 +394,25 @@ describe('Battleflow', () => {
 
             const { store } = createStore();
 
+            const spellSnapshot: SpellSnapshot = spellToSnapshot({
+                ...snapshotState.battleDataCurrent.spells.s1,
+                feature: {
+                    area: -1,
+                    attack: 10,
+                    duration: 1234
+                }
+            });
+
             await store.dispatch(ReceiveMessageAction({
                 type: 'confirm',
                 sendTime: timerTester.now,
                 isOk: false,
-                lastCorrectHash: 'first-hash'
+                lastCorrectHash: 'first-hash',
+                correctBattleSnapshot: {
+                    battleHash: 'first-hash',
+                    charactersSnapshots: [],
+                    spellsSnapshots: [ spellSnapshot ]
+                }
             }));
 
             jest.runOnlyPendingTimers();
@@ -407,7 +421,7 @@ describe('Battleflow', () => {
 
             expect(state1.battle.snapshotState.battleDataCurrent.battleHash).toEqual('first-hash');
             expect(state1.battle.snapshotState.battleDataFuture.battleHash).toEqual('first-hash');
-            expect(state1.battle.snapshotState.battleDataCurrent.spells.s1.feature).toEqual(snapshotState.snapshotList[ 0 ].spellsSnapshots[ 0 ].features);
+            expect(state1.battle.snapshotState.battleDataCurrent.spells.s1.feature).toEqual(spellSnapshot.features);
             expect(state1.battle.snapshotState.currentSpellAction).toEqual(null);
             expect(state1.battle.snapshotState.spellActionSnapshotList).toEqual([]);
         });
