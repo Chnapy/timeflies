@@ -39,4 +39,4 @@ export const Character = (
         features: { ...staticData.initialFeatures },
         playerId
     };
-}
+};
