@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { assertIsDefined, BattleSnapshot, denormalize, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, denormalize, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot, DynamicBattleSnapshot } from '@timeflies/shared';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn as spellLaunchFnGetter } from '../engine/spellMapping';
@@ -101,7 +101,7 @@ const commit = (state: SnapshotState, time: number): void => {
 // consider using immer
 const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string, period: BattleDataPeriod, {
     battleHash, charactersSnapshots, spellsSnapshots
-}: BattleSnapshot) => {
+}: DynamicBattleSnapshot) => {
 
     data.battleHash = battleHash;
 
@@ -174,19 +174,13 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
                     state.snapshotList.pop();
                 }
 
-                const currentSnapshot = getLastSnapshot(state.snapshotList)!;
-                updateBattleDataFromSnapshot(state.battleDataFuture, state.myPlayerId, 'future', currentSnapshot);
-
-                if (currentSnapshot.time < Date.now()) {
-                    updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', currentSnapshot);
-                }
             } else {
 
                 const snapshot = state.snapshotList.find(s => s.battleHash === correctHash);
 
-                assertIsDefined(snapshot);
-
-                updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', snapshot);
+                if (snapshot) {
+                    updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', snapshot);
+                }
             }
         },
         [ SpellActionLaunchAction.type ]: (state, { payload }: SpellActionLaunchAction) => {
@@ -227,9 +221,14 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
         [ SpellActionTimerStartAction.type ]: (state, { payload }: SpellActionTimerStartAction) => {
             state.currentSpellAction = payload.spellActionSnapshot;
         },
-        [ SpellActionCancelAction.type ]: (state, { payload: { spellActionSnapshotsValids } }: SpellActionCancelAction) => {
+        [ SpellActionCancelAction.type ]: (state, { payload: { spellActionSnapshotsValids, correctBattleSnapshot } }: SpellActionCancelAction) => {
             state.spellActionSnapshotList = spellActionSnapshotsValids;
             state.currentSpellAction = null;
+
+            if (correctBattleSnapshot) {
+                updateBattleDataFromSnapshot(state.battleDataFuture, state.myPlayerId, 'future', correctBattleSnapshot);
+                updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', correctBattleSnapshot);
+            }
         }
     }
 );

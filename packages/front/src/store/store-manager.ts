@@ -70,8 +70,8 @@ export const getFullStoreMiddlewareList = (assetLoader: AssetLoader, middlewareL
     return [
         ...getDefaultMiddleware({
             thunk: false,
-            // immutableCheck: false,
-            // serializableCheck: false
+            immutableCheck: process.env.NODE_ENV === 'test',
+            serializableCheck: process.env.NODE_ENV === 'test'
         }),
         ...middlewareList
     ];

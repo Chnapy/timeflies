@@ -31,6 +31,8 @@ export const SpellActionReceiver = (
 
     const { playerList, get } = stateManager;
 
+    const getLastHash = () => get('battleHashList')[ get('battleHashList').length - 1 ];
+
     const spellActionChecker = spellActionCheckerCreator(cycle, mapManager);
 
     const notifyDeaths = (deaths: Character[]): void => {
@@ -49,19 +51,24 @@ export const SpellActionReceiver = (
 
         const sendConfirmAction = (isOk: boolean, lastCorrectHash: string): void => {
 
+            const partial: Pick<ConfirmSAction, 'correctBattleSnapshot' | 'debug'> = isOk
+                ? {}
+                : {
+                    correctBattleSnapshot: {
+                        battleHash: getLastHash(),
+                        charactersSnapshots: get('characters').map(characterToSnapshot),
+                        spellsSnapshots: get('spells').map(spellToSnapshot)
+                    },
+                    debug: {
+                        sendHash: action.spellAction.battleHash,
+                    }
+                };
+
             player.socket.send<ConfirmSAction>({
                 type: 'confirm',
                 isOk,
                 lastCorrectHash,
-                debug: isOk
-                    ? undefined
-                    : {
-                        sendHash: action.spellAction.battleHash,
-                        correctBattleSnapshot: {
-                            charactersSnapshots: get('characters').map(characterToSnapshot),
-                            spellsSnapshots: get('spells').map(spellToSnapshot)
-                        }
-                    }
+                ...partial
             });
         };
 
@@ -92,7 +99,7 @@ export const SpellActionReceiver = (
             }
         }
 
-        const lastCorrectHash = get('battleHashList')[ get('battleHashList').length - 1 ];
+        const lastCorrectHash = getLastHash();
 
         sendConfirmAction(false, lastCorrectHash);
     };

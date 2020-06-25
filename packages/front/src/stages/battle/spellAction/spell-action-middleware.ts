@@ -1,9 +1,9 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { assertIsDefined, ConfirmSAction, getLast, Normalized, SpellActionSnapshot } from '@timeflies/shared';
+import { assertIsDefined, ConfirmSAction, getLast, Normalized, SpellActionSnapshot, DynamicBattleSnapshot } from '@timeflies/shared';
 import diffDefault from 'jest-diff';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
-import { BattleStateSpellLaunchAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
+import { BattleStateSpellLaunchAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
 import { Spell } from '../entities/spell/Spell';
 import { SnapshotState } from '../snapshot/snapshot-reducer';
@@ -34,12 +34,10 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
     const batcher = createActionBatch();
 
-    const logSnapshotDiff = ({ debug }: ConfirmSAction) => {
-        if (!debug) {
+    const logSnapshotDiff = ({ correctBattleSnapshot, debug }: ConfirmSAction) => {
+        if (!correctBattleSnapshot || !debug) {
             return;
         }
-
-        const { correctBattleSnapshot } = debug;
 
         const { charactersSnapshots, spellsSnapshots } = (api.getState() as GameState).battle.snapshotState.snapshotList
             .find(s => s.battleHash === debug.sendHash)!;
@@ -59,7 +57,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         dispatch: api.dispatch
     })(batcher.batch);
 
-    const cancelCurrentAndNextSpells = (lastCorrectHash: string, { spellActionSnapshotList }: SnapshotState) => {
+    const cancelCurrentAndNextSpells = (lastCorrectHash: string, { spellActionSnapshotList }: SnapshotState, correctBattleSnapshot?: DynamicBattleSnapshot) => {
 
         const spellActionSnapshotsValids = [ ...spellActionSnapshotList ];
 
@@ -80,17 +78,15 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
         if (toRemoveList.length) {
             batcher.batch(SpellActionCancelAction({
-                spellActionSnapshotsValids
-            }))
+                spellActionSnapshotsValids,
+                correctBattleSnapshot
+            }));
         }
 
         spellActionTimer.onRemove(toRemoveList, lastCorrectHash);
     };
 
     return async (action: AnyAction) => {
-
-        const previousState = api.getState();
-        const getPreviousState = () => previousState;
 
         const ret = next(action);
 
@@ -128,18 +124,11 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                 spellActionTimer.onAdd(spellActList[ 0 ].startTime, false);
             }
 
-        } else if (BattleStateTurnEndAction.match(action)) {
-
-            const state = extractState(getPreviousState);
-            const currentBattleHash = extractCurrentHash(getPreviousState);
-
-            cancelCurrentAndNextSpells(currentBattleHash, state);
-
         } else if (ReceiveMessageAction.match(action)) {
             const { payload } = action;
 
             if (payload.type === 'confirm') {
-                const { isOk, lastCorrectHash } = payload;
+                const { isOk, lastCorrectHash, correctBattleSnapshot } = payload;
                 if (!isOk) {
 
                     try {
@@ -147,7 +136,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                     } catch (e) { console.warn(e); }
 
                     const state = extractState(api.getState);
-                    cancelCurrentAndNextSpells(lastCorrectHash, state);
+                    cancelCurrentAndNextSpells(lastCorrectHash, state, correctBattleSnapshot);
                 }
 
             } else if (payload.type === 'notify') {

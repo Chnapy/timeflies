@@ -1,4 +1,4 @@
-import { ConfirmSAction, NotifySAction, seedSpellActionSnapshot, SpellActionSnapshot } from '@timeflies/shared';
+import { ConfirmSAction, NotifySAction, seedSpellActionSnapshot, SpellActionSnapshot, DynamicBattleSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { BattleStateManager, BattleState } from '../battleStateManager/BattleStateManager';
@@ -134,6 +134,9 @@ describe('# SpellActionReceiver', () => {
                 sendTime: expect.anything(),
                 isOk: false,
                 lastCorrectHash: 'firstHash',
+                correctBattleSnapshot: expect.objectContaining<Partial<DynamicBattleSnapshot>>({
+                    battleHash: 'firstHash'
+                }),
                 debug: expect.anything()
             } ]);
         });
@@ -164,6 +167,9 @@ describe('# SpellActionReceiver', () => {
                 sendTime: expect.anything(),
                 isOk: false,
                 lastCorrectHash: 'firstHash',
+                correctBattleSnapshot: expect.objectContaining<Partial<DynamicBattleSnapshot>>({
+                    battleHash: 'firstHash'
+                }),
                 debug: expect.anything()
             } ]);
         });
