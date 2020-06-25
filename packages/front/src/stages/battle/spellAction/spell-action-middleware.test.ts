@@ -194,7 +194,7 @@ describe('# spell-action-middleware', () => {
             expect(next).toHaveBeenNthCalledWith(1, BattleStateTurnEndAction());
         });
 
-        it('should dispatch spell canceled action with new snapshot list', async () => {
+        it.skip('should dispatch spell canceled action with new snapshot list', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -231,7 +231,7 @@ describe('# spell-action-middleware', () => {
             }));
         });
 
-        it('should notify timer of removed snapshots', () => {
+        it.skip('should notify timer of removed snapshots', () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 

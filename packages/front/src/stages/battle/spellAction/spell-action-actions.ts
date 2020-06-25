@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { SpellActionSnapshot } from '@timeflies/shared';
+import { SpellActionSnapshot, DynamicBattleSnapshot } from '@timeflies/shared';
 import { SpellAction } from './spell-action-reducer';
 
 export type SpellActionTimerStartAction = ReturnType<typeof SpellActionTimerStartAction>;
@@ -17,6 +17,7 @@ export const SpellActionTimerEndAction = createAction<{
 export type SpellActionCancelAction = ReturnType<typeof SpellActionCancelAction>;
 export const SpellActionCancelAction = createAction<{
     spellActionSnapshotsValids: SpellActionSnapshot[];
+    correctBattleSnapshot?: DynamicBattleSnapshot;
 }>('battle/spell-action/cancel');
 
 export type SpellActionLaunchAction = ReturnType<typeof SpellActionLaunchAction>;

@@ -1,4 +1,4 @@
-import { BattleSnapshot } from "../battleStage/battle-snapshot";
+import { BattleSnapshot, DynamicBattleSnapshot } from "../battleStage/battle-snapshot";
 import { GlobalTurnSnapshot } from "../cycle/GlobalTurn";
 import { TurnSnapshot } from "../cycle/Turn";
 import { PlayerSnapshot, TeamSnapshot } from '../entities';
@@ -27,9 +27,9 @@ export interface BRunTurnStartSAction extends TAction<'battle-run/turn-start'> {
 export interface ConfirmSAction extends TAction<'confirm'> {
     isOk: boolean;
     lastCorrectHash: string;
+    correctBattleSnapshot?: DynamicBattleSnapshot;
     debug?: {
         sendHash: string;
-        correctBattleSnapshot: Omit<BattleSnapshot, 'battleHash' | 'time' | 'launchTime'>;
     };
 }
 

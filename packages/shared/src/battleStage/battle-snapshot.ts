@@ -1,12 +1,15 @@
 import { CharacterSnapshot, SpellSnapshot } from '../entities';
 import crypto from 'crypto-js/sha1';
 
-export type BattleSnapshot = {
-    time: number;
+export type DynamicBattleSnapshot = {
     battleHash: string;
-    launchTime: number;
     charactersSnapshots: CharacterSnapshot[];
     spellsSnapshots: SpellSnapshot[];
+};
+
+export type BattleSnapshot = DynamicBattleSnapshot & {
+    time: number;
+    launchTime: number;
 };
 
 export const getBattleSnapshotWithHash = ({
