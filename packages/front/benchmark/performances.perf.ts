@@ -1,3 +1,4 @@
+import './nodeEnv';
 import { runBenchmark } from './benchmark-redux';
 
 describe('[LOCAL] performances', () => {
