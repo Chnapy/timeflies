@@ -1,1 +1,1 @@
-export * from './BattleSnapshot';
+export * from './battle-snapshot';

@@ -28,28 +28,4 @@ export const Spell = (
         },
         characterId
     };
-
-    // let features: Readonly<SpellFeatures> = {
-    //     ...staticData.initialFeatures
-    // };
-
-    // return {
-    //     id: staticData.id,
-    //     staticData,
-    //     character,
-    //     get features() {
-    //         return features;
-    //     },
-    //     toSnapshot(): SpellSnapshot {
-    //         return {
-    //             id: staticData.id,
-    //             index,
-    //             staticData,
-    //             features
-    //         };
-    //     },
-    //     updateFromSnapshot(snapshot) {
-    //         features = { ...snapshot.features };
-    //     }
-    // };
-}
+};

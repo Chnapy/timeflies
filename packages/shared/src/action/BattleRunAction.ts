@@ -1,4 +1,4 @@
-import { BattleSnapshot } from "../battleStage/BattleSnapshot";
+import { BattleSnapshot } from "../battleStage/battle-snapshot";
 import { GlobalTurnSnapshot } from "../cycle/GlobalTurn";
 import { TurnSnapshot } from "../cycle/Turn";
 import { PlayerSnapshot, TeamSnapshot } from '../entities';
