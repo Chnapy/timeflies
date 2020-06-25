@@ -53,7 +53,7 @@ export const getFullStoreMiddlewareList = (assetLoader: AssetLoader, middlewareL
                         type: action.type + ' > ' + action.payload.type
                     };
 
-                } else if(BatchActions.match(action)) {
+                } else if (BatchActions.match(action)) {
                     return {
                         ...action,
                         type: action.type + ' [ ' + action.payload.map(a => a.type).join(' - ') + ' ]'
