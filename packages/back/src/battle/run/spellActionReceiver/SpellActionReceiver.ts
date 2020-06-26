@@ -51,9 +51,12 @@ export const SpellActionReceiver = (
 
         const sendConfirmAction = (isOk: boolean, lastCorrectHash: string): void => {
 
-            const partial: Pick<ConfirmSAction, 'correctBattleSnapshot' | 'debug'> = isOk
-                ? {}
+            const partial = isOk
+                ? {
+                    isOk: true
+                } as const
                 : {
+                    isOk: false,
                     correctBattleSnapshot: {
                         battleHash: getLastHash(),
                         charactersSnapshots: get('characters').map(characterToSnapshot),
@@ -62,11 +65,10 @@ export const SpellActionReceiver = (
                     debug: {
                         sendHash: action.spellAction.battleHash,
                     }
-                };
+                } as const;
 
             player.socket.send<ConfirmSAction>({
                 type: 'confirm',
-                isOk,
                 lastCorrectHash,
                 ...partial
             });
