@@ -17,7 +17,7 @@ export const SpellActionTimerEndAction = createAction<{
 export type SpellActionCancelAction = ReturnType<typeof SpellActionCancelAction>;
 export const SpellActionCancelAction = createAction<{
     spellActionSnapshotsValids: SpellActionSnapshot[];
-    correctBattleSnapshot?: DynamicBattleSnapshot;
+    correctBattleSnapshot: DynamicBattleSnapshot;
 }>('battle/spell-action/cancel');
 
 export type SpellActionLaunchAction = ReturnType<typeof SpellActionLaunchAction>;

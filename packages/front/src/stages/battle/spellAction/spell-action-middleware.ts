@@ -57,7 +57,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
         dispatch: api.dispatch
     })(batcher.batch);
 
-    const cancelCurrentAndNextSpells = (lastCorrectHash: string, { spellActionSnapshotList }: SnapshotState, correctBattleSnapshot?: DynamicBattleSnapshot) => {
+    const cancelCurrentAndNextSpells = (lastCorrectHash: string, { spellActionSnapshotList }: SnapshotState, correctBattleSnapshot: DynamicBattleSnapshot) => {
 
         const spellActionSnapshotsValids = [ ...spellActionSnapshotList ];
 
@@ -128,15 +128,15 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             const { payload } = action;
 
             if (payload.type === 'confirm') {
-                const { isOk, lastCorrectHash, correctBattleSnapshot } = payload;
-                if (!isOk) {
+
+                if (!payload.isOk) {
 
                     try {
                         logSnapshotDiff(payload);
                     } catch (e) { console.warn(e); }
 
                     const state = extractState(api.getState);
-                    cancelCurrentAndNextSpells(lastCorrectHash, state, correctBattleSnapshot);
+                    cancelCurrentAndNextSpells(payload.lastCorrectHash, state, payload.correctBattleSnapshot);
                 }
 
             } else if (payload.type === 'notify') {

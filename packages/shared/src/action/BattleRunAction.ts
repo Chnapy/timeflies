@@ -24,14 +24,23 @@ export interface BRunTurnStartSAction extends TAction<'battle-run/turn-start'> {
     turnState: TurnSnapshot;
 }
 
-export interface ConfirmSAction extends TAction<'confirm'> {
-    isOk: boolean;
-    lastCorrectHash: string;
-    correctBattleSnapshot?: DynamicBattleSnapshot;
-    debug?: {
-        sendHash: string;
-    };
-}
+export type ConfirmSAction = TAction<'confirm'>
+    & {
+        lastCorrectHash: string;
+        debug?: {
+            sendHash: string;
+        };
+    }
+    & (
+        | {
+            isOk: true;
+            correctBattleSnapshot?: undefined;
+        }
+        | {
+            isOk: false;
+            correctBattleSnapshot: DynamicBattleSnapshot;
+        }
+    );
 
 export interface NotifySAction extends TAction<'notify'> {
     spellActionSnapshot: SpellActionSnapshot;
