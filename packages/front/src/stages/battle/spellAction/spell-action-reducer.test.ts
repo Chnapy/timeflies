@@ -235,7 +235,12 @@ describe('# spell-action-reducer', () => {
             });
 
             const state1 = snapshotReducer()(initialState, SpellActionCancelAction({
-                spellActionSnapshotsValids: []
+                spellActionSnapshotsValids: [],
+                correctBattleSnapshot: {
+                    battleHash: '',
+                    charactersSnapshots: [],
+                    spellsSnapshots: []
+                }
             }));
 
             expect(state1.currentSpellAction).toEqual(null);
@@ -252,7 +257,12 @@ describe('# spell-action-reducer', () => {
             });
 
             const state1 = snapshotReducer()(initialState, SpellActionCancelAction({
-                spellActionSnapshotsValids: initialState.spellActionSnapshotList.slice(0, 1)
+                spellActionSnapshotsValids: initialState.spellActionSnapshotList.slice(0, 1),
+                correctBattleSnapshot: {
+                    battleHash: '',
+                    charactersSnapshots: [],
+                    spellsSnapshots: []
+                }
             }));
 
             expect(state1.spellActionSnapshotList).toEqual(initialState.spellActionSnapshotList.slice(0, 1));

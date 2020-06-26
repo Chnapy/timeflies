@@ -225,10 +225,8 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
             state.spellActionSnapshotList = spellActionSnapshotsValids;
             state.currentSpellAction = null;
 
-            if (correctBattleSnapshot) {
-                updateBattleDataFromSnapshot(state.battleDataFuture, state.myPlayerId, 'future', correctBattleSnapshot);
-                updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', correctBattleSnapshot);
-            }
+            updateBattleDataFromSnapshot(state.battleDataFuture, state.myPlayerId, 'future', correctBattleSnapshot);
+            updateBattleDataFromSnapshot(state.battleDataCurrent, state.myPlayerId, 'current', correctBattleSnapshot);
         }
     }
 );
