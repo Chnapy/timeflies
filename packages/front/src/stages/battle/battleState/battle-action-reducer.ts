@@ -110,7 +110,7 @@ export const battleActionReducer = createReducer(initialState, {
 
         return {
             ...state,
-            selectedSpellId: futureSpell.id,
+            selectedSpellId: futureSpell ? futureSpell.id : undefined,
             futureCharacterPosition: futureCharacter.position,
             path: [],
             rangeArea: {},

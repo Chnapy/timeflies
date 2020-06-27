@@ -16,7 +16,7 @@ export const BattleStateTurnEndAction = createAction('battle/state/turn-end');
 
 export type BattleStateSpellPrepareAction = ReturnType<typeof BattleStateSpellPrepareAction>;
 export const BattleStateSpellPrepareAction = createAction<{
-    futureSpell: Spell<'future'>;
+    futureSpell: Spell<'future'> | null;
     futureCharacter: Character<'future'>;
 }>('battle/state/spell-prepare');
 

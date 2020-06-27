@@ -3,6 +3,8 @@ import { SpellType } from '@timeflies/shared';
 import { SpellEngine, SpellEngineDependencies, spellEngineMap } from '../engine/spellEngine/spell-engine';
 import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
 import { BattleStateSpellPrepareAction } from './battle-state-actions';
+import { Spell } from '../entities/spell/Spell';
+import { getTurnRemainingTime } from '../cycle/cycle-reducer';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
     getSpellEngineFromType?: (spellType: SpellType, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
@@ -20,18 +22,52 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
 }) => api => next => {
     const { extractState, extractFutureSpell, extractFutureCharacter } = deps;
 
+    const updateSpellTimeout = (spell?: Spell<'future'>) => {
+
+        if (spellEnableTimeout) {
+            clearTimeout(spellEnableTimeout);
+        }
+
+        if (!spell) {
+            return;
+        }
+
+        const timeoutDuration = getTurnRemainingTime(api.getState().battle, 'future') - spell.feature.duration;
+
+        const futureCharacter = extractFutureCharacter(api.getState);
+
+        const fn = () => {
+            spellEnableTimeout = null;
+
+            const nextFutureCharacter = extractFutureCharacter(api.getState);
+
+            if (nextFutureCharacter && nextFutureCharacter.id === futureCharacter?.id) {
+                api.dispatch(BattleStateSpellPrepareAction({
+                    futureSpell: null,
+                    futureCharacter
+                }));
+            }
+        };
+
+        spellEnableTimeout = setTimeout(fn, timeoutDuration);
+    };
+
     const getSpellEngine = (): SpellEngine => {
         const state = extractState(api.getState);
 
         if (state.currentAction === 'spellPrepare') {
-            const spell = extractFutureSpell(api.getState)!;
+            const spell = extractFutureSpell(api.getState);
 
-            return getSpellEngineFromType(spell.staticData.type, api, deps);
+            updateSpellTimeout(spell);
+
+            if (spell)
+                return getSpellEngineFromType(spell.staticData.type, api, deps);
         }
 
         return async () => { };
     };
 
+    let spellEnableTimeout: NodeJS.Timeout | null = null;
     let spellEngine = getSpellEngine();
 
     return async (action: AnyAction) => {
@@ -54,10 +90,14 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
 
         if (nextState.currentAction === 'spellPrepare') {
             if (SpellActionLaunchAction.match(action)) {
-                api.dispatch(BattleStateSpellPrepareAction({
-                    futureSpell: nextSpell!,
-                    futureCharacter: extractFutureCharacter(api.getState)!
-                }));
+
+                updateSpellTimeout(nextSpell);
+
+                if (nextSpell)
+                    api.dispatch(BattleStateSpellPrepareAction({
+                        futureSpell: nextSpell!,
+                        futureCharacter: extractFutureCharacter(api.getState)!
+                    }));
             }
         }
 
