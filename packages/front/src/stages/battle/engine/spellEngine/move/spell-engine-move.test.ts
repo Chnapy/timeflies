@@ -7,6 +7,8 @@ import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedSpell } from '../../../entities/spell/Spell.seed';
 import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actions';
 import { CreateTileTypeGetter, spellEngineMove } from './spell-engine-move';
+import { battleReducer, BattleState } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
+import { getInitialCycleState } from '../../../cycle/cycle-reducer';
 
 describe('# spell-engine-move (depends on #battle-action)', () => {
 
@@ -32,6 +34,16 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             return initialState;
         };
 
+        const battleState: BattleState = {
+            ...battleReducer(undefined, { type: '' }),
+            cycleState: {
+                ...getInitialCycleState(),
+                currentCharacterId: '1',
+                turnDuration: 10000,
+                turnStartTime: Date.now() - 100,
+            }
+        };
+
         const middleware = battleActionMiddleware({
             extractState: () => initialState,
             extractFutureCharacter: () => futureCharacter,
@@ -39,8 +51,10 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             extractFutureAliveCharacterPositionList: () => [],
             getSpellEngineFromType: (spellType, api, deps) => spellEngineMove({
                 ...deps,
-                createTileTypeGetter
+                createTileTypeGetter,
+                extractBattleState: () => battleState
             })(api),
+            extractBattleState: () => battleState,
             ...middlewareDeps
         });
 

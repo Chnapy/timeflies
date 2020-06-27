@@ -17,7 +17,7 @@ export type CycleState = {
     turnDuration: number;
 };
 
-const initialState: CycleState = {
+export const getInitialCycleState = (): CycleState => ({
     globalTurnId: -1,
     globalTurnOrder: [],
     globalTurnStartTime: -1,
@@ -25,7 +25,7 @@ const initialState: CycleState = {
     currentCharacterId: '',
     turnStartTime: -1,
     turnDuration: -1
-};
+});
 
 export const getTurnState = ({ turnStartTime, turnDuration }: Pick<CycleState, 'turnStartTime' | 'turnDuration'>): TurnState => {
     const now = Date.now();
@@ -66,7 +66,7 @@ export const getTurnRemainingTime = (battle: BattleState, period: BattleDataPeri
     })();
 };
 
-export const cycleReducer = createReducer(initialState, {
+export const cycleReducer = createReducer(getInitialCycleState(), {
 
     [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
         const { id, order, startTime, currentTurn: {

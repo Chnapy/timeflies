@@ -7,6 +7,7 @@ import { seedSpell } from '../entities/spell/Spell.seed';
 import { battleActionMiddleware } from './battle-action-middleware';
 import { battleActionReducer, BattleActionState } from './battle-action-reducer';
 import { BattleMapPathAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
+import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 
 describe('# battle-action', () => {
 
@@ -31,6 +32,7 @@ describe('# battle-action', () => {
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
             getSpellEngineFromType: () => async () => { },
+            extractBattleState: () => battleReducer(undefined, { type: '' }),
             ...deps
         });
 

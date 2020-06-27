@@ -9,6 +9,8 @@ import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
 import { getTurnRemainingTime } from '../../../cycle/cycle-reducer';
+import { BattleState } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
+import { GameState } from '../../../../../game-state';
 
 export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
     const character = characters[ spell.characterId ];
@@ -23,6 +25,7 @@ export type CreateTileTypeGetter = (tiledSchema: TiledMap) => (position: Positio
 
 type Dependencies = {
     createTileTypeGetter?: CreateTileTypeGetter;
+    extractBattleState: (getState: () => GameState) => BattleState;
 };
 
 const defaultCreateTileTypeGetter: CreateTileTypeGetter = tiledSchema => {
@@ -36,7 +39,8 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
     extractFutureAliveCharacterPositionList,
     extractFutureCharacter,
     extractFutureSpell,
-    createTileTypeGetter = defaultCreateTileTypeGetter
+    createTileTypeGetter = defaultCreateTileTypeGetter,
+    extractBattleState = getState => getState().battle
 }) => api => {
 
     const finder = new EasyStar.js();
@@ -118,7 +122,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
             return [];
         }
 
-        const remainingTime = getTurnRemainingTime(api.getState().battle, 'future');
+        const remainingTime = getTurnRemainingTime(extractBattleState(api.getState), 'future');
 
         const nbrTiles = Number.parseInt(remainingTime / spell.feature.duration + '');
 
