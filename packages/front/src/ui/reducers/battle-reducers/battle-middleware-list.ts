@@ -29,7 +29,8 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
             const { spells } = snapshotState.battleDataFuture;
 
             return selectedSpellId ? spells[ selectedSpellId ] : undefined;
-        }
+        },
+        extractBattleState: getState => getState().battle
     }),
     cycleMiddleware<GameState>({
         extractState: getState => getState().battle.cycleState,

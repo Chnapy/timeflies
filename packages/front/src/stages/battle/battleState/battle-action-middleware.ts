@@ -5,9 +5,11 @@ import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
 import { BattleStateSpellPrepareAction } from './battle-state-actions';
 import { Spell } from '../entities/spell/Spell';
 import { getTurnRemainingTime } from '../cycle/cycle-reducer';
+import { BattleState } from '../../../ui/reducers/battle-reducers/battle-reducer';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
     getSpellEngineFromType?: (spellType: SpellType, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
+    extractBattleState: (getState: () => S) => BattleState;
 };
 
 const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType' ] = (spellType, api, deps) => {
@@ -18,6 +20,7 @@ const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType'
 
 export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     getSpellEngineFromType = defaultGetSpellEngineFromType,
+    extractBattleState,
     ...deps
 }) => api => next => {
     const { extractState, extractFutureSpell, extractFutureCharacter } = deps;
@@ -32,7 +35,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             return;
         }
 
-        const timeoutDuration = getTurnRemainingTime(api.getState().battle, 'future') - spell.feature.duration;
+        const timeoutDuration = getTurnRemainingTime(extractBattleState(api.getState), 'future') - spell.feature.duration;
 
         const futureCharacter = extractFutureCharacter(api.getState);
 
