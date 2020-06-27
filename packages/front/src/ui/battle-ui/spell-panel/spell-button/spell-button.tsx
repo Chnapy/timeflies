@@ -2,21 +2,19 @@ import { Box, Button, ButtonProps, Tooltip } from '@material-ui/core';
 import { Theme, useTheme } from '@material-ui/core/styles';
 import { assertIsDefined, switchUtil } from '@timeflies/shared';
 import React from 'react';
-import { BattleStateSpellPrepareAction } from '../../../../stages/battle/battleState/battle-state-actions';
-import { Spell } from '../../../../stages/battle/entities/spell/Spell';
-import { useGameStep } from '../../../hooks/useGameStep';
-import { SpellImage } from './spell-image';
-import { SpellNumber } from './spell-number';
-import { UIIcon, UIIconValue } from './ui-icon';
-import { formatMsToSeconds, UIText } from './ui-text';
-import { UIGauge } from './ui-gauge';
-import { useGameDispatch } from '../../../hooks/useGameDispatch';
-import { BattleState } from '../../../reducers/battle-reducers/battle-reducer';
-import { getTurnRemainingTime } from '../../../../stages/battle/cycle/cycle-reducer';
-import { playerIsMine } from '../../../../stages/battle/entities/player/Player';
-import { useGameSelector } from '../../../hooks/useGameSelector';
 import { useStore } from 'react-redux';
 import { GameState } from '../../../../game-state';
+import { BattleStateSpellPrepareAction } from '../../../../stages/battle/battleState/battle-state-actions';
+import { Spell, spellIsUsable } from '../../../../stages/battle/entities/spell/Spell';
+import { useGameDispatch } from '../../../hooks/useGameDispatch';
+import { useGameSelector } from '../../../hooks/useGameSelector';
+import { useGameStep } from '../../../hooks/useGameStep';
+import { BattleState } from '../../../reducers/battle-reducers/battle-reducer';
+import { SpellImage } from './spell-image';
+import { SpellNumber } from './spell-number';
+import { UIGauge } from './ui-gauge';
+import { UIIcon, UIIconValue } from './ui-icon';
+import { formatMsToSeconds, UIText } from './ui-text';
 
 export interface SpellButtonProps {
     spellId: string;
@@ -83,26 +81,16 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         }
         : null;
 
-    const isSelected = useGameStep('battle', ({ battleActionState }) =>
-        battleActionState.selectedSpellId === spellId);
-
     const disableReason = useGameSelector(gameState => {
-        const { snapshotState, cycleState } = gameState.battle;
 
-        const currentCharacter = snapshotState.battleDataCurrent.characters[ cycleState.currentCharacterId ];
-
-        if (!playerIsMine(gameState, currentCharacter.playerId)) {
-            return 'player';
-        }
-
-        if (getTurnRemainingTime(gameState.battle, 'future') < duration) {
-            return 'time';
-        }
-
-        return;
+        return spellIsUsable(gameState, spellId).reason;
     });
 
     const isDisabled = !!disableReason;
+
+    const isSelected = useGameStep('battle', ({ battleActionState }) =>
+        battleActionState.selectedSpellId === spellId)
+        && !isDisabled;
 
     const store = useStore<GameState>();
 

@@ -8,6 +8,7 @@ import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actio
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
+import { getTurnRemainingTime } from '../../../cycle/cycle-reducer';
 
 export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
     const character = characters[ spell.characterId ];
@@ -109,9 +110,26 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         return (await calculatePath(mainPos, tilePos)).slice(1);
     };
 
+    const getTimeFilteredPath = (path: Position[]): Position[] => {
+
+        const spell = extractFutureSpell(api.getState);
+
+        if (!spell) {
+            return [];
+        }
+
+        const remainingTime = getTurnRemainingTime(api.getState().battle, 'future');
+
+        const nbrTiles = Number.parseInt(remainingTime / spell.feature.duration + '');
+
+        return path.slice(0, nbrTiles);
+    };
+
     const onMoveHover = async (tilePos: Position, tileType: TileType) => {
 
-        const path = await getPath(tilePos, tileType);
+        const initialPath = await getPath(tilePos, tileType);
+
+        const path = getTimeFilteredPath(initialPath);
 
         if (path.length) {
             api.dispatch(BattleMapPathAction({
@@ -126,7 +144,9 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
 
     const onMoveClick = (spell: Spell<'future'>) => {
 
-        const path = extractState(api.getState).path;
+        const initialPath = extractState(api.getState).path;
+
+        const path = getTimeFilteredPath(initialPath);
 
         if (path.length) {
             const spellActions = path.map((position): SpellAction => ({

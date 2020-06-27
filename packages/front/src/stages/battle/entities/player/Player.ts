@@ -15,7 +15,7 @@ export const playerToSnapshot = ({ id, name, teamId }: Player): PlayerSnapshot =
     };
 };
 
-export const playerIsMine = ({ currentPlayer }: GameState, playerId: string) => currentPlayer?.id === playerId;
+export const playerIsMine = (currentPlayer: GameState['currentPlayer'], playerId: string) => currentPlayer?.id === playerId;
 
 export const Player = (
     {

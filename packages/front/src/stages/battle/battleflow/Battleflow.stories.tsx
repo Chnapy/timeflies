@@ -105,7 +105,7 @@ export const Default: React.FC = () => {
                 characterId: 'c1',
                 index: 1,
                 feature: {
-                    duration: 300,
+                    duration: 1000,
                     area: -1
                 }
             }),
