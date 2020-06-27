@@ -6,19 +6,19 @@ export type CharacterType =
     | 'sampleChar2'
     | 'sampleChar3';
 
-export interface CharacterFeatures {
+export type CharacterFeatures = {
     life: number;
     actionTime: number;
-}
+};
 
-export interface StaticCharacter {
+export type StaticCharacter = {
     id: string;
     name: string;
     type: CharacterType;
     initialFeatures: CharacterFeatures;
     staticSpells: StaticSpell[];
     defaultSpellId: string;
-}
+};
 
 export type CharacterSnapshot = {
     id: string;
@@ -29,8 +29,8 @@ export type CharacterSnapshot = {
     features: CharacterFeatures;
 };
 
-export interface CharacterRoom {
+export type CharacterRoom = {
     readonly id: string;
     readonly type: CharacterType;
     position: Position;
-}
+};
