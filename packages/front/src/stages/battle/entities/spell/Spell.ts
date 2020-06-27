@@ -24,9 +24,11 @@ export const spellToSnapshot = ({ id, characterId, staticData, index, feature: f
 };
 
 export const updateSpellFromSnapshot = (spell: Spell<any>, snapshot: SpellSnapshot) => {
-    spell.feature.area = snapshot.features.area;
-    spell.feature.attack = snapshot.features.attack;
-    spell.feature.duration = snapshot.features.duration;
+    const {
+        features
+    } = cloneByJSON(snapshot);
+
+    spell.feature = features;
 };
 
 export type SpellIsUsable =
