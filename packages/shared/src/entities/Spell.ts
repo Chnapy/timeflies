@@ -6,18 +6,18 @@ export type SpellType =
     // | 'orientate'
     | 'simpleAttack';
 
-export interface SpellFeatures {
+export type SpellFeatures = {
     duration: number;
     attack: number;
     area: number;
-}
+};
 
-export interface StaticSpell {
+export type StaticSpell = {
     id: string;
     name: string;
     type: SpellType;
     initialFeatures: SpellFeatures;
-}
+};
 
 export type SpellSnapshot = {
     id: string;
@@ -27,7 +27,7 @@ export type SpellSnapshot = {
     features: SpellFeatures;
 };
 
-export interface SpellActionSnapshot {
+export type SpellActionSnapshot = {
     startTime: number;
     characterId: string;
     duration: number;
@@ -35,4 +35,4 @@ export interface SpellActionSnapshot {
     position: Position;
     actionArea: Normalized<Position>;
     battleHash: string;
-}
+};

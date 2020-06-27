@@ -3,9 +3,9 @@ import { assertIsDefined, BattleSnapshot, denormalize, getBattleSnapshotWithHash
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn as spellLaunchFnGetter } from '../engine/spellMapping';
-import { Character, characterToSnapshot } from '../entities/character/Character';
+import { Character, characterToSnapshot, updateCharacterFromSnapshot } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
-import { Spell, spellToSnapshot } from '../entities/spell/Spell';
+import { Spell, spellToSnapshot, updateSpellFromSnapshot } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleData, BattleDataPeriod, periodList } from './battle-data';
@@ -28,18 +28,6 @@ export type SnapshotState = {
 export const getBattleData = <P extends BattleDataPeriod>(state: SnapshotState, period: P): BattleData<P> => period === 'current'
     ? state.battleDataCurrent as BattleData<P>
     : state.battleDataFuture as BattleData<P>;
-
-// export const assertEntitySnapshotConsistency = <S extends { id: string; }>(
-//     entityList: PeriodicEntity<any, S>[],
-//     snapshotList: S[]
-// ): void | never => {
-//     const serialize = (list: { id: string; }[]) => list.map(i => i.id).sort().join('.');
-
-//     if (serialize(entityList) !== serialize(snapshotList)) {
-//         throw new Error(`Ids of entities differs from these snapshots [${serialize(entityList)}]<->[${serialize(snapshotList)}].
-//         There is an inconsistence front<->back.`);
-//     }
-// }
 
 const assertHashIsInSnapshotList = (
     hash: string,
@@ -97,8 +85,6 @@ const commit = (state: SnapshotState, time: number): void => {
     }
 };
 
-// TODO merge objects instead
-// consider using immer
 const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string, period: BattleDataPeriod, {
     battleHash, charactersSnapshots, spellsSnapshots
 }: DynamicBattleSnapshot) => {
@@ -107,20 +93,21 @@ const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string,
 
     spellsSnapshots.forEach(snap => {
         const spell = data.spells[ snap.id ];
-        if (spell)
-            Object.assign(spell, Spell(period, snap));
+        if (spell) {
+            updateSpellFromSnapshot(spell, snap);
+        } else {
+            data.spells[ snap.id ] = Spell(period, snap);
+        }
     });
 
     charactersSnapshots.forEach(snap => {
         const character = data.characters[ snap.id ];
-        if (character)
-            Object.assign(character, Character(period, myPlayerId, snap));
+        if (character) {
+            updateCharacterFromSnapshot(character, snap);
+        } else {
+            data.characters[ snap.id ] = Character(period, myPlayerId, snap);
+        }
     });
-
-    // data.spells.forEach((s, i) => Object.assign(s, Spell(period, spellsSnapshots[ i ])));
-    // data.characters.forEach((s, i) => Object.assign(s, Character(period, myPlayerId, charactersSnapshots[ i ])));
-    // data.spells = spellsSnapshots.map(snap => Spell(period, snap));
-    // data.characters = charactersSnapshots.map(snap => Character(period, myPlayerId, snap));
 };
 
 type Dependencies = {

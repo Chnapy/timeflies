@@ -46,3 +46,5 @@ export const clone = <V extends Clonable>(value: V): DeepMutable<V> => {
 
     throw new Error(`Type not handled: ${type} for value ${value}`);
 };
+
+export const cloneByJSON = <V>(value: V): V => JSON.parse(JSON.stringify(value));
