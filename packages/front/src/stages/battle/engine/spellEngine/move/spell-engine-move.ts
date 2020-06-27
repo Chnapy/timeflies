@@ -25,7 +25,7 @@ export type CreateTileTypeGetter = (tiledSchema: TiledMap) => (position: Positio
 
 type Dependencies = {
     createTileTypeGetter?: CreateTileTypeGetter;
-    extractBattleState: (getState: () => GameState) => BattleState;
+    extractBattleState?: (getState: () => GameState) => BattleState;
 };
 
 const defaultCreateTileTypeGetter: CreateTileTypeGetter = tiledSchema => {
