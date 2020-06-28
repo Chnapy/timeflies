@@ -1,11 +1,11 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { assertIsDefined, BattleSnapshot, denormalize, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot, DynamicBattleSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, characterEntityToSnapshot, denormalize, DynamicBattleSnapshot, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot, spellEntityToSnapshot } from '@timeflies/shared';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { getSpellLaunchFn as spellLaunchFnGetter } from '../engine/spellMapping';
-import { Character, characterToSnapshot, updateCharacterFromSnapshot } from '../entities/character/Character';
+import { Character, updateCharacterFromSnapshot } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
-import { Spell, spellToSnapshot, updateSpellFromSnapshot } from '../entities/spell/Spell';
+import { Spell, updateSpellFromSnapshot } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleData, BattleDataPeriod, periodList } from './battle-data';
@@ -70,8 +70,8 @@ const commit = (state: SnapshotState, time: number): void => {
     const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
         time,
         launchTime,
-        charactersSnapshots: denormalize(characters).map(characterToSnapshot),
-        spellsSnapshots: denormalize(spells).map(spellToSnapshot)
+        charactersSnapshots: denormalize(characters).map(characterEntityToSnapshot),
+        spellsSnapshots: denormalize(spells).map(spellEntityToSnapshot)
     };
 
     const snap: BattleSnapshot = getBattleSnapshotWithHash(partialSnap);
@@ -177,7 +177,7 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
 
                 const { spell } = spellAction;
 
-                const duration = spellAction.spell.feature.duration;
+                const duration = spellAction.spell.features.duration;
 
                 const commitTime = startTime + duration;
 

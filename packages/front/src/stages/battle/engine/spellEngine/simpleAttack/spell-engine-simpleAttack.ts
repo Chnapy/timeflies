@@ -10,7 +10,7 @@ export const spellLaunchSimpleAttack: SpellLaunchFn = ({ spell, actionArea }, { 
 
     const targets = denormalize(characters).filter(c => !!actionArea[ c.position.id ]);
 
-    targets.forEach(t => characterAlterLife(t, -spell.feature.attack));
+    targets.forEach(t => characterAlterLife(t, -spell.features.attack));
 };
 
 export const spellEngineSimpleAttack: SpellEngineCreator = ({
@@ -85,7 +85,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const { tiledSchema } = extractState(api.getState);
 
             const futureCharacterPosition = extractFutureCharacter(api.getState)!.position;
-            const spellArea = extractFutureSpell(api.getState)!.feature.area;
+            const spellArea = extractFutureSpell(api.getState)!.features.area;
             const charactersPos = extractFutureAliveCharacterPositionList(api.getState)
                 .filter(p => p.id !== futureCharacterPosition.id);
 

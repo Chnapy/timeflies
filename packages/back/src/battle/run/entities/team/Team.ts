@@ -1,14 +1,7 @@
-import { TeamRoom, TeamSnapshot } from "@timeflies/shared";
+import { TeamEntity, TeamRoom } from "@timeflies/shared";
 
-export type Team = {
-    id: string;
-    letter: string;
-};
-
-export const teamToSnapshot = ({ id, letter }: Team): TeamSnapshot => ({
-    id,
-    letter
-});
+// should not use entity directly, for future updates
+export type Team = TeamEntity;
 
 export const Team = ({ id, letter }: Pick<TeamRoom, 'id' | 'letter'>) => {
 

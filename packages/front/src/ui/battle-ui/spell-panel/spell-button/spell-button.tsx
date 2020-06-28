@@ -29,9 +29,9 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const index = useGameStep('battle', battle => selectSpell(battle).index);
 
-    const duration = useGameStep('battle', battle => selectSpell(battle).feature.duration);
+    const duration = useGameStep('battle', battle => selectSpell(battle).features.duration);
 
-    const attack = useGameStep('battle', battle => selectSpell(battle).feature.attack);
+    const attack = useGameStep('battle', battle => selectSpell(battle).features.attack);
 
     const spellType = useGameStep('battle', battle => selectSpell(battle).staticData.type);
 

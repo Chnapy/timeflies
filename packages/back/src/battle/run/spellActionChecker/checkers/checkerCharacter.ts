@@ -1,5 +1,5 @@
 import { CheckerCreator } from '../SpellActionChecker';
-import { characterIsAlive } from '../../entities/character/Character';
+import { characterIsAlive } from '@timeflies/shared';
 
 export const checkerCharacter: CheckerCreator = (cycle, mapManager) => ({ spellAction }, player, get) => {
     const spells = get('spells');

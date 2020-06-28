@@ -1,9 +1,8 @@
-import { ConfirmSAction, NotifySAction, SpellActionCAction } from '@timeflies/shared';
+import { characterEntityToSnapshot, ConfirmSAction, NotifySAction, SpellActionCAction, spellEntityToSnapshot } from '@timeflies/shared';
 import { BattleStateManager } from '../battleStateManager/BattleStateManager';
 import { Cycle } from '../cycle/Cycle';
-import { Character, characterToSnapshot } from '../entities/character/Character';
+import { Character } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
-import { spellToSnapshot } from '../entities/spell/Spell';
 import { MapManager } from '../mapManager/MapManager';
 import { SpellActionChecker } from '../spellActionChecker/SpellActionChecker';
 
@@ -59,8 +58,8 @@ export const SpellActionReceiver = (
                     isOk: false,
                     correctBattleSnapshot: {
                         battleHash: getLastHash(),
-                        charactersSnapshots: get('characters').map(characterToSnapshot),
-                        spellsSnapshots: get('spells').map(spellToSnapshot)
+                        charactersSnapshots: get('characters').map(characterEntityToSnapshot),
+                        spellsSnapshots: get('spells').map(spellEntityToSnapshot)
                     },
                     debug: {
                         sendHash: action.spellAction.battleHash,

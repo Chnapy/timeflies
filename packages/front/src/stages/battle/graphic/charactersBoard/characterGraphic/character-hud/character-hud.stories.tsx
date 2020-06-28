@@ -1,3 +1,4 @@
+import { characterEntityToSnapshot, playerEntityToSnapshot, teamEntityToSnapshot } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { createAssetLoader } from '../../../../../../assetManager/AssetLoader';
@@ -8,11 +9,8 @@ import { createStoreManager } from '../../../../../../store/store-manager';
 import { battleReducer } from '../../../../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../../../../view';
 import { BattleStartAction } from '../../../../battle-actions';
-import { characterToSnapshot } from '../../../../entities/character/Character';
 import { seedCharacter } from '../../../../entities/character/Character.seed';
-import { playerToSnapshot } from '../../../../entities/player/Player';
 import { seedPlayer } from '../../../../entities/player/Player.seed';
-import { teamToSnapshot } from '../../../../entities/team/Team';
 import { seedTeam } from '../../../../entities/team/Team.seed';
 import { BattleDataPeriod } from '../../../../snapshot/battle-data';
 import { TiledMapGraphic } from '../../../tiledMap/TiledMapGraphic';
@@ -93,11 +91,11 @@ export const Default: React.FC = () => {
                     startTime: Date.now()
                 }
             },
-            teamSnapshotList: [ teamToSnapshot(team) ],
-            playerSnapshotList: [ playerToSnapshot(player) ],
+            teamSnapshotList: [ teamEntityToSnapshot(team) ],
+            playerSnapshotList: [ playerEntityToSnapshot(player) ],
             entitiesSnapshot: {
                 battleHash: '',
-                charactersSnapshots: [ characterToSnapshot(character) ],
+                charactersSnapshots: [ characterEntityToSnapshot(character) ],
                 launchTime: Date.now(),
                 spellsSnapshots: [],
                 time: Date.now()

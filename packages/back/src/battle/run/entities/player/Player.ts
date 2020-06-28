@@ -1,18 +1,9 @@
-import { PlayerRoom, PlayerSnapshot } from '@timeflies/shared';
+import { PlayerRoom, PlayerEntity } from '@timeflies/shared';
 import { WSSocketPool } from "../../../../transport/ws/WSSocket";
 
-export type Player = {
-    id: string;
-    name: string;
+export type Player = PlayerEntity & {
     socket: WSSocketPool;
-    teamId: string;
 };
-
-export const playerToSnapshot = ({ id, name, teamId }: Player): PlayerSnapshot => ({
-    id,
-    name,
-    teamId
-});
 
 export const Player = (
     { id, name }: Pick<PlayerRoom, 'id' | 'name'>,

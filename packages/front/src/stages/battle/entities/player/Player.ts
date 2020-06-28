@@ -1,19 +1,8 @@
-import { PlayerSnapshot } from '@timeflies/shared';
+import { PlayerEntity, PlayerSnapshot } from '@timeflies/shared';
 import { GameState } from '../../../../game-state';
 
-export type Player = {
-    id: string;
-    name: string;
-    teamId: string;
-};
-
-export const playerToSnapshot = ({ id, name, teamId }: Player): PlayerSnapshot => {
-    return {
-        id,
-        name,
-        teamId
-    };
-};
+// should not use entity directly, for future updates
+export type Player = PlayerEntity;
 
 export const playerIsMine = (currentPlayer: GameState['currentPlayer'], playerId: string) => currentPlayer?.id === playerId;
 

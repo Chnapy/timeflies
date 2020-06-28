@@ -4,7 +4,7 @@ import { Spell } from './Spell';
 
 export type SeedSpellProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Spell<P>, 'id' | 'period'>, 'feature'> & { 
     type?: SpellType;
-    feature?: Partial<Spell<P>['feature']>;
+    feature?: Partial<Spell<P>['features']>;
 };
 
 export type SeedSpellSnapshotProps = Omit<RequiredOnly<SpellSnapshot, 'id'>, 'features'> & { 
@@ -51,7 +51,7 @@ export const seedSpell = <P extends BattleDataPeriod>({ type, feature, ...props 
             }
         },
         index: 1,
-        feature: {
+        features: {
             area: 3,
             attack: 10,
             duration: 1000,

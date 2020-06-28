@@ -1,11 +1,11 @@
-import { assertIsDefined, BattleSnapshot, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, characterAlterLife, characterIsAlive, characterEntityToSnapshot, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, PlayerRoom, SpellActionSnapshot, TeamRoom, spellEntityToSnapshot } from '@timeflies/shared';
 import { Draft, Immutable, produce } from 'immer';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../../room/room';
 import { createStaticCharacter } from '../createStaticCharacter';
-import { Character, characterAlterLife, characterIsAlive, characterToSnapshot } from '../entities/character/Character';
+import { Character } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
-import { Spell, spellToSnapshot } from '../entities/spell/Spell';
+import { Spell } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 
 export type BattleState = Immutable<{
@@ -78,13 +78,13 @@ export const BattleStateManager = (
         };
     };
 
-    const generateSnapshot = ({ characters, spells }: Immutable<BattleState>, launchTime: number, time: number): BattleSnapshot => {
+    const generateSnapshot = ({ characters, spells }: BattleState, launchTime: number, time: number): BattleSnapshot => {
 
         return getBattleSnapshotWithHash({
             time,
             launchTime,
-            charactersSnapshots: characters.map(characterToSnapshot),
-            spellsSnapshots: spells.map(spellToSnapshot)
+            charactersSnapshots: characters.map(characterEntityToSnapshot),
+            spellsSnapshots: spells.map(spellEntityToSnapshot)
         });
     };
 
