@@ -11,19 +11,23 @@ describe('# checkerPlayer', () => {
 
     const getBattleState = (): BattleState => ({
         battleHashList: [],
-        characters: [ seedCharacter({
+        characters: {
+            c1: seedCharacter({
 
-            alterFn: char => {
-                char.id = 'c1';
+                alterFn: char => {
+                    char.id = 'c1';
+                }
+            }, 'p1').c1
+        },
+        spells: {
+            s1: {
+                id: 's1', index: 1, staticData: {
+                    id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
+                },
+                features: {} as any,
+                characterId: 'c1'
             }
-        }, 'p1')[ 0 ] ],
-        spells: [ {
-            id: 's1', index: 1, staticData: {
-                id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
-            },
-            features: {} as any,
-            characterId: 'c1'
-        } ]
+        }
     });
 
     it('should fail if not current turn', () => {
@@ -59,7 +63,7 @@ describe('# checkerPlayer', () => {
         const battleState = getBattleState();
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
+        const character = battleState.characters.c1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 

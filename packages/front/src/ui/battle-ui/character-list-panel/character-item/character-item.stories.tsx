@@ -1,12 +1,11 @@
 import { Box } from '@material-ui/core';
-import { characterEntityToSnapshot, playerEntityToSnapshot, seedTiledMap, teamEntityToSnapshot } from '@timeflies/shared';
+import { characterAlterLife, characterEntityToSnapshot, playerEntityToSnapshot, seedTiledMap, teamEntityToSnapshot } from '@timeflies/shared';
 import React from 'react';
 import { AssetLoader, createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { useAssetLoader } from '../../../../assetManager/AssetProvider';
 import { seedGameState } from '../../../../game-state.seed';
 import { BattleStartAction } from '../../../../stages/battle/battle-actions';
-import { characterAlterLife } from '../../../../stages/battle/entities/character/Character';
 import { seedCharacter } from '../../../../stages/battle/entities/character/Character.seed';
 import { seedPlayer } from '../../../../stages/battle/entities/player/Player.seed';
 import { seedTeam } from '../../../../stages/battle/entities/team/Team.seed';

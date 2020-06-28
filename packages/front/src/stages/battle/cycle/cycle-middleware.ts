@@ -1,10 +1,10 @@
 import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
-import { Character, characterIsAlive } from '../entities/character/Character';
+import { Character } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { BattleStartAction } from '../battle-actions';
-import { Normalized, TurnSnapshot, TURN_DELAY } from '@timeflies/shared';
+import { Normalized, TurnSnapshot, TURN_DELAY, characterIsAlive } from '@timeflies/shared';
 import { CycleState, getTurnState } from './cycle-reducer';
 
 type Dependencies<S> = {

@@ -11,20 +11,24 @@ describe('# checkerCharacter', () => {
 
     const getBattleState = (charLife: number = 100): BattleState => ({
         battleHashList: [],
-        characters: [ seedCharacter({
+        characters: {
+            c1: seedCharacter({
 
-            alterFn: char => {
-                char.id = 'c1';
-                char.initialFeatures.life = charLife;
+                alterFn: char => {
+                    char.id = 'c1';
+                    char.initialFeatures.life = charLife;
+                }
+            }, 'p1').c1
+        },
+        spells: {
+            s1: {
+                id: 's1', index: 1, staticData: {
+                    id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
+                },
+                features: {} as any,
+                characterId: 'c1'
             }
-        }, 'p1')[ 0 ] ],
-        spells: [ {
-            id: 's1', index: 1, staticData: {
-                id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
-            },
-            features: {} as any,
-            characterId: 'c1'
-        } ]
+        }
     });
 
     it('should fail if character is dead', () => {
@@ -32,7 +36,7 @@ describe('# checkerCharacter', () => {
         const battleState = getBattleState(0);
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
+        const character = battleState.characters.c1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 
@@ -45,7 +49,7 @@ describe('# checkerCharacter', () => {
         const spellAction: SpellActionCAction = {
             type: 'battle/spellAction',
             sendTime: -1,
-            spellAction: seedSpellActionSnapshot(battleState.spells[ 0 ].id, {
+            spellAction: seedSpellActionSnapshot(battleState.spells.s1.id, {
                 characterId: 'other',
                 duration: 200,
             })
@@ -62,7 +66,7 @@ describe('# checkerCharacter', () => {
         const battleState = getBattleState();
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
+        const character = battleState.characters.c1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 
@@ -91,8 +95,8 @@ describe('# checkerCharacter', () => {
         const battleState = getBattleState();
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
-        const spell = battleState.spells[ 0 ];
+        const character = battleState.characters.c1;
+        const spell = battleState.spells.s1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 

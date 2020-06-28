@@ -1,4 +1,4 @@
-import { BRunEndSAction, BRunLaunchSAction, characterIsAlive, playerEntityToSnapshot, SpellActionCAction, teamEntityToSnapshot } from '@timeflies/shared';
+import { BRunEndSAction, BRunLaunchSAction, characterIsAlive, playerEntityToSnapshot, SpellActionCAction, teamEntityToSnapshot, denormalize } from '@timeflies/shared';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../room/room';
 import { RoomState } from '../room/room-state-manager';
@@ -55,7 +55,7 @@ export const BattleRunRoom = ({ mapSelected, teamList: teamRoomList, playerDataL
     };
 
     const checkDeathsAndDisconnects = () => {
-        const charactersAlivePlayerIds = get('characters')
+        const charactersAlivePlayerIds = denormalize(get('characters'))
             .filter(characterIsAlive)
             .map(c => c.playerId);
 

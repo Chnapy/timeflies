@@ -17,7 +17,7 @@ export const seedCycle = ({ globalTurn, turn }: SeedCycleProps = {}): Cycle => (
         state: 'running',
         currentTurn: {
             id: -1,
-            getCharacter: () => seedCharacter()[ 0 ],
+            getCharacter: () => seedCharacter()[ '1' ],
             clearTimedActions() { },
             endTime: -1,
             refreshTimedActions() { },

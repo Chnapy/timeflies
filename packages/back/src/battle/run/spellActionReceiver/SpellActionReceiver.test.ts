@@ -62,8 +62,8 @@ describe('# SpellActionReceiver', () => {
 
         const battleState: BattleState = {
             battleHashList,
-            characters: [],
-            spells: []
+            characters: {},
+            spells: {}
         };
 
         const stateManager: BattleStateManager = {

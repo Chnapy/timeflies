@@ -1,13 +1,13 @@
-import { BRunGlobalTurnStartSAction, GLOBALTURN_DELAY, ServerAction, TimerTester, TURN_DELAY } from '@timeflies/shared';
+import { BRunGlobalTurnStartSAction, denormalize, GLOBALTURN_DELAY, Normalized, ServerAction, TimerTester, TURN_DELAY } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
+import { EntitiesGetter } from '../battleStateManager/BattleStateManager';
 import { Character } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { Player } from '../entities/player/Player';
 import { seedPlayer } from '../entities/player/Player.seed';
 import { Cycle } from './Cycle';
 import { GlobalTurn, GlobalTurnState } from './turn/GlobalTurn';
-import { EntitiesGetter } from '../battleStateManager/BattleStateManager';
 import WebSocket = require('ws');
 
 describe('# Cycle', () => {
@@ -21,7 +21,7 @@ describe('# Cycle', () => {
 
     let players: Player[];
 
-    let characters: Character[];
+    let characters: Normalized<Character>;
 
     const getter: EntitiesGetter<'characters'> = () => characters;
 
@@ -45,7 +45,7 @@ describe('# Cycle', () => {
             { length: 3 },
             players[ 1 ].id
         );
-        characters[ 0 ].playerId = players[ 0 ].id;
+        characters[ '1' ].playerId = players[ 0 ].id;
 
         onSendFn1 = () => { };
         onSendFn2 = () => { };
@@ -56,7 +56,7 @@ describe('# Cycle', () => {
 
         sockets.forEach(c => c.close());
 
-        characters.length = 0;
+        characters = {};
         players.length = 0;
         sockets.length = 0;
 
@@ -139,14 +139,15 @@ describe('# Cycle', () => {
         cycle.start(launchTime);
 
         let advance = 0;
-        characters.forEach((c, i) => {
+        const characterList = denormalize(characters);
+        characterList.forEach((c, i) => {
             const delay = i && TURN_DELAY;
             advance += c.features.actionTime + delay;
         });
         timerTester.advanceBy(advance);
 
         expect(cycle.globalTurn.id).toBe(1);
-        expect(cycle.globalTurn.currentTurn.id).toBe(characters.length);
+        expect(cycle.globalTurn.currentTurn.id).toBe(characterList.length);
         expect(cycle.globalTurn.state).toBe<GlobalTurnState>('idle');
 
         timerTester.advanceBy(GLOBALTURN_DELAY);
@@ -163,6 +164,6 @@ describe('# Cycle', () => {
         // note that the first turn of a global turn does not send any action
         expect(actionTypes
             .filter(t => t === 'battle-run/turn-start')
-        ).toHaveLength(characters.length - 1);
+        ).toHaveLength(denormalize(characters).length - 1);
     });
 });

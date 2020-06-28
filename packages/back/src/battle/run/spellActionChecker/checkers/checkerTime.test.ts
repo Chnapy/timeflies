@@ -11,18 +11,22 @@ describe('# checkerTime', () => {
 
     const getBattleState = (): BattleState => ({
         battleHashList: [],
-        characters: [ seedCharacter({
-            alterFn: char => {
-                char.id = 'c1';
+        characters: {
+            c1: seedCharacter({
+                alterFn: char => {
+                    char.id = 'c1';
+                }
+            }, 'p1').c1
+        },
+        spells: {
+            s1: {
+                id: 's1', index: 1, staticData: {
+                    id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
+                },
+                features: { duration: 1000 } as any,
+                characterId: 'c1'
             }
-        }, 'p1')[ 0 ] ],
-        spells: [ {
-            id: 's1', index: 1, staticData: {
-                id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
-            },
-            features: { duration: 1000 } as any,
-            characterId: 'c1'
-        } ]
+        }
     });
 
     it('should fail on bad start time', () => {
@@ -30,8 +34,8 @@ describe('# checkerTime', () => {
         const battleState = getBattleState();
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
-        const spell = battleState.spells[ 0 ];
+        const character = battleState.characters.c1;
+        const spell = battleState.spells.s1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 
@@ -66,8 +70,8 @@ describe('# checkerTime', () => {
         const battleState = getBattleState();
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
-        const spell = battleState.spells[ 0 ];
+        const character = battleState.characters.c1;
+        const spell = battleState.spells.s1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 
@@ -103,8 +107,8 @@ describe('# checkerTime', () => {
         const battleState = getBattleState();
 
         const player = seedPlayer({ id: 'p1' });
-        const character = battleState.characters[ 0 ];
-        const spell = battleState.spells[ 0 ];
+        const character = battleState.characters.c1;
+        const spell = battleState.spells.s1;
 
         const get: EntitiesGetter = key => battleState[ key ];
 

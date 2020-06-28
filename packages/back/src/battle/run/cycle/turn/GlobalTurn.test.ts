@@ -55,7 +55,7 @@ describe('# GlobalTurn', () => {
         timerTester.advanceBy(globalTurn.currentTurn.turnDuration + 10);
 
         expect(globalTurn.currentTurn.id).toBe(firstTurnId + 1);
-        expect(globalTurn.currentTurn.getCharacter()).toBe(characters[ 1 ]);
+        expect(globalTurn.currentTurn.getCharacter()).toBe(characters[ '2' ]);
     });
 
     it('should run callback when last turn ends', () => {
@@ -98,7 +98,7 @@ describe('# GlobalTurn', () => {
             () => characters, turnIdGenerator,
             () => null, () => null);
 
-        const secondChar = characters[ 1 ];
+        const secondChar = characters[ '2' ];
 
         secondChar.features = {
             ...secondChar.features,
@@ -122,13 +122,13 @@ describe('# GlobalTurn', () => {
             () => characters, turnIdGenerator,
             () => null, () => null);
 
-        const firstChar = characters[ 0 ];
+        const firstChar = characters[ '1' ];
 
         firstChar.features = {
             ...firstChar.features,
             life: 0
         };
-        
+
         globalTurn.notifyDeaths();
 
         expect(globalTurn.currentTurn.getCharacter()).not.toBe(firstChar);
