@@ -39,7 +39,7 @@ describe('# snapshot-reducer', () => {
         });
 
         const state1 = snapshotReducer({
-            getSpellLaunchFn: () => () => { }
+            getSpellEffectFn: () => () => []
         })(initialState, SpellActionLaunchAction({
             spellActList: [ {
                 startTime: timerTester.now,
@@ -93,8 +93,9 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
+                    return [];
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
@@ -112,8 +113,9 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 20;
+                    return [];
                 }
             })(state1, SpellActionLaunchAction({
                 spellActList: [ {
@@ -163,8 +165,9 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
+                    return [];
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {
@@ -182,8 +185,9 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 20;
+                    return [];
                 }
             })(state1, SpellActionLaunchAction({
                 spellActList: [ {
@@ -234,8 +238,9 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
+                    return [];
                 }
             })(initialState, SpellActionLaunchAction({
                 spellActList: [ {

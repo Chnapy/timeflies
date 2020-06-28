@@ -1,33 +1,29 @@
-import { assertIsDefined } from '@timeflies/shared';
-import { TiledMapSpellObject } from '../../engine/spellMapping';
+import { assertIsDefined, Normalized, SpellActionSnapshot } from '@timeflies/shared';
+import { TileGraphic } from './TileGraphic';
 
+type TiledMapStartFn = (props: Pick<SpellActionSnapshot,
+    | 'startTime'
+    | 'position'
+    | 'actionArea'
+    | 'duration'
+> & {
+    tileGraphicList: Normalized<TileGraphic>;
+}) => void;
 
-export const tiledMapSpellMove: TiledMapSpellObject = {
-    onHoverFn: ({ tileGraphicList }) => {
-        return startTime => {
-        }
-    },
-    onSpellStartFn: ({
-        tileGraphicList, startTime, duration, position
-    }) => {
-        const tilePos = tileGraphicList[ position.id ];
-        assertIsDefined(tilePos);
+export const tiledMapSpellMove: TiledMapStartFn = ({
+    tileGraphicList, startTime, duration, position
+}) => {
+    const tilePos = tileGraphicList[ position.id ];
+    assertIsDefined(tilePos);
 
-        tilePos.persistActionStart(duration, startTime);
-    }
+    tilePos.persistActionStart(duration, startTime);
 };
 
-export const tiledMapSpellSimpleAttack: TiledMapSpellObject = {
-    onHoverFn: ({ tileGraphicList, rangeTiles }) => {
-        return startTime => {
-        };
-    },
-    onSpellStartFn: ({
-        tileGraphicList, startTime, duration, position
-    }) => {
-        const tilePos = tileGraphicList[ position.id ];
-        assertIsDefined(tilePos);
+export const tiledMapSpellSimpleAttack: TiledMapStartFn = ({
+    tileGraphicList, startTime, duration, position
+}) => {
+    const tilePos = tileGraphicList[ position.id ];
+    assertIsDefined(tilePos);
 
-        tilePos.persistActionStart(duration, startTime);
-    }
+    tilePos.persistActionStart(duration, startTime);
 };
