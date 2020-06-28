@@ -1,4 +1,4 @@
-import { Orientation, Position, SpellActionSnapshot, switchUtil, createPosition } from '@timeflies/shared';
+import { Position, SpellActionSnapshot, switchUtil, createPosition, SpellType, CharacterType, Orientation } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap from 'tiled-types/types';
@@ -23,12 +23,10 @@ interface PeriodFn {
     ): {
         sprite: PIXI.Sprite;
         hud?: CharacterHud;
+        debug: {
+            onStateChange: (payload: any) => void;
+        };
     };
-}
-
-interface GeoState {
-    position: Position;
-    orientation: Orientation;
 }
 
 export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) => {
@@ -43,7 +41,7 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
         ? periodCurrent
         : periodFuture;
 
-    const { sprite, hud } = periodFn(
+    const { sprite, hud, debug } = periodFn(
         characterId,
         storeEmitter,
         tiledMapGraphic,
@@ -57,8 +55,30 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
         container.addChild(hud.container);
     }
 
+    type StateChangePayload = {
+        tiledSchema: TiledMap | null;
+        position: Position;
+    };
+
+    const onStateChange = ({ tiledSchema, position }: StateChangePayload) => {
+        if (!tiledSchema) {
+            return;
+        }
+
+        const { tilewidth, tileheight } = tiledMapGraphic.getTilesize(tiledSchema);
+        sprite.width = tilewidth;
+        sprite.height = tileheight;
+
+        const worldPos = tiledMapGraphic.getWorldFromTile(tiledSchema, position);
+        sprite.position.set(worldPos.x, worldPos.y);
+
+        if (hud) {
+            hud.container.position.set(worldPos.x, worldPos.y);
+        }
+    }
+
     storeEmitter.onStateChange(
-        state => {
+        (state): StateChangePayload => {
             const { tiledSchema } = state.battle.battleActionState;
             const { position } = getBattleData(state.battle.snapshotState, period).characters[ characterId ];
 
@@ -67,31 +87,36 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
                 position
             };
         },
-        ({ tiledSchema, position }) => {
-            if (!tiledSchema) {
-                return;
-            }
-
-            const { tilewidth, tileheight } = tiledMapGraphic.getTilesize(tiledSchema);
-            sprite.width = tilewidth;
-            sprite.height = tileheight;
-
-            const worldPos = tiledMapGraphic.getWorldFromTile(tiledSchema, position);
-            sprite.position.set(worldPos.x, worldPos.y);
-
-            if (hud) {
-                hud.container.position.set(worldPos.x, worldPos.y);
-            }
-        },
+        onStateChange,
         shallowEqual
     );
 
 
     return {
-        // character,
-        container
+        container,
+
+        debug: {
+            onStateChangePeriod: (payload: StateChangePayloadCurrent | StateChangePayloadFuture) =>
+                debug.onStateChange(payload),
+
+            onStateChange
+        }
     };
 };
+
+type StateChangePayloadCurrent =
+    | {
+        state: 'no-spell';
+        characterPosition: Position;
+        tiledSchema: TiledMap | null;
+    }
+    | {
+        state: 'current-spell';
+        characterPosition: Position;
+        tiledSchema: TiledMap;
+        currentSpellAction: SpellActionSnapshot;
+        spellType: SpellType;
+    };
 
 const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => {
 
@@ -120,26 +145,71 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             endWorldPos.y - startWorldPos.y,
         );
 
-        let now, ratio;
-        ticker?.add(() => {
-            now = Date.now();
+        const getRatio = () => {
+            return Math.min((Date.now() - startTime) / duration, 1);
+        };
 
-            ratio = (now - startTime) / duration;
+        const setNewPosition = (ratio: number) => {
             const x = startWorldPos.x + ratio * diffWorldPos.x;
             const y = startWorldPos.y + ratio * diffWorldPos.y;
 
             setPosition(x, y);
+        };
+
+        const initialRatio = getRatio();
+
+        if (initialRatio === 1) {
+            setNewPosition(initialRatio);
+
+        } else {
+
+            ticker?.add(() => {
+                const ratio = getRatio();
+                setNewPosition(ratio);
+            });
+        }
+    };
+
+    const onStateChange = (payload: StateChangePayloadCurrent) => {
+        if (payload.state === 'no-spell') {
+            if (payload.tiledSchema) {
+                const p = tiledMapGraphic.getWorldFromTile(payload.tiledSchema, payload.characterPosition);
+                setPosition(p.x, p.y);
+            }
+            ticker?.destroy();
+            ticker = null;
+            return;
+        }
+        const { tiledSchema, characterPosition, currentSpellAction, spellType } = payload;
+
+        if (ticker?.started) {
+            ticker.destroy();
+            ticker = null;
+        }
+
+        ticker = new PIXI.Ticker();
+
+        const actionFn: SpellFn = switchUtil(spellType, {
+            move: onMoveAction,
+            orientate: () => { },
+            simpleAttack: () => { },
+            sampleSpell1: () => { },
+            sampleSpell2: () => { },
+            sampleSpell3: () => { },
         });
+        actionFn(currentSpellAction, characterPosition, tiledSchema);
+
+        ticker.start();
     };
 
     storeEmitter.onStateChange(
-        ({ battle }) => {
+        ({ battle }): StateChangePayloadCurrent => {
             const { tiledSchema } = battle.battleActionState;
             const { currentSpellAction, battleDataCurrent } = battle.snapshotState;
             const characterPosition = battleDataCurrent.characters[ characterId ].position;
             if (!tiledSchema || currentSpellAction?.characterId !== characterId) {
                 return {
-                    state: 'no-spell' as const,
+                    state: 'no-spell',
                     characterPosition,
                     tiledSchema
                 };
@@ -148,57 +218,51 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             const spellType = battleDataCurrent.spells[ currentSpellAction.spellId ].staticData.type;
 
             return {
-                state: 'current-spell' as const,
+                state: 'current-spell',
                 tiledSchema,
                 characterPosition,
                 currentSpellAction,
                 spellType
             };
         },
-        payload => {
-            if (payload.state === 'no-spell') {
-                if (payload.tiledSchema) {
-                    const p = tiledMapGraphic.getWorldFromTile(payload.tiledSchema, payload.characterPosition);
-                    setPosition(p.x, p.y);
-                }
-                ticker?.destroy();
-                ticker = null;
-                return;
-            }
-            const { tiledSchema, characterPosition, currentSpellAction, spellType } = payload;
-
-            if (ticker?.started) {
-                ticker?.destroy();
-                ticker = null;
-            }
-
-            ticker = new PIXI.Ticker();
-
-            const actionFn: SpellFn = switchUtil(spellType, {
-                move: onMoveAction,
-                orientate: () => { },
-                simpleAttack: () => { },
-                sampleSpell1: () => { },
-                sampleSpell2: () => { },
-                sampleSpell3: () => { },
-            });
-            actionFn(currentSpellAction, characterPosition, tiledSchema);
-
-            ticker.start();
-        },
+        onStateChange,
         shallowEqual
     );
 
     return {
         sprite: animatedSprite,
-        hud
+        hud,
+        debug: {
+            onStateChange
+        }
     };
 };
+
+type StateChangePayloadFuture =
+    | {
+        type: CharacterType;
+        orientation: Orientation;
+    }
+    | null;
 
 const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet) => {
 
     const sprite = new PIXI.Sprite();
     sprite.alpha = 0.25;
+
+    const onStateChange = (payload: StateChangePayloadFuture) => {
+        if (!payload) {
+            sprite.visible = false;
+            return;
+        }
+        
+        const { type, orientation } = payload;
+        const idlePath = getAnimPath(type, 'idle', orientation);
+        const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
+
+        sprite.texture = texture;
+        sprite.visible = true;
+    };
 
     storeEmitter.onStateChange(
         state => {
@@ -212,20 +276,14 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
                 orientation
             };
         },
-        payload => {
-            if (!payload) {
-                sprite.visible = false;
-                return;
-            }
-            const { type, orientation } = payload;
-            const idlePath = getAnimPath(type, 'idle', orientation);
-            const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
-
-            sprite.texture = texture;
-            sprite.visible = true;
-        },
+        onStateChange,
         shallowEqual
     );
 
-    return { sprite };
+    return {
+        sprite,
+        debug: {
+            onStateChange
+        }
+    };
 };

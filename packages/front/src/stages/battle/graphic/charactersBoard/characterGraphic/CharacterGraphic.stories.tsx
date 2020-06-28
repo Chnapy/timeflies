@@ -1,4 +1,4 @@
-import { characterEntityToSnapshot, playerEntityToSnapshot, teamEntityToSnapshot } from '@timeflies/shared';
+import { characterEntityToSnapshot, createPosition, playerEntityToSnapshot, Position, seedSpellActionSnapshot, teamEntityToSnapshot } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { createAssetLoader } from '../../../../../assetManager/AssetLoader';
@@ -13,6 +13,7 @@ import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedPlayer } from '../../../entities/player/Player.seed';
 import { seedTeam } from '../../../entities/team/Team.seed';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
+import { TileGrid } from '../../tiledMap/tile-grid';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
 
@@ -21,7 +22,7 @@ export default {
     component: CharacterGraphic
 };
 
-export const Current: React.FC = () => {
+const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
 
     const initialState: GameState = {
         currentPlayer: {
@@ -41,13 +42,13 @@ export const Current: React.FC = () => {
         middlewareList: []
     });
 
+    let graphic: CharacterGraphic;
+
     const createPixi: CreatePixiFn = async ({ canvas, parent }) => {
         const app = new PIXI.Application({
             view: canvas,
             resizeTo: parent
         });
-
-        const period: BattleDataPeriod = 'current';
 
         const team = seedTeam({
             id: 't1'
@@ -58,7 +59,7 @@ export const Current: React.FC = () => {
         });
 
         const character = seedCharacter({
-            id: 'c1', period, playerId: 'p1'
+            id: 'c1', period, playerId: 'p1', features: { actionTime: 9999999 }
         });
 
         const { map, characters } = await assetLoader.newInstance()
@@ -76,12 +77,12 @@ export const Current: React.FC = () => {
             },
             globalTurnSnapshot: {
                 id: 1,
-                order: [],
+                order: [ 'c1' ],
                 startTime: Date.now(),
                 currentTurn: {
                     id: 1,
-                    characterId: '1',
-                    duration: 0,
+                    characterId: 'c1',
+                    duration: 999999,
                     startTime: Date.now()
                 }
             },
@@ -96,13 +97,16 @@ export const Current: React.FC = () => {
             }
         }));
 
-        const hud = CanvasContext.provider({
+        graphic = CanvasContext.provider({
             tiledMapGraphic,
             spritesheets: {
                 characters: characters.spritesheet
             }
         }, () => CharacterGraphic(character.id, period));
-        app.stage.addChild(hud.container);
+
+        const grid = TileGrid(map.schema, 0xFFFFFF);
+
+        app.stage.addChild(graphic.container, grid.graphic);
     };
 
     const view = createView({
@@ -112,99 +116,57 @@ export const Current: React.FC = () => {
         gameUIChildren: null
     });
 
-    return view;
-};
+    let currentPosition: Position | null = null;
 
-export const Future: React.FC = () => {
+    const getOnButtonClick = (getStartTime: () => number) => () => {
+        const { battle } = storeManager.getState();
+        const { tiledSchema } = battle.battleActionState;
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: ''
-        },
-        step: 'battle',
-        room: null,
-        battle: battleReducer(undefined, { type: '' })
+        if (!currentPosition) {
+            currentPosition = battle.snapshotState.battleDataFuture.characters.c1.position;
+        }
+
+        const previousPosition = currentPosition;
+        currentPosition = createPosition(previousPosition.x + 1, previousPosition.y);
+
+        const position = currentPosition;
+
+        const duration = 1000;
+
+        graphic.debug.onStateChangePeriod({
+            state: 'current-spell',
+            tiledSchema: tiledSchema!,
+            characterPosition: previousPosition,
+            spellType: 'move',
+            currentSpellAction: seedSpellActionSnapshot('s1', {
+                position,
+                startTime: getStartTime(),
+                duration
+            })
+        });
+
+        setTimeout(() => {
+            graphic.debug.onStateChangePeriod({
+                state: 'no-spell',
+                tiledSchema,
+                characterPosition: currentPosition!
+            });
+        }, duration);
     };
 
-    const assetLoader = createAssetLoader();
+    return <>
+        {view}
 
-    const storeManager = createStoreManager({
-        assetLoader,
-        initialState,
-        middlewareList: []
-    });
+        <div>
+            <button onClick={getOnButtonClick(Date.now)}>right</button>
 
-    const createPixi: CreatePixiFn = async ({ canvas, parent }) => {
-        const app = new PIXI.Application({
-            view: canvas,
-            resizeTo: parent
-        });
+            <button onClick={getOnButtonClick(() => Date.now() - 500)}>right (+500ms)</button>
 
-        const period: BattleDataPeriod = 'future';
-
-        const team = seedTeam({
-            id: 't1'
-        });
-
-        const player = seedPlayer({
-            id: 'p1', teamId: 't1'
-        });
-
-        const character = seedCharacter({
-            id: 'c1', period, playerId: 'p1'
-        });
-
-        const { map, characters } = await assetLoader.newInstance()
-            .add('map', AssetManager.fake.mapSchema)
-            .addSpritesheet('characters', AssetManager.spritesheets.characters)
-            .load();
-
-        const tiledMapGraphic = TiledMapGraphic();
-
-        storeManager.dispatch(BattleStartAction({
-            myPlayerId: 'p1',
-            tiledMapAssets: {
-                schema: map.schema,
-                imagesUrls: map.images
-            },
-            globalTurnSnapshot: {
-                id: 1,
-                order: [],
-                startTime: Date.now(),
-                currentTurn: {
-                    id: 1,
-                    characterId: '1',
-                    duration: 0,
-                    startTime: Date.now()
-                }
-            },
-            teamSnapshotList: [ teamEntityToSnapshot(team) ],
-            playerSnapshotList: [ playerEntityToSnapshot(player) ],
-            entitiesSnapshot: {
-                battleHash: '',
-                charactersSnapshots: [ characterEntityToSnapshot(character) ],
-                launchTime: Date.now(),
-                spellsSnapshots: [],
-                time: Date.now()
-            }
-        }));
-
-        const hud = CanvasContext.provider({
-            tiledMapGraphic,
-            spritesheets: {
-                characters: characters.spritesheet
-            }
-        }, () => CharacterGraphic(character.id, period));
-        app.stage.addChild(hud.container);
-    };
-
-    const view = createView({
-        storeManager,
-        assetLoader,
-        createPixi,
-        gameUIChildren: null
-    });
-
-    return view;
+            <button onClick={getOnButtonClick(() => Date.now() - 2000)}>right (+2000ms)</button>
+        </div>
+    </>;
 };
+
+export const Current: React.FC = () => <Render period='current' />;
+
+export const Future: React.FC = () => <Render period='future' />;

@@ -4,9 +4,9 @@ import { shallowEqual } from 'react-redux';
 import TiledMap, { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../canvas/GameCanvas';
-import { graphicTheme } from '../graphic-theme';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from './tiledSpellFns';
 import { TileGraphic } from './TileGraphic';
+import { TileGrid } from './tile-grid';
 
 export type TiledMapGraphic = ReturnType<typeof TiledMapGraphic>;
 
@@ -150,20 +150,9 @@ export const TiledMapGraphic = () => {
             const layerContainerOver = new PIXI.Container();
             layerContainerOver.addChild(...layerTiles.map(t => t.containerOver));
 
-            const { palette } = graphicTheme;
+            const gridGraphic = TileGrid(schema);
 
-            const gridGraphic = new PIXI.Graphics();
-            gridGraphic.lineStyle(1, palette.primary.main, 0.1);
-            for (let y = 0; y < schema.height; y++) {
-                gridGraphic.moveTo(0, y * schema.tileheight);
-                gridGraphic.lineTo(schema.width * schema.tilewidth, y * schema.tileheight);
-            }
-            for (let x = 0; x < schema.width; x++) {
-                gridGraphic.moveTo(x * schema.tilewidth, 0);
-                gridGraphic.lineTo(x * schema.tilewidth, schema.height * schema.tileheight);
-            }
-
-            container.addChild(layerContainer, gridGraphic);
+            container.addChild(layerContainer, gridGraphic.graphic);
 
             containerOver.addChild(layerContainerOver);
 
