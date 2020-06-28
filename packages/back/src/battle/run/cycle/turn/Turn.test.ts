@@ -14,7 +14,7 @@ describe('# Turn', () => {
         character = seedCharacter({
             length: 1,
             alterFn: (char) => char.initialFeatures.actionTime = 2000
-        })[ 0 ];
+        })[ '1' ];
     });
 
     afterEach(() => {

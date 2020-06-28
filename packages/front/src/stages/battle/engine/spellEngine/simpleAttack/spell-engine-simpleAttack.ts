@@ -1,12 +1,11 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { BresenhamPoint, denormalize, normalize, Position, TiledManager, TileType } from '@timeflies/shared';
+import { BresenhamPoint, characterAlterLife, denormalize, normalize, Position, TiledManager, TileType } from '@timeflies/shared';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, BattleStateSpellPrepareAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
-import { characterAlterLife } from '../../../entities/character/Character';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
 import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
 
-export const spellLaunchSimpleAttack: SpellLaunchFn = ({ spell, actionArea }, { characters }) => {
+export const spellLaunchSimpleAttack: SpellLaunchFn = (spell, { actionArea }, { characters }) => {
 
     const targets = denormalize(characters).filter(c => !!actionArea[ c.position.id ]);
 

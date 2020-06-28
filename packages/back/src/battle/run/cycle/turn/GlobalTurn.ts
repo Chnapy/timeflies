@@ -1,4 +1,4 @@
-import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY, characterIsAlive } from "@timeflies/shared";
+import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY, characterIsAlive, denormalize } from "@timeflies/shared";
 import { EntitiesGetter } from '../../battleStateManager/BattleStateManager';
 import { Turn } from "./Turn";
 
@@ -22,6 +22,8 @@ export const GlobalTurn = (
 ) => {
 
     const getCharacters = () => get('characters');
+
+    const order = denormalize(getCharacters()).map(c => c.id);
 
     let currentTurn: Turn;
 
@@ -51,11 +53,11 @@ export const GlobalTurn = (
 
     const runNextTurn = (nextCharacterIndex: number): void => {
 
-        if (nextCharacterIndex >= getCharacters().length) {
+        if (nextCharacterIndex >= order.length) {
             onGlobalTurnEnd(currentTurn.endTime);
         }
         else {
-            const getCurrentCharacter = () => getCharacters()[ nextCharacterIndex ];
+            const getCurrentCharacter = () => getCharacters()[ order[ nextCharacterIndex ] ];
 
             if (characterIsAlive(getCurrentCharacter())) {
                 console.log(`Wait ${TURN_DELAY}ms`);
@@ -68,14 +70,14 @@ export const GlobalTurn = (
     };
 
     const getCurrentCharacterIndex = (): number => {
-        return getCharacters().findIndex(c => c.id === currentTurn.getCharacter().id);
+        return order.findIndex(id => id === currentTurn.getCharacter().id);
     };
 
     const toSnapshot = (): GlobalTurnSnapshot => {
         return {
             id,
             startTime,
-            order: getCharacters().map(c => c.staticData.id),
+            order: [ ...order ],
             currentTurn: currentTurn.toSnapshot()
         };
     };
@@ -84,7 +86,7 @@ export const GlobalTurn = (
         currentTurn.clearTimedActions();
     };
 
-    setCurrentTurn(Turn(turnId, startTime, () => getCharacters()[ 0 ], () => null, onTurnEnd));
+    setCurrentTurn(Turn(turnId, startTime, () => getCharacters()[ order[0] ], () => null, onTurnEnd));
 
     const this_: GlobalTurn = {
         id,

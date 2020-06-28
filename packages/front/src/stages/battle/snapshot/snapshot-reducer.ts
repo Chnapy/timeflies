@@ -183,17 +183,21 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
 
                 const spellLaunchFn = getSpellLaunchFn(spell.staticData.type);
 
-                spellLaunchFn(spellAction, state.battleDataFuture);
-
-                commit(state, commitTime);
-
-                const snapshot: SpellActionSnapshot = {
+                const partialSnapshot: Omit<SpellActionSnapshot, 'battleHash'> = {
                     startTime,
                     characterId: spellAction.spell.characterId,
                     duration,
                     spellId: spellAction.spell.id,
                     position: spellAction.position,
-                    actionArea: spellAction.actionArea,
+                    actionArea: spellAction.actionArea
+                };
+
+                spellLaunchFn(spell, partialSnapshot, state.battleDataFuture);
+
+                commit(state, commitTime);
+
+                const snapshot: SpellActionSnapshot = {
+                    ...partialSnapshot,
                     battleHash: state.battleDataFuture.battleHash,
                 };
 

@@ -1,4 +1,4 @@
-import { assertIsDefined, BattleSnapshot, characterAlterLife, characterIsAlive, characterEntityToSnapshot, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, PlayerRoom, SpellActionSnapshot, TeamRoom, spellEntityToSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, BattleStateEntity, battleStateEntityToSnapshot, characterAlterLife, characterIsAlive, denormalize, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, normalize, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
 import { Draft, Immutable, produce } from 'immer';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../../room/room';
@@ -8,11 +8,11 @@ import { Player } from '../entities/player/Player';
 import { Spell } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 
-export type BattleState = Immutable<{
-    battleHashList: string[];
-    characters: Character[];
-    spells: Spell[];
-}>;
+export type BattleState =
+    & BattleStateEntity<Character, Spell>
+    & {
+        battleHashList: string[];
+    };
 
 export type EntitiesGetter<K extends keyof BattleState = keyof BattleState> = <K2 extends K>(key: K2) => BattleState[ K2 ];
 
@@ -73,24 +73,23 @@ export const BattleStateManager = (
 
         return {
             battleHashList,
-            characters,
-            spells
+            characters: normalize(characters),
+            spells: normalize(spells)
         };
     };
 
-    const generateSnapshot = ({ characters, spells }: BattleState, launchTime: number, time: number): BattleSnapshot => {
+    const generateSnapshot = (battleState: BattleState, launchTime: number, time: number): BattleSnapshot => {
 
         return getBattleSnapshotWithHash({
             time,
             launchTime,
-            charactersSnapshots: characters.map(characterEntityToSnapshot),
-            spellsSnapshots: spells.map(spellEntityToSnapshot)
+            ...battleStateEntityToSnapshot(battleState)
         });
     };
 
     // TODO share all these functions
     const applyMoveAction = (spell: Spell, { position }: SpellActionSnapshot, { characters }: Draft<BattleState>): Character[] => {
-        const character = characters.find(c => c.id === spell.characterId)!;
+        const character = characters[ spell.characterId ]
 
         const orientation = getOrientationFromTo(character.position, position);
 
@@ -102,7 +101,7 @@ export const BattleStateManager = (
 
     const applySimpleAttack = (spell: Spell, { actionArea }: SpellActionSnapshot, { characters }: Draft<BattleState>): Character[] => {
 
-        const targets = characters.filter(c => characterIsAlive(c) && !!actionArea[c.position.id]);
+        const targets = denormalize<Character>(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
 
         targets.forEach(t => characterAlterLife(t, -spell.features.attack));
 
@@ -129,7 +128,7 @@ export const BattleStateManager = (
 
     const applySpellAction = (spellAction: SpellActionSnapshot, battleState: Draft<BattleState>): Character[] => {
 
-        const spell = battleState.spells.find(s => s.id === spellAction.spellId);
+        const spell = battleState.spells[ spellAction.spellId ];
         assertIsDefined(spell);
 
         const { staticData: { type } } = spell;

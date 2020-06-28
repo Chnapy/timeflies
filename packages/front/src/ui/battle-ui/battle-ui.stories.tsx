@@ -1,7 +1,6 @@
 import React from 'react';
 import { createAssetLoader } from '../../assetManager/AssetLoader';
 import { seedGameState } from '../../game-state.seed';
-import { characterAlterLife } from '../../stages/battle/entities/character/Character';
 import { seedCharacter } from '../../stages/battle/entities/character/Character.seed';
 import { seedPlayer } from '../../stages/battle/entities/player/Player.seed';
 import { seedSpell } from '../../stages/battle/entities/spell/Spell.seed';
@@ -11,6 +10,7 @@ import { createView } from '../../view';
 import { battleReducer, BattleState } from '../reducers/battle-reducers/battle-reducer';
 import { BattleUI } from './battle-ui';
 import { getInitialSnapshotState } from '../../stages/battle/snapshot/snapshot-reducer';
+import { characterAlterLife } from '@timeflies/shared';
 
 export default {
     title: 'Battle',

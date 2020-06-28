@@ -93,7 +93,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
@@ -112,7 +112,7 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 20;
                 }
             })(state1, SpellActionLaunchAction({
@@ -163,7 +163,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({
@@ -182,7 +182,7 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 20;
                 }
             })(state1, SpellActionLaunchAction({
@@ -234,7 +234,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellLaunchFn: spellType => (spellAction, { characters }) => {
+                getSpellLaunchFn: spellType => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
                 }
             })(initialState, SpellActionLaunchAction({

@@ -17,12 +17,6 @@ export const updateCharacterFromSnapshot = (character: Character<any>, snapshot:
     character.features = features;
 };
 
-export const characterAlterLife = ({ features }: Character<BattleDataPeriod>, value: number) => {
-    features.life = Math.max(features.life + value, 0);
-};
-
-export const characterIsAlive = (character: Character<BattleDataPeriod>) => character.features.life > 0;
-
 export const Character = <P extends BattleDataPeriod>(period: P, myPlayerId: string, snapshot: CharacterSnapshot): Character<P> => {
 
     const {

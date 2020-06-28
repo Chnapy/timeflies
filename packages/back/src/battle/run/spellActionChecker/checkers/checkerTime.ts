@@ -15,7 +15,7 @@ export const checkerTime: CheckerCreator = (cycle, mapManager) => ({ sendTime, s
         };
     }
 
-    const spell = spells.find(s => s.staticData.id === spellAction.spellId);
+    const spell = spells[spellAction.spellId];
 
     assertIsDefined(spell);
 

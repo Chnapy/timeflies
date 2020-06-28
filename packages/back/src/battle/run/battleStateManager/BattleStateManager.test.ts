@@ -1,4 +1,4 @@
-import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom, BattleSnapshot, createPosition } from '@timeflies/shared';
+import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom, BattleSnapshot, createPosition, Normalized, Normalizable } from '@timeflies/shared';
 import util from 'util';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
@@ -56,10 +56,10 @@ describe('# BattleStateManager', () => {
         const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList);
 
         const expected: BattleState = {
-            characters: [ expect.objectContaining({
-                id: 'c1'
-            }) ],
-            spells: expect.any(Array),
+            characters: expect.objectContaining({
+                c1: expect.any(Object)
+            }),
+            spells: expect.any(Object),
             battleHashList: []
         };
 
@@ -107,6 +107,8 @@ describe('# BattleStateManager', () => {
 
     describe('on spell action', () => {
 
+        const getFirstObjectItem = <O extends Normalizable>(value: Normalized<O>): O => (value as any)[Object.keys(value)[0]];
+
         it('should not call callback on bad hash', () => {
             const { playerDataList, teamRoomList, playerRoomList } = getInitData();
 
@@ -122,7 +124,7 @@ describe('# BattleStateManager', () => {
 
             const firstState = util.inspect(extractState(manager));
 
-            const spell = manager.get('spells')[ 0 ];
+            const spell = getFirstObjectItem(manager.get('spells'));
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
@@ -156,7 +158,7 @@ describe('# BattleStateManager', () => {
 
             const firstState = util.inspect(extractState(manager));
 
-            const spell = manager.get('spells')[ 0 ];
+            const spell = getFirstObjectItem(manager.get('spells'));
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,
@@ -191,7 +193,7 @@ describe('# BattleStateManager', () => {
 
             const firstState = util.inspect(extractState(manager));
 
-            const spell = manager.get('spells')[ 0 ];
+            const spell = getFirstObjectItem(manager.get('spells'));
 
             const spellAction: SpellActionSnapshot = seedSpellActionSnapshot(spell.id, {
                 characterId: spell.characterId,

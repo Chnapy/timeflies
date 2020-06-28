@@ -12,7 +12,7 @@ import { getTurnRemainingTime } from '../../../cycle/cycle-reducer';
 import { BattleState } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
 import { GameState } from '../../../../../game-state';
 
-export const spellLaunchMove: SpellLaunchFn = ({ spell, position }, { characters }) => {
+export const spellLaunchMove: SpellLaunchFn = (spell, { position }, { characters }) => {
     const character = characters[ spell.characterId ];
 
     const orientation = getOrientationFromTo(character.position, position);

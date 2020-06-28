@@ -1,5 +1,5 @@
 
-type Normalizable = {
+export type Normalizable = {
     id: string;
 };
 

@@ -1,7 +1,6 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { denormalize } from '@timeflies/shared';
+import { denormalize, characterIsAlive } from '@timeflies/shared';
 import { NotifyDeathsAction } from '../cycle/cycle-manager-actions';
-import { characterIsAlive } from '../entities/character/Character';
 import { SpellActionTimerEndAction } from '../spellAction/spell-action-actions';
 import { SnapshotState } from './snapshot-reducer';
 

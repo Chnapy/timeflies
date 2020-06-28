@@ -16,7 +16,7 @@ export const checkerCharacter: CheckerCreator = (cycle, mapManager) => ({ spellA
         };
     }
 
-    const spell = spells.find(s => s.id === spellAction.spellId);
+    const spell = spells[spellAction.spellId];
 
     if (!spell) {
         console.log('check spell');
