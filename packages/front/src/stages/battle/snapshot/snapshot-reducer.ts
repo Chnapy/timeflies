@@ -1,8 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { assertIsDefined, BattleSnapshot, characterEntityToSnapshot, denormalize, DynamicBattleSnapshot, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot, spellEntityToSnapshot } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, characterEntityToSnapshot, denormalize, DynamicBattleSnapshot, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot, spellEntityToSnapshot, getSpellEffectFn as spellEffectFnGetter } from '@timeflies/shared';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { getSpellLaunchFn as spellLaunchFnGetter } from '../engine/spellMapping';
 import { Character, updateCharacterFromSnapshot } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
 import { Spell, updateSpellFromSnapshot } from '../entities/spell/Spell';
@@ -111,10 +110,10 @@ const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string,
 };
 
 type Dependencies = {
-    getSpellLaunchFn: typeof spellLaunchFnGetter;
+    getSpellEffectFn: typeof spellEffectFnGetter;
 };
 
-export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellLaunchFn: spellLaunchFnGetter }) => createReducer(
+export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellEffectFn: spellEffectFnGetter }) => createReducer(
     getInitialSnapshotState(),
     {
         [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
@@ -181,7 +180,7 @@ export const snapshotReducer = ({ getSpellLaunchFn }: Dependencies = { getSpellL
 
                 const commitTime = startTime + duration;
 
-                const spellLaunchFn = getSpellLaunchFn(spell.staticData.type);
+                const spellLaunchFn = getSpellEffectFn(spell.staticData.type);
 
                 const partialSnapshot: Omit<SpellActionSnapshot, 'battleHash'> = {
                     startTime,

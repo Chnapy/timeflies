@@ -1,25 +1,15 @@
-import { createPosition, getOrientationFromTo, normalize, Position, TiledManager, TileType } from '@timeflies/shared';
+import { createPosition, normalize, Position, TiledManager, TileType } from '@timeflies/shared';
 import EasyStar from 'easystarjs';
 import { TiledMap } from 'tiled-types';
+import { GameState } from '../../../../../game-state';
+import { BattleState } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
 import { ACCEPTABLE_TILES } from '../../../battleState/battle-action-reducer';
 import { BattleMapPathAction, BattleStateSpellLaunchAction, TileClickAction, TileHoverAction } from '../../../battleState/battle-state-actions';
+import { getTurnRemainingTime } from '../../../cycle/cycle-reducer';
 import { Spell } from '../../../entities/spell/Spell';
 import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actions';
 import { SpellAction } from '../../../spellAction/spell-action-reducer';
-import { SpellLaunchFn } from '../../spellMapping';
 import { SpellEngineCreator } from '../spell-engine';
-import { getTurnRemainingTime } from '../../../cycle/cycle-reducer';
-import { BattleState } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
-import { GameState } from '../../../../../game-state';
-
-export const spellLaunchMove: SpellLaunchFn = (spell, { position }, { characters }) => {
-    const character = characters[ spell.characterId ];
-
-    const orientation = getOrientationFromTo(character.position, position);
-
-    character.position = position;
-    character.orientation = orientation;
-};
 
 export type CreateTileTypeGetter = (tiledSchema: TiledMap) => (position: Position) => TileType;
 

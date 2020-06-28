@@ -196,7 +196,7 @@ export const TiledMapGraphic = () => {
                     ? tiledMapSpellMove
                     : tiledMapSpellSimpleAttack;
 
-                startFn.onSpellStartFn({
+                startFn({
                     ...currentSpellAction,
                     tileGraphicList: layerTilesMap,
                 });

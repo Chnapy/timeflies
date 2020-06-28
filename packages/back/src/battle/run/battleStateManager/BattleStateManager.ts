@@ -1,4 +1,4 @@
-import { assertIsDefined, BattleSnapshot, BattleStateEntity, battleStateEntityToSnapshot, characterAlterLife, characterIsAlive, denormalize, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getOrientationFromTo, normalize, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, BattleStateEntity, battleStateEntityToSnapshot, getBattleSnapshotWithHash as _getBattleSnapshotWithHash, getSpellEffectFn, normalize, PlayerRoom, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
 import { Draft, Immutable, produce } from 'immer';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../../room/room';
@@ -87,45 +87,6 @@ export const BattleStateManager = (
         });
     };
 
-    // TODO share all these functions
-    const applyMoveAction = (spell: Spell, { position }: SpellActionSnapshot, { characters }: Draft<BattleState>): Character[] => {
-        const character = characters[ spell.characterId ]
-
-        const orientation = getOrientationFromTo(character.position, position);
-
-        character.position = position;
-        character.orientation = orientation;
-
-        return [];
-    };
-
-    const applySimpleAttack = (spell: Spell, { actionArea }: SpellActionSnapshot, { characters }: Draft<BattleState>): Character[] => {
-
-        const targets = denormalize<Character>(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
-
-        targets.forEach(t => characterAlterLife(t, -spell.features.attack));
-
-        return targets.filter(t => !characterIsAlive(t));
-    };
-
-    // const applyDefaultAction = (spell: Spell, positions: Position[]) => {
-    //     const targets = characters.filter(({ isAlive, position: p }) => isAlive
-    //         && positions.some(p2 =>
-    //             p.x === p2.x && p.y === p2.y
-    //         ));
-
-    //     const { features: { attack } } = spell;
-
-    //     targets.forEach(t => {
-    //         t.features = {
-    //             ...t.features,
-    //             life: Math.max(t.features.life - attack, 0)
-    //         };
-    //     });
-
-    //     return targets.filter(t => !t.isAlive);
-    // };
-
     const applySpellAction = (spellAction: SpellActionSnapshot, battleState: Draft<BattleState>): Character[] => {
 
         const spell = battleState.spells[ spellAction.spellId ];
@@ -133,17 +94,9 @@ export const BattleStateManager = (
 
         const { staticData: { type } } = spell;
 
-        if (type === 'move') {
-            return applyMoveAction(spell, spellAction, battleState);
-        } else if (type === 'simpleAttack') {
-            return applySimpleAttack(spell, spellAction, battleState);
-        } else if (type === 'orientate') {
-            // TODO
-        } else {
-            // TODO
-            // this.applyDefaultAction(spell, position);
-        }
-        return [];
+        const spellEffectFn = getSpellEffectFn(type);
+
+        return spellEffectFn(spell, spellAction, battleState);
     };
 
     const useSpellAction = (spellAction: SpellActionSnapshot) => {
