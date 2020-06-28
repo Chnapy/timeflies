@@ -35,7 +35,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             return;
         }
 
-        const timeoutDuration = getTurnRemainingTime(extractBattleState(api.getState), 'future') - spell.feature.duration;
+        const timeoutDuration = getTurnRemainingTime(extractBattleState(api.getState), 'future') - spell.features.duration;
 
         const futureCharacter = extractFutureCharacter(api.getState);
 

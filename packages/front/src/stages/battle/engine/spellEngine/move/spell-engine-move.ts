@@ -124,7 +124,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
 
         const remainingTime = getTurnRemainingTime(extractBattleState(api.getState), 'future');
 
-        const nbrTiles = Number.parseInt(remainingTime / spell.feature.duration + '');
+        const nbrTiles = Number.parseInt(remainingTime / spell.features.duration + '');
 
         return path.slice(0, nbrTiles);
     };

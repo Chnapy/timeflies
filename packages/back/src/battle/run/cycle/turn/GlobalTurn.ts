@@ -1,6 +1,5 @@
-import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY } from "@timeflies/shared";
+import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY, characterIsAlive } from "@timeflies/shared";
 import { EntitiesGetter } from '../../battleStateManager/BattleStateManager';
-import { characterIsAlive } from "../../entities/character/Character";
 import { Turn } from "./Turn";
 
 export type GlobalTurnState = 'idle' | 'running';

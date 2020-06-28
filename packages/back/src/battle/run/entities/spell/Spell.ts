@@ -1,20 +1,7 @@
-import { SpellFeatures, StaticSpell, SpellSnapshot } from '@timeflies/shared';
+import { SpellEntity, StaticSpell } from '@timeflies/shared';
 
-export type Spell = {
-    id: string;
-    staticData: Readonly<StaticSpell>;
-    index: number;
-    features: SpellFeatures;
-    characterId: string;
-};
-
-export const spellToSnapshot = ({ id, staticData, index, features, characterId }: Spell): SpellSnapshot => ({
-    id,
-    staticData,
-    index,
-    features,
-    characterId
-});
+// should not use entity directly, for future updates
+export type Spell = SpellEntity;
 
 export const Spell = (
     staticData: StaticSpell, index: number, characterId: string): Spell => {

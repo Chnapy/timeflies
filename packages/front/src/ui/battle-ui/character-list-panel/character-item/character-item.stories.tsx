@@ -1,16 +1,14 @@
 import { Box } from '@material-ui/core';
-import { seedTiledMap } from '@timeflies/shared';
+import { characterEntityToSnapshot, playerEntityToSnapshot, seedTiledMap, teamEntityToSnapshot } from '@timeflies/shared';
 import React from 'react';
 import { AssetLoader, createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { useAssetLoader } from '../../../../assetManager/AssetProvider';
 import { seedGameState } from '../../../../game-state.seed';
 import { BattleStartAction } from '../../../../stages/battle/battle-actions';
-import { characterAlterLife, characterToSnapshot } from '../../../../stages/battle/entities/character/Character';
+import { characterAlterLife } from '../../../../stages/battle/entities/character/Character';
 import { seedCharacter } from '../../../../stages/battle/entities/character/Character.seed';
-import { playerToSnapshot } from '../../../../stages/battle/entities/player/Player';
 import { seedPlayer } from '../../../../stages/battle/entities/player/Player.seed';
-import { teamToSnapshot } from '../../../../stages/battle/entities/team/Team';
 import { seedTeam } from '../../../../stages/battle/entities/team/Team.seed';
 import { createStoreManager } from '../../../../store/store-manager';
 import { createView } from '../../../../view';
@@ -119,8 +117,8 @@ export const Default: React.FC = () => {
                 startTime: now
             }
         },
-        teamSnapshotList: [ t1, t2 ].map(teamToSnapshot),
-        playerSnapshotList: [ p1, p2, p3 ].map(playerToSnapshot),
+        teamSnapshotList: [ t1, t2 ].map(teamEntityToSnapshot),
+        playerSnapshotList: [ p1, p2, p3 ].map(playerEntityToSnapshot),
         entitiesSnapshot: {
             battleHash: '',
             charactersSnapshots: [
@@ -147,7 +145,7 @@ export const Default: React.FC = () => {
                 }),
                 c4,
                 c5,
-            ].map(characterToSnapshot),
+            ].map(characterEntityToSnapshot),
             launchTime: Date.now(),
             spellsSnapshots: [],
             time: Date.now()

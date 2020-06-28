@@ -1,6 +1,5 @@
-import { BattleSnapshot, createPosition, getBattleSnapshotWithHash, normalize, Normalized, TimerTester } from '@timeflies/shared';
+import { BattleSnapshot, createPosition, getBattleSnapshotWithHash, normalize, Normalized, TimerTester, characterEntityToSnapshot } from '@timeflies/shared';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
-import { characterToSnapshot } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { Team } from '../entities/team/Team';
@@ -55,7 +54,7 @@ describe('# snapshot-reducer', () => {
         const partialSnap: Omit<BattleSnapshot, 'battleHash'> = {
             time: timerTester.now,
             launchTime: -1,
-            charactersSnapshots: [ characterToSnapshot(character) ],
+            charactersSnapshots: [ characterEntityToSnapshot(character) ],
             spellsSnapshots: []
         };
 

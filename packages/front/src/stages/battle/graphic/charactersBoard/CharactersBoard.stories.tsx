@@ -8,16 +8,13 @@ import { createStoreManager } from '../../../../store/store-manager';
 import { battleReducer } from '../../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../../view';
 import { BattleStartAction } from '../../battle-actions';
-import { characterToSnapshot } from '../../entities/character/Character';
 import { seedCharacter } from '../../entities/character/Character.seed';
-import { playerToSnapshot } from '../../entities/player/Player';
 import { seedPlayer } from '../../entities/player/Player.seed';
-import { teamToSnapshot } from '../../entities/team/Team';
 import { seedTeam } from '../../entities/team/Team.seed';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
-import { createPosition } from '@timeflies/shared';
+import { createPosition, characterEntityToSnapshot, playerEntityToSnapshot, teamEntityToSnapshot } from '@timeflies/shared';
 
 export default {
     title: 'graphic/CharactersBoard',
@@ -99,11 +96,11 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
                     startTime: Date.now()
                 }
             },
-            playerSnapshotList: [ playerToSnapshot(player) ],
-            teamSnapshotList: [ teamToSnapshot(team) ],
+            playerSnapshotList: [ playerEntityToSnapshot(player) ],
+            teamSnapshotList: [ teamEntityToSnapshot(team) ],
             entitiesSnapshot: {
                 battleHash: '',
-                charactersSnapshots: characterList.map(characterToSnapshot),
+                charactersSnapshots: characterList.map(characterEntityToSnapshot),
                 launchTime: Date.now(),
                 spellsSnapshots: [],
                 time: Date.now()

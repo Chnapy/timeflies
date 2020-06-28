@@ -1,26 +1,11 @@
-import { cloneByJSON, SpellFeatures, SpellSnapshot, StaticSpell } from '@timeflies/shared';
+import { cloneByJSON, SpellEntity, SpellSnapshot } from '@timeflies/shared';
 import { GameState } from '../../../../game-state';
 import { getTurnRemainingTime } from '../../cycle/cycle-reducer';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { playerIsMine } from '../player/Player';
 
-export type Spell<P extends BattleDataPeriod> = {
-    id: string;
+export type Spell<P extends BattleDataPeriod> = SpellEntity & {
     period: P;
-    index: number;
-    staticData: Readonly<StaticSpell>;
-    feature: SpellFeatures;
-    characterId: string;
-};
-
-export const spellToSnapshot = ({ id, characterId, staticData, index, feature: features }: Spell<BattleDataPeriod>): SpellSnapshot => {
-    return {
-        id,
-        characterId,
-        staticData,
-        index,
-        features
-    };
 };
 
 export const updateSpellFromSnapshot = (spell: Spell<any>, snapshot: SpellSnapshot) => {
@@ -28,7 +13,7 @@ export const updateSpellFromSnapshot = (spell: Spell<any>, snapshot: SpellSnapsh
         features
     } = cloneByJSON(snapshot);
 
-    spell.feature = features;
+    spell.features = features;
 };
 
 export type SpellIsUsable =
@@ -64,7 +49,7 @@ export const spellIsUsable = ({ currentPlayer, battle }: GameState, spellId: str
 
     const remainingTime = getTurnRemainingTime(battle, 'future');
 
-    if (remainingTime < spell.feature.duration) {
+    if (remainingTime < spell.features.duration) {
         return {
             usable: false,
             reason: 'time'
@@ -83,7 +68,7 @@ export const Spell = <P extends BattleDataPeriod>(period: P, snapshot: SpellSnap
         period,
         index,
         staticData,
-        feature: features,
+        features,
         characterId
     };
 };

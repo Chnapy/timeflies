@@ -1,29 +1,10 @@
-import { CharacterFeatures, CharacterSnapshot, Orientation, Position, StaticCharacter, cloneByJSON } from '@timeflies/shared';
+import { CharacterEntity, CharacterSnapshot, cloneByJSON } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 
-export type Character<P extends BattleDataPeriod> = {
-    id: string;
+export type Character<P extends BattleDataPeriod> = CharacterEntity & {
     period: P;
     isMine: boolean;
-    staticData: Readonly<StaticCharacter>;
-    position: Readonly<Position>;
-    orientation: Orientation;
-    features: CharacterFeatures;
-
     defaultSpellId: string;
-
-    playerId: string;
-};
-
-export const characterToSnapshot = ({ id, playerId, staticData, position, orientation, features }: Character<BattleDataPeriod>): CharacterSnapshot => {
-    return {
-        id,
-        playerId,
-        staticData: { ...staticData },
-        position: { ...position },
-        orientation,
-        features: { ...features },
-    };
 };
 
 export const updateCharacterFromSnapshot = (character: Character<any>, snapshot: CharacterSnapshot) => {

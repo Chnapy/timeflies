@@ -107,7 +107,7 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
             const spellActList = spellActions.map((spellAction, i) => {
 
                 if (i) {
-                    startTime += spellAction.spell.feature.duration;
+                    startTime += spellAction.spell.features.duration;
                 }
 
                 return {

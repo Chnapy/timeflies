@@ -1,14 +1,12 @@
 import { AnyAction } from '@reduxjs/toolkit';
-import { BattleSnapshot, createPosition, denormalize, getBattleSnapshotWithHash, normalize, seedSpellActionSnapshot, seedTiledMap, SpellActionSnapshot, TimerTester, SpellSnapshot } from '@timeflies/shared';
+import { BattleSnapshot, characterEntityToSnapshot, createPosition, denormalize, getBattleSnapshotWithHash, normalize, seedSpellActionSnapshot, seedTiledMap, SpellActionSnapshot, spellEntityToSnapshot, SpellSnapshot, TimerTester } from '@timeflies/shared';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { createStoreManager, getFullStoreMiddlewareList } from '../../../store/store-manager';
 import { battleActionReducer } from '../battleState/battle-action-reducer';
 import { TileClickAction } from '../battleState/battle-state-actions';
-import { characterToSnapshot } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
-import { spellToSnapshot } from '../entities/spell/Spell';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { BattleDataPeriod } from '../snapshot/battle-data';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
@@ -293,8 +291,8 @@ describe('Battleflow', () => {
                 spellsSnapshots: []
             } ];
 
-            const characterSnapshot = characterToSnapshot(initialState.battle.snapshotState.battleDataCurrent.characters.c1);
-            const spellsSnapshots = denormalize(initialState.battle.snapshotState.battleDataCurrent.spells).map(spellToSnapshot);
+            const characterSnapshot = characterEntityToSnapshot(initialState.battle.snapshotState.battleDataCurrent.characters.c1);
+            const spellsSnapshots = denormalize(initialState.battle.snapshotState.battleDataCurrent.spells).map(spellEntityToSnapshot);
 
             const expectedSnapshot: Omit<BattleSnapshot, 'battleHash'> = {
                 launchTime: -1,
@@ -381,7 +379,7 @@ describe('Battleflow', () => {
                 battleHash: 'first-hash',
                 launchTime: -1,
                 time: -1,
-                charactersSnapshots: denormalize(snapshotState.battleDataCurrent.characters).map(characterToSnapshot),
+                charactersSnapshots: denormalize(snapshotState.battleDataCurrent.characters).map(characterEntityToSnapshot),
                 spellsSnapshots: [ {
                     ...snapshotState.battleDataCurrent.spells.s1,
                     features: {
@@ -394,9 +392,9 @@ describe('Battleflow', () => {
 
             const { store } = createStore();
 
-            const spellSnapshot: SpellSnapshot = spellToSnapshot({
+            const spellSnapshot: SpellSnapshot = spellEntityToSnapshot({
                 ...snapshotState.battleDataCurrent.spells.s1,
-                feature: {
+                features: {
                     area: -1,
                     attack: 10,
                     duration: 1234
@@ -421,7 +419,7 @@ describe('Battleflow', () => {
 
             expect(state1.battle.snapshotState.battleDataCurrent.battleHash).toEqual('first-hash');
             expect(state1.battle.snapshotState.battleDataFuture.battleHash).toEqual('first-hash');
-            expect(state1.battle.snapshotState.battleDataCurrent.spells.s1.feature).toEqual(spellSnapshot.features);
+            expect(state1.battle.snapshotState.battleDataCurrent.spells.s1.features).toEqual(spellSnapshot.features);
             expect(state1.battle.snapshotState.currentSpellAction).toEqual(null);
             expect(state1.battle.snapshotState.spellActionSnapshotList).toEqual([]);
         });

@@ -1,12 +1,10 @@
-import { BRunEndSAction, BRunLaunchSAction, SpellActionCAction } from '@timeflies/shared';
+import { BRunEndSAction, BRunLaunchSAction, characterIsAlive, playerEntityToSnapshot, SpellActionCAction, teamEntityToSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../room/room';
 import { RoomState } from '../room/room-state-manager';
 import { BattleStateManager } from './battleStateManager/BattleStateManager';
 import { Cycle } from "./cycle/Cycle";
-import { characterIsAlive } from './entities/character/Character';
-import { playerToSnapshot } from './entities/player/Player';
-import { Team, teamToSnapshot } from "./entities/team/Team";
+import { Team } from "./entities/team/Team";
 import { MapManager } from "./mapManager/MapManager";
 import { SpellActionReceiver } from './spellActionReceiver/SpellActionReceiver';
 
@@ -43,8 +41,8 @@ export const BattleRunRoom = ({ mapSelected, teamList: teamRoomList, playerDataL
 
         const launchAction: Omit<BRunLaunchSAction, 'sendTime'> = {
             type: 'battle-run/launch',
-            teamSnapshotList: teamList.map(teamToSnapshot),
-            playerSnapshotList: playerList.map(playerToSnapshot),
+            teamSnapshotList: teamList.map(teamEntityToSnapshot),
+            playerSnapshotList: playerList.map(playerEntityToSnapshot),
             battleSnapshot,
             globalTurnState: cycle.globalTurn.toSnapshot()
         };
