@@ -22,8 +22,12 @@ Finally, when only one team remains on the board, game ends.
 
 ## Game mechanics
 
-TODO
+How the game deeply works, all its mechanics, without depending on mutable content.
+
+You can find all game mechanics infos [here](./game-mechanics.md).
 
 ## Game content
 
-TODO
+All the mutable content, that can change over the time, like entities.
+
+You can find all game content infos [here](./game-content.md).
