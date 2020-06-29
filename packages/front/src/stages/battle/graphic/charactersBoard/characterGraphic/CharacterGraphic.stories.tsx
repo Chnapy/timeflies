@@ -151,19 +151,23 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
                 tiledSchema,
                 characterPosition: currentPosition!
             });
+            graphic.debug.onStateChange({
+                tiledSchema,
+                position: currentPosition!
+            });
         }, duration);
     };
 
     return <>
         {view}
 
-        <div>
+        {period === 'current' && <div>
             <button onClick={getOnButtonClick(Date.now)}>right</button>
 
             <button onClick={getOnButtonClick(() => Date.now() - 500)}>right (+500ms)</button>
 
             <button onClick={getOnButtonClick(() => Date.now() - 2000)}>right (+2000ms)</button>
-        </div>
+        </div>}
     </>;
 };
 

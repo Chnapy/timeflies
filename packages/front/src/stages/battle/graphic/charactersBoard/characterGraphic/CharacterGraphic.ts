@@ -134,6 +134,13 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
 
     let ticker: PIXI.Ticker | null = null;
 
+    const destroyTicker = () => {
+        if (ticker) {
+            ticker.destroy();
+            ticker = null;
+        }
+    };
+
     type SpellFn = (spellActionSnapshot: SpellActionSnapshot, characterPosition: Position, tiledSchema: TiledMap) => void;
 
     const onMoveAction: SpellFn = ({ startTime, duration, position: endPosition }, characterPosition, tiledSchema) => {
@@ -166,6 +173,10 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             ticker?.add(() => {
                 const ratio = getRatio();
                 setNewPosition(ratio);
+
+                if (ratio === 1) {
+                    destroyTicker();
+                }
             });
         }
     };
@@ -176,15 +187,13 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
                 const p = tiledMapGraphic.getWorldFromTile(payload.tiledSchema, payload.characterPosition);
                 setPosition(p.x, p.y);
             }
-            ticker?.destroy();
-            ticker = null;
+            destroyTicker();
             return;
         }
         const { tiledSchema, characterPosition, currentSpellAction, spellType } = payload;
 
         if (ticker?.started) {
-            ticker.destroy();
-            ticker = null;
+            destroyTicker();
         }
 
         ticker = new PIXI.Ticker();
@@ -251,25 +260,32 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
     sprite.alpha = 0.25;
 
     const onStateChange = (payload: StateChangePayloadFuture) => {
-        if (!payload) {
-            sprite.visible = false;
-            return;
-        }
-        
-        const { type, orientation } = payload;
-        const idlePath = getAnimPath(type, 'idle', orientation);
-        const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
 
-        sprite.texture = texture;
-        sprite.visible = true;
+        if (payload) {
+            const { type, orientation } = payload;
+            const idlePath = getAnimPath(type, 'idle', orientation);
+            const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
+
+            sprite.texture = texture;
+            sprite.visible = true;
+            
+        } else {
+            sprite.visible = false;
+        }
+
+        requestRender();
     };
 
     storeEmitter.onStateChange(
-        state => {
-            if (state.battle.cycleState.currentCharacterId !== characterId) {
+        ({ currentPlayer, battle }) => {
+            if (battle.cycleState.currentCharacterId !== characterId) {
                 return null;
             }
-            const { staticData, orientation } = state.battle.snapshotState.battleDataFuture.characters[ characterId ];
+            const { staticData, orientation, playerId } = battle.snapshotState.battleDataFuture.characters[ characterId ];
+
+            if (playerId !== currentPlayer?.id) {
+                return null;
+            }
 
             return {
                 type: staticData.type,
