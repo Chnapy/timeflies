@@ -15,7 +15,7 @@ How the game works, how players play it.
 
 All infos concerning gameplay can be found [here](./docs/gameplay/gameplay.md).
 
-## :heavy_check_mark: User interfaces
+## :art: UI & graphics
 
 How interfaces works, and how should they be used.
 

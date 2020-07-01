@@ -24,7 +24,7 @@ Finally, when only one team remains on the board, game ends.
 
 How the game deeply works, all its mechanics, without depending on mutable content.
 
-You can find all game mechanics infos [here](./game-mechanics.md).
+You can find all game mechanics infos [here](./game-mechanics/game-mechanics.md).
 
 ## Game content
 
