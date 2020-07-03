@@ -3,7 +3,7 @@ import { StaticCharacter } from "@timeflies/shared";
 const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '1',
-        type: 'sampleChar1',
+        role: 'sampleChar1',
         name: 'Ramio',
         initialFeatures: {
             life: 100,
@@ -13,7 +13,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '1',
                 name: 'MOVE',
-                type: 'move',
+                role: 'move',
                 initialFeatures: {
                     duration: 200,
                     area: 1,
@@ -23,7 +23,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '10',
                 name: 'S1',
-                type: 'simpleAttack',
+                role: 'simpleAttack',
                 initialFeatures: {
                     duration: 1000,
                     area: 10,
@@ -37,7 +37,7 @@ const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '2',
         name: 'Guili',
-        type: 'sampleChar1',
+        role: 'sampleChar1',
         initialFeatures: {
             life: 120,
             actionTime: 15000
@@ -46,7 +46,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '2',
                 name: 'MOVE',
-                type: 'simpleAttack',
+                role: 'simpleAttack',
                 initialFeatures: {
                     duration: 4000,
                     area: 8,
@@ -60,7 +60,7 @@ const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '3',
         name: 'Shoyi',
-        type: 'sampleChar1',
+        role: 'sampleChar1',
         initialFeatures: {
             life: 80,
             actionTime: 22000
@@ -69,7 +69,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '3',
                 name: 'MOVE',
-                type: 'move',
+                role: 'move',
                 initialFeatures: {
                     area: 1,
                     duration: 300,
@@ -79,7 +79,7 @@ const MOCK_CHAR: StaticCharacter[] = [
             {
                 id: '20',
                 name: 'S3',
-                type: 'simpleAttack',
+                role: 'simpleAttack',
                 initialFeatures: {
                     area: 8,
                     duration: 500,

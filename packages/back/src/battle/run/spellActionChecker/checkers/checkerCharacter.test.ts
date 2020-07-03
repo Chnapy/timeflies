@@ -23,7 +23,7 @@ describe('# checkerCharacter', () => {
         spells: {
             s1: {
                 id: 's1', index: 1, staticData: {
-                    id: 's1', name: 's1', type: 'move', initialFeatures: {} as any
+                    id: 's1', name: 's1', role: 'move', initialFeatures: {} as any
                 },
                 features: {} as any,
                 characterId: 'c1'

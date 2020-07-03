@@ -3,7 +3,7 @@ import { StaticSpell } from "./Spell";
 import { cloneByJSON } from '../util';
 import { DeepReadonly } from '../types';
 
-export type CharacterType =
+export type CharacterRole =
     | 'sampleChar1'
     | 'sampleChar2'
     | 'sampleChar3';
@@ -26,7 +26,7 @@ export type CharacterEntity = {
 export type StaticCharacter = {
     id: string;
     name: string;
-    type: CharacterType;
+    role: CharacterRole;
     initialFeatures: CharacterFeatures;
     staticSpells: StaticSpell[];
     defaultSpellId: string;
@@ -43,7 +43,7 @@ export type CharacterSnapshot = {
 
 export type CharacterRoom = {
     readonly id: string;
-    readonly type: CharacterType;
+    readonly type: CharacterRole;
     position: Position;
 };
 

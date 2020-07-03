@@ -1,20 +1,20 @@
-import { SpellType } from '@timeflies/shared';
+import { SpellRole } from '@timeflies/shared';
 import React from 'react';
 import { SpriteImage } from '../../sprite-image';
 
 export type SpellImageProps = {
-    spellType: SpellType;
+    spellRole: SpellRole;
     size: number;
-}
+};
 
-const getTexturePath = (spellType: SpellType) => `${spellType}.png`;
+const getTexturePath = (spellRole: SpellRole) => `${spellRole}.png`;
 
-export const SpellImage: React.FC<SpellImageProps> = React.memo(({ spellType, size }) => {
+export const SpellImage: React.FC<SpellImageProps> = React.memo(({ spellRole, size }) => {
     
     return (
         <SpriteImage
             spritesheetKey='spells'
-            textureKey={getTexturePath(spellType)}
+            textureKey={getTexturePath(spellRole)}
             size={size}
         />
     );

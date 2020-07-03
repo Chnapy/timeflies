@@ -16,7 +16,7 @@ export const EntityTreeCharacter: React.FC<EntityTreeCharacterProps> = ({ charac
             <Box display='flex' alignItems='center' mb={1}>
 
                 <Box clone maxWidth={32} maxHeight={32} flexShrink={0}>
-                    <CharacterImage characterType={character.type} size={32} />
+                    <CharacterImage characterRole={character.type} size={32} />
                 </Box>
 
                 <Box flexGrow={1} ml={1}>

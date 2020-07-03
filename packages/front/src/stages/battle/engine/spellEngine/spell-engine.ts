@@ -1,4 +1,4 @@
-import { SpellType, Position } from '@timeflies/shared';
+import { SpellRole, Position } from '@timeflies/shared';
 import { MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
 import { spellEngineMove } from './move/spell-engine-move';
 import { BattleActionState } from '../../battleState/battle-action-reducer';
@@ -18,7 +18,7 @@ export type SpellEngine = (action: AnyAction) => Promise<void>;
 export type SpellEngineCreator<D = {}> = <S>(deps: SpellEngineDependencies<S> & D) => (api: MiddlewareAPI) => SpellEngine;
 
 export const spellEngineMap: {
-    readonly [ K in SpellType ]: SpellEngineCreator;
+    readonly [ K in SpellRole ]: SpellEngineCreator;
 } = {
     move: spellEngineMove,
     simpleAttack: spellEngineSimpleAttack

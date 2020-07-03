@@ -1,4 +1,4 @@
-import { Position, SpellActionSnapshot, switchUtil, createPosition, SpellType, CharacterType, Orientation } from '@timeflies/shared';
+import { Position, SpellActionSnapshot, switchUtil, createPosition, SpellRole, CharacterRole, Orientation } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap from 'tiled-types/types';
@@ -115,7 +115,7 @@ type StateChangePayloadCurrent =
         characterPosition: Position;
         tiledSchema: TiledMap;
         currentSpellAction: SpellActionSnapshot;
-        spellType: SpellType;
+        spellRole: SpellRole;
     };
 
 const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => {
@@ -190,7 +190,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             destroyTicker();
             return;
         }
-        const { tiledSchema, characterPosition, currentSpellAction, spellType } = payload;
+        const { tiledSchema, characterPosition, currentSpellAction, spellRole } = payload;
 
         if (ticker?.started) {
             destroyTicker();
@@ -198,7 +198,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
 
         ticker = new PIXI.Ticker();
 
-        const actionFn: SpellFn = switchUtil(spellType, {
+        const actionFn: SpellFn = switchUtil(spellRole, {
             move: onMoveAction,
             orientate: () => { },
             simpleAttack: () => { },
@@ -224,14 +224,14 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
                 };
             }
 
-            const spellType = battleDataCurrent.spells[ currentSpellAction.spellId ].staticData.type;
+            const spellRole = battleDataCurrent.spells[ currentSpellAction.spellId ].staticData.role;
 
             return {
                 state: 'current-spell',
                 tiledSchema,
                 characterPosition,
                 currentSpellAction,
-                spellType
+                spellRole
             };
         },
         onStateChange,
@@ -249,7 +249,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
 
 type StateChangePayloadFuture =
     | {
-        type: CharacterType;
+        type: CharacterRole;
         orientation: Orientation;
     }
     | null;
@@ -288,7 +288,7 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
             }
 
             return {
-                type: staticData.type,
+                type: staticData.role,
                 orientation
             };
         },

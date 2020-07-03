@@ -170,18 +170,18 @@ export const TiledMapGraphic = () => {
                 return null;
             }
 
-            const spellType = snapshotState.battleDataFuture.spells[ currentSpellAction.spellId ].staticData.type;
+            const spellRole = snapshotState.battleDataFuture.spells[ currentSpellAction.spellId ].staticData.role;
 
             return {
                 currentSpellAction,
-                spellType
+                spellRole
             };
         },
         spellActionInfos => {
             if (spellActionInfos) {
-                const { currentSpellAction, spellType } = spellActionInfos;
+                const { currentSpellAction, spellRole } = spellActionInfos;
 
-                const startFn = spellType === 'move'
+                const startFn = spellRole === 'move'
                     ? tiledMapSpellMove
                     : tiledMapSpellSimpleAttack;
 

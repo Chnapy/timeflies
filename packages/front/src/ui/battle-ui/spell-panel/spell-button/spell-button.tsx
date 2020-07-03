@@ -33,7 +33,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const attack = useGameStep('battle', battle => selectSpell(battle).features.attack);
 
-    const spellType = useGameStep('battle', battle => selectSpell(battle).staticData.type);
+    const spellRole = useGameStep('battle', battle => selectSpell(battle).staticData.role);
 
     const nbrWaitingSpellAction: number = useGameStep('battle', battle => {
         const { spellActionSnapshotList } = battle.snapshotState;
@@ -166,7 +166,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
                             borderRadius={2}
                             style={{ opacity: isDisabled ? .25 : 1 }}
                         >
-                            <SpellImage spellType={spellType} size={48} />
+                            <SpellImage spellRole={spellRole} size={48} />
                         </Box>
 
                         <Box display='flex' flexDirection='column' justifyContent='space-evenly' ml={1}>

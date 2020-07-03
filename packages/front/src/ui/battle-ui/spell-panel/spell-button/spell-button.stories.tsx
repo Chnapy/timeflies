@@ -185,7 +185,7 @@ export const Default: React.FC = () => {
                 <UIIcon icon='attack' />
                 <UIIcon icon='time' strikeOut />
                 <UIText variant='numeric'>12.4s</UIText>
-                <SpellImage spellType={'move'} size={48} />
+                <SpellImage spellRole={'move'} size={48} />
                 <Box width={300}>
                     <UIGauge variant='dynamic' timeElapsed={3000} durationTotal={10000} />
                 </Box>

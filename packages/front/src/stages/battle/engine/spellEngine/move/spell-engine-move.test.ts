@@ -49,7 +49,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
             extractFutureAliveCharacterPositionList: () => [],
-            getSpellEngineFromType: (spellType, api, deps) => spellEngineMove({
+            getSpellEngineFromType: (spellRole, api, deps) => spellEngineMove({
                 ...deps,
                 createTileTypeGetter,
                 extractBattleState: () => battleState

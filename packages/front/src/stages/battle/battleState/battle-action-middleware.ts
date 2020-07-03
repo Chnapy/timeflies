@@ -1,5 +1,5 @@
 import { AnyAction, Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
-import { SpellType } from '@timeflies/shared';
+import { SpellRole } from '@timeflies/shared';
 import { SpellEngine, SpellEngineDependencies, spellEngineMap } from '../engine/spellEngine/spell-engine';
 import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
 import { BattleStateSpellPrepareAction } from './battle-state-actions';
@@ -8,12 +8,12 @@ import { getTurnRemainingTime } from '../cycle/cycle-reducer';
 import { BattleState } from '../../../ui/reducers/battle-reducers/battle-reducer';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
-    getSpellEngineFromType?: (spellType: SpellType, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
+    getSpellEngineFromType?: (spellRole: SpellRole, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
     extractBattleState: (getState: () => S) => BattleState;
 };
 
-const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType' ] = (spellType, api, deps) => {
-    const spellEngineCreator = spellEngineMap[ spellType ];
+const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType' ] = (spellRole, api, deps) => {
+    const spellEngineCreator = spellEngineMap[ spellRole ];
 
     return spellEngineCreator(deps)(api);
 };
@@ -64,7 +64,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             updateSpellTimeout(spell);
 
             if (spell)
-                return getSpellEngineFromType(spell.staticData.type, api, deps);
+                return getSpellEngineFromType(spell.staticData.role, api, deps);
         }
 
         return async () => { };

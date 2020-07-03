@@ -116,8 +116,8 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
         return battle.snapshotState.teamList[teamId].letter;
     });
 
-    const characterType = useGameStep('battle', battle =>
-        characterSelector(battle, characterId).staticData.type);
+    const characterRole = useGameStep('battle', battle =>
+        characterSelector(battle, characterId).staticData.role);
 
     const lifeTotal = useGameStep('battle', battle =>
         characterSelector(battle, characterId).staticData.initialFeatures.life);
@@ -230,12 +230,12 @@ export const CharacterItem: React.FC<CharacterItemProps> = React.memo(({ charact
 
                         <Box display='flex' alignItems='center' justifyContent='center' width={48} height={48}
                             bgcolor={state === 'current' ? palette.primary.contrastText : undefined} borderRadius={shape.borderRadius}>
-                            <CharacterImage characterType={characterType} size={48} />
+                            <CharacterImage characterRole={characterRole} size={48} />
                         </Box>
 
                         <Box display='flex' flexDirection='column' flexGrow={1} ml={1}>
 
-                            <UIText variant='main'>{characterType}</UIText>
+                            <UIText variant='main'>{characterRole}</UIText>
 
                             <Box display='flex' alignItems='center' mt={0.5}>
                                 <UIIcon icon='life' />

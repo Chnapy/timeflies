@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import { Theme, useTheme } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import { assertIsDefined, CharacterRoom, CharacterType, PlayerRoom, Position, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, CharacterRoom, CharacterRole, PlayerRoom, Position, TeamRoom } from '@timeflies/shared';
 import React from 'react';
 import { CharacterImage } from '../../../battle-ui/character-list-panel/character-item/character-image';
 import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
@@ -104,9 +104,9 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
     const [ anchorEl, setAnchorEl ] = React.useState(null);
 
     const { sendCharacterAdd, sendCharacterRemove } = useGameNetwork({
-        sendCharacterAdd: (characterType: CharacterType) => ({
+        sendCharacterAdd: (characterRole: CharacterRole) => ({
             type: 'room/character/add',
-            characterType,
+            characterType: characterRole,
             position
         }),
         sendCharacterRemove: () => ({
@@ -123,16 +123,16 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
         setAnchorEl(null);
     };
 
-    const handleMenuItemClick = (characterType: CharacterType): void => {
+    const handleMenuItemClick = (characterRole: CharacterRole): void => {
         handleClose();
 
-        sendCharacterAdd(characterType);
+        sendCharacterAdd(characterRole);
     };
 
     const handleRemove = sendCharacterRemove;
 
     const mainRender = isAllowed
-        ? (character ? <CharacterImage characterType={character.type} size={40} /> : <AddIcon fontSize='large' />)
+        ? (character ? <CharacterImage characterRole={character.type} size={40} /> : <AddIcon fontSize='large' />)
         : null;
 
     const { palette } = useTheme<Theme>();
@@ -175,9 +175,9 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
                 vertical: 'top'
             }}
         >
-            {new Array<CharacterType>('sampleChar1', 'sampleChar2').map(type => (
+            {new Array<CharacterRole>('sampleChar1', 'sampleChar2').map(type => (
                 <MenuItem key={type} onClick={() => handleMenuItemClick(type)}>
-                    <CharacterImage characterType={type} size={40} />
+                    <CharacterImage characterRole={type} size={40} />
                 </MenuItem>
             ))}
         </Menu>

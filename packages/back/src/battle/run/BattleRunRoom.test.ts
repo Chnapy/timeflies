@@ -103,7 +103,7 @@ describe.skip('BattleRunRoom', () => {
                         const { charactersSnapshots, spellsSnapshots } = action.battleSnapshot;
 
                         const char = charactersSnapshots[ 0 ];
-                        const spellmove = spellsSnapshots.find(s => s.staticData.type === 'move')!;
+                        const spellmove = spellsSnapshots.find(s => s.staticData.role === 'move')!;
 
                         if (c0OnStart)
                             c0OnStart();

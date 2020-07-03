@@ -1,5 +1,5 @@
 import { TAction } from '../TAction';
-import { CharacterType, PlayerRoom } from '../../entities';
+import { CharacterRole, PlayerRoom } from '../../entities';
 import { Position } from '../../geo';
 
 export type RoomClientAction =
@@ -35,7 +35,7 @@ export module RoomClientAction {
     };
 
     export type CharacterAdd = TAction<'room/character/add'> & {
-        characterType: CharacterType;
+        characterType: CharacterRole;
         position: Position;
     };
 
