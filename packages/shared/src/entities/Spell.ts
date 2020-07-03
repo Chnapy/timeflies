@@ -10,7 +10,7 @@ export type SpellRole =
 export type SpellFeatures = {
     duration: number;
     attack: number;
-    area: number;
+    rangeArea: number;
 };
  
 export type SpellEntity = {

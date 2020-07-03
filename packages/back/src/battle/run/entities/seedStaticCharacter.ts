@@ -16,7 +16,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'move',
                 initialFeatures: {
                     duration: 200,
-                    area: 1,
+                    rangeArea: 1,
                     attack: -1
                 }
             },
@@ -26,7 +26,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'simpleAttack',
                 initialFeatures: {
                     duration: 1000,
-                    area: 10,
+                    rangeArea: 10,
                     attack: 10
                 }
             }
@@ -49,7 +49,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'simpleAttack',
                 initialFeatures: {
                     duration: 4000,
-                    area: 8,
+                    rangeArea: 8,
                     attack: 30
                 }
             }
@@ -71,7 +71,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 name: 'MOVE',
                 role: 'move',
                 initialFeatures: {
-                    area: 1,
+                    rangeArea: 1,
                     duration: 300,
                     attack: -1
                 }
@@ -81,7 +81,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 name: 'S3',
                 role: 'simpleAttack',
                 initialFeatures: {
-                    area: 8,
+                    rangeArea: 8,
                     duration: 500,
                     attack: 10
                 }

@@ -106,7 +106,7 @@ export const Default: React.FC = () => {
                 index: 1,
                 feature: {
                     duration: 1000,
-                    area: -1
+                    rangeArea: -1
                 }
             }),
             seedSpellSnapshot({
@@ -116,7 +116,7 @@ export const Default: React.FC = () => {
                 index: 2,
                 feature: {
                     duration: 1000,
-                    area: 8,
+                    rangeArea: 8,
                     attack: 20
                 }
             }),
@@ -127,7 +127,7 @@ export const Default: React.FC = () => {
                 index: 1,
                 feature: {
                     duration: 600,
-                    area: -1
+                    rangeArea: -1
                 }
             }),
             seedSpellSnapshot({
@@ -137,7 +137,7 @@ export const Default: React.FC = () => {
                 index: 1,
                 feature: {
                     duration: 1500,
-                    area: 5,
+                    rangeArea: 5,
                     attack: 40
                 }
             }),

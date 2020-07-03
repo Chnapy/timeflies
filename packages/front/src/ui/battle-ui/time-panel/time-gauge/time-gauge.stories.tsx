@@ -42,7 +42,7 @@ export const Default: React.FC = () => {
                         feature: {
                             duration: 800,
                             attack: 12,
-                            area: 4
+                            rangeArea: 4
                         },
                         index: 1,
                         characterId: 'c1'
@@ -54,7 +54,7 @@ export const Default: React.FC = () => {
                         feature: {
                             duration: 1000,
                             attack: 22,
-                            area: 3
+                            rangeArea: 3
                         },
                         index: 2,
                         characterId: 'c1'
