@@ -10,7 +10,7 @@ But "tactical-RPG" doesn't mean a lot, so let imagine a concrete example: **a ch
 
 In a chess game you play with another player. Imagine you can play with several players, each one can be your *ally*, or your *ennemy*: there is **teams**.
 
-Each of these players have pawns, towers, king, queen etc. These *entities* are your **characters**. You can use them on the game board to play moves, the goal being to erase ennemies characters.
+Each of these players have pawns, towers, king, queen etc. These *entities* are your **characters**. You can use them on the game board to play moves, the goal being to erase enemies characters.
 
 If in a chess game players play these moves one after the other, in Timeflies the game is *turn-based*: each character plays one after the other. Also **turns** have *duration*. When this duration has elapsed, the turn ends and the next character plays its turn.
 
@@ -30,4 +30,4 @@ You can find all game mechanics infos [here](./game-mechanics/game-mechanics.md)
 
 All the mutable content, that can change over the time, like entities.
 
-You can find all game content infos [here](./game-content.md).
+You can find all game content infos [here](./game-content/game-content.md).
