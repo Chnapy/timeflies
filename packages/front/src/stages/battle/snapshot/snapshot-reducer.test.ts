@@ -93,7 +93,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
                     return [];
                 }
@@ -113,7 +113,7 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 20;
                     return [];
                 }
@@ -165,7 +165,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
                     return [];
                 }
@@ -185,7 +185,7 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 20;
                     return [];
                 }
@@ -238,7 +238,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellEffectFn: spellType => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
                     characters[ 'c1' ].features.life = 50;
                     return [];
                 }

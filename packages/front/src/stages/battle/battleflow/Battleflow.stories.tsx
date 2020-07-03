@@ -69,7 +69,7 @@ export const Default: React.FC = () => {
                 staticData: {
                     id: 'c1',
                     name: 'toto',
-                    type: 'sampleChar1',
+                    role: 'sampleChar1',
                     defaultSpellId: 's1',
                     initialFeatures: {
                         life: 100,
@@ -87,7 +87,7 @@ export const Default: React.FC = () => {
                 staticData: {
                     id: 'c2',
                     name: 'africa',
-                    type: 'sampleChar2',
+                    role: 'sampleChar2',
                     defaultSpellId: 's3',
                     initialFeatures: {
                         life: 120,

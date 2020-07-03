@@ -1,14 +1,14 @@
-import { RequiredOnly, CharacterFeatures, CharacterType, CharacterSnapshot, createPosition } from '@timeflies/shared';
+import { RequiredOnly, CharacterFeatures, CharacterRole, CharacterSnapshot, createPosition } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Character } from './Character';
 
 export type SeedCharacterProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Character<P>, 'id' | 'period'>, 'features'> & {
-    type?: CharacterType;
+    type?: CharacterRole;
     features?: Partial<CharacterFeatures>;
 };
 
 export type SeedCharacterSnapshotProps = Omit<RequiredOnly<CharacterSnapshot, 'id'>, 'features'> & {
-    type?: CharacterType;
+    type?: CharacterRole;
     features?: Partial<CharacterFeatures>;
 };
 
@@ -17,7 +17,7 @@ export const seedCharacterSnapshot = ({ type, features, ...props }: SeedCharacte
     staticData: {
         id: props.id,
         name: 'name',
-        type: type ?? 'sampleChar1',
+        role: type ?? 'sampleChar1',
         initialFeatures: {
             life: 100,
             actionTime: 2000,
@@ -25,7 +25,7 @@ export const seedCharacterSnapshot = ({ type, features, ...props }: SeedCharacte
         },
         staticSpells: [ {
             id: 's1',
-            type: 'move',
+            role: 'move',
             name: 'name',
             initialFeatures: {
                 area: 2,
@@ -53,7 +53,7 @@ export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...p
         staticData: {
             id: props.id,
             name: 'name',
-            type: type ?? 'sampleChar1',
+            role: type ?? 'sampleChar1',
             initialFeatures: {
                 life: 100,
                 actionTime: 2000,
@@ -61,7 +61,7 @@ export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...p
             },
             staticSpells: [ {
                 id: 's1',
-                type: 'move',
+                role: 'move',
                 name: 'name',
                 initialFeatures: {
                     area: 2,

@@ -1,14 +1,14 @@
-import { RequiredOnly, SpellSnapshot, SpellType } from '@timeflies/shared';
+import { RequiredOnly, SpellSnapshot, SpellRole } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Spell } from './Spell';
 
 export type SeedSpellProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Spell<P>, 'id' | 'period'>, 'feature'> & { 
-    type?: SpellType;
+    type?: SpellRole;
     feature?: Partial<Spell<P>['features']>;
 };
 
 export type SeedSpellSnapshotProps = Omit<RequiredOnly<SpellSnapshot, 'id'>, 'features'> & { 
-    type?: SpellType;
+    type?: SpellRole;
     feature?: Partial<SpellSnapshot['features']>;
 };
 
@@ -17,7 +17,7 @@ export const seedSpellSnapshot = ({type, feature, ...props}: SeedSpellSnapshotPr
     staticData: {
         id: props.id,
         name: 'name',
-        type: type ?? 'move',
+        role: type ?? 'move',
         initialFeatures: {
             area: 3,
             attack: 10,
@@ -42,7 +42,7 @@ export const seedSpell = <P extends BattleDataPeriod>({ type, feature, ...props 
         staticData: {
             id: props.id,
             name: 'name',
-            type: type ?? 'move',
+            role: type ?? 'move',
             initialFeatures: {
                 area: 3,
                 attack: 10,

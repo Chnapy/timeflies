@@ -1,4 +1,4 @@
-import { assertIsDefined, CharacterType, Orientation, getOrientationFromTo } from '@timeflies/shared';
+import { assertIsDefined, CharacterRole, Orientation, getOrientationFromTo } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
@@ -6,7 +6,7 @@ import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 
 export interface CharacterSpriteProps {
-    characterType: CharacterType;
+    characterRole: CharacterRole;
     characterState: CharacterSpriteState;
     orientation: Orientation;
 }
@@ -19,17 +19,17 @@ export type CharacterSpriteMutableProps = Pick<CharacterSpriteProps,
 export type CharacterSpriteState = 'idle' | 'walk';
 
 export const getAnimPath = (
-    type: CharacterType,
+    type: CharacterRole,
     state: CharacterSpriteState,
     orientation: Orientation
 ) => `${type}/${state}/${orientation}/${type}_${state}_${orientation}`;
 
 const getTextures = (
     spritesheet: PIXI.Spritesheet,
-    { characterType, characterState, orientation }: CharacterSpriteProps
+    { characterRole, characterState, orientation }: CharacterSpriteProps
 ): PIXI.Texture[] => {
 
-    const path = getAnimPath(characterType, characterState, orientation);
+    const path = getAnimPath(characterRole, characterState, orientation);
     const textures = spritesheet.animations[ path ];
     assertIsDefined(textures);
 
@@ -53,24 +53,24 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                 if (currentSpellAction && currentSpellAction.characterId === characterId) {
                     const spell = battleDataFuture.spells[currentSpellAction.spellId];
 
-                    const spriteState: CharacterSpriteState = spell.staticData.type === 'move' ? 'walk' : 'idle'
+                    const spriteState: CharacterSpriteState = spell.staticData.role === 'move' ? 'walk' : 'idle'
 
                     return {
-                        type: character.staticData.type,
+                        type: character.staticData.role,
                         orientation: getOrientationFromTo(character.position, currentSpellAction.position),
                         spriteState
                     };
                 }
                 
                 return {
-                    type: character.staticData.type,
+                    type: character.staticData.role,
                     orientation: character.orientation,
                     spriteState: 'idle' as CharacterSpriteState
                 };
             },
             ({ type, orientation, spriteState }) => {
                 this.textures = getTextures(spritesheets.characters, {
-                    characterType: type,
+                    characterRole: type,
                     characterState: spriteState,
                     orientation
                 });

@@ -137,7 +137,7 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
             state: 'current-spell',
             tiledSchema: tiledSchema!,
             characterPosition: previousPosition,
-            spellType: 'move',
+            spellRole: 'move',
             currentSpellAction: seedSpellActionSnapshot('s1', {
                 position,
                 startTime: getStartTime(),

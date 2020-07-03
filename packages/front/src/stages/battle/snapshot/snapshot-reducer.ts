@@ -180,7 +180,7 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
 
                 const commitTime = startTime + duration;
 
-                const spellLaunchFn = getSpellEffectFn(spell.staticData.type);
+                const spellLaunchFn = getSpellEffectFn(spell.staticData.role);
 
                 const partialSnapshot: Omit<SpellActionSnapshot, 'battleHash'> = {
                     startTime,

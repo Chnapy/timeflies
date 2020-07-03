@@ -1,4 +1,4 @@
-import { SpellEntity, SpellActionSnapshot, SpellType } from './Spell';
+import { SpellEntity, SpellActionSnapshot, SpellRole } from './Spell';
 import { CharacterEntity, characterIsAlive, characterAlterLife } from './Character';
 import { getOrientationFromTo } from '../geo';
 import { denormalize, switchUtil } from '../util';
@@ -26,9 +26,9 @@ const spellSimpleAttackEffect: SpellEffect = (spell, { actionArea }, { character
     return targets.filter(t => !characterIsAlive(t));
 };
 
-export const getSpellEffectFn = (spellType: SpellType): SpellEffect => {
+export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
-    return switchUtil(spellType, {
+    return switchUtil(spellRole, {
         move: spellMoveEffect,
         simpleAttack: spellSimpleAttackEffect
     });

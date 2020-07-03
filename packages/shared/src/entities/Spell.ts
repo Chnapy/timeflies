@@ -2,7 +2,7 @@ import { Position } from '../geo/position';
 import { Normalized } from '../util/normalize';
 import { cloneByJSON } from '../util';
 
-export type SpellType =
+export type SpellRole =
     | 'move'
     // | 'orientate'
     | 'simpleAttack';
@@ -12,7 +12,7 @@ export type SpellFeatures = {
     attack: number;
     area: number;
 };
-
+ 
 export type SpellEntity = {
     id: string;
     staticData: Readonly<StaticSpell>;
@@ -24,7 +24,7 @@ export type SpellEntity = {
 export type StaticSpell = {
     id: string;
     name: string;
-    type: SpellType;
+    role: SpellRole;
     initialFeatures: SpellFeatures;
 };
 

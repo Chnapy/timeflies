@@ -92,7 +92,7 @@ export const BattleStateManager = (
         const spell = battleState.spells[ spellAction.spellId ];
         assertIsDefined(spell);
 
-        const { staticData: { type } } = spell;
+        const { staticData: { role: type } } = spell;
 
         const spellEffectFn = getSpellEffectFn(type);
 
