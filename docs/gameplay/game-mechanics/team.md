@@ -8,3 +8,5 @@ When a player joins a team, all its characters join it. A player cannot share se
 A battle consists of teams confrontation, with the unique goal to letting only a single one of them in the battle.
 
 A team loose the battle when all its characters die. On the other hand, if a team is the only one remaining in the battle the latter ends with this last team as winner (so all its players win also).
+
+Players cannot change team during battle.

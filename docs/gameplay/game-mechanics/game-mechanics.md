@@ -12,5 +12,5 @@ This content should not change often, since it does not depend on the game conte
     - [Character](./character.md)
     - [Spell](./spell.md)
 - Map
-    - Tiles
-    - Characters placement
+    - [Tiles](./tiles.md)
+    - [Characters placement](./characters-placement.md)

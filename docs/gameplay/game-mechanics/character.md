@@ -20,5 +20,3 @@ Characters have several attributes:
 - Spatial attributes: **position** & **orientation**
 
     Position defines where the character is placed on the map. Orientation towards which direction character is seeing.
-
-    > For now, orientation exists only for visual purpose, nothing related to gameplay.
