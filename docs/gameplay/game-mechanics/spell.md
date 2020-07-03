@@ -4,14 +4,16 @@ A spell is an action launchable by a character during its turn. This action can 
 
 ## Attributes
 
-Several attributes compose a spell. For now all of them are statics, and cannot change during a battle.
+Several attributes compose a spell. Some of them are statics, and cannot change during a battle. Others are dynamics, values can be modified.
 
+**Statics**
 - Name
 - Description
 - Role
 
     Works as characters roles, it defines what kind of spell it is, what kind of effects it does.
 
+**Dynamics**
 - Duration
 
     How long this spell takes on launch to apply its effects.
@@ -30,13 +32,12 @@ Several attributes compose a spell. For now all of them are statics, and cannot 
 
 ## Spell prepare & launch
 
-When a spell is selected to be launched the range area is shown around the character. **This area uses *lines of sight***, so if obstacles bars view, several tiles may be not targetable.
+When a spell is selected to be launched the range area is shown around the character. This area may use **lines of sight**, so if obstacles bars view, several tiles may be not targetable.
 
 Player can then click on one of available tiles to launch the spell. At this moment action area show up on tiles around targeted tile, all characters in this area receive spell effects.
 
 To launch a spell, some conditions should be respected:
-- target tile should not be an obstacle
-- target tile should be in range area
+- target tile should be in range area (this area may be virtually infinite)
 - it should remains at least the spell duration as turn time
 - it should be character turn
 
@@ -49,6 +50,7 @@ Spells can affect many character attributes:
 - Action time
 - Position
 - Orientation
+- Character spells dynamic attributes
 
 There effects can also depend of these attributes, from targets, of launcher. There are many possibilities, some random samples:
 - an offensive spell that attacks a character, and absorb half of removed life points
