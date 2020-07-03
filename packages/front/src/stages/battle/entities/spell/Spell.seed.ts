@@ -19,7 +19,7 @@ export const seedSpellSnapshot = ({type, feature, ...props}: SeedSpellSnapshotPr
         name: 'name',
         role: type ?? 'move',
         initialFeatures: {
-            area: 3,
+            rangeArea: 3,
             attack: 10,
             duration: 1000,
             ...feature
@@ -27,7 +27,7 @@ export const seedSpellSnapshot = ({type, feature, ...props}: SeedSpellSnapshotPr
     },
     index: 1,
     features: {
-        area: 3,
+        rangeArea: 3,
         attack: 10,
         duration: 1000,
         ...feature
@@ -44,7 +44,7 @@ export const seedSpell = <P extends BattleDataPeriod>({ type, feature, ...props 
             name: 'name',
             role: type ?? 'move',
             initialFeatures: {
-                area: 3,
+                rangeArea: 3,
                 attack: 10,
                 duration: 1000,
                 ...feature
@@ -52,7 +52,7 @@ export const seedSpell = <P extends BattleDataPeriod>({ type, feature, ...props 
         },
         index: 1,
         features: {
-            area: 3,
+            rangeArea: 3,
             attack: 10,
             duration: 1000,
             ...feature

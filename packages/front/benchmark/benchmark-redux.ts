@@ -29,7 +29,7 @@ const initStore = () => {
         characterId: 'c1',
         type: 'move',
         feature: {
-            area: 999,
+            rangeArea: 999,
             attack: -1,
             duration: 1500
         }

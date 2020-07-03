@@ -76,7 +76,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
             const { tiledSchema } = extractState(api.getState);
 
             const futureCharacterPosition = extractFutureCharacter(api.getState)!.position;
-            const spellArea = extractFutureSpell(api.getState)!.features.area;
+            const spellArea = extractFutureSpell(api.getState)!.features.rangeArea;
             const charactersPos = extractFutureAliveCharacterPositionList(api.getState)
                 .filter(p => p.id !== futureCharacterPosition.id);
 

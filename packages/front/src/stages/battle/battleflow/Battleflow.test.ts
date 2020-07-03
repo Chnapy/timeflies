@@ -32,7 +32,7 @@ describe('Battleflow', () => {
             characterId: 'c1',
             type: 'simpleAttack',
             feature: {
-                area: 999,
+                rangeArea: 999,
                 attack: 10,
                 duration: 1500
             }
@@ -272,7 +272,7 @@ describe('Battleflow', () => {
                 type: 'simpleAttack',
                 characterId: 'c1',
                 feature: {
-                    area: 999,
+                    rangeArea: 999,
                     attack: 20,
                     duration: 100
                 }
@@ -383,7 +383,7 @@ describe('Battleflow', () => {
                 spellsSnapshots: [ {
                     ...snapshotState.battleDataCurrent.spells.s1,
                     features: {
-                        area: -1,
+                        rangeArea: -1,
                         attack: 10,
                         duration: 1234
                     }
@@ -395,7 +395,7 @@ describe('Battleflow', () => {
             const spellSnapshot: SpellSnapshot = spellEntityToSnapshot({
                 ...snapshotState.battleDataCurrent.spells.s1,
                 features: {
-                    area: -1,
+                    rangeArea: -1,
                     attack: 10,
                     duration: 1234
                 }
