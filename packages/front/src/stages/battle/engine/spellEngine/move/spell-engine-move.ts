@@ -26,6 +26,7 @@ const defaultCreateTileTypeGetter: CreateTileTypeGetter = tiledSchema => {
 
 export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
     extractState,
+    extractGrid,
     extractFutureAliveCharacterPositionList,
     extractFutureCharacter,
     extractFutureSpell,
@@ -160,10 +161,10 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
     return async action => {
 
         if (TileHoverAction.match(action)) {
-            const state = extractState(api.getState);
+            const grid = extractGrid(api.getState);
 
             const { position } = action.payload;
-            const tile = state.grid[ position.id ]
+            const tile = grid[ position.id ]
 
             await onMoveHover(position, tile.tileType);
 

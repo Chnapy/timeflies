@@ -1,14 +1,10 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { createPosition, normalize, Normalized, Position, TiledManager, TileType } from '@timeflies/shared';
+import { Normalized, Position } from '@timeflies/shared';
 import TiledMap from 'tiled-types/types';
 import { BattleStartAction } from '../battle-actions';
 import { BattleMapPathAction, BattleStateSpellPrepareAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
 
 export type BState = 'watch' | 'spellPrepare';
-
-export type GridTile = Position & {
-    tileType: TileType;
-};
 
 export type BattleActionState = {
     currentAction: BState;
@@ -16,7 +12,6 @@ export type BattleActionState = {
     tiledSchema: TiledMap | null;
     tiledImagesUrls: Record<string, string>;
     futureCharacterPosition: Position | null;
-    grid: Normalized<GridTile>;
 
     // TODO consider normalize
     path: Position[];
@@ -29,7 +24,6 @@ const initialState: BattleActionState = {
     tiledSchema: null,
     tiledImagesUrls: {},
     futureCharacterPosition: null,
-    grid: {},
     path: [],
     rangeArea: {},
     actionArea: {}
@@ -37,37 +31,14 @@ const initialState: BattleActionState = {
 
 export const ACCEPTABLE_TILES: number[] = [ 0 ];
 
-const calculateGrid = (tiledSchema: TiledMap): Normalized<GridTile> => {
-    const { width, height } = tiledSchema;
-
-    const tiledManager = TiledManager(tiledSchema);
-
-    const grid: GridTile[] = [];
-
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const p = createPosition(x, y);
-            const tileType = tiledManager.getTileType(p);
-
-            grid.push({
-                ...p,
-                tileType
-            });
-        }
-    }
-
-    return normalize(grid);
-};
-
 export const battleActionReducer = createReducer(initialState, {
     [ BattleStartAction.type ]: (state, { payload }: BattleStartAction) => {
         const { tiledMapAssets } = payload;
 
         return {
             ...state,
-            tiledSchema: payload.tiledMapAssets.schema,
-            tiledImagesUrls: payload.tiledMapAssets.imagesUrls,
-            grid: calculateGrid(tiledMapAssets.schema)
+            tiledSchema: tiledMapAssets.schema,
+            tiledImagesUrls: tiledMapAssets.imagesUrls
         };
     },
     [ BattleStateTurnStartAction.type ]: (state, { payload }: BattleStateTurnStartAction) => {

@@ -46,6 +46,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
 
         const middleware = battleActionMiddleware({
             extractState: () => initialState,
+            extractGrid: () => ({}),
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
             extractFutureAliveCharacterPositionList: () => [],
@@ -79,20 +80,6 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: normalize([
-                    {
-                        ...createPosition(0, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(1, 0),
-                        tileType: 'obstacle',
-                    },
-                    {
-                        ...createPosition(2, 0),
-                        tileType: 'default',
-                    }
-                ]),
                 path: [
                     createPosition(1, 0),
                     createPosition(2, 0)
@@ -105,6 +92,20 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             const { store } = getStore(initialState,
                 () => () => 'obstacle',
                 {
+                    extractGrid: () => normalize([
+                        {
+                            ...createPosition(0, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(1, 0),
+                            tileType: 'obstacle',
+                        },
+                        {
+                            ...createPosition(2, 0),
+                            tileType: 'default',
+                        }
+                    ]),
                     extractFutureCharacter: () => seedCharacter({
                         id: '1', period: 'future', position: createPosition(0, 0)
                     })
@@ -128,20 +129,6 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: normalize([
-                    {
-                        ...createPosition(0, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(1, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(2, 0),
-                        tileType: 'default',
-                    }
-                ]),
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -151,6 +138,20 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             const { store } = getStore(initialState,
                 () => () => 'default',
                 {
+                    extractGrid: () => normalize([
+                        {
+                            ...createPosition(0, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(1, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(2, 0),
+                            tileType: 'default',
+                        }
+                    ]),
                     extractFutureCharacter: () => seedCharacter({
                         id: '1', period: 'future', position: createPosition(0, 0)
                     })
@@ -177,20 +178,6 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: normalize([
-                    {
-                        ...createPosition(0, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(1, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(2, 0),
-                        tileType: 'default',
-                    }
-                ]),
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -204,6 +191,20 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             const { store } = getStore(initialState,
                 () => p => p.y ? 'obstacle' : 'default',
                 {
+                    extractGrid: () => normalize([
+                        {
+                            ...createPosition(0, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(1, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(2, 0),
+                            tileType: 'default',
+                        }
+                    ]),
                     extractFutureCharacter: () => mainCharacter,
                     extractFutureAliveCharacterPositionList: () => [
                         mainCharacter.position,
@@ -232,20 +233,6 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: normalize([
-                    {
-                        ...createPosition(0, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(1, 0),
-                        tileType: 'obstacle',
-                    },
-                    {
-                        ...createPosition(2, 0),
-                        tileType: 'default',
-                    }
-                ]),
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -255,6 +242,20 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             const { store, dispatchMock } = getStore(initialState,
                 () => ({ x, y }) => y || x === 1 ? 'obstacle' : 'default',
                 {
+                    extractGrid: () => normalize([
+                        {
+                            ...createPosition(0, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(1, 0),
+                            tileType: 'obstacle',
+                        },
+                        {
+                            ...createPosition(2, 0),
+                            tileType: 'default',
+                        }
+                    ]),
                     extractFutureCharacter: () => seedCharacter({
                         id: '1', period: 'future', position: createPosition(0, 0)
                     })
@@ -275,20 +276,6 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMap('map_1'),
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: normalize([
-                    {
-                        ...createPosition(0, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(1, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(2, 0),
-                        tileType: 'default',
-                    }
-                ]),
                 path: [
                     createPosition(1, 0),
                     createPosition(2, 0)
@@ -301,6 +288,20 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             const { store, dispatchMock } = getStore(initialState,
                 () => () => 'default',
                 {
+                    extractGrid: () => normalize([
+                        {
+                            ...createPosition(0, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(1, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(2, 0),
+                            tileType: 'default',
+                        }
+                    ]),
                     extractFutureCharacter: () => seedCharacter({
                         id: '1', period: 'future', position: createPosition(0, 0)
                     })
@@ -326,20 +327,6 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 tiledSchema: seedTiledMapAssets('map_1').schema,
                 tiledImagesUrls: {},
                 currentAction: 'spellPrepare',
-                grid: normalize([
-                    {
-                        ...createPosition(0, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(1, 0),
-                        tileType: 'default',
-                    },
-                    {
-                        ...createPosition(2, 0),
-                        tileType: 'default',
-                    }
-                ]),
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -355,6 +342,20 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             const { store } = getStore(initialState,
                 () => p => p.y ? 'obstacle' : 'default',
                 {
+                    extractGrid: () => normalize([
+                        {
+                            ...createPosition(0, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(1, 0),
+                            tileType: 'default',
+                        },
+                        {
+                            ...createPosition(2, 0),
+                            tileType: 'default',
+                        }
+                    ]),
                     extractState: () => initialState,
                     extractFutureCharacter: () => characterList[ 0 ],
                     extractFutureAliveCharacterPositionList: () => characterList.map(c => c.position)

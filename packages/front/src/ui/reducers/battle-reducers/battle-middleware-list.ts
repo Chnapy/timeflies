@@ -16,6 +16,7 @@ const extractFutureCharacter = (getState: () => GameState) => {
 export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
     battleActionMiddleware<GameState>({
         extractState: getState => getState().battle.battleActionState,
+        extractGrid: getState => getState().battle.snapshotState.grid,
         extractFutureAliveCharacterPositionList: getState => denormalize(getState().battle.snapshotState.battleDataFuture.characters)
             .filter(characterIsAlive)
             .map(c => c.position),
