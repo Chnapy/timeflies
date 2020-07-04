@@ -11,6 +11,7 @@ export type SpellFeatures = {
     duration: number;
     attack: number;
     rangeArea: number;
+    actionArea: number;
 };
  
 export type SpellEntity = {

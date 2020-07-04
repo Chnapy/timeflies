@@ -19,6 +19,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 initialFeatures: {
                     duration: 200,
                     rangeArea: 1,
+                    actionArea: 1,
                     attack: -1
                 }
             },
@@ -30,6 +31,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 initialFeatures: {
                     duration: 1000,
                     rangeArea: 10,
+                    actionArea: 2,
                     attack: 10
                 }
             }
@@ -55,6 +57,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 initialFeatures: {
                     duration: 4000,
                     rangeArea: 8,
+                    actionArea: 2,
                     attack: 30
                 }
             }
@@ -79,6 +82,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 description: 'description move',
                 initialFeatures: {
                     rangeArea: 1,
+                    actionArea: 1,
                     duration: 300,
                     attack: -1
                 }
@@ -90,6 +94,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 description: 'description simpleAttack',
                 initialFeatures: {
                     rangeArea: 8,
+                    actionArea: 2,
                     duration: 500,
                     attack: 10
                 }

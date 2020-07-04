@@ -21,7 +21,11 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
 
         const tiledManager = TiledManager(tiledSchema!);
 
-        const actionArea = normalize(tiledManager.getArea(tilePos, 1));
+        const spell = extractFutureSpell(api.getState)!;
+
+        const actionAreaRadius = spell.features.actionArea;
+
+        const actionArea = normalize(tiledManager.getArea(tilePos, actionAreaRadius));
 
         api.dispatch(BattleMapPathAction({
             actionArea
@@ -40,7 +44,9 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
 
         const spell = extractFutureSpell(api.getState)!;
 
-        const actionArea = normalize(tiledManager.getArea(tilePos, 1));
+        const actionAreaRadius = spell.features.actionArea;
+
+        const actionArea = normalize(tiledManager.getArea(tilePos, actionAreaRadius));
 
         const spellAction: SpellAction = {
             spell,
