@@ -159,14 +159,13 @@ const createVemo = (id: string): StaticCharacter => {
             {
                 id: id + '-1',
                 name: 'S1',
-                role: 'simpleAttack',
-                description: 'description simpleAttack',
+                role: 'switch',
+                description: 'Moves the character in diagonal, switching position with others characters if any',
                 initialFeatures: {
                     lineOfSight: true,
-                    duration: 1000,
-                    rangeArea: 10,
-                    actionArea: 2,
-                    attack: 10
+                    duration: 2000,
+                    rangeArea: 2,
+                    actionArea: 0,
                 }
             }
         ],
