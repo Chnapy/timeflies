@@ -384,6 +384,7 @@ describe('Battleflow', () => {
                     ...snapshotState.battleDataCurrent.spells.s1,
                     features: {
                         rangeArea: -1,
+                        actionArea: 1,
                         attack: 10,
                         duration: 1234
                     }
@@ -396,6 +397,7 @@ describe('Battleflow', () => {
                 ...snapshotState.battleDataCurrent.spells.s1,
                 features: {
                     rangeArea: -1,
+                    actionArea: 1,
                     attack: 10,
                     duration: 1234
                 }

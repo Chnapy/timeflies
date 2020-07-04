@@ -31,6 +31,7 @@ export const seedCharacterSnapshot = ({ type, features, ...props }: SeedCharacte
             description: 'description move',
             initialFeatures: {
                 rangeArea: 2,
+                actionArea: 1,
                 attack: 2,
                 duration: 1000
             }
@@ -69,6 +70,7 @@ export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...p
                 description: 'description move',
                 initialFeatures: {
                     rangeArea: 2,
+                    actionArea: 1,
                     attack: 2,
                     duration: 1000
                 }

@@ -119,6 +119,7 @@ export const Default: React.FC = () => {
                 feature: {
                     duration: 1000,
                     rangeArea: 8,
+                    actionArea: 1,
                     attack: 20
                 }
             }),
@@ -140,6 +141,7 @@ export const Default: React.FC = () => {
                 feature: {
                     duration: 1500,
                     rangeArea: 5,
+                    actionArea: 1,
                     attack: 40
                 }
             }),
