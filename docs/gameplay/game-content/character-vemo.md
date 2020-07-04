@@ -1,4 +1,4 @@
-# Character #1
+# Vemo
 
 This character is focused in placement & map control.
 
@@ -11,7 +11,7 @@ This character is focused in placement & map control.
 
 ## Spells
 
-### Move
+### Switch
 
 This spell moves the character in diagonal only, switching position with others characters if any.
 
@@ -19,11 +19,10 @@ This spell moves the character in diagonal only, switching position with others 
 | --- | --- |
 | Duration | 2s |
 | Range area | 2 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 |
 
-### Placement
+### Incitement
 
 This spell moves target depending of its orientation. If he's looking right, he is moved to the right. If he's looking left, he is moved to the left. Etc.
 
@@ -33,24 +32,22 @@ Target is moved to 3 tiles. If any obstacle is encounter, move is interrupted at
 | --- | --- |
 | Duration | 3s |
 | Range area | 5 |
-| Allow obstacles | no |
 | Line of sight | no |
 | Action area | 1 |
 
-### Attack
+### Treacherous blow
 
-This spell attack its target, removing life points. If target is from the back (from launcher point of view), then damages are considerably increased. Also change target orientation towards launcher.
+This spell attacks its target, removing life points. If target is from the back (from launcher point of view), then damages are considerably increased. Also change target orientation towards launcher.
 
 | Attribute | Value |
 | --- | --- |
 | Duration | 5s |
 | Range area | 1 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 |
 | Attack | 15 (45 if from the back) |
 
-### Support
+### Pressure
 
 This spell boosts the target, only if others characters are seeing him. For each character in the same lines of the target, and have there orientation toward the target, this last one gains a boost of action time. Launcher is counted in the condition.
 
@@ -60,6 +57,5 @@ For each character respecting this condition, target gains 1s of action time.
 | --- | --- |
 | Duration | 3s |
 | Range area | 6 |
-| Allow obstacles | no |
 | Line of sight | no |
 | Action area | 1 |

@@ -28,6 +28,6 @@ Each spell has its own attributes values, and effects.
 
 > It includes spell roles
 
-- [Character #1](./character-1.md)
-- [Character #2](./character-2.md)
-- [Character #3](./character-3.md)
+- [Vemo](./character-vemo.md)
+- [Tacka](./character-tacka.md)
+- [Meti](./character-meti.md)

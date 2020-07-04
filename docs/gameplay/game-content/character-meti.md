@@ -1,4 +1,4 @@
-# Character #3
+# Meti
 
 This character is focused in time management.
 
@@ -19,11 +19,10 @@ This spell moves the character one tile. This is the basic move spell.
 | --- | --- |
 | Duration | 1s |
 | Range area | 1 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 |
 
-### Attack
+### Slump
 
 This spell attacks target and removes action time from him.
 
@@ -31,13 +30,12 @@ This spell attacks target and removes action time from him.
 | --- | --- |
 | Duration | 3s |
 | Range area | 4 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 |
 | Attack | 15 |
 | Action time removed | 2s |
 
-### Attack
+### Last resort
 
 This spell attacks target with damage depending of current remaining time. The less launcher action time left, the more powerful spell is.
 
@@ -45,12 +43,11 @@ This spell attacks target with damage depending of current remaining time. The l
 | --- | --- |
 | Duration | 5s |
 | Range area | 2 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 |
 | Attack | 20 (minimum) |
 
-### Support
+### Motivation
 
 This spell boosts others characters action time, in exchange of launcher life. Life spent is shared as action time to others characters.
 
@@ -58,7 +55,6 @@ This spell boosts others characters action time, in exchange of launcher life. L
 | --- | --- |
 | Duration | 3s |
 | Range area | 4 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 2 |
 | Life removed (launcher) | 20 |

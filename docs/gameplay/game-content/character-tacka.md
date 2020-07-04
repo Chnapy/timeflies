@@ -1,4 +1,4 @@
-# Character #2
+# Tacka
 
 This character is focused in attack & heal.
 
@@ -19,11 +19,10 @@ This spell moves the character one tile. This is the basic move spell.
 | --- | --- |
 | Duration | 1s |
 | Range area | 1 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 |
 
-### Attack
+### Health sharing
 
 This spell attacks enemies in an area, and heals allies in this same area.
 Enemies damages are shared to allies as heal.
@@ -34,12 +33,11 @@ Enemies damages are shared to allies as heal.
 | --- | --- |
 | Duration | 4s |
 | Range area | 3 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 3 |
 | Attack | 20 |
 
-### Attack
+### Sacrificial gift
 
 This spell attacks target and boosts close enemies. Enemies close to 3 tiles from target position are healed depending of damage, and there action time is boosted depending of spell duration.
 
@@ -49,21 +47,19 @@ This spell attacks target and boosts close enemies. Enemies close to 3 tiles fro
 | --- | --- |
 | Duration | 6s |
 | Range area | 1 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 1 (side effects: 3) |
 | Attack | 60 |
 
-### Heal
+### Attention attraction
 
-This spell heals allies and enemies, and change there orientation.
+This spell heals allies and enemies, and changes there orientation.
 Orientation is set so as to be towards center of action area.
 
 | Attribute | Value |
 | --- | --- |
 | Duration | 3s |
 | Range area | 6 |
-| Allow obstacles | no |
 | Line of sight | yes |
 | Action area | 2 |
 | Heal | 20 |
