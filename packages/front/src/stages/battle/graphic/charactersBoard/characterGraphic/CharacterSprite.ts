@@ -1,4 +1,4 @@
-import { assertIsDefined, CharacterRole, Orientation, getOrientationFromTo } from '@timeflies/shared';
+import { CharacterRole, Orientation, getOrientationFromTo } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
@@ -31,7 +31,11 @@ const getTextures = (
 
     const path = getAnimPath(characterRole, characterState, orientation);
     const textures = spritesheet.animations[ path ];
-    assertIsDefined(textures);
+
+    // If texture not found, get sampleChar1 as default
+    if (!textures) {
+        return getTextures(spritesheet, { characterRole: 'sampleChar1', characterState, orientation });
+    }
 
     return textures;
 };
@@ -46,12 +50,12 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
         storeEmitter.onStateChange(
             ({ battle }) => {
                 const { snapshotState, } = battle;
-                const character = getBattleData(snapshotState, period).characters[characterId];
+                const character = getBattleData(snapshotState, period).characters[ characterId ];
 
                 const { currentSpellAction, battleDataFuture } = snapshotState;
 
                 if (currentSpellAction && currentSpellAction.characterId === characterId) {
-                    const spell = battleDataFuture.spells[currentSpellAction.spellId];
+                    const spell = battleDataFuture.spells[ currentSpellAction.spellId ];
 
                     const spriteState: CharacterSpriteState = spell.staticData.role === 'move' ? 'walk' : 'idle'
 
@@ -61,7 +65,7 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                         spriteState
                     };
                 }
-                
+
                 return {
                     type: character.staticData.role,
                     orientation: character.orientation,

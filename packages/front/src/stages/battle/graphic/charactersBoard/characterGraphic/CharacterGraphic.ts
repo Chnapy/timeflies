@@ -264,11 +264,15 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
         if (payload) {
             const { type, orientation } = payload;
             const idlePath = getAnimPath(type, 'idle', orientation);
-            const texture: PIXI.Texture = spritesheet.animations[ idlePath ][ 0 ];
+
+            // If texture not found, get sampleChar1 as default
+            const textureList: PIXI.Texture[] = spritesheet.animations[ idlePath ]
+                ?? spritesheet.animations[ getAnimPath('sampleChar1', 'idle', orientation) ];
+            const texture = textureList[ 0 ];
 
             sprite.texture = texture;
             sprite.visible = true;
-            
+
         } else {
             sprite.visible = false;
         }
