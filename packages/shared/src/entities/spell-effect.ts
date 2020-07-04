@@ -21,7 +21,10 @@ const spellSimpleAttackEffect: SpellEffect = (spell, { actionArea }, { character
 
     const targets = denormalize<CharacterEntity>(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
 
-    targets.forEach(t => characterAlterLife(t, -spell.features.attack));
+    if (spell.features.attack) {
+        const attack = spell.features.attack;
+        targets.forEach(t => characterAlterLife(t, -attack));
+    }
 
     return targets.filter(t => !characterIsAlive(t));
 };
