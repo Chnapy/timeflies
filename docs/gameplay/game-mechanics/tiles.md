@@ -10,5 +10,3 @@ Tiles has 2 states:
 - **obstacle**
 
     Characters cannot be placed on it, and it breaks lines of sight. But it can be targeted by some spells.
-
-Spells can change tiles states.

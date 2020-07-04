@@ -20,10 +20,6 @@ Several attributes compose a spell. All of them are statics, and cannot change d
 
     The range of the spell, how far it can be launch.
 
-- Allow obstacles
-
-    Indicate if this spell can be launched on obstacle tiles.
-
 - Line of sight
 
     Indicate if this spell is sensitive of lines of sight.
