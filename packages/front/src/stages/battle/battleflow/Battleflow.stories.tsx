@@ -70,6 +70,7 @@ export const Default: React.FC = () => {
                     id: 'c1',
                     name: 'toto',
                     role: 'sampleChar1',
+                    description: 'description toto',
                     defaultSpellId: 's1',
                     initialFeatures: {
                         life: 100,
@@ -88,6 +89,7 @@ export const Default: React.FC = () => {
                     id: 'c2',
                     name: 'africa',
                     role: 'sampleChar2',
+                    description: 'description africa',
                     defaultSpellId: 's3',
                     initialFeatures: {
                         life: 120,

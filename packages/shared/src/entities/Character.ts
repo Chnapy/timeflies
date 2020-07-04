@@ -26,6 +26,7 @@ export type CharacterEntity = {
 export type StaticCharacter = {
     id: string;
     name: string;
+    description: string;
     role: CharacterRole;
     initialFeatures: CharacterFeatures;
     staticSpells: StaticSpell[];

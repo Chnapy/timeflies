@@ -5,6 +5,7 @@ const MOCK_CHAR: StaticCharacter[] = [
         id: '1',
         role: 'sampleChar1',
         name: 'Ramio',
+        description: 'description Ramio',
         initialFeatures: {
             life: 100,
             actionTime: 20000
@@ -38,6 +39,7 @@ const MOCK_CHAR: StaticCharacter[] = [
         id: '2',
         name: 'Guili',
         role: 'sampleChar1',
+        description: 'description Guili',
         initialFeatures: {
             life: 120,
             actionTime: 15000
@@ -61,6 +63,7 @@ const MOCK_CHAR: StaticCharacter[] = [
         id: '3',
         name: 'Shoyi',
         role: 'sampleChar1',
+        description: 'description Shoyi',
         initialFeatures: {
             life: 80,
             actionTime: 22000
