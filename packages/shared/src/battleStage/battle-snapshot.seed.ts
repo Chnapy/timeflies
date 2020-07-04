@@ -10,19 +10,19 @@ export const seedObjectSnapshotable = (): Omit<BattleSnapshot, 'battleHash'> => 
     } ], "spellsSnapshots": [
         {
             "id": "s1", "characterId": "c1",
-            "staticData": { "id": "s1", "name": "name", "description": "", "role": "move", "initialFeatures": { "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 300 } },
-            "index": 1, "features": { "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 300 }
+            "staticData": { "id": "s1", "name": "name", "description": "", "role": "move", "initialFeatures": { "lineOfSight": true, "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 300 } },
+            "index": 1, "features": { "lineOfSight": true, "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 300 }
         }, {
             "id": "s2", "characterId": "c1",
-            "staticData": { "id": "s2", "name": "name", "description": "", "role": "simpleAttack", "initialFeatures": { "rangeArea": 8, "actionArea": -1, "attack": 20, "duration": 1000 } },
-            "index": 2, "features": { "rangeArea": 8, "actionArea": -1, "attack": 20, "duration": 1000 }
+            "staticData": { "id": "s2", "name": "name", "description": "", "role": "simpleAttack", "initialFeatures": { "lineOfSight": true, "rangeArea": 8, "actionArea": -1, "attack": 20, "duration": 1000 } },
+            "index": 2, "features": { "lineOfSight": true, "rangeArea": 8, "actionArea": -1, "attack": 20, "duration": 1000 }
         }, {
             "id": "s3", "characterId": "c2",
-            "staticData": { "id": "s3", "name": "name", "description": "", "role": "move", "initialFeatures": { "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 600 } },
-            "index": 1, "features": { "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 600 }
+            "staticData": { "id": "s3", "name": "name", "description": "", "role": "move", "initialFeatures": { "lineOfSight": true, "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 600 } },
+            "index": 1, "features": { "lineOfSight": true, "rangeArea": -1, "actionArea": -1, "attack": 10, "duration": 600 }
         }, {
             "id": "s4", "characterId": "c2",
-            "staticData": { "id": "s4", "name": "name", "description": "", "role": "simpleAttack", "initialFeatures": { "rangeArea": 5, "actionArea": -1, "attack": 40, "duration": 1500 } },
-            "index": 1, "features": { "rangeArea": 5, "actionArea": -1, "attack": 40, "duration": 1500 }
+            "staticData": { "id": "s4", "name": "name", "description": "", "role": "simpleAttack", "initialFeatures": { "lineOfSight": true, "rangeArea": 5, "actionArea": -1, "attack": 40, "duration": 1500 } },
+            "index": 1, "features": { "lineOfSight": true, "rangeArea": 5, "actionArea": -1, "attack": 40, "duration": 1500 }
         } ]
 });

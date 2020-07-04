@@ -118,6 +118,7 @@ export const Default: React.FC = () => {
                 index: 2,
                 feature: {
                     duration: 1000,
+                    lineOfSight: true,
                     rangeArea: 8,
                     actionArea: 1,
                     attack: 20
