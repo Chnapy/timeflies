@@ -1,15 +1,15 @@
-import { Position, SpellActionSnapshot, switchUtil, createPosition, SpellRole, CharacterRole, Orientation } from '@timeflies/shared';
+import { CharacterRole, createPosition, Orientation, Position, SpellActionSnapshot, SpellRole, switchUtilOption } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap from 'tiled-types/types';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
+import { requestRender } from '../../../../../canvas/GameCanvas';
 import { StoreEmitter } from '../../../../../store/store-manager';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
-import { requestRender } from '../../../../../canvas/GameCanvas';
 
 
 export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
@@ -196,19 +196,18 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             destroyTicker();
         }
 
-        ticker = new PIXI.Ticker();
-
-        const actionFn: SpellFn = switchUtil(spellRole, {
-            move: onMoveAction,
-            orientate: () => { },
-            simpleAttack: () => { },
-            sampleSpell1: () => { },
-            sampleSpell2: () => { },
-            sampleSpell3: () => { },
+        const actionFn: SpellFn | undefined = switchUtilOption(spellRole, {
+            move: onMoveAction
         });
-        actionFn(currentSpellAction, characterPosition, tiledSchema);
 
-        ticker.start();
+        if (actionFn) {
+
+            ticker = new PIXI.Ticker();
+
+            actionFn(currentSpellAction, characterPosition, tiledSchema);
+
+            ticker.start();
+        }
     };
 
     storeEmitter.onStateChange(

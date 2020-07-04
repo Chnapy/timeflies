@@ -125,6 +125,18 @@ export const Default: React.FC = () => {
                 }
             }),
             seedSpellSnapshot({
+                id: 's-switch',
+                type: 'switch',
+                characterId: 'c1',
+                index: 3,
+                feature: {
+                    duration: 2000,
+                    lineOfSight: true,
+                    rangeArea: 2,
+                    actionArea: 0
+                }
+            }),
+            seedSpellSnapshot({
                 id: 's3',
                 type: 'move',
                 characterId: 'c2',

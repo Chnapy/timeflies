@@ -4,8 +4,8 @@ import { cloneByJSON } from '../util';
 
 export type SpellRole =
     | 'move'
-    // | 'orientate'
-    | 'simpleAttack';
+    | 'simpleAttack'
+    | 'switch';
 
 export type SpellFeatures = {
     duration: number;
@@ -15,7 +15,7 @@ export type SpellFeatures = {
 
     attack?: number;
 };
- 
+
 export type SpellEntity = {
     id: string;
     staticData: Readonly<StaticSpell>;
