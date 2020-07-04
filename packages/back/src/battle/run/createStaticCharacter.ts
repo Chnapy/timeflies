@@ -17,8 +17,9 @@ const createSampleChar1 = (id: string): StaticCharacter => {
 
     return {
         id,
-        name: 'sampleChar 1',
         role: 'sampleChar1',
+        name: 'sampleChar 1',
+        description: 'description sampleChar 1',
         initialFeatures: {
             life: 100,
             actionTime: 20000
@@ -53,8 +54,9 @@ const createSampleChar2 = (id: string): StaticCharacter => {
 
     return {
         id,
-        name: 'sampleChar 2',
         role: 'sampleChar2',
+        name: 'sampleChar 2',
+        description: 'description sampleChar 2',
         initialFeatures: {
             life: 120,
             actionTime: 15000
@@ -89,8 +91,9 @@ const createSampleChar3 = (id: string): StaticCharacter => {
 
     return {
         id,
-        name: 'sampleChar 3',
         role: 'sampleChar3',
+        name: 'sampleChar 3',
+        description: 'description sampleChar 3',
         initialFeatures: {
             life: 80,
             actionTime: 22000
