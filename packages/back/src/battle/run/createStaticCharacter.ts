@@ -10,6 +10,8 @@ export const createStaticCharacter = (id: string, type: CharacterRole): StaticCh
             return createSampleChar2(id);
         case 'sampleChar3':
             return createSampleChar3(id);
+        case 'vemo':
+            return createVemo(id);
     }
 };
 
@@ -139,5 +141,35 @@ const createSampleChar3 = (id: string): StaticCharacter => {
             }
         ],
         defaultSpellId: id + '-3'
+    }
+};
+
+const createVemo = (id: string): StaticCharacter => {
+
+    return {
+        id,
+        role: 'vemo',
+        name: 'Vemo',
+        description: 'A character focused in placement & map control',
+        initialFeatures: {
+            life: 80,
+            actionTime: 10000
+        },
+        staticSpells: [
+            {
+                id: id + '-1',
+                name: 'S1',
+                role: 'simpleAttack',
+                description: 'description simpleAttack',
+                initialFeatures: {
+                    lineOfSight: true,
+                    duration: 1000,
+                    rangeArea: 10,
+                    actionArea: 2,
+                    attack: 10
+                }
+            }
+        ],
+        defaultSpellId: id + '-1'
     }
 };

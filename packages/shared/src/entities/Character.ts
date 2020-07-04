@@ -3,10 +3,12 @@ import { StaticSpell } from "./Spell";
 import { cloneByJSON } from '../util';
 import { DeepReadonly } from '../types';
 
-export type CharacterRole =
-    | 'sampleChar1'
-    | 'sampleChar2'
+export type CharacterRole = (typeof characterRoleList)[ number ]
     | 'sampleChar3';
+
+export const characterRoleList = [
+    'sampleChar1', 'sampleChar2', 'vemo'
+] as const;
 
 export type CharacterFeatures = {
     life: number;

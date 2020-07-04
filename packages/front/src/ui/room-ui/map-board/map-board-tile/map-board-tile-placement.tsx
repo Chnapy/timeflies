@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import { Theme, useTheme } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import { assertIsDefined, CharacterRoom, CharacterRole, PlayerRoom, Position, TeamRoom } from '@timeflies/shared';
+import { assertIsDefined, CharacterRoom, CharacterRole, PlayerRoom, Position, TeamRoom, characterRoleList } from '@timeflies/shared';
 import React from 'react';
 import { CharacterImage } from '../../../battle-ui/character-list-panel/character-item/character-image';
 import { useGameCurrentPlayer } from '../../../hooks/useGameCurrentPlayer';
@@ -175,7 +175,7 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
                 vertical: 'top'
             }}
         >
-            {new Array<CharacterRole>('sampleChar1', 'sampleChar2').map(type => (
+            {characterRoleList.map(type => (
                 <MenuItem key={type} onClick={() => handleMenuItemClick(type)}>
                     <CharacterImage characterRole={type} size={40} />
                 </MenuItem>

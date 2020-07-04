@@ -69,7 +69,7 @@ export const Default: React.FC = () => {
                 staticData: {
                     id: 'c1',
                     name: 'toto',
-                    role: 'sampleChar1',
+                    role: 'vemo',
                     description: 'description toto',
                     defaultSpellId: 's1',
                     initialFeatures: {
