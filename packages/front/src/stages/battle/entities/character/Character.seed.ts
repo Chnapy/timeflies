@@ -33,7 +33,6 @@ export const seedCharacterSnapshot = ({ type, features, ...props }: SeedCharacte
                 lineOfSight: true,
                 rangeArea: 2,
                 actionArea: 1,
-                attack: 2,
                 duration: 1000
             }
         } ],
@@ -73,7 +72,6 @@ export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...p
                     lineOfSight: true,
                     rangeArea: 2,
                     actionArea: 1,
-                    attack: 2,
                     duration: 1000
                 }
             } ],

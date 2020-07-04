@@ -383,6 +383,7 @@ describe('Battleflow', () => {
                 spellsSnapshots: [ {
                     ...snapshotState.battleDataCurrent.spells.s1,
                     features: {
+                        lineOfSight: true,
                         rangeArea: -1,
                         actionArea: 1,
                         attack: 10,
@@ -396,6 +397,7 @@ describe('Battleflow', () => {
             const spellSnapshot: SpellSnapshot = spellEntityToSnapshot({
                 ...snapshotState.battleDataCurrent.spells.s1,
                 features: {
+                    lineOfSight: true,
                     rangeArea: -1,
                     actionArea: 1,
                     attack: 10,

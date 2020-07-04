@@ -173,7 +173,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
                         <Box display='flex' flexDirection='column' justifyContent='space-evenly' ml={1}>
                             {renderAttribute('time', formatMsToSeconds(duration) + 's')}
-                            {renderAttribute('attack', attack)}
+                            {attack !== undefined && renderAttribute('attack', attack)}
                         </Box>
 
                     </Box>

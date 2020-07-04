@@ -30,7 +30,6 @@ const initStore = () => {
         type: 'move',
         feature: {
             rangeArea: 999,
-            attack: -1,
             duration: 1500
         }
     });

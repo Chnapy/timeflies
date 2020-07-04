@@ -41,7 +41,6 @@ export const Default: React.FC = () => {
                         type: 'move',
                         feature: {
                             duration: 800,
-                            attack: 12,
                             rangeArea: 4
                         },
                         index: 1,
