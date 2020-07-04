@@ -6,6 +6,7 @@ import { SpellEngineCreator } from '../spell-engine';
 
 export const spellEngineSimpleAttack: SpellEngineCreator = ({
     extractState,
+    extractGrid,
     extractFutureSpell,
     extractFutureCharacter,
     extractFutureAliveCharacterPositionList
@@ -62,18 +63,18 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
     return async (action: AnyAction) => {
 
         if (TileHoverAction.match(action)) {
-            const state = extractState(api.getState);
+            const grid = extractGrid(api.getState);
 
             const { position } = action.payload;
-            const tile = state.grid[ position.id ];
+            const tile = grid[ position.id ];
 
             await onTileHover(position, tile.tileType);
 
         } else if (TileClickAction.match(action)) {
-            const state = extractState(api.getState);
+            const grid = extractGrid(api.getState);
 
             const { position } = action.payload;
-            const tile = state.grid[ position.id ];
+            const tile = grid[ position.id ];
 
             await onTileClick(position, tile.tileType);
 

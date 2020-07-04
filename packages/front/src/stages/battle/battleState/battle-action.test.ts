@@ -28,6 +28,7 @@ describe('# battle-action', () => {
 
         const middleware = battleActionMiddleware({
             extractState: () => initialState,
+            extractGrid: () => ({}),
             extractFutureAliveCharacterPositionList: () => [ futureCharacter.position ],
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
@@ -47,7 +48,6 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: {},
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -81,7 +81,6 @@ describe('# battle-action', () => {
                 tiledSchema: action.payload.tiledMapAssets.schema,
                 tiledImagesUrls: { toto: 'url' },
                 currentAction: 'watch',
-                grid: expect.any(Object),
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -102,7 +101,6 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: {},
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -145,7 +143,6 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: {},
                 path: [ createPosition(2, 2) ],
                 rangeArea: normalize([ createPosition(3, 3) ]),
                 actionArea: normalize([ createPosition(1, 1) ]),
@@ -172,7 +169,6 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: {},
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -201,7 +197,6 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                grid: {},
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -235,7 +230,6 @@ describe('# battle-action', () => {
                 tiledSchema: seedTiledMapAssets('map_1').schema,
                 tiledImagesUrls: { toto: 'url' },
                 currentAction: 'watch',
-                grid: {},
                 path: [],
                 rangeArea: {},
                 actionArea: {},
@@ -252,8 +246,7 @@ describe('# battle-action', () => {
             // store.dispatch(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
-                ...initialState,
-                grid: expect.any(Object)
+                ...initialState
             })
         });
     });

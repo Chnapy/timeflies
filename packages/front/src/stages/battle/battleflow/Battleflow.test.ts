@@ -63,16 +63,6 @@ describe('Battleflow', () => {
                     futureCharacterPosition: createPosition(8, 6),
                     currentAction: 'spellPrepare',
                     selectedSpellId: 's1',
-                    grid: normalize([
-                        {
-                            ...createPosition(8, 6),
-                            tileType: 'default'
-                        },
-                        {
-                            ...createPosition(9, 6),
-                            tileType: 'default'
-                        }
-                    ]),
                     rangeArea: normalize([ createPosition(9, 6) ])
                 },
                 cycleState: {
@@ -86,6 +76,16 @@ describe('Battleflow', () => {
                 },
                 snapshotState: getInitialSnapshotState({
                     myPlayerId: 'p1',
+                    grid: normalize([
+                        {
+                            ...createPosition(8, 6),
+                            tileType: 'default'
+                        },
+                        {
+                            ...createPosition(9, 6),
+                            tileType: 'default'
+                        }
+                    ]),
                     battleDataCurrent: {
                         battleHash: '',
                         characters: { c1: getCharacter('current') },

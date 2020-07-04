@@ -59,16 +59,6 @@ const initStore = () => {
                 futureCharacterPosition: createPosition(8, 6),
                 currentAction: 'spellPrepare',
                 selectedSpellId: 's1',
-                grid: {
-                    '8:6': {
-                        ...createPosition(8, 6),
-                        tileType: 'default'
-                    },
-                    '9:6': {
-                        ...createPosition(9, 6),
-                        tileType: 'default'
-                    }
-                },
                 rangeArea: normalize([ createPosition(9, 6) ])
             },
             cycleState: {
@@ -82,6 +72,16 @@ const initStore = () => {
             },
             snapshotState: getInitialSnapshotState({
                 myPlayerId: 'p1',
+                grid: {
+                    '8:6': {
+                        ...createPosition(8, 6),
+                        tileType: 'default'
+                    },
+                    '9:6': {
+                        ...createPosition(9, 6),
+                        tileType: 'default'
+                    }
+                },
                 teamList: {
                     t1: {
                         id: 't1',

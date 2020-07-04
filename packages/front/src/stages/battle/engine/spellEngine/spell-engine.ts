@@ -1,14 +1,16 @@
 import { AnyAction, MiddlewareAPI } from '@reduxjs/toolkit';
-import { Position, SpellRole } from '@timeflies/shared';
+import { Normalized, Position, SpellRole } from '@timeflies/shared';
 import { BattleActionState } from '../../battleState/battle-action-reducer';
 import { Character } from '../../entities/character/Character';
 import { Spell } from '../../entities/spell/Spell';
+import { GridTile } from '../../snapshot/snapshot-reducer';
 import { spellEngineMove } from './move/spell-engine-move';
 import { spellEngineSimpleAttack } from './simpleAttack/spell-engine-simpleAttack';
 import { spellEngineSwitch } from './switch/spell-engine-switch';
 
 export type SpellEngineDependencies<S> = {
     extractState: (getState: () => S) => BattleActionState;
+    extractGrid: (getState: () => S) => Normalized<GridTile>;
     extractFutureAliveCharacterPositionList: (getState: () => S) => Position[];
     extractFutureCharacter: (getState: () => S) => Character<'future'> | undefined;
     extractFutureSpell: (getState: () => S) => Spell<'future'> | undefined;
