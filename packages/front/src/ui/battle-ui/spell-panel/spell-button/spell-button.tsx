@@ -35,6 +35,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const spellRole = useGameStep('battle', battle => selectSpell(battle).staticData.role);
 
+    const spellDescription = useGameStep('battle', battle => selectSpell(battle).staticData.description);
+
     const nbrWaitingSpellAction: number = useGameStep('battle', battle => {
         const { spellActionSnapshotList } = battle.snapshotState;
 
@@ -153,7 +155,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
                 {currentSpellActionInfos && <UIGauge variant='dynamic' timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />}
             </Box>
 
-            <Tooltip title={'Spell description'}>
+            <Tooltip title={spellDescription}>
                 <Button component='span' onClick={onBtnClick} size='large' color='primary' disabled={isDisabled} {...buttonProps}>
 
                     <Box display='flex' flexWrap='nowrap'>

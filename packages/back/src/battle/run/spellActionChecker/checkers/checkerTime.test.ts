@@ -21,7 +21,7 @@ describe('# checkerTime', () => {
         spells: {
             s1: {
                 id: 's1', index: 1, staticData: {
-                    id: 's1', name: 's1', role: 'move', initialFeatures: {} as any
+                    id: 's1', name: 's1', description: '', role: 'move', initialFeatures: {} as any
                 },
                 features: { duration: 1000 } as any,
                 characterId: 'c1'

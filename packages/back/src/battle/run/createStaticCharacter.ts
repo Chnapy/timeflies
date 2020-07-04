@@ -29,6 +29,7 @@ const createSampleChar1 = (id: string): StaticCharacter => {
                 id: id + '-1',
                 name: 'MOVE',
                 role: 'move',
+                description: 'description move',
                 initialFeatures: {
                     duration: 200,
                     rangeArea: -1,
@@ -39,6 +40,7 @@ const createSampleChar1 = (id: string): StaticCharacter => {
                 id: id + '-10',
                 name: 'S1',
                 role: 'simpleAttack',
+                description: 'description simpleAttack',
                 initialFeatures: {
                     duration: 1000,
                     rangeArea: 10,
@@ -66,6 +68,7 @@ const createSampleChar2 = (id: string): StaticCharacter => {
                 id: id + '-2',
                 name: 'MOVE',
                 role: 'move',
+                description: 'description move',
                 initialFeatures: {
                     duration: 600,
                     rangeArea: -1,
@@ -76,6 +79,7 @@ const createSampleChar2 = (id: string): StaticCharacter => {
                 id: id + '-20',
                 name: 'Attack',
                 role: 'simpleAttack',
+                description: 'description simpleAttack',
                 initialFeatures: {
                     duration: 4000,
                     rangeArea: 8,
@@ -103,6 +107,7 @@ const createSampleChar3 = (id: string): StaticCharacter => {
                 id: id + '-3',
                 name: 'MOVE',
                 role: 'move',
+                description: 'description move',
                 initialFeatures: {
                     rangeArea: -1,
                     duration: 300,
@@ -113,6 +118,7 @@ const createSampleChar3 = (id: string): StaticCharacter => {
                 id: id + '-30',
                 name: 'S3',
                 role: 'simpleAttack',
+                description: 'description simpleAttack',
                 initialFeatures: {
                     rangeArea: 8,
                     duration: 500,

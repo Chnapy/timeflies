@@ -15,6 +15,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '1',
                 name: 'MOVE',
                 role: 'move',
+                description: 'description move',
                 initialFeatures: {
                     duration: 200,
                     rangeArea: 1,
@@ -25,6 +26,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '10',
                 name: 'S1',
                 role: 'simpleAttack',
+                description: 'description simpleAttack',
                 initialFeatures: {
                     duration: 1000,
                     rangeArea: 10,
@@ -49,6 +51,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '2',
                 name: 'MOVE',
                 role: 'simpleAttack',
+                description: 'description simpleAttack',
                 initialFeatures: {
                     duration: 4000,
                     rangeArea: 8,
@@ -73,6 +76,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '3',
                 name: 'MOVE',
                 role: 'move',
+                description: 'description move',
                 initialFeatures: {
                     rangeArea: 1,
                     duration: 300,
@@ -83,6 +87,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 id: '20',
                 name: 'S3',
                 role: 'simpleAttack',
+                description: 'description simpleAttack',
                 initialFeatures: {
                     rangeArea: 8,
                     duration: 500,
