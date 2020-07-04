@@ -23,8 +23,9 @@ export type SpellEntity = {
 
 export type StaticSpell = {
     id: string;
-    name: string;
     role: SpellRole;
+    name: string;
+    description: string;
     initialFeatures: SpellFeatures;
 };
 

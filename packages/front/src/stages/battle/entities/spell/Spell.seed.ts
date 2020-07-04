@@ -2,22 +2,23 @@ import { RequiredOnly, SpellSnapshot, SpellRole } from '@timeflies/shared';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { Spell } from './Spell';
 
-export type SeedSpellProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Spell<P>, 'id' | 'period'>, 'feature'> & { 
+export type SeedSpellProps<P extends BattleDataPeriod> = Omit<RequiredOnly<Spell<P>, 'id' | 'period'>, 'feature'> & {
     type?: SpellRole;
-    feature?: Partial<Spell<P>['features']>;
+    feature?: Partial<Spell<P>[ 'features' ]>;
 };
 
-export type SeedSpellSnapshotProps = Omit<RequiredOnly<SpellSnapshot, 'id'>, 'features'> & { 
+export type SeedSpellSnapshotProps = Omit<RequiredOnly<SpellSnapshot, 'id'>, 'features'> & {
     type?: SpellRole;
-    feature?: Partial<SpellSnapshot['features']>;
+    feature?: Partial<SpellSnapshot[ 'features' ]>;
 };
 
-export const seedSpellSnapshot = ({type, feature, ...props}: SeedSpellSnapshotProps): SpellSnapshot => ({
+export const seedSpellSnapshot = ({ type = 'move', feature, ...props }: SeedSpellSnapshotProps): SpellSnapshot => ({
     characterId: '',
     staticData: {
         id: props.id,
         name: 'name',
-        role: type ?? 'move',
+        role: type,
+        description: 'description ' + type,
         initialFeatures: {
             rangeArea: 3,
             attack: 10,
@@ -35,14 +36,15 @@ export const seedSpellSnapshot = ({type, feature, ...props}: SeedSpellSnapshotPr
     ...props
 });
 
-export const seedSpell = <P extends BattleDataPeriod>({ type, feature, ...props }: SeedSpellProps<P>): Spell<P> => {
+export const seedSpell = <P extends BattleDataPeriod>({ type = 'move', feature, ...props }: SeedSpellProps<P>): Spell<P> => {
 
     return {
         characterId: '',
         staticData: {
             id: props.id,
             name: 'name',
-            role: type ?? 'move',
+            role: type,
+            description: 'description ' + type,
             initialFeatures: {
                 rangeArea: 3,
                 attack: 10,
