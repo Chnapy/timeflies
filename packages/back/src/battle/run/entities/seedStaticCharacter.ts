@@ -17,6 +17,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'move',
                 description: 'description move',
                 initialFeatures: {
+                    lineOfSight: true,
                     duration: 200,
                     rangeArea: 1,
                     actionArea: 1,
@@ -29,6 +30,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'simpleAttack',
                 description: 'description simpleAttack',
                 initialFeatures: {
+                    lineOfSight: true,
                     duration: 1000,
                     rangeArea: 10,
                     actionArea: 2,
@@ -55,6 +57,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'simpleAttack',
                 description: 'description simpleAttack',
                 initialFeatures: {
+                    lineOfSight: true,
                     duration: 4000,
                     rangeArea: 8,
                     actionArea: 2,
@@ -81,6 +84,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'move',
                 description: 'description move',
                 initialFeatures: {
+                    lineOfSight: true,
                     rangeArea: 1,
                     actionArea: 1,
                     duration: 300,
@@ -93,6 +97,7 @@ const MOCK_CHAR: StaticCharacter[] = [
                 role: 'simpleAttack',
                 description: 'description simpleAttack',
                 initialFeatures: {
+                    lineOfSight: true,
                     rangeArea: 8,
                     actionArea: 2,
                     duration: 500,

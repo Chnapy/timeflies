@@ -10,6 +10,7 @@ export type SpellRole =
 export type SpellFeatures = {
     duration: number;
     attack: number;
+    lineOfSight: boolean;
     rangeArea: number;
     actionArea: number;
 };

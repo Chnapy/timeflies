@@ -83,6 +83,7 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
 
             const futureCharacterPosition = extractFutureCharacter(api.getState)!.position;
             const spellArea = extractFutureSpell(api.getState)!.features.rangeArea;
+            const lineOfSight = extractFutureSpell(api.getState)!.features.lineOfSight;
             const charactersPos = extractFutureAliveCharacterPositionList(api.getState)
                 .filter(p => p.id !== futureCharacterPosition.id);
 
@@ -101,20 +102,25 @@ export const spellEngineSimpleAttack: SpellEngineCreator = ({
                 return 'yes';
             };
 
-            const rangeArea = normalize(tiledManager.getArea(futureCharacterPosition, spellArea)
-                .filter(p => {
+            const rangeAreaRaw = tiledManager.getArea(futureCharacterPosition, spellArea);
 
-                    const points = tiledManager.getBresenhamLine(futureCharacterPosition, p);
+            const rangeArea = normalize(lineOfSight
+                ? rangeAreaRaw
+                    .filter(p => {
 
-                    for (let i = 0; i < points.length; i++) {
-                        const check = isPositionTargetable(points[ i ]);
-                        if (check === 'no'
-                            || (check === 'last' && i < points.length - 1)) {
-                            return false;
+                        const points = tiledManager.getBresenhamLine(futureCharacterPosition, p);
+
+                        for (let i = 0; i < points.length; i++) {
+                            const check = isPositionTargetable(points[ i ]);
+                            if (check === 'no'
+                                || (check === 'last' && i < points.length - 1)) {
+                                return false;
+                            }
                         }
-                    }
-                    return true;
-                }));
+                        return true;
+                    })
+                : rangeAreaRaw
+            );
 
             api.dispatch(BattleMapPathAction({
                 rangeArea
