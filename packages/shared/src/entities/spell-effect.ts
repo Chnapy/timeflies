@@ -153,6 +153,61 @@ const spellPressureEffect: SpellEffect = (spell, { position }, { characters }, {
     return [];
 };
 
+const spellHealthSharingEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { teams, players }, grid) => {
+    const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
+
+    const { attack } = spell.features;
+
+    if (!attack) {
+        return [];
+    }
+
+    const characterList = denormalize(characters);
+
+    const actionAreaList = denormalize(actionArea);
+
+    const launcherTeam = teams[ players[ launcher.playerId ].teamId ];
+
+    const isAlly = (character: CharacterEntity) => teams[ players[ character.playerId ].teamId ] === launcherTeam;
+
+    const deadCharacterList: CharacterEntity[] = [];
+
+    const totalDamages = actionAreaList
+        .map<number>(p => {
+
+            const target = characterList.find(c => characterIsAlive(c) && c.position.id === p.id && !isAlly(c));
+
+            if (target) {
+                const lifeRemoved = Math.min(target.features.life, attack);
+
+                characterAlterLife(target, -attack);
+
+                if (!characterIsAlive(target)) {
+                    deadCharacterList.push(target);
+                }
+
+                return lifeRemoved;
+            }
+
+            return 0;
+        })
+        .reduce((acc, v) => acc + v, 0);
+
+    const targetAllies = actionAreaList
+        .map(p =>
+            characterList.find(c => characterIsAlive(c) && c.position.id === p.id && isAlly(c))
+        )
+        .filter((c): c is CharacterEntity => c !== undefined);
+
+    targetAllies.forEach(target => {
+        characterAlterLife(target, totalDamages / targetAllies.length);
+    });
+
+    return deadCharacterList;
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -161,6 +216,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         switch: spellSwitchEffect,
         incitement: spellIncitementEffect,
         treacherousBlow: spellTreacherousBlowEffect,
-        pressure: spellPressureEffect
+        pressure: spellPressureEffect,
+        healthSharing: spellHealthSharingEffect
     });
 };
