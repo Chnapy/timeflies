@@ -76,7 +76,7 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
             launchTime
         });
 
-        const launchTimeout = setTimeout(() => {
+        const launchTimeout = setTimeout(async () => {
 
             const roomState = stateManager.get();
 
@@ -99,7 +99,7 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
 
             assertIsNonNullable(roomState.mapSelected);
 
-            const battle = BattleRunRoom(roomStateReady);
+            const battle = await BattleRunRoom(roomStateReady);
 
             stateManager.set({
                 step: 'battle',

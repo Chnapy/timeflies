@@ -1,11 +1,12 @@
-import { ConfirmSAction, NotifySAction, seedSpellActionSnapshot, SpellActionSnapshot, DynamicBattleSnapshot } from '@timeflies/shared';
+import { ConfirmSAction, DynamicBattleSnapshot, NotifySAction, seedSpellActionSnapshot, SpellActionSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
-import { BattleStateManager, BattleState } from '../battleStateManager/BattleStateManager';
+import { BattleState, BattleStateManager } from '../battleStateManager/BattleStateManager';
 import { Cycle } from '../cycle/Cycle';
 import { Character } from '../entities/character/Character';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedPlayer } from '../entities/player/Player.seed';
+import { seedMapManager } from '../mapManager/MapManager.seed';
 import { CharActionCheckerResult } from '../spellActionChecker/SpellActionChecker';
 import { SpellActionReceiver } from './SpellActionReceiver';
 
@@ -18,8 +19,6 @@ describe('# SpellActionReceiver', () => {
             notifyDeaths: notifyDeathsFn
         } as any
     });
-
-    const seedMapManager = () => ({});
 
     const getAll = ({ checkResult, generateSnapshotHash, spellActionHash, isHashCorrect, deaths = [] }: {
         checkResult: CharActionCheckerResult;

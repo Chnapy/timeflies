@@ -1,16 +1,19 @@
-import { PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom, BattleSnapshot, createPosition, Normalized, Normalizable } from '@timeflies/shared';
+import { BattleSnapshot, createPosition, Normalizable, normalize, Normalized, PlayerRoom, seedSpellActionSnapshot, SpellActionSnapshot, TeamRoom } from '@timeflies/shared';
 import util from 'util';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { IPlayerRoomData } from '../../room/room';
-import { BattleState, BattleStateManager } from './BattleStateManager';
-import { Team } from '../entities/team/Team';
 import { Player } from '../entities/player/Player';
-import { normalize } from '@timeflies/shared';
+import { Team } from '../entities/team/Team';
+import { seedMapManager } from '../mapManager/MapManager.seed';
+import { BattleState, BattleStateManager } from './BattleStateManager';
 
 describe('# BattleStateManager', () => {
 
     const getInitData = () => {
+
+        const mapManager = seedMapManager();
+
         const playerDataList: IPlayerRoomData<WSSocket>[] = [
             {
                 id: 'p1',
@@ -35,7 +38,7 @@ describe('# BattleStateManager', () => {
             ]
         } as PlayerRoom ];
 
-        return { playerDataList, playerRoomList, teamRoomList };
+        return { mapManager, playerDataList, playerRoomList, teamRoomList };
     };
 
     const extractState = (manager: BattleStateManager): BattleState => ({
@@ -51,9 +54,9 @@ describe('# BattleStateManager', () => {
     };
 
     it('should correctly init battle state', () => {
-        const { playerDataList, teamRoomList, playerRoomList } = getInitData();
+        const { mapManager, playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-        const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList);
+        const manager = BattleStateManager(mapManager, playerDataList, teamRoomList, playerRoomList);
 
         const expected: BattleState = {
             characters: expect.objectContaining({
@@ -81,9 +84,9 @@ describe('# BattleStateManager', () => {
     });
 
     it('should return correct first snapshot', () => {
-        const { playerDataList, teamRoomList, playerRoomList } = getInitData();
+        const { mapManager, playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-        const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
+        const manager = BattleStateManager(mapManager, playerDataList, teamRoomList, playerRoomList, {
             getBattleSnapshotWithHash: (): BattleSnapshot => ({
                 launchTime: -1,
                 time: -1,
@@ -107,12 +110,12 @@ describe('# BattleStateManager', () => {
 
     describe('on spell action', () => {
 
-        const getFirstObjectItem = <O extends Normalizable>(value: Normalized<O>): O => (value as any)[Object.keys(value)[0]];
+        const getFirstObjectItem = <O extends Normalizable>(value: Normalized<O>): O => (value as any)[ Object.keys(value)[ 0 ] ];
 
         it('should not call callback on bad hash', () => {
-            const { playerDataList, teamRoomList, playerRoomList } = getInitData();
+            const { mapManager, playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-            const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
+            const manager = BattleStateManager(mapManager, playerDataList, teamRoomList, playerRoomList, {
                 getBattleSnapshotWithHash: (): BattleSnapshot => ({
                     launchTime: -1,
                     time: -1,
@@ -144,9 +147,9 @@ describe('# BattleStateManager', () => {
         });
 
         it('should call callback on correct hash', () => {
-            const { playerDataList, teamRoomList, playerRoomList } = getInitData();
+            const { mapManager, playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-            const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
+            const manager = BattleStateManager(mapManager, playerDataList, teamRoomList, playerRoomList, {
                 getBattleSnapshotWithHash: (): BattleSnapshot => ({
                     launchTime: -1,
                     time: -1,
@@ -179,9 +182,9 @@ describe('# BattleStateManager', () => {
         });
 
         it('should change battle state on callback function called', () => {
-            const { playerDataList, teamRoomList, playerRoomList } = getInitData();
+            const { mapManager, playerDataList, teamRoomList, playerRoomList } = getInitData();
 
-            const manager = BattleStateManager(playerDataList, teamRoomList, playerRoomList, {
+            const manager = BattleStateManager(mapManager, playerDataList, teamRoomList, playerRoomList, {
                 getBattleSnapshotWithHash: (): BattleSnapshot => ({
                     launchTime: -1,
                     time: -1,

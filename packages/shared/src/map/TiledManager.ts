@@ -1,12 +1,16 @@
 import bresenham from 'bresenham';
 import { TiledLayerTilelayer, TiledMap, TiledMapOrthogonal, TiledMapType, TiledTileset } from 'tiled-types';
 import { Position, createPosition } from '../geo';
-import { assertIsDefined } from '../util';
+import { assertIsDefined, Normalized } from '../util';
 
 export interface TilePositioned<T extends TileTypeWithPlacement> {
     type: T;
     position: Position;
 }
+
+export type GridTile = Position & {
+    tileType: TileType;
+};
 
 export interface TiledManager {
     readonly orientation: TiledMapType;
@@ -23,6 +27,8 @@ export interface TiledManager {
 
     getTilePositionFromIndex(index: number): Position;
     getTilesetFromId(id: number): TiledTileset | undefined;
+
+    getGrid(): Normalized<GridTile>;
 
     getArea(center: Position, r: number): Position[];
     getBresenhamLine(start: Position, end: Position): BresenhamPoint[];
@@ -152,6 +158,25 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
     const getTilesetFromId = (id: number): TiledTileset | undefined =>
         schema.tilesets.find(t => t.firstgid <= id && t.firstgid + t.tilecount - 1 >= id);
 
+    const getGrid = (): Normalized<GridTile> => {
+
+        const grid: Normalized<GridTile> = {};
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const p = createPosition(x, y);
+                const tileType = getTileType(p);
+
+                grid[ p.id ] = {
+                    ...p,
+                    tileType
+                };
+            }
+        }
+
+        return grid;
+    };
+
     const getArea = (center: Position, r: number): Position[] => {
 
         const area: Position[] = [];
@@ -203,6 +228,8 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
 
         getTilePositionFromIndex,
         getTilesetFromId,
+
+        getGrid,
 
         getArea,
         getBresenhamLine

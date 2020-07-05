@@ -6,6 +6,7 @@ import { TeamData } from '../../TeamData';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { BattleRunRoom, RoomStateReady } from './BattleRunRoom';
 import { normalize } from '@timeflies/shared';
+import { seedMapManager } from './mapManager/MapManager.seed';
 
 describe.skip('BattleRunRoom', () => {
 
@@ -57,7 +58,7 @@ describe.skip('BattleRunRoom', () => {
 
     let battleRunRoom: BattleRunRoom;
 
-    const generateBattleRunRoom = ({
+    const generateBattleRunRoom = async ({
         c0OnStart, c0OnConfirm, c1OnNotify,
         c0GetCharActionCAction
     }: {
@@ -66,7 +67,9 @@ describe.skip('BattleRunRoom', () => {
         c0OnConfirm?: (action: ConfirmSAction) => void,
         c1OnNotify?: (action: NotifySAction) => void
     }) => {
-        battleRunRoom = BattleRunRoom(roomState);
+        battleRunRoom = await BattleRunRoom(roomState, {
+            createMapManager: async () => seedMapManager()
+        });
 
         const onStart = (char: CharacterSnapshot, spellMove: SpellSnapshot) => {
             const position = createPosition(char.position.x, char.position.y + 1);

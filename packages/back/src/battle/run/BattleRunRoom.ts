@@ -1,4 +1,4 @@
-import { BRunEndSAction, BRunLaunchSAction, characterIsAlive, playerEntityToSnapshot, SpellActionCAction, teamEntityToSnapshot, denormalize } from '@timeflies/shared';
+import { BRunEndSAction, BRunLaunchSAction, characterIsAlive, denormalize, PromisePayload, playerEntityToSnapshot, SpellActionCAction, teamEntityToSnapshot } from '@timeflies/shared';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { IPlayerRoomData } from '../room/room';
 import { RoomState } from '../room/room-state-manager';
@@ -18,13 +18,21 @@ export type RoomStateReady = {
     playerDataList: IPlayerRoomData<WSSocket>[];
 };
 
-export interface BattleRunRoom {
-    start(): void;
-}
+export type BattleRunRoom = PromisePayload<ReturnType<typeof BattleRunRoom>>;
 
-export const BattleRunRoom = ({ mapSelected, teamList: teamRoomList, playerDataList, playerList: playerRoomList }: RoomStateReady): BattleRunRoom => {
+type Dependencies = {
+    createMapManager: typeof MapManager;
+};
+
+export const BattleRunRoom = async (
+    { mapSelected, teamList: teamRoomList, playerDataList, playerList: playerRoomList }: RoomStateReady,
+    { createMapManager }: Dependencies = { createMapManager: MapManager }
+) => {
+
+    const mapManager = await createMapManager(mapSelected.config);
 
     const stateManager = BattleStateManager(
+        mapManager,
         playerDataList,
         teamRoomList,
         playerRoomList
@@ -86,8 +94,6 @@ export const BattleRunRoom = ({ mapSelected, teamList: teamRoomList, playerDataL
         console.log(`Battle ended. Team ${team.letter} wins !`);
         console.log('---\n');
     };
-
-    const mapManager = MapManager(mapSelected.config);
 
     const cycle = Cycle(playerList, get);
 

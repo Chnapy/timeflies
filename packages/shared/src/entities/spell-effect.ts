@@ -1,10 +1,17 @@
-import { SpellEntity, SpellActionSnapshot, SpellRole } from './Spell';
-import { CharacterEntity, characterIsAlive, characterAlterLife } from './Character';
 import { getOrientationFromTo } from '../geo';
-import { denormalize, switchUtil } from '../util';
+import { GridTile } from '../map';
+import { DeepReadonly } from '../types';
+import { denormalize, Normalized, switchUtil } from '../util';
 import { BattleStateEntity } from './battle-state';
+import { characterAlterLife, CharacterEntity, characterIsAlive } from './Character';
+import { SpellActionSnapshot, SpellEntity, SpellRole } from './Spell';
 
-export type SpellEffect = (spell: SpellEntity, snapshot: Omit<SpellActionSnapshot, 'battleHash'>, battleState: BattleStateEntity) => CharacterEntity[];
+export type SpellEffect = (
+    spell: SpellEntity,
+    snapshot: Omit<SpellActionSnapshot, 'battleHash'>,
+    battleState: BattleStateEntity,
+    grid: DeepReadonly<Normalized<GridTile>>
+) => CharacterEntity[];
 
 const spellMoveEffect: SpellEffect = (spell, { position }, { characters }) => {
     const character = characters[ spell.characterId ];
@@ -41,7 +48,7 @@ const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => 
 
     const target = denormalize(characters).find(c => c.position.id === oldPosition.id);
 
-    if(target) {
+    if (target) {
         target.position = oldPosition;
     }
 

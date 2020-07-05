@@ -4,16 +4,18 @@ import { BattleRunRoom } from '../run/BattleRunRoom';
 
 type RoomStateStep = 'idle' | 'will-launch' | 'battle';
 
+export type RoomMapSelected = {
+    config: MapConfig;
+    placementTileList: MapPlacementTile[];
+};
+
 export type RoomState = {
     id: string;
     step: RoomStateStep;
     playerDataList: PlayerRoomDataConnected[];
     playerList: PlayerRoom[];
     teamList: TeamRoom[];
-    mapSelected: {
-        config: MapConfig;
-        placementTileList: MapPlacementTile[];
-    } | null;
+    mapSelected: RoomMapSelected | null;
     launchTimeout: NodeJS.Timeout | null;
     battle: BattleRunRoom | null;
 };
