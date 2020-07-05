@@ -39,18 +39,18 @@ const spellSimpleAttackEffect: SpellEffect = (spell, { actionArea }, { character
 const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => {
     const launcher = characters[ spell.characterId ];
 
-    const oldPosition = launcher.position;
+    const launcherFirstPosition = launcher.position;
 
-    const orientation = getOrientationFromTo(launcher.position, position);
+    const target = denormalize(characters).find(c => c.position.id === position.id);
+
+    if (target) {
+        target.position = launcherFirstPosition;
+    }
+
+    const orientation = getOrientationFromTo(launcherFirstPosition, position);
 
     launcher.position = position;
     launcher.orientation = orientation;
-
-    const target = denormalize(characters).find(c => c.position.id === oldPosition.id);
-
-    if (target) {
-        target.position = oldPosition;
-    }
 
     return [];
 };
