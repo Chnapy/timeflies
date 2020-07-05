@@ -49,13 +49,14 @@ This spell attacks its target, removing life points. If target is from the back 
 
 ### Pressure
 
-This spell boosts the target, only if others characters are seeing him. For each character in the same lines of the target, and have there orientation toward the target, this last one gains a boost of action time. Launcher is counted in the condition.
-
-For each character respecting this condition, target gains 1s of action time.
+If target is an enemy, this spell removes life points from him. If target is an ally, this spell boosts him in action time.
+This spell does nothing if target orientation is not toward launcher.
 
 | Attribute | Value |
 | --- | --- |
 | Duration | 3s |
-| Range area | 6 |
-| Line of sight | no |
+| Range area | 2 |
+| Line of sight | yes |
 | Action area | 1 |
+| Attack (enemy) | 15 |
+| Action time (ally) | 1s |
