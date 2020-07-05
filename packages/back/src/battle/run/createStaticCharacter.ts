@@ -153,7 +153,7 @@ const createVemo = (id: string): StaticCharacter => {
         description: 'A character focused in placement & map control',
         initialFeatures: {
             life: 80,
-            actionTime: 10000
+            actionTime: 20000
         },
         staticSpells: [
             {
@@ -190,7 +190,7 @@ const createVemo = (id: string): StaticCharacter => {
                     lineOfSight: false,
                     rangeArea: 1,
                     actionArea: 0,
-                    attack: 15
+                    attack: 20
                 }
             },
             {
