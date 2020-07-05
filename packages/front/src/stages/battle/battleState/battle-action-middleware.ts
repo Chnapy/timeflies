@@ -6,6 +6,7 @@ import { BattleStateSpellPrepareAction } from './battle-state-actions';
 import { Spell } from '../entities/spell/Spell';
 import { getTurnRemainingTime } from '../cycle/cycle-reducer';
 import { BattleState } from '../../../ui/reducers/battle-reducers/battle-reducer';
+import { spellEngineDefault } from '../engine/spellEngine/default/spell-engine-default';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
     getSpellEngineFromType?: (spellRole: SpellRole, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
@@ -13,7 +14,7 @@ type Dependencies<S> = SpellEngineDependencies<S> & {
 };
 
 const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType' ] = (spellRole, api, deps) => {
-    const spellEngineCreator = spellEngineMap[ spellRole ];
+    const spellEngineCreator = spellEngineMap[ spellRole ] ?? spellEngineDefault;
 
     return spellEngineCreator(deps)(api);
 };
