@@ -24,5 +24,6 @@ export const spellEngineMap: {
 } = {
     move: spellEngineMove,
     simpleAttack: spellEngineSimpleAttack,
-    switch: spellEngineSwitch
+    switch: spellEngineSwitch,
+    incitement: spellEngineSimpleAttack
 };

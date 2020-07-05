@@ -158,16 +158,28 @@ const createVemo = (id: string): StaticCharacter => {
         staticSpells: [
             {
                 id: id + '-1',
-                name: 'S1',
+                name: 'Switch',
                 role: 'switch',
-                description: 'Moves the character in diagonal, switching position with others characters if any',
+                description: 'Moves launcher in diagonal, switching position with others characters if any',
                 initialFeatures: {
                     lineOfSight: true,
                     duration: 2000,
                     rangeArea: 2,
                     actionArea: 0,
                 }
-            }
+            },
+            {
+                id: id + '-2',
+                name: 'Incitement',
+                role: 'incitement',
+                description: 'Moves target depending of its orientation',
+                initialFeatures: {
+                    lineOfSight: false,
+                    duration: 3000,
+                    rangeArea: 5,
+                    actionArea: 0,
+                }
+            },
         ],
         defaultSpellId: id + '-1'
     }

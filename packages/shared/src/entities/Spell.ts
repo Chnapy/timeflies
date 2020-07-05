@@ -5,7 +5,8 @@ import { cloneByJSON } from '../util';
 export type SpellRole =
     | 'move'
     | 'simpleAttack'
-    | 'switch';
+    | 'switch'
+    | 'incitement';
 
 export type SpellFeatures = {
     duration: number;

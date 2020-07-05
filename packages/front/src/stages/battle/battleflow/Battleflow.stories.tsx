@@ -137,6 +137,18 @@ export const Default: React.FC = () => {
                 }
             }),
             seedSpellSnapshot({
+                id: 's-incitement',
+                type: 'incitement',
+                characterId: 'c1',
+                index: 4,
+                feature: {
+                    duration: 3000,
+                    lineOfSight: false,
+                    rangeArea: 5,
+                    actionArea: 0
+                }
+            }),
+            seedSpellSnapshot({
                 id: 's3',
                 type: 'move',
                 characterId: 'c2',
