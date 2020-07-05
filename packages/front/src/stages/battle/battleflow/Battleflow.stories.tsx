@@ -149,6 +149,19 @@ export const Default: React.FC = () => {
                 }
             }),
             seedSpellSnapshot({
+                id: 's-treacherousBlow',
+                type: 'treacherousBlow',
+                characterId: 'c1',
+                index: 5,
+                feature: {
+                    duration: 5000,
+                    lineOfSight: true,
+                    rangeArea: 1,
+                    actionArea: 0,
+                    attack: 15
+                }
+            }),
+            seedSpellSnapshot({
                 id: 's3',
                 type: 'move',
                 characterId: 'c2',

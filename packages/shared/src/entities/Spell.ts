@@ -6,7 +6,9 @@ export type SpellRole =
     | 'move'
     | 'simpleAttack'
     | 'switch'
-    | 'incitement';
+    | 'incitement'
+    | 'treacherousBlow'
+    ;
 
 export type SpellFeatures = {
     duration: number;
