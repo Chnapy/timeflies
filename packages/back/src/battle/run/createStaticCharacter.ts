@@ -192,6 +192,19 @@ const createVemo = (id: string): StaticCharacter => {
                     actionArea: 0,
                     attack: 15
                 }
+            },
+            {
+                id: id + '-4',
+                name: 'Pressure',
+                role: 'pressure',
+                description: 'If target is an enemy, this spell removes life points from him. If target is an ally, this spell boosts him in action time. This spell does nothing if target orientation is not toward launcher.',
+                initialFeatures: {
+                    duration: 2000,
+                    lineOfSight: true,
+                    rangeArea: 2,
+                    actionArea: 0,
+                    attack: 10
+                }
             }
         ],
         defaultSpellId: id + '-1'
