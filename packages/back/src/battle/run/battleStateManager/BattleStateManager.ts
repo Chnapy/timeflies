@@ -57,6 +57,11 @@ export const BattleStateManager = (
             socket.createPool());
     }));
 
+    const staticEntities = {
+        teams: normalize(teamList),
+        players: normalize(playerList)
+    };
+
     const generateBattleState = (): BattleState => {
 
         const characters: Character[] = playerList.flatMap(({ id: pId }) => {
@@ -100,7 +105,7 @@ export const BattleStateManager = (
 
         const spellEffectFn = getSpellEffectFn(type);
 
-        return spellEffectFn(spell, spellAction, battleState, mapGrid);
+        return spellEffectFn(spell, spellAction, battleState, staticEntities, mapGrid);
     };
 
     const useSpellAction = (spellAction: SpellActionSnapshot) => {

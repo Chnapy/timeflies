@@ -195,7 +195,10 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
                     actionArea: spellAction.actionArea
                 };
 
-                spellLaunchFn(spell, partialSnapshot, state.battleDataFuture, state.grid);
+                spellLaunchFn(spell, partialSnapshot, state.battleDataFuture, {
+                    teams: state.teamList,
+                    players: state.playerList
+                }, state.grid);
 
                 commit(state, commitTime);
 

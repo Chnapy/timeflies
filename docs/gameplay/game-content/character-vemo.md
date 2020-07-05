@@ -54,9 +54,9 @@ This spell does nothing if target orientation is not toward launcher.
 
 | Attribute | Value |
 | --- | --- |
-| Duration | 3s |
+| Duration | 2s |
 | Range area | 2 |
 | Line of sight | yes |
 | Action area | 1 |
-| Attack (enemy) | 15 |
+| Attack (enemy) | 10 |
 | Action time (ally) | 1s |

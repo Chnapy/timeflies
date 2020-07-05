@@ -5,11 +5,17 @@ import { denormalize, Normalized, switchUtil } from '../util';
 import { BattleStateEntity } from './battle-state';
 import { characterAlterLife, CharacterEntity, characterIsAlive } from './Character';
 import { SpellActionSnapshot, SpellEntity, SpellRole } from './Spell';
+import { TeamEntity } from './Team';
+import { PlayerEntity } from './Player';
 
 export type SpellEffect = (
     spell: SpellEntity,
     snapshot: Omit<SpellActionSnapshot, 'battleHash'>,
     battleState: BattleStateEntity,
+    staticEntities: DeepReadonly<{
+        teams: Normalized<TeamEntity>;
+        players: Normalized<PlayerEntity>;
+    }>,
     grid: DeepReadonly<Normalized<GridTile>>
 ) => CharacterEntity[];
 
@@ -55,7 +61,7 @@ const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => 
     return [];
 };
 
-const spellIncitementEffect: SpellEffect = (spell, { position }, { characters }, grid) => {
+const spellIncitementEffect: SpellEffect = (spell, { position }, { characters }, staticEntities, grid) => {
 
     const nbrTiles = 3;
 
@@ -84,11 +90,10 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
     return [];
 };
 
-const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characters }, grid) => {
+const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characters }, staticEntities, grid) => {
     const launcher = characters[ spell.characterId ];
 
     const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
-
 
     if (target) {
         const { attack } = spell.features;
@@ -111,6 +116,38 @@ const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characte
     return [];
 };
 
+const spellPressureEffect: SpellEffect = (spell, { position }, { characters }, { teams, players }, grid) => {
+    const launcher = characters[ spell.characterId ];
+
+    const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
+
+    if (target) {
+
+        const targetIsTowardLauncher = getOrientationFromTo(target.position, launcher.position) === target.orientation;
+
+        if (targetIsTowardLauncher) {
+
+            const launcherTeam = teams[ players[ launcher.playerId ].teamId ];
+            const targetTeam = teams[ players[ target.playerId ].teamId ];
+
+            if (launcherTeam === targetTeam) {
+
+                target.features.actionTime += 500;
+
+            } else if (spell.features.attack) {
+
+                characterAlterLife(target, -spell.features.attack);
+
+                if (!characterIsAlive(target)) {
+                    return [ target ];
+                }
+            }
+        }
+    }
+
+    return [];
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -118,6 +155,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         simpleAttack: spellSimpleAttackEffect,
         switch: spellSwitchEffect,
         incitement: spellIncitementEffect,
-        treacherousBlow: spellTreacherousBlowEffect
+        treacherousBlow: spellTreacherousBlowEffect,
+        pressure: spellPressureEffect
     });
 };

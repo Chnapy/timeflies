@@ -162,6 +162,19 @@ export const Default: React.FC = () => {
                 }
             }),
             seedSpellSnapshot({
+                id: 's-pressure',
+                type: 'pressure',
+                characterId: 'c1',
+                index: 6,
+                feature: {
+                    duration: 2000,
+                    lineOfSight: true,
+                    rangeArea: 2,
+                    actionArea: 0,
+                    attack: 10
+                }
+            }),
+            seedSpellSnapshot({
                 id: 's3',
                 type: 'move',
                 characterId: 'c2',
