@@ -53,10 +53,7 @@ const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => 
         target.position = launcherFirstPosition;
     }
 
-    const orientation = getOrientationFromTo(launcherFirstPosition, position);
-
     launcher.position = position;
-    launcher.orientation = orientation;
 
     return [];
 };
@@ -65,7 +62,9 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
 
     const nbrTiles = 3;
 
-    const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
+    const characterList = denormalize(characters);
+
+    const target = characterList.find(c => characterIsAlive(c) && c.position.id === position.id);
 
     if (target) {
 
@@ -79,7 +78,9 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
         for (let i = 0; i < nbrTiles; i++) {
             const nextPosition = getNextPosition(target.position);
 
-            if (grid[ nextPosition.id ]?.tileType !== 'default') {
+            if (grid[ nextPosition.id ]?.tileType !== 'default'
+                || characterList.some(c => c.position.id === nextPosition.id)
+            ) {
                 break;
             }
 
@@ -92,6 +93,8 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
 
 const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characters }, staticEntities, grid) => {
     const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
 
     const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
 
@@ -118,6 +121,8 @@ const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characte
 
 const spellPressureEffect: SpellEffect = (spell, { position }, { characters }, { teams, players }, grid) => {
     const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
 
     const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
 
