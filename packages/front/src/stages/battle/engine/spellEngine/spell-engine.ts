@@ -1,9 +1,8 @@
 import { AnyAction, MiddlewareAPI } from '@reduxjs/toolkit';
-import { Normalized, Position, SpellRole } from '@timeflies/shared';
+import { GridTile, Normalized, Position, SpellRole } from '@timeflies/shared';
 import { BattleActionState } from '../../battleState/battle-action-reducer';
 import { Character } from '../../entities/character/Character';
 import { Spell } from '../../entities/spell/Spell';
-import { GridTile } from '../../snapshot/snapshot-reducer';
 import { spellEngineMove } from './move/spell-engine-move';
 import { spellEngineSimpleAttack } from './simpleAttack/spell-engine-simpleAttack';
 import { spellEngineSwitch } from './switch/spell-engine-switch';

@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { assertIsDefined, BattleSnapshot, characterEntityToSnapshot, denormalize, DynamicBattleSnapshot, getBattleSnapshotWithHash, normalize, Normalized, SpellActionSnapshot, spellEntityToSnapshot, getSpellEffectFn as spellEffectFnGetter, TileType, Position, TiledManager, createPosition } from '@timeflies/shared';
+import { assertIsDefined, BattleSnapshot, characterEntityToSnapshot, denormalize, DynamicBattleSnapshot, getBattleSnapshotWithHash, getSpellEffectFn as spellEffectFnGetter, GridTile, normalize, Normalized, SpellActionSnapshot, spellEntityToSnapshot, TiledManager } from '@timeflies/shared';
 import { BattleStartAction } from '../battle-actions';
 import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character, updateCharacterFromSnapshot } from '../entities/character/Character';
@@ -8,11 +8,6 @@ import { Spell, updateSpellFromSnapshot } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
 import { SpellActionCancelAction, SpellActionLaunchAction, SpellActionTimerEndAction, SpellActionTimerStartAction } from '../spellAction/spell-action-actions';
 import { BattleData, BattleDataPeriod, periodList } from './battle-data';
-import TiledMap from 'tiled-types/types';
-
-export type GridTile = Position & {
-    tileType: TileType;
-};
 
 export type SnapshotState = {
     // TODO consider normalize it
@@ -117,28 +112,6 @@ const updateBattleDataFromSnapshot = (data: BattleData<any>, myPlayerId: string,
     });
 };
 
-const calculateGrid = (tiledSchema: TiledMap): Normalized<GridTile> => {
-    const { width, height } = tiledSchema;
-
-    const tiledManager = TiledManager(tiledSchema);
-
-    const grid: GridTile[] = [];
-
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const p = createPosition(x, y);
-            const tileType = tiledManager.getTileType(p);
-
-            grid.push({
-                ...p,
-                tileType
-            });
-        }
-    }
-
-    return normalize(grid);
-};
-
 type Dependencies = {
     getSpellEffectFn: typeof spellEffectFnGetter;
 };
@@ -150,7 +123,7 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
             const { myPlayerId, teamSnapshotList, playerSnapshotList, entitiesSnapshot, tiledMapAssets } = payload;
             const { battleHash, spellsSnapshots, charactersSnapshots } = entitiesSnapshot;
 
-            state.grid = calculateGrid(tiledMapAssets.schema);
+            state.grid = TiledManager(tiledMapAssets.schema).getGrid();
             state.myPlayerId = myPlayerId;
             state.teamList = normalize(teamSnapshotList.map(Team));
             state.playerList = normalize(playerSnapshotList.map(Player));
@@ -222,7 +195,7 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
                     actionArea: spellAction.actionArea
                 };
 
-                spellLaunchFn(spell, partialSnapshot, state.battleDataFuture);
+                spellLaunchFn(spell, partialSnapshot, state.battleDataFuture, state.grid);
 
                 commit(state, commitTime);
 

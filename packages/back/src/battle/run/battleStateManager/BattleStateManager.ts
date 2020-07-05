@@ -7,6 +7,7 @@ import { Character } from '../entities/character/Character';
 import { Player } from '../entities/player/Player';
 import { Spell } from '../entities/spell/Spell';
 import { Team } from '../entities/team/Team';
+import { MapManager } from '../mapManager/MapManager';
 
 export type BattleState =
     & BattleStateEntity<Character, Spell>
@@ -33,11 +34,14 @@ interface Dependencies {
 }
 
 export const BattleStateManager = (
+    mapManager: Pick<MapManager, 'getGrid'>,
     playerDataList: Immutable<IPlayerRoomData<WSSocket>[]>,
     teamRoomList: Immutable<TeamRoom[]>,
     playerRoomList: PlayerRoom[],
     { getBattleSnapshotWithHash }: Dependencies = { getBattleSnapshotWithHash: _getBattleSnapshotWithHash }
 ): BattleStateManager => {
+
+    const mapGrid = mapManager.getGrid();
 
     const teamList = teamRoomList.map(({ id, letter }): Team => ({
         id, letter
@@ -96,7 +100,7 @@ export const BattleStateManager = (
 
         const spellEffectFn = getSpellEffectFn(type);
 
-        return spellEffectFn(spell, spellAction, battleState);
+        return spellEffectFn(spell, spellAction, battleState, mapGrid);
     };
 
     const useSpellAction = (spellAction: SpellActionSnapshot) => {

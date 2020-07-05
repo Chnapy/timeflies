@@ -1,23 +1,26 @@
-import { MapConfig } from '@timeflies/shared';
-import _fs from 'fs';
+import { MapConfig, TiledManager, PromisePayload } from '@timeflies/shared';
+import fs from 'fs';
+import TiledMap from 'tiled-types';
+import urlJoin from 'url-join';
+import util from 'util';
 
-export interface MapManager {
-}
+const _readFile = util.promisify(fs.readFile);
 
-interface Dependencies {
-    fs: Pick<typeof _fs, 'readFileSync'>;
-}
+export type MapManager = PromisePayload<ReturnType<typeof MapManager>>;
 
-export const MapManager = (mapConfig: MapConfig, { fs }: Dependencies = { fs: _fs }): MapManager => {
+type Dependencies = {
+    readFile: typeof _readFile;
+};
 
-    // const { schemaUrl } = mapConfig;
+export const MapManager = async (mapConfig: MapConfig, { readFile }: Dependencies = { readFile: _readFile }) => {
 
-    // const data = fs.readFileSync(urlJoin('public', schemaUrl), 'utf8');
+    const { schemaUrl } = mapConfig;
 
-    // const schema: TiledMapOrthogonal = JSON.parse(data);
+    const data = await readFile(urlJoin('public', schemaUrl), 'utf8');
 
-    // const tiledManager = TiledManager(schema);
+    const schema: TiledMap = JSON.parse(data);
 
-    return {
-    };
+    const tiledManager = TiledManager(schema);
+
+    return tiledManager;
 };

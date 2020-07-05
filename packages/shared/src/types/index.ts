@@ -22,3 +22,5 @@ export type DeepReadonly<T> = T extends Array<infer I>
     );
 
 export type RequiredOnly<O, K extends keyof O> = Required<Pick<O, K>> & Partial<Omit<O, K>>;
+
+export type PromisePayload<T extends PromiseLike<unknown>> = T extends PromiseLike<infer U> ? U : never;
