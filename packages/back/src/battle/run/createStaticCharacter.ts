@@ -12,6 +12,8 @@ export const createStaticCharacter = (id: string, type: CharacterRole): StaticCh
             return createSampleChar3(id);
         case 'vemo':
             return createVemo(id);
+        case 'tacka':
+            return createTacka(id);
     }
 };
 
@@ -206,6 +208,48 @@ const createVemo = (id: string): StaticCharacter => {
                     attack: 10
                 }
             }
+        ],
+        defaultSpellId: id + '-1'
+    }
+};
+
+const createTacka = (id: string): StaticCharacter => {
+
+    return {
+        id,
+        role: 'tacka',
+        name: 'Tacka',
+        description: 'A character focused in attack & heal.',
+        initialFeatures: {
+            life: 120,
+            actionTime: 24000
+        },
+        staticSpells: [
+            {
+                id: id + '-1',
+                name: 'Move',
+                role: 'move',
+                description: 'Moves the character one tile.',
+                initialFeatures: {
+                    lineOfSight: true,
+                    rangeArea: -1,
+                    actionArea: 1,
+                    duration: 1000
+                }
+            },
+            {
+                id: id + '-2',
+                name: 'Health sharing',
+                role: 'healthSharing',
+                description: 'Attacks enemies in an area, and heals allies in this same area. Enemies damages are shared to allies as heal.',
+                initialFeatures: {
+                    duration: 4000,
+                    lineOfSight: true,
+                    rangeArea: 3,
+                    actionArea: 2,
+                    attack: 20
+                }
+            },
         ],
         defaultSpellId: id + '-1'
     }

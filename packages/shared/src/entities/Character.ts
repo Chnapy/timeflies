@@ -7,7 +7,7 @@ export type CharacterRole = (typeof characterRoleList)[ number ]
     | 'sampleChar3';
 
 export const characterRoleList = [
-    'sampleChar1', 'sampleChar2', 'vemo'
+    'sampleChar1', 'sampleChar2', 'vemo', 'tacka'
 ] as const;
 
 export type CharacterFeatures = {
@@ -63,8 +63,8 @@ export const characterEntityToSnapshot = (entity: CharacterEntity | DeepReadonly
     };
 };
 
-export const characterAlterLife = ({ features }: CharacterEntity, value: number) => {
-    features.life = Math.max(features.life + value, 0);
+export const characterAlterLife = ({ features, staticData }: CharacterEntity, value: number) => {
+    features.life = Math.min(Math.max(features.life + value, 0), staticData.initialFeatures.life);
 };
 
 export const characterIsAlive = (character: CharacterEntity | DeepReadonly<CharacterEntity>) => character.features.life > 0;

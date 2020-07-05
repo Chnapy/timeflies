@@ -125,55 +125,68 @@ export const Default: React.FC = () => {
                 }
             }),
             seedSpellSnapshot({
-                id: 's-switch',
-                type: 'switch',
+                id: 's-healthSharing',
+                type: 'healthSharing',
                 characterId: 'c1',
                 index: 3,
                 feature: {
-                    duration: 2000,
+                    duration: 4000,
                     lineOfSight: true,
-                    rangeArea: 2,
-                    actionArea: 0
+                    rangeArea: 3,
+                    actionArea: 2,
+                    attack: 20
                 }
             }),
-            seedSpellSnapshot({
-                id: 's-incitement',
-                type: 'incitement',
-                characterId: 'c1',
-                index: 4,
-                feature: {
-                    duration: 3000,
-                    lineOfSight: false,
-                    rangeArea: 5,
-                    actionArea: 0
-                }
-            }),
-            seedSpellSnapshot({
-                id: 's-treacherousBlow',
-                type: 'treacherousBlow',
-                characterId: 'c1',
-                index: 5,
-                feature: {
-                    duration: 5000,
-                    lineOfSight: true,
-                    rangeArea: 1,
-                    actionArea: 0,
-                    attack: 15
-                }
-            }),
-            seedSpellSnapshot({
-                id: 's-pressure',
-                type: 'pressure',
-                characterId: 'c1',
-                index: 6,
-                feature: {
-                    duration: 2000,
-                    lineOfSight: true,
-                    rangeArea: 2,
-                    actionArea: 0,
-                    attack: 10
-                }
-            }),
+            // seedSpellSnapshot({
+            //     id: 's-switch',
+            //     type: 'switch',
+            //     characterId: 'c1',
+            //     index: 3,
+            //     feature: {
+            //         duration: 2000,
+            //         lineOfSight: true,
+            //         rangeArea: 2,
+            //         actionArea: 0
+            //     }
+            // }),
+            // seedSpellSnapshot({
+            //     id: 's-incitement',
+            //     type: 'incitement',
+            //     characterId: 'c1',
+            //     index: 4,
+            //     feature: {
+            //         duration: 3000,
+            //         lineOfSight: false,
+            //         rangeArea: 5,
+            //         actionArea: 0
+            //     }
+            // }),
+            // seedSpellSnapshot({
+            //     id: 's-treacherousBlow',
+            //     type: 'treacherousBlow',
+            //     characterId: 'c1',
+            //     index: 5,
+            //     feature: {
+            //         duration: 5000,
+            //         lineOfSight: true,
+            //         rangeArea: 1,
+            //         actionArea: 0,
+            //         attack: 15
+            //     }
+            // }),
+            // seedSpellSnapshot({
+            //     id: 's-pressure',
+            //     type: 'pressure',
+            //     characterId: 'c1',
+            //     index: 6,
+            //     feature: {
+            //         duration: 2000,
+            //         lineOfSight: true,
+            //         rangeArea: 2,
+            //         actionArea: 0,
+            //         attack: 10
+            //     }
+            // }),
             seedSpellSnapshot({
                 id: 's3',
                 type: 'move',

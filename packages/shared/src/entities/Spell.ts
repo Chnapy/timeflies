@@ -9,6 +9,7 @@ export type SpellRole =
     | 'incitement'
     | 'treacherousBlow'
     | 'pressure'
+    | 'healthSharing'
     ;
 
 export type SpellFeatures = {
