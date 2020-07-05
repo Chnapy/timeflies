@@ -1,4 +1,4 @@
-import { getOrientationFromTo } from '../geo';
+import { getOrientationFromTo, Position, createPosition } from '../geo';
 import { GridTile } from '../map';
 import { DeepReadonly } from '../types';
 import { denormalize, Normalized, switchUtil } from '../util';
@@ -55,11 +55,41 @@ const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => 
     return [];
 };
 
+const spellIncitementEffect: SpellEffect = (spell, { position }, { characters }, grid) => {
+
+    const nbrTiles = 3;
+
+    const target = denormalize(characters).find(c => c.position.id === position.id);
+
+    if (target) {
+
+        const getNextPosition = switchUtil(target.orientation, {
+            bottom: ({ x, y }: Position) => createPosition(x, y + 1),
+            top: ({ x, y }: Position) => createPosition(x, y - 1),
+            left: ({ x, y }: Position) => createPosition(x - 1, y),
+            right: ({ x, y }: Position) => createPosition(x + 1, y),
+        });
+
+        for (let i = 0; i < nbrTiles; i++) {
+            const nextPosition = getNextPosition(target.position);
+
+            if (grid[ nextPosition.id ]?.tileType !== 'default') {
+                break;
+            }
+
+            target.position = nextPosition;
+        }
+    }
+
+    return [];
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
         move: spellMoveEffect,
         simpleAttack: spellSimpleAttackEffect,
-        switch: spellSwitchEffect
+        switch: spellSwitchEffect,
+        incitement: spellIncitementEffect
     });
 };
