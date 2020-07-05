@@ -100,7 +100,7 @@ const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characte
 
         if (attack) {
             const finalAttack = getOrientationFromTo(launcher.position, target.position) === target.orientation
-                ? attack * 3
+                ? attack * 2.5
                 : attack;
 
             characterAlterLife(target, -finalAttack);

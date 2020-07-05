@@ -7,7 +7,7 @@ This character is focused in placement & map control.
 | Attribute | Value |
 | --- | --- |
 | Life | 80 |
-| Action time | 10s |
+| Action time | 20s |
 
 ## Spells
 
@@ -45,7 +45,7 @@ This spell attacks its target, removing life points. If target is from the back 
 | Range area | 1 |
 | Line of sight | yes |
 | Action area | 1 |
-| Attack | 15 (45 if from the back) |
+| Attack | 20 (50 if from the back) |
 
 ### Pressure
 
