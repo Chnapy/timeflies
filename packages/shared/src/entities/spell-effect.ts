@@ -41,7 +41,7 @@ const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => 
 
     const launcherFirstPosition = launcher.position;
 
-    const target = denormalize(characters).find(c => c.position.id === position.id);
+    const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
 
     if (target) {
         target.position = launcherFirstPosition;
@@ -59,7 +59,7 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
 
     const nbrTiles = 3;
 
-    const target = denormalize(characters).find(c => c.position.id === position.id);
+    const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
 
     if (target) {
 
@@ -84,12 +84,40 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
     return [];
 };
 
+const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characters }, grid) => {
+    const launcher = characters[ spell.characterId ];
+
+    const target = denormalize(characters).find(c => characterIsAlive(c) && c.position.id === position.id);
+
+
+    if (target) {
+        const { attack } = spell.features;
+
+        if (attack) {
+            const finalAttack = getOrientationFromTo(launcher.position, target.position) === target.orientation
+                ? attack * 3
+                : attack;
+
+            characterAlterLife(target, -finalAttack);
+
+            if (!characterIsAlive(target)) {
+                return [ target ];
+            }
+        }
+
+        target.orientation = getOrientationFromTo(target.position, launcher.position);
+    }
+
+    return [];
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
         move: spellMoveEffect,
         simpleAttack: spellSimpleAttackEffect,
         switch: spellSwitchEffect,
-        incitement: spellIncitementEffect
+        incitement: spellIncitementEffect,
+        treacherousBlow: spellTreacherousBlowEffect
     });
 };

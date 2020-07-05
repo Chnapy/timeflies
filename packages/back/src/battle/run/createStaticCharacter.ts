@@ -162,8 +162,8 @@ const createVemo = (id: string): StaticCharacter => {
                 role: 'switch',
                 description: 'Moves launcher in diagonal, switching position with others characters if any',
                 initialFeatures: {
-                    lineOfSight: true,
                     duration: 2000,
+                    lineOfSight: true,
                     rangeArea: 2,
                     actionArea: 0,
                 }
@@ -174,12 +174,25 @@ const createVemo = (id: string): StaticCharacter => {
                 role: 'incitement',
                 description: 'Moves target depending of its orientation',
                 initialFeatures: {
-                    lineOfSight: false,
                     duration: 3000,
+                    lineOfSight: false,
                     rangeArea: 5,
                     actionArea: 0,
                 }
             },
+            {
+                id: id + '-3',
+                name: 'Treacherous blow',
+                role: 'treacherousBlow',
+                description: 'Attacks its target, removing life points. If target is from the back (from launcher point of view), then damages are considerably increased. Also change target orientation towards launcher.',
+                initialFeatures: {
+                    duration: 5000,
+                    lineOfSight: false,
+                    rangeArea: 1,
+                    actionArea: 0,
+                    attack: 15
+                }
+            }
         ],
         defaultSpellId: id + '-1'
     }
