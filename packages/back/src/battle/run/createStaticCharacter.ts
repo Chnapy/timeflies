@@ -333,6 +333,18 @@ const createMeti = (id: string): StaticCharacter => {
                     attack: 20
                 }
             },
+            {
+                id: id + '-4',
+                name: 'Motivation',
+                role: 'motivation',
+                description: 'Boosts others characters action time, in exchange of launcher life. Life spent is shared as action time to others characters.',
+                initialFeatures: {
+                    duration: 3000,
+                    lineOfSight: true,
+                    rangeArea: 4,
+                    actionArea: 1
+                }
+            },
         ],
         defaultSpellId: id + '-1'
     }

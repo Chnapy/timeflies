@@ -14,6 +14,7 @@ export type SpellRole =
     | 'attentionAttraction'
     | 'slump'
     | 'lastResort'
+    | 'motivation'
     ;
 
 export type SpellFeatures = {
