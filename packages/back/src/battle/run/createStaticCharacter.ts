@@ -263,6 +263,19 @@ const createTacka = (id: string): StaticCharacter => {
                     attack: 60
                 }
             },
+            {
+                id: id + '-4',
+                name: 'Attention attraction',
+                role: 'attentionAttraction',
+                description: 'Heals allies and enemies, and changes there orientation.',
+                initialFeatures: {
+                    duration: 3000,
+                    lineOfSight: true,
+                    rangeArea: 6,
+                    actionArea: 1,
+                    attack: -20
+                }
+            },
         ],
         defaultSpellId: id + '-1'
     }

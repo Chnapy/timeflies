@@ -257,6 +257,29 @@ const spellSacrificialGiftEffect: SpellEffect = (spell, { position, actionArea }
     return [];
 };
 
+const spellAttentionAttractionEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { players, teams }, grid) => {
+
+    const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
+
+    const heal = -(spell.features.attack ?? 0);
+
+    const targetList = denormalize(characters).filter(c => characterIsAlive(c) && actionArea[ c.position.id ]);
+
+    targetList.forEach(c => {
+
+        characterAlterLife(c, heal);
+
+        if (c !== launcher
+            && c.position.id !== position.id) {
+            c.orientation = getOrientationFromTo(c.position, position);
+        }
+    });
+
+    return [];
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -267,6 +290,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         treacherousBlow: spellTreacherousBlowEffect,
         pressure: spellPressureEffect,
         healthSharing: spellHealthSharingEffect,
-        sacrificialGift: spellSacrificialGiftEffect
+        sacrificialGift: spellSacrificialGiftEffect,
+        attentionAttraction: spellAttentionAttractionEffect
     });
 };
