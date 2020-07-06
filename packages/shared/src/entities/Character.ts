@@ -7,7 +7,7 @@ export type CharacterRole = (typeof characterRoleList)[ number ]
     | 'sampleChar3';
 
 export const characterRoleList = [
-    'sampleChar1', 'sampleChar2', 'vemo', 'tacka'
+    'sampleChar1', 'sampleChar2', 'vemo', 'tacka', 'meti'
 ] as const;
 
 export type CharacterFeatures = {
