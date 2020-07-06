@@ -14,6 +14,8 @@ export const createStaticCharacter = (id: string, type: CharacterRole): StaticCh
             return createVemo(id);
         case 'tacka':
             return createTacka(id);
+        case 'meti':
+            return createMeti(id);
     }
 };
 
@@ -274,6 +276,48 @@ const createTacka = (id: string): StaticCharacter => {
                     rangeArea: 6,
                     actionArea: 1,
                     attack: -20
+                }
+            },
+        ],
+        defaultSpellId: id + '-1'
+    }
+};
+
+const createMeti = (id: string): StaticCharacter => {
+
+    return {
+        id,
+        role: 'meti',
+        name: 'Meti',
+        description: 'A character focused in time management.',
+        initialFeatures: {
+            life: 90,
+            actionTime: 20000
+        },
+        staticSpells: [
+            {
+                id: id + '-1',
+                name: 'Move',
+                role: 'move',
+                description: 'Moves the character one tile.',
+                initialFeatures: {
+                    lineOfSight: true,
+                    rangeArea: -1,
+                    actionArea: 1,
+                    duration: 1000
+                }
+            },
+            {
+                id: id + '-2',
+                name: 'Slump',
+                role: 'slump',
+                description: 'Attacks target and removes action time from him.',
+                initialFeatures: {
+                    duration: 3000,
+                    lineOfSight: true,
+                    rangeArea: 4,
+                    actionArea: 0,
+                    attack: 15
                 }
             },
         ],

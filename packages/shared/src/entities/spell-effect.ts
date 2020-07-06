@@ -280,6 +280,27 @@ const spellAttentionAttractionEffect: SpellEffect = (spell, { position, actionAr
     return [];
 };
 
+const spellSlumpEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { players, teams }, grid) => {
+
+    const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
+
+    const { attack } = spell.features;
+
+    const targets = denormalize(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
+
+    targets.forEach(c => {
+        if (attack) {
+            characterAlterLife(c, -attack);
+        }
+
+        c.features.actionTime -= Math.min(2000, c.features.actionTime);
+    });
+
+    return targets.filter(c => !characterIsAlive(c));
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -291,6 +312,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         pressure: spellPressureEffect,
         healthSharing: spellHealthSharingEffect,
         sacrificialGift: spellSacrificialGiftEffect,
-        attentionAttraction: spellAttentionAttractionEffect
+        attentionAttraction: spellAttentionAttractionEffect,
+        slump: spellSlumpEffect
     });
 };
