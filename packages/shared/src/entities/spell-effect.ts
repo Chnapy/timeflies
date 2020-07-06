@@ -331,6 +331,32 @@ const spellLastResortEffect: SpellEffect = ({ spell, snapshot: { startTime, dura
     return targets.filter(c => !characterIsAlive(c));
 };
 
+const spellMotivationEffect: SpellEffect = ({
+    spell,
+    snapshot: { position, actionArea },
+    battleState: { characters }
+}) => {
+
+    const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
+
+    const lifeToRemove = Math.min(20, launcher.features.life);
+
+    const targets = denormalize(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
+
+    characterAlterLife(launcher, -lifeToRemove);
+
+    const timeToAdd = lifeToRemove / 10 * 1000;
+
+    targets.forEach(c => {
+
+        c.features.actionTime += timeToAdd;
+    });
+
+    return characterIsAlive(launcher) ? [] : [ launcher ];
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -344,6 +370,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         sacrificialGift: spellSacrificialGiftEffect,
         attentionAttraction: spellAttentionAttractionEffect,
         slump: spellSlumpEffect,
-        lastResort: spellLastResortEffect
+        lastResort: spellLastResortEffect,
+        motivation: spellMotivationEffect
     });
 };
