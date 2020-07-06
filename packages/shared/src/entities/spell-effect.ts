@@ -8,18 +8,19 @@ import { SpellActionSnapshot, SpellEntity, SpellRole } from './Spell';
 import { TeamEntity } from './Team';
 import { PlayerEntity } from './Player';
 
-export type SpellEffect = (
-    spell: SpellEntity,
-    snapshot: Omit<SpellActionSnapshot, 'battleHash'>,
-    battleState: BattleStateEntity,
+export type SpellEffect = (data: {
+    spell: SpellEntity;
+    snapshot: Omit<SpellActionSnapshot, 'battleHash'>;
+    battleState: BattleStateEntity;
     staticEntities: DeepReadonly<{
         teams: Normalized<TeamEntity>;
         players: Normalized<PlayerEntity>;
-    }>,
-    grid: DeepReadonly<Normalized<GridTile>>
-) => CharacterEntity[];
+    }>;
+    grid: DeepReadonly<Normalized<GridTile>>;
+    turnStart: number;
+}) => CharacterEntity[];
 
-const spellMoveEffect: SpellEffect = (spell, { position }, { characters }) => {
+const spellMoveEffect: SpellEffect = ({ spell, snapshot: { position }, battleState: { characters } }) => {
     const character = characters[ spell.characterId ];
 
     const orientation = getOrientationFromTo(character.position, position);
@@ -30,7 +31,7 @@ const spellMoveEffect: SpellEffect = (spell, { position }, { characters }) => {
     return [];
 };
 
-const spellSimpleAttackEffect: SpellEffect = (spell, { actionArea }, { characters }) => {
+const spellSimpleAttackEffect: SpellEffect = ({ spell, snapshot: { actionArea }, battleState: { characters } }) => {
 
     const targets = denormalize(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
 
@@ -42,7 +43,7 @@ const spellSimpleAttackEffect: SpellEffect = (spell, { actionArea }, { character
     return targets.filter(t => !characterIsAlive(t));
 };
 
-const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => {
+const spellSwitchEffect: SpellEffect = ({ spell, snapshot: { position }, battleState: { characters } }) => {
     const launcher = characters[ spell.characterId ];
 
     const launcherFirstPosition = launcher.position;
@@ -58,7 +59,7 @@ const spellSwitchEffect: SpellEffect = (spell, { position }, { characters }) => 
     return [];
 };
 
-const spellIncitementEffect: SpellEffect = (spell, { position }, { characters }, staticEntities, grid) => {
+const spellIncitementEffect: SpellEffect = ({ snapshot: { position }, battleState: { characters }, grid }) => {
 
     const nbrTiles = 3;
 
@@ -91,7 +92,7 @@ const spellIncitementEffect: SpellEffect = (spell, { position }, { characters },
     return [];
 };
 
-const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characters }, staticEntities, grid) => {
+const spellTreacherousBlowEffect: SpellEffect = ({ spell, snapshot: { position }, battleState: { characters } }) => {
     const launcher = characters[ spell.characterId ];
 
     launcher.orientation = getOrientationFromTo(launcher.position, position);
@@ -119,7 +120,7 @@ const spellTreacherousBlowEffect: SpellEffect = (spell, { position }, { characte
     return [];
 };
 
-const spellPressureEffect: SpellEffect = (spell, { position }, { characters }, { teams, players }, grid) => {
+const spellPressureEffect: SpellEffect = ({ spell, snapshot: { position }, battleState: { characters }, staticEntities: { teams, players } }) => {
     const launcher = characters[ spell.characterId ];
 
     launcher.orientation = getOrientationFromTo(launcher.position, position);
@@ -153,7 +154,7 @@ const spellPressureEffect: SpellEffect = (spell, { position }, { characters }, {
     return [];
 };
 
-const spellHealthSharingEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { teams, players }, grid) => {
+const spellHealthSharingEffect: SpellEffect = ({ spell, snapshot: { position, actionArea }, battleState: { characters }, staticEntities: { teams, players } }) => {
     const launcher = characters[ spell.characterId ];
 
     launcher.orientation = getOrientationFromTo(launcher.position, position);
@@ -208,7 +209,7 @@ const spellHealthSharingEffect: SpellEffect = (spell, { position, actionArea }, 
     return deadCharacterList;
 };
 
-const spellSacrificialGiftEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { players, teams }, grid) => {
+const spellSacrificialGiftEffect: SpellEffect = ({ spell, snapshot: { position, actionArea }, battleState: { characters }, staticEntities: { teams, players } }) => {
 
     const launcher = characters[ spell.characterId ];
 
@@ -257,7 +258,7 @@ const spellSacrificialGiftEffect: SpellEffect = (spell, { position, actionArea }
     return [];
 };
 
-const spellAttentionAttractionEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { players, teams }, grid) => {
+const spellAttentionAttractionEffect: SpellEffect = ({ spell, snapshot: { position, actionArea }, battleState: { characters } }) => {
 
     const launcher = characters[ spell.characterId ];
 
@@ -280,7 +281,7 @@ const spellAttentionAttractionEffect: SpellEffect = (spell, { position, actionAr
     return [];
 };
 
-const spellSlumpEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { players, teams }, grid) => {
+const spellSlumpEffect: SpellEffect = ({ spell, snapshot: { position, actionArea }, battleState: { characters } }) => {
 
     const launcher = characters[ spell.characterId ];
 
@@ -301,6 +302,35 @@ const spellSlumpEffect: SpellEffect = (spell, { position, actionArea }, { charac
     return targets.filter(c => !characterIsAlive(c));
 };
 
+const spellLastResortEffect: SpellEffect = ({ spell, snapshot: { startTime, duration, position, actionArea }, battleState: { characters }, turnStart }) => {
+
+    const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
+
+    const spellEndTime = startTime + duration;
+
+    const totalTime = launcher.features.actionTime;
+    const elapsedTime = spellEndTime - turnStart;
+    const remainingTime = totalTime - elapsedTime;
+
+    const ratio = 1 - remainingTime / totalTime;
+
+    const { attack } = spell.features;
+
+    const finalAttack = attack && attack * Math.exp(ratio);
+
+    const targets = denormalize(characters).filter(c => characterIsAlive(c) && !!actionArea[ c.position.id ]);
+
+    targets.forEach(c => {
+        if (finalAttack) {
+            characterAlterLife(c, -finalAttack);
+        }
+    });
+
+    return targets.filter(c => !characterIsAlive(c));
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -313,6 +343,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         healthSharing: spellHealthSharingEffect,
         sacrificialGift: spellSacrificialGiftEffect,
         attentionAttraction: spellAttentionAttractionEffect,
-        slump: spellSlumpEffect
+        slump: spellSlumpEffect,
+        lastResort: spellLastResortEffect
     });
 };

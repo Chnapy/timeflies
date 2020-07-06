@@ -21,7 +21,7 @@ export type BattleStateManager = {
     playerList: Player[];
     teamList: Team[];
     generateFirstSnapshot(launchTime: number): BattleSnapshot;
-    useSpellAction(spellAction: SpellActionSnapshot): {
+    useSpellAction(spellAction: SpellActionSnapshot, turnStartTime: number): {
         onClone(): {
             ifCorrectHash(fn: (hash: string, applyOnCurrentState: () => { deaths: Character[] }) => void): boolean;
         };
@@ -96,7 +96,7 @@ export const BattleStateManager = (
         });
     };
 
-    const applySpellAction = (spellAction: SpellActionSnapshot, battleState: Draft<BattleState>): Character[] => {
+    const applySpellAction = (spellAction: SpellActionSnapshot, battleState: Draft<BattleState>, turnStartTime: number): Character[] => {
 
         const spell = battleState.spells[ spellAction.spellId ];
         assertIsDefined(spell);
@@ -105,15 +105,22 @@ export const BattleStateManager = (
 
         const spellEffectFn = getSpellEffectFn(type);
 
-        return spellEffectFn(spell, spellAction, battleState, staticEntities, mapGrid);
+        return spellEffectFn({
+            spell,
+            snapshot: spellAction,
+            battleState,
+            staticEntities,
+            grid: mapGrid,
+            turnStart: turnStartTime
+        });
     };
 
-    const useSpellAction = (spellAction: SpellActionSnapshot) => {
+    const useSpellAction = (spellAction: SpellActionSnapshot, turnStartTime: number) => {
 
         return {
             onClone: () => {
                 const tempNextBattleState = produce(currentBattleState, draftBattleState => {
-                    applySpellAction(spellAction, draftBattleState);
+                    applySpellAction(spellAction, draftBattleState, turnStartTime);
                 });
 
                 const snapshotClone = produce(tempNextBattleState, draftBattleState => {
@@ -128,7 +135,7 @@ export const BattleStateManager = (
                                 let deaths: Character[] = [];
                                 currentBattleState = produce(currentBattleState, draftBattleState => {
                                     draftBattleState.battleHashList.push(snapshotClone.battleHash);
-                                    deaths = applySpellAction(spellAction, draftBattleState);
+                                    deaths = applySpellAction(spellAction, draftBattleState, turnStartTime);
                                 });
                                 return { deaths };
                             });

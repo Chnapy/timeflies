@@ -16,6 +16,9 @@ describe('# SpellActionReceiver', () => {
         start() { },
         stop() { },
         globalTurn: {
+            currentTurn: {
+                startTime: -1
+            },
             notifyDeaths: notifyDeathsFn
         } as any
     });

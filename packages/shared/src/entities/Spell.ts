@@ -13,6 +13,7 @@ export type SpellRole =
     | 'sacrificialGift'
     | 'attentionAttraction'
     | 'slump'
+    | 'lastResort'
     ;
 
 export type SpellFeatures = {
