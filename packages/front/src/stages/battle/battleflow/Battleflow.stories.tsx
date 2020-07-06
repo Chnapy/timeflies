@@ -188,6 +188,19 @@ export const Default: React.FC = () => {
                     attack: 60
                 }
             }),
+            seedSpellSnapshot({
+                id: 's-attentionAttraction',
+                type: 'attentionAttraction',
+                characterId: 'c1',
+                index: 5,
+                feature: {
+                    duration: 3000,
+                    lineOfSight: true,
+                    rangeArea: 6,
+                    actionArea: 1,
+                    attack: -20
+                }
+            }),
             // seedSpellSnapshot({
             //     id: 's-switch',
             //     type: 'switch',
