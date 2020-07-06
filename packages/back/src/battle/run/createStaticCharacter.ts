@@ -320,6 +320,19 @@ const createMeti = (id: string): StaticCharacter => {
                     attack: 15
                 }
             },
+            {
+                id: id + '-3',
+                name: 'Last resort',
+                role: 'lastResort',
+                description: 'Attacks target with damage depending of current remaining time. The less launcher action time left, the more powerful spell is.',
+                initialFeatures: {
+                    duration: 5000,
+                    lineOfSight: true,
+                    rangeArea: 2,
+                    actionArea: 0,
+                    attack: 20
+                }
+            },
         ],
         defaultSpellId: id + '-1'
     }

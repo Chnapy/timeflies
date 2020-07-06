@@ -79,7 +79,7 @@ export const SpellActionReceiver = (
 
         if (isCheckSuccess) {
 
-            const applySucceed = stateManager.useSpellAction(action.spellAction)
+            const applySucceed = stateManager.useSpellAction(action.spellAction, cycle.globalTurn.currentTurn.startTime)
                 .onClone()
                 .ifCorrectHash((hash, applyOnCurrentState) => {
 

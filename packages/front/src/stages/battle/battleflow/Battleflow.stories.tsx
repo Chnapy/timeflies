@@ -163,44 +163,57 @@ export const Default: React.FC = () => {
                 }
             }),
             seedSpellSnapshot({
-                id: 's-healthSharing',
-                type: 'healthSharing',
+                id: 's-slump',
+                type: 'slump',
                 characterId: 'c1',
                 index: 3,
                 feature: {
-                    duration: 4000,
+                    duration: 3000,
                     lineOfSight: true,
-                    rangeArea: 3,
-                    actionArea: 2,
-                    attack: 20
+                    rangeArea: 4,
+                    actionArea: 0,
+                    attack: 15
                 }
             }),
             seedSpellSnapshot({
-                id: 's-sacrificialGift',
-                type: 'sacrificialGift',
+                id: 's-lastResort',
+                type: 'lastResort',
                 characterId: 'c1',
                 index: 4,
                 feature: {
-                    duration: 6000,
+                    duration: 5000,
                     lineOfSight: true,
-                    rangeArea: 1,
-                    actionArea: 2,
-                    attack: 60
+                    rangeArea: 2,
+                    actionArea: 0,
+                    attack: 20
                 }
             }),
-            seedSpellSnapshot({
-                id: 's-attentionAttraction',
-                type: 'attentionAttraction',
-                characterId: 'c1',
-                index: 5,
-                feature: {
-                    duration: 3000,
-                    lineOfSight: true,
-                    rangeArea: 6,
-                    actionArea: 1,
-                    attack: -20
-                }
-            }),
+            // seedSpellSnapshot({
+            //     id: 's-sacrificialGift',
+            //     type: 'sacrificialGift',
+            //     characterId: 'c1',
+            //     index: 4,
+            //     feature: {
+            //         duration: 6000,
+            //         lineOfSight: true,
+            //         rangeArea: 1,
+            //         actionArea: 2,
+            //         attack: 60
+            //     }
+            // }),
+            // seedSpellSnapshot({
+            //     id: 's-attentionAttraction',
+            //     type: 'attentionAttraction',
+            //     characterId: 'c1',
+            //     index: 5,
+            //     feature: {
+            //         duration: 3000,
+            //         lineOfSight: true,
+            //         rangeArea: 6,
+            //         actionArea: 1,
+            //         attack: -20
+            //     }
+            // }),
             // seedSpellSnapshot({
             //     id: 's-switch',
             //     type: 'switch',

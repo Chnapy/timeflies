@@ -137,7 +137,7 @@ describe('# BattleStateManager', () => {
 
             const callback = jest.fn();
 
-            const succeed = manager.useSpellAction(spellAction)
+            const succeed = manager.useSpellAction(spellAction, -1)
                 .onClone()
                 .ifCorrectHash(callback);
 
@@ -172,7 +172,7 @@ describe('# BattleStateManager', () => {
 
             const callback = jest.fn();
 
-            const succeed = manager.useSpellAction(spellAction)
+            const succeed = manager.useSpellAction(spellAction, -1)
                 .onClone()
                 .ifCorrectHash(callback);
 
@@ -207,7 +207,7 @@ describe('# BattleStateManager', () => {
 
             let applyReturn = undefined;
 
-            manager.useSpellAction(spellAction)
+            manager.useSpellAction(spellAction, -1)
                 .onClone()
                 .ifCorrectHash((hash, applyOnCurrentState) => {
 

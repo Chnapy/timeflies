@@ -18,6 +18,7 @@ export type SnapshotState = {
     playerList: Normalized<Player>;
     battleDataCurrent: BattleData<'current'>;
     battleDataFuture: BattleData<'future'>;
+    turnStartTime?: number;
 
     grid: Normalized<GridTile>;
 
@@ -136,11 +137,13 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
                 data.characters = normalize(charactersSnapshots.map(snap => Character(period, myPlayerId, snap)));
             });
         },
-        [ BattleStateTurnStartAction.type ]: (state, action: BattleStateTurnStartAction) => {
+        [ BattleStateTurnStartAction.type ]: (state, { payload }: BattleStateTurnStartAction) => {
             state.spellActionSnapshotList = [];
+            state.turnStartTime = payload.turnSnapshot.startTime;
             commit(state, Date.now());
         },
         [ BattleStateTurnEndAction.type ]: (state, action: BattleStateTurnEndAction) => {
+            state.turnStartTime = undefined;
 
             const now = Date.now();
 
@@ -176,6 +179,10 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
         [ SpellActionLaunchAction.type ]: (state, { payload }: SpellActionLaunchAction) => {
             const { spellActList } = payload;
 
+            const { turnStartTime } = state;
+
+            assertIsDefined(turnStartTime);
+
             spellActList.forEach(({ spellAction, startTime }) => {
 
                 const { spell } = spellAction;
@@ -195,10 +202,17 @@ export const snapshotReducer = ({ getSpellEffectFn }: Dependencies = { getSpellE
                     actionArea: spellAction.actionArea
                 };
 
-                spellLaunchFn(spell, partialSnapshot, state.battleDataFuture, {
-                    teams: state.teamList,
-                    players: state.playerList
-                }, state.grid);
+                spellLaunchFn({
+                    spell,
+                    snapshot: partialSnapshot,
+                    battleState: state.battleDataFuture,
+                    staticEntities: {
+                        teams: state.teamList,
+                        players: state.playerList
+                    },
+                    grid: state.grid,
+                    turnStart: turnStartTime
+                });
 
                 commit(state, commitTime);
 
