@@ -208,6 +208,55 @@ const spellHealthSharingEffect: SpellEffect = (spell, { position, actionArea }, 
     return deadCharacterList;
 };
 
+const spellSacrificialGiftEffect: SpellEffect = (spell, { position, actionArea }, { characters }, { players, teams }, grid) => {
+
+    const launcher = characters[ spell.characterId ];
+
+    launcher.orientation = getOrientationFromTo(launcher.position, position);
+
+    const { attack } = spell.features;
+
+    if (!attack) {
+        return [];
+    }
+
+    const characterList = denormalize(characters);
+    const target = characterList.find(c => characterIsAlive(c) && c.position.id === position.id);
+
+    if (target) {
+
+        const launcherTeam = teams[ players[ launcher.playerId ].teamId ];
+
+        const isAlly = (character: CharacterEntity) => teams[ players[ character.playerId ].teamId ] === launcherTeam;
+
+        const lifeRemoved = Math.min(target.features.life, attack);
+        const spellTime = spell.features.duration;
+
+        characterAlterLife(target, -attack);
+
+        const closeEnemies = characterList.filter(c =>
+            c !== target
+            && characterIsAlive(c)
+            && !isAlly(c)
+            && !!actionArea[ c.position.id ]
+        );
+
+        closeEnemies.forEach(c => {
+
+            characterAlterLife(c, lifeRemoved / closeEnemies.length);
+
+            c.features.actionTime += spellTime / closeEnemies.length;
+
+        });
+
+        if (!characterIsAlive(target)) {
+            return [ target ];
+        }
+    }
+
+    return [];
+};
+
 export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
 
     return switchUtil(spellRole, {
@@ -217,6 +266,7 @@ export const getSpellEffectFn = (spellRole: SpellRole): SpellEffect => {
         incitement: spellIncitementEffect,
         treacherousBlow: spellTreacherousBlowEffect,
         pressure: spellPressureEffect,
-        healthSharing: spellHealthSharingEffect
+        healthSharing: spellHealthSharingEffect,
+        sacrificialGift: spellSacrificialGiftEffect
     });
 };

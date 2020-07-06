@@ -97,6 +97,44 @@ export const Default: React.FC = () => {
                     },
                     staticSpells: []
                 }
+            }),
+            seedCharacterSnapshot({
+                id: 'c3', playerId: 'p2', position: createPosition(7, 4),
+                features: {
+                    life: 50,
+                    actionTime: 25000
+                },
+                staticData: {
+                    id: 'c3',
+                    name: 'africa',
+                    role: 'sampleChar2',
+                    description: 'description africa',
+                    defaultSpellId: 's3',
+                    initialFeatures: {
+                        life: 120,
+                        actionTime: 25000
+                    },
+                    staticSpells: []
+                }
+            }),
+            seedCharacterSnapshot({
+                id: 'c4', playerId: 'p2', position: createPosition(8, 4),
+                features: {
+                    life: 50,
+                    actionTime: 25000
+                },
+                staticData: {
+                    id: 'c4',
+                    name: 'africa',
+                    role: 'sampleChar2',
+                    description: 'description africa',
+                    defaultSpellId: 's3',
+                    initialFeatures: {
+                        life: 120,
+                        actionTime: 25000
+                    },
+                    staticSpells: []
+                }
             })
         ];
 
@@ -135,6 +173,19 @@ export const Default: React.FC = () => {
                     rangeArea: 3,
                     actionArea: 2,
                     attack: 20
+                }
+            }),
+            seedSpellSnapshot({
+                id: 's-sacrificialGift',
+                type: 'sacrificialGift',
+                characterId: 'c1',
+                index: 4,
+                feature: {
+                    duration: 6000,
+                    lineOfSight: true,
+                    rangeArea: 1,
+                    actionArea: 2,
+                    attack: 60
                 }
             }),
             // seedSpellSnapshot({
