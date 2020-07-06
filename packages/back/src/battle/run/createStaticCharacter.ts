@@ -250,6 +250,19 @@ const createTacka = (id: string): StaticCharacter => {
                     attack: 20
                 }
             },
+            {
+                id: id + '-3',
+                name: 'Sacrificial gift',
+                role: 'sacrificialGift',
+                description: 'Attacks target and boosts close enemies. Enemies close to 3 tiles from target position are healed depending of damage, and there action time is boosted depending of spell duration.',
+                initialFeatures: {
+                    duration: 6000,
+                    lineOfSight: true,
+                    rangeArea: 1,
+                    actionArea: 2,
+                    attack: 60
+                }
+            },
         ],
         defaultSpellId: id + '-1'
     }
