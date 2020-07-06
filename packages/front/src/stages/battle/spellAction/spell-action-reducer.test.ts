@@ -31,6 +31,7 @@ describe('# spell-action-reducer', () => {
                     },
                     spells
                 },
+                turnStartTime: -1
             });
 
             const now = Date.now();
@@ -90,6 +91,7 @@ describe('# spell-action-reducer', () => {
                     },
                     spells
                 },
+                turnStartTime: -1,
                 currentSpellAction: seedSpellActionSnapshot('s0'),
             });
 
@@ -130,6 +132,7 @@ describe('# spell-action-reducer', () => {
                     },
                     spells
                 },
+                turnStartTime: -1
             });
 
             const now = Date.now();

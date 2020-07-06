@@ -35,7 +35,8 @@ describe('# snapshot-reducer', () => {
                 battleHash: 'not-matter',
                 characters: { [ character.id ]: character },
                 spells: {}
-            }
+            },
+            turnStartTime: -1
         });
 
         const state1 = snapshotReducer({
@@ -93,7 +94,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
                     characters[ 'c1' ].features.life = 50;
                     return [];
                 }
@@ -113,7 +114,7 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
                     characters[ 'c1' ].features.life = 20;
                     return [];
                 }
@@ -165,7 +166,7 @@ describe('# snapshot-reducer', () => {
             });
 
             const state1 = snapshotReducer({
-                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
                     characters[ 'c1' ].features.life = 50;
                     return [];
                 }
@@ -185,7 +186,7 @@ describe('# snapshot-reducer', () => {
             timerTester.advanceBy(100);
 
             const state2 = snapshotReducer({
-                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
                     characters[ 'c1' ].features.life = 20;
                     return [];
                 }
@@ -235,10 +236,11 @@ describe('# snapshot-reducer', () => {
                     characters: { [ characterFuture.id ]: characterFuture },
                     spells: {}
                 },
+                turnStartTime: -1
             });
 
             const state1 = snapshotReducer({
-                getSpellEffectFn: spellRole => (spell, snapshot, { characters }) => {
+                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
                     characters[ 'c1' ].features.life = 50;
                     return [];
                 }

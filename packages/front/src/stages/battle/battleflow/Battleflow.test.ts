@@ -96,6 +96,7 @@ describe('Battleflow', () => {
                         characters: { c1: getCharacter('future') },
                         spells: { s1: getSpell('future') }
                     },
+                    turnStartTime: -1
                 })
             }
         };
