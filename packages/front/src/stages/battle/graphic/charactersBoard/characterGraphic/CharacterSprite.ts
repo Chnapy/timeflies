@@ -1,7 +1,8 @@
-import { CharacterRole, Orientation, getOrientationFromTo } from '@timeflies/shared';
+import { CharacterRole, getOrientationFromTo, Orientation } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
+import { requestRender } from '../../../../../canvas/GameCanvas';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 
@@ -78,7 +79,10 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                     characterState: spriteState,
                     orientation
                 });
+                this.width = this.textures[0].frame.width;
+                this.height = this.textures[0].frame.height;
                 this.play();
+                requestRender();
             },
             shallowEqual
         );
