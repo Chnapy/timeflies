@@ -14,12 +14,15 @@ import { CharacterSprite, getAnimPath } from './CharacterSprite';
 
 export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
 
+type SpritePositionSetter = (sprite: PIXI.Sprite) => (tiledSchema: TiledMap, x: number, y: number) => void;
+
 interface PeriodFn {
     (
         characterId: string,
         storeEmitter: StoreEmitter,
         tiledMapGraphic: TiledMapGraphic,
-        charactersSheet: PIXI.Spritesheet
+        charactersSheet: PIXI.Spritesheet,
+        spritePositionSetter: SpritePositionSetter
     ): {
         sprite: PIXI.Sprite;
         hud?: CharacterHud;
@@ -41,13 +44,27 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
         ? periodCurrent
         : periodFuture;
 
+    const spritePositionSetter: SpritePositionSetter = sprite => (tiledSchema, x, y) => {
+        const tilesize = tiledMapGraphic.getTilesize(tiledSchema).tileheight;
+
+        const marginX = Math.max(tilesize - sprite.width, 0) / 2;
+        const marginY = Math.max(tilesize - sprite.height, 0) / 2;
+
+        sprite.position.set(
+            x + marginX, y + marginY
+        );
+    };
+
     const { sprite, hud, debug } = periodFn(
         characterId,
         storeEmitter,
         tiledMapGraphic,
-        charactersSheet
+        charactersSheet,
+        spritePositionSetter
     );
     sprite.interactiveChildren = false;
+
+    const setSpritePosition = spritePositionSetter(sprite);
 
     container.addChild(sprite);
 
@@ -65,12 +82,8 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
             return;
         }
 
-        const { tilewidth, tileheight } = tiledMapGraphic.getTilesize(tiledSchema);
-        sprite.width = tilewidth;
-        sprite.height = tileheight;
-
         const worldPos = tiledMapGraphic.getWorldFromTile(tiledSchema, position);
-        sprite.position.set(worldPos.x, worldPos.y);
+        setSpritePosition(tiledSchema, worldPos.x, worldPos.y);
 
         if (hud) {
             hud.container.position.set(worldPos.x, worldPos.y);
@@ -118,15 +131,17 @@ type StateChangePayloadCurrent =
         spellRole: SpellRole;
     };
 
-const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => {
+const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet, spritePositionSetter) => {
 
     const animatedSprite = new CharacterSprite(characterId, 'current');
-    animatedSprite.animationSpeed = 0.4;
+    animatedSprite.animationSpeed = 0.2;
+
+    const setSpritePosition = spritePositionSetter(animatedSprite);
 
     const hud = CharacterHud(characterId);
 
-    const setPosition = (x: number, y: number) => {
-        animatedSprite.position.set(x, y);
+    const setPosition = (tiledSchema: TiledMap, x: number, y: number) => {
+        setSpritePosition(tiledSchema, x, y);
         hud.container.position.set(x, y);
 
         requestRender();
@@ -160,7 +175,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
             const x = startWorldPos.x + ratio * diffWorldPos.x;
             const y = startWorldPos.y + ratio * diffWorldPos.y;
 
-            setPosition(x, y);
+            setPosition(tiledSchema, x, y);
         };
 
         const initialRatio = getRatio();
@@ -185,7 +200,7 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic) => 
         if (payload.state === 'no-spell') {
             if (payload.tiledSchema) {
                 const p = tiledMapGraphic.getWorldFromTile(payload.tiledSchema, payload.characterPosition);
-                setPosition(p.x, p.y);
+                setPosition(payload.tiledSchema, p.x, p.y);
             }
             destroyTicker();
             return;
@@ -253,7 +268,7 @@ type StateChangePayloadFuture =
     }
     | null;
 
-const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet) => {
+const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet, spritePositionSetter) => {
 
     const sprite = new PIXI.Sprite();
     sprite.alpha = 0.25;
@@ -267,9 +282,13 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
             // If texture not found, get sampleChar1 as default
             const textureList: PIXI.Texture[] = spritesheet.animations[ idlePath ]
                 ?? spritesheet.animations[ getAnimPath('sampleChar1', 'idle', orientation) ];
+
             const texture = textureList[ 0 ];
 
             sprite.texture = texture;
+            sprite.width = texture.frame.width;
+            sprite.height = texture.frame.height;
+
             sprite.visible = true;
 
         } else {
