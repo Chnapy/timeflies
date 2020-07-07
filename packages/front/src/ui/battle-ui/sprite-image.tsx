@@ -14,7 +14,7 @@ export type SpriteImageProps = {
 type StyleProps = {
     size: number;
     url?: string;
-    orig?: PIXI.Rectangle;
+    frame?: PIXI.Rectangle;
 };
 
 const useStyles = makeStyles(() => ({
@@ -23,29 +23,46 @@ const useStyles = makeStyles(() => ({
         height: size,
         overflow: 'hidden'
     }),
-    background: ({ url, size, orig }: StyleProps) => (url && orig)
-        ? {
-            backgroundImage: `url(${url})`,
-            backgroundPosition: `${-orig.x}px ${-orig.y}px`,
-            backgroundRepeat: 'no-repeat',
-            width: orig.width,
-            height: orig.height,
-            transformOrigin: '0 0',
-            transform: `scale(${size / orig.width})`
+    background: ({ url, size, frame }: StyleProps) => {
+
+        if (!url || !frame) {
+            return {};
         }
-        : {}
+
+        const ratioX = size / frame.width;
+        const ratioY = size / frame.height;
+
+        const scale = Math.min(ratioX, ratioY, 1);
+
+        const transformOrigin = ratioY === ratioX
+            ? '0 0'
+            : scale === ratioY
+                ? 'center 0'
+                : '0 center';
+
+        return {
+            backgroundImage: `url(${url})`,
+            backgroundPosition: `${-frame.x}px ${-frame.y}px`,
+            backgroundRepeat: 'no-repeat',
+            width: frame.width,
+            height: frame.height,
+            transformOrigin,
+            transform: `scale(${scale})`,
+            margin: 'auto'
+        };
+    }
 }));
 
 const getStyleProps = (asset: LoaderResourceSpritesheet | undefined, textureKey: string, size: number): StyleProps => {
 
     const url = asset?.resource.url;
     const texture: PIXI.Texture | undefined = asset?.spritesheet.textures[ textureKey ];
-    const orig = texture?.orig;
+    const frame = texture?.frame;
 
     return {
         size,
         url,
-        orig
+        frame
     };
 };
 
