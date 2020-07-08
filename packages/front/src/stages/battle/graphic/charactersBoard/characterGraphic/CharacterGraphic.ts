@@ -5,7 +5,7 @@ import TiledMap from 'tiled-types/types';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../../canvas/GameCanvas';
 import { StoreEmitter } from '../../../../../store/store-manager';
-import { BattleDataPeriod } from '../../../snapshot/battle-data';
+import { BattleDataPeriod, periodList } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
@@ -17,8 +17,12 @@ const characterSpriteSize: {
     [ k in CharacterRole ]?: (texture: PIXI.Texture) => [ number, number ];
 } = {
     vemo: texture => [
-        texture.width * 4,
-        texture.height * 4,
+        texture.width * 3,
+        texture.height * 3,
+    ],
+    tacka: texture => [
+        texture.width * 3,
+        texture.height * 3,
     ]
 };
 
@@ -160,7 +164,7 @@ type StateChangePayloadCurrent =
 const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet, spritePositionSetter) => {
 
     const animatedSprite = new CharacterSprite(characterId, 'current', setCharacterSpriteSize);
-    animatedSprite.animationSpeed = 0.2;
+    animatedSprite.animationSpeed = 0.1;
 
     const setSpritePosition = spritePositionSetter(animatedSprite);
 
@@ -331,6 +335,12 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
             const { staticData, orientation, playerId } = battle.snapshotState.battleDataFuture.characters[ characterId ];
 
             if (playerId !== currentPlayer?.id) {
+                return null;
+            }
+
+            const [ positionPeriod1, positionPeriod2 ] = periodList.map(period => getBattleData(battle.snapshotState, period).characters[ characterId ].position);
+
+            if (positionPeriod1.id === positionPeriod2.id) {
                 return null;
             }
 
