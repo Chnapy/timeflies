@@ -5,6 +5,7 @@ import { CanvasContext } from '../../../../../canvas/CanvasContext';
 import { requestRender } from '../../../../../canvas/GameCanvas';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
+import { CharacterSpriteSizeSetter } from './CharacterGraphic';
 
 export interface CharacterSpriteProps {
     characterRole: CharacterRole;
@@ -31,7 +32,7 @@ const getTextures = (
 ): PIXI.Texture[] => {
 
     const path = getAnimPath(characterRole, characterState, orientation);
-    const textures = spritesheet.animations[ path ];
+    const textures: PIXI.Texture[] | undefined = spritesheet.animations[ path ];
 
     // If texture not found, get sampleChar1 as default
     if (!textures) {
@@ -43,7 +44,7 @@ const getTextures = (
 
 export const CharacterSprite = class extends PIXI.AnimatedSprite {
 
-    constructor(characterId: string, period: BattleDataPeriod) {
+    constructor(characterId: string, period: BattleDataPeriod, setCharacterSpriteSize: CharacterSpriteSizeSetter) {
         super([ PIXI.Texture.EMPTY ]);
 
         const { storeEmitter, spritesheets } = CanvasContext.consumer('storeEmitter', 'spritesheets');
@@ -79,8 +80,9 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                     characterState: spriteState,
                     orientation
                 });
-                this.width = this.textures[0].frame.width;
-                this.height = this.textures[0].frame.height;
+
+                setCharacterSpriteSize(type, this);
+                
                 this.play();
                 requestRender();
             },

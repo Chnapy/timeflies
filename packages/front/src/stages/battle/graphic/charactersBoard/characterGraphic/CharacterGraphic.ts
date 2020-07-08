@@ -11,6 +11,32 @@ import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterHud } from './character-hud/character-hud';
 import { CharacterSprite, getAnimPath } from './CharacterSprite';
 
+export type CharacterSpriteSizeSetter = typeof setCharacterSpriteSize;
+
+const characterSpriteSize: {
+    [ k in CharacterRole ]?: (texture: PIXI.Texture) => [ number, number ];
+} = {
+    vemo: texture => [
+        texture.width * 4,
+        texture.height * 4,
+    ]
+};
+
+const setCharacterSpriteSize = (role: CharacterRole, sprite: PIXI.Sprite): void => {
+    const fn = characterSpriteSize[ role ];
+
+    const { texture } = sprite;
+
+    const [ width, height ] = fn
+        ? fn(texture)
+        : [
+            texture.width,
+            texture.height
+        ];
+
+    sprite.width = width;
+    sprite.height = height;
+};
 
 export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
 
@@ -47,8 +73,8 @@ export const CharacterGraphic = (characterId: string, period: BattleDataPeriod) 
     const spritePositionSetter: SpritePositionSetter = sprite => (tiledSchema, x, y) => {
         const tilesize = tiledMapGraphic.getTilesize(tiledSchema).tileheight;
 
-        const marginX = Math.max(tilesize - sprite.width, 0) / 2;
-        const marginY = Math.max(tilesize - sprite.height, 0) / 2;
+        const marginX = (tilesize - sprite.width) / 2;
+        const marginY = Math.min(tilesize - sprite.height, 0) / 2;
 
         sprite.position.set(
             x + marginX, y + marginY
@@ -133,7 +159,7 @@ type StateChangePayloadCurrent =
 
 const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spritesheet, spritePositionSetter) => {
 
-    const animatedSprite = new CharacterSprite(characterId, 'current');
+    const animatedSprite = new CharacterSprite(characterId, 'current', setCharacterSpriteSize);
     animatedSprite.animationSpeed = 0.2;
 
     const setSpritePosition = spritePositionSetter(animatedSprite);
@@ -286,8 +312,7 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
             const texture = textureList[ 0 ];
 
             sprite.texture = texture;
-            sprite.width = texture.frame.width;
-            sprite.height = texture.frame.height;
+            setCharacterSpriteSize(type, sprite);
 
             sprite.visible = true;
 
