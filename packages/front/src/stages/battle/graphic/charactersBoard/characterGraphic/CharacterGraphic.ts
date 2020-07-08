@@ -23,6 +23,10 @@ const characterSpriteSize: {
     tacka: texture => [
         texture.width * 3,
         texture.height * 3,
+    ],
+    meti: texture => [
+        texture.width * 3,
+        texture.height * 3,
     ]
 };
 
