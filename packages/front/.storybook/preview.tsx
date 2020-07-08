@@ -1,7 +1,7 @@
 import { addParameters } from '@storybook/react';
 // deploy files for AssetLoader
 import '../src/_assets/map/map.png';
-import '../src/_assets/spritesheets/sokoban.png';
+import '../src/_assets/spritesheets/spritesheet-characters.png';
 
 
 addParameters({
