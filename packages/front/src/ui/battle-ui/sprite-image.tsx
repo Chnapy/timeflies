@@ -19,6 +19,7 @@ type StyleProps = {
 
 const useStyles = makeStyles(() => ({
     root: ({ size }: StyleProps) => ({
+        position: 'relative',
         width: size,
         height: size,
         overflow: 'hidden'
@@ -34,20 +35,17 @@ const useStyles = makeStyles(() => ({
 
         const scale = Math.min(ratioX, ratioY, 1);
 
-        const transformOrigin = ratioY === ratioX
-            ? '0 0'
-            : scale === ratioY
-                ? 'center 0'
-                : '0 center';
-
         return {
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
             backgroundImage: `url(${url})`,
             backgroundPosition: `${-frame.x}px ${-frame.y}px`,
             backgroundRepeat: 'no-repeat',
             width: frame.width,
             height: frame.height,
-            transformOrigin,
-            transform: `scale(${scale})`,
+            transformOrigin: '0 0',
+            transform: `scale(${scale}) translate(-50%, -50%)`,
             margin: 'auto'
         };
     }
