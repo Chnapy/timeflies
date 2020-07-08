@@ -1,4 +1,4 @@
-import charactersSpritesheetPath from '../_assets/spritesheets/sokoban.json';
+import charactersSpritesheetPath from '../_assets/spritesheets/spritesheet-characters.json';
 import spellsSpritesheetPath from '../_assets/spritesheets/spritesheet-spells.json';
 import mapPath from '../_assets/map/map.json';
 import mapPreviewPath from '../_assets/map/map_preview.png';
