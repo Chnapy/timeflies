@@ -1,6 +1,7 @@
 import React from 'react';
 import { AssetLoader, AssetMap } from '../assetManager/AssetLoader';
 import { AssetProvider } from '../assetManager/AssetProvider';
+import './pixi-settings';
 import { UIThemeProvider } from './ui-theme-provider';
 
 type UIProviderProps = {
