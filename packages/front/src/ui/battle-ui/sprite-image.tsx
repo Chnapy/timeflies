@@ -33,7 +33,7 @@ const useStyles = makeStyles(() => ({
         const ratioX = size / frame.width;
         const ratioY = size / frame.height;
 
-        const scale = Math.min(ratioX, ratioY, 1);
+        const scale = Math.min(ratioX, ratioY);
 
         return {
             position: 'absolute',
@@ -46,7 +46,8 @@ const useStyles = makeStyles(() => ({
             height: frame.height,
             transformOrigin: '0 0',
             transform: `scale(${scale}) translate(-50%, -50%)`,
-            margin: 'auto'
+            margin: 'auto',
+            imageRendering: 'pixelated'
         };
     }
 }));
