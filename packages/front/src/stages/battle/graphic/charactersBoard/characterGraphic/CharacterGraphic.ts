@@ -3,7 +3,6 @@ import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap from 'tiled-types/types';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
-import { requestRender } from '../../../../../canvas/GameCanvas';
 import { StoreEmitter } from '../../../../../store/store-manager';
 import { BattleDataPeriod, periodList } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
@@ -177,8 +176,6 @@ const periodCurrent: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spr
     const setPosition = (tiledSchema: TiledMap, x: number, y: number) => {
         setSpritePosition(tiledSchema, x, y);
         hud.container.position.set(x, y);
-
-        requestRender();
     };
 
     let ticker: PIXI.Ticker | null = null;
@@ -327,8 +324,6 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
         } else {
             sprite.visible = false;
         }
-
-        requestRender();
     };
 
     storeEmitter.onStateChange(

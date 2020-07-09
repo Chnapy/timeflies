@@ -3,7 +3,6 @@ import { CanvasContext } from '../../../canvas/CanvasContext';
 import { StageGraphicCreator } from '../../../canvas/StageGraphic';
 import { CharactersBoard } from './charactersBoard/CharactersBoard';
 import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
-import { requestRender } from '../../../canvas/GameCanvas';
 import { assertIsDefined } from '@timeflies/shared';
 
 export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
@@ -30,13 +29,6 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
             .drag({
                 mouseButtons: 'middle',
             });
-
-        let isDragging = false;
-
-        viewport.on('wheel', requestRender);
-        viewport.on('drag-start', () => isDragging = true);
-        viewport.on('drag-end', () => isDragging = false);
-        viewport.on('moved', () => isDragging && requestRender());
     };
 
     const tiledMapGraphic = TiledMapGraphic();
@@ -57,8 +49,6 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
                 tilewidth * width,
                 tileheight * height
             );
-
-            requestRender();
         }
     );
 
@@ -79,7 +69,6 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
             charactersBoardFuture.container,
             tiledMapGraphic.containerOver
         );
-        requestRender();
     });
 
     return {

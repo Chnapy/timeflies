@@ -3,7 +3,6 @@ import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import TiledMap, { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
-import { requestRender } from '../../../../canvas/GameCanvas';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from './tiledSpellFns';
 import { TileGraphic } from './TileGraphic';
 import { TileGrid } from './tile-grid';
@@ -155,8 +154,6 @@ export const TiledMapGraphic = () => {
             container.addChild(layerContainer, gridGraphic.graphic);
 
             containerOver.addChild(layerContainerOver);
-
-            requestRender();
         },
         shallowEqual
     );
