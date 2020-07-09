@@ -87,9 +87,9 @@ export const Default: React.FC = () => {
                 },
                 staticData: {
                     id: 'c2',
-                    name: 'africa',
-                    role: 'sampleChar2',
-                    description: 'description africa',
+                    name: 'tacka',
+                    role: 'tacka',
+                    description: 'description tacka',
                     defaultSpellId: 's3',
                     initialFeatures: {
                         life: 120,
@@ -106,9 +106,9 @@ export const Default: React.FC = () => {
                 },
                 staticData: {
                     id: 'c3',
-                    name: 'africa',
-                    role: 'sampleChar2',
-                    description: 'description africa',
+                    name: 'vemo',
+                    role: 'vemo',
+                    description: 'description vemo',
                     defaultSpellId: 's3',
                     initialFeatures: {
                         life: 120,
@@ -291,6 +291,7 @@ export const Default: React.FC = () => {
         const { map, characters } = await assetLoader.newInstance()
             .add('map', AssetManager.fake.mapSchema)
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
+            .addSpritesheet('spells', AssetManager.spritesheets.spells)
             .load();
 
         const startTime = Date.now() + 1000;
