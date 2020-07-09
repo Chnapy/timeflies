@@ -14,17 +14,6 @@ const stageGraphicsMap: Record<GameStateStep, StageGraphicCreator> = {
     battle: BattleStageGraphic
 } as const;
 
-let renderFn: () => void = () => { };
-
-let shouldRender: boolean = false;
-
-export const requestRender = () => {
-    if (!shouldRender) {
-        shouldRender = true;
-        requestAnimationFrame(renderFn);
-    }
-};
-
 export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement, storeEmitter: StoreEmitter, assetLoader: AssetLoader) => {
 
     const renderer = PIXI.autoDetectRenderer({
@@ -38,9 +27,21 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement, storeEm
 
     let stageGraphic: StageGraphic | null = null;
 
-    renderFn = () => {
-        shouldRender = false;
-        renderer.render(rootStage);
+    let currentMode: 'loop' | 'once';
+    let currentLoop: number;
+
+    const requestRender = (mode: 'loop' | 'once') => {
+        const renderFn = () => {
+            renderer.render(rootStage);
+            if (mode === 'loop') {
+                requestAnimationFrame(renderFn);
+            }
+        };
+
+        currentMode = mode;
+
+        cancelAnimationFrame(currentLoop);
+        currentLoop = requestAnimationFrame(renderFn);
     };
 
     const onResize = () => {
@@ -49,7 +50,9 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement, storeEm
         renderer.resize(clientWidth, clientHeight);
         stageGraphic?.onResize && stageGraphic.onResize(clientWidth, clientHeight);
 
-        requestRender();
+        if (currentMode === 'once') {
+            requestRender('once');
+        }
     };
 
     window.addEventListener('resize', onResize);
@@ -70,7 +73,9 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement, storeEm
                 rootStage.addChild(stageGraphic!.container);
             });
 
-            requestRender();
+            requestRender(
+                step === 'battle' ? 'loop' : 'once'
+            );
         }
     );
 };

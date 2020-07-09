@@ -2,7 +2,6 @@ import { CharacterRole, getOrientationFromTo, Orientation } from '@timeflies/sha
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
-import { requestRender } from '../../../../../canvas/GameCanvas';
 import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { getBattleData } from '../../../snapshot/snapshot-reducer';
 import { CharacterSpriteSizeSetter } from './CharacterGraphic';
@@ -84,7 +83,6 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                 setCharacterSpriteSize(type, this);
                 
                 this.play();
-                requestRender();
             },
             shallowEqual
         );

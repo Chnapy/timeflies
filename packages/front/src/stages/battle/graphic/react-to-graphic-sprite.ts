@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { requestRender } from '../../../canvas/GameCanvas';
 import { UIThemeProvider } from '../../../ui/ui-theme-provider';
 import { graphicTheme } from './graphic-theme';
 
@@ -14,8 +13,6 @@ export const ReactToGraphicSprite = (reactElement: React.ReactElement, width: nu
 
     getTexture(reactElement, width, height, customStyle).then(texture => {
         sprite.texture = texture;
-        
-        requestRender();
     });
 
     return sprite;

@@ -2,7 +2,6 @@ import { denormalize, characterIsAlive } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import { shallowEqual } from 'react-redux';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
-import { requestRender } from '../../../../canvas/GameCanvas';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { getBattleData } from '../../snapshot/snapshot-reducer';
 import { CharacterGraphic } from './characterGraphic/CharacterGraphic';
@@ -33,8 +32,6 @@ export const CharactersBoard = (period: BattleDataPeriod) => {
 
                 container.addChild(...charactersGraphics.map(c => c.container));
             }
-
-            requestRender();
         },
         shallowEqual
     );
