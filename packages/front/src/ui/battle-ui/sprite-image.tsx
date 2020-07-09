@@ -15,6 +15,7 @@ type StyleProps = {
     size: number;
     url?: string;
     frame?: PIXI.Rectangle;
+    rotate: boolean;
 };
 
 const useStyles = makeStyles(() => ({
@@ -24,7 +25,7 @@ const useStyles = makeStyles(() => ({
         height: size,
         overflow: 'hidden'
     }),
-    background: ({ url, size, frame }: StyleProps) => {
+    background: ({ url, size, frame, rotate }: StyleProps) => {
 
         if (!url || !frame) {
             return {};
@@ -34,6 +35,10 @@ const useStyles = makeStyles(() => ({
         const ratioY = size / frame.height;
 
         const scale = Math.min(ratioX, ratioY);
+
+        const transform = rotate
+            ? `scale(${scale}) translate(${-frame.height / 2}px, ${frame.width / 2}px) rotate(-90deg)`
+            : `scale(${scale}) translate(-50%, -50%)`;
 
         return {
             position: 'absolute',
@@ -45,7 +50,7 @@ const useStyles = makeStyles(() => ({
             width: frame.width,
             height: frame.height,
             transformOrigin: '0 0',
-            transform: `scale(${scale}) translate(-50%, -50%)`,
+            transform,
             margin: 'auto',
             imageRendering: 'pixelated'
         };
@@ -57,11 +62,13 @@ const getStyleProps = (asset: LoaderResourceSpritesheet | undefined, textureKey:
     const url = asset?.resource.url;
     const texture: PIXI.Texture | undefined = asset?.spritesheet.textures[ textureKey ];
     const frame = texture?.frame;
+    const rotate = !!texture?.rotate;
 
     return {
         size,
         url,
-        frame
+        frame,
+        rotate
     };
 };
 
