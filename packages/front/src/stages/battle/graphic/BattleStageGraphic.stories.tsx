@@ -69,7 +69,7 @@ export const Default: React.FC = () => {
             .addSpritesheet('characters', AssetManager.spritesheets.characters)
             .load();
 
-        storeManager.dispatch(BattleStartAction({
+        await storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,

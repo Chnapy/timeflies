@@ -79,7 +79,7 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
         }, () => CharactersBoard(period));
         app.stage.addChild(hud.container);
 
-        storeManager.dispatch(BattleStartAction({
+        await storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,

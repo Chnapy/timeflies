@@ -4,29 +4,19 @@ import { createAssetLoader } from '../../../assetManager/AssetLoader';
 import { GameState } from '../../../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { createStoreManager, getFullStoreMiddlewareList } from '../../../store/store-manager';
+import { getDispatchThenPassTimeouts } from '../../../test-utils';
 import { battleActionReducer } from '../battleState/battle-action-reducer';
 import { TileClickAction } from '../battleState/battle-state-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { BattleDataPeriod } from '../snapshot/battle-data';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
-import { waitTimeoutPool } from '../../../wait-timeout-pool';
-import { getDispatchThenPassTimeouts } from '../../../test-utils';
 
 describe('Battleflow', () => {
 
     const timerTester = new TimerTester();
 
     const init = () => {
-
-        // const promiseList: Promise<any>[] = [];
-
-        // global.Promise = class extends Promise<any> {
-        //     constructor(e) {
-        //         super(e);
-        //         promiseList.push(this);
-        //     }
-        // };
 
         const getSpell = <P extends BattleDataPeriod>(period: P) => seedSpell<P>({
             id: 's1',

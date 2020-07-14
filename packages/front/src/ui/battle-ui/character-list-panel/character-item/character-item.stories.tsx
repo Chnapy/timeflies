@@ -1,6 +1,7 @@
 import { Box } from '@material-ui/core';
 import { characterAlterLife, characterEntityToSnapshot, playerEntityToSnapshot, seedTiledMap, teamEntityToSnapshot } from '@timeflies/shared';
 import React from 'react';
+import { usePromise } from '../../../../../.storybook/storybook-utils';
 import { AssetLoader, createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { useAssetLoader } from '../../../../assetManager/AssetProvider';
@@ -99,7 +100,7 @@ export const Default: React.FC = () => {
         middlewareList: []
     });
 
-    storeManager.dispatch(BattleStartAction({
+    const promise = storeManager.dispatch(BattleStartAction({
         myPlayerId: 'p1',
         tiledMapAssets: {
             schema: seedTiledMap('map_1'),
@@ -156,24 +157,27 @@ export const Default: React.FC = () => {
         assetLoader,
         createPixi: async () => { },
         gameUIChildren: <Box width={215}>
-            <InnerDefault loader={assetLoader}/>
+            <InnerDefault loader={assetLoader} promise={promise} />
         </Box>
     });
 
     return view;
 };
 
-const InnerDefault: React.FC<{ loader: AssetLoader }> = ({ loader }) => {
+const InnerDefault: React.FC<{ loader: AssetLoader; promise: Promise<unknown> }> = ({ loader, promise }) => {
     useAssetLoader(loader, 'characters', AssetManager.spritesheets.characters, true);
+    const shouldRender = usePromise(promise);
 
-    return <>
-        <CharacterItem characterId='c1' />
-        <CharacterItem characterId='c2' />
-        <CharacterItem characterId='c3' />
-        <CharacterItem characterId='c4' />
+    return shouldRender
+        ? <>
+            <CharacterItem characterId='c1' />
+            <CharacterItem characterId='c2' />
+            <CharacterItem characterId='c3' />
+            <CharacterItem characterId='c4' />
 
-        <Box bgcolor='#222' p={1}>
-            <CharacterItem characterId='c5' />
-        </Box>
-    </>;
+            <Box bgcolor='#222' p={1}>
+                <CharacterItem characterId='c5' />
+            </Box>
+        </>
+        : null;
 };

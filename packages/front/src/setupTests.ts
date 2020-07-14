@@ -56,9 +56,9 @@ beforeEach(() => {
     waitTimeoutPool.setPoolEnable(true);
 });
 
-afterEach(() => {
+afterEach(async () => {
     waitTimeoutPool.setPoolEnable(false);
-    waitTimeoutPool.clearAll();
+    await waitTimeoutPool.clearAll();
     jest.clearAllTimers();
     jest.useRealTimers();
 });

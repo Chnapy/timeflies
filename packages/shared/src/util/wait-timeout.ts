@@ -26,7 +26,7 @@ export const createWaitTimeoutPool = () => {
 
     let isEnabled = true;
 
-    const pool: WaitTimeoutPromise<any>[] = [];
+    const pool: WaitTimeoutPromise<unknown>[] = [];
 
     const setPoolEnable = (enable: boolean) => isEnabled = enable;
 
@@ -51,9 +51,11 @@ export const createWaitTimeoutPool = () => {
 
     const clearAll = () => {
         pool.forEach(t => t.cancel());
+
+        return Promise.all(pool);
     };
 
-    const getAll = (): readonly WaitTimeoutPromise<any>[] => pool;
+    const getAll = (): readonly WaitTimeoutPromise<unknown>[] => pool;
 
     return {
 

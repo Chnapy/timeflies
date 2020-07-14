@@ -109,7 +109,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             }
         }
 
-        if (spellEnableTimeout) {
+        if (spellEnableTimeout?.getState() === 'wait') {
             await spellEnableTimeout;
         }
 

@@ -1,13 +1,14 @@
-import { CycleState } from './cycle-reducer';
 import { MiddlewareAPI } from '@reduxjs/toolkit';
-import { cycleMiddleware } from './cycle-middleware';
-import { seedCharacter } from '../entities/character/Character.seed';
-import { BattleStartAction } from '../battle-actions';
 import { Normalized, TimerTester, TURN_DELAY } from '@timeflies/shared';
-import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
-import { NotifyDeathsAction } from './cycle-manager-actions';
+import { BattleStartAction } from '../battle-actions';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
+import { seedCharacter } from '../entities/character/Character.seed';
+import { NotifyDeathsAction } from './cycle-manager-actions';
+import { cycleMiddleware } from './cycle-middleware';
+import { CycleState } from './cycle-reducer';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
 
 describe('# cycle-middleware', () => {
 
@@ -21,9 +22,26 @@ describe('# cycle-middleware', () => {
         timerTester.afterTest();
     });
 
+    const killPromises = (...promises: Promise<any>[]) => {
+        waitTimeoutPool.setPoolEnable(false);
+        waitTimeoutPool.clearAll();
+
+        return Promise.all([
+            waitTimeoutPool.clearAll(),
+            ...promises
+        ]);
+    };
+
+    const triggerPromisesWorkaround = async () => {
+        await timerTester.advanceBy(0);
+        await timerTester.advanceBy(0);
+        await timerTester.advanceBy(0);
+        await timerTester.advanceBy(0);
+    };
+
     describe('on battle start', () => {
 
-        it('should dispatch turn start action after some times', () => {
+        it('should dispatch turn start action after some times', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -68,14 +86,14 @@ describe('# cycle-middleware', () => {
                 }
             } as BattleStartAction[ 'payload' ]);
 
-            cycleMiddleware({
+            const p = cycleMiddleware({
                 extractState: () => initialState,
                 extractCurrentCharacters: () => currentCharacters
             })(api)(next)(action);
 
             expect(api.dispatch).not.toHaveBeenCalled();
 
-            timerTester.advanceBy(1050);
+            await timerTester.advanceBy(1050);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: action.payload.globalTurnSnapshot.currentTurn,
@@ -83,12 +101,14 @@ describe('# cycle-middleware', () => {
                     id: '1'
                 })
             }));
+
+            await killPromises(p);
         });
     })
 
     describe('on turn start message', () => {
 
-        it('should update current turn if same id', () => {
+        it('should update current turn if same id', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -132,19 +152,21 @@ describe('# cycle-middleware', () => {
                 }
             });
 
-            cycleMiddleware({
+            const p = cycleMiddleware({
                 extractState: () => initialState,
                 extractCurrentCharacters: () => currentCharacters
             })(api)(next)(action);
 
             expect(api.dispatch).not.toHaveBeenCalled();
 
-            timerTester.advanceBy(850);
+            await timerTester.advanceBy(850);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnEndAction());
+
+            await killPromises(p);
         });
 
-        it('should start it now if no current turn', () => {
+        it('should start it now if no current turn', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -190,20 +212,22 @@ describe('# cycle-middleware', () => {
                 turnState
             });
 
-            cycleMiddleware({
+            const p = cycleMiddleware({
                 extractState: () => initialState,
                 extractCurrentCharacters: () => currentCharacters
             })(api)(next)(action);
 
-            timerTester.advanceBy(5);
+            await timerTester.advanceBy(5);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: turnState,
                 currentCharacter: expect.anything()
             }));
+
+            await killPromises(p);
         });
 
-        it('should add to queue if future, then start it at good time', () => {
+        it('should add to queue if future, then start it at good time', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -253,7 +277,7 @@ describe('# cycle-middleware', () => {
             });
 
             // required for creating timeout
-            middleware(action1);
+            const p1 = middleware(action1);
 
             initialState.turnId = 1;
             initialState.currentCharacterId = '1';
@@ -271,19 +295,21 @@ describe('# cycle-middleware', () => {
                 turnState
             });
 
-            middleware(action2);
+            const p2 = middleware(action2);
 
             expect(api.dispatch).not.toHaveBeenCalled();
 
-            timerTester.advanceBy(1150);
+            await timerTester.advanceBy(1150);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: turnState,
                 currentCharacter: expect.anything()
             }));
+
+            await killPromises(p1, p2);
         });
 
-        it('should end after some time, then start a new turn', () => {
+        it('should end after some time, then start a new turn', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -330,7 +356,7 @@ describe('# cycle-middleware', () => {
                 }
             });
 
-            cycleMiddleware({
+            const p = cycleMiddleware({
                 extractState: () => initialState,
                 extractCurrentCharacters: () => currentCharacters
             })(api)(next)(action);
@@ -338,11 +364,13 @@ describe('# cycle-middleware', () => {
             initialState.turnId++;
             initialState.currentCharacterId = '2';
 
-            timerTester.advanceBy(1050);
+            await timerTester.advanceBy(1050);
+
+            await triggerPromisesWorkaround();
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnEndAction());
 
-            timerTester.advanceBy(TURN_DELAY);
+            await timerTester.advanceBy(TURN_DELAY);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: {
@@ -353,9 +381,11 @@ describe('# cycle-middleware', () => {
                 },
                 currentCharacter: expect.anything()
             }));
+
+            await killPromises(p);
         });
 
-        it('should ignore dead characters', () => {
+        it('should ignore dead characters', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -410,7 +440,7 @@ describe('# cycle-middleware', () => {
                 }
             });
 
-            cycleMiddleware({
+            const p = cycleMiddleware({
                 extractState: () => initialState,
                 extractCurrentCharacters: () => currentCharacters
             })(api)(next)(action);
@@ -418,11 +448,13 @@ describe('# cycle-middleware', () => {
             initialState.turnId++;
             initialState.currentCharacterId = '2';
 
-            timerTester.advanceBy(1050);
+            await timerTester.advanceBy(1050);
+
+            await triggerPromisesWorkaround();
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnEndAction());
 
-            timerTester.advanceBy(TURN_DELAY);
+            await timerTester.advanceBy(TURN_DELAY);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnStartAction({
                 turnSnapshot: {
@@ -433,12 +465,14 @@ describe('# cycle-middleware', () => {
                 },
                 currentCharacter: expect.anything()
             }));
+
+            await killPromises(p);
         });
     });
 
     describe('on notify deaths', () => {
 
-        it('should end current turn if character died', () => {
+        it('should end current turn if character died', async () => {
 
             const currentCharacters: Normalized<Character<'current'>> = {
                 '1': seedCharacter({
@@ -490,20 +524,22 @@ describe('# cycle-middleware', () => {
                 extractCurrentCharacters: () => currentCharacters
             })(api)(next);
 
-            middleware(action);
+            const p1 = middleware(action);
 
             initialState.turnId++;
             initialState.currentCharacterId = '2';
 
-            timerTester.advanceBy(50);
+            await timerTester.advanceBy(50);
 
             currentCharacters[ '2' ].features.life = 0;
 
-            middleware(NotifyDeathsAction());
+            const p2 = middleware(NotifyDeathsAction());
 
-            timerTester.advanceBy(50);
+            await timerTester.advanceBy(50);
 
             expect(api.dispatch).toHaveBeenCalledWith(BattleStateTurnEndAction());
+
+            await killPromises(p1, p2);
         });
     });
 });

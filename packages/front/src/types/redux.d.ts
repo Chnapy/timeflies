@@ -1,5 +1,5 @@
 import * as R from 'redux';
-// import { GameState } from '../game-state';
+import { GameState } from '../game-state';
 
 declare module 'redux' {
 
@@ -7,14 +7,14 @@ declare module 'redux' {
         <T extends A>(action: T): Promise<void>
     }
 
-    // export interface Middleware<
-    //     DispatchExt = {},
-    //     S = string,
-    //     D extends R.Dispatch = Dispatch
-    //     > extends R.Middleware<{}, number, Dispatch> {
-    //         tto: 9
-    //     (api): (
-    //         next
-    //     ) => (action: any) => any;
-    // }
+    interface MiddlewareAPI {
+        dispatch: Dispatch;
+        getState(): GameState;
+    }
+
+    interface Middleware {
+        (api: MiddlewareAPI): (
+            next: Dispatch
+        ) => (action: any) => Promise<void>;
+    }
 }

@@ -1,13 +1,14 @@
 import { applyMiddleware, createStore, Store } from '@reduxjs/toolkit';
-import { normalize, seedTiledMapAssets, createPosition } from '@timeflies/shared';
+import { createPosition, normalize, seedTiledMapAssets } from '@timeflies/shared';
 import { Reducer } from 'react';
+import { getDispatchThenPassTimeouts } from '../../../test-utils';
+import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 import { BattleStartAction } from '../battle-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { battleActionMiddleware } from './battle-action-middleware';
 import { battleActionReducer, BattleActionState } from './battle-action-reducer';
 import { BattleMapPathAction, BattleStateTurnEndAction, BattleStateTurnStartAction } from './battle-state-actions';
-import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 
 describe('# battle-action', () => {
 
@@ -42,7 +43,7 @@ describe('# battle-action', () => {
 
     describe('on battle start', () => {
 
-        it('should define new state', () => {
+        it('should define new state', async () => {
 
             const initialState: BattleActionState = {
                 tiledSchema: null,
@@ -75,7 +76,7 @@ describe('# battle-action', () => {
                 } as any
             });
 
-            store.dispatch(action);
+            await store.dispatch(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 tiledSchema: action.payload.tiledMapAssets.schema,
@@ -95,7 +96,7 @@ describe('# battle-action', () => {
 
         it.todo('should set action to spellPrepare, if character mine');
 
-        it('should get spell engine and pass it action, if character mine', () => {
+        it.only('should get spell engine and pass it action, if character mine', async () => {
 
             const initialState: BattleActionState = {
                 tiledSchema: null,
@@ -128,7 +129,9 @@ describe('# battle-action', () => {
                 currentCharacter: seedCharacter({ id: 'c1', period: 'current', isMine: true })
             });
 
-            store.dispatch(action);
+            const dispatchThenPassTimeouts = getDispatchThenPassTimeouts(store.dispatch);
+
+            await dispatchThenPassTimeouts(action);
 
             expect(getSpellEngineFromType).toHaveBeenNthCalledWith(1, 'move', expect.anything(), expect.anything());
             expect(spellEngine).toHaveBeenNthCalledWith(1, action);
@@ -137,7 +140,7 @@ describe('# battle-action', () => {
 
     describe('on turn end', () => {
 
-        it('should set action to watch and clear areas', () => {
+        it('should set action to watch and clear areas', async () => {
 
             const initialState: BattleActionState = {
                 tiledSchema: null,
@@ -153,7 +156,7 @@ describe('# battle-action', () => {
 
             const action = BattleStateTurnEndAction();
 
-            store.dispatch(action);
+            await store.dispatch(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
@@ -163,7 +166,7 @@ describe('# battle-action', () => {
             });
         });
 
-        it('should not get spell engine', () => {
+        it('should not get spell engine', async () => {
 
             const initialState: BattleActionState = {
                 tiledSchema: null,
@@ -183,7 +186,7 @@ describe('# battle-action', () => {
 
             const action = BattleStateTurnEndAction();
 
-            store.dispatch(action);
+            await store.dispatch(action);
 
             expect(getSpellEngineFromType).not.toHaveBeenCalled();
         });
@@ -191,7 +194,7 @@ describe('# battle-action', () => {
 
     describe('on map area', () => {
 
-        it('should set given areas', () => {
+        it('should set given areas', async () => {
 
             const initialState: BattleActionState = {
                 tiledSchema: null,
@@ -211,7 +214,7 @@ describe('# battle-action', () => {
                 actionArea: normalize([ createPosition(1, 1) ])
             });
 
-            store.dispatch(action);
+            await store.dispatch(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
