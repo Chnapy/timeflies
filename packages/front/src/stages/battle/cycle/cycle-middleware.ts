@@ -69,10 +69,10 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                     currentCharacter
                 }));
 
-                await differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);
-            });
+                differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);
 
-        return timeout;
+                await timeout;
+            });
     };
 
     const differTurnEnd = (characterId: string, startTime?: number) => {
@@ -100,16 +100,16 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 const nextChar = getNextCharacterInfos(currentCharacterId);
 
                 if (nextChar) {
-                    await differTurnStart({
+                    differTurnStart({
                         id: turnId + 1,
                         startTime: endTime + TURN_DELAY,
                         characterId: nextChar.id,
                         duration: nextChar.duration
                     });
+
+                    await timeout;
                 }
             });
-            
-        return timeout;
     };
 
     const turnQueue: TurnSnapshot[] = [];

@@ -1,5 +1,5 @@
 import { assertIsDefined, assertIsNonNullable, MapConfig } from '@timeflies/shared';
-import { Action, Middleware } from 'redux';
+import { Action, Middleware, MiddlewareAPI } from 'redux';
 import { AssetLoader } from '../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../assetManager/AssetManager';
 import { GameState } from '../../../game-state';
@@ -13,7 +13,7 @@ type Dependencies = {
 
 export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> = ({
     assetLoader
-}) => api => next => {
+}) => (api: MiddlewareAPI) => next => {
 
     return async (action: Action) => {
 
@@ -38,7 +38,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
                 const { schema, images } = assetLoader.get('map')!;
 
-                api.dispatch(BattleStartAction({
+                await api.dispatch(BattleStartAction({
                     myPlayerId: currentPlayer!.id,
                     tiledMapAssets: {
                         schema,
@@ -71,7 +71,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
 
                 if (message.mapSelected && mapConfig) {
 
-                    api.dispatch(SendMessageAction({
+                    await api.dispatch(SendMessageAction({
                         type: 'room/player/state',
                         isReady: false,
                         isLoading: true
@@ -81,7 +81,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                         .add('map', mapConfig.schemaUrl)
                         .load();
 
-                    api.dispatch<MapLoadedAction>({
+                    await api.dispatch<MapLoadedAction>({
                         type: 'room/map/loaded',
                         payload: {
                             assets: map
@@ -93,7 +93,7 @@ export const roomMiddleware: (deps: Dependencies) => Middleware<{}, GameState> =
                         .addSpritesheet('spells', AssetManager.spritesheets.spells)
                         .load();
 
-                    api.dispatch(SendMessageAction({
+                    await api.dispatch(SendMessageAction({
                         type: 'room/player/state',
                         isReady: false,
                         isLoading: false

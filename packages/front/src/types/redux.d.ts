@@ -4,7 +4,7 @@ import { GameState } from '../game-state';
 declare module 'redux' {
 
     interface Dispatch<A extends R.Action = R.AnyAction> {
-        <T extends A>(action: T): Promise<void>
+        <T extends A>(action: T): Promise<unknown>
     }
 
     interface MiddlewareAPI {
@@ -15,6 +15,6 @@ declare module 'redux' {
     interface Middleware {
         (api: MiddlewareAPI): (
             next: Dispatch
-        ) => (action: any) => Promise<void>;
+        ) => (action: any) => Promise<unknown>;
     }
 }

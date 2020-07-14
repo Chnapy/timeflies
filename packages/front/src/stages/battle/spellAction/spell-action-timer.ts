@@ -1,8 +1,9 @@
 import { Dispatch } from '@reduxjs/toolkit';
-import { SpellActionSnapshot } from '@timeflies/shared';
+import { SpellActionSnapshot, WaitTimeoutPromise } from '@timeflies/shared';
 import { SendMessageAction } from '../../../socket/wsclient-actions';
 import { Batch, createActionBatch } from '../../../store/create-action-batch';
 import { SpellActionTimerEndAction, SpellActionTimerStartAction } from './spell-action-actions';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
 
 
 export type SpellActionTimer = ReturnType<typeof SpellActionTimer>;
@@ -24,7 +25,7 @@ export const SpellActionTimer = ({
     dispatch
 }: Dependencies) => {
 
-    let timeout: NodeJS.Timeout | undefined;
+    let timeout: WaitTimeoutPromise<unknown> | undefined;
 
     const differEndSpell = (snapshot: SpellActionSnapshot, fromNotify: boolean): void => {
 
@@ -32,17 +33,21 @@ export const SpellActionTimer = ({
 
         const delta = Math.max(Date.now() - startTime, 0);
 
-        timeout = setTimeout(() => {
+        timeout = waitTimeoutPool.createTimeout(duration - delta)
+            .then(state => {
 
-            const batcher = createActionBatch();
+                if (state === 'canceled') {
+                    return;
+                }
 
-            const { endSpellAction } = prepareBatch(batcher.batch);
+                const batcher = createActionBatch();
 
-            endSpellAction(snapshot, fromNotify);
+                const { endSpellAction } = prepareBatch(batcher.batch);
 
-            batcher.dispatchWith(dispatch);
+                endSpellAction(snapshot, fromNotify);
 
-        }, duration - delta);
+                return batcher.dispatchWith(dispatch);
+            });
     };
 
     const prepareBatch = (batch: Batch) => {
@@ -67,7 +72,7 @@ export const SpellActionTimer = ({
 
         const cancelTimeout = () => {
             if (timeout) {
-                clearTimeout(timeout);
+                timeout.cancel();
                 timeout = undefined;
             }
         };
@@ -131,6 +136,7 @@ export const SpellActionTimer = ({
             if (currentOrPassedSnapshot) {
                 removeSpellAction(currentOrPassedSnapshot, correctHash);
             }
-        }
+        },
+        getTimeout: () => timeout
     });
 };

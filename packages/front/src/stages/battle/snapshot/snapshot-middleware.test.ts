@@ -9,9 +9,7 @@ import { getInitialSnapshotState } from './snapshot-reducer';
 
 describe('# snapshot-middleware', () => {
 
-    jest.useFakeTimers();
-
-    it('should not notify for deaths on spell action end action if there is not new deaths', () => {
+    it('should not notify for deaths on spell action end action if there is not new deaths', async () => {
 
         const currentCharacters: Normalized<Character<'current'>> = {
             '1': seedCharacter({
@@ -51,7 +49,7 @@ describe('# snapshot-middleware', () => {
             spellActionSnapshot: {} as any
         });
 
-        snapshotMiddleware({
+        await snapshotMiddleware({
             extractState: () => initialState,
         })(api)(next)(action);
 
@@ -59,7 +57,7 @@ describe('# snapshot-middleware', () => {
         expect(api.dispatch).not.toHaveBeenCalled();
     });
 
-    it('should notify for deaths on spell action end action if there is new deaths', () => {
+    it('should notify for deaths on spell action end action if there is new deaths', async () => {
 
         const currentCharacters: Normalized<Character<'current'>> = {
             '1': seedCharacter({
@@ -101,11 +99,9 @@ describe('# snapshot-middleware', () => {
             spellActionSnapshot: {} as any
         });
 
-        snapshotMiddleware({
+        await snapshotMiddleware({
             extractState: () => initialState,
         })(api)(next)(action);
-
-        jest.runOnlyPendingTimers();
 
         expect(next).toHaveBeenNthCalledWith(1, action);
         expect(api.dispatch).toHaveBeenNthCalledWith(1, NotifyDeathsAction());

@@ -1,24 +1,31 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { SendMessageAction, ReceiveMessageAction } from '../../socket/wsclient-actions';
-import { RoomStartAction } from '../../ui/reducers/room-reducers/room-actions';
 import { GameState } from '../../game-state';
+import { ReceiveMessageAction, SendMessageAction } from '../../socket/wsclient-actions';
+import { RoomStartAction } from '../../ui/reducers/room-reducers/room-actions';
+import { waitTimeoutPool } from '../../wait-timeout-pool';
 
 export const bootMiddleware: Middleware<{}, GameState> = api => next => {
 
-    setTimeout(() => {
-        if (api.getState().step === 'boot') {
-            api.dispatch(SendMessageAction({
-                type: 'set-id',
-                id: Math.random() + ''
-            }));
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    waitTimeoutPool.createTimeout(5)
+        .then(async state => {
+            if (state === 'canceled') {
+                return;
+            }
 
-            api.dispatch(SendMessageAction({
-                type: 'matchmaker/enter'
-            }));
-        }
-    });
+            if (api.getState().step === 'boot') {
+                await api.dispatch(SendMessageAction({
+                    type: 'set-id',
+                    id: Math.random() + ''
+                }));
 
-    return action => {
+                await api.dispatch(SendMessageAction({
+                    type: 'matchmaker/enter'
+                }));
+            }
+        });
+
+    return async action => {
 
         const ret = next(action);
 
@@ -26,7 +33,7 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
             const { payload } = action;
 
             if (payload.type === 'room/state') {
-                api.dispatch(RoomStartAction({
+                await api.dispatch(RoomStartAction({
                     roomState: payload
                 }));
             }

@@ -12,7 +12,7 @@ export const snapshotMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractState
 }) => api => next => {
 
-    return (action: AnyAction) => {
+    return async (action: AnyAction) => {
 
         if (SpellActionTimerEndAction.match(action)) {
 
@@ -27,7 +27,7 @@ export const snapshotMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
             const serializedDeathsAfter = serializeDeaths();
 
             if (serializedDeathsBefore !== serializedDeathsAfter) {
-                api.dispatch(NotifyDeathsAction());
+                await api.dispatch(NotifyDeathsAction());
             }
 
             return ret;

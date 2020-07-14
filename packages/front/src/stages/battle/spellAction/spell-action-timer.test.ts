@@ -66,7 +66,7 @@ describe('# SpellActionTimer', () => {
         }));
     });
 
-    it('should end current spell on its end', () => {
+    it('should end current spell on its end', async () => {
 
         const dispatch = jest.fn();
 
@@ -83,7 +83,7 @@ describe('# SpellActionTimer', () => {
 
         timer.onAdd(snapshot.startTime, false);
 
-        timerTester.advanceBy(200);
+        await timerTester.advanceBy(200);
 
         expect(dispatch).toHaveBeenCalledWith(SpellActionTimerEndAction({
             removed: false,
@@ -92,7 +92,7 @@ describe('# SpellActionTimer', () => {
         }));
     });
 
-    it('should remove current spell action on its end & launch the next one', () => {
+    it('should remove current spell action on its end & launch the next one', async () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
@@ -115,7 +115,7 @@ describe('# SpellActionTimer', () => {
 
         timer.onAdd(spellActionSnapshotList[ 0 ].startTime, false);
 
-        timerTester.advanceBy(200);
+        await timerTester.advanceBy(200);
 
         expect(dispatch).toHaveBeenCalledWith(BatchActions(
             expect.arrayContaining([
@@ -191,7 +191,7 @@ describe('# SpellActionTimer', () => {
         }));
     });
 
-    it('should end passed spell action on delayed rollback', () => {
+    it('should end passed spell action on delayed rollback', async () => {
 
         const spellActionSnapshotList: SpellActionSnapshot[] = [];
 
@@ -214,7 +214,7 @@ describe('# SpellActionTimer', () => {
 
         timer.onAdd(spellActionSnapshotList[ 0 ].startTime, false);
 
-        timerTester.advanceBy(300);
+        await timerTester.advanceBy(300);
 
         timer.onRemove([
             getSnapshot({
