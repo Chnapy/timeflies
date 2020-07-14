@@ -69,146 +69,146 @@ describe('# snapshot-reducer', () => {
 
         it.skip('should rollback on spell action removed', () => {
 
-            const teams: Normalized<Team> = {
-                t1: {
-                    id: 't1',
-                    letter: 'A',
-                }
-            };
+            // const teams: Normalized<Team> = {
+            //     t1: {
+            //         id: 't1',
+            //         letter: 'A',
+            //     }
+            // };
 
-            const character = seedCharacter({ id: 'c1', period: 'future' });
+            // const character = seedCharacter({ id: 'c1', period: 'future' });
 
-            const initialState = getInitialSnapshotState({
-                myPlayerId: 'p1',
-                teamList: teams,
-                battleDataCurrent: {
-                    battleHash: 'not-matter',
-                    characters: {},
-                    spells: {}
-                },
-                battleDataFuture: {
-                    battleHash: 'not-matter',
-                    characters: { [ character.id ]: character },
-                    spells: {}
-                },
-            });
+            // const initialState = getInitialSnapshotState({
+            //     myPlayerId: 'p1',
+            //     teamList: teams,
+            //     battleDataCurrent: {
+            //         battleHash: 'not-matter',
+            //         characters: {},
+            //         spells: {}
+            //     },
+            //     battleDataFuture: {
+            //         battleHash: 'not-matter',
+            //         characters: { [ character.id ]: character },
+            //         spells: {}
+            //     },
+            // });
 
-            const state1 = snapshotReducer({
-                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
-                    characters[ 'c1' ].features.life = 50;
-                    return [];
-                }
-            })(initialState, SpellActionLaunchAction({
-                spellActList: [ {
-                    startTime: timerTester.now,
-                    spellAction: {
-                        spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: createPosition(0, 0),
-                        actionArea: normalize([ createPosition(0, 0) ])
-                    }
-                } ]
-            }));
+            // const state1 = snapshotReducer({
+            //     getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
+            //         characters[ 'c1' ].features.life = 50;
+            //         return [];
+            //     }
+            // })(initialState, SpellActionLaunchAction({
+            //     spellActList: [ {
+            //         startTime: timerTester.now,
+            //         spellAction: {
+            //             spell: seedSpell({ id: 's1', period: 'future' }),
+            //             position: createPosition(0, 0),
+            //             actionArea: normalize([ createPosition(0, 0) ])
+            //         }
+            //     } ]
+            // }));
 
-            const firstHash = state1.battleDataFuture.battleHash;
+            // const firstHash = state1.battleDataFuture.battleHash;
 
-            timerTester.advanceBy(100);
+            // timerTester.advanceBy(100);
 
-            const state2 = snapshotReducer({
-                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
-                    characters[ 'c1' ].features.life = 20;
-                    return [];
-                }
-            })(state1, SpellActionLaunchAction({
-                spellActList: [ {
-                    startTime: timerTester.now,
-                    spellAction: {
-                        spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: createPosition(0, 0),
-                        actionArea: normalize([ createPosition(0, 0) ])
-                    }
-                } ]
-            }));
+            // const state2 = snapshotReducer({
+            //     getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
+            //         characters[ 'c1' ].features.life = 20;
+            //         return [];
+            //     }
+            // })(state1, SpellActionLaunchAction({
+            //     spellActList: [ {
+            //         startTime: timerTester.now,
+            //         spellAction: {
+            //             spell: seedSpell({ id: 's1', period: 'future' }),
+            //             position: createPosition(0, 0),
+            //             actionArea: normalize([ createPosition(0, 0) ])
+            //         }
+            //     } ]
+            // }));
 
-            const state3 = snapshotReducer()(state2, SpellActionTimerEndAction({
-                removed: true,
-                correctHash: firstHash,
-                spellActionSnapshot: {} as any
-            }));
+            // const state3 = snapshotReducer()(state2, SpellActionTimerEndAction({
+            //     removed: true,
+            //     correctHash: firstHash,
+            //     spellActionSnapshot: {} as any
+            // }));
 
-            expect(state3.battleDataFuture.battleHash).toBe(firstHash);
-            expect(state3.battleDataFuture.characters[ 'c1' ].features.life).toBe(50);
+            // expect(state3.battleDataFuture.battleHash).toBe(firstHash);
+            // expect(state3.battleDataFuture.characters[ 'c1' ].features.life).toBe(50);
         });
 
         it.skip('should rollback on previous spell action removed and update current battle data', () => {
 
-            const teams: Normalized<Team> = {
-                t1: {
-                    id: 't1',
-                    letter: 'A',
-                }
-            };
+            // const teams: Normalized<Team> = {
+            //     t1: {
+            //         id: 't1',
+            //         letter: 'A',
+            //     }
+            // };
 
-            const character = seedCharacter({ id: 'c1', period: 'future' });
+            // const character = seedCharacter({ id: 'c1', period: 'future' });
 
-            const initialState = getInitialSnapshotState({
-                myPlayerId: 'p1',
-                teamList: teams,
-                battleDataCurrent: {
-                    battleHash: 'not-matter',
-                    characters: {},
-                    spells: {}
-                },
-                battleDataFuture: {
-                    battleHash: 'not-matter',
-                    characters: { [ character.id ]: character },
-                    spells: {}
-                },
-            });
+            // const initialState = getInitialSnapshotState({
+            //     myPlayerId: 'p1',
+            //     teamList: teams,
+            //     battleDataCurrent: {
+            //         battleHash: 'not-matter',
+            //         characters: {},
+            //         spells: {}
+            //     },
+            //     battleDataFuture: {
+            //         battleHash: 'not-matter',
+            //         characters: { [ character.id ]: character },
+            //         spells: {}
+            //     },
+            // });
 
-            const state1 = snapshotReducer({
-                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
-                    characters[ 'c1' ].features.life = 50;
-                    return [];
-                }
-            })(initialState, SpellActionLaunchAction({
-                spellActList: [ {
-                    startTime: timerTester.now,
-                    spellAction: {
-                        spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: createPosition(0, 0),
-                        actionArea: normalize([ createPosition(0, 0) ])
-                    }
-                } ]
-            }));
+            // const state1 = snapshotReducer({
+            //     getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
+            //         characters[ 'c1' ].features.life = 50;
+            //         return [];
+            //     }
+            // })(initialState, SpellActionLaunchAction({
+            //     spellActList: [ {
+            //         startTime: timerTester.now,
+            //         spellAction: {
+            //             spell: seedSpell({ id: 's1', period: 'future' }),
+            //             position: createPosition(0, 0),
+            //             actionArea: normalize([ createPosition(0, 0) ])
+            //         }
+            //     } ]
+            // }));
 
-            const firstHash = state1.battleDataFuture.battleHash;
+            // const firstHash = state1.battleDataFuture.battleHash;
 
-            timerTester.advanceBy(100);
+            // timerTester.advanceBy(100);
 
-            const state2 = snapshotReducer({
-                getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
-                    characters[ 'c1' ].features.life = 20;
-                    return [];
-                }
-            })(state1, SpellActionLaunchAction({
-                spellActList: [ {
-                    startTime: timerTester.now,
-                    spellAction: {
-                        spell: seedSpell({ id: 's1', period: 'future' }),
-                        position: createPosition(0, 0),
-                        actionArea: normalize([ createPosition(0, 0) ])
-                    }
-                } ]
-            }));
+            // const state2 = snapshotReducer({
+            //     getSpellEffectFn: spellRole => ({ battleState: { characters } }) => {
+            //         characters[ 'c1' ].features.life = 20;
+            //         return [];
+            //     }
+            // })(state1, SpellActionLaunchAction({
+            //     spellActList: [ {
+            //         startTime: timerTester.now,
+            //         spellAction: {
+            //             spell: seedSpell({ id: 's1', period: 'future' }),
+            //             position: createPosition(0, 0),
+            //             actionArea: normalize([ createPosition(0, 0) ])
+            //         }
+            //     } ]
+            // }));
 
-            const state3 = snapshotReducer()(state2, SpellActionTimerEndAction({
-                removed: true,
-                correctHash: firstHash,
-                spellActionSnapshot: {} as any
-            }));
+            // const state3 = snapshotReducer()(state2, SpellActionTimerEndAction({
+            //     removed: true,
+            //     correctHash: firstHash,
+            //     spellActionSnapshot: {} as any
+            // }));
 
-            expect(state3.battleDataFuture.battleHash).toBe(firstHash);
-            expect(state3.battleDataCurrent.battleHash).toBe(firstHash);
+            // expect(state3.battleDataFuture.battleHash).toBe(firstHash);
+            // expect(state3.battleDataCurrent.battleHash).toBe(firstHash);
         });
 
         it('should update current battle data from future on spell action end action', () => {

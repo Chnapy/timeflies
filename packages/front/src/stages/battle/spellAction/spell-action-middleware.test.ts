@@ -48,7 +48,8 @@ describe('# spell-action-middleware', () => {
 
         const timer: ReturnType<SpellActionTimer> = {
             onAdd: jest.fn(),
-            onRemove: jest.fn()
+            onRemove: jest.fn(),
+            getTimeout: () => undefined
         };
 
         const state = getInitialSnapshotState({
@@ -104,31 +105,31 @@ describe('# spell-action-middleware', () => {
         });
 
         it.skip('should dispatch commit for each spell', () => {
-            const { futureCharacter, spell, api, next, timer, state } = init();
+            // const { futureCharacter, spell, api, next, timer, state } = init();
 
-            const action = BattleStateSpellLaunchAction({
-                spellActions: [
-                    {
-                        spell,
-                        position: createPosition(-1, -1),
-                        actionArea: normalize([ createPosition(-1, -1) ])
-                    },
-                    {
-                        spell,
-                        position: createPosition(-1, -1),
-                        actionArea: normalize([ createPosition(-1, -1) ])
-                    }
-                ]
-            });
+            // const action = BattleStateSpellLaunchAction({
+            //     spellActions: [
+            //         {
+            //             spell,
+            //             position: createPosition(-1, -1),
+            //             actionArea: normalize([ createPosition(-1, -1) ])
+            //         },
+            //         {
+            //             spell,
+            //             position: createPosition(-1, -1),
+            //             actionArea: normalize([ createPosition(-1, -1) ])
+            //         }
+            //     ]
+            // });
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => () => timer,
-                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
-                extractFutureSpells: () => ({ [ spell.id ]: spell }),
-                extractFutureHash: () => '-hash-',
-                extractCurrentHash: () => '-hash-',
-                extractState: () => state
-            })(api)(next)(action);
+            // spellActionMiddleware({
+            //     createSpellActionTimer: () => () => timer,
+            //     extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+            //     extractFutureSpells: () => ({ [ spell.id ]: spell }),
+            //     extractFutureHash: () => '-hash-',
+            //     extractCurrentHash: () => '-hash-',
+            //     extractState: () => state
+            // })(api)(next)(action);
 
             // expect(api.dispatch).toHaveBeenNthCalledWith(2, BattleCommitAction({
             //     time: expect.any(Number),
@@ -169,7 +170,7 @@ describe('# spell-action-middleware', () => {
 
     describe('on turn end action', () => {
 
-        it('should return turn end action', () => {
+        it('should return turn end action', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -182,7 +183,7 @@ describe('# spell-action-middleware', () => {
 
             const action = BattleStateTurnEndAction();
 
-            spellActionMiddleware({
+            const p = spellActionMiddleware({
                 createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
@@ -192,39 +193,41 @@ describe('# spell-action-middleware', () => {
             })(api)(next)(action);
 
             expect(next).toHaveBeenNthCalledWith(1, BattleStateTurnEndAction());
+
+            await p;
         });
 
         it.skip('should dispatch spell canceled action with new snapshot list', async () => {
 
-            const { futureCharacter, spell, api, next, timer, state } = init();
+            // const { futureCharacter, spell, api, next, timer, state } = init();
 
-            state.spellActionSnapshotList.push(
-                seedSpellActionSnapshot('s1', {
-                    startTime: timerTester.now,
-                    duration: 1000,
-                }),
-                seedSpellActionSnapshot('s1', {
-                    startTime: timerTester.now + 1000,
-                    duration: 1000,
-                }),
-                seedSpellActionSnapshot('s1', {
-                    startTime: timerTester.now + 2000,
-                    duration: 1000,
-                })
-            );
+            // state.spellActionSnapshotList.push(
+            //     seedSpellActionSnapshot('s1', {
+            //         startTime: timerTester.now,
+            //         duration: 1000,
+            //     }),
+            //     seedSpellActionSnapshot('s1', {
+            //         startTime: timerTester.now + 1000,
+            //         duration: 1000,
+            //     }),
+            //     seedSpellActionSnapshot('s1', {
+            //         startTime: timerTester.now + 2000,
+            //         duration: 1000,
+            //     })
+            // );
 
-            timerTester.advanceBy(1200);
+            // timerTester.advanceBy(1200);
 
-            const action = BattleStateTurnEndAction();
+            // const action = BattleStateTurnEndAction();
 
-            await spellActionMiddleware({
-                createSpellActionTimer: () => () => timer,
-                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
-                extractFutureSpells: () => ({ [ spell.id ]: spell }),
-                extractFutureHash: () => '-hash-future-',
-                extractCurrentHash: () => '-hash-current-',
-                extractState: () => state
-            })(api)(next)(action);
+            // await spellActionMiddleware({
+            //     createSpellActionTimer: () => () => timer,
+            //     extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+            //     extractFutureSpells: () => ({ [ spell.id ]: spell }),
+            //     extractFutureHash: () => '-hash-future-',
+            //     extractCurrentHash: () => '-hash-current-',
+            //     extractState: () => state
+            // })(api)(next)(action);
 
             // expect(api.dispatch).toHaveBeenNthCalledWith(1, SpellActionCancelAction({
             //     spellActionSnapshotsValids: state.spellActionSnapshotList.slice(0, 1)
@@ -233,46 +236,46 @@ describe('# spell-action-middleware', () => {
 
         it.skip('should notify timer of removed snapshots', () => {
 
-            const { futureCharacter, spell, api, next, timer, state } = init();
+            // const { futureCharacter, spell, api, next, timer, state } = init();
 
-            state.spellActionSnapshotList.push(
-                seedSpellActionSnapshot('s1', {
-                    startTime: timerTester.now,
-                    duration: 1000,
-                }),
-                seedSpellActionSnapshot('s1', {
-                    startTime: timerTester.now + 1000,
-                    duration: 1000,
-                }),
-                seedSpellActionSnapshot('s1', {
-                    startTime: timerTester.now + 2000,
-                    duration: 1000,
-                })
-            );
+            // state.spellActionSnapshotList.push(
+            //     seedSpellActionSnapshot('s1', {
+            //         startTime: timerTester.now,
+            //         duration: 1000,
+            //     }),
+            //     seedSpellActionSnapshot('s1', {
+            //         startTime: timerTester.now + 1000,
+            //         duration: 1000,
+            //     }),
+            //     seedSpellActionSnapshot('s1', {
+            //         startTime: timerTester.now + 2000,
+            //         duration: 1000,
+            //     })
+            // );
 
-            timerTester.advanceBy(1200);
+            // timerTester.advanceBy(1200);
 
-            const action = BattleStateTurnEndAction();
+            // const action = BattleStateTurnEndAction();
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => () => timer,
-                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
-                extractFutureSpells: () => ({ [ spell.id ]: spell }),
-                extractFutureHash: () => '-hash-future-',
-                extractCurrentHash: () => '-hash-current-',
-                extractState: () => state
-            })(api)(next)(action);
+            // spellActionMiddleware({
+            //     createSpellActionTimer: () => () => timer,
+            //     extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+            //     extractFutureSpells: () => ({ [ spell.id ]: spell }),
+            //     extractFutureHash: () => '-hash-future-',
+            //     extractCurrentHash: () => '-hash-current-',
+            //     extractState: () => state
+            // })(api)(next)(action);
 
-            expect(timer.onRemove).toHaveBeenNthCalledWith(1,
-                expect.arrayContaining(state.spellActionSnapshotList.slice(1)),
-                '-hash-current-'
-            );
+            // expect(timer.onRemove).toHaveBeenNthCalledWith(1,
+            //     expect.arrayContaining(state.spellActionSnapshotList.slice(1)),
+            //     '-hash-current-'
+            // );
         });
     });
 
     describe('on confirm action', () => {
 
-        it('should return confirm action', () => {
+        it('should return confirm action', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -290,7 +293,7 @@ describe('# spell-action-middleware', () => {
                 sendTime: -1
             });
 
-            spellActionMiddleware({
+            const p = spellActionMiddleware({
                 createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
@@ -300,9 +303,11 @@ describe('# spell-action-middleware', () => {
             })(api)(next)(action);
 
             expect(next).toHaveBeenNthCalledWith(1, action);
+
+            await p;
         });
 
-        it('should not dispatch on OK', () => {
+        it('should not dispatch on OK', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -320,7 +325,7 @@ describe('# spell-action-middleware', () => {
                 sendTime: -1
             });
 
-            spellActionMiddleware({
+            await spellActionMiddleware({
                 createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
@@ -351,7 +356,7 @@ describe('# spell-action-middleware', () => {
                 })
             );
 
-            timerTester.advanceBy(1200);
+            await timerTester.advanceBy(1200);
 
             const action = ReceiveMessageAction({
                 type: 'confirm',
@@ -380,7 +385,7 @@ describe('# spell-action-middleware', () => {
             }));
         });
 
-        it('should notify timer of removed snapshots and correct hash', () => {
+        it('should notify timer of removed snapshots and correct hash', async () => {
 
             const { futureCharacter, spell, api, next, timer, state } = init();
 
@@ -399,7 +404,7 @@ describe('# spell-action-middleware', () => {
                 })
             );
 
-            timerTester.advanceBy(1200);
+            await timerTester.advanceBy(1200);
 
             const action = ReceiveMessageAction({
                 type: 'confirm',
@@ -413,7 +418,7 @@ describe('# spell-action-middleware', () => {
                 sendTime: -1
             });
 
-            spellActionMiddleware({
+            await spellActionMiddleware({
                 createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
@@ -431,7 +436,7 @@ describe('# spell-action-middleware', () => {
 
     describe('on notify action', () => {
 
-        it('should dispatch launch action with spell action', () => {
+        it('should dispatch launch action with spell action', async () => {
             const { futureCharacter, spell, api, next, timer, state } = init();
 
             const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
@@ -447,7 +452,7 @@ describe('# spell-action-middleware', () => {
                 spellActionSnapshot: snapshot
             });
 
-            spellActionMiddleware({
+            await spellActionMiddleware({
                 createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),
@@ -473,29 +478,29 @@ describe('# spell-action-middleware', () => {
         });
 
         it.skip('should dispatch commit', () => {
-            const { futureCharacter, spell, api, next, timer, state } = init();
+            // const { futureCharacter, spell, api, next, timer, state } = init();
 
-            const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
-                startTime: timerTester.now,
-                duration: 200,
-                battleHash: '-hash-',
-                characterId: futureCharacter.id,
-            });
+            // const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
+            //     startTime: timerTester.now,
+            //     duration: 200,
+            //     battleHash: '-hash-',
+            //     characterId: futureCharacter.id,
+            // });
 
-            const action = ReceiveMessageAction({
-                type: 'notify',
-                sendTime: -1,
-                spellActionSnapshot: snapshot
-            });
+            // const action = ReceiveMessageAction({
+            //     type: 'notify',
+            //     sendTime: -1,
+            //     spellActionSnapshot: snapshot
+            // });
 
-            spellActionMiddleware({
-                createSpellActionTimer: () => () => timer,
-                extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
-                extractFutureSpells: () => ({ [ spell.id ]: spell }),
-                extractFutureHash: () => '-hash-',
-                extractCurrentHash: () => '-hash-',
-                extractState: () => state
-            })(api)(next)(action);
+            // spellActionMiddleware({
+            //     createSpellActionTimer: () => () => timer,
+            //     extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
+            //     extractFutureSpells: () => ({ [ spell.id ]: spell }),
+            //     extractFutureHash: () => '-hash-',
+            //     extractCurrentHash: () => '-hash-',
+            //     extractState: () => state
+            // })(api)(next)(action);
 
             // expect(api.dispatch).toHaveBeenCalledWith(BattleCommitAction({
             //     time: expect.any(Number),
@@ -503,7 +508,7 @@ describe('# spell-action-middleware', () => {
             // }));
         });
 
-        it('should notify timer', () => {
+        it('should notify timer', async () => {
             const { futureCharacter, spell, api, next, timer, state } = init();
 
             const snapshot = seedSpellActionSnapshot(futureCharacter.staticData.staticSpells[ 0 ].id, {
@@ -519,7 +524,7 @@ describe('# spell-action-middleware', () => {
                 spellActionSnapshot: snapshot
             });
 
-            spellActionMiddleware({
+            await spellActionMiddleware({
                 createSpellActionTimer: () => () => timer,
                 extractFutureCharacters: () => ({ [ futureCharacter.id ]: futureCharacter }),
                 extractFutureSpells: () => ({ [ spell.id ]: spell }),

@@ -20,7 +20,7 @@ export const useGameNetwork = <P extends Params<A>, A extends ClientAction>(map:
         .reduce((arr, [ key, value ]) => {
 
             arr[ key ] = (...args) => {
-                dispatch(SendMessageAction(value(...args)));
+                return dispatch(SendMessageAction(value(...args)));
             };
 
             return arr;

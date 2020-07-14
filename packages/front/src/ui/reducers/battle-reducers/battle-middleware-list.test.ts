@@ -4,13 +4,13 @@ import { getBattleMiddlewareList } from './battle-middleware-list';
 
 describe('# battle-middleware-list', () => {
 
-    it('should handle random action without blocking', () => {
+    it('should handle random action without blocking', async () => {
 
         const reducer = jest.fn(rootReducer);
 
         const store = createStore(reducer, applyMiddleware(...getBattleMiddlewareList()));
 
-        store.dispatch({ type: 'any' });
+        await store.dispatch({ type: 'any' });
 
         expect(reducer).toHaveBeenCalledWith(expect.anything(), { type: 'any' });
     });

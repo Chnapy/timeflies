@@ -24,7 +24,6 @@ describe('# cycle-middleware', () => {
 
     const killPromises = (...promises: Promise<any>[]) => {
         waitTimeoutPool.setPoolEnable(false);
-        waitTimeoutPool.clearAll();
 
         return Promise.all([
             waitTimeoutPool.clearAll(),

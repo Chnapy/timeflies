@@ -90,6 +90,8 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
         const ret = next(action);
 
+        const promisesToWait: PromiseLike<unknown>[] = [ret];
+
         if (BattleStateSpellLaunchAction.match(action)) {
 
             const { spellActions } = action.payload;
@@ -115,10 +117,11 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
                     startTime
                 };
             });
-
-            api.dispatch(SpellActionLaunchAction({
+            
+            const p1 = api.dispatch(SpellActionLaunchAction({
                 spellActList
             }));
+            promisesToWait.push(p1);
 
             if (!hadCurrentSpellAction) {
                 spellActionTimer.onAdd(spellActList[ 0 ].startTime, false);
@@ -161,9 +164,10 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
                 const hadCurrentSpell = !!spellActionState.currentSpellAction;
 
-                api.dispatch(SpellActionLaunchAction({
+                const p2 = api.dispatch(SpellActionLaunchAction({
                     spellActList: [ { spellAction, startTime } ],
                 }));
+                promisesToWait.push(p2);
 
                 if (!hadCurrentSpell) {
                     spellActionTimer.onAdd(startTime, true);
@@ -173,6 +177,11 @@ export const spellActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = (
 
         await batcher.dispatchWith(api.dispatch);
 
-        return ret;
+        const timerTimeout = spellActionTimer.getTimeout();
+        if(timerTimeout?.getState() === 'wait') {
+            promisesToWait.push(timerTimeout);
+        }
+
+        return Promise.all(promisesToWait);
     };
 };
