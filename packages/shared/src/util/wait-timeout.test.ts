@@ -1,16 +1,16 @@
-import { WaitTimeoutPromiseState, WaitTimeoutPromisePayload, createWaitTimeoutPool } from './wait-timeout';
+import { WaitTimeoutPromiseState, WaitTimeoutPromisePayload, createWaitTimeoutPool, WaitTimeoutPromise } from './wait-timeout';
 
 describe('# wait-timeout', () => {
 
     jest.useFakeTimers();
 
-    afterEach(() => {
-        jest.clearAllTimers();
-    });
-
     const globalPool = createWaitTimeoutPool();
 
     const waitTimeout = globalPool.createTimeout;
+
+    afterEach(() => {
+        jest.clearAllTimers();
+    });
 
     it('should complete promise after given timeout', async () => {
         const promise = waitTimeout(1000);
@@ -50,13 +50,17 @@ describe('# wait-timeout', () => {
 
         const fn1 = jest.fn();
         const fn2 = jest.fn();
+        const fn3 = jest.fn();
 
         const promise = waitTimeout(1000)
             .then(fn1)
-            .then(fn2);
+            .onCompleted(fn2)
+            .then(fn3);
 
-        expect(promise).toHaveProperty('getState');
-        expect(promise).toHaveProperty('cancel');
+        expect(promise).toHaveProperty<keyof WaitTimeoutPromise>('getState');
+        expect(promise).toHaveProperty<keyof WaitTimeoutPromise>('cancel');
+        expect(promise).toHaveProperty<keyof WaitTimeoutPromise>('onCanceled');
+        expect(promise).toHaveProperty<keyof WaitTimeoutPromise>('onCompleted');
 
         jest.runOnlyPendingTimers();
 
@@ -64,6 +68,7 @@ describe('# wait-timeout', () => {
 
         expect(fn1).toHaveBeenCalledTimes(1);
         expect(fn2).toHaveBeenCalledTimes(1);
+        expect(fn3).toHaveBeenCalledTimes(1);
     });
 
     it('should call catch function on error', async () => {
@@ -83,7 +88,79 @@ describe('# wait-timeout', () => {
         expect(fn1).toHaveBeenCalled();
     });
 
-    describe('Timeout state', () => {
+    describe('onCompleted', () => {
+
+        it('should run callback on timeout complete', async () => {
+            const promise = waitTimeout(1000);
+
+            const fn = jest.fn();
+
+            promise.onCompleted(fn);
+
+            jest.advanceTimersByTime(900);
+
+            expect(fn).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(200);
+
+            await promise;
+
+            expect(fn).toHaveBeenCalledTimes(1);
+        });
+
+        it('should not run callback on timeout cancel', async () => {
+            const promise = waitTimeout(1000);
+
+            const fn = jest.fn();
+
+            promise.onCompleted(fn);
+
+            jest.advanceTimersByTime(500);
+    
+            promise.cancel();
+
+            expect(fn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('onCanceled', () => {
+
+        it('should run callback on timeout cancel', async () => {
+            const promise = waitTimeout(1000);
+
+            const fn = jest.fn();
+
+            promise.onCanceled(fn);
+
+            jest.advanceTimersByTime(500);
+    
+            promise.cancel();
+
+            await promise;
+
+            expect(fn).toHaveBeenCalledTimes(1);
+        });
+
+        it('should not run callback on timeout complete', async () => {
+            const promise = waitTimeout(1000);
+
+            const fn = jest.fn();
+
+            promise.onCanceled(fn);
+
+            jest.advanceTimersByTime(900);
+
+            expect(fn).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(200);
+
+            await promise;
+
+            expect(fn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('getState', () => {
 
         it('should give "wait" state if promise not ended', async () => {
             const promise = waitTimeout(1000);
@@ -116,7 +193,7 @@ describe('# wait-timeout', () => {
         });
     });
 
-    describe('Pool', () => {
+    describe('createWaitTimeoutPool', () => {
 
         it('should add timeout to pool on creation', async () => {
             const pool = createWaitTimeoutPool();

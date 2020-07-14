@@ -53,10 +53,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
         };
 
         spellEnableTimeout = waitTimeoutPool.createTimeout(timeoutDuration)
-            .then(state => {
-                if (state === 'completed')
-                    return fn();
-            });
+            .onCompleted(fn);
     };
 
     const getSpellEngine = (): SpellEngine => {

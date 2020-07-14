@@ -8,10 +8,7 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     waitTimeoutPool.createTimeout(5)
-        .then(async state => {
-            if (state === 'canceled') {
-                return;
-            }
+        .onCompleted(async () => {
 
             if (api.getState().step === 'boot') {
                 await api.dispatch(SendMessageAction({
