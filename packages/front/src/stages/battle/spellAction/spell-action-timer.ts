@@ -34,11 +34,7 @@ export const SpellActionTimer = ({
         const delta = Math.max(Date.now() - startTime, 0);
 
         timeout = waitTimeoutPool.createTimeout(duration - delta)
-            .then(state => {
-
-                if (state === 'canceled') {
-                    return;
-                }
+            .onCompleted(async () => {
 
                 const batcher = createActionBatch();
 

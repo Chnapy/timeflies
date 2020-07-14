@@ -4,6 +4,11 @@ export type WaitTimeoutPromiseState = 'wait' | 'completed' | 'canceled';
 export type WaitTimeoutPromisePayload = Extract<WaitTimeoutPromiseState, 'completed' | 'canceled'>;
 
 export type WaitTimeoutPromise<T = WaitTimeoutPromisePayload> = Omit<Promise<T>, 'then' | 'catch'> & {
+
+    onCompleted<R>(fn: () => R | PromiseLike<R>): WaitTimeoutPromise<R | Exclude<WaitTimeoutPromisePayload, 'completed'>>;
+
+    onCanceled<R>(fn: () => R | PromiseLike<R>): WaitTimeoutPromise<R | Exclude<WaitTimeoutPromisePayload, 'canceled'>>;
+
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): WaitTimeoutPromise<TResult1 | TResult2>;
 
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): WaitTimeoutPromise<T | TResult>;
@@ -135,7 +140,35 @@ const waitTimeout = (ms: number): WaitTimeoutPromise => {
             return transformPromise(catchPromise);
         };
 
+        const onCompleted: WaitTimeoutPromise<T>[ 'onCompleted' ] = fn => {
+            const completePromise = promise.then(_state => {
+
+                if (_state === 'completed') {
+                    return fn();
+                }
+
+                return _state;
+            });
+
+            return transformPromise(completePromise);
+        };
+
+        const onCanceled: WaitTimeoutPromise<T>[ 'onCanceled' ] = fn => {
+            const canceledPromise = promise.then(_state => {
+
+                if (_state === 'canceled') {
+                    return fn();
+                }
+
+                return _state;
+            });
+
+            return transformPromise(canceledPromise);
+        };
+
         return Object.assign(p, {
+            onCompleted,
+            onCanceled,
             then: thenFn,
             catch: catchFn,
             getState,

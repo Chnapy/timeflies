@@ -56,12 +56,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
         cancelTimeout();
 
         timeout = waitTimeoutPool.createTimeout(delta)
-            .then(async state => {
-
-                if (state === 'canceled') {
-                    return;
-                }
-
+            .onCompleted(async () => {
                 const currentCharacter = extractCurrentCharacters(api.getState)[ turnSnapshot.characterId ];
 
                 await api.dispatch(BattleStateTurnStartAction({
@@ -87,11 +82,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
         const duration = endTime - Date.now();
 
         timeout = waitTimeoutPool.createTimeout(duration)
-            .then(async state => {
-
-                if (state === 'canceled') {
-                    return;
-                }
+            .onCompleted(async () => {
 
                 await api.dispatch(BattleStateTurnEndAction());
 
