@@ -17,11 +17,13 @@ export const useAssetLoader = <K extends AssetMapKey>(loader: AssetLoader, key: 
         if (isSpritesheet) {
             loader.newInstance()
                 .addSpritesheet(key as SpritesheetMapKey, path)
-                .load();
+                .load()
+                .catch(console.error);
         } else {
             loader.newInstance()
                 .add(key as any, path)
-                .load();
+                .load()
+                .catch(console.error);
         }
 
     }, [ isSpritesheet, key, loader, path ]);

@@ -11,11 +11,14 @@ export const ReactToGraphicSprite = (reactElement: React.ReactElement, width: nu
 
     const sprite = new PIXI.Sprite();
 
-    getTexture(reactElement, width, height, customStyle).then(texture => {
+    const texturePromise = getTexture(reactElement, width, height, customStyle).then(texture => {
         sprite.texture = texture;
     });
 
-    return sprite;
+    return {
+        sprite,
+        texturePromise
+    };
 };
 
 const getHTMLString = (strElement: string): string => {

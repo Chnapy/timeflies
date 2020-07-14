@@ -10,6 +10,8 @@ import { seedCharacter } from '../entities/character/Character.seed';
 import { seedSpell } from '../entities/spell/Spell.seed';
 import { BattleDataPeriod } from '../snapshot/battle-data';
 import { getInitialSnapshotState } from '../snapshot/snapshot-reducer';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
+import { getDispatchThenPassTimeouts } from '../../../test-utils';
 
 describe('Battleflow', () => {
 
@@ -119,9 +121,12 @@ describe('Battleflow', () => {
                 ]
             });
 
+            const dispatchThenPassTimeouts = getDispatchThenPassTimeouts(store.dispatch);
+
             return {
                 store,
-                actionList
+                actionList,
+                dispatchThenPassTimeouts
             };
         };
 
@@ -249,11 +254,11 @@ describe('Battleflow', () => {
                 spellsSnapshots: []
             } ];
 
-            const { store } = createStore();
+            const { store, dispatchThenPassTimeouts } = createStore();
 
-            await store.dispatch(TileClickAction({
+            await dispatchThenPassTimeouts(TileClickAction({
                 position: createPosition(9, 6)
-            }));
+            }), true);
 
             const state1 = store.getState();
 
@@ -312,13 +317,11 @@ describe('Battleflow', () => {
 
             const { battleHash } = getBattleSnapshotWithHash(expectedSnapshot);
 
-            const { store, actionList } = createStore();
+            const { store, actionList, dispatchThenPassTimeouts } = createStore();
 
-            await store.dispatch(TileClickAction({
+            await dispatchThenPassTimeouts(TileClickAction({
                 position: createPosition(9, 6)
-            }));
-
-            jest.runOnlyPendingTimers();
+            }), true);
 
             expect(store.getState().battle.snapshotState.battleDataFuture.characters.c1.features.life).toBe(80);
 
@@ -393,7 +396,7 @@ describe('Battleflow', () => {
                 } ]
             } ];
 
-            const { store } = createStore();
+            const { store, dispatchThenPassTimeouts } = createStore();
 
             const spellSnapshot: SpellSnapshot = spellEntityToSnapshot({
                 ...snapshotState.battleDataCurrent.spells.s1,
@@ -406,7 +409,7 @@ describe('Battleflow', () => {
                 }
             });
 
-            await store.dispatch(ReceiveMessageAction({
+            await dispatchThenPassTimeouts(ReceiveMessageAction({
                 type: 'confirm',
                 sendTime: timerTester.now,
                 isOk: false,
@@ -416,9 +419,7 @@ describe('Battleflow', () => {
                     charactersSnapshots: [],
                     spellsSnapshots: [ spellSnapshot ]
                 }
-            }));
-
-            jest.runOnlyPendingTimers();
+            }), true);
 
             const state1 = store.getState();
 

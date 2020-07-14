@@ -38,15 +38,15 @@ export const Default: React.FC = () => {
         graphic.drawRect(0, 0, 500, 100);
         graphic.endFill();
 
-        const someText = ReactToGraphicSprite(<div>some basic text</div>, 100, 10);
+        const someText = ReactToGraphicSprite(<div>some basic text</div>, 100, 10).sprite;
 
-        const muiTypography = ReactToGraphicSprite(<Typography variant='h6'>Mui typography h6</Typography>, 100, 50);
+        const muiTypography = ReactToGraphicSprite(<Typography variant='h6'>Mui typography h6</Typography>, 100, 50).sprite;
         muiTypography.x = 100;
 
-        const muiIcon = ReactToGraphicSprite(<FavoriteIcon />, 24, 24);
+        const muiIcon = ReactToGraphicSprite(<FavoriteIcon />, 24, 24).sprite;
         muiIcon.x = 200;
 
-        const muiUIIcon = ReactToGraphicSprite(<UIIcon icon='life' inPixiContext />, 24, 24, 'color: white');
+        const muiUIIcon = ReactToGraphicSprite(<UIIcon icon='life' inPixiContext />, 24, 24, 'color: white').sprite;
         muiUIIcon.x = 300;
 
         app.stage.addChild(someText, muiTypography, muiIcon, muiUIIcon);

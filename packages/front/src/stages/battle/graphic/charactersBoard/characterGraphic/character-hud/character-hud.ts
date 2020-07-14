@@ -30,12 +30,12 @@ export const CharacterHud = (
     const lifeIconBg = ReactToGraphicSprite(React.createElement<UIIconProps>(UIIcon, {
         icon: 'life',
         inPixiContext: true
-    }), lifeIconSize, lifeIconSize, `color: ${palette.primary.contrastText}`);
+    }), lifeIconSize, lifeIconSize, `color: ${palette.primary.contrastText}`).sprite;
 
     const lifeIcon = ReactToGraphicSprite(React.createElement<UIIconProps>(UIIcon, {
         icon: 'life',
         inPixiContext: true
-    }), lifeIconSize - 4, lifeIconSize - 4);
+    }), lifeIconSize - 4, lifeIconSize - 4).sprite;
     lifeIcon.x = 2;
     lifeIcon.y = 2;
 

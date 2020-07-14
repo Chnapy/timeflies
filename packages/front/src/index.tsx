@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom';
 import { createAssetLoader } from './assetManager/AssetLoader';
 import './envManager';
+import './wait-timeout-pool';
 import { createStoreManager } from './store/store-manager';
 import { createView } from './view';
 
