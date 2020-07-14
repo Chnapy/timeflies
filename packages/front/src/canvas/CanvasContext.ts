@@ -32,7 +32,11 @@ export const CanvasContext = {
         const ret = fn();
 
         if (ret instanceof Promise) {
-            ret.then(() => contextsBuffer.delete(id));
+            return ret.then(payload => {
+                contextsBuffer.delete(id);
+
+                return payload;
+            }) as unknown as R;
         } else {
             contextsBuffer.delete(id);
         };

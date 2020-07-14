@@ -16,7 +16,12 @@
     "module": "esnext",
     "resolveJsonModule": false,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "../../node_modules/@types",
+      "src/types"
+    ]
   },
   "include": [
     "src/**/*",
@@ -24,6 +29,7 @@
     "benchmark/*"
   ],
   "exclude": [
-    "**/node_modules"
+    "**/node_modules",
+    "src/_assets"
   ]
 }

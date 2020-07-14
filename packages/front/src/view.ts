@@ -44,7 +44,8 @@ export const createView = ({ storeManager, assetLoader, gameUIChildren, createPi
                     storeManager,
                     assetLoader
                 })
-            );
+            )
+                .catch(console.error);
         }
     },
         gameUIChildren);

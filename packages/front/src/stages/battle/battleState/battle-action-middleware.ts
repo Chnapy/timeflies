@@ -1,5 +1,5 @@
 import { AnyAction, Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
-import { SpellRole } from '@timeflies/shared';
+import { SpellRole, WaitTimeoutPromise } from '@timeflies/shared';
 import { SpellEngine, SpellEngineDependencies, spellEngineMap } from '../engine/spellEngine/spell-engine';
 import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
 import { BattleStateSpellPrepareAction } from './battle-state-actions';
@@ -7,6 +7,7 @@ import { Spell } from '../entities/spell/Spell';
 import { getTurnRemainingTime } from '../cycle/cycle-reducer';
 import { BattleState } from '../../../ui/reducers/battle-reducers/battle-reducer';
 import { spellEngineDefault } from '../engine/spellEngine/default/spell-engine-default';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
     getSpellEngineFromType?: (spellRole: SpellRole, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
@@ -29,7 +30,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
     const updateSpellTimeout = (spell?: Spell<'future'>) => {
 
         if (spellEnableTimeout) {
-            clearTimeout(spellEnableTimeout);
+            spellEnableTimeout.cancel();
         }
 
         if (!spell) {
@@ -41,19 +42,21 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
         const futureCharacter = extractFutureCharacter(api.getState);
 
         const fn = () => {
-            spellEnableTimeout = null;
-
             const nextFutureCharacter = extractFutureCharacter(api.getState);
 
             if (nextFutureCharacter && nextFutureCharacter.id === futureCharacter?.id) {
-                api.dispatch(BattleStateSpellPrepareAction({
+                return api.dispatch(BattleStateSpellPrepareAction({
                     futureSpell: null,
                     futureCharacter
                 }));
             }
         };
 
-        spellEnableTimeout = setTimeout(fn, timeoutDuration);
+        spellEnableTimeout = waitTimeoutPool.createTimeout(timeoutDuration)
+            .then(state => {
+                if (state === 'completed')
+                    return fn();
+            });
     };
 
     const getSpellEngine = (): SpellEngine => {
@@ -71,7 +74,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
         return async () => { };
     };
 
-    let spellEnableTimeout: NodeJS.Timeout | null = null;
+    let spellEnableTimeout: WaitTimeoutPromise<void> | null = null;
     let spellEngine = getSpellEngine();
 
     return async (action: AnyAction) => {
@@ -97,12 +100,17 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
 
                 updateSpellTimeout(nextSpell);
 
-                if (nextSpell)
-                    api.dispatch(BattleStateSpellPrepareAction({
+                if (nextSpell) {
+                    await api.dispatch(BattleStateSpellPrepareAction({
                         futureSpell: nextSpell!,
                         futureCharacter: extractFutureCharacter(api.getState)!
                     }));
+                }
             }
+        }
+
+        if (spellEnableTimeout) {
+            await spellEnableTimeout;
         }
 
         return ret;

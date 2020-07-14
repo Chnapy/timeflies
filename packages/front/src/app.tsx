@@ -10,7 +10,7 @@ import { Box } from '@material-ui/core';
 export interface AppProps {
     store: Store<GameState, Action>;
     assetLoader: AssetLoader;
-    onMount(gameWrapper: HTMLElement, canvas: HTMLCanvasElement);
+    onMount: (gameWrapper: HTMLElement, canvas: HTMLCanvasElement) => void;
     children?: React.ReactNode;
 }
 

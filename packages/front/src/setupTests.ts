@@ -1,3 +1,4 @@
+import { waitTimeoutPool } from './wait-timeout-pool';
 
 //
 // Mock Canvas / Context2D calls
@@ -49,5 +50,17 @@ if (!process.env.LISTENING_TO_UNHANDLED_REJECTION) {
     // Avoid memory leak by adding too many listeners
     process.env.LISTENING_TO_UNHANDLED_REJECTION = 'true';
 }
+
+beforeEach(() => {
+    jest.useFakeTimers();
+    waitTimeoutPool.setPoolEnable(true);
+});
+
+afterEach(() => {
+    waitTimeoutPool.setPoolEnable(false);
+    waitTimeoutPool.clearAll();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+});
 
 export { };

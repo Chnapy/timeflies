@@ -127,11 +127,11 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         const path = getTimeFilteredPath(initialPath);
 
         if (path.length) {
-            api.dispatch(BattleMapPathAction({
+            return api.dispatch(BattleMapPathAction({
                 path
             }));
         } else if (extractState(api.getState).path.length) {
-            api.dispatch(BattleMapPathAction({
+            return api.dispatch(BattleMapPathAction({
                 path: []
             }));
         }
@@ -150,7 +150,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
                 actionArea: normalize([ position ])
             }));
 
-            api.dispatch(BattleStateSpellLaunchAction({
+            return api.dispatch(BattleStateSpellLaunchAction({
                 spellActions
             }));
         }
@@ -171,7 +171,7 @@ export const spellEngineMove: SpellEngineCreator<Dependencies> = ({
         } else if (TileClickAction.match(action)) {
             const spell = extractFutureSpell(api.getState)!;
 
-            onMoveClick(spell);
+            await onMoveClick(spell);
 
         } else if (SpellActionLaunchAction.match(action)) {
 

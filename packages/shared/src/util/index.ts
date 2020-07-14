@@ -7,3 +7,4 @@ export * from './inferFn';
 export * from './clone';
 export * from './assign-keep-get-set';
 export * from './normalize';
+export * from './wait-timeout';

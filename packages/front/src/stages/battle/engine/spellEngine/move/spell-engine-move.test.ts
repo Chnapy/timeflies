@@ -1,4 +1,4 @@
-import { applyMiddleware, createStore, Middleware, Reducer, Store } from '@reduxjs/toolkit';
+import { applyMiddleware, createStore, Middleware, Reducer } from '@reduxjs/toolkit';
 import { createPosition, normalize, seedTiledMap, seedTiledMapAssets } from '@timeflies/shared';
 import { battleActionMiddleware } from '../../../battleState/battle-action-middleware';
 import { battleActionReducer, BattleActionState } from '../../../battleState/battle-action-reducer';
@@ -9,6 +9,7 @@ import { SpellActionLaunchAction } from '../../../spellAction/spell-action-actio
 import { CreateTileTypeGetter, spellEngineMove } from './spell-engine-move';
 import { battleReducer, BattleState } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
 import { getInitialCycleState } from '../../../cycle/cycle-reducer';
+import { getDispatchThenPassTimeouts } from '../../../../../test-utils';
 
 describe('# spell-engine-move (depends on #battle-action)', () => {
 
@@ -16,10 +17,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
         initialState: BattleActionState,
         createTileTypeGetter: CreateTileTypeGetter,
         middlewareDeps: Partial<Parameters<typeof spellEngineMove>[ 0 ]> = {}
-    ): {
-        store: Store<BattleActionState>;
-        dispatchMock: jest.Mock;
-    } => {
+    ) => {
 
         const futureCharacter = seedCharacter({
             id: '1', period: 'future'
@@ -69,7 +67,9 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
 
         const store = createStore(reducer as any, initialState, applyMiddleware(wrapMiddleware));
 
-        return { store, dispatchMock };
+        const dispatchThenPassTimeouts = getDispatchThenPassTimeouts(store.dispatch);
+
+        return { store, dispatchMock, dispatchThenPassTimeouts };
     };
 
     describe('on tile hover', () => {
@@ -89,7 +89,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 futureCharacterPosition: null
             };
 
-            const { store } = getStore(initialState,
+            const { store, dispatchThenPassTimeouts } = getStore(initialState,
                 () => () => 'obstacle',
                 {
                     extractGrid: () => normalize([
@@ -115,7 +115,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 position: createPosition(2, 0)
             });
 
-            await store.dispatch(action);
+            await dispatchThenPassTimeouts(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
@@ -135,7 +135,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 futureCharacterPosition: null
             };
 
-            const { store } = getStore(initialState,
+            const { store, dispatchThenPassTimeouts } = getStore(initialState,
                 () => () => 'default',
                 {
                     extractGrid: () => normalize([
@@ -161,7 +161,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 position: createPosition(2, 0)
             });
 
-            await store.dispatch(action);
+            await dispatchThenPassTimeouts(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
@@ -188,7 +188,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 id: '1', period: 'future', position: createPosition(0, 0)
             });
 
-            const { store } = getStore(initialState,
+            const { store, dispatchThenPassTimeouts } = getStore(initialState,
                 () => p => p.y ? 'obstacle' : 'default',
                 {
                     extractGrid: () => normalize([
@@ -216,7 +216,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 position: createPosition(2, 0)
             });
 
-            await store.dispatch(action);
+            await dispatchThenPassTimeouts(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
@@ -239,7 +239,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 futureCharacterPosition: null
             };
 
-            const { store, dispatchMock } = getStore(initialState,
+            const { dispatchMock, dispatchThenPassTimeouts } = getStore(initialState,
                 () => ({ x, y }) => y || x === 1 ? 'obstacle' : 'default',
                 {
                     extractGrid: () => normalize([
@@ -265,7 +265,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 position: createPosition(2, 0)
             });
 
-            await store.dispatch(action);
+            await dispatchThenPassTimeouts(action);
 
             expect(dispatchMock).not.toHaveBeenCalled();
         });
@@ -285,7 +285,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 futureCharacterPosition: null
             };
 
-            const { store, dispatchMock } = getStore(initialState,
+            const { dispatchMock, dispatchThenPassTimeouts } = getStore(initialState,
                 () => () => 'default',
                 {
                     extractGrid: () => normalize([
@@ -311,7 +311,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 position: createPosition(2, 0)
             });
 
-            await store.dispatch(action);
+            await dispatchThenPassTimeouts(action);
 
             expect(dispatchMock).toHaveBeenNthCalledWith(1, BattleStateSpellLaunchAction({
                 spellActions: expect.arrayContaining([ expect.any(Object) ])
@@ -339,7 +339,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 })
             ];
 
-            const { store } = getStore(initialState,
+            const { store, dispatchThenPassTimeouts } = getStore(initialState,
                 () => p => p.y ? 'obstacle' : 'default',
                 {
                     extractGrid: () => normalize([
@@ -363,7 +363,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
 
             characterList.push(seedCharacter({ id: '2', period: 'future', position: createPosition(1, 0) }));
 
-            await store.dispatch(SpellActionLaunchAction({
+            await dispatchThenPassTimeouts(SpellActionLaunchAction({
                 spellActList: [ {
                     startTime: Date.now(),
                     spellAction: {
@@ -372,13 +372,11 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                         position: createPosition(0, 0)
                     }
                 } ]
-            }))
+            }), true);
 
-            const action2 = TileHoverAction({
+            await dispatchThenPassTimeouts(TileHoverAction({
                 position: createPosition(2, 0)
-            });
-
-            await store.dispatch(action2);
+            }));
 
             expect(store.getState().path).toEqual([]);
         });

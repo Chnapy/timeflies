@@ -20,7 +20,7 @@ export const TeamIndicatorGraphic = (teamLetter: string) => {
         size,
         size,
         `font-size: ${fontSize}px`
-    );
+    ).sprite;
 
     container.addChild(sprite);
 
