@@ -296,7 +296,8 @@ export const Default: React.FC = () => {
 
         const startTime = Date.now() + 1000;
 
-        storeManager.dispatch(BattleStartAction({
+        console.log('start')
+        await storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,
@@ -323,6 +324,7 @@ export const Default: React.FC = () => {
                 time: startTime
             }
         }));
+        console.log('end')
 
         const battleStageGraphic = CanvasContext.provider({
             spritesheets: {
@@ -344,7 +346,7 @@ export const Default: React.FC = () => {
 
         const newPosition = createPosition(position.x + 1, position.y);
 
-        storeManager.dispatch(ReceiveMessageAction({
+        return storeManager.dispatch(ReceiveMessageAction({
             type: 'notify',
             sendTime: -1,
             spellActionSnapshot: {

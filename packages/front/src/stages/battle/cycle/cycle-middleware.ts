@@ -4,8 +4,9 @@ import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleS
 import { Character } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { BattleStartAction } from '../battle-actions';
-import { Normalized, TurnSnapshot, TURN_DELAY, characterIsAlive } from '@timeflies/shared';
+import { Normalized, TurnSnapshot, TURN_DELAY, characterIsAlive, WaitTimeoutPromise } from '@timeflies/shared';
 import { CycleState, getTurnState } from './cycle-reducer';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => CycleState;
@@ -17,11 +18,11 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractCurrentCharacters
 }) => api => next => {
 
-    const getCharacter = (characterId: string): Character<'current'> => extractCurrentCharacters(api.getState)[characterId];
+    const getCharacter = (characterId: string): Character<'current'> => extractCurrentCharacters(api.getState)[ characterId ];
 
     const isCharacterDead = (characterId: string) => {
 
-        return !characterIsAlive(extractCurrentCharacters(api.getState)[characterId]);
+        return !characterIsAlive(extractCurrentCharacters(api.getState)[ characterId ]);
     };
 
     const getNextCharacterInfos = (currentCharacterId: string, index: number = 0): {
@@ -54,18 +55,24 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
         cancelTimeout();
 
-        timeout = setTimeout(() => {
+        timeout = waitTimeoutPool.createTimeout(delta)
+            .then(async state => {
 
-            const currentCharacter = extractCurrentCharacters(api.getState)[turnSnapshot.characterId];
+                if (state === 'canceled') {
+                    return;
+                }
 
-            api.dispatch(BattleStateTurnStartAction({
-                turnSnapshot,
-                currentCharacter
-            }));
+                const currentCharacter = extractCurrentCharacters(api.getState)[ turnSnapshot.characterId ];
 
-            differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);
+                await api.dispatch(BattleStateTurnStartAction({
+                    turnSnapshot,
+                    currentCharacter
+                }));
 
-        }, delta);
+                await differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);
+            });
+
+        return timeout;
     };
 
     const differTurnEnd = (characterId: string, startTime?: number) => {
@@ -79,38 +86,44 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
             : Date.now();
         const duration = endTime - Date.now();
 
-        timeout = setTimeout(() => {
+        timeout = waitTimeoutPool.createTimeout(duration)
+            .then(async state => {
 
-            api.dispatch(BattleStateTurnEndAction());
+                if (state === 'canceled') {
+                    return;
+                }
 
-            const { turnId, currentCharacterId } = extractState(api.getState);
+                await api.dispatch(BattleStateTurnEndAction());
 
-            const nextChar = getNextCharacterInfos(currentCharacterId);
+                const { turnId, currentCharacterId } = extractState(api.getState);
 
-            if (nextChar) {
-                differTurnStart({
-                    id: turnId + 1,
-                    startTime: endTime + TURN_DELAY,
-                    characterId: nextChar.id,
-                    duration: nextChar.duration
-                });
-            }
+                const nextChar = getNextCharacterInfos(currentCharacterId);
 
-        }, duration);
+                if (nextChar) {
+                    await differTurnStart({
+                        id: turnId + 1,
+                        startTime: endTime + TURN_DELAY,
+                        characterId: nextChar.id,
+                        duration: nextChar.duration
+                    });
+                }
+            });
+            
+        return timeout;
     };
 
     const turnQueue: TurnSnapshot[] = [];
 
-    let timeout: NodeJS.Timeout | null = null;
+    let timeout: WaitTimeoutPromise<any> | null = null;
 
     const cancelTimeout = () => {
         if (timeout) {
-            clearTimeout(timeout);
+            timeout.cancel();
             timeout = null;
         }
     };
 
-    return (action: AnyAction) => {
+    return async (action: AnyAction) => {
 
         const ret = next(action);
 
@@ -155,7 +168,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
                 cancelTimeout();
 
-                api.dispatch(BattleStateTurnEndAction());
+                await api.dispatch(BattleStateTurnEndAction());
 
                 alert(`Battle ended. Team ${payload.winnerTeamId} wins !`);
             }
@@ -168,6 +181,8 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 differTurnEnd(currentCharacterId);
             }
         }
+
+        // 'timeout' is never waited since it never ends 
 
         return ret;
     };

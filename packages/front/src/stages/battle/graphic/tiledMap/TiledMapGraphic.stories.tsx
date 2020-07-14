@@ -44,7 +44,7 @@ export const Default = () => {
 
         const tiledMap = TiledMapGraphic();
 
-        storeManager.dispatch(BattleStartAction({
+        await storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,

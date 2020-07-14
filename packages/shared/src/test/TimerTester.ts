@@ -21,9 +21,12 @@ export class TimerTester {
         this.spyInstance = jest.spyOn(Date, 'now').mockImplementation(() => this.now);
     }
 
-    advanceBy(msToRun: number): void {
+    advanceBy(msToRun: number): Promise<void> {
         this._now = this.now + msToRun;
         jest.advanceTimersByTime(msToRun);
+        
+        // trigger ended promises
+        return Promise.resolve().then(() => {});
     }
 
     immediates = {

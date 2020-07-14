@@ -157,10 +157,7 @@ describe('# wait-timeout', () => {
             const p1 = pool.createTimeout(1000);
             const p2 = pool.createTimeout(1000);
 
-            pool.clearAll();
-
-            await p1;
-            await p2;
+            await pool.clearAll();
 
             expect(p1.getState()).toBe<WaitTimeoutPromiseState>('canceled');
             expect(p2.getState()).toBe<WaitTimeoutPromiseState>('canceled');

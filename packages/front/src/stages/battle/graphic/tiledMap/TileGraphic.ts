@@ -43,7 +43,7 @@ export const TileGraphic = ({
     container.on('mouseover', (e) => {
         // if no click
         if (e.data.originalEvent.buttons === 0) {
-            storeEmitter.dispatch(TileHoverAction({
+            return storeEmitter.dispatch(TileHoverAction({
                 position: tilePos
             }));
         }
@@ -52,7 +52,7 @@ export const TileGraphic = ({
     container.on('click', (e: PIXI.interaction.InteractionEvent) => {
         // if left-click
         if (e.data.originalEvent.which === 1) {
-            storeEmitter.dispatch(TileClickAction({
+            return storeEmitter.dispatch(TileClickAction({
                 position: tilePos
             }));
         }

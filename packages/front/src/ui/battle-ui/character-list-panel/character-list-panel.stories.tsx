@@ -1,6 +1,7 @@
 import { Box } from '@material-ui/core';
-import { characterEntityToSnapshot, playerEntityToSnapshot, seedTiledMap, teamEntityToSnapshot, characterAlterLife } from '@timeflies/shared';
+import { characterAlterLife, characterEntityToSnapshot, playerEntityToSnapshot, seedTiledMap, teamEntityToSnapshot } from '@timeflies/shared';
 import React from 'react';
+import { usePromise } from '../../../../.storybook/storybook-utils';
 import { AssetLoader, createAssetLoader } from '../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../assetManager/AssetManager';
 import { useAssetLoader } from '../../../assetManager/AssetProvider';
@@ -99,7 +100,7 @@ export const Default: React.FC = () => {
         middlewareList: []
     });
 
-    storeManager.dispatch(BattleStartAction({
+    const promise = storeManager.dispatch(BattleStartAction({
         myPlayerId: 'p1',
         tiledMapAssets: {
             schema: seedTiledMap('map_1'),
@@ -156,17 +157,20 @@ export const Default: React.FC = () => {
         assetLoader,
         createPixi: async () => { },
         gameUIChildren: <Box maxHeight='100%' width={250}>
-            <InnerDefault loader={assetLoader} />
+            <InnerDefault loader={assetLoader} promise={promise} />
         </Box>
     });
 
     return view;
 };
 
-const InnerDefault: React.FC<{ loader: AssetLoader }> = ({ loader }) => {
+const InnerDefault: React.FC<{ loader: AssetLoader; promise: Promise<unknown> }> = ({ loader, promise }) => {
     useAssetLoader(loader, 'characters', AssetManager.spritesheets.characters, true);
+    const shouldRender = usePromise(promise);
 
     return (
-        <CharacterListPanel />
+        shouldRender
+            ? <CharacterListPanel />
+            : null
     );
 };

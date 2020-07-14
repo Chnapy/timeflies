@@ -74,7 +74,7 @@ export const Default: React.FC = () => {
         hud.container.y = 30;
         app.stage.addChild(hud.container);
 
-        storeManager.dispatch(BattleStartAction({
+        await storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
                 schema: map.schema,

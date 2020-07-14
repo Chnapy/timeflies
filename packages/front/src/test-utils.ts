@@ -10,7 +10,7 @@ import { waitTimeoutPool } from './wait-timeout-pool';
  * - cancel any current custom timeout (waitTimeout)
  * - avoid any future custom timeout by disabling pool (if disableTimeoutPool defined)
  */
-export const getDispatchThenPassTimeouts = (dispatch: Dispatch) => (action: AnyAction, disableTimeoutPool?: boolean) => {
+export const getDispatchThenPassTimeouts = (dispatch: Dispatch) => async (action: AnyAction, disableTimeoutPool?: boolean) => {
 
     const promise = dispatch(action);
 
@@ -21,7 +21,7 @@ export const getDispatchThenPassTimeouts = (dispatch: Dispatch) => (action: AnyA
     disableTimeoutPool && waitTimeoutPool.setPoolEnable(false)
 
     // cancel all current waitTimeouts 
-    waitTimeoutPool.clearAll();
+    await waitTimeoutPool.clearAll();
 
     return promise;
 };
