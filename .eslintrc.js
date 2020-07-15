@@ -1,8 +1,10 @@
-{
-    "extends": [
+module.exports = {
+    extends: [
         "react-app"
     ],
-    "rules": {
+    parser: "@typescript-eslint/parser",
+    plugins: [ "@typescript-eslint" ],
+    rules: {
         "no-restricted-globals": [
             "error",
             "postMessage",
@@ -175,7 +177,19 @@
             "speechSynthesis",
             "webkitRequestFileSystem",
             "webkitResolveLocalFileSystemURL",
-            "openDatabase"
-        ]
+            "openDatabase",
+            {
+                name: "setTimeout",
+                message: "Use promise-based waitTimeout instead."
+            },
+        ],
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                args: "none",
+                varsIgnorePattern: "^_"
+            }
+        ],
+        "@typescript-eslint/no-floating-promises": "error",
     }
-}
+};

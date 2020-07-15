@@ -16,6 +16,7 @@ import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { TileGrid } from '../../tiledMap/tile-grid';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
+import { waitTimeoutPool } from '../../../../../wait-timeout-pool';
 
 export default {
     title: 'graphic/CharacterGraphic',
@@ -145,17 +146,18 @@ const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
             })
         });
 
-        setTimeout(() => {
-            graphic.debug.onStateChangePeriod({
-                state: 'no-spell',
-                tiledSchema,
-                characterPosition: currentPosition!
+        return waitTimeoutPool.createTimeout(duration)
+            .onCompleted(() => {
+                graphic.debug.onStateChangePeriod({
+                    state: 'no-spell',
+                    tiledSchema,
+                    characterPosition: currentPosition!
+                });
+                graphic.debug.onStateChange({
+                    tiledSchema,
+                    position: currentPosition!
+                });
             });
-            graphic.debug.onStateChange({
-                tiledSchema,
-                position: currentPosition!
-            });
-        }, duration);
     };
 
     return <>
