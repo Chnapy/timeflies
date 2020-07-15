@@ -7,7 +7,10 @@
       "src/types"
     ]
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
-    "**/__*__/*"
+    "**/node_modules"
   ]
 }

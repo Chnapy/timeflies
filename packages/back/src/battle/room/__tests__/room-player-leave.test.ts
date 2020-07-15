@@ -1,5 +1,6 @@
 import { RoomServerAction, TeamRoom, PlayerRoom, TimerTester } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
 
 describe('# room > on player leave', () => {
 
@@ -194,7 +195,7 @@ describe('# room > on player leave', () => {
         const { createRoom, initialState, receiveJ2, sendListJ1 } = getRoomStateWithTwoPlayers('p1', 'p2');
 
         initialState.step = 'will-launch';
-        initialState.launchTimeout = setTimeout(() => {}, 10);
+        initialState.launchTimeout = waitTimeoutPool.createTimeout(10);
 
         createRoom();
 

@@ -114,6 +114,7 @@ const waitTimeout = (ms: number): WaitTimeoutPromise => {
 
         cancel = () => {
             if (state === 'wait' && timeout) {
+                // eslint-disable-next-line no-restricted-globals
                 clearTimeout(timeout);
 
                 state = 'canceled';

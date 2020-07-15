@@ -1,4 +1,4 @@
-import { RoomServerAction, TeamRoom, ErrorServerAction } from '@timeflies/shared';
+import { RoomServerAction, TeamRoom, ErrorServerAction, createPosition } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('# room > on character remove request', () => {
@@ -14,7 +14,7 @@ describe('# room > on character remove request', () => {
             await receive({
                 type: 'room/character/remove',
                 sendTime: -1,
-                position: { x: 0, y: 0 }
+                position: createPosition(0, 0)
             });
 
             expect(sendList).toContainEqual<ErrorServerAction>({
@@ -54,7 +54,7 @@ describe('# room > on character remove request', () => {
             await receiveJ1({
                 type: 'room/character/remove',
                 sendTime: -1,
-                position: { x: 32, y: 14 }
+                position: createPosition(32, 14)
             });
 
             expect(sendListJ1).toContainEqual<ErrorServerAction>({
@@ -171,7 +171,7 @@ describe('# room > on character remove request', () => {
             position: firstTile.position
         });
         teamJ1.playersIds.push('p1');
-        
+
         createRoom();
 
         await receiveJ1({

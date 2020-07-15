@@ -6,7 +6,7 @@ export type SocketState = 'init' | 'hasID';
 
 export type WSSocketPool = {
     isConnected(): boolean;
-    on: <A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void) => void | Promise<void>;
+    on: <A extends ClientAction>(type: A[ 'type' ], fn: (action: A) => void) => void;
     onDisconnect: (fn: () => void) => void;
     send: <A extends ServerAction>(...actionList: DistributiveOmit<A, 'sendTime'>[]) => void;
     sendError: (error: WSError) => void;

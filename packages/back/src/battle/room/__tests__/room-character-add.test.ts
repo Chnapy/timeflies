@@ -1,4 +1,4 @@
-import { RoomServerAction, ServerAction, TeamRoom, ErrorServerAction } from '@timeflies/shared';
+import { RoomServerAction, ServerAction, TeamRoom, ErrorServerAction, createPosition } from '@timeflies/shared';
 import { RoomTester } from './room-tester';
 
 describe('# room > on character add request', () => {
@@ -15,7 +15,7 @@ describe('# room > on character add request', () => {
                 type: 'room/character/add',
                 sendTime: -1,
                 characterType: 'sampleChar1',
-                position: { x: 0, y: 0 }
+                position: createPosition(0, 0)
             });
 
             expect(sendList).toContainEqual<ErrorServerAction>({

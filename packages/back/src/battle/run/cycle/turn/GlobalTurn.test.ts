@@ -36,7 +36,7 @@ describe('# GlobalTurn', () => {
         expect(globalTurnRunning.state).toBe<GlobalTurnState>('running');
     });
 
-    it('should change current turn when previous one ends', () => {
+    it('should change current turn when previous one ends', async () => {
 
         const characters = seedCharacter({
             alterFn: char => char.initialFeatures.actionTime = 2000
@@ -52,13 +52,13 @@ describe('# GlobalTurn', () => {
 
         const firstTurnId = globalTurn.currentTurn.id;
 
-        timerTester.advanceBy(globalTurn.currentTurn.turnDuration + 10);
+        await timerTester.advanceBy(globalTurn.currentTurn.turnDuration + 10);
 
         expect(globalTurn.currentTurn.id).toBe(firstTurnId + 1);
         expect(globalTurn.currentTurn.getCharacter()).toBe(characters[ '2' ]);
     });
 
-    it('should run callback when last turn ends', () => {
+    it('should run callback when last turn ends', async () => {
 
         const characters = seedCharacter({
             length: 1,
@@ -75,16 +75,16 @@ describe('# GlobalTurn', () => {
             () => characters, turnIdGenerator,
             onGTurnEnd, () => null);
 
-        timerTester.advanceBy(1900);
+        await timerTester.advanceBy(1900);
 
         expect(onGTurnEnd).not.toHaveBeenCalled();
 
-        timerTester.advanceBy(200);
+        await timerTester.advanceBy(200);
 
         expect(onGTurnEnd).toHaveBeenCalledTimes(1);
     });
 
-    it('should not run dead character turn', () => {
+    it('should not run dead character turn', async () => {
 
         const characters = seedCharacter({
             alterFn: char => char.initialFeatures.actionTime = 2000
@@ -105,7 +105,7 @@ describe('# GlobalTurn', () => {
             life: 0
         };
 
-        timerTester.advanceBy(3000);
+        await timerTester.advanceBy(3000);
 
         expect(globalTurn.currentTurn.getCharacter()).not.toBe(secondChar);
     });

@@ -1,4 +1,4 @@
-import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY, characterIsAlive, denormalize } from "@timeflies/shared";
+import { GlobalTurnSnapshot, IndexGenerator, TURN_DELAY, characterIsAlive, denormalize, WaitTimeoutPromise } from "@timeflies/shared";
 import { EntitiesGetter } from '../../battleStateManager/BattleStateManager';
 import { Turn } from "./Turn";
 
@@ -34,24 +34,24 @@ export const GlobalTurn = (
             currentTurn.clearTimedActions();
 
         currentTurn = turn;
-        turn.refreshTimedActions();
+        return turn.refreshTimedActions();
     };
 
-    const notifyDeaths = (): void => {
+    const notifyDeaths = () => {
         if (!characterIsAlive(currentTurn.getCharacter())) {
-            onTurnEnd();
+            return onTurnEnd();
         }
     };
 
-    const onTurnEnd = (): void => {
+    const onTurnEnd = () => {
         currentTurn.clearTimedActions();
 
         const currentCharacterIndex = getCurrentCharacterIndex();
 
-        runNextTurn(currentCharacterIndex + 1);
+        return runNextTurn(currentCharacterIndex + 1);
     };
 
-    const runNextTurn = (nextCharacterIndex: number): void => {
+    const runNextTurn = (nextCharacterIndex: number): WaitTimeoutPromise<unknown> | undefined => {
 
         if (nextCharacterIndex >= order.length) {
             onGlobalTurnEnd(currentTurn.endTime);
@@ -62,9 +62,9 @@ export const GlobalTurn = (
             if (characterIsAlive(getCurrentCharacter())) {
                 console.log(`Wait ${TURN_DELAY}ms`);
                 const turnId = generateTurnId.next().value;
-                setCurrentTurn(Turn(turnId, currentTurn.endTime + TURN_DELAY, getCurrentCharacter, onTurnStart, onTurnEnd));
+                return setCurrentTurn(Turn(turnId, currentTurn.endTime + TURN_DELAY, getCurrentCharacter, onTurnStart, onTurnEnd));
             } else {
-                runNextTurn(nextCharacterIndex + 1);
+                return runNextTurn(nextCharacterIndex + 1);
             }
         }
     };
@@ -86,6 +86,7 @@ export const GlobalTurn = (
         currentTurn.clearTimedActions();
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     setCurrentTurn(Turn(turnId, startTime, () => getCharacters()[ order[0] ], () => null, onTurnEnd));
 
     const this_: GlobalTurn = {
