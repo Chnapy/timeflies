@@ -1,7 +1,6 @@
 import { applyMiddleware, createStore, Store } from '@reduxjs/toolkit';
 import { createPosition, normalize, seedTiledMapAssets } from '@timeflies/shared';
 import { Reducer } from 'react';
-import { getDispatchThenPassTimeouts } from '../../../test-utils';
 import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 import { BattleStartAction } from '../battle-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -129,9 +128,7 @@ describe('# battle-action', () => {
                 currentCharacter: seedCharacter({ id: 'c1', period: 'current', isMine: true })
             });
 
-            const dispatchThenPassTimeouts = getDispatchThenPassTimeouts(store.dispatch);
-
-            await dispatchThenPassTimeouts(action);
+            await store.dispatch(action);
 
             expect(getSpellEngineFromType).toHaveBeenNthCalledWith(1, 'move', expect.anything(), expect.anything());
             expect(spellEngine).toHaveBeenNthCalledWith(1, action);
