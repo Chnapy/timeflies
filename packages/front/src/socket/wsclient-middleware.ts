@@ -2,6 +2,7 @@ import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { getEndpoint } from '@timeflies/shared';
 import { envManager } from '../envManager';
 import { SendMessageAction, ReceiveMessageAction } from './wsclient-actions';
+import { waitTimeoutPool } from '../wait-timeout-pool';
 
 export type WebSocketCreator = (endPoint: string) => WebSocket;
 
@@ -22,7 +23,8 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
     const send = async (action: SendMessageAction) => {
 
         if (socket.readyState === WebSocket.CONNECTING) {
-            return new Promise(r => setTimeout(() => send(action).then(r), 1000));
+            return waitTimeoutPool.createTimeout(1000)
+                .onCompleted(() => send(action));
         }
         // console.log('<-', action.payload);
 

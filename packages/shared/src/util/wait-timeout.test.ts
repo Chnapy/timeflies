@@ -13,11 +13,10 @@ describe('# wait-timeout', () => {
     });
 
     it('should complete promise after given timeout', async () => {
-        const promise = waitTimeout(1000);
-
         const fn = jest.fn();
 
-        promise.then(fn);
+        const promise = waitTimeout(1000)
+            .then(fn);
 
         jest.advanceTimersByTime(900);
 
@@ -31,11 +30,10 @@ describe('# wait-timeout', () => {
     });
 
     it('should cancel promise on cancel function call', async () => {
-        const promise = waitTimeout(1000);
-
         const fn = jest.fn();
 
-        promise.then(fn);
+        const promise = waitTimeout(1000)
+            .then(fn);
 
         jest.advanceTimersByTime(500);
 
@@ -91,11 +89,10 @@ describe('# wait-timeout', () => {
     describe('onCompleted', () => {
 
         it('should run callback on timeout complete', async () => {
-            const promise = waitTimeout(1000);
-
             const fn = jest.fn();
 
-            promise.onCompleted(fn);
+            const promise = waitTimeout(1000)
+                .onCompleted(fn);
 
             jest.advanceTimersByTime(900);
 
@@ -109,14 +106,13 @@ describe('# wait-timeout', () => {
         });
 
         it('should not run callback on timeout cancel', async () => {
-            const promise = waitTimeout(1000);
-
             const fn = jest.fn();
 
-            promise.onCompleted(fn);
+            const promise = waitTimeout(1000)
+                .onCompleted(fn);
 
             jest.advanceTimersByTime(500);
-    
+
             promise.cancel();
 
             expect(fn).not.toHaveBeenCalled();
@@ -126,14 +122,13 @@ describe('# wait-timeout', () => {
     describe('onCanceled', () => {
 
         it('should run callback on timeout cancel', async () => {
-            const promise = waitTimeout(1000);
-
             const fn = jest.fn();
 
-            promise.onCanceled(fn);
+            const promise = waitTimeout(1000)
+                .onCanceled(fn);
 
             jest.advanceTimersByTime(500);
-    
+
             promise.cancel();
 
             await promise;
@@ -142,11 +137,10 @@ describe('# wait-timeout', () => {
         });
 
         it('should not run callback on timeout complete', async () => {
-            const promise = waitTimeout(1000);
-
             const fn = jest.fn();
 
-            promise.onCanceled(fn);
+            const promise = waitTimeout(1000)
+                .onCanceled(fn);
 
             jest.advanceTimersByTime(900);
 

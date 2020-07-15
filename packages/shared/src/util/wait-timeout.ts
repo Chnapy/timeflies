@@ -106,6 +106,7 @@ const waitTimeout = (ms: number): WaitTimeoutPromise => {
 
     const promise = new Promise<WaitTimeoutPromisePayload>(r => {
 
+        // eslint-disable-next-line no-restricted-globals
         timeout = setTimeout(() => {
             state = 'completed';
             r(state);
