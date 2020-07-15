@@ -96,7 +96,7 @@ describe('# battle-action', () => {
 
         it.todo('should set action to spellPrepare, if character mine');
 
-        it.only('should get spell engine and pass it action, if character mine', async () => {
+        it('should get spell engine and pass it action, if character mine', async () => {
 
             const initialState: BattleActionState = {
                 tiledSchema: null,
