@@ -23,8 +23,8 @@ describe('# room', () => {
             [ ...new Array(nbrPlayersMax - 2) ]
                 .map((_, i) => createPlayer(`p${i + 2}`, false))
                 .forEach(({ playerData, player }) => {
-                    playerDataList.push(playerData);
-                    playerList.push(player);
+                    playerDataList!.push(playerData);
+                    playerList!.push(player);
                 });
 
             const room = createRoom();

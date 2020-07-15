@@ -1,6 +1,7 @@
 import { assertIsDefined, RoomClientAction, RoomServerAction, assertIsNonNullable } from '@timeflies/shared';
 import { RoomListener } from './room';
 import { BattleRunRoom, RoomStateReady } from '../run/BattleRunRoom';
+import { waitTimeoutPool } from '../../wait-timeout-pool';
 
 export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
     playerData: { id }, stateManager, sendToEveryone, forbiddenError
@@ -8,14 +9,14 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
 
     const { step, mapSelected, teamList, launchTimeout } = stateManager.get();
 
-    if(step === 'will-launch') {
-        if(isReady || isLoading) {
+    if (step === 'will-launch') {
+        if (isReady || isLoading) {
             throw forbiddenError('cannot set player state to loading nor ready on will-launch step');
         }
 
         assertIsNonNullable(launchTimeout);
 
-        clearTimeout(launchTimeout);
+        launchTimeout.cancel();
 
         stateManager.set({
             step: 'idle',
@@ -63,7 +64,7 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
 
     const allPlayersAreReady = mutable.playerList.every(p => p.isReady);
 
-    if(allPlayersAreReady) {
+    if (allPlayersAreReady) {
 
         // TODO use config
         const delay = 5000;
@@ -76,39 +77,40 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
             launchTime
         });
 
-        const launchTimeout = setTimeout(async () => {
+        const launchTimeout = waitTimeoutPool.createTimeout(delay)
+            .onCompleted(async () => {
 
-            const roomState = stateManager.get();
+                const roomState = stateManager.get();
 
-            assertIsNonNullable(mapSelected);
+                assertIsNonNullable(mapSelected);
 
-            const roomStateReady: RoomStateReady = {
-                ...roomState,
-                mapSelected,
-                playerDataList: roomState.playerDataList.map(p => {
+                const roomStateReady: RoomStateReady = {
+                    ...roomState,
+                    mapSelected,
+                    playerDataList: roomState.playerDataList.map(p => {
 
-                    // TODO test that
-                    const socket = p.socket.close();
+                        // TODO test that
+                        const socket = p.socket.close();
 
-                    return {
-                        ...p,
-                        socket
-                    };
-                })
-            } as any;
+                        return {
+                            ...p,
+                            socket
+                        };
+                    })
+                } as any;
 
-            assertIsNonNullable(roomState.mapSelected);
+                assertIsNonNullable(roomState.mapSelected);
 
-            const battle = await BattleRunRoom(roomStateReady);
+                const battle = await BattleRunRoom(roomStateReady);
 
-            stateManager.set({
-                step: 'battle',
-                battle
+                stateManager.set({
+                    step: 'battle',
+                    battle
+                });
+
+                battle.start();
+
             });
-
-            battle.start();
-
-        }, delay);
 
         stateManager.set({
             step: 'will-launch',

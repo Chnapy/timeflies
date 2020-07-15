@@ -206,7 +206,7 @@ describe('# room > on player state request', () => {
                 isReady: true
             });
 
-            timerTester.advanceBy(100);
+            await timerTester.advanceBy(100);
     
             await receiveJ2({
                 type: 'room/player/state',

@@ -2,12 +2,22 @@ import { TimerTester } from "@timeflies/shared";
 import { seedCharacter } from "../../entities/character/Character.seed";
 import { Character } from "../../entities/character/Character";
 import { Turn, TurnState } from "./Turn";
+import { waitTimeoutPool } from '../../../../wait-timeout-pool';
 
 describe('# Turn', () => {
 
     const timerTester = new TimerTester();
 
     let character: Character;
+
+    const killPromises = (...promises: (PromiseLike<unknown> | undefined)[]) => {
+        waitTimeoutPool.setPoolEnable(false);
+
+        return Promise.all([
+            waitTimeoutPool.clearAll(),
+            ...promises
+        ]);
+    };
 
     beforeEach(() => {
         timerTester.beforeTest();
@@ -37,9 +47,9 @@ describe('# Turn', () => {
             wayBefore: timerTester.now - 5000
         };
 
-        const turnIdle = Turn(1, startTimes.future, () => character, () => null, () => null);
-        const turnRunning = Turn(1, startTimes.past, () => character, () => null, () => null);
-        const turnEnded = Turn(1, startTimes.wayBefore, () => character, () => null, () => null);
+        const turnIdle = Turn(1, startTimes.future, () => character, () => null, () => undefined);
+        const turnRunning = Turn(1, startTimes.past, () => character, () => null, () => undefined);
+        const turnEnded = Turn(1, startTimes.wayBefore, () => character, () => null, () => undefined);
 
         const states: TurnState[] = [ 'idle', 'running', 'ended' ];
 
@@ -48,19 +58,21 @@ describe('# Turn', () => {
         expect(turnEnded.state).toBe(states[ 2 ]);
     });
 
-    it('should run start callback at creation', () => {
+    it('should run start callback at creation', async () => {
 
         const startTime = timerTester.now;
 
         const startFn = jest.fn();
 
-        const turnIdle = Turn(1, startTime, () => character, startFn, () => { });
-        turnIdle.refreshTimedActions();
+        const turnIdle = Turn(1, startTime, () => character, startFn, () => undefined);
+        const p = turnIdle.refreshTimedActions();
 
         expect(startFn).toHaveBeenCalled();
+
+        await killPromises(p);
     });
 
-    it('should run callbacks at expected time', () => {
+    it('should run callbacks at expected time', async () => {
 
         const now = timerTester.now;
 
@@ -70,31 +82,32 @@ describe('# Turn', () => {
         const endFn = jest.fn();
 
         const turnIdle = Turn(1, startTime, () => character, startFn, endFn);
-        turnIdle.refreshTimedActions();
+        const p = turnIdle.refreshTimedActions();
 
-        timerTester.advanceBy(900);
+        await timerTester.advanceBy(900);
 
         expect(startFn).not.toHaveBeenCalled();
 
-        timerTester.advanceBy(200);
+        await timerTester.advanceBy(200);
 
         // 1100
 
         expect(startFn).toHaveBeenCalled();
 
-        timerTester.advanceBy(1700);
+        await timerTester.advanceBy(1700);
 
         // 2800
 
         expect(endFn).not.toHaveBeenCalled();
 
-        timerTester.advanceBy(500);
+        await timerTester.advanceBy(500);
 
         // 3300
 
         expect(endFn).toHaveBeenCalledTimes(1);
         expect(startFn).toHaveBeenCalledTimes(1);
 
+        await killPromises(p);
     });
 
 });

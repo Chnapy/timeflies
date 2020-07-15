@@ -48,7 +48,7 @@ export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
 
             assertIsNonNullable(launchTimeout);
 
-            clearTimeout(launchTimeout);
+            launchTimeout.cancel();
 
             stateManager.set({
                 step: 'idle',

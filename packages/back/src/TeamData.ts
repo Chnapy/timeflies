@@ -1,7 +1,5 @@
-import { PlayerData } from "./PlayerData";
 
-export interface TeamData {
+export type TeamData = {
     id: string;
     letter: string;
-    // players: PlayerData[];
-}
+};

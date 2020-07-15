@@ -1,4 +1,4 @@
-import { clone, DeepReadonly, MapConfig, MapPlacementTile, PlayerRoom, TeamRoom } from '@timeflies/shared';
+import { clone, DeepReadonly, MapConfig, MapPlacementTile, PlayerRoom, TeamRoom, WaitTimeoutPromise } from '@timeflies/shared';
 import { PlayerRoomDataConnected } from './room';
 import { BattleRunRoom } from '../run/BattleRunRoom';
 
@@ -16,7 +16,7 @@ export type RoomState = {
     playerList: PlayerRoom[];
     teamList: TeamRoom[];
     mapSelected: RoomMapSelected | null;
-    launchTimeout: NodeJS.Timeout | null;
+    launchTimeout: WaitTimeoutPromise<unknown> | null;
     battle: BattleRunRoom | null;
 };
 

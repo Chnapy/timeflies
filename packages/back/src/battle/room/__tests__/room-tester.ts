@@ -1,4 +1,4 @@
-import { MapConfig, MapPlacementTile, PlayerRoom, seedTiledMap, TeamRoom } from '@timeflies/shared';
+import { MapConfig, MapPlacementTile, PlayerRoom, seedTiledMap, TeamRoom, createPosition } from '@timeflies/shared';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { PlayerRoomDataConnected, Room, RoomDependencies, PlayerRoomData } from '../room';
@@ -161,22 +161,22 @@ export const RoomTester = {
         const tilesTeamJ1: MapPlacementTile[] = [
             {
                 teamId: 'A',
-                position: { x: 0, y: 0 }
+                position: createPosition(0, 0)
             },
             {
                 teamId: 'A',
-                position: { x: 1, y: 1 }
+                position: createPosition(1, 1)
             }
         ];
 
         const tilesTeamJ2: MapPlacementTile[] = [
             {
                 teamId: 'B',
-                position: { x: 2, y: 2 }
+                position: createPosition(2, 2)
             },
             {
                 teamId: 'B',
-                position: { x: 3, y: 3 }
+                position: createPosition(3, 3)
             }
         ];
 

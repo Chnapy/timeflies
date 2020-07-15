@@ -1,6 +1,7 @@
-import { TurnSnapshot } from "@timeflies/shared";
+import { TurnSnapshot, WaitTimeoutPromise } from "@timeflies/shared";
 import { Immutable } from 'immer';
 import { Character } from "../../entities/character/Character";
+import { waitTimeoutPool } from '../../../../wait-timeout-pool';
 
 export type TurnState = 'idle' | 'running' | 'ended';
 
@@ -11,22 +12,22 @@ export interface Turn {
     readonly startTime: number;
     readonly turnDuration: number;
     readonly endTime: number;
-    refreshTimedActions(): void;
+    refreshTimedActions(): WaitTimeoutPromise<unknown> | undefined;
     clearTimedActions(): void;
     toSnapshot(): TurnSnapshot;
 }
 
 export const Turn = (
     id: number, startTime: number, getCharacter: () => Immutable<Character>,
-    onTurnStart: () => void, onTurnEnd: () => void
+    onTurnStart: () => void, onTurnEnd: () => WaitTimeoutPromise<unknown> | undefined
 ): Turn => {
 
-    let timedActionTimeout: NodeJS.Timeout | undefined;
+    let timedActionTimeout: WaitTimeoutPromise<unknown> | undefined;
     let lastCallback: 'start' | 'end' | undefined;
 
     const clearTimedActions = (): void => {
         if (timedActionTimeout) {
-            clearTimeout(timedActionTimeout);
+            timedActionTimeout.cancel();
             timedActionTimeout = undefined;
         }
     };
@@ -40,7 +41,7 @@ export const Turn = (
         };
     };
 
-    const refreshTimedActions = (): void => {
+    const refreshTimedActions = (): WaitTimeoutPromise<unknown> | undefined => {
         clearTimedActions();
 
         const now = Date.now();
@@ -48,36 +49,39 @@ export const Turn = (
         if (this_.state === 'idle') {
             if (!lastCallback) {
                 const diff = startTime - now;
-                timedActionTimeout = setTimeout(start, diff);
+                timedActionTimeout = waitTimeoutPool.createTimeout(diff)
+                    .onCompleted(start);
             }
         }
 
         else {
 
             if (!lastCallback) {
-                start();
-                return;
+                return start();
             }
 
             if (lastCallback === 'start') {
                 const diff = this_.endTime - now;
-                timedActionTimeout = setTimeout(end, diff);
+                timedActionTimeout = waitTimeoutPool.createTimeout(diff)
+                    .onCompleted(end);
             }
 
         }
-    }
 
-    const start = (): void => {
+        return timedActionTimeout;
+    };
+
+    const start = () => {
         console.log('TURN-START', id, `${this_.turnDuration}ms`, getCharacter().playerId);
         lastCallback = 'start';
         onTurnStart();
-        refreshTimedActions();
+        return refreshTimedActions();
     };
 
-    const end = (): void => {
+    const end = () => {
         console.log('TURN-END', id);
         lastCallback = 'end';
-        onTurnEnd();
+        return onTurnEnd();
     };
 
     const this_: Turn = {

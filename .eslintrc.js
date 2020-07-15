@@ -182,6 +182,10 @@ module.exports = {
                 name: "setTimeout",
                 message: "Use promise-based waitTimeout instead."
             },
+            {
+                name: "clearTimeout",
+                message: "Use promise-based waitTimeout instead."
+            },
         ],
         "@typescript-eslint/no-unused-vars": [
             "warn",

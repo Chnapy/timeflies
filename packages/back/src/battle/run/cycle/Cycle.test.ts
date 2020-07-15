@@ -70,7 +70,7 @@ describe('# Cycle', () => {
         expect(cycle.globalTurn).toBeUndefined();
     });
 
-    it('should run the first global turn & not send action', () => {
+    it('should run the first global turn & not send action', async () => {
 
         onSendFn1 = jest.fn();
 
@@ -84,12 +84,12 @@ describe('# Cycle', () => {
             startTime: launchTime
         });
 
-        timerTester.advanceBy(1000);
+        await timerTester.advanceBy(1000);
 
         expect(onSendFn1).not.toHaveBeenCalled();
     });
 
-    it('should send action on second turn, not before', () => {
+    it('should send action on second turn, not before', async () => {
 
         const actions: ServerAction[] = [];
 
@@ -109,7 +109,7 @@ describe('# Cycle', () => {
 
         const { turnDuration } = cycle.globalTurn.currentTurn;
 
-        timerTester.advanceBy(turnDuration + TURN_DELAY + 10);
+        await timerTester.advanceBy(turnDuration + TURN_DELAY + 10);
 
         expect(on).toHaveBeenCalledTimes(players.length);
 
@@ -122,7 +122,7 @@ describe('# Cycle', () => {
         ).not.toContain<BRunGlobalTurnStartSAction[ 'type' ]>('battle-run/global-turn-start')
     });
 
-    it('should run a complete global turn, then run the next one', () => {
+    it('should run a complete global turn, then run the next one', async () => {
 
         const actions: ServerAction[] = [];
 
@@ -138,19 +138,22 @@ describe('# Cycle', () => {
         cycle = Cycle(players, getter);
         cycle.start(launchTime);
 
-        let advance = 0;
         const characterList = denormalize(characters);
-        characterList.forEach((c, i) => {
-            const delay = i && TURN_DELAY;
-            advance += c.features.actionTime + delay;
-        });
-        timerTester.advanceBy(advance);
+        let isFirstCharacter = true;
+        for(const c of characterList) {
+            const delay = isFirstCharacter ? 0 : TURN_DELAY;
+            await timerTester.advanceBy(c.features.actionTime + delay);
+            isFirstCharacter = false;
+        }
+
+        // workaround for triggering ended promise 'then'
+        await timerTester.advanceBy(0);
 
         expect(cycle.globalTurn.id).toBe(1);
         expect(cycle.globalTurn.currentTurn.id).toBe(characterList.length);
         expect(cycle.globalTurn.state).toBe<GlobalTurnState>('idle');
 
-        timerTester.advanceBy(GLOBALTURN_DELAY);
+        await timerTester.advanceBy(GLOBALTURN_DELAY);
 
         expect(cycle.globalTurn.state).toBe<GlobalTurnState>('running');
 
