@@ -3,7 +3,7 @@ module.exports = {
         "react-app"
     ],
     parser: "@typescript-eslint/parser",
-    plugins: [ "@typescript-eslint" ],
+    plugins: [ "@typescript-eslint", "jest" ],
     rules: {
         "no-restricted-globals": [
             "error",
@@ -187,6 +187,9 @@ module.exports = {
                 message: "Use promise-based waitTimeout instead."
             },
         ],
+
+        // Typescript
+
         "@typescript-eslint/no-unused-vars": [
             "warn",
             {
@@ -195,5 +198,10 @@ module.exports = {
             }
         ],
         "@typescript-eslint/no-floating-promises": "error",
+
+        // Jest
+        
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "error",
     }
 };
