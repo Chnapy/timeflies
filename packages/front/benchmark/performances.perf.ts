@@ -5,6 +5,8 @@ describe('[LOCAL] performances', () => {
     jest.setTimeout(1000000);
 
     it('', async () => {
+        jest.useRealTimers();
+        
         const { results } = await runBenchmark();
 
         const timesMedian = results.map(({ name, details }) => {
