@@ -133,12 +133,14 @@ export const TiledMapGraphic = () => {
                 });
             };
 
-            const renderableLayer = tiledManager.getRenderableLayer();
+            const renderableLayerList = tiledManager.getRenderableLayerList();
 
             layerTiles.push(
-                ...renderableLayer.data
-                    .map(getTileGraphic)
-                    .filter((tile): tile is TileGraphic => tile !== null)
+                ...renderableLayerList.flatMap(renderableLayer =>
+                    renderableLayer.data
+                        .map(getTileGraphic)
+                        .filter((tile): tile is TileGraphic => tile !== null)
+                )
             );
 
             Object.assign(layerTilesMap, normalize(layerTiles));
