@@ -17,7 +17,7 @@ export interface TiledManager {
     readonly width: number;
     readonly height: number;
 
-    getRenderableLayer(): TiledLayerTilelayer;
+    getRenderableLayerList(): TiledLayerTilelayer[];
 
     getTileType(position: Position): TileType;
     getTileTypeWithPlacement(position: Position): TileTypeWithPlacement;
@@ -60,6 +60,11 @@ const tileLayerNames = Object.freeze({
     obstacles: 'obstacles'
 });
 
+const notRenderableNames = [
+    tileLayerNames.obstacles,
+    tileLayerNames.placement
+];
+
 export const TiledManager = (schema: TiledMap): TiledManager => {
 
     const getTilelayer = (name: string): TiledLayerTilelayer => {
@@ -79,7 +84,9 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
     const defaultTilelayer = getTilelayer(tileLayerNames.default);
     const obstacleTilelayer = getTilelayer(tileLayerNames.obstacles);
 
-    const getRenderableLayer = () => defaultTilelayer;
+    const getRenderableLayerList = () => schema.layers.filter((layer): layer is TiledLayerTilelayer =>
+        layer.type === 'tilelayer' && !notRenderableNames.includes(layer.name)
+    );
 
     const getTilePositionFromIndex = (index: number): Position => {
         const y = Number.parseInt(index / width + '');
@@ -218,7 +225,7 @@ export const TiledManager = (schema: TiledMap): TiledManager => {
         width,
         height,
 
-        getRenderableLayer,
+        getRenderableLayerList,
 
         getTileType,
         getTileTypeWithPlacement,
