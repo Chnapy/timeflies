@@ -18,12 +18,14 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
     const initViewport = (worldWidth: number, worldHeight: number) => {
         viewport.worldWidth = worldWidth;
         viewport.worldHeight = worldHeight;
+
+        const ratioWidth = Math.ceil(window.innerWidth / worldWidth);
+        const ratioHeight = Math.ceil(window.innerHeight / worldHeight);
+
         viewport
             .clamp({ direction: 'all' })
             .clampZoom({
-                minScale: 0.25,
-                maxScale: 1,
-
+                minScale: Math.min(ratioWidth, ratioHeight)
             })
             .wheel()
             .drag({

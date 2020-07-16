@@ -92,7 +92,7 @@ export const TiledMapGraphic = () => {
                 const idIndex = id - tileset.firstgid;
                 const { x, y } = getWorldPositionFromIndex(idIndex, tileset);
 
-                texture.frame = new PIXI.Rectangle(y, x, tileset.tilewidth, tileset.tileheight);
+                texture.frame = new PIXI.Rectangle(x, y, tileset.tilewidth, tileset.tileheight);
                 texture.updateUvs();
                 texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
