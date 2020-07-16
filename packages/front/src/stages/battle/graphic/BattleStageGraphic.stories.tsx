@@ -57,10 +57,12 @@ export const Default: React.FC = () => {
 
         const characterList = [
             seedCharacter({
-                id: 'c1', period, playerId: 'p1', position: createPosition(4, 3)
+                id: 'c1', period, playerId: 'p1', position: createPosition(4, 3),
+                type: 'tacka'
             }),
             seedCharacter({
-                id: 'c2', period, playerId: 'p1', position: createPosition(6, 4)
+                id: 'c2', period, playerId: 'p1', position: createPosition(6, 4),
+                type: 'meti'
             })
         ];
 
