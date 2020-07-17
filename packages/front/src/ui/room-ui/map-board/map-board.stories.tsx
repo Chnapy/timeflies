@@ -37,7 +37,7 @@ export const BoardTile: React.FC = () => {
                             {
                                 id: 'c1',
                                 position: createPosition(2, 0),
-                                type: 'sampleChar1'
+                                type: 'tacka'
                             }
                         ]
                     },
@@ -49,7 +49,7 @@ export const BoardTile: React.FC = () => {
                         name: 'p-2',
                         characters: [ {
                             id: 'c2',
-                            type: 'sampleChar2',
+                            type: 'meti',
                             position: createPosition(4, 0)
                         } ]
                     }
@@ -220,7 +220,7 @@ export const Board: React.FC = () => {
                             {
                                 id: 'c1',
                                 position: createPosition(5, 2),
-                                type: 'sampleChar1'
+                                type: 'tacka'
                             }
                         ]
                     },
@@ -232,7 +232,7 @@ export const Board: React.FC = () => {
                         name: 'p-2',
                         characters: [ {
                             id: 'c2',
-                            type: 'sampleChar2',
+                            type: 'meti',
                             position: createPosition(3, 5)
                         } ]
                     }

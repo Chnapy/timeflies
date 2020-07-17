@@ -17,7 +17,7 @@ export const seedCharacterSnapshot = ({ type, features, ...props }: SeedCharacte
     staticData: {
         id: props.id,
         name: 'name',
-        role: type ?? 'sampleChar1',
+        role: type ?? 'tacka',
         description: '',
         initialFeatures: {
             life: 100,
@@ -56,7 +56,7 @@ export const seedCharacter = <P extends BattleDataPeriod>({ type, features, ...p
         staticData: {
             id: props.id,
             name: 'name',
-            role: type ?? 'sampleChar1',
+            role: type ?? 'tacka',
             description: '',
             initialFeatures: {
                 life: 100,

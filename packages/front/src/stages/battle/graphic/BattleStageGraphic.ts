@@ -36,7 +36,9 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
             });
     };
 
-    const tiledMapGraphic = TiledMapGraphic();
+    const tiledMapGraphic = CanvasContext.provider({
+        viewportListener
+    }, () => TiledMapGraphic());
 
     const { storeEmitter, assetLoader } = CanvasContext.consumer('storeEmitter', 'assetLoader');
 

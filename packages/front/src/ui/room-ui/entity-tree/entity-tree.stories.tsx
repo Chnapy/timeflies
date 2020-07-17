@@ -26,7 +26,7 @@ export const Default: React.FC = () => {
                 characters: [
                     {
                         id: 'c1',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(4, 8)
                     }
                 ]
@@ -40,12 +40,12 @@ export const Default: React.FC = () => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     },
                     {
                         id: 'c3',
-                        type: 'sampleChar2',
+                        type: 'vemo',
                         position: createPosition(10, 8)
                     }
                 ]
@@ -59,7 +59,7 @@ export const Default: React.FC = () => {
                 characters: [
                     {
                         id: 'c4',
-                        type: 'sampleChar2',
+                        type: 'meti',
                         position: createPosition(6, 2)
                     }
                 ]
