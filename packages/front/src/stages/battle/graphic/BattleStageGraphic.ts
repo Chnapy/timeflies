@@ -4,6 +4,7 @@ import { StageGraphicCreator } from '../../../canvas/StageGraphic';
 import { CharactersBoard } from './charactersBoard/CharactersBoard';
 import { TiledMapGraphic } from './tiledMap/TiledMapGraphic';
 import { assertIsDefined } from '@timeflies/shared';
+import { createViewportListener } from './viewport-listener';
 
 export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
 
@@ -14,6 +15,8 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
 
         interaction: renderer.plugins.interaction
     });
+
+    const viewportListener = createViewportListener(viewport);
 
     const initViewport = (worldWidth: number, worldHeight: number) => {
         viewport.worldWidth = worldWidth;
@@ -58,6 +61,7 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
     assertIsDefined(charactersSpritesheet);
 
     CanvasContext.provider({
+        viewportListener,
         tiledMapGraphic,
         spritesheets: { characters: charactersSpritesheet.spritesheet }
     }, () => {

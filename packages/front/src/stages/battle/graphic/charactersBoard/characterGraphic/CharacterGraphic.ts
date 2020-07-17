@@ -12,37 +12,11 @@ import { CharacterSprite, getAnimPath } from './CharacterSprite';
 
 export type CharacterSpriteSizeSetter = typeof setCharacterSpriteSize;
 
-const characterSpriteSize: {
-    [ k in CharacterRole ]?: (texture: PIXI.Texture) => [ number, number ];
-} = {
-    vemo: texture => [
-        texture.width * 3,
-        texture.height * 3,
-    ],
-    tacka: texture => [
-        texture.width * 3,
-        texture.height * 3,
-    ],
-    meti: texture => [
-        texture.width * 3,
-        texture.height * 3,
-    ]
-};
-
 const setCharacterSpriteSize = (role: CharacterRole, sprite: PIXI.Sprite): void => {
-    const fn = characterSpriteSize[ role ];
-
     const { texture } = sprite;
 
-    const [ width, height ] = fn
-        ? fn(texture)
-        : [
-            texture.width,
-            texture.height
-        ];
-
-    sprite.width = width;
-    sprite.height = height;
+    sprite.width = texture.width;
+    sprite.height = texture.height;
 };
 
 export type CharacterGraphic = ReturnType<typeof CharacterGraphic>;
