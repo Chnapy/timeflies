@@ -7,7 +7,7 @@ import { appTheme } from '../../../../../../ui/app-theme';
 import { UIIcon, UIIconProps } from '../../../../../../ui/battle-ui/spell-panel/spell-button/ui-icon';
 import { GaugeGraphic } from '../../../gauge-graphic';
 import { ReactToGraphicSprite } from '../../../react-to-graphic-sprite';
-import { TeamIndicatorGraphic } from './team-indicator-graphic';
+import { TeamIndicatorGraphic, teamIndicatorGraphicSize } from './team-indicator-graphic';
 
 export type CharacterHud = ReturnType<typeof CharacterHud>;
 
@@ -15,11 +15,11 @@ export const CharacterHud = (
     characterId: string
 ) => {
 
-    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters[characterId];
+    const selectCharacter = (state: GameState) => state.battle.snapshotState.battleDataCurrent.characters[ characterId ];
 
     const container = new PIXI.Container();
 
-    const { tiledMapGraphic: { getTilesize }, storeEmitter } = CanvasContext.consumer('tiledMapGraphic', 'storeEmitter');
+    const { tiledMapGraphic: { getTilesize }, storeEmitter, viewportListener } = CanvasContext.consumer('tiledMapGraphic', 'storeEmitter', 'viewportListener');
 
     const { palette } = appTheme;
 
@@ -41,14 +41,8 @@ export const CharacterHud = (
 
     const lifeIconContainer = new PIXI.Container();
     lifeIconContainer.addChild(lifeIconBg, lifeIcon);
-    lifeIconContainer.y = -18;
 
     const gauge = GaugeGraphic();
-    gauge.setGeo({
-        x: 22,
-        y: -12,
-        height: 6
-    });
 
     container.addChild(teamIndicatorContainer, lifeIconContainer, gauge.graphic);
 
@@ -57,6 +51,42 @@ export const CharacterHud = (
 
         gauge.update(ratio);
     };
+
+    const onScaleChange = (scaleValue: number) => {
+        const scaleInverted = Math.min(1 / scaleValue, 1);
+
+        teamIndicatorContainer.scale.set(scaleInverted);
+        lifeIconContainer.scale.set(scaleInverted);
+        gauge.graphic.scale.set(scaleInverted);
+
+        lifeIconContainer.y = -18 * scaleInverted;
+
+        gauge.setGeo({
+            x: (4 + lifeIconSize) * scaleInverted,
+            y: -12 * scaleInverted,
+            height: 6
+        });
+
+        const schema = storeEmitter.getState().battle.battleActionState.tiledSchema;
+
+        if (schema) {
+
+            const { tilewidth, tileheight } = getTilesize(schema);
+
+            console.log(tilewidth, scaleValue)
+
+            gauge.setGeo({
+                width: tilewidth / scaleInverted - (lifeIconSize + 4)
+            });
+
+            const teamIndicatorRealSize = teamIndicatorGraphicSize * scaleInverted;
+
+            teamIndicatorContainer.y = tileheight - teamIndicatorRealSize / 3 * 2;
+            teamIndicatorContainer.x = -teamIndicatorRealSize / 3;
+        }
+    };
+
+    viewportListener.onScaleChange(onScaleChange);
 
     storeEmitter.onStateChange(
         state => {
@@ -68,31 +98,21 @@ export const CharacterHud = (
             }
 
             const { playerList, teamList } = state.battle.snapshotState;
-            const { teamId } = playerList[playerId];
-            const { letter } = teamList[teamId];
+            const { teamId } = playerList[ playerId ];
+            const { letter } = teamList[ teamId ];
 
-            return { letter, tiledSchema };
+            return letter;
         },
-        letterAndSchema => {
+        letter => {
             teamIndicatorContainer.removeChildren();
 
-            if (!letterAndSchema) {
-                return;
+            if (letter) {
+                const teamIndicator = TeamIndicatorGraphic(letter);
+                teamIndicatorContainer.addChild(teamIndicator.container);
             }
 
-            const { letter, tiledSchema } = letterAndSchema;
-
-            const { tilewidth, tileheight } = getTilesize(tiledSchema);
-            gauge.setGeo({
-                width: tilewidth - 22,
-            });
-
-            const teamIndicator = TeamIndicatorGraphic(letter);
-            teamIndicator.container.y = tileheight - teamIndicator.size;
-
-            teamIndicatorContainer.addChild(teamIndicator.container);
-        },
-        shallowEqual
+            onScaleChange(viewportListener.getCurrentScale());
+        }
     );
 
     storeEmitter.onStateChange(

@@ -5,27 +5,26 @@ import { ReactToGraphicSprite } from '../../../react-to-graphic-sprite';
 
 export type TeamIndicatorGraphic = ReturnType<typeof TeamIndicatorGraphic>;
 
+export const teamIndicatorGraphicSize = 18;
+
 export const TeamIndicatorGraphic = (teamLetter: string) => {
 
     const container = new PIXI.Container();
 
-    const size = 18;
-
-    const fontSize = size / teamIndicatorSizeRem;
+    const fontSize = teamIndicatorGraphicSize / teamIndicatorSizeRem;
 
     const sprite = ReactToGraphicSprite(
         React.createElement(TeamIndicator, {
             teamLetter
         }),
-        size,
-        size,
+        teamIndicatorGraphicSize,
+        teamIndicatorGraphicSize,
         `font-size: ${fontSize}px`
     ).sprite;
 
     container.addChild(sprite);
 
     return {
-        container,
-        size
+        container
     };
 };
