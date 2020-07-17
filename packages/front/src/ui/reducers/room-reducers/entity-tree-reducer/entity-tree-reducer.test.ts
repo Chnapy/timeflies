@@ -299,7 +299,7 @@ describe('# entity-tree-reducer', () => {
                 isReady: false,
                 characters: [ {
                     id: 'c-1',
-                    type: 'sampleChar1',
+                    type: 'tacka',
                     position: createPosition(-1, -1)
                 } ]
             } ],
@@ -334,7 +334,7 @@ describe('# entity-tree-reducer', () => {
             playerId: 'p-1',
             character: {
                 id: 'c-1',
-                type: 'sampleChar1',
+                type: 'tacka',
                 position: createPosition(-1, -1)
             },
             teamList: []
@@ -367,7 +367,7 @@ describe('# entity-tree-reducer', () => {
                 isReady: false,
                 characters: [ {
                     id: 'c-1',
-                    type: 'sampleChar1',
+                    type: 'tacka',
                     position: createPosition(-1, -1)
                 } ]
             } ],

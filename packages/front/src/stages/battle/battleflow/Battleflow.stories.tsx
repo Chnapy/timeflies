@@ -126,7 +126,7 @@ export const Default: React.FC = () => {
                 staticData: {
                     id: 'c4',
                     name: 'africa',
-                    role: 'sampleChar2',
+                    role: 'meti',
                     description: 'description africa',
                     defaultSpellId: 's3',
                     initialFeatures: {

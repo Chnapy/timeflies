@@ -60,7 +60,7 @@ const getWaitingOthersState = (): RoomData => {
                 characters: [
                     {
                         id: 'c1',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(4, 8)
                     }
                 ]
@@ -74,7 +74,7 @@ const getWaitingOthersState = (): RoomData => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     }
                 ]
@@ -126,7 +126,7 @@ const getShouldPutCharactersState = (): RoomData => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     }
                 ]
@@ -170,7 +170,7 @@ const getTeamsEnoughState = (): RoomData => {
                 characters: [
                     {
                         id: 'c1',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 1)
                     }
                 ]
@@ -184,7 +184,7 @@ const getTeamsEnoughState = (): RoomData => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     },
                 ]
@@ -228,7 +228,7 @@ const getNotReadyState = (): RoomData => {
                 characters: [
                     {
                         id: 'c1',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(4, 8)
                     }
                 ]
@@ -242,7 +242,7 @@ const getNotReadyState = (): RoomData => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     }
                 ]
@@ -286,7 +286,7 @@ const getIsLoadingState = (): RoomData => {
                 characters: [
                     {
                         id: 'c1',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(4, 8)
                     }
                 ]
@@ -300,7 +300,7 @@ const getIsLoadingState = (): RoomData => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     }
                 ]
@@ -344,7 +344,7 @@ const getLaunchState = (): RoomData => {
                 characters: [
                     {
                         id: 'c1',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(4, 8)
                     }
                 ]
@@ -358,7 +358,7 @@ const getLaunchState = (): RoomData => {
                 characters: [
                     {
                         id: 'c2',
-                        type: 'sampleChar1',
+                        type: 'tacka',
                         position: createPosition(0, 2)
                     }
                 ]

@@ -33,7 +33,7 @@ export const TileGraphic = ({
     texture, tilePos, worldPos, tilewidth: tilesize
 }: TileGraphicProps): TileGraphic => {
 
-    const { storeEmitter } = CanvasContext.consumer('storeEmitter');
+    const { storeEmitter, viewportListener } = CanvasContext.consumer('storeEmitter', 'viewportListener');
 
     const container = new PIXI.Container();
     container.x = worldPos.x;
@@ -87,12 +87,12 @@ export const TileGraphic = ({
     const drawTarget = () => {
         const { palette } = graphicTheme;
 
-        const margin = 4;
+        const margin = 1;
         const size = tilesize - margin * 2;
-        const length = 12;
+        const length = 4;
 
         graphicsOver.moveTo(margin, margin + length);
-        graphicsOver.lineStyle(4, palette.primary.main);
+        graphicsOver.lineStyle(2, palette.primary.main);
         graphicsOver.lineTo(margin, margin);
         graphicsOver.lineTo(margin + length, margin);
 
@@ -128,15 +128,7 @@ export const TileGraphic = ({
             const size = tilesize / 4;
 
             graphicsUnder.beginFill(palette.primary.main);
-            graphicsUnder.drawRoundedRect(margin, margin, size, size, 2);
-            graphicsUnder.endFill();
-
-            const margin2 = tilesize / 4;
-            const size2 = tilesize / 2;
-
-            graphicsUnder.beginFill(0, 0);
-            graphicsUnder.lineStyle(4, palette.primary.main, undefined, 0);
-            graphicsUnder.drawRoundedRect(margin2, margin2, size2, size2, 2);
+            graphicsUnder.drawRect(margin, margin, size, size);
             graphicsUnder.endFill();
 
             drawTarget();
@@ -163,12 +155,12 @@ export const TileGraphic = ({
 
         const { palette } = graphicTheme;
 
-        const margin = 20;
+        const margin = 5;
         const size = tilesize - margin * 2;
-        const length = 6;
+        const length = 2;
 
         graphicsOverPersist.moveTo(margin, margin + length);
-        graphicsOverPersist.lineStyle(4, palette.primary.main);
+        graphicsOverPersist.lineStyle(2, palette.primary.main);
         graphicsOverPersist.lineTo(margin, margin);
         graphicsOverPersist.lineTo(margin + length, margin);
 
@@ -195,18 +187,23 @@ export const TileGraphic = ({
     const persistActionStart = (duration: number, startTime: number) => {
         const { palette } = graphicTheme;
 
-        const width = tilesize / 2;
-        const height = 6;
-        const marginX = tilesize / 4;
-        const marginTop = 8;
-
-        const fullBarWidth = width - 2;
-
         graphicsOverPersist.clear();
 
         drawTargetCurrent();
 
         const drawGauge = () => {
+            const scaleValue = viewportListener.getCurrentScale();
+            const scaleInverted = 1 / scaleValue;
+
+            const borderSize = 1 * scaleInverted;
+
+            const width = tilesize / 2;
+            const height = 6 * scaleInverted;
+            const marginX = tilesize / 4;
+            const marginTop = 8 * scaleInverted;
+
+            const fullBarWidth = width - 2;
+
             const timeElapsed = Date.now() - startTime;
             const ratio = Math.max(1 - timeElapsed / duration, 0);
 
@@ -215,12 +212,12 @@ export const TileGraphic = ({
             graphicsOverPersistStart.clear();
 
             graphicsOverPersistStart.beginFill(palette.primary.contrastText);
-            graphicsOverPersistStart.drawRoundedRect(marginX, marginTop, width, height, 2);
+            graphicsOverPersistStart.drawRect(marginX, marginTop, width, height);
             graphicsOverPersistStart.endFill();
 
             if (barWidth) {
                 graphicsOverPersistStart.beginFill(palette.primary.main);
-                graphicsOverPersistStart.drawRoundedRect(marginX + 1, marginTop + 1, barWidth, height - 2, 2);
+                graphicsOverPersistStart.drawRect(marginX + borderSize, marginTop + borderSize, barWidth, height - borderSize * 2);
                 graphicsOverPersistStart.endFill();
             }
         };

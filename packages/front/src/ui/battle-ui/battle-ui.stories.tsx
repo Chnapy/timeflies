@@ -52,7 +52,7 @@ export const Default: React.FC = () => {
     const c1 = seedCharacter({
         id: 'c1',
         period: 'current',
-        type: 'sampleChar1',
+        type: 'tacka',
         features: {
             life: 100,
             actionTime: 12400
@@ -64,7 +64,7 @@ export const Default: React.FC = () => {
     const c4 = seedCharacter({
         id: 'c4',
         period: 'current',
-        type: 'sampleChar1',
+        type: 'tacka',
         features: {
             life: 100,
             actionTime: 12400
@@ -76,7 +76,7 @@ export const Default: React.FC = () => {
     const c5 = seedCharacter({
         id: 'c5',
         period: 'current',
-        type: 'sampleChar1',
+        type: 'tacka',
         features: {
             life: 100,
             actionTime: 12400
@@ -99,7 +99,7 @@ export const Default: React.FC = () => {
                     c2: seedCharacter({
                         id: 'c2',
                         period: 'current',
-                        type: 'sampleChar2',
+                        type: 'vemo',
                         features: {
                             life: 100,
                             actionTime: 13400
@@ -109,7 +109,7 @@ export const Default: React.FC = () => {
                     c3: seedCharacter({
                         id: 'c3',
                         period: 'current',
-                        type: 'sampleChar1',
+                        type: 'meti',
                         features: {
                             life: 110,
                             actionTime: 18100

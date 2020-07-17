@@ -17,8 +17,8 @@ const InnerDefault: React.FC<{ loader: AssetLoader }> = ({ loader }) => {
     useAssetLoader(loader, 'characters', AssetManager.spritesheets.characters, true);
 
     return <>
-        <CharacterImage characterRole='sampleChar1' size={56} />
-        <CharacterImage characterRole='sampleChar2' size={64} />
+        <CharacterImage characterRole='tacka' size={56} />
+        <CharacterImage characterRole='meti' size={64} />
     </>;
 };
 

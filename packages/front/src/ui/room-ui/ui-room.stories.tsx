@@ -107,7 +107,7 @@ export const Default: React.FC = () => {
                             {
                                 id: 'c1',
                                 position: createPosition(5, 2),
-                                type: 'sampleChar1'
+                                type: 'tacka'
                             }
                         ]
                     },
@@ -119,7 +119,7 @@ export const Default: React.FC = () => {
                         name: 'p-2',
                         characters: [ {
                             id: 'c2',
-                            type: 'sampleChar2',
+                            type: 'vemo',
                             position: createPosition(3, 5)
                         } ]
                     }
