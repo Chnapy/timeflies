@@ -1,7 +1,7 @@
 import charactersSpritesheetPath from '../_assets/spritesheets/spritesheet-characters.json';
 import spellsSpritesheetPath from '../_assets/spritesheets/spritesheet-spells.json';
 import mapPath from '../_assets/map/map_dungeon.json';
-import mapPreviewPath from '../_assets/map/map_preview.png';
+import mapPreviewPath from '../_assets/map/map_dungeon_preview.png';
 
 export type IAssetManager = typeof AssetManager;
 
