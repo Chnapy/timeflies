@@ -40,13 +40,13 @@ const readFile = util.promisify(fs.readFile);
 const getMapConfigList = (): MapConfig[] => [
     {
         id: 'm1',
-        name: 'Map 1',
+        name: 'Dungeon map',
         width: 20,
         height: 20,
-        nbrTeams: 2,
-        nbrCharactersPerTeam: 3,
-        previewUrl: '',
-        schemaUrl: 'map/sample2/map.json'
+        nbrTeams: 3,
+        nbrCharactersPerTeam: 4,
+        previewUrl: 'map/map_dungeon/map_dungeon_preview.png',
+        schemaUrl: 'map/map_dungeon/map_dungeon.json'
     }
 ];
 
