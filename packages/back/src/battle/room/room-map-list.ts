@@ -16,7 +16,8 @@ export const getRoomMapList: RoomListener<RoomClientAction.MapList> = ({
         mapList: dataManager.getMapConfigList()
             .map(c => ({
                 ...c,
-                schemaUrl: dataManager.urlTransform(c.schemaUrl).forClient()
+                schemaUrl: dataManager.urlTransform(c.schemaUrl).forClient(),
+                previewUrl: dataManager.urlTransform(c.previewUrl).forClient(),
             }))
     });
 };

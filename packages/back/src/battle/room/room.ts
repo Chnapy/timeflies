@@ -141,6 +141,8 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
                         config: {
                             ...mapSelected.config,
                             schemaUrl: dataManager.urlTransform(mapSelected.config.schemaUrl)
+                                .forClient(),
+                            previewUrl: dataManager.urlTransform(mapSelected.config.previewUrl)
                                 .forClient()
                         },
                         placementTileList: mapSelected.placementTileList
@@ -215,7 +217,7 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
 
             const { step, mapSelected, playerList } = stateManager.get();
 
-            if(step !== 'idle') {
+            if (step !== 'idle') {
                 return false;
             }
 
