@@ -35,6 +35,8 @@ export const TileGraphic = ({
 
     const { storeEmitter, viewportListener } = CanvasContext.consumer('storeEmitter', 'viewportListener');
 
+    const { palette } = graphicTheme;
+
     const container = new PIXI.Container();
     container.x = worldPos.x;
     container.y = worldPos.y;
@@ -84,6 +86,12 @@ export const TileGraphic = ({
 
     let ticker: PIXI.Ticker | null = null;
 
+    const drawHighlight = () => {
+        graphicsUnder.beginFill(palette.common.white, 0.25);
+        graphicsUnder.drawRect(0, 0, sprite.width, sprite.height);
+        graphicsUnder.endFill();
+    };
+
     const drawTarget = () => {
         const { palette } = graphicTheme;
 
@@ -110,7 +118,6 @@ export const TileGraphic = ({
     };
 
     const reset = () => {
-        sprite.alpha = 0.75;
         graphicsUnder.clear();
         graphicsOver.clear();
     };
@@ -118,9 +125,7 @@ export const TileGraphic = ({
     const showPath = (isLast: boolean) => {
         reset();
 
-        sprite.alpha = 1;
-
-        const { palette } = graphicTheme;
+        drawHighlight();
 
         if (isLast) {
 
@@ -138,14 +143,14 @@ export const TileGraphic = ({
     const showRange = () => {
         reset();
 
-        sprite.alpha = 1;
+        drawHighlight();
     };
 
     const showAction = (inRange: boolean) => {
         reset();
 
         if (inRange) {
-            sprite.alpha = 1;
+            drawHighlight();
         }
 
         drawTarget();
