@@ -33,9 +33,8 @@ const getTextures = (
     const path = getAnimPath(characterRole, characterState, orientation);
     const textures: PIXI.Texture[] | undefined = spritesheet.animations[ path ];
 
-    // If texture not found, get sampleChar1 as default
     if (!textures) {
-        return getTextures(spritesheet, { characterRole: 'sampleChar1', characterState, orientation });
+        throw new Error('Sprite animation texture not found for path ' + path);
     }
 
     return textures;
@@ -81,7 +80,7 @@ export const CharacterSprite = class extends PIXI.AnimatedSprite {
                 });
 
                 setCharacterSpriteSize(type, this);
-                
+
                 this.play();
             },
             shallowEqual

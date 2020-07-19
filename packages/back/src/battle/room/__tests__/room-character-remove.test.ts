@@ -93,7 +93,7 @@ describe('# room > on character remove request', () => {
 
             j1Infos.player.characters.push({
                 id: 'c1',
-                type: 'sampleChar1',
+                type: 'vemo',
                 position: firstTile.position
             });
 
@@ -122,12 +122,12 @@ describe('# room > on character remove request', () => {
         j1Infos.player.characters.push(
             {
                 id: 'c1',
-                type: 'sampleChar1',
+                type: 'vemo',
                 position: firstTile.position
             },
             {
                 id: 'c2',
-                type: 'sampleChar1',
+                type: 'vemo',
                 position: secondTile.position
             }
         );
@@ -167,7 +167,7 @@ describe('# room > on character remove request', () => {
 
         j1Infos.player.characters.push({
             id: 'c1',
-            type: 'sampleChar1',
+            type: 'vemo',
             position: firstTile.position
         });
         teamJ1.playersIds.push('p1');

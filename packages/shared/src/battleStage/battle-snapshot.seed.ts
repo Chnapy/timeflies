@@ -3,10 +3,10 @@ import { BattleSnapshot } from './battle-snapshot';
 export const seedObjectSnapshotable = (): Omit<BattleSnapshot, 'battleHash'> => ({
     "time": 1593079336988, "launchTime": -1, "charactersSnapshots": [ {
         "id": "c1", "playerId": "p1",
-        "staticData": { "id": "c1", "name": "toto", "description": "", "role": "sampleChar1", "defaultSpellId": "s1", "initialFeatures": { "life": 100, "actionTime": 30000 }, "staticSpells": [] }, "position": { "id": "4:3", "x": 4, "y": 3 }, "orientation": "bottom", "features": { "life": 100, "actionTime": 30000 }
+        "staticData": { "id": "c1", "name": "toto", "description": "", "role": "vemo", "defaultSpellId": "s1", "initialFeatures": { "life": 100, "actionTime": 30000 }, "staticSpells": [] }, "position": { "id": "4:3", "x": 4, "y": 3 }, "orientation": "bottom", "features": { "life": 100, "actionTime": 30000 }
     }, {
         "id": "c2", "playerId": "p2",
-        "staticData": { "id": "c2", "name": "africa", "description": "", "role": "sampleChar2", "defaultSpellId": "s3", "initialFeatures": { "life": 120, "actionTime": 25000 }, "staticSpells": [] }, "position": { "id": "6:4", "x": 6, "y": 4 }, "orientation": "bottom", "features": { "life": 120, "actionTime": 25000 }
+        "staticData": { "id": "c2", "name": "africa", "description": "", "role": "meti", "defaultSpellId": "s3", "initialFeatures": { "life": 120, "actionTime": 25000 }, "staticSpells": [] }, "position": { "id": "6:4", "x": 6, "y": 4 }, "orientation": "bottom", "features": { "life": 120, "actionTime": 25000 }
     } ], "spellsSnapshots": [
         {
             "id": "s1", "characterId": "c1",

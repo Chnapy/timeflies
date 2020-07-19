@@ -4,7 +4,7 @@ import { cloneByJSON } from '../util';
 
 export type SpellRole =
     | 'move'
-    | 'simpleAttack'
+    | 'simpleAttack'    // testing
     | 'switch'
     | 'incitement'
     | 'treacherousBlow'

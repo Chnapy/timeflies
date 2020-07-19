@@ -4,10 +4,11 @@ import { cloneByJSON } from '../util';
 import { DeepReadonly } from '../types';
 
 export type CharacterRole = (typeof characterRoleList)[ number ]
-    | 'sampleChar3';
+    // | 'sampleChar3';
 
 export const characterRoleList = [
-    'sampleChar1', 'sampleChar2', 'vemo', 'tacka', 'meti'
+    // 'sampleChar1', 'sampleChar2', 
+    'vemo', 'tacka', 'meti'
 ] as const;
 
 export type CharacterFeatures = {

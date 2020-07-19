@@ -3,7 +3,7 @@ import { StaticCharacter } from "@timeflies/shared";
 const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '1',
-        role: 'sampleChar1',
+        role: 'vemo',
         name: 'Ramio',
         description: 'description Ramio',
         initialFeatures: {
@@ -44,7 +44,7 @@ const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '2',
         name: 'Guili',
-        role: 'sampleChar1',
+        role: 'vemo',
         description: 'description Guili',
         initialFeatures: {
             life: 120,
@@ -71,7 +71,7 @@ const MOCK_CHAR: StaticCharacter[] = [
     {
         id: '3',
         name: 'Shoyi',
-        role: 'sampleChar1',
+        role: 'vemo',
         description: 'description Shoyi',
         initialFeatures: {
             life: 80,
