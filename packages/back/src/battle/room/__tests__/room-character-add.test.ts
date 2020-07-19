@@ -14,7 +14,7 @@ describe('# room > on character add request', () => {
             await receive({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: createPosition(0, 0)
             });
 
@@ -36,7 +36,7 @@ describe('# room > on character add request', () => {
             await receiveJ1({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: secondTile.position
             });
 
@@ -55,7 +55,7 @@ describe('# room > on character add request', () => {
 
             j1Infos.player.characters.push({
                 id: 'c1',
-                type: 'sampleChar1',
+                type: 'vemo',
                 position: firstTile.position
             });
 
@@ -64,7 +64,7 @@ describe('# room > on character add request', () => {
             await receiveJ2({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: firstTile.position
             });
 
@@ -83,7 +83,7 @@ describe('# room > on character add request', () => {
 
             j1Infos.player.characters.push({
                 id: 'c1',
-                type: 'sampleChar1',
+                type: 'vemo',
                 position: firstTile.position
             });
             teamJ1.playersIds.push('p1');
@@ -95,7 +95,7 @@ describe('# room > on character add request', () => {
             await receiveJ1({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: otherTeamTile.position
             });
 
@@ -120,7 +120,7 @@ describe('# room > on character add request', () => {
             await receiveJ1({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: firstTile.position
             });
 
@@ -131,7 +131,7 @@ describe('# room > on character add request', () => {
                 playerId: 'p1',
                 character: {
                     id: expect.any(String),
-                    type: 'sampleChar1',
+                    type: 'vemo',
                     position: firstTile.position
                 },
                 teamList: expect.anything()
@@ -152,7 +152,7 @@ describe('# room > on character add request', () => {
             await receiveJ1({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: firstTile.position
             });
 
@@ -187,21 +187,21 @@ describe('# room > on character add request', () => {
             await receiveJ1({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: firstTileT1.position
             });
 
             await receiveJ2({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar2',
+                characterType: 'tacka',
                 position: firstTileT2.position
             });
 
             await receiveJ2({
                 type: 'room/character/add',
                 sendTime: -1,
-                characterType: 'sampleChar1',
+                characterType: 'vemo',
                 position: secondTileT2.position
             });
 
@@ -214,7 +214,7 @@ describe('# room > on character add request', () => {
                     character: {
                         id: expect.any(String),
                         position: firstTileT1.position,
-                        type: 'sampleChar1'
+                        type: 'vemo'
                     },
                     teamList: expect.arrayContaining<TeamRoom>([
                         expect.objectContaining<TeamRoom>({
@@ -231,7 +231,7 @@ describe('# room > on character add request', () => {
                     character: {
                         id: expect.any(String),
                         position: firstTileT2.position,
-                        type: 'sampleChar2'
+                        type: 'tacka'
                     },
                     teamList: expect.arrayContaining<TeamRoom>([
                         expect.objectContaining<TeamRoom>({
@@ -252,7 +252,7 @@ describe('# room > on character add request', () => {
                     character: {
                         id: expect.any(String),
                         position: secondTileT2.position,
-                        type: 'sampleChar1'
+                        type: 'vemo'
                     },
                     teamList: expect.arrayContaining<TeamRoom>([
                         expect.objectContaining<TeamRoom>({

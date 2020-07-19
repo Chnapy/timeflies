@@ -252,29 +252,15 @@ export const RoomTester = {
 
         j1Infos.player.characters.push({
             id: 'c1',
-            type: 'sampleChar1',
+            type: 'vemo',
             position: firstTile.position,
         });
 
         j2Infos.player.characters.push({
             id: 'c2',
-            type: 'sampleChar1',
+            type: 'vemo',
             position: otherTeamTile.position,
         });
-
-        // await receiveJ1({
-        //     type: 'room/character/add',
-        //     sendTime: -1,
-        //     characterType: 'sampleChar1',
-        //     position: firstTile.position
-        // });
-
-        // await receiveJ2({
-        //     type: 'room/character/add',
-        //     sendTime: -1,
-        //     characterType: 'sampleChar1',
-        //     position: otherTeamTile.position
-        // });
 
         return {
             ...roomInfos,

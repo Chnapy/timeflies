@@ -61,7 +61,7 @@ describe('# room > on player state request', () => {
 
             j1Infos.player.characters.push({
                 id: 'c1',
-                type: 'sampleChar1',
+                type: 'vemo',
                 position: firstTile.position
             });
 

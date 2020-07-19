@@ -32,7 +32,7 @@ describe('# BattleStateManager', () => {
             characters: [
                 {
                     id: 'c1',
-                    type: 'sampleChar1',
+                    type: 'vemo',
                     position: { x: 0, y: 0 }
                 }
             ]
