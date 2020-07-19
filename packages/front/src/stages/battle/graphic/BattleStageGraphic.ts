@@ -25,15 +25,18 @@ export const BattleStageGraphic: StageGraphicCreator = (renderer) => {
         const ratioWidth = Math.ceil(window.innerWidth / worldWidth);
         const ratioHeight = Math.ceil(window.innerHeight / worldHeight);
 
+        const defaultScale = Math.min(ratioWidth, ratioHeight);
+
         viewport
             .clamp({ direction: 'all' })
             .clampZoom({
-                minScale: Math.min(ratioWidth, ratioHeight)
+                minScale: Math.max(defaultScale - 1, 0.1)
             })
             .wheel()
             .drag({
                 mouseButtons: 'middle',
-            });
+            })
+            .scale.set(defaultScale);
     };
 
     const tiledMapGraphic = CanvasContext.provider({
