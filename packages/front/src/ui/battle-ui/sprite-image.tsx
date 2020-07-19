@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { LoaderResourceSpritesheet, SpritesheetMapKey } from '../../assetManager/AssetLoader';
 import { useAsset } from '../../assetManager/AssetProvider';
+import clsx from 'clsx';
 
 
 export type SpriteImageProps = {
@@ -54,6 +55,11 @@ const useStyles = makeStyles(() => ({
             margin: 'auto',
             imageRendering: 'pixelated'
         };
+    },
+
+    // workaround for image-rendering issue in Firefox
+    backgroundMoz: {
+        imageRendering: 'crisp-edges'
     }
 }));
 
@@ -85,9 +91,9 @@ export const SpriteImage: React.FC<SpriteImageProps> = React.memo(({ spritesheet
         return (
             <div className={classes.root}>
                 {asset ?
-                    <div className={classes.background} />
+                    <div className={clsx(classes.background, classes.backgroundMoz)} />
                     : placeholder}
             </div>
         );
-    }, [ classes.root, classes.background, asset, placeholder ]);
+    }, [ classes.root, classes.background, classes.backgroundMoz, asset, placeholder ]);
 });
