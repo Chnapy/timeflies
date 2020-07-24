@@ -19,7 +19,15 @@ All infos concerning gameplay can be found [here](./docs/gameplay/gameplay.md).
 
 How interfaces works, and how should they be used.
 
+You can see all the mockups on [Figma](https://www.figma.com/file/Y23sbARnRD2ZXG6aQ4WMko/Timeflies?node-id=235%3A2531).
+
 TODO
+
+## :page_facing_up: Pages
+
+List of app pages, and all their functional features.
+
+All infos [here](./docs/pages/pages.md).
 
 ## :wrench: Technical
 
