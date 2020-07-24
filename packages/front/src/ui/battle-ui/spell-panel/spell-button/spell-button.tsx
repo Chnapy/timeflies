@@ -30,7 +30,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
     const index = useGameStep('battle', battle => selectSpell(battle).index);
 
     const duration = useGameStep('battle', battle => selectSpell(battle).features.duration);
-
+    const rangeArea = useGameStep('battle', battle => selectSpell(battle).features.rangeArea);
+    const actionArea = useGameStep('battle', battle => selectSpell(battle).features.actionArea);
     const attack = useGameStep('battle', battle => selectSpell(battle).features.attack);
 
     const spellRole = useGameStep('battle', battle => selectSpell(battle).staticData.role);
@@ -171,9 +172,14 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
                             <SpellImage spellRole={spellRole} size={48} />
                         </Box>
 
-                        <Box display='flex' flexDirection='column' justifyContent='space-evenly' ml={1}>
+                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.5} ml={1}>
                             {renderAttribute('time', formatMsToSeconds(duration) + 's')}
                             {attack !== undefined && renderAttribute('attack', attack)}
+                        </Box>
+
+                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.5} ml={1}>
+                            {renderAttribute('rangeArea', rangeArea >= 0 ? rangeArea : '-')}
+                            {renderAttribute('actionArea', actionArea + 1)}
                         </Box>
 
                     </Box>

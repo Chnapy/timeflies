@@ -4,14 +4,18 @@ import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import BlockIcon from '@material-ui/icons/Block';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import SignalWifi4BarIcon from '@material-ui/icons/SignalWifi4Bar';
+import BorderAllIcon from '@material-ui/icons/BorderAll';
 import React from 'react';
 
 const iconMap = {
     attack: FullscreenIcon,
     time: HourglassFullIcon,
     play: PlayArrowIcon,
-    life: FavoriteIcon
-};
+    life: FavoriteIcon,
+    rangeArea: SignalWifi4BarIcon,
+    actionArea: BorderAllIcon
+} as const;
 
 export type UIIconValue = keyof typeof iconMap;
 
