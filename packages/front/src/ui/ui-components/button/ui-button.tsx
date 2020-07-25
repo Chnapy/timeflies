@@ -7,7 +7,7 @@ export type UIButtonProps = Omit<ButtonProps, 'variant' | 'color'> & {
     variant?: Extract<PropTypes.Color, 'primary' | 'secondary'>;
 };
 
-const useStyles = makeStyles(({}) => ({
+const useStyles = makeStyles(() => ({
     root: {
         '&, &:hover': {
             borderWidth: 2
