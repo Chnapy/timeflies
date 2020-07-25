@@ -92,6 +92,11 @@ export const appTheme: Theme = createMuiTheme({
             fontSize: '1.6rem'
         }
     },
+    props: {
+        MuiButtonBase: {
+            centerRipple: true
+        },
+    },
     overrides: {
         MuiCssBaseline: {
             '@global': {
@@ -132,6 +137,29 @@ export const appTheme: Theme = createMuiTheme({
             //     }
             // }
         },
+
+        MuiInput: {
+            underline: {
+                '&::before': {
+                    borderWidth: 2
+                }
+            }
+        },
+
+        MuiFilledInput: {
+            underline: {
+                '&::before': {
+                    borderWidth: '2px !important'
+                }
+            }
+        },
+
+        MuiOutlinedInput: {
+            notchedOutline: {
+                borderWidth: 2
+            }
+        },
+
         MuiChip: {
             root: {
                 borderRadius: 4

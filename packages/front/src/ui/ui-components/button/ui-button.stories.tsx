@@ -14,22 +14,36 @@ export const Default = () => {
 
             <Card>
 
-                <Box p={2}>
+                <Box display='inline-block' m={2}>
                     <UIButton>
                         default
-                </UIButton>
+</UIButton>
                 </Box>
 
-                <Box p={2}>
+                <Box display='inline-block' m={2}>
                     <UIButton variant='secondary'>
                         secondary
-                </UIButton>
+</UIButton>
                 </Box>
 
-                <Box p={2}>
+                <Box display='inline-block' m={2}>
                     <UIButton variant='primary'>
                         primary
-                </UIButton>
+</UIButton>
+                </Box>
+
+                <br />
+
+                <Box display='inline-block' m={2}>
+                    <UIButton variant='secondary' disabled>
+                        secondary
+</UIButton>
+                </Box>
+
+                <Box display='inline-block' m={2}>
+                    <UIButton variant='primary' disabled>
+                        primary
+</UIButton>
                 </Box>
 
             </Card>
