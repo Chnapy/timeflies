@@ -26,7 +26,7 @@ const contrast = '#FFF';
 
 const bgDark = '#181818';
 const bgPanel = '#333333';
-const bgMain = '#424242';
+// const bgMain = '#424242';
 
 export const appTheme: Theme = createMuiTheme({
     palette: {
