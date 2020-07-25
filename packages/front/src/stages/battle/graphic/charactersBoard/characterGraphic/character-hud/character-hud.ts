@@ -73,8 +73,6 @@ export const CharacterHud = (
 
             const { tilewidth, tileheight } = getTilesize(schema);
 
-            console.log(tilewidth, scaleValue)
-
             gauge.setGeo({
                 width: tilewidth / scaleInverted - (lifeIconSize + 4)
             });

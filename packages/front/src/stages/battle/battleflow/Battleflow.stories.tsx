@@ -296,7 +296,6 @@ export const Default: React.FC = () => {
 
         const startTime = Date.now() + 1000;
 
-        console.log('start')
         await storeManager.dispatch(BattleStartAction({
             myPlayerId: 'p1',
             tiledMapAssets: {
@@ -324,7 +323,6 @@ export const Default: React.FC = () => {
                 time: startTime
             }
         }));
-        console.log('end')
 
         const battleStageGraphic = CanvasContext.provider({
             spritesheets: {
