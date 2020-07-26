@@ -9,25 +9,19 @@ export type UIButtonProps = Omit<ButtonProps, 'variant' | 'color'> & {
 
 const useStyles = makeStyles(() => ({
     root: {
-        '&, &:hover': {
-            borderWidth: 2
-        }
-    },
-    secondary: {
-    },
-    primary: {
+        borderWidth: '2px !important'
     }
 }));
 
-export const UIButton: React.FC<UIButtonProps> = ({
+export const UIButton = React.forwardRef<HTMLButtonElement, UIButtonProps>(({
     variant = 'secondary',
     ...rest
-}) => {
+}, ref) => {
     const classes = useStyles();
 
     const btnVariant = variant === 'primary'
         ? 'contained'
         : 'outlined';
 
-    return <Button className={clsx(classes.root, classes[variant])} variant={btnVariant} color={variant} {...rest} />;
-};
+    return <Button ref={ref} variant={btnVariant} color={variant} {...rest} className={clsx(classes.root, rest.className)} />;
+});

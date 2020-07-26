@@ -1,15 +1,15 @@
 import { Box } from '@material-ui/core';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import BlockIcon from '@material-ui/icons/Block';
+import BorderAllIcon from '@material-ui/icons/BorderAll';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FlareIcon from '@material-ui/icons/Flare';
 import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import BlockIcon from '@material-ui/icons/Block';
-import FavoriteIcon from '@material-ui/icons/Favorite';
 import SignalWifi4BarIcon from '@material-ui/icons/SignalWifi4Bar';
-import BorderAllIcon from '@material-ui/icons/BorderAll';
 import React from 'react';
 
 const iconMap = {
-    attack: FullscreenIcon,
+    attack: FlareIcon,
     time: HourglassFullIcon,
     play: PlayArrowIcon,
     life: FavoriteIcon,

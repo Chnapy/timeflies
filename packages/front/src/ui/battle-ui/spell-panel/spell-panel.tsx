@@ -1,4 +1,4 @@
-import { Box, Paper } from '@material-ui/core';
+import { Box, Card } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { denormalize } from '@timeflies/shared';
 import React from 'react';
@@ -19,13 +19,6 @@ export const SpellPanel: React.FC = () => {
     const { spellIdList } = useGameStep('battle',
         ({ cycleState, snapshotState }) => {
 
-            // if (!cycle.globalTurn) {
-            //     return {
-            //         characterId: null,
-            //         spellIdList: [] as string[]
-            //     };
-            // }
-
             const { currentCharacterId } = cycleState;
 
             const spellIdList = denormalize(snapshotState.battleDataCurrent.spells)
@@ -40,13 +33,13 @@ export const SpellPanel: React.FC = () => {
         (a, b) => a.characterId === b.characterId
     );
 
-    return <Paper className={classes.root} elevation={3}>
-        <Box display='flex' flexWrap='nowrap' px={1} py={1}>
+    return <Card className={classes.root}>
+        <Box display='flex' flexWrap='nowrap' p={2}>
 
             {spellIdList.map((spellId, i) => <Box key={spellId} ml={i && 1}>
                 <SpellButton spellId={spellId} />
             </Box>)}
 
         </Box>
-    </Paper>;
+    </Card>;
 };

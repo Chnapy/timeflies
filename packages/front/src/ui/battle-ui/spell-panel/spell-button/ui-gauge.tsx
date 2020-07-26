@@ -17,7 +17,7 @@ const useStyles = makeStyles(({ palette, shape }) => ({
         flexGrow: 1,
         height: 4,
         width: '100%',
-        backgroundColor: '#E7E7E7',
+        backgroundColor: palette.background.default,
         borderRadius: shape.borderRadius,
         overflow: 'hidden'
     },
