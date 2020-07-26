@@ -26,7 +26,7 @@ const contrast = '#FFF';
 
 const bgDark = '#181818';
 const bgPanel = '#333333';
-// const bgMain = '#424242';
+const bgMain = '#424242';
 
 export const appTheme: Theme = createMuiTheme({
     palette: {
@@ -51,7 +51,15 @@ export const appTheme: Theme = createMuiTheme({
         },
         background: {
             default: bgDark,
-            paper: bgPanel
+            paper: bgPanel,
+            level1: bgMain
+        },
+        features: {
+            life: '#EB6F6F',
+            time: primary,
+            rangeArea: '#A499E7',
+            actionArea: '#C691B4',
+            attack: '#FF8B66'
         }
     },
     shape: {

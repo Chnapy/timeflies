@@ -49,7 +49,7 @@ export const Default: React.FC = () => {
                     s2: seedSpell({
                         id: 's2',
                         period: 'current',
-                        type: 'simpleAttack',
+                        type: 'healthSharing',
                         feature: {
                             duration: 1000,
                             attack: 22,

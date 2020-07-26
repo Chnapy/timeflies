@@ -1,6 +1,7 @@
-import { Box, Button, ButtonProps, Tooltip } from '@material-ui/core';
-import { Theme, useTheme } from '@material-ui/core/styles';
+import { Box, Tooltip } from '@material-ui/core';
+import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import { assertIsDefined, switchUtil } from '@timeflies/shared';
+import clsx from 'clsx';
 import React from 'react';
 import { useStore } from 'react-redux';
 import { GameState } from '../../../../game-state';
@@ -10,15 +11,60 @@ import { useGameDispatch } from '../../../hooks/useGameDispatch';
 import { useGameSelector } from '../../../hooks/useGameSelector';
 import { useGameStep } from '../../../hooks/useGameStep';
 import { BattleState } from '../../../reducers/battle-reducers/battle-reducer';
+import { UIButton } from '../../../ui-components/button/ui-button';
+import { UITypography } from '../../../ui-components/typography/ui-typography';
 import { SpellImage } from './spell-image';
 import { SpellNumber } from './spell-number';
 import { UIGauge } from './ui-gauge';
 import { UIIcon, UIIconValue } from './ui-icon';
-import { formatMsToSeconds, UIText } from './ui-text';
+import { formatMsToSeconds } from './ui-text';
 
-export interface SpellButtonProps {
+export type SpellButtonProps = {
     spellId: string;
-}
+};
+
+type StyleProps = {
+    selected: boolean;
+    disabled: boolean;
+};
+
+const useStyles = makeStyles(({ palette }) => ({
+    btn: ({ selected }: StyleProps) =>
+        selected ? {
+            backgroundColor: palette.background.default + ' !important',
+            borderColor: palette.common.white,
+            cursor: 'default'
+        }
+            : {
+                backgroundColor: palette.background.level1
+            },
+    attribute: ({ disabled }: StyleProps) => ({
+        display: 'flex',
+        flexWrap: 'nowrap',
+        alignItems: 'center',
+        textTransform: 'none',
+        opacity: disabled ? 0.5 : 1
+    }),
+    time: {
+        color: palette.features.time
+    },
+    attack: {
+        color: palette.features.attack
+    },
+    rangeArea: {
+        color: palette.features.rangeArea
+    },
+    actionArea: {
+        color: palette.features.actionArea
+    },
+    spellImage: ({ selected, disabled }: StyleProps) => ({
+        display: 'flex',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: selected ? 'currentColor' : 'transparent',
+        opacity: disabled ? 0.5 : 1
+    })
+}));
 
 export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) => {
 
@@ -118,13 +164,20 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
         dispatchSpellPrepare();
     }, [ dispatchSpellPrepare, isDisabled ]);
+    console.log('s', isSelected)
+    const classes = useStyles({
+        selected: isSelected,
+        disabled: isDisabled
+    });
 
-    const renderAttribute = (icon: UIIconValue, value: React.ReactText) => (
+    const renderAttribute = (icon: Extract<UIIconValue, keyof typeof classes>, value: React.ReactText) => (
         <Box display='flex' flexWrap='nowrap' alignItems='center'>
-            <UIIcon icon={icon} />
-            <Box ml={0.5}>
-                <UIText variant='numeric'>{value}</UIText>
-            </Box>
+            <div className={clsx(classes.attribute, classes[ icon ])}>
+                <UIIcon icon={icon} />
+                <Box ml={0.5}>
+                    <UITypography variant='numeric'>{value}</UITypography>
+                </Box>
+            </div>
         </Box>
     );
 
@@ -134,67 +187,51 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         player: <UIIcon icon='play' strikeOut />
     });
 
-    const buttonProps: ButtonProps = isSelected
-        ? {
-            variant: 'contained',
-            disableElevation: true
-        }
-        : {
-            variant: 'outlined'
-        };
-
     const { palette } = useTheme<Theme>();
 
     const renderPoint = (key: number) =>
-        <Box key={key} width={4} height={4} borderRadius={10} bgcolor={palette.primary.main} mr={'1px'} />;
+        <Box key={key} width={4} height={4} bgcolor='currentColor' mr={'1px'} />;
 
     return (
         <Box display='flex' flexDirection='column'>
 
-            <Box display='flex' height={4} mx={0.5} mb={0.5}>
+            <Box color='primary.main' display='flex' height={4} mx={0.5} mb={0.5}>
                 {[ ...new Array(nbrWaitingSpellAction) ].map((_, i) => renderPoint(i))}
-                {currentSpellActionInfos && <UIGauge variant='dynamic' timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />}
+                {currentSpellActionInfos
+                    && <UIGauge variant='dynamic' timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />
+                }
             </Box>
 
             <Tooltip title={spellDescription}>
-                <Button component='span' onClick={onBtnClick} size='large' color='primary' disabled={isDisabled} {...buttonProps}>
+                <UIButton className={classes.btn} onClick={onBtnClick} disabled={isDisabled}>
 
                     <Box display='flex' flexWrap='nowrap'>
 
-                        <Box
-                            display='flex'
-                            border={1}
-                            borderColor={'currentColor'}
-                            bgcolor={palette.primary.main}
-                            borderRadius={2}
-                            style={{ opacity: isDisabled ? .25 : 1 }}
-                        >
+                        <div className={classes.spellImage}>
                             <SpellImage spellRole={spellRole} size={48} />
-                        </Box>
+                        </div>
 
-                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.5} ml={1}>
+                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.25} ml={1.5}>
                             {renderAttribute('time', formatMsToSeconds(duration) + 's')}
                             {attack !== undefined && renderAttribute('attack', attack)}
                         </Box>
 
-                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.5} ml={1}>
+                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.25} ml={1.5}>
                             {renderAttribute('rangeArea', rangeArea >= 0 ? rangeArea : '-')}
                             {renderAttribute('actionArea', actionArea + 1)}
                         </Box>
 
                     </Box>
 
-                    <Box position='absolute' left={0} bottom={0} style={{
-                        transform: 'translate(-25%, 25%)'
-                    }}>
-                        <SpellNumber value={index} disabled={isDisabled} />
+                    <Box position='absolute' left={-2} bottom={-5}>
+                        <SpellNumber value={index} />
                     </Box>
 
-                    <Box color={palette.primary.main} position='absolute' top={4} right={4}>
+                    <Box color={palette.background.default} position='absolute' top={0} right={0}>
                         {renderDisableIcon()}
                     </Box>
 
-                </Button>
+                </UIButton>
             </Tooltip>
         </Box>
     );

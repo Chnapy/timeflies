@@ -134,7 +134,7 @@ export const Default: React.FC = () => {
                     s2: seedSpell({
                         id: 's2',
                         period: 'current',
-                        type: 'simpleAttack',
+                        type: 'pressure',
                         feature: {
                             duration: 1000,
                             attack: 22,
@@ -146,7 +146,7 @@ export const Default: React.FC = () => {
                     s3: seedSpell({
                         id: 's3',
                         period: 'current',
-                        type: 'simpleAttack',
+                        type: 'lastResort',
                         feature: {
                             duration: 1000,
                             attack: 22,
@@ -158,7 +158,7 @@ export const Default: React.FC = () => {
                     s4: seedSpell({
                         id: 's4',
                         period: 'current',
-                        type: 'simpleAttack',
+                        type: 'healthSharing',
                         feature: {
                             duration: 1000,
                             attack: 22,

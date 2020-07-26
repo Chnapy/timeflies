@@ -39,6 +39,10 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
         return index;
     });
 
+    if(finished) {
+        return null;
+    }
+
     const paddingLeft = 2;
 
     const leftPercent = (turnDuration - startTimeFromTurnStart - duration) / turnDuration * 100;
@@ -49,7 +53,7 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
             display='flex' alignItems='center'
         >
             <Box display='inline-flex' height={4} bgcolor='#E7E7E7' width={paddingLeft + 2} mr={'-2px'} />
-            <SpellNumber value={spellIndex} disabled={finished} />
+            <SpellNumber value={spellIndex} />
         </Box>
     </Box>;
 });

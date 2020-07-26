@@ -1,4 +1,4 @@
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography, Card } from '@material-ui/core';
 import { seedSpellActionSnapshot } from '@timeflies/shared';
 import React from 'react';
 import { AssetLoader, createAssetLoader } from '../../../../assetManager/AssetLoader';
@@ -16,6 +16,7 @@ import { SpellNumber } from './spell-number';
 import { UIGauge } from './ui-gauge';
 import { UIIcon } from './ui-icon';
 import { UIText } from './ui-text';
+import { UIThemeProvider } from '../../../ui-theme-provider';
 
 export default {
     component: SpellButton,
@@ -83,8 +84,11 @@ export const Default: React.FC = () => {
                     s1: seedSpell({
                         id: 's1',
                         period: 'current',
-                        type: 'simpleAttack',
-                        characterId: 'c1'
+                        type: 'move',
+                        characterId: 'c1',
+                        feature: {
+                            attack: 20
+                        }
                     })
                 }
             }
@@ -99,9 +103,9 @@ export const Default: React.FC = () => {
 
     const stateSelected: BattleState = {
         ...stateDefault,
-        snapshotState: {
-            ...stateDefault.snapshotState,
-            currentSpellAction: seedSpellActionSnapshot('s1')
+        battleActionState: {
+            ...stateDefault.battleActionState,
+            selectedSpellId: 's1'
         }
     };
 
@@ -162,34 +166,38 @@ export const Default: React.FC = () => {
     const stateQueueCurrentAction = getQueueGameState(true, Date.now() - 1500);
 
     return (
-        <Box display='flex' flexWrap='wrap'>
+        <UIThemeProvider>
+            <Card>
+                <Box display='flex' flexWrap='wrap'>
 
-            <Wrapper title='Default' battleState={stateDefault} spellId='s1' />
+                    <Wrapper title='Default' battleState={stateDefault} spellId='s1' />
 
-            <Wrapper title='Selected' battleState={stateSelected} spellId='s1' />
+                    <Wrapper title='Selected' battleState={stateSelected} spellId='s1' />
 
-            <Wrapper title='Disabled (time)' battleState={stateDisabledTime} spellId='s1' />
+                    <Wrapper title='Disabled (time)' battleState={stateDisabledTime} spellId='s1' />
 
-            <Wrapper title='Disabled (not my character)' battleState={stateDisabledTurn} spellId='s1' />
+                    <Wrapper title='Disabled (not my character)' battleState={stateDisabledTurn} spellId='s1' />
 
-            <Wrapper title='With queue' battleState={stateQueue} spellId='s1' />
+                    <Wrapper title='With queue' battleState={stateQueue} spellId='s1' />
 
-            <Wrapper title='With queue, disabled (time)' battleState={stateQueueDisabled} spellId='s1' />
+                    <Wrapper title='With queue, disabled (time)' battleState={stateQueueDisabled} spellId='s1' />
 
-            <Wrapper title='With queue, current action' battleState={stateQueueCurrentAction} spellId='s1' />
+                    <Wrapper title='With queue, current action' battleState={stateQueueCurrentAction} spellId='s1' />
 
-            <Box width='100%'>
-                <SpellNumber value={1} />
-                <SpellNumber value={2} />
-                <UIIcon icon='time' />
-                <UIIcon icon='attack' />
-                <UIIcon icon='time' strikeOut />
-                <UIText variant='numeric'>12.4s</UIText>
-                <SpellImage spellRole={'move'} size={48} />
-                <Box width={300}>
-                    <UIGauge variant='dynamic' timeElapsed={3000} durationTotal={10000} />
+                    <Box width='100%'>
+                        <SpellNumber value={1} />
+                        <SpellNumber value={2} />
+                        <UIIcon icon='time' />
+                        <UIIcon icon='attack' />
+                        <UIIcon icon='time' strikeOut />
+                        <UIText variant='numeric'>12.4s</UIText>
+                        <SpellImage spellRole={'move'} size={48} />
+                        <Box width={300}>
+                            <UIGauge variant='dynamic' timeElapsed={3000} durationTotal={10000} />
+                        </Box>
+                    </Box>
                 </Box>
-            </Box>
-        </Box>
+            </Card>
+        </UIThemeProvider>
     );
 };
