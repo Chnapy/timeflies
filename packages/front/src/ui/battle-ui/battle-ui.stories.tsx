@@ -175,6 +175,10 @@ export const Default: React.FC = () => {
             currentCharacterId: c5.id,
             turnDuration: 12400,
             turnStartTime: now
+        },
+        battleActionState: {
+            ...preloadedState.battleActionState,
+            selectedSpellId: 's1'
         }
     };
 

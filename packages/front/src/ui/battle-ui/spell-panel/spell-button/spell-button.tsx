@@ -29,15 +29,14 @@ type StyleProps = {
 };
 
 const useStyles = makeStyles(({ palette }) => ({
-    btn: ({ selected }: StyleProps) =>
-        selected ? {
-            backgroundColor: palette.background.default + ' !important',
-            borderColor: palette.common.white,
-            cursor: 'default'
-        }
-            : {
-                backgroundColor: palette.background.level1
-            },
+    btn: {
+        backgroundColor: palette.background.level1
+    },
+    btnSelected: {
+        backgroundColor: palette.background.default + ' !important',
+        borderColor: palette.common.white,
+        cursor: 'default'
+    },
     attribute: ({ disabled }: StyleProps) => ({
         display: 'flex',
         flexWrap: 'nowrap',
@@ -203,7 +202,9 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
             </Box>
 
             <Tooltip title={spellDescription}>
-                <UIButton className={classes.btn} onClick={onBtnClick} disabled={isDisabled}>
+                <UIButton className={clsx(classes.btn, {
+                    [classes.btnSelected]: isSelected
+                })} onClick={onBtnClick} disabled={isDisabled}>
 
                     <Box display='flex' flexWrap='nowrap'>
 
