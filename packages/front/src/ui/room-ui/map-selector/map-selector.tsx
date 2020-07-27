@@ -1,6 +1,5 @@
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import Dialog from '@material-ui/core/Dialog';
 import Grid from '@material-ui/core/Grid';
@@ -8,9 +7,10 @@ import { assertIsDefined, MapConfig } from '@timeflies/shared';
 import React from 'react';
 import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useGameStep } from '../../hooks/useGameStep';
-import { MapSelectorItem } from './map-selector-item';
+import { UIButton } from '../../ui-components/button/ui-button';
+import { UITypography } from '../../ui-components/typography/ui-typography';
 import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
-import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
+import { MapSelectorItem } from './map-selector-item';
 
 export interface MapSelectorProps {
     defaultOpen?: boolean;
@@ -36,13 +36,7 @@ const RenderSingleChild: React.FC<{
         }
 
         return (
-            <Card>
-                <CardActionArea onClick={onClick} disabled={disabled}>
-                    <CardContent>
-                        Click to select a map
-                </CardContent>
-                </CardActionArea>
-            </Card>
+            <UIButton onClick={onClick} disabled={disabled}>Choose a map</UIButton>
         );
     };
 
@@ -72,22 +66,23 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
 
     return (
         <Box display={'inline-flex'}>
-            <Box display={'inline-flex'}>
-                <RenderSingleChild
-                    map={map}
-                    onClick={() => {
-                        sendMapList();
-                        setOpen(true);
-                    }}
-                    disabled={!isAdmin}
-                />
-            </Box>
+            <Card>
+                <CardContent>
+                    <UITypography variant='h3' align='center' gutterBottom>Map select</UITypography>
+                    <RenderSingleChild
+                        map={map}
+                        onClick={() => {
+                            sendMapList();
+                            setOpen(true);
+                        }}
+                        disabled={!isAdmin}
+                    />
+                </CardContent>
+            </Card>
             <Dialog open={open} fullScreen>
-                <Box p={1}>
+                <CardContent>
 
-                    <Box mb={1}>
-                        <UIText variant='main'>Select a map</UIText>
-                    </Box>
+                    <UITypography variant='h3' gutterBottom>Select a map</UITypography>
 
                     <Grid container spacing={2}>
                         {mapList.map(config => (
@@ -105,7 +100,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
                         ))}
                     </Grid>
 
-                </Box>
+                </CardContent>
             </Dialog>
         </Box>
     );

@@ -6,7 +6,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Skeleton } from '@material-ui/lab';
 import { MapConfig } from '@timeflies/shared';
 import React from 'react';
-import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
+import { UITypography } from '../../ui-components/typography/ui-typography';
 
 export interface MapSelectorItemProps {
     map: MapConfig;
@@ -42,10 +42,10 @@ export const MapSelectorItem: React.FC<MapSelectorItemProps> = ({ map, isSelecte
 
                 <CardContent>
 
-                    <UIText variant='main'>{name}</UIText>
-                    <UIText variant='second'>{width}x{height}</UIText>
-                    <UIText variant='second'>Teams: {nbrTeams}</UIText>
-                    <UIText variant='second'>Characters: {nbrCharactersPerTeam * nbrTeams} ({nbrCharactersPerTeam}/team)</UIText>
+                    <UITypography variant='h4'>{name}</UITypography>
+                    <UITypography variant='bodyMini'>{width}x{height}</UITypography>
+                    <UITypography variant='bodyMini'>Teams: {nbrTeams}</UITypography>
+                    <UITypography variant='bodyMini'>Characters: {nbrCharactersPerTeam * nbrTeams} ({nbrCharactersPerTeam}/team)</UITypography>
 
                 </CardContent>
 

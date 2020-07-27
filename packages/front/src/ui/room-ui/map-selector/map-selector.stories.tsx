@@ -73,6 +73,11 @@ export const Default: React.FC = () => {
             map: {
                 mapList,
                 mapSelected: null
+                // {
+                //     id: '1',
+                //     tileList: [],
+                //     tileListLoading: false
+                // }
             },
             launchTime: null
         }
@@ -90,7 +95,7 @@ export const Default: React.FC = () => {
         storeManager,
         assetLoader,
         createPixi: async () => { },
-        gameUIChildren: <MapSelector defaultOpen={true} />
+        gameUIChildren: <MapSelector defaultOpen={false} />
     });
 
     return view;
