@@ -12,13 +12,6 @@ export const TimeGauge: React.FC = () => {
 
     const { turnDuration, remainingTime } = useGameStep('battle', battle => {
         const { turnStartTime, turnDuration } = battle.cycleState;
-        // if (!cycle.globalTurn) {
-        //     return {
-        //         startTime: 0,
-        //         turnDuration: 0,
-        //         remainingTime: 0
-        //     };
-        // }
 
         return {
             startTime: turnStartTime,
@@ -34,7 +27,7 @@ export const TimeGauge: React.FC = () => {
     );
 
 
-    return <Box position='relative' display='flex' alignItems='center' flexGrow={1}>
+    return <Box position='relative' display='flex' alignItems='center' flexGrow={1} color='primary.main'>
 
         <Box width={0} overflow='hidden'>
             <SpellNumber value={0} />

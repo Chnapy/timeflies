@@ -34,12 +34,12 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
 
         const spellAction = spellActionSnapshotList.find(sa => sa.startTime === spellActionStartTime)!;
 
-        const { index } = snapshotState.battleDataCurrent.spells[spellAction.spellId];
+        const { index } = snapshotState.battleDataCurrent.spells[ spellAction.spellId ];
 
         return index;
     });
 
-    if(finished) {
+    if (finished) {
         return null;
     }
 
@@ -49,10 +49,12 @@ export const SpellTimeGauge: React.FC<SpellTimeGaugeProps> = React.memo(({ spell
 
     return <Box display='flex' alignItems='center'>
         <Box
-            position='absolute' top={0} left={`calc(${leftPercent}% - ${paddingLeft}px)`}
+            position='absolute'
+            top={'50%'} left={`calc(${leftPercent}% - ${paddingLeft}px)`}
             display='flex' alignItems='center'
+            style={{ transform: 'translateY(-50%)' }}
         >
-            <Box display='inline-flex' height={4} bgcolor='#E7E7E7' width={paddingLeft + 2} mr={'-2px'} />
+            <Box display='inline-flex' height={4} bgcolor='background.default' width={paddingLeft + 2} mr={'-2px'} />
             <SpellNumber value={spellIndex} />
         </Box>
     </Box>;

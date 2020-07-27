@@ -11,6 +11,7 @@ const useStyles = makeStyles(({ palette }) => ({
         display: 'inline-block',
         width: 12,
         height: 12,
+        textAlign: 'center',
         color: palette.common.white,
         backgroundColor: palette.background.default
     }
