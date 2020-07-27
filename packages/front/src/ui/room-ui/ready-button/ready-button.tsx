@@ -1,10 +1,11 @@
-import React from 'react';
-import { Button, Box } from '@material-ui/core';
-import { useGameNetwork } from '../../hooks/useGameNetwork';
-import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
+import { Box, Card, CardContent } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
+import React from 'react';
+import { useGameNetwork } from '../../hooks/useGameNetwork';
 import { useGameStep } from '../../hooks/useGameStep';
-import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
+import { UIButton } from '../../ui-components/button/ui-button';
+import { UITypography } from '../../ui-components/typography/ui-typography';
+import { useCurrentPlayerRoom } from '../hooks/useCurrentPlayerRoom';
 
 export const ReadyButton: React.FC = () => {
 
@@ -52,7 +53,7 @@ export const ReadyButton: React.FC = () => {
 
         return <>
             Everyone is ready!
-            <UIText variant='main'>Battle start in <span ref={timeRef} />s</UIText>
+            <UITypography variant='body1'>Battle start in <span ref={timeRef} />s</UITypography>
         </>;
     }, [ charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime ]);
 
@@ -83,17 +84,20 @@ export const ReadyButton: React.FC = () => {
 
     }, [ launchTime ]);
 
-    return <Box display='flex' flexDirection='column'>
+    return <Card>
+        <CardContent>
+            <Box display='flex' flexDirection='column'>
 
-        <UIText variant='second'>{message}</UIText>
+                <UITypography variant='body2' gutterBottom>{message}</UITypography>
 
-        <Button
-            variant='outlined'
-            onClick={onClick}
-            endIcon={isReady ? <CheckIcon /> : null}
-            disabled={disabled}
-        >
-            <UIText variant='main'>I'm ready</UIText>
-        </Button>
-    </Box>;
+                <UIButton
+                    onClick={onClick}
+                    endIcon={isReady ? <CheckIcon /> : null}
+                    disabled={disabled}
+                >
+                    I'm ready
+        </UIButton>
+            </Box>
+        </CardContent>
+    </Card>;
 };

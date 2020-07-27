@@ -31,7 +31,7 @@ export const BoardTile: React.FC = () => {
                         id: 'p1',
                         isAdmin: true,
                         isLoading: true,
-                        isReady: true,
+                        isReady: false,
                         name: 'p-1',
                         characters: [
                             {
@@ -85,11 +85,11 @@ export const BoardTile: React.FC = () => {
             position: createPosition(1, 0),
             teamId: 't1',
         },
-        {
-            type: 'placement',
-            position: createPosition(2, 0),
-            teamId: 't1',
-        },
+        // {
+        //     type: 'placement',
+        //     position: createPosition(2, 0),
+        //     teamId: 't1',
+        // },
         {
             type: 'placement',
             position: createPosition(3, 0),
@@ -214,7 +214,7 @@ export const Board: React.FC = () => {
                         id: 'p1',
                         isAdmin: true,
                         isLoading: true,
-                        isReady: true,
+                        isReady: false,
                         name: 'p-1',
                         characters: [
                             {

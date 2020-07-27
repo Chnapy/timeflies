@@ -28,5 +28,5 @@ export const MapBoardTile: React.FC<MapBoardTileProps> = ({ tileInfos }) => {
 
 const MapBoardTileObstacle: React.FC<MapBoardTileInfos<'obstacle'>> = props => {
 
-    return <Box flexGrow={1} bgcolor='#444' />;
+    return <Box flexGrow={1} bgcolor='background.default' />;
 };
