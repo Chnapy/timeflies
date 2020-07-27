@@ -20,12 +20,12 @@ export const GaugeGraphic = (graphic: PIXI.Graphics = new PIXI.Graphics()) => {
 
         graphic.clear();
 
-        graphic.beginFill(palette.primary.contrastText);
+        graphic.beginFill(palette.common.white);
         graphic.drawRoundedRect(0, 0, geoRect.width, geoRect.height, borderRadius);
         graphic.endFill();
 
         if (barWidth >= 1) {
-            graphic.beginFill(palette.primary.main);
+            graphic.beginFill(palette.features.life);
             graphic.drawRoundedRect(borderSize, borderSize, barWidth, geoRect.height - borderSize * 2, borderRadius);
             graphic.endFill();
         }

@@ -37,6 +37,8 @@ export const TileGraphic = ({
 
     const { palette } = graphicTheme;
 
+    const targetColor = palette.background.default;
+
     const container = new PIXI.Container();
     container.x = worldPos.x;
     container.y = worldPos.y;
@@ -93,14 +95,13 @@ export const TileGraphic = ({
     };
 
     const drawTarget = () => {
-        const { palette } = graphicTheme;
 
         const margin = 1;
         const size = tilesize - margin * 2;
         const length = 4;
 
         graphicsOver.moveTo(margin, margin + length);
-        graphicsOver.lineStyle(2, palette.primary.main);
+        graphicsOver.lineStyle(2, targetColor);
         graphicsOver.lineTo(margin, margin);
         graphicsOver.lineTo(margin + length, margin);
 
@@ -132,7 +133,7 @@ export const TileGraphic = ({
             const margin = tilesize * (3 / 8);
             const size = tilesize / 4;
 
-            graphicsUnder.beginFill(palette.primary.main);
+            graphicsUnder.beginFill(targetColor);
             graphicsUnder.drawRect(margin, margin, size, size);
             graphicsUnder.endFill();
 
@@ -158,14 +159,12 @@ export const TileGraphic = ({
 
     const drawTargetCurrent = () => {
 
-        const { palette } = graphicTheme;
-
         const margin = 5;
         const size = tilesize - margin * 2;
         const length = 2;
 
         graphicsOverPersist.moveTo(margin, margin + length);
-        graphicsOverPersist.lineStyle(2, palette.primary.main);
+        graphicsOverPersist.lineStyle(2, targetColor);
         graphicsOverPersist.lineTo(margin, margin);
         graphicsOverPersist.lineTo(margin + length, margin);
 
@@ -190,7 +189,6 @@ export const TileGraphic = ({
     };
 
     const persistActionStart = (duration: number, startTime: number) => {
-        const { palette } = graphicTheme;
 
         graphicsOverPersist.clear();
 
@@ -216,12 +214,12 @@ export const TileGraphic = ({
 
             graphicsOverPersistStart.clear();
 
-            graphicsOverPersistStart.beginFill(palette.primary.contrastText);
+            graphicsOverPersistStart.beginFill(targetColor);
             graphicsOverPersistStart.drawRect(marginX, marginTop, width, height);
             graphicsOverPersistStart.endFill();
 
             if (barWidth) {
-                graphicsOverPersistStart.beginFill(palette.primary.main);
+                graphicsOverPersistStart.beginFill(palette.common.white);
                 graphicsOverPersistStart.drawRect(marginX + borderSize, marginTop + borderSize, barWidth, height - borderSize * 2);
                 graphicsOverPersistStart.endFill();
             }
