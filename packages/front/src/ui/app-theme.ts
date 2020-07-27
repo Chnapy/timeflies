@@ -43,7 +43,7 @@ export const appTheme: Theme = createMuiTheme({
             main: white
         },
         action: {
-            // disabled: '#888',
+            disabled: '#888',
             // disabledBackground: '#888'
         },
         text: {

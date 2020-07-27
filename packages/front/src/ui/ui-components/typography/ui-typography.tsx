@@ -32,15 +32,15 @@ export const UITypography: React.FC<UITypographyProps> = ({ variant, ...rest }) 
     const classes = useStyles();
 
     if (variant === 'bodyMini') {
-        return <Typography className={clsx(classes.bodyMini, rest.className)} variant='body2' {...rest} />;
+        return <Typography {...rest} className={clsx(classes.bodyMini, rest.className)} variant='body2' />;
     }
 
     if (variant === 'labelMini') {
-        return <Typography className={clsx(classes.labelMini, rest.className)} variant='body2' {...rest} />;
+        return <Typography {...rest} className={clsx(classes.labelMini, rest.className)} variant='body2' />;
     }
 
     if (variant === 'numeric') {
-        return <Typography className={clsx(classes.numeric, rest.className)} variant='body2' {...rest} />;
+        return <Typography {...rest} className={clsx(classes.numeric, rest.className)} variant='body2' />;
     }
 
     return <Typography variant={variant} {...rest} />;

@@ -15,8 +15,8 @@ const useStyles = makeStyles(({ palette }) => ({
         borderWidth: 2,
         borderStyle: 'solid',
         borderColor: 'currentColor',
-        borderRadius: '100%',
-        backgroundColor: palette.primary.contrastText,
+        color: palette.background.default,
+        backgroundColor: palette.common.white,
         fontSize: '1.4rem',
         fontWeight: 600
     }

@@ -36,17 +36,17 @@ export const CharacterListPanel: React.FC = () => {
         return null;
     }
 
-    return <Paper className={classes.root} elevation={3}>
+    return <Paper className={classes.root}>
 
         <Box display='flex' flexDirection='column' overflow='auto'>
             {charactersIds.map((id, i) => <Box key={id} position='relative' p={1}>
-                <VerticalLine top={i > 0} bottom color={palette.primary.main} />
+                <VerticalLine top={i > 0} bottom color={palette.background.default} />
                 <CharacterItem characterId={id} />
             </Box>)}
         </Box>
 
-        <Box position='relative' bgcolor={palette.primary.main} p={1}>
-            <VerticalLine top color={palette.primary.contrastText} />
+        <Box position='relative' p={1}>
+            <VerticalLine top color={palette.background.default} />
             <CharacterItem characterId={current} />
         </Box>
     </Paper>
