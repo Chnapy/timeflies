@@ -5,7 +5,6 @@ import TiledMap, { TiledTileset } from 'tiled-types';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
 import { tiledMapSpellMove, tiledMapSpellSimpleAttack } from './tiledSpellFns';
 import { TileGraphic } from './TileGraphic';
-import { TileGrid } from './tile-grid';
 
 export type TiledMapGraphic = ReturnType<typeof TiledMapGraphic>;
 
@@ -151,9 +150,12 @@ export const TiledMapGraphic = () => {
             const layerContainerOver = new PIXI.Container();
             layerContainerOver.addChild(...layerTiles.map(t => t.containerOver));
 
-            const gridGraphic = TileGrid(schema);
+            // const gridGraphic = TileGrid(schema);
 
-            container.addChild(layerContainer, gridGraphic.graphic);
+            container.addChild(
+                layerContainer,
+                // gridGraphic.graphic
+            );
 
             containerOver.addChild(layerContainerOver);
         },

@@ -30,12 +30,12 @@ export const CharacterHud = (
     const lifeIconBg = ReactToGraphicSprite(React.createElement<UIIconProps>(UIIcon, {
         icon: 'life',
         inPixiContext: true
-    }), lifeIconSize, lifeIconSize, `color: ${palette.primary.contrastText}`).sprite;
+    }), lifeIconSize, lifeIconSize, `color: ${palette.common.white}`).sprite;
 
     const lifeIcon = ReactToGraphicSprite(React.createElement<UIIconProps>(UIIcon, {
         icon: 'life',
         inPixiContext: true
-    }), lifeIconSize - 4, lifeIconSize - 4).sprite;
+    }), lifeIconSize - 4, lifeIconSize - 4, `color: ${palette.features.life}`).sprite;
     lifeIcon.x = 2;
     lifeIcon.y = 2;
 
@@ -64,7 +64,7 @@ export const CharacterHud = (
         gauge.setGeo({
             x: (4 + lifeIconSize) * scaleInverted,
             y: -12 * scaleInverted,
-            height: 6
+            height: 8
         });
 
         const schema = storeEmitter.getState().battle.battleActionState.tiledSchema;
