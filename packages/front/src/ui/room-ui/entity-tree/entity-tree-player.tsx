@@ -3,11 +3,11 @@ import CheckIcon from '@material-ui/icons/Check';
 import StarIcon from '@material-ui/icons/Star';
 import SyncIcon from '@material-ui/icons/Sync';
 import { TreeItem } from '@material-ui/lab';
-import { PlayerRoom, assertIsDefined } from '@timeflies/shared';
+import { assertIsDefined, PlayerRoom } from '@timeflies/shared';
 import React from 'react';
-import { EntityTreeCharacter } from './entity-tree-character';
 import { useGameStep } from '../../hooks/useGameStep';
-import { UIText } from '../../battle-ui/spell-panel/spell-button/ui-text';
+import { UITypography } from '../../ui-components/typography/ui-typography';
+import { EntityTreeCharacter } from './entity-tree-character';
 
 export interface EntityTreePlayerProps {
     playerId: PlayerRoom[ 'id' ];
@@ -24,8 +24,8 @@ export const EntityTreePlayer: React.FC<EntityTreePlayerProps> = ({ playerId }) 
 
     return (
         <TreeItem nodeId={id} label={<Box display='flex' mb={1}>
-            <UIText variant='username'>
-                {isAdmin && <Box display='inline-flex' mr={1}>
+            <UITypography variant='body2' style={{ display: 'flex' }}>
+                {isAdmin && <Box display='inline-flex' mr={1} color='primary.main'>
                     <StarIcon />
                 </Box>}
                 {name}
@@ -35,7 +35,7 @@ export const EntityTreePlayer: React.FC<EntityTreePlayerProps> = ({ playerId }) 
                 {isLoading && <Box display='inline-flex' ml={1}>
                     <SyncIcon />
                 </Box>}
-            </UIText>
+            </UITypography>
         </Box>}>
             {characters.map(c => (
                 <EntityTreeCharacter key={c.id} character={c} />

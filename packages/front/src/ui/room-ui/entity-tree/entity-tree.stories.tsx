@@ -7,6 +7,7 @@ import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';
 import { EntityTree } from './entity-tree';
 import { createPosition } from '@timeflies/shared';
+import { Box } from '@material-ui/core';
 
 export default {
     title: 'Room/Entity Tree',
@@ -109,7 +110,9 @@ export const Default: React.FC = () => {
         storeManager,
         assetLoader,
         createPixi: async () => { },
-        gameUIChildren: <EntityTree />
+        gameUIChildren: <Box width={300}>
+            <EntityTree />
+        </Box>
     });
 
     return view;

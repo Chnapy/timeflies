@@ -1,6 +1,5 @@
 import { Menu, MenuItem } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import { Theme, useTheme } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import { assertIsDefined, CharacterRoom, CharacterRole, PlayerRoom, Position, TeamRoom, characterRoleList } from '@timeflies/shared';
@@ -11,6 +10,7 @@ import { useGameNetwork } from '../../../hooks/useGameNetwork';
 import { useGameStep } from '../../../hooks/useGameStep';
 import { RemoveBtn } from './remove-btn';
 import { TeamIndicator } from './team-indicator';
+import { UIButton } from '../../../ui-components/button/ui-button';
 
 export interface MapBoardTilePlacementProps {
     position: Position;
@@ -137,19 +137,20 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
 
     const { palette } = useTheme<Theme>();
 
-    return <Box
-        position='relative'
-        flexGrow={1}
-        display='flex'
-        bgcolor={isAllowed ? palette.primary.contrastText : palette.action.disabled}
-        border='2px solid currentColor'
-    >
-        <CardActionArea disabled={!canAdd} onClick={handleMainClick} style={{
-            flexGrow: 1,
-            display: 'flex',
-        }}>
+    return <Box position='relative' flexGrow={1} display='flex'>
+        <UIButton
+            disabled={!canAdd}
+            onClick={handleMainClick}
+            style={{
+                position: 'relative',
+                flexGrow: 1,
+                display: 'flex',
+                padding: 5,
+                backgroundColor: palette.background.level1
+            }}
+        >
             {mainRender}
-        </CardActionArea>
+        </UIButton>
 
         <Box position='absolute' left={0} top={0} style={{
             transform: 'translate(-50%, -50%)'

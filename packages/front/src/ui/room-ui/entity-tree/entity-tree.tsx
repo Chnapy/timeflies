@@ -2,7 +2,7 @@ import { TreeView } from '@material-ui/lab';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { EntityTreeTeam } from './entity-tree-team';
-import { Box } from '@material-ui/core';
+import { Box, Card, CardContent } from '@material-ui/core';
 import { EntityTreePlayer } from './entity-tree-player';
 
 export const EntityTree: React.FC = () => {
@@ -25,17 +25,21 @@ export const EntityTree: React.FC = () => {
     });
 
     return (
-        <TreeView disableSelection expanded={expandedHack} style={{ pointerEvents: 'none' }}>
-            <>
-                {noTeamPlayerList.map(p => (
-                    <EntityTreePlayer key={p.id} playerId={p.id} />
-                ))}
-            </>
-            {teamList.map(t => (
-                <Box key={t.id} mb={2}>
-                    <EntityTreeTeam team={t} />
-                </Box>
-            ))}
-        </TreeView>
+        <Card>
+            <CardContent style={{ overflow: 'auto' }}>
+                <TreeView disableSelection expanded={expandedHack} style={{ pointerEvents: 'none' }}>
+                    <>
+                        {noTeamPlayerList.map(p => (
+                            <EntityTreePlayer key={p.id} playerId={p.id} />
+                        ))}
+                    </>
+                    {teamList.map(t => (
+                        <Box key={t.id} mb={2}>
+                            <EntityTreeTeam team={t} />
+                        </Box>
+                    ))}
+                </TreeView>
+            </CardContent>
+        </Card>
     );
 };

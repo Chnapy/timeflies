@@ -10,8 +10,10 @@ import { ConnectedAppHeader } from '../connected-components/connected-app-header
 
 const useStyles = makeStyles(({ palette, spacing }) => ({
     root: {
+        flexGrow: 1,
         display: 'flex',
-        height: '100%',
+        overflow: 'auto',
+        justifyContent: 'center',
         padding: spacing(2),
         backgroundColor: palette.background.default,
         pointerEvents: 'all'
@@ -23,9 +25,9 @@ export const UIRoom: React.FC = () => {
     const classes = useStyles();
 
     return (
-        <Box>
+        <Box display='flex' flexDirection='column' height='100%'>
             <ConnectedAppHeader />
-            
+
             <div className={classes.root}>
 
                 <Box display='flex' flexDirection='column' minWidth={300} width={400} flexShrink={1}>

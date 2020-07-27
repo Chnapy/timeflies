@@ -3,6 +3,7 @@ import { assertIsDefined } from '@timeflies/shared';
 import React from 'react';
 import { useGameStep } from '../../hooks/useGameStep';
 import { MapBoardTile } from './map-board-tile/map-board-tile';
+import { Card, CardContent } from '@material-ui/core';
 
 export const MapBoard: React.FC = () => {
 
@@ -21,15 +22,19 @@ export const MapBoard: React.FC = () => {
 
     const borderWidth = 2;
 
-    return <Box position='relative' width={width * 64 + borderWidth * 2} height={height * 64 + borderWidth * 2} bgcolor='#CCC' border={borderWidth} borderRadius={4}>
-        {mapSelected.tileList.map((tileInfos) => {
-            const { position: { x, y } } = tileInfos;
+    return <Card>
+        <CardContent>
+            <Box position='relative' width={width * 64 + borderWidth * 2} height={height * 64 + borderWidth * 2} bgcolor='common.white' border={borderWidth} borderRadius={4}>
+                {mapSelected.tileList.map((tileInfos) => {
+                    const { position: { x, y } } = tileInfos;
 
-            return (
-                <Box key={`${x}:${y}`} position='absolute' left={64 * x} top={64 * y} width={64} height={64}>
-                    <MapBoardTile tileInfos={tileInfos} />
-                </Box>
-            );
-        })}
-    </Box>;
+                    return (
+                        <Box key={`${x}:${y}`} position='absolute' left={64 * x} top={64 * y} width={64} height={64}>
+                            <MapBoardTile tileInfos={tileInfos} />
+                        </Box>
+                    );
+                })}
+            </Box>
+        </CardContent>
+    </Card>;
 };

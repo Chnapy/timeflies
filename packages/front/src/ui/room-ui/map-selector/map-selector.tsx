@@ -65,18 +65,20 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ defaultOpen = false })
     assertIsDefined(map);
 
     return (
-        <Box display={'inline-flex'}>
+        <Box>
             <Card>
                 <CardContent>
                     <UITypography variant='h3' align='center' gutterBottom>Map select</UITypography>
-                    <RenderSingleChild
-                        map={map}
-                        onClick={() => {
-                            sendMapList();
-                            setOpen(true);
-                        }}
-                        disabled={!isAdmin}
-                    />
+                    <Box display='flex' justifyContent='center'>
+                        <RenderSingleChild
+                            map={map}
+                            onClick={() => {
+                                sendMapList();
+                                setOpen(true);
+                            }}
+                            disabled={!isAdmin}
+                        />
+                    </Box>
                 </CardContent>
             </Card>
             <Dialog open={open} fullScreen>
