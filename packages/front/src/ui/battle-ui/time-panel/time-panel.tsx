@@ -1,19 +1,21 @@
-import { Paper, Box } from '@material-ui/core';
+import { Box, Card } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
-import { TimeGauge } from './time-gauge/time-gauge';
-import { UIIcon } from '../spell-panel/spell-button/ui-icon';
-import { UIText, formatMsToSeconds } from '../spell-panel/spell-button/ui-text';
-import { useGameStep } from '../../hooks/useGameStep';
 import { shallowEqual } from 'react-redux';
+import { useGameStep } from '../../hooks/useGameStep';
+import { UITypography } from '../../ui-components/typography/ui-typography';
+import { UIIcon } from '../spell-panel/spell-button/ui-icon';
+import { formatMsToSeconds } from '../spell-panel/spell-button/ui-text';
+import { TimeGauge } from './time-gauge/time-gauge';
 
-const useStyles = makeStyles(({ spacing }) => ({
+const useStyles = makeStyles(({ palette, spacing }) => ({
     root: {
         pointerEvents: 'all',
         display: 'flex',
         flexGrow: 1,
         flexWrap: 'nowrap',
         alignItems: 'center',
+        color: palette.primary.main,
         padding: spacing(1)
     }
 }));
@@ -54,18 +56,18 @@ export const TimePanel: React.FC = () => {
 
     }, [ turnDuration, turnStartTime ]);
 
-    return <Paper className={classes.root} elevation={3}>
+    return <Card className={classes.root}>
 
         <UIIcon icon='time' />
 
-        <Box width='2.7rem' textAlign='right' mx={0.5}>
-            <UIText variant='numeric'>
+        <Box minWidth='3rem' textAlign='right' mx={0.5}>
+            <UITypography variant='numeric'>
                 <span ref={remainingTimeSpan}>{formatMsToSeconds(initialRemainingTime)}</span>
                 s
-                </UIText>
+                </UITypography>
         </Box>
 
         <TimeGauge />
 
-    </Paper>;
+    </Card>;
 };
