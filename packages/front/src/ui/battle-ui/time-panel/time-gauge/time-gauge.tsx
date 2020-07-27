@@ -26,7 +26,6 @@ export const TimeGauge: React.FC = () => {
         shallowEqual
     );
 
-
     return <Box position='relative' display='flex' alignItems='center' flexGrow={1} color='primary.main'>
 
         <Box width={0} overflow='hidden'>

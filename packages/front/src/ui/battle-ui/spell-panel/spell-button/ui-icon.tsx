@@ -31,6 +31,7 @@ export const UIIcon: React.FC<UIIconProps> = React.memo(({ icon, strikeOut, inPi
     const IconComponent = iconMap[ icon ];
 
     const renderIcon = () => <IconComponent style={{
+        fontSize: 'inherit',
         opacity: strikeOut ? 0.75 : 1
     }} />;
 
@@ -42,7 +43,7 @@ export const UIIcon: React.FC<UIIconProps> = React.memo(({ icon, strikeOut, inPi
         {renderIcon()}
         {strikeOut && (
             <Box position='absolute' left={0} clone>
-                <BlockIcon />
+                <BlockIcon style={{ fontSize: 'inherit' }} />
             </Box>
         )}
     </Box>;

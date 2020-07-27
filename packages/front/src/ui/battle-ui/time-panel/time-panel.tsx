@@ -16,7 +16,10 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
         flexWrap: 'nowrap',
         alignItems: 'center',
         color: palette.primary.main,
-        padding: spacing(1)
+        paddingTop: spacing(0.5),
+        paddingBottom: spacing(0.5),
+        paddingLeft: spacing(2),
+        paddingRight: spacing(2)
     }
 }));
 
@@ -58,7 +61,9 @@ export const TimePanel: React.FC = () => {
 
     return <Card className={classes.root}>
 
-        <UIIcon icon='time' />
+        <UITypography variant='body1'>
+            <UIIcon icon='time' />
+        </UITypography>
 
         <Box minWidth='3rem' textAlign='right' mx={0.5}>
             <UITypography variant='numeric'>

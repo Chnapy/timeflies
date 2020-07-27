@@ -227,7 +227,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
                         <SpellNumber value={index} />
                     </Box>
 
-                    <Box color={palette.background.default} position='absolute' top={0} right={0}>
+                    <Box color={palette.background.default} position='absolute' top={2} right={2} display='flex' alignItems='flex-start'>
                         {renderDisableIcon()}
                     </Box>
 
