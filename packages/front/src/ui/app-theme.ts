@@ -22,7 +22,6 @@ const monogramFontFace = {
 
 const white = '#FFFFFF';
 const primary = '#EBDE66';
-const contrast = '#FFF';
 
 const bgDark = '#181818';
 const bgPanel = '#333333';
@@ -168,17 +167,6 @@ export const appTheme: Theme = createMuiTheme({
             }
         },
 
-        MuiChip: {
-            root: {
-                borderRadius: 4
-            },
-            sizeSmall: {
-                height: 16
-            },
-            outlined: {
-                backgroundColor: contrast,
-            }
-        },
         MuiTooltip: {
             tooltip: {
                 backgroundColor: bgDark,
