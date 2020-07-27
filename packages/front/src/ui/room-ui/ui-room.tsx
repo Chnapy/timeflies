@@ -5,6 +5,7 @@ import { EntityTree } from './entity-tree/entity-tree';
 import { MapBoard } from './map-board/map-board';
 import { MapSelector } from './map-selector/map-selector';
 import { ReadyButton } from './ready-button/ready-button';
+import { ConnectedAppHeader } from '../connected-components/connected-app-header';
 
 
 const useStyles = makeStyles(({ palette, spacing }) => ({
@@ -22,29 +23,33 @@ export const UIRoom: React.FC = () => {
     const classes = useStyles();
 
     return (
-        <div className={classes.root}>
+        <Box>
+            <ConnectedAppHeader />
+            
+            <div className={classes.root}>
 
-            <Box display='flex' flexDirection='column' minWidth={300} width={400} flexShrink={1}>
+                <Box display='flex' flexDirection='column' minWidth={300} width={400} flexShrink={1}>
 
-                <Box flexShrink={0}>
-                    <MapSelector />
+                    <Box flexShrink={0}>
+                        <MapSelector />
+                    </Box>
+
+                    <Box flexGrow={1} overflow='auto' mt={2}>
+                        <EntityTree />
+                    </Box>
+
+                    <Box display='flex' flexDirection='column' flexShrink={0} mt={2}>
+                        <ReadyButton />
+                    </Box>
                 </Box>
 
-                <Box flexGrow={1} overflow='auto' mt={2}>
-                    <EntityTree />
+                <Box overflow='auto' ml={2}>
+                    <MapBoard />
+
                 </Box>
 
-                <Box display='flex' flexDirection='column' flexShrink={0} mt={2}>
-                    <ReadyButton />
-                </Box>
-            </Box>
 
-            <Box overflow='auto' ml={2}>
-                <MapBoard />
-
-            </Box>
-
-
-        </div>
+            </div>
+        </Box>
     );
 };
