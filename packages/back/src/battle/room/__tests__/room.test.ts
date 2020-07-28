@@ -1,4 +1,5 @@
 import { RoomTester } from './room-tester';
+import { RoomOpenState } from '@timeflies/shared';
 
 describe('# room', () => {
 
@@ -9,7 +10,7 @@ describe('# room', () => {
         it('no map selected', () => {
             const { room } = createRoomWithCreator('p1');
 
-            expect(room.isOpen()).toBe(false);
+            expect(room.getOpenState()).toBe<RoomOpenState>('no-map');
         });
 
         it('nbr players equals or more than map nbr teams times nbr characters per team', () => {
@@ -29,7 +30,7 @@ describe('# room', () => {
 
             const room = createRoom();
 
-            expect(room.isOpen()).toBe(false);
+            expect(room.getOpenState()).toBe<RoomOpenState>('players-full');
         });
 
         it('room step is will-launch', () => {
@@ -39,7 +40,7 @@ describe('# room', () => {
 
             const room = createRoom();
     
-            expect(room.isOpen()).toBe(false);
+            expect(room.getOpenState()).toBe<RoomOpenState>('in-battle');
         });
 
         it('room step is battle', () => {
@@ -49,7 +50,7 @@ describe('# room', () => {
 
             const room = createRoom();
     
-            expect(room.isOpen()).toBe(false);
+            expect(room.getOpenState()).toBe<RoomOpenState>('in-battle');
         });
     });
 
@@ -59,6 +60,6 @@ describe('# room', () => {
 
         const room = createRoom();
 
-        expect(room.isOpen()).toBe(true);
+        expect(room.getOpenState()).toBe<RoomOpenState>('open');
     });
 });

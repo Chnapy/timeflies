@@ -1,9 +1,10 @@
-import { DeepReadonly, DistributiveOmit, MapConfig, PlayerRoom, RoomClientAction, RoomServerAction, ServerAction } from '@timeflies/shared';
+import { DeepReadonly, DistributiveOmit, MapConfig, PlayerRoom, RoomClientAction, RoomOpenState, RoomServerAction, ServerAction } from '@timeflies/shared';
 import fs from 'fs';
 import { TiledMap } from 'tiled-types';
 import urlJoin from 'url-join';
 import util from 'util';
 import { staticURL } from '../../config';
+import { WSError } from '../../transport/ws/WSError';
 import { WSSocket, WSSocketPool } from '../../transport/ws/WSSocket';
 import { Util } from '../../Util';
 import { getRoomCharacterAdd } from './room-character-add';
@@ -13,7 +14,6 @@ import { getRoomMapSelect } from './room-map-select';
 import { getRoomPlayerLeave } from './room-player-leave';
 import { getRoomPlayerState } from './room-player-state';
 import { RoomState, RoomStateManager } from './room-state-manager';
-import { WSError } from '../../transport/ws/WSError';
 
 type DataManager = {
     urlTransform: (url: string) => ({
@@ -204,6 +204,8 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
     // addNewPlayer(creatorData, true);
 
     return {
+        id: roomId,
+
         onJoin: (playerData: PlayerRoomData) => {
 
             const { playerDataList } = stateManager.get();
@@ -213,23 +215,31 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
             addNewPlayer(playerData, isAdmin);
         },
 
-        isOpen: (): boolean => {
+        getOpenState: (): RoomOpenState => {
 
             const { step, mapSelected, playerList } = stateManager.get();
 
             if (step !== 'idle') {
-                return false;
+                return 'in-battle';
             }
 
             if (!mapSelected) {
-                return false;
+                return 'no-map';
             }
 
             const { nbrTeams, nbrCharactersPerTeam } = mapSelected.config;
 
             const nbrMaxPlayers = nbrTeams * nbrCharactersPerTeam;
 
-            return playerList.length < nbrMaxPlayers;
-        }
+            if (playerList.length >= nbrMaxPlayers) {
+                return 'players-full';
+            }
+
+            return 'open';
+        },
+
+        getPlayerList: () => stateManager.get().playerList,
+
+        getMapSelected: () => stateManager.get().mapSelected
     };
 };

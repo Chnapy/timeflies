@@ -1,7 +1,8 @@
 import WebSocket from "ws";
 import { PlayerService } from "../PlayerService";
 import { WSSocket } from "../transport/ws/WSSocket";
-import { PlayerRoomData, Room } from './room/room';
+import { RoomList } from './room-list/room-list';
+import { PlayerRoomData } from './room/room';
 
 export class Matchmaker {
 
@@ -11,8 +12,7 @@ export class Matchmaker {
 
     private readonly players: Record<string, PlayerRoomData>;
 
-    // private readonly battlePrepareRooms: BattlePrepareRoom[];
-    private readonly roomList: Room[];
+    private readonly roomList: RoomList;
 
     private tempIndex = 0;
 
@@ -20,8 +20,7 @@ export class Matchmaker {
         this.ws = ws;
         this.playerService = new PlayerService();
         this.players = {};
-        // this.battlePrepareRooms = [];
-        this.roomList = [];
+        this.roomList = RoomList();
     }
 
     connection(socket: WSSocket): void {
@@ -29,22 +28,6 @@ export class Matchmaker {
         this.tempIndex++;
         this.players[ player.id ] = player;
 
-        this.onPrepareNewPlayer(player);
-    }
-
-    private onPrepareNewPlayer = (player: PlayerRoomData): void => {
-        const room = this.getOpenBattleRoom();
-        room.onJoin(player);
-    }
-
-    private getOpenBattleRoom(): Room {
-        let room = this.roomList.find(b => b.isOpen());
-        if (!room) {
-            room = Room();
-            this.roomList.push(room);
-            console.log('new room');
-        }
-
-        return room;
+        this.roomList.onPlayerConnect(player);
     }
 }
