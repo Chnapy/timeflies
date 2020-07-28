@@ -309,7 +309,7 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
             }
             const { staticData, orientation, playerId } = battle.snapshotState.battleDataFuture.characters[ characterId ];
 
-            if (playerId !== currentPlayer?.id) {
+            if (playerId !== currentPlayer.id) {
                 return null;
             }
 

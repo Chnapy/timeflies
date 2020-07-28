@@ -7,7 +7,6 @@ import { CanvasContext } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
 const stageGraphicsMap: Record<GameStateStep, StageGraphicCreator | null> = {
-    // TODO remove Boot/Room graphics
     boot: null,
     roomList: null,
     room: null,

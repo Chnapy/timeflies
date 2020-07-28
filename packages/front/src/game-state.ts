@@ -8,8 +8,7 @@ export type GameStateStep = 'boot' | keyof Pick<GameState, 'room' | 'roomList' |
 
 export interface GameState {
 
-    // TODO avoid null
-    currentPlayer: CurrentPlayer | null;
+    currentPlayer: CurrentPlayer;
 
     step: GameStateStep;
 
