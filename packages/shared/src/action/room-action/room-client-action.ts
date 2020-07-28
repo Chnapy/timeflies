@@ -3,8 +3,8 @@ import { CharacterRole, PlayerRoom } from '../../entities';
 import { Position } from '../../geo';
 
 export type RoomClientAction =
-    | RoomClientAction.Create
-    | RoomClientAction.PlayerJoin
+    // | RoomClientAction.Create
+    // | RoomClientAction.PlayerJoin
     | RoomClientAction.PlayerLeave
     | RoomClientAction.PlayerState
     | RoomClientAction.MapList
@@ -14,11 +14,11 @@ export type RoomClientAction =
 
 export module RoomClientAction {
 
-    export type Create = TAction<'room/create'>;
+    // export type Create = TAction<'room/create'>;
 
-    export type PlayerJoin = TAction<'room/player/join'> & {
-        roomId: string;
-    };
+    // export type PlayerJoin = TAction<'room/player/join'> & {
+    //     roomId: string;
+    // };
 
     export type PlayerLeave = TAction<'room/player/leave'>;
 

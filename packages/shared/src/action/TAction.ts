@@ -1,8 +1,9 @@
 import { BattlePrepareClientAction, BattlePrepareServerAction } from "./BattlePrepareAction";
 import { BattleRunCAction, BattleRunSAction } from "./BattleRunAction";
-import { MatchmakerClientAction } from './MatchmakerAction';
-import { RoomServerAction, RoomClientAction } from './room-action';
 import { ErrorServerAction } from './error-server-action';
+import { MatchmakerClientAction } from './MatchmakerAction';
+import { RoomClientAction, RoomServerAction } from './room-action';
+import { RoomListClientAction, RoomListServerAction } from './room-list-action';
 
 export interface TAction<T extends string> {
     type: T;
@@ -19,11 +20,15 @@ export type ServerAction =
     | ErrorServerAction
     | BattlePrepareServerAction
     | BattleRunSAction
-    | RoomServerAction;
+    | RoomServerAction
+    | RoomListServerAction
+    ;
 
 export type ClientAction =
     | SetIDCAction
     | MatchmakerClientAction
     | BattlePrepareClientAction
     | BattleRunCAction
-    | RoomClientAction;
+    | RoomClientAction
+    | RoomListClientAction
+    ;
