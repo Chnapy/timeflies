@@ -22,10 +22,10 @@
     "@types/bresenham": "^0.0.0",
     "@types/crypto-js": "^3.1.47",
     "@types/jest": "^25.2.1",
-    "eslint": "^7.4.0",
+    "eslint": "^7.5.0",
     "jest": "^25.5.2",
     "tiled-types": "1.1.0",
-    "typescript": "3.9.2"
+    "typescript": "3.9.7"
   },
   "peerDependencies": {
     "tiled-types": "1.1.0"

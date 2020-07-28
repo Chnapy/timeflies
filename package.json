@@ -6,9 +6,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "resolutions": {
-    "immer": "6.0.8"
-  },
   "scripts": {
     "heroku-postbuild": "yarn workspace @timeflies/shared run build && yarn workspace @timeflies/back run build"
   },
