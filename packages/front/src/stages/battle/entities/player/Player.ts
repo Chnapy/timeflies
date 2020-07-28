@@ -4,7 +4,7 @@ import { GameState } from '../../../../game-state';
 // should not use entity directly, for future updates
 export type Player = PlayerEntity;
 
-export const playerIsMine = (currentPlayer: GameState['currentPlayer'], playerId: string) => currentPlayer?.id === playerId;
+export const playerIsMine = (currentPlayer: GameState['currentPlayer'], playerId: string) => currentPlayer.id === playerId;
 
 export const Player = (
     {

@@ -2,10 +2,12 @@ import { createReducer } from '@reduxjs/toolkit';
 import { CurrentPlayer } from "../../CurrentPlayer";
 import { ReceiveMessageAction } from '../../socket/wsclient-actions';
 
-export const currentPlayerReducer = createReducer({
+const initialState: CurrentPlayer = {
     id: 'c1',
     name: 'chnapy'
-} as CurrentPlayer | null, {
+};
+
+export const currentPlayerReducer = createReducer(initialState, {
 
     // TODO replace by log-in
     [ ReceiveMessageAction.type ]: (state, { payload }: ReceiveMessageAction) => {
