@@ -4,10 +4,10 @@ import React from 'react';
 import { createAssetLoader } from '../../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../../assetManager/AssetManager';
 import { CanvasContext } from '../../../../../canvas/CanvasContext';
-import { GameState } from '../../../../../game-state';
+import { seedGameState } from '../../../../../game-state.seed';
 import { createStoreManager } from '../../../../../store/store-manager';
-import { battleReducer } from '../../../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../../../view';
+import { waitTimeoutPool } from '../../../../../wait-timeout-pool';
 import { BattleStartAction } from '../../../battle-actions';
 import { seedCharacter } from '../../../entities/character/Character.seed';
 import { seedPlayer } from '../../../entities/player/Player.seed';
@@ -16,7 +16,6 @@ import { BattleDataPeriod } from '../../../snapshot/battle-data';
 import { TileGrid } from '../../tiledMap/tile-grid';
 import { TiledMapGraphic } from '../../tiledMap/TiledMapGraphic';
 import { CharacterGraphic } from './CharacterGraphic';
-import { waitTimeoutPool } from '../../../../../wait-timeout-pool';
 
 export default {
     title: 'graphic/CharacterGraphic',
@@ -25,15 +24,9 @@ export default {
 
 const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: ''
-        },
+    const initialState = seedGameState('p1', {
         step: 'battle',
-        room: null,
-        battle: battleReducer(undefined, { type: '' })
-    };
+    });
 
     const assetLoader = createAssetLoader();
 

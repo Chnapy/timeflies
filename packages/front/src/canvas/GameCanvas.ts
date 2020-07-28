@@ -2,15 +2,15 @@ import * as PIXI from 'pixi.js';
 import { AssetLoader } from '../assetManager/AssetLoader';
 import { GameStateStep } from '../game-state';
 import { BattleStageGraphic } from '../stages/battle/graphic/BattleStageGraphic';
-import { BootStageGraphic } from '../stages/boot/graphic/BootStageGraphic';
-import { RoomStageGraphic } from '../stages/room/graphic/RoomStageGraphic';
 import { StoreEmitter } from '../store/store-manager';
 import { CanvasContext } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
-const stageGraphicsMap: Record<GameStateStep, StageGraphicCreator> = {
-    boot: BootStageGraphic,
-    room: RoomStageGraphic,
+const stageGraphicsMap: Record<GameStateStep, StageGraphicCreator | null> = {
+    // TODO remove Boot/Room graphics
+    boot: null,
+    roomList: null,
+    room: null,
     battle: BattleStageGraphic
 } as const;
 
@@ -68,9 +68,13 @@ export const GameCanvas = (view: HTMLCanvasElement, parent: HTMLElement, storeEm
                 storeEmitter,
                 assetLoader
             }, () => {
-                stageGraphic = stageGraphicsMap[ step ](renderer);
+                const graphic = stageGraphicsMap[ step ];
 
-                rootStage.addChild(stageGraphic!.container);
+                if (graphic) {
+                    stageGraphic = graphic(renderer);
+
+                    rootStage.addChild(stageGraphic!.container);
+                }
             });
 
             requestRender(

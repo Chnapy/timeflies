@@ -1,13 +1,12 @@
+import { createPosition } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
-import { GameState } from '../../../game-state';
+import { seedGameState } from '../../../game-state.seed';
 import { createStoreManager } from '../../../store/store-manager';
 import { createView } from '../../../view';
-import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { EntityTreeData } from '../../reducers/room-reducers/entity-tree-reducer/entity-tree-reducer';
 import { RoomData } from '../../reducers/room-reducers/room-reducer';
 import { ReadyButton } from './ready-button';
-import { createPosition } from '@timeflies/shared';
 
 export default {
     title: 'Room/Ready button',
@@ -18,15 +17,10 @@ const Wrapper: React.FC<{
     roomState: RoomData;
 }> = ({ roomState }) => {
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: 'chnapy',
-        },
+    const initialState = seedGameState('p1', {
         step: 'room',
-        battle: battleReducer(undefined, { type: '' }),
         room: roomState
-    };
+    });
 
     const assetLoader = createAssetLoader();
 

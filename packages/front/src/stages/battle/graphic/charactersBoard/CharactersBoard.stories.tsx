@@ -1,11 +1,11 @@
+import { characterEntityToSnapshot, createPosition, playerEntityToSnapshot, teamEntityToSnapshot } from '@timeflies/shared';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { createAssetLoader } from '../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../assetManager/AssetManager';
 import { CanvasContext } from '../../../../canvas/CanvasContext';
-import { GameState } from '../../../../game-state';
+import { seedGameState } from '../../../../game-state.seed';
 import { createStoreManager } from '../../../../store/store-manager';
-import { battleReducer } from '../../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../../view';
 import { BattleStartAction } from '../../battle-actions';
 import { seedCharacter } from '../../entities/character/Character.seed';
@@ -14,7 +14,6 @@ import { seedTeam } from '../../entities/team/Team.seed';
 import { BattleDataPeriod } from '../../snapshot/battle-data';
 import { TiledMapGraphic } from '../tiledMap/TiledMapGraphic';
 import { CharactersBoard } from './CharactersBoard';
-import { createPosition, characterEntityToSnapshot, playerEntityToSnapshot, teamEntityToSnapshot } from '@timeflies/shared';
 
 export default {
     title: 'graphic/CharactersBoard',
@@ -23,15 +22,9 @@ export default {
 
 const Render: React.FC<{ period: BattleDataPeriod }> = ({ period }) => {
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: ''
-        },
+    const initialState = seedGameState('p1', {
         step: 'battle',
-        room: null,
-        battle: battleReducer(undefined, { type: '' })
-    };
+    });
 
     const assetLoader = createAssetLoader();
 

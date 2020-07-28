@@ -19,7 +19,7 @@ describe('# room-reducer', () => {
     it('should ignore not handled actions', () => {
 
         expect(
-            RoomReducer(null, { type: 'not-matter' } as any)
+            RoomReducer(undefined, { type: 'not-matter' } as any)
         ).toBe(null);
 
         const actionMessage: ReceiveMessageAction = ReceiveMessageAction({
@@ -27,7 +27,7 @@ describe('# room-reducer', () => {
         } as any);
 
         expect(
-            RoomReducer(null, actionMessage)
+            RoomReducer(undefined, actionMessage)
         ).toBe(null);
     });
 
@@ -45,7 +45,7 @@ describe('# room-reducer', () => {
         });
 
         expect(
-            RoomReducer(null, action)
+            RoomReducer(undefined, action)
         ).toMatchObject<RoomData>({
             roomId: 'id',
             map: expect.any(Object),

@@ -19,7 +19,10 @@ export const RoomList = ({ initialList, createRoom }: Dependencies = {
 
     const getCurrentListAction = (): Omit<RoomListServerAction.List, 'sendTime'> => ({
         type: 'room-list/list',
-        list: roomList.map(roomListItem)
+        list: roomList
+            // TODO remove empty rooms
+            .filter(r => r.getPlayerList().length > 0)
+            .map(roomListItem)
     });
 
     return {

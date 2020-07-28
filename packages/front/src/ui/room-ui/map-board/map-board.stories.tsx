@@ -1,11 +1,10 @@
 import { Box } from '@material-ui/core';
-import { MapConfig, createPosition } from '@timeflies/shared';
+import { createPosition, MapConfig } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
-import { GameState } from '../../../game-state';
+import { seedGameState } from '../../../game-state.seed';
 import { createStoreManager } from '../../../store/store-manager';
 import { createView } from '../../../view';
-import { battleReducer } from '../../reducers/battle-reducers/battle-reducer';
 import { MapBoard } from './map-board';
 import { MapBoardTile, MapBoardTileInfos } from './map-board-tile/map-board-tile';
 
@@ -16,13 +15,8 @@ export default {
 
 export const BoardTile: React.FC = () => {
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: 'chnapy'
-        },
+    const initialState = seedGameState('p1', {
         step: 'room',
-        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
@@ -73,7 +67,7 @@ export const BoardTile: React.FC = () => {
             },
             launchTime: null
         }
-    };
+    });
 
     const tileInfosList: MapBoardTileInfos[] = [
         {
@@ -199,13 +193,8 @@ export const Board: React.FC = () => {
     }
 
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: 'chnapy'
-        },
+    const initialState = seedGameState('p1', {
         step: 'room',
-        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
@@ -260,7 +249,7 @@ export const Board: React.FC = () => {
             },
             launchTime: null
         }
-    };
+    });
 
     const assetLoader = createAssetLoader();
 

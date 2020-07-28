@@ -1,7 +1,7 @@
 import { Middleware } from '@reduxjs/toolkit';
 import { GameState } from '../../game-state';
-import { ReceiveMessageAction, SendMessageAction } from '../../socket/wsclient-actions';
-import { RoomStartAction } from '../../ui/reducers/room-reducers/room-actions';
+import { SendMessageAction } from '../../socket/wsclient-actions';
+import { RoomListStart } from '../../ui/reducers/room-list-reducers/room-list-actions';
 import { waitTimeoutPool } from '../../wait-timeout-pool';
 
 export const bootMiddleware: Middleware<{}, GameState> = api => next => {
@@ -19,22 +19,14 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
                 await api.dispatch(SendMessageAction({
                     type: 'matchmaker/enter'
                 }));
+
+                await api.dispatch(RoomListStart());
             }
         });
 
     return async action => {
 
         const ret = next(action);
-
-        if (ReceiveMessageAction.match(action)) {
-            const { payload } = action;
-
-            if (payload.type === 'room/state') {
-                await api.dispatch(RoomStartAction({
-                    roomState: payload
-                }));
-            }
-        }
 
         return ret;
     };

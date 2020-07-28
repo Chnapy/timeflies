@@ -16,6 +16,7 @@ describe('# store-manager', () => {
         expect(manager.getState()).toEqual(expect.objectContaining<GameState>({
             step: expect.any(String),
             currentPlayer: expect.any(Object),
+            roomList: expect.any(Object),
             room: expect.any(Object),
             battle: expect.any(Object)
         }));

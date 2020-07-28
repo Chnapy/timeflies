@@ -62,6 +62,8 @@ const reduceMapSelect: SubReducer<RoomServerAction.MapSelect> = (state, { mapSel
 };
 
 export const mapSelectReducer = createReducer(initialState, {
+
+    // TODO consider remove
     [ RoomStartAction.type ]: (state, { payload }: RoomStartAction) => {
 
         const { mapSelected } = payload.roomState;
@@ -76,6 +78,17 @@ export const mapSelectReducer = createReducer(initialState, {
     [ ReceiveMessageAction.type ]: (state, { payload }: ReceiveMessageAction) => {
 
         switch (payload.type) {
+
+            case 'room/state':
+                const { mapSelected } = payload;
+        
+                if (!mapSelected) {
+                    handleMapSelect(state, null, []);
+                } else {
+                    state.mapList = [ mapSelected.config ];
+                    handleMapSelect(state, mapSelected.config, mapSelected.placementTileList);
+                }
+                return;
 
             case 'room/map/list':
                 return reduceMapList(state, payload);

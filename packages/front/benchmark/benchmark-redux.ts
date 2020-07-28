@@ -1,20 +1,20 @@
-import { normalize, seedTiledMap, createPosition } from '@timeflies/shared';
+import { render } from '@testing-library/react';
+import { createPosition, normalize, seedTiledMap } from '@timeflies/shared';
 import Benchmark from 'benchmark';
 import b from 'benny';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
 import { createAssetLoader } from '../src/assetManager/AssetLoader';
-import { GameState } from '../src/game-state';
-import { createStoreManager } from '../src/store/store-manager';
+import { seedGameState } from '../src/game-state.seed';
 import { battleActionReducer } from '../src/stages/battle/battleState/battle-action-reducer';
 import { TileClickAction, TileHoverAction } from '../src/stages/battle/battleState/battle-state-actions';
 import { seedCharacter } from '../src/stages/battle/entities/character/Character.seed';
 import { seedSpell } from '../src/stages/battle/entities/spell/Spell.seed';
 import { BattleDataPeriod } from '../src/stages/battle/snapshot/battle-data';
 import { getInitialSnapshotState } from '../src/stages/battle/snapshot/snapshot-reducer';
+import { createStoreManager } from '../src/store/store-manager';
 import { createView } from '../src/view';
-import { render } from '@testing-library/react';
-import path from 'path';
-import fs from 'fs';
-import { promisify } from 'util';
 
 const mkdir = promisify(fs.mkdir);
 const writeFile = promisify(fs.writeFile);
@@ -45,13 +45,8 @@ const initStore = () => {
         }
     });
 
-    const initialState: GameState = {
+    const initialState = seedGameState('p1', {
         step: 'battle',
-        currentPlayer: {
-            id: 'p1',
-            name: 'p1'
-        },
-        room: null,
         battle: {
             battleActionState: {
                 ...battleActionReducer(undefined, { type: '' }),
@@ -107,7 +102,7 @@ const initStore = () => {
                 },
             })
         }
-    };
+    });
 
     const assetLoader = createAssetLoader();
 

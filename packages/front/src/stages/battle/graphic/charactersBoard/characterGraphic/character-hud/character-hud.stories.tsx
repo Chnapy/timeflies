@@ -4,9 +4,8 @@ import React from 'react';
 import { createAssetLoader } from '../../../../../../assetManager/AssetLoader';
 import { AssetManager } from '../../../../../../assetManager/AssetManager';
 import { CanvasContext } from '../../../../../../canvas/CanvasContext';
-import { GameState } from '../../../../../../game-state';
+import { seedGameState } from '../../../../../../game-state.seed';
 import { createStoreManager } from '../../../../../../store/store-manager';
-import { battleReducer } from '../../../../../../ui/reducers/battle-reducers/battle-reducer';
 import { CreatePixiFn, createView } from '../../../../../../view';
 import { BattleStartAction } from '../../../../battle-actions';
 import { seedCharacter } from '../../../../entities/character/Character.seed';
@@ -23,15 +22,9 @@ export default {
 
 export const Default: React.FC = () => {
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: ''
-        },
+    const initialState = seedGameState('p1',{
         step: 'battle',
-        room: null,
-        battle: battleReducer(undefined, { type: '' })
-    };
+    });
 
     const assetLoader = createAssetLoader();
 
