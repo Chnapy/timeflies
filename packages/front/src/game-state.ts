@@ -1,9 +1,10 @@
 import { CurrentPlayer } from "./CurrentPlayer";
 import { BattleState } from './ui/reducers/battle-reducers/battle-reducer';
+import { RoomListState } from './ui/reducers/room-list-reducers/room-list-reducer';
 import { RoomData } from './ui/reducers/room-reducers/room-reducer';
 
 
-export type GameStateStep = 'boot' | keyof Pick<GameState, 'room' | 'battle'>;
+export type GameStateStep = 'boot' | keyof Pick<GameState, 'room' | 'roomList' | 'battle'>;
 
 export interface GameState {
 
@@ -12,8 +13,9 @@ export interface GameState {
 
     step: GameStateStep;
 
-    // TODO avoid null
-    room: RoomData | null;
+    roomList: RoomListState;
+
+    room: RoomData;
 
     battle: BattleState;
 

@@ -1,7 +1,7 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { BattleSnapshot, characterEntityToSnapshot, createPosition, denormalize, getBattleSnapshotWithHash, normalize, seedSpellActionSnapshot, seedTiledMap, SpellActionSnapshot, spellEntityToSnapshot, SpellSnapshot, TimerTester } from '@timeflies/shared';
 import { createAssetLoader } from '../../../assetManager/AssetLoader';
-import { GameState } from '../../../game-state';
+import { seedGameState } from '../../../game-state.seed';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { createStoreManager, getFullStoreMiddlewareList } from '../../../store/store-manager';
 import { getDispatchThenPassTimeouts } from '../../../test-utils';
@@ -41,13 +41,8 @@ describe('Battleflow', () => {
             }
         });
 
-        const initialState: GameState = {
+        const initialState = seedGameState('p1', {
             step: 'battle',
-            currentPlayer: {
-                id: 'p1',
-                name: 'p1'
-            },
-            room: null,
             battle: {
                 battleActionState: {
                     ...battleActionReducer(undefined, { type: '' }),
@@ -91,7 +86,7 @@ describe('Battleflow', () => {
                     turnStartTime: timerTester.now
                 })
             }
-        };
+        });
 
         const assetLoader = createAssetLoader();
 

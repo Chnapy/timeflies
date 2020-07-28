@@ -1,15 +1,22 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { CurrentPlayer } from "../../CurrentPlayer";
-import { RoomStartAction } from './room-reducers/room-actions';
+import { ReceiveMessageAction } from '../../socket/wsclient-actions';
 
-export const currentPlayerReducer = createReducer(null as CurrentPlayer | null, {
-    [ RoomStartAction.type ]: (state, { payload }: RoomStartAction) => {
-        const { playerList } = payload.roomState;
-        const p = playerList[ playerList.length - 1 ];
+export const currentPlayerReducer = createReducer({
+    id: 'c1',
+    name: 'chnapy'
+} as CurrentPlayer | null, {
 
-        return {
-            id: p.id,
-            name: p.name
-        };
+    // TODO replace by log-in
+    [ ReceiveMessageAction.type ]: (state, { payload }: ReceiveMessageAction) => {
+        if (payload.type === 'room/state') {
+            const { playerList } = payload;
+            const p = playerList[ playerList.length - 1 ];
+
+            return {
+                id: p.id,
+                name: p.name
+            };
+        }
     }
 });

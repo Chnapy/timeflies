@@ -2,10 +2,9 @@ import { createPosition, MapConfig } from '@timeflies/shared';
 import React from 'react';
 import { createAssetLoader } from '../../assetManager/AssetLoader';
 import { AssetManager } from '../../assetManager/AssetManager';
-import { GameState } from '../../game-state';
+import { seedGameState } from '../../game-state.seed';
 import { createStoreManager } from '../../store/store-manager';
 import { createView } from '../../view';
-import { battleReducer } from '../reducers/battle-reducers/battle-reducer';
 import { MapBoardTileInfos } from './map-board/map-board-tile/map-board-tile';
 import { UIRoom } from './ui-room';
 
@@ -86,13 +85,8 @@ export const Default: React.FC = () => {
         }
     }
 
-    const initialState: GameState = {
-        currentPlayer: {
-            id: 'p1',
-            name: 'chnapy'
-        },
+    const initialState = seedGameState('p1', {
         step: 'room',
-        battle: battleReducer(undefined, { type: '' }),
         room: {
             roomId: '',
             teamsTree: {
@@ -147,7 +141,7 @@ export const Default: React.FC = () => {
             },
             launchTime: null
         }
-    };
+    });
 
     const assetLoader = createAssetLoader();
 
