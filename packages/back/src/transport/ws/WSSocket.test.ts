@@ -111,12 +111,12 @@ describe('WSSocket', () => {
 
             const pool = wss.createPool();
 
-            pool.on('room/create', () => {
+            pool.on('some/action' as any, () => {
                 throw new WSError(401, 'test');
             });
 
             await clientSend({
-                type: 'room/create',
+                type: 'some/action' as any,
                 sendTime: -1
             });
 
@@ -132,12 +132,12 @@ describe('WSSocket', () => {
 
             const pool = wss.createPool();
 
-            pool.on('room/create', () => {
+            pool.on('some/action' as any, () => {
                 throw new TypeError();
             });
 
             await clientSend({
-                type: 'room/create',
+                type: 'some/action' as any,
                 sendTime: -1
             });
 
