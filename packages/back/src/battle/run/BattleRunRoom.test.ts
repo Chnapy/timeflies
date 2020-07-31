@@ -1,60 +1,51 @@
-import { BattleRunSAction, MapConfig, TimerTester } from '@timeflies/shared';
-import { Server, WebSocket } from 'mock-socket';
-import path from 'path';
-import { PlayerService } from '../../PlayerService';
-import { TeamData } from '../../TeamData';
-import { WSSocket } from '../../transport/ws/WSSocket';
-import { BattleRunRoom, RoomStateReady } from './BattleRunRoom';
 
 describe.skip('BattleRunRoom', () => {
 
-    const timerTester = new TimerTester();
+    // const timerTester = new TimerTester();
 
-    const URL = `ws://localhost:1234`;
+    // const URL = `ws://localhost:1234`;
 
-    const playerService = new PlayerService();
-
-    const mapConfig: MapConfig = {
-        id: 'm-1',
-        schemaUrl: path.join('map', 'sample2', 'map.json'),
-        name: 'm1',
-        height: 10,
-        nbrCharactersPerTeam: 1,
-        nbrTeams: 1,
-        previewUrl: '',
-        width: 10
-    };
+    // const mapConfig: MapConfig = {
+    //     id: 'm-1',
+    //     schemaUrl: path.join('map', 'sample2', 'map.json'),
+    //     name: 'm1',
+    //     height: 10,
+    //     nbrCharactersPerTeam: 1,
+    //     nbrTeams: 1,
+    //     previewUrl: '',
+    //     width: 10
+    // };
 
 
-    const getTeams: () => TeamData[] = () => [
-        {
-            id: '1',
-            letter: 'A',
-            players: []
-        },
-        {
-            id: '2',
-            letter: 'B',
-            players: []
-        }
-    ];
-    let teams: TeamData[];
-    const roomState: RoomStateReady = {
-        id: '',
-        mapSelected: {
-            config: mapConfig,
-            placementTileList: []
-        },
-        playerDataList: [],
-        playerList: [],
-        teamList: []
-    };
+    // const getTeams: () => TeamData[] = () => [
+    //     {
+    //         id: '1',
+    //         letter: 'A',
+    //         players: []
+    //     },
+    //     {
+    //         id: '2',
+    //         letter: 'B',
+    //         players: []
+    //     }
+    // ];
+    // let teams: TeamData[];
+    // const roomState: RoomStateReady = {
+    //     id: '',
+    //     mapSelected: {
+    //         config: mapConfig,
+    //         placementTileList: []
+    //     },
+    //     playerDataList: [],
+    //     playerList: [],
+    //     teamList: []
+    // };
 
-    let server: Server;
+    // let server: Server;
 
-    let clients: WebSocket[];
+    // let clients: WebSocket[];
 
-    let battleRunRoom: BattleRunRoom;
+    // let battleRunRoom: BattleRunRoom;
 
     // const generateBattleRunRoom = async ({
     //     c0OnStart, c0OnConfirm, c1OnNotify,
@@ -138,90 +129,90 @@ describe.skip('BattleRunRoom', () => {
     //     jest.runOnlyPendingTimers();
     // };
 
-    beforeEach(() => {
-        timerTester.beforeTest();
+    // beforeEach(() => {
+        // timerTester.beforeTest();
 
-        teams = getTeams();
+        // teams = getTeams();
 
-        server = new Server(URL);
-        let i = 0;
-        server.on('connection', socket => {
-            const wss = new WSSocket(socket as any);
-            const player = playerService.getPlayer(wss, i);
-            roomState.playerDataList.push(player);
-            roomState.playerList.push({
-                id: player.id,
-                name: player.name,
-                isAdmin: false,
-                isLoading: false,
-                isReady: true,
-                characters: []
-            });
-            i++;
-            roomState.teamList.push({
-                id: 't' + i,
-                letter: '' + i,
-                playersIds: [ player.id ]
-            });
-        });
+        // server = new Server(URL);
+        // let i = 0;
+        // server.on('connection', socket => {
+        //     const wss = new WSSocket(socket as any);
+        //     const player = playerService.getPlayer(wss, i);
+        //     roomState.playerDataList.push(player);
+        //     roomState.playerList.push({
+        //         id: player.id,
+        //         name: player.name,
+        //         isAdmin: false,
+        //         isLoading: false,
+        //         isReady: true,
+        //         characters: []
+        //     });
+        //     i++;
+        //     roomState.teamList.push({
+        //         id: 't' + i,
+        //         letter: '' + i,
+        //         playersIds: [ player.id ]
+        //     });
+        // });
 
-        clients = [ 1, 2 ].map(_ => new WebSocket(URL));
+        // clients = [ 1, 2 ].map(_ => new WebSocket(URL));
 
-        jest.runOnlyPendingTimers();
-    });
+        // jest.runOnlyPendingTimers();
+    // });
 
-    afterEach(() => {
-        timerTester.afterTest();
+    // afterEach(() => {
+    //     timerTester.afterTest();
 
-        if (server) server.close();
-        clients.forEach(c => c.close());
+    //     if (server) server.close();
+    //     clients.forEach(c => c.close());
 
-        clients = [];
-        teams = [];
-    });
+    //     clients = [];
+    //     teams = [];
+    // });
 
     test.skip('should correctly init & start: parsing map, place characters, receive first actions', () => {
 
-        //@ts-ignore
-        battleRunRoom = BattleRunRoom(mapConfig, teams);
+        // //@ts-ignore
+        // battleRunRoom = BattleRunRoom(mapConfig, teams);
 
-        const encounteredTypes: BattleRunSAction[ 'type' ][] = [];
+        // const encounteredTypes: BattleRunSAction[ 'type' ][] = [];
 
-        const jestFn = jest.fn();
-        clients[ 1 ].onmessage = (m: any) => {
-            if (m.type !== 'message') return;
+        // const jestFn = jest.fn();
+        // clients[ 1 ].onmessage = (m: any) => {
+        //     if (m.type !== 'message') return;
 
-            jestFn();
-        }
+        //     jestFn();
+        // }
 
-        clients[ 0 ].onmessage = (message: any) => {
-            if (message.type !== 'message') return;
+        // clients[ 0 ].onmessage = (message: any) => {
+        //     if (message.type !== 'message') return;
 
-            const actionList: BattleRunSAction[] = JSON.parse(message.data);
+        //     const actionList: BattleRunSAction[] = JSON.parse(message.data);
 
-            actionList.forEach(action => {
-                encounteredTypes.push(action.type);
+        //     actionList.forEach(action => {
+        //         encounteredTypes.push(action.type);
 
-                if (action.type === 'battle-run/launch') {
+        //         if (action.type === 'battle-run/launch') {
 
-                    expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
+        //             expect(action.battleSnapshot.launchTime).toBeGreaterThan(Date.now());
 
-                    const positions = action.battleSnapshot.charactersSnapshots.map(c => c.position)
-                    expect(positions).not.toContain(undefined);
-                    expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
-                }
-            });
-        };
+        //             const positions = action.battleSnapshot.charactersSnapshots.map(c => c.position)
+        //             expect(positions).not.toContain(undefined);
+        //             expect(positions.some(p => p.x < 0 || p.y < 0)).toBeFalsy();
+        //         }
+        //     });
+        // };
 
-        battleRunRoom.start();
+        // battleRunRoom.start();
 
-        jest.runOnlyPendingTimers();
+        // jest.runOnlyPendingTimers();
 
-        expect(jestFn).toHaveBeenCalled();
+        // expect(jestFn).toHaveBeenCalled();
 
-        expect(encounteredTypes).toEqual(expect.arrayContaining<BattleRunSAction[ 'type' ]>([
-            "battle-run/launch"
-        ]));
+        // expect(encounteredTypes).toEqual(expect.arrayContaining<BattleRunSAction[ 'type' ]>([
+        //     "battle-run/launch"
+        // ]));
     });
 
     // TODO

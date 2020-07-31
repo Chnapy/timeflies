@@ -4,6 +4,7 @@ import { ErrorServerAction } from './error-server-action';
 import { MatchmakerClientAction } from './MatchmakerAction';
 import { RoomClientAction, RoomServerAction } from './room-action';
 import { RoomListClientAction, RoomListServerAction } from './room-list-action';
+import { AuthServerAction } from './auth';
 
 export interface TAction<T extends string> {
     type: T;
@@ -18,6 +19,7 @@ export interface SetIDCAction extends TAction<'set-id'> {
 
 export type ServerAction =
     | ErrorServerAction
+    | AuthServerAction
     | BattlePrepareServerAction
     | BattleRunSAction
     | RoomServerAction
