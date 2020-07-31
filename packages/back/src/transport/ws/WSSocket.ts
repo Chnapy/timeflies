@@ -1,8 +1,6 @@
-import { ClientAction, DistributiveOmit, NarrowTAction, ServerAction, SetIDCAction } from '@timeflies/shared';
+import { ClientAction, DistributiveOmit, NarrowTAction, ServerAction } from '@timeflies/shared';
 import WebSocket from 'ws';
 import { WSError } from './WSError';
-
-export type SocketState = 'init' | 'hasID';
 
 export type WSSocketPool = {
     isConnected(): boolean;
@@ -27,21 +25,12 @@ export class WSSocket {
 
     private readonly poolList: WSSocketPoolInner[];
 
-    private state: SocketState;
-
-    private _id: string;
-    get id(): string {
-        return this._id;
-    }
-
     get isConnected(): boolean {
         return this.socket.readyState === this.socket.OPEN;
     }
 
     constructor(socket: WebSocket) {
         this.socket = socket;
-        this.state = 'init';
-        this._id = '';
 
         this.poolList = [];
 
@@ -84,18 +73,6 @@ export class WSSocket {
                     this.sendError(new WSError(500, 'unexpected error'));
                 }
             })
-        );
-
-        const innerPool = this.createPool();
-
-        innerPool.on<SetIDCAction>(
-            'set-id',
-            action => {
-                if (this.state === 'init') {
-                    this._id = action.id;
-                    this.state = 'hasID';
-                }
-            }
         );
     }
 

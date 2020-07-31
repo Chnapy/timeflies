@@ -1,4 +1,4 @@
-import { ErrorServerAction, ServerAction, SetIDCAction, TimerTester, ClientAction, assertIsDefined } from "@timeflies/shared";
+import { assertIsDefined, ClientAction, ErrorServerAction, ServerAction, TimerTester } from "@timeflies/shared";
 import WebSocket from 'ws';
 import { WSError } from './WSError';
 import { WSSocket } from "./WSSocket";
@@ -56,20 +56,6 @@ describe('WSSocket', () => {
 
     afterEach(() => {
         timerTester.afterTest();
-    });
-
-    it('action set-id should set the socket ID', async () => {
-        const { clientSend, wss } = initialize();
-
-        const action: SetIDCAction = {
-            type: 'set-id',
-            sendTime: Date.now(),
-            id: 'hummus'
-        };
-
-        await clientSend(action);
-
-        expect(wss.id).toBe(action.id);
     });
 
     describe('error management', () => {

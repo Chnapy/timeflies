@@ -17,6 +17,7 @@ export default class WebSocket extends MS.WebSocket implements WS {
     }
 
     // Events
+    // @ts-ignore
     on(event: string | symbol, listener: (this: WebSocket, ...args: any[]) => void): any {
     }
 

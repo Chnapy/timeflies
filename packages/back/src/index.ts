@@ -1,10 +1,9 @@
-import cors from "cors";
-import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
 import { App } from './App';
+import { Auth } from './battle/auth/auth';
 import { envManager } from './envManager';
-import { staticPostURL } from './config';
+import { expressApp } from './express-app';
 
 // TODO use shared config
 
@@ -14,13 +13,10 @@ const port = Number(envManager.PORT);
 
 // Express
 
-const app = express();
-app.use(
-  cors({ allowedHeaders: '*' }),
-  express.json()
-);
+const app = expressApp();
 
-app.use(staticPostURL, express.static('public'));
+const auth = Auth();
+app.post('/auth', auth.route());
 
 const server = http.createServer(app);
 

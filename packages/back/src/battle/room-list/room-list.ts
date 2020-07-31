@@ -26,6 +26,7 @@ export const RoomList = ({ initialList, createRoom }: Dependencies = {
     });
 
     return {
+        // TODO should work as an api service, data should be sent on request only
         onPlayerConnect: (player: IPlayerRoomData<WSSocket>) => {
 
             const wsPool = player.socket.createPool();

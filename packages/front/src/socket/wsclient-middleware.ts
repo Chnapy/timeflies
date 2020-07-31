@@ -1,5 +1,5 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
-import { getEndpoint } from '@timeflies/shared';
+import { getEndpoint, WSQueryParams } from '@timeflies/shared';
 import { envManager } from '../envManager';
 import { SendMessageAction, ReceiveMessageAction } from './wsclient-actions';
 import { waitTimeoutPool } from '../wait-timeout-pool';
@@ -8,12 +8,25 @@ export type WebSocketCreator = (endPoint: string) => WebSocket;
 
 export type Dependencies = {
     websocketCreator?: WebSocketCreator;
-}
+};
+
+// TODO
+const getAuthenticatedWSEndpoint = (params: WSQueryParams): string => {
+    const baseEndpoint = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
+    console.log('ws endpoint:', baseEndpoint);
+
+    const url = new URL(baseEndpoint);
+
+    Object.entries(params).forEach(([ key, value ]) => {
+        url.searchParams.set(key, value);
+    });
+
+    return url.href;
+};
 
 export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
     websocketCreator = endpoint => new WebSocket(endpoint)
 }) => api => next => {
-
 
     const endpoint = getEndpoint('ws', envManager.REACT_APP_SERVER_URL);
     console.log('ws endpoint:', endpoint);
