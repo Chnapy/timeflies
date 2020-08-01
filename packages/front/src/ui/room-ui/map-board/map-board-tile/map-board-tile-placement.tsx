@@ -75,7 +75,7 @@ export const MapBoardTilePlacement: React.FC<MapBoardTilePlacementProps> = ({ te
         return currentPlayer.isReady;
     });
 
-    const canAdd = isAllowed && (!character || isCharacterMine) && !isPlayerReady;
+    const canAdd = isAllowed && !character && !isPlayerReady;
 
     const canRemove = isCharacterMine && !isPlayerReady;
 
