@@ -7,7 +7,11 @@ type Params = {
     );
 };
 
-export const useGameDispatch = <P extends Params>(map: P): P => {
+type Return<P extends Params> = {
+    [K in keyof P]: (...args: Parameters<P[K]>) => Promise<unknown>;
+};
+
+export const useGameDispatch = <P extends Params>(map: P): Return<P> => {
 
     const dispatch = useDispatch();
 
@@ -17,5 +21,5 @@ export const useGameDispatch = <P extends Params>(map: P): P => {
             arr[ key ] = (...args) => dispatch((value as any)(...args));
 
             return arr;
-        }, {}) as P;
+        }, {}) as Return<P>;
 };

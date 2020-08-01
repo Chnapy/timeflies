@@ -89,7 +89,7 @@ describe('# auth', () => {
                     .expect(400),
                     (err, { body }) => {
                         expect(body).toEqual<AuthResponseBody>({
-                            success: false,
+                            token: '',
                             error: 'player-name-exist'
                         });
                     }
@@ -111,7 +111,6 @@ describe('# auth', () => {
                 .expect(200),
                 (err, { body }) => {
                     expect(body).toEqual<AuthResponseBody>({
-                        success: true,
                         token: expect.any(String)
                     });
                     expect(body.token).toMatch(jwtRegex);

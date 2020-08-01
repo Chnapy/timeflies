@@ -1,5 +1,5 @@
 import { Box } from "@material-ui/core";
-import { playerNameConstraints } from "@timeflies/shared";
+import { playerNameConstraints, AuthResponseBodyError } from "@timeflies/shared";
 import React from "react";
 import { useGameDispatch } from "../hooks/useGameDispatch";
 import { AuthFormSubmit } from "../reducers/auth-reducers/auth-actions";
@@ -7,11 +7,30 @@ import { UIButton } from "../ui-components/button/ui-button";
 import { UITextField, UITextFieldProps } from "../ui-components/text-field/ui-text-field";
 import { UITypography } from "../ui-components/typography/ui-typography";
 
+const { min, max } = playerNameConstraints.length;
+
+type InputError = AuthResponseBodyError | 'length' | 'unknown';
+
+const helperTextMap: Record<
+    InputError, (value: string) => string
+> = {
+    unknown: () => `An unexpected error occured, please try again.`,
+    length: () => `Player name length should be between ${min} and ${max}.`,
+    "player-name-exist": value => `Player with name "${value}" already exist.`
+};
+
 export const UIAuthForm: React.FC = () => {
     const [playerName, setPlayerName] = React.useState('');
+    const [inputError, setInputError] = React.useState<InputError | null>(null);
 
-    const onInputChange: UITextFieldProps['onChange'] = ({ currentTarget }) =>
+    const onInputChange: UITextFieldProps['onChange'] = ({ currentTarget }) => {
         setPlayerName(currentTarget.value);
+        if (currentTarget.value.length < min) {
+            setInputError('length');
+        } else {
+            setInputError(null);
+        }
+    };
 
     const { dispatchFormSubmit } = useGameDispatch({
         dispatchFormSubmit: () => AuthFormSubmit({
@@ -19,12 +38,8 @@ export const UIAuthForm: React.FC = () => {
         })
     });
 
-    const { min, max } = playerNameConstraints.length;
-
-    const isInputError = !!playerName && playerName.length < min;
-    const helperText = isInputError
-        ? `Player name length should be between ${min} and ${max}.`
-        : ' ';
+    const helperText = inputError && helperTextMap[inputError](playerName);
+    const isInputError = !!inputError;
 
     const isBtnDisabled = isInputError || !playerName;
 
@@ -32,7 +47,10 @@ export const UIAuthForm: React.FC = () => {
         onSubmit={e => {
             e.preventDefault();
 
-            return dispatchFormSubmit();
+            return dispatchFormSubmit()
+                .catch((err?: AuthResponseBodyError) => {
+                    setInputError(err ?? 'unknown');
+                });
         }}
         spellCheck={false}
         autoCorrect='off'
@@ -48,7 +66,7 @@ export const UIAuthForm: React.FC = () => {
                     value={playerName}
                     onChange={onInputChange}
                     error={isInputError}
-                    helperText={helperText}
+                    helperText={helperText ?? ' '}
                     inputProps={{
                         maxLength: max,
                         style: { textAlign: 'center' }

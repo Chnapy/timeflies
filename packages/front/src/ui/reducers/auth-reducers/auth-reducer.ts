@@ -14,8 +14,8 @@ const initialState: AuthState = {
 };
 
 export const authReducer = createReducer(initialState, {
-    [ReceiveMessageAction.type]: (state, {payload}: ReceiveMessageAction) => {
-        if(payload.type === 'auth/credentials') {
+    [ReceiveMessageAction.type]: (state, { payload }: ReceiveMessageAction) => {
+        if (payload.type === 'auth/credentials') {
             return {
                 isAuth: true,
                 ...payload.credentials

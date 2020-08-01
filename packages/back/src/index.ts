@@ -1,3 +1,4 @@
+import { authEndpoint } from '@timeflies/shared';
 import http from 'http';
 import WebSocket from 'ws';
 import { App } from './App';
@@ -15,8 +16,7 @@ const port = Number(envManager.PORT);
 const app = expressApp();
 
 const myApp = new App();
-// TODO share path
-app.post('/auth', myApp.getAuthRoute());
+app.post(authEndpoint, myApp.getAuthRoute());
 
 // const 
 

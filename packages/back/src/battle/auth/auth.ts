@@ -52,7 +52,7 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
             if (playerWithNameExist(playerName)) {
                 res.status(400)
                     .json({
-                        success: false,
+                        token: '',
                         error: 'player-name-exist'
                     });
                 return;
@@ -83,14 +83,14 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
             // send token
             res.status(200)
                 .json({
-                    success: true,
                     token
                 });
         },
 
         onClientSocket: (rawSocket: WebSocket, { url }: Pick<IncomingMessage, 'url'>): IPlayerRoomData<WSSocket> | null => {
 
-            const socketPool = new WSSocket(rawSocket).createPool();
+            const socket = new WSSocket(rawSocket);
+            const socketPool = socket.createPool();
 
             const sendErrorThenClose = (error: WSError) => {
                 socketPool.sendError(error);
@@ -120,12 +120,17 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
                 return sendErrorThenClose(new WSError(401, 'token is invalid'));
             }
 
+            socketPool.onDisconnect(() => {
+                playerCredList.splice(
+                    playerCredList.findIndex(p => p.token === token),
+                    1
+                );
+            });
+
             socketPool.send<AuthServerAction>({
                 type: 'auth/credentials',
                 credentials: playerCredentials
             });
-
-            const socket = socketPool.close();
 
             return {
                 id: playerCredentials.id,

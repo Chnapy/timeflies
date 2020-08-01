@@ -3,18 +3,17 @@ export type AuthRequestBody = {
     playerName: string;
 };
 
-export type AuthResponseBody = 
-| {
-    success: true;
+export type AuthResponseBodyError = 
+| 'player-name-exist'
+;
+
+export type AuthResponseBody = {
     token: string;
-}
-| {
-    success: false;
-    error: 
-    | 'player-name-exist'
-    ;
+    error?: AuthResponseBodyError;
 };
 
 export type WSQueryParams = {
     token: string;
 };
+
+export const authEndpoint = '/auth';
