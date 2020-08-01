@@ -4,37 +4,28 @@ import { RoomList } from './battle/room-list/room-list';
 
 export class App {
 
-    private readonly ws: WebSocket.Server;
     private readonly auth: Auth;
     private readonly roomList: RoomList;
 
-    constructor(ws: WebSocket.Server) {
-        this.ws = ws;
+    constructor() {
         this.auth = Auth();
         this.roomList = RoomList();
     }
 
-    init(): void {
-        this.ws.on('connection', rawSocket => {
+    getAuthRoute() {
+        return this.auth.route();
+    }
 
-            const playerData = this.auth.onClientSocket(rawSocket);
+    init(ws: WebSocket.Server): void {
+        ws.on('connection', (rawSocket, req) => {
+
+            const playerData = this.auth.onClientSocket(rawSocket, req);
 
             if(!playerData) {
                 return;
             }
 
-            this.roomList.onPlayerConnect(playerData)
-
-             // TODO remove matchmaker
-             // move room-list here
-             // remove player service
-
-            // const socket = new WSSocket(_socket);
-            // const appPool = socket.createPool();
-            // appPool.on<MatchmakerEnterCAction>('matchmaker/enter', action => {
-
-            //     this.matchmaker.connection(socket);
-            // });
+            this.roomList.onPlayerConnect(playerData);
         });
     }
 }

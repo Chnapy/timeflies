@@ -2,5 +2,10 @@
 export type PlayerCredentials = {
     id: string;
     token: string;
-    name: string;
+    playerName: string;
 };
+
+// TODO check with lib like yup
+export const playerNameConstraints = {
+    length: { min: 3, max: 12 }
+} as const;

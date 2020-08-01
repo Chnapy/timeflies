@@ -20,6 +20,7 @@ export const bootMiddleware: Middleware<{}, GameState> = api => next => {
                     type: 'matchmaker/enter'
                 }));
 
+                // keep
                 await api.dispatch(RoomListStart());
             }
         });

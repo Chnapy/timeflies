@@ -33,12 +33,12 @@ export const currentSpellIsUsable = (gameState: GameState): SpellIsUsable => {
     return spellIsUsable(gameState, spellId);
 };
 
-export const spellIsUsable = ({ currentPlayer, battle }: GameState, spellId: string): SpellIsUsable => {
+export const spellIsUsable = ({ auth, battle }: GameState, spellId: string): SpellIsUsable => {
     const { snapshotState, cycleState } = battle;
 
     const currentCharacter = snapshotState.battleDataCurrent.characters[ cycleState.currentCharacterId ];
 
-    if (!playerIsMine(currentPlayer, currentCharacter.playerId)) {
+    if (!playerIsMine(auth, currentCharacter.playerId)) {
         return {
             usable: false,
             reason: 'player'

@@ -215,7 +215,6 @@ describe.skip('BattleRunRoom', () => {
         // ]));
     });
 
-    // TODO
     it.skip('should play a turn with a valid char action', async () => {
         // const startFn = jest.fn();
         // const notifyFn = jest.fn();

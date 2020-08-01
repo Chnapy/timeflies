@@ -3,7 +3,7 @@ import { useGameSelector } from './useGameSelector';
 import { assertIsNonNullable } from '@timeflies/shared';
 
 
-export const useGameStep = <S extends Exclude<GameStateStep, 'boot'>, R>(
+export const useGameStep = <S extends GameStateStep, R>(
     step: S,
     fn: (stepData: NonNullable<GameState[ S ]>) => R,
     equalityFn?: (left: R, right: R) => boolean

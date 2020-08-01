@@ -1,5 +1,6 @@
-import { AuthRequestBody, AuthResponseBody, AuthServerAction, PlayerCredentials, WSQueryParams } from '@timeflies/shared';
+import { AuthRequestBody, AuthResponseBody, AuthServerAction, PlayerCredentials, playerNameConstraints, WSQueryParams } from '@timeflies/shared';
 import { RequestHandler } from 'express-serve-static-core';
+import { IncomingMessage } from 'http';
 import { Algorithm as JwtAlgorithm, sign as jwtSign } from 'jsonwebtoken';
 import { parse as parseURL } from 'url';
 import WebSocket from 'ws';
@@ -20,21 +21,16 @@ export type Auth = ReturnType<typeof Auth>;
 const privateKey = envManager.JWT_PRIVATE_KEY;
 const jwtAlgo: JwtAlgorithm = 'HS256';
 
-// TODO check with lib like yup
-export const playerNameConstraints = {
-    length: { min: 3, max: 12 }
-} as const;
-
 type Dependencies = {
     initialPlayerCredList: PlayerCredentials[];
 };
 
 export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCredList: [] }) => {
 
-    const playerCredList: PlayerCredentials[] = [ ...initialPlayerCredList ];
+    const playerCredList: PlayerCredentials[] = [...initialPlayerCredList];
 
     const playerWithNameExist = (playerName: string) => playerCredList
-        .some(p => p.name.toLowerCase() === playerName.toLowerCase());
+        .some(p => p.playerName.toLowerCase() === playerName.toLowerCase());
 
     return {
 
@@ -47,6 +43,8 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
                 || playerName.length > playerNameConstraints.length.max
             ) {
                 res.sendStatus(400);
+                console.log('auth anormaly failed for player name: ' + playerName);
+                console.log('body: ', req.body);
                 return;
             }
 
@@ -76,7 +74,7 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
             // add player to list
             const playerCredentials: PlayerCredentials = {
                 id,
-                name: playerName,
+                playerName,
                 token
             };
 
@@ -90,7 +88,7 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
                 });
         },
 
-        onClientSocket: (rawSocket: WebSocket): IPlayerRoomData<WSSocket> | null => {
+        onClientSocket: (rawSocket: WebSocket, { url }: Pick<IncomingMessage, 'url'>): IPlayerRoomData<WSSocket> | null => {
 
             const socketPool = new WSSocket(rawSocket).createPool();
 
@@ -102,7 +100,9 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
             };
 
             // https://toto.com?token=abc
-            const { url } = rawSocket;
+            if (!url) {
+                return sendErrorThenClose(new WSError(500, 'socket url is undefined'));
+            }
 
             // extract url params
             const authQuery: Partial<WSQueryParams> = parseURL(url, true).query;
@@ -129,7 +129,7 @@ export const Auth = ({ initialPlayerCredList }: Dependencies = { initialPlayerCr
 
             return {
                 id: playerCredentials.id,
-                name: playerCredentials.name,
+                name: playerCredentials.playerName,
                 socket
             };
         }

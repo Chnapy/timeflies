@@ -1,12 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { GameState, GameStateStep } from '../game-state';
+import { UIAuth } from './auth-ui/ui-auth';
 import { BattleUI } from './battle-ui/battle-ui';
 import { UIRoomList } from './room-list-ui/ui-room-list';
 import { UIRoom } from './room-ui/ui-room';
 
 const stepComponentMap: Record<GameStateStep, React.ComponentType> = {
-    'boot': () => null,
+    'auth': UIAuth,
     'room': UIRoom,
     'roomList': UIRoomList,
     'battle': BattleUI
