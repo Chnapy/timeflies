@@ -48,6 +48,11 @@ export class WSSocket {
                 throw new WSError(400, `typeof message not handled: ${typeof data}`);
             }
 
+            // ping-pong
+            if(data === 'heartbeat') {
+                return;
+            }
+
             let actionList;
             try {
                 actionList = JSON.parse(data);

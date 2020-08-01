@@ -30,6 +30,29 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
 
     let socket: WebSocket | null = null;
 
+    /**
+     * If no message is send or received in an interval of 55s 
+     * heroku closes the connection.
+     * 
+     * To fix that we regulary send pings.
+     * 
+     * @see https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
+     */
+    const heartbeat = () => {
+
+        // avoid unhandled timeouts in tests (use promises would be the same)
+        if (process.env.NODE_ENV === 'test') {
+            return;
+        }
+
+        if (socket && socket.readyState === socket.OPEN) {
+            socket.send("heartbeat");
+        }
+
+        // eslint-disable-next-line no-restricted-globals
+        setTimeout(heartbeat, 25_000);
+    };
+
     const send = async (action: SendMessageAction) => {
 
         if (!socket || socket.readyState === WebSocket.CONNECTING) {
@@ -52,6 +75,8 @@ export const wsClientMiddleware: (deps: Dependencies) => Middleware = ({
         console.log('ws endpoint:', endpoint);
 
         socket = websocketCreator(endpoint);
+
+        heartbeat();
 
         socket.onmessage = ({ data }: MessageEvent) => {
 

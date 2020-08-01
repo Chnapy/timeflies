@@ -21,7 +21,7 @@ export class App {
 
             const playerData = this.auth.onClientSocket(rawSocket, req);
 
-            if(!playerData) {
+            if (!playerData) {
                 return;
             }
 
