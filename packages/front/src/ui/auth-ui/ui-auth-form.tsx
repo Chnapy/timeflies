@@ -38,7 +38,8 @@ export const UIAuthForm: React.FC = () => {
         })
     });
 
-    const helperText = inputError && helperTextMap[inputError](playerName);
+    const helperText = inputError
+        && (helperTextMap[inputError] ?? helperTextMap.unknown)(playerName);
     const isInputError = !!inputError;
 
     const isBtnDisabled = isInputError || !playerName;
