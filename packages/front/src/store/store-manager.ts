@@ -1,16 +1,16 @@
 import { Action, configureStore, getDefaultMiddleware, Middleware } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
 import { AssetLoader } from '../assetManager/AssetLoader';
+import { CanvasContext } from '../canvas/CanvasContext';
 import { GameState } from '../game-state';
 import { ReceiveMessageAction, SendMessageAction } from '../socket/wsclient-actions';
 import { wsClientMiddleware } from '../socket/wsclient-middleware';
+import { authMiddleware } from '../ui/reducers/auth-reducers/auth-middleware';
 import { getBattleMiddlewareList } from '../ui/reducers/battle-reducers/battle-middleware-list';
 import { roomMiddleware } from '../ui/reducers/room-reducers/room-middleware';
 import { rootReducer } from '../ui/reducers/root-reducer';
-import { bootMiddleware } from '../stages/boot/boot-middleware';
-import { CanvasContext } from '../canvas/CanvasContext';
+import { BatchActions, batchMiddleware } from './batch-middleware';
 import { batchReducer } from './batch-reducer';
-import { batchMiddleware, BatchActions } from './batch-middleware';
 
 export type StoreManager = ReturnType<typeof createStoreManager>;
 
@@ -23,7 +23,7 @@ type Props = {
 };
 
 const defaultMiddlewareList = (assetLoader: AssetLoader): Middleware[] => [
-    bootMiddleware,
+    authMiddleware,
     wsClientMiddleware({}),
     roomMiddleware({
         assetLoader

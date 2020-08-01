@@ -1,8 +1,8 @@
+import { AuthResponseBody, AuthServerAction, ErrorServerAction, PlayerCredentials, playerNameConstraints } from '@timeflies/shared';
 import requestRaw from 'supertest';
 import { expressApp } from '../../express-app';
-import { Auth, playerNameConstraints } from './auth';
-import { AuthResponseBody, AuthServerAction, ErrorServerAction, PlayerCredentials } from '@timeflies/shared';
 import { seedWebSocket } from '../../transport/ws/WSSocket.seed';
+import { Auth } from './auth';
 
 const supertest = (
     fn: (request: typeof requestRaw) => requestRaw.Test,
@@ -74,11 +74,11 @@ describe('# auth', () => {
             it('already exist, with correct error type', async () => {
 
                 const { app } = initHttpApp({
-                    initialPlayerCredList: [ {
+                    initialPlayerCredList: [{
                         id: '',
-                        name: 'chnapy',
+                        playerName: 'chnapy',
                         token: ''
-                    } ]
+                    }]
                 });
 
                 await supertest(request => request(app)
@@ -129,10 +129,9 @@ describe('# auth', () => {
 
                 const { ws, sendList } = seedWebSocket();
 
-                ws.url = url;
                 ws.close = jest.fn();
 
-                auth.onClientSocket(ws);
+                auth.onClientSocket(ws, { url });
 
                 expect(sendList).toContainEqual<ErrorServerAction>({
                     type: 'error',
@@ -154,20 +153,21 @@ describe('# auth', () => {
         it('should succeed sending player credentials', () => {
             const initialCredentials: PlayerCredentials = {
                 id: 'id',
-                name: 'chnapy',
+                playerName: 'chnapy',
                 token: 'abc.toto.tutu'
             };
 
             const auth = Auth({
-                initialPlayerCredList: [ initialCredentials ]
+                initialPlayerCredList: [initialCredentials]
             });
 
             const { ws, sendList } = seedWebSocket();
 
-            ws.url = 'https://toto.com/?token=abc.toto.tutu';
             ws.close = jest.fn();
 
-            auth.onClientSocket(ws);
+            auth.onClientSocket(ws, {
+                url: 'https://toto.com/?token=abc.toto.tutu'
+            });
 
             expect(sendList).toContainEqual<AuthServerAction.Credentials>({
                 type: 'auth/credentials',
@@ -192,17 +192,18 @@ describe('# auth', () => {
 
                 const { ws, sendList } = seedWebSocket();
 
-                ws.url = 'https://toto.com/?token=' + token;
                 ws.close = jest.fn();
 
-                auth.onClientSocket(ws);
+                auth.onClientSocket(ws, {
+                    url: 'https://toto.com/?token=' + token
+                });
 
                 expect(sendList).toContainEqual<AuthServerAction.Credentials>({
                     type: 'auth/credentials',
                     sendTime: expect.anything(),
                     credentials: {
                         id: expect.any(String),
-                        name: 'chnapy',
+                        playerName: 'chnapy',
                         token
                     }
                 });

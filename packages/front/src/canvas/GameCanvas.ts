@@ -6,10 +6,7 @@ import { StoreEmitter } from '../store/store-manager';
 import { CanvasContext } from './CanvasContext';
 import { StageGraphic, StageGraphicCreator } from './StageGraphic';
 
-const stageGraphicsMap: Record<GameStateStep, StageGraphicCreator | null> = {
-    boot: null,
-    roomList: null,
-    room: null,
+const stageGraphicsMap: Partial<Record<GameStateStep, StageGraphicCreator>> = {
     battle: BattleStageGraphic
 } as const;
 

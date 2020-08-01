@@ -1,12 +1,9 @@
-import { assertIsNonNullable } from '@timeflies/shared';
 import { GameState } from '../../game-state';
 import { useGameSelector } from './useGameSelector';
 
 export const useGameCurrentPlayer = <R>(
-    fn: (currentPlayer: NonNullable<GameState[ 'currentPlayer' ]>) => R
-) => useGameSelector(({ currentPlayer }) => {
+    fn: (currentPlayer: GameState[ 'auth' ]) => R
+) => useGameSelector(({ auth }) => {
 
-    assertIsNonNullable(currentPlayer);
-
-    return fn(currentPlayer);
+    return fn(auth);
 });

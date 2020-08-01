@@ -303,13 +303,13 @@ const periodFuture: PeriodFn = (characterId, storeEmitter, tiledMapGraphic, spri
     };
 
     storeEmitter.onStateChange(
-        ({ currentPlayer, battle }) => {
+        ({ auth, battle }) => {
             if (battle.cycleState.currentCharacterId !== characterId) {
                 return null;
             }
             const { staticData, orientation, playerId } = battle.snapshotState.battleDataFuture.characters[ characterId ];
 
-            if (playerId !== currentPlayer.id) {
+            if (playerId !== auth.id) {
                 return null;
             }
 

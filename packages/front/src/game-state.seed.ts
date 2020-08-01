@@ -4,11 +4,13 @@ import { RoomReducer } from './ui/reducers/room-reducers/room-reducer';
 import { roomListReducer } from './ui/reducers/room-list-reducers/room-list-reducer';
 
 export const seedGameState = (playerId: string, initialState: Partial<GameState>): GameState => ({
-    currentPlayer: {
+    step: 'roomList',
+    auth: {
+        isAuth: true,
         id: playerId,
-        name: playerId
+        playerName: playerId,
+        token: ''
     },
-    step: 'boot',
     roomList: roomListReducer(undefined, { type: 'any' }),
     room: RoomReducer(undefined, { type: 'any' }),
     battle: battleReducer(undefined, { type: 'any' }),
