@@ -1,4 +1,4 @@
-import { Middleware, AnyAction } from '@reduxjs/toolkit';
+import { Middleware, AnyAction, MiddlewareAPI } from '@reduxjs/toolkit';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
@@ -16,13 +16,13 @@ type Dependencies<S> = {
 export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     extractState,
     extractCurrentCharacters
-}) => api => next => {
+}) => (api: MiddlewareAPI) => next => {
 
-    const getCharacter = (characterId: string): Character<'current'> => extractCurrentCharacters(api.getState)[ characterId ];
+    const getCharacter = (characterId: string): Character<'current'> => extractCurrentCharacters(api.getState)[characterId];
 
     const isCharacterDead = (characterId: string) => {
 
-        return !characterIsAlive(extractCurrentCharacters(api.getState)[ characterId ]);
+        return !characterIsAlive(extractCurrentCharacters(api.getState)[characterId]);
     };
 
     const getNextCharacterInfos = (currentCharacterId: string, index: number = 0): {
@@ -37,7 +37,7 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
         const orderIndex = globalTurnOrder.indexOf(currentCharacterId) + 1;
 
-        const id = globalTurnOrder[ orderIndex % globalTurnOrder.length ];
+        const id = globalTurnOrder[orderIndex % globalTurnOrder.length];
 
         if (isCharacterDead(id)) {
             return getNextCharacterInfos(id, index + 1);
@@ -57,7 +57,18 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
 
         timeout = waitTimeoutPool.createTimeout(delta)
             .onCompleted(async () => {
-                const currentCharacter = extractCurrentCharacters(api.getState)[ turnSnapshot.characterId ];
+                const currentCharacter = extractCurrentCharacters(api.getState)[turnSnapshot.characterId];
+
+                console.log();
+                console.log('--- TURN-START ---');
+                console.table({
+                    turnId: turnSnapshot.id,
+                    duration: turnSnapshot.duration,
+                    playerId: currentCharacter.playerId,
+                    characterId: turnSnapshot.characterId
+                });
+                console.log('--- ---------- ---');
+                console.log();
 
                 await api.dispatch(BattleStateTurnStartAction({
                     turnSnapshot,

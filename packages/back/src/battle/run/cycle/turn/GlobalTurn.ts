@@ -57,7 +57,7 @@ export const GlobalTurn = (
             onGlobalTurnEnd(currentTurn.endTime);
         }
         else {
-            const getCurrentCharacter = () => getCharacters()[ order[ nextCharacterIndex ] ];
+            const getCurrentCharacter = () => getCharacters()[order[nextCharacterIndex]];
 
             if (characterIsAlive(getCurrentCharacter())) {
                 console.log(`Wait ${TURN_DELAY}ms`);
@@ -77,7 +77,7 @@ export const GlobalTurn = (
         return {
             id,
             startTime,
-            order: [ ...order ],
+            order: [...order],
             currentTurn: currentTurn.toSnapshot()
         };
     };
@@ -86,8 +86,13 @@ export const GlobalTurn = (
         currentTurn.clearTimedActions();
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    setCurrentTurn(Turn(turnId, startTime, () => getCharacters()[ order[0] ], () => null, onTurnEnd));
+    const firstAliveCharacterId = order.find(id => characterIsAlive(getCharacters()[id]));
+
+    if (firstAliveCharacterId) {
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        setCurrentTurn(Turn(turnId, startTime, () => getCharacters()[firstAliveCharacterId], () => null, onTurnEnd));
+    }
 
     const this_: GlobalTurn = {
         id,
