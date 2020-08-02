@@ -7,6 +7,7 @@ import { ReceiveMessageAction, SendMessageAction } from '../socket/wsclient-acti
 import { wsClientMiddleware } from '../socket/wsclient-middleware';
 import { authMiddleware } from '../ui/reducers/auth-reducers/auth-middleware';
 import { getBattleMiddlewareList } from '../ui/reducers/battle-reducers/battle-middleware-list';
+import { roomListMiddleware } from '../ui/reducers/room-list-reducers/room-list-middleware';
 import { roomMiddleware } from '../ui/reducers/room-reducers/room-middleware';
 import { rootReducer } from '../ui/reducers/root-reducer';
 import { BatchActions, batchMiddleware } from './batch-middleware';
@@ -23,8 +24,9 @@ type Props = {
 };
 
 const defaultMiddlewareList = (assetLoader: AssetLoader): Middleware[] => [
-    authMiddleware,
     wsClientMiddleware({}),
+    authMiddleware,
+    roomListMiddleware,
     roomMiddleware({
         assetLoader
     }),
