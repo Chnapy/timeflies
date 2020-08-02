@@ -68,6 +68,7 @@ export const UIAuthForm: React.FC = () => {
                     onChange={onInputChange}
                     error={isInputError}
                     helperText={helperText ?? ' '}
+                    autoFocus
                     inputProps={{
                         maxLength: max,
                         style: { textAlign: 'center' }
