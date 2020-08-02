@@ -72,7 +72,18 @@ export const Turn = (
     };
 
     const start = () => {
-        console.log('TURN-START', id, `${this_.turnDuration}ms`, getCharacter().playerId);
+
+        console.log();
+        console.log('--- TURN-START ---');
+        console.table({
+            turnId: id,
+            duration: this_.turnDuration,
+            playerId: getCharacter().playerId,
+            characterId: getCharacter().id
+        });
+        console.log('--- ---------- ---');
+        console.log();
+
         lastCallback = 'start';
         onTurnStart();
         return refreshTimedActions();
