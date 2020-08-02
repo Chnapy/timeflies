@@ -14,8 +14,8 @@ type Dependencies<S> = SpellEngineDependencies<S> & {
     extractBattleState: (getState: () => S) => BattleState;
 };
 
-const defaultGetSpellEngineFromType: Dependencies<any>[ 'getSpellEngineFromType' ] = (spellRole, api, deps) => {
-    const spellEngineCreator = spellEngineMap[ spellRole ] ?? spellEngineDefault;
+const defaultGetSpellEngineFromType: Dependencies<any>['getSpellEngineFromType'] = (spellRole, api, deps) => {
+    const spellEngineCreator = spellEngineMap[spellRole] ?? spellEngineDefault;
 
     return spellEngineCreator(deps)(api);
 };
@@ -27,6 +27,9 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
 }) => api => next => {
     const { extractState, extractFutureSpell, extractFutureCharacter } = deps;
 
+    /**
+     * Remove selected spell when there is no enough time left to launch it
+     */
     const updateSpellTimeout = (spell?: Spell<'future'>) => {
 
         if (spellEnableTimeout) {
@@ -37,14 +40,27 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             return;
         }
 
-        const timeoutDuration = getTurnRemainingTime(extractBattleState(api.getState), 'future') - spell.features.duration;
+        const timeoutDuration = getTurnRemainingTime(extractBattleState(api.getState), 'current') - spell.features.duration;
 
         const futureCharacter = extractFutureCharacter(api.getState);
 
         const fn = () => {
             const nextFutureCharacter = extractFutureCharacter(api.getState);
 
-            if (nextFutureCharacter && nextFutureCharacter.id === futureCharacter?.id) {
+            const nextFutureSpell = extractFutureSpell(api.getState);
+
+            if (nextFutureCharacter
+                && nextFutureCharacter.id === futureCharacter?.id
+                && nextFutureSpell?.id === spell.id
+            ) {
+                // console.log('cancel spell');
+                // console.table({
+                //     spellId: spell.id,
+                //     spellRole: spell.staticData.role,
+                //     timeoutDuration,
+                //     spellDuration: spell.features.duration
+                // });
+
                 return api.dispatch(BattleStateSpellPrepareAction({
                     futureSpell: null,
                     futureCharacter
