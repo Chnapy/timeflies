@@ -68,7 +68,7 @@ const useStyles = makeStyles(({ palette }) => ({
 export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) => {
 
     const selectSpell = ({ snapshotState }: BattleState): Spell<'current'> =>
-        snapshotState.battleDataCurrent.spells[ spellId ];
+        snapshotState.battleDataCurrent.spells[spellId];
 
     const now = Date.now();
 
@@ -146,8 +146,8 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         dispatchSpellPrepare: () => {
             const { battleDataFuture } = store.getState().battle.snapshotState;
 
-            const futureSpell = battleDataFuture.spells[ spellId ];
-            const futureCharacter = battleDataFuture.characters[ futureSpell.characterId ];
+            const futureSpell = battleDataFuture.spells[spellId];
+            const futureCharacter = battleDataFuture.characters[futureSpell.characterId];
 
             return BattleStateSpellPrepareAction({
                 futureSpell,
@@ -156,14 +156,14 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         }
     });
 
-    const onBtnClick = React.useCallback((): void => {
+    const onBtnClick = React.useCallback(() => {
         if (isDisabled) {
             return;
         }
 
-        dispatchSpellPrepare();
-    }, [ dispatchSpellPrepare, isDisabled ]);
-    console.log('s', isSelected)
+        return dispatchSpellPrepare();
+    }, [dispatchSpellPrepare, isDisabled]);
+
     const classes = useStyles({
         selected: isSelected,
         disabled: isDisabled
@@ -171,7 +171,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
 
     const renderAttribute = (icon: Extract<UIIconValue, keyof typeof classes>, value: React.ReactText) => (
         <Box display='flex' flexWrap='nowrap' alignItems='center'>
-            <div className={clsx(classes.attribute, classes[ icon ])}>
+            <div className={clsx(classes.attribute, classes[icon])}>
                 <UIIcon icon={icon} />
                 <Box ml={0.5}>
                     <UITypography variant='numeric'>{value}</UITypography>
@@ -195,7 +195,7 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
         <Box display='flex' flexDirection='column'>
 
             <Box color='primary.main' display='flex' height={4} mx={0.5} mb={0.5}>
-                {[ ...new Array(nbrWaitingSpellAction) ].map((_, i) => renderPoint(i))}
+                {[...new Array(nbrWaitingSpellAction)].map((_, i) => renderPoint(i))}
                 {currentSpellActionInfos
                     && <UIGauge variant='dynamic' timeElapsed={currentSpellActionInfos.timeElapsed} durationTotal={currentSpellActionInfos.duration} />
                 }
