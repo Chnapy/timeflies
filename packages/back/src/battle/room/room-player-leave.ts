@@ -1,8 +1,8 @@
 import { RoomListener } from './room';
-import { RoomClientAction, RoomServerAction, assertIsNonNullable } from '@timeflies/shared';
+import { RoomClientAction, RoomServerAction, assertIsNonNullable, removeFromArray } from '@timeflies/shared';
 
 export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
-    playerData, stateManager, sendToEveryone
+    playerData, stateManager, sendToEveryone, closeRoom
 }) => {
 
     const { id, socket } = playerData;
@@ -17,15 +17,11 @@ export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
             team.playersIds = team.playersIds.filter(pid => pid !== id);
         }
 
-        const playerIndex = mutable.playerList.findIndex(p => p.id === id);
-        if (playerIndex === -1) {
+        const playerDeleted = removeFromArray(mutable.playerList, p => p.id === id);
+
+        if(!playerDeleted) {
             throw new Error();
         }
-
-        const [ playerDeleted ] = mutable.playerList.splice(
-            playerIndex,
-            1
-        );
 
         if (playerDeleted.isAdmin) {
             if (mutable.playerList.length) {
@@ -41,6 +37,11 @@ export const getRoomPlayerLeave: RoomListener<RoomClientAction.PlayerLeave> = ({
             ...mutable,
             playerDataList: [ ...playerDataList ].filter(p => p.id !== id)
         }));
+
+        if(!mutable.playerList.length) {
+            // no more players, closing room
+            closeRoom();
+        }
 
         const { step, launchTimeout } = stateManager.get();
 

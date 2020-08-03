@@ -25,12 +25,13 @@ type DataManager = {
 
 type RoomListenerDependencies = {
     playerData: PlayerRoomDataConnected;
-    sendToEveryone: WSSocket[ 'send' ];
+    sendToEveryone: WSSocket['send'];
     stateManager: RoomStateManager;
     dataManager: DataManager;
     readFileMap: (url: string) => Promise<TiledMap>;
     getPlayerRoom: () => DeepReadonly<PlayerRoom>;
     forbiddenError(reason: string): Error;
+    closeRoom: () => void;
 };
 
 export type RoomListener<A extends RoomClientAction> = (deps: RoomListenerDependencies) => (action: A) => void | Promise<void>;
@@ -76,16 +77,19 @@ const getDataManager = (): DataManager => ({
     getMapConfigList
 });
 
-export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencies = {
-    initialState: {},
-    dataManager: getDataManager(),
-    readFileMap: async url => {
+export const Room = (
+    closeRoom: () => void,
+    { initialState, dataManager, readFileMap }: RoomDependencies = {
+        initialState: {},
+        dataManager: getDataManager(),
+        readFileMap: async url => {
 
-        const schemaRaw = await readFile(url, 'utf8');
+            const schemaRaw = await readFile(url, 'utf8');
 
-        return JSON.parse(schemaRaw);
+            return JSON.parse(schemaRaw);
+        }
     }
-}) => {
+) => {
 
     const stateManager = RoomStateManager(Util.getUnique(), initialState);
 
@@ -111,8 +115,8 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
         };
 
         stateManager.setFn(({ playerDataList, playerList }) => ({
-            playerDataList: [ ...playerDataList, playerData ],
-            playerList: [ ...playerList, player ]
+            playerDataList: [...playerDataList, playerData],
+            playerList: [...playerList, player]
         }));
 
         initializePlayer(playerData);
@@ -132,7 +136,7 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
         );
 
         sendTo<RoomServerAction.RoomState>(
-            [ playerData ],
+            [playerData],
             {
                 type: 'room/state',
                 roomId,
@@ -181,7 +185,8 @@ export const Room = ({ initialState, dataManager, readFileMap }: RoomDependencie
             dataManager,
             readFileMap,
             getPlayerRoom,
-            forbiddenError
+            forbiddenError,
+            closeRoom
         };
 
         socket.on<RoomClientAction.MapList>('room/map/list', getRoomMapList(deps));

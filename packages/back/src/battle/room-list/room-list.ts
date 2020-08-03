@@ -1,4 +1,4 @@
-import { RoomListClientAction, RoomListItem, RoomListServerAction } from '@timeflies/shared';
+import { RoomListClientAction, RoomListItem, RoomListServerAction, removeFromArray } from '@timeflies/shared';
 import { WSError } from '../../transport/ws/WSError';
 import { WSSocket } from '../../transport/ws/WSSocket';
 import { IPlayerRoomData, Room } from '../room/room';
@@ -17,12 +17,13 @@ export const RoomList = ({ initialList, createRoom }: Dependencies = {
 
     const roomList: Room[] = [ ...initialList ];
 
+    const removeRoom = (roomId: string) => {
+        removeFromArray(roomList, room => room.id === roomId);
+    };
+
     const getCurrentListAction = (): Omit<RoomListServerAction.List, 'sendTime'> => ({
         type: 'room-list/list',
-        list: roomList
-            // TODO remove empty rooms
-            .filter(r => r.getPlayerList().length > 0)
-            .map(roomListItem)
+        list: roomList.map(roomListItem)
     });
 
     return {
@@ -57,7 +58,9 @@ export const RoomList = ({ initialList, createRoom }: Dependencies = {
 
                 wsPool.close();
 
-                const room = createRoom();
+                const room = createRoom(
+                    () => removeRoom(room.id)
+                );
                 roomList.push(room);
 
                 room.onJoin(player);
