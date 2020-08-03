@@ -42,7 +42,14 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             return;
         }
 
-        const timeoutDuration = getTurnRemainingTime(extractBattleState(api.getState), 'current') - spell.features.duration;
+        const currentTimeRemaining = getTurnRemainingTime(extractBattleState(api.getState), 'current');
+        const futureTimeRemaining = getTurnRemainingTime(extractBattleState(api.getState), 'future');
+
+        const timeoutDuration = futureTimeRemaining - spell.features.duration > 0
+            // if spell can be launched again, we can wait until it cannot
+            ? currentTimeRemaining - spell.features.duration
+            // else spell should be disabled now
+            : 0;
 
         const futureCharacter = extractFutureCharacter(api.getState);
 
@@ -132,7 +139,7 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
             }
         }
 
-        if(BattleStateTurnStartAction.match(action)) {
+        if (BattleStateTurnStartAction.match(action)) {
 
             const futureCharacter = extractFutureCharacter(api.getState)!;
             const futureSpell = extractFutureSpells(api.getState)[futureCharacter.defaultSpellId];
