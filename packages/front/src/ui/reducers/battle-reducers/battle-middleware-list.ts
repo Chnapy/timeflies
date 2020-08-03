@@ -10,7 +10,7 @@ const extractFutureCharacter = (getState: () => GameState) => {
     const state = getState().battle;
     const { currentCharacterId } = state.cycleState;
 
-    return state.snapshotState.battleDataFuture.characters[ currentCharacterId ];
+    return state.snapshotState.battleDataFuture.characters[currentCharacterId];
 };
 
 export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
@@ -28,9 +28,10 @@ export const getBattleMiddlewareList: () => readonly Middleware[] = () => [
 
             const { spells } = snapshotState.battleDataFuture;
 
-            return selectedSpellId ? spells[ selectedSpellId ] : undefined;
+            return selectedSpellId ? spells[selectedSpellId] : undefined;
         },
-        extractBattleState: getState => getState().battle
+        extractBattleState: getState => getState().battle,
+        extractFutureSpells: getState => getState().battle.snapshotState.battleDataFuture.spells
     }),
     cycleMiddleware<GameState>({
         extractState: getState => getState().battle.cycleState,

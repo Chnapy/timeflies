@@ -11,7 +11,7 @@ import { BattleMapPathAction, BattleStateTurnEndAction, BattleStateTurnStartActi
 
 describe('# battle-action', () => {
 
-    const getStore = (initialState: BattleActionState, deps: Partial<Parameters<typeof battleActionMiddleware>[ 0 ]> = {}): Store<BattleActionState> => {
+    const getStore = (initialState: BattleActionState, deps: Partial<Parameters<typeof battleActionMiddleware>[0]> = {}): Store<BattleActionState> => {
 
         const futureCharacter = seedCharacter({
             id: '1', period: 'future'
@@ -29,11 +29,12 @@ describe('# battle-action', () => {
         const middleware = battleActionMiddleware({
             extractState: () => initialState,
             extractGrid: () => ({}),
-            extractFutureAliveCharacterPositionList: () => [ futureCharacter.position ],
+            extractFutureAliveCharacterPositionList: () => [futureCharacter.position],
             extractFutureCharacter: () => futureCharacter,
             extractFutureSpell: () => futureSpell,
             getSpellEngineFromType: () => async () => { },
             extractBattleState: () => battleReducer(undefined, { type: '' }),
+            extractFutureSpells: () => normalize([futureSpell]),
             ...deps
         });
 
@@ -143,9 +144,9 @@ describe('# battle-action', () => {
                 tiledSchema: null,
                 tiledImagesUrls: {},
                 currentAction: 'watch',
-                path: [ createPosition(2, 2) ],
-                rangeArea: normalize([ createPosition(3, 3) ]),
-                actionArea: normalize([ createPosition(1, 1) ]),
+                path: [createPosition(2, 2)],
+                rangeArea: normalize([createPosition(3, 3)]),
+                actionArea: normalize([createPosition(1, 1)]),
                 futureCharacterPosition: null
             };
 
@@ -206,18 +207,18 @@ describe('# battle-action', () => {
             const store = getStore(initialState);
 
             const action = BattleMapPathAction({
-                path: [ createPosition(2, 3) ],
-                rangeArea: normalize([ createPosition(8, 7) ]),
-                actionArea: normalize([ createPosition(1, 1) ])
+                path: [createPosition(2, 3)],
+                rangeArea: normalize([createPosition(8, 7)]),
+                actionArea: normalize([createPosition(1, 1)])
             });
 
             await store.dispatch(action);
 
             expect(store.getState()).toEqual<BattleActionState>({
                 ...initialState,
-                path: [ createPosition(2, 3) ],
-                rangeArea: normalize([ createPosition(8, 7) ]),
-                actionArea: normalize([ createPosition(1, 1) ])
+                path: [createPosition(2, 3)],
+                rangeArea: normalize([createPosition(8, 7)]),
+                actionArea: normalize([createPosition(1, 1)])
             });
         });
     });
