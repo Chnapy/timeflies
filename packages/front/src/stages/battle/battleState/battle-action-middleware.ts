@@ -100,6 +100,14 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
         const nextState = extractState(api.getState);
         const nextSpell = extractFutureSpell(api.getState);
 
+        // console.log('B-A middleware')
+        // console.table({
+        //     prevCurrentAction: prevState.currentAction,
+        //     nextCurrentAction: nextState.currentAction,
+        //     prevSpellId: nextSpell?.id,
+        //     nextSpellId: nextSpell?.id,
+        // })
+
         if (prevState.currentAction !== nextState.currentAction
             || prevSpell?.id !== nextSpell?.id) {
 

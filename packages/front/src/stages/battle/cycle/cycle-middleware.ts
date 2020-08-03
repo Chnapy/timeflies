@@ -1,12 +1,12 @@
-import { Middleware, AnyAction, MiddlewareAPI } from '@reduxjs/toolkit';
+import { AnyAction, Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
+import { characterIsAlive, Normalized, TurnSnapshot, TURN_DELAY, WaitTimeoutPromise } from '@timeflies/shared';
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
-import { BattleStateTurnStartAction, BattleStateTurnEndAction } from '../battleState/battle-state-actions';
+import { waitTimeoutPool } from '../../../wait-timeout-pool';
+import { BattleStartAction } from '../battle-actions';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction, BattleStateSpellPrepareAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
-import { BattleStartAction } from '../battle-actions';
-import { Normalized, TurnSnapshot, TURN_DELAY, characterIsAlive, WaitTimeoutPromise } from '@timeflies/shared';
 import { CycleState, getTurnState } from './cycle-reducer';
-import { waitTimeoutPool } from '../../../wait-timeout-pool';
 
 type Dependencies<S> = {
     extractState: (getState: () => S) => CycleState;
@@ -73,6 +73,14 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 await api.dispatch(BattleStateTurnStartAction({
                     turnSnapshot,
                     currentCharacter
+                }));
+
+                const futureCharacter = api.getState().battle.snapshotState.battleDataFuture.characters[turnSnapshot.characterId];
+                const futureSpell = api.getState().battle.snapshotState.battleDataFuture.spells[futureCharacter.defaultSpellId];
+
+                await api.dispatch(BattleStateSpellPrepareAction({
+                    futureCharacter,
+                    futureSpell
                 }));
 
                 differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);
