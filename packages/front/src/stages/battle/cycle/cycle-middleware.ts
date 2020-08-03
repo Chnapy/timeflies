@@ -3,7 +3,7 @@ import { characterIsAlive, Normalized, TurnSnapshot, TURN_DELAY, WaitTimeoutProm
 import { ReceiveMessageAction } from '../../../socket/wsclient-actions';
 import { waitTimeoutPool } from '../../../wait-timeout-pool';
 import { BattleStartAction } from '../battle-actions';
-import { BattleStateTurnEndAction, BattleStateTurnStartAction, BattleStateSpellPrepareAction } from '../battleState/battle-state-actions';
+import { BattleStateTurnEndAction, BattleStateTurnStartAction } from '../battleState/battle-state-actions';
 import { Character } from '../entities/character/Character';
 import { NotifyDeathsAction } from './cycle-manager-actions';
 import { CycleState, getTurnState } from './cycle-reducer';
@@ -73,14 +73,6 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 await api.dispatch(BattleStateTurnStartAction({
                     turnSnapshot,
                     currentCharacter
-                }));
-
-                const futureCharacter = api.getState().battle.snapshotState.battleDataFuture.characters[turnSnapshot.characterId];
-                const futureSpell = api.getState().battle.snapshotState.battleDataFuture.spells[futureCharacter.defaultSpellId];
-
-                await api.dispatch(BattleStateSpellPrepareAction({
-                    futureCharacter,
-                    futureSpell
                 }));
 
                 differTurnEnd(turnSnapshot.characterId, turnSnapshot.startTime);

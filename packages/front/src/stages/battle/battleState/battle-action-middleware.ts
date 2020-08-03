@@ -1,17 +1,18 @@
 import { AnyAction, Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
-import { SpellRole, WaitTimeoutPromise } from '@timeflies/shared';
-import { SpellEngine, SpellEngineDependencies, spellEngineMap } from '../engine/spellEngine/spell-engine';
-import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
-import { BattleStateSpellPrepareAction } from './battle-state-actions';
-import { Spell } from '../entities/spell/Spell';
-import { getTurnRemainingTime } from '../cycle/cycle-reducer';
+import { Normalized, SpellRole, WaitTimeoutPromise } from '@timeflies/shared';
 import { BattleState } from '../../../ui/reducers/battle-reducers/battle-reducer';
-import { spellEngineDefault } from '../engine/spellEngine/default/spell-engine-default';
 import { waitTimeoutPool } from '../../../wait-timeout-pool';
+import { getTurnRemainingTime } from '../cycle/cycle-reducer';
+import { spellEngineDefault } from '../engine/spellEngine/default/spell-engine-default';
+import { SpellEngine, SpellEngineDependencies, spellEngineMap } from '../engine/spellEngine/spell-engine';
+import { Spell } from '../entities/spell/Spell';
+import { SpellActionLaunchAction } from '../spellAction/spell-action-actions';
+import { BattleStateSpellPrepareAction, BattleStateTurnStartAction } from './battle-state-actions';
 
 type Dependencies<S> = SpellEngineDependencies<S> & {
     getSpellEngineFromType?: (spellRole: SpellRole, api: MiddlewareAPI, deps: SpellEngineDependencies<S>) => SpellEngine;
     extractBattleState: (getState: () => S) => BattleState;
+    extractFutureSpells: (getState: () => S) => Normalized<Spell<'future'>>;
 };
 
 const defaultGetSpellEngineFromType: Dependencies<any>['getSpellEngineFromType'] = (spellRole, api, deps) => {
@@ -23,6 +24,7 @@ const defaultGetSpellEngineFromType: Dependencies<any>['getSpellEngineFromType']
 export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
     getSpellEngineFromType = defaultGetSpellEngineFromType,
     extractBattleState,
+    extractFutureSpells,
     ...deps
 }) => api => next => {
     const { extractState, extractFutureSpell, extractFutureCharacter } = deps;
@@ -128,6 +130,17 @@ export const battleActionMiddleware: <S>(deps: Dependencies<S>) => Middleware = 
                     }));
                 }
             }
+        }
+
+        if(BattleStateTurnStartAction.match(action)) {
+
+            const futureCharacter = extractFutureCharacter(api.getState)!;
+            const futureSpell = extractFutureSpells(api.getState)[futureCharacter.defaultSpellId];
+
+            await api.dispatch(BattleStateSpellPrepareAction({
+                futureCharacter,
+                futureSpell
+            }));
         }
 
         // spellEnableTimeout is not waited since it does not represent middleware process time
