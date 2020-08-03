@@ -232,7 +232,7 @@ describe('# SpellActionReceiver', () => {
             }
         });
 
-        it('should notify deaths if any', () => {
+        it('should notify deaths if any', async () => {
 
             const death = seedCharacter()[ 0 ];
 
@@ -251,6 +251,8 @@ describe('# SpellActionReceiver', () => {
                 sendTime: -1,
                 spellAction
             });
+
+            jest.runOnlyPendingTimers();
 
             expect(checkDeathsAndDisconnects).toHaveBeenCalledTimes(1);
         });
