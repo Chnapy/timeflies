@@ -9,9 +9,11 @@ import { waitTimeoutPool } from '../../../wait-timeout-pool';
 export type SpellActionTimer = ReturnType<typeof SpellActionTimer>;
 
 const assertSpellActionIsNotFuture = (snapshot: SpellActionSnapshot): void | never => {
-    if (snapshot.startTime > Date.now()) {
-        throw new Error(`Spell action snapshot [${snapshot.spellId}] should not be future:
+    if (process.env.NODE_ENV !== 'production') {
+        if (snapshot.startTime > Date.now()) {
+            throw new Error(`Spell action snapshot [${snapshot.spellId}] should not be future:
         [now:${Date.now()}]<->[startTime:${snapshot.startTime}]`);
+        }
     }
 };
 
