@@ -14,6 +14,7 @@ import { seedSpell } from '../src/stages/battle/entities/spell/Spell.seed';
 import { BattleDataPeriod } from '../src/stages/battle/snapshot/battle-data';
 import { getInitialSnapshotState } from '../src/stages/battle/snapshot/snapshot-reducer';
 import { createStoreManager } from '../src/store/store-manager';
+import { battleReducer } from '../src/ui/reducers/battle-reducers/battle-reducer';
 import { createView } from '../src/view';
 
 const mkdir = promisify(fs.mkdir);
@@ -48,18 +49,19 @@ const initStore = () => {
     const initialState = seedGameState('p1', {
         step: 'battle',
         battle: {
+            ...battleReducer(undefined, { type: '' }),
             battleActionState: {
                 ...battleActionReducer(undefined, { type: '' }),
                 tiledSchema: seedTiledMap('map_1'),
                 futureCharacterPosition: createPosition(8, 6),
                 currentAction: 'spellPrepare',
                 selectedSpellId: 's1',
-                rangeArea: normalize([ createPosition(9, 6) ])
+                rangeArea: normalize([createPosition(9, 6)])
             },
             cycleState: {
                 currentCharacterId: 'c1',
                 globalTurnId: 1,
-                globalTurnOrder: [ 'c1' ],
+                globalTurnOrder: ['c1'],
                 globalTurnStartTime: Date.now(),
                 turnId: 1,
                 turnDuration: 9000,

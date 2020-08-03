@@ -16,7 +16,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
     const getStore = (
         initialState: BattleActionState,
         createTileTypeGetter: CreateTileTypeGetter,
-        middlewareDeps: Partial<Parameters<typeof spellEngineMove>[ 0 ]> = {}
+        middlewareDeps: Partial<Parameters<typeof spellEngineMove>[0]> = {}
     ) => {
 
         const futureCharacter = seedCharacter({
@@ -54,6 +54,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                 extractBattleState: () => battleState
             })(api),
             extractBattleState: () => battleState,
+            extractFutureSpells: () => normalize([futureSpell]),
             ...middlewareDeps
         });
 
@@ -314,7 +315,7 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
             await dispatchThenPassTimeouts(action);
 
             expect(dispatchMock).toHaveBeenNthCalledWith(1, BattleStateSpellLaunchAction({
-                spellActions: expect.arrayContaining([ expect.any(Object) ])
+                spellActions: expect.arrayContaining([expect.any(Object)])
             }));
         });
     });
@@ -357,21 +358,21 @@ describe('# spell-engine-move (depends on #battle-action)', () => {
                         }
                     ]),
                     extractState: () => initialState,
-                    extractFutureCharacter: () => characterList[ 0 ],
+                    extractFutureCharacter: () => characterList[0],
                     extractFutureAliveCharacterPositionList: () => characterList.map(c => c.position)
                 });
 
             characterList.push(seedCharacter({ id: '2', period: 'future', position: createPosition(1, 0) }));
 
             await dispatchThenPassTimeouts(SpellActionLaunchAction({
-                spellActList: [ {
+                spellActList: [{
                     startTime: Date.now(),
                     spellAction: {
                         spell: seedSpell({ id: 's1', period: 'future' }),
-                        actionArea: normalize([ createPosition(0, 0) ]),
+                        actionArea: normalize([createPosition(0, 0)]),
                         position: createPosition(0, 0)
                     }
-                } ]
+                }]
             }), true);
 
             await dispatchThenPassTimeouts(TileHoverAction({

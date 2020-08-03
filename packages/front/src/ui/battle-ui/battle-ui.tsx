@@ -1,8 +1,9 @@
+import { Box } from '@material-ui/core';
 import React from "react";
+import { BattleResults } from "./battle-results/battle-results";
+import { CharacterListPanel } from "./character-list-panel/character-list-panel";
 import { SpellPanel } from "./spell-panel/spell-panel";
 import { TimePanel } from "./time-panel/time-panel";
-import { CharacterListPanel } from "./character-list-panel/character-list-panel";
-import { Box } from '@material-ui/core';
 
 
 export const BattleUI: React.FC = () => {
@@ -23,7 +24,9 @@ export const BattleUI: React.FC = () => {
 
         </Box>
 
-        <Box/>
+        <Box />
+
+        <BattleResults />
 
     </Box>;
 };
