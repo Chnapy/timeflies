@@ -1,4 +1,5 @@
 export * from './switchUtil';
+export * from './array';
 export * from './asserts';
 export * from './equals';
 export * from './getters';

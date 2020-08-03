@@ -4,7 +4,7 @@ import { BattleRunRoom, RoomStateReady } from '../run/BattleRunRoom';
 import { waitTimeoutPool } from '../../wait-timeout-pool';
 
 export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
-    playerData: { id }, stateManager, sendToEveryone, forbiddenError
+    playerData: { id }, stateManager, sendToEveryone, forbiddenError, closeRoom
 }) => ({ isLoading, isReady }) => {
 
     const { step, mapSelected, teamList, launchTimeout } = stateManager.get();
@@ -101,7 +101,10 @@ export const getRoomPlayerState: RoomListener<RoomClientAction.PlayerState> = ({
 
                 assertIsNonNullable(roomState.mapSelected);
 
-                const battle = await BattleRunRoom(roomStateReady);
+                const battle = await BattleRunRoom(
+                    roomStateReady,
+                    closeRoom
+                );
 
                 stateManager.set({
                     step: 'battle',

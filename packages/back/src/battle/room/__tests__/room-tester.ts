@@ -26,18 +26,20 @@ export const RoomTester = {
     createRoom: (
         initialState: Partial<RoomState> = {},
         mapConfigList: MapConfig[] = [],
-        readFileMap: RoomDependencies[ 'readFileMap' ] = () => null as any
-    ) => Room({
-        initialState,
-        dataManager: {
-            urlTransform: (url) => ({
-                forClient: () => url,
-                forServer: () => url,
-            }),
-            getMapConfigList: () => mapConfigList
-        },
-        readFileMap
-    }),
+        readFileMap: RoomDependencies['readFileMap'] = () => null as any
+    ) => Room(
+        () => { },
+        {
+            initialState,
+            dataManager: {
+                urlTransform: (url) => ({
+                    forClient: () => url,
+                    forServer: () => url,
+                }),
+                getMapConfigList: () => mapConfigList
+            },
+            readFileMap
+        }),
 
     createPlayer: (id: string, isAdmin: boolean): PlayerInfos => {
         const wsInfos = seedWebSocket();
@@ -71,8 +73,8 @@ export const RoomTester = {
         const j1Infos = RoomTester.createPlayer(j1Id, isAdmin);
 
         const room = RoomTester.createRoom({
-            playerDataList: [ j1Infos.playerData ],
-            playerList: [ j1Infos.player ]
+            playerDataList: [j1Infos.playerData],
+            playerList: [j1Infos.player]
         }, mapConfigList);
 
         return {
@@ -110,8 +112,8 @@ export const RoomTester = {
         };
 
         const createRoom = (
-            mapConfigList?: Parameters<typeof RoomTester.createRoom>[ 1 ],
-            readFileMap?: Parameters<typeof RoomTester.createRoom>[ 2 ],
+            mapConfigList?: Parameters<typeof RoomTester.createRoom>[1],
+            readFileMap?: Parameters<typeof RoomTester.createRoom>[2],
         ) => RoomTester.createRoom(
             initialState,
             mapConfigList,
@@ -213,7 +215,7 @@ export const RoomTester = {
 
         const createRoom = () => RoomTester.createRoom(
             initialState,
-            [ mapConfig ],
+            [mapConfig],
             () => Promise.resolve(map)
         );
 
@@ -246,9 +248,9 @@ export const RoomTester = {
 
         const { tilesTeamJ1, tilesTeamJ2 } = roomInfos;
 
-        const [ firstTile, secondTile ] = tilesTeamJ1;
+        const [firstTile, secondTile] = tilesTeamJ1;
 
-        const [ otherTeamTile ] = tilesTeamJ2;
+        const [otherTeamTile] = tilesTeamJ2;
 
         j1Infos.player.characters.push({
             id: 'c1',

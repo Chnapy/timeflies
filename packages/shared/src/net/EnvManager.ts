@@ -40,10 +40,12 @@ export const EnvManager = <K extends string>(...requiredKeys: K[]): EnvManager<K
         return acc;
     }, {});
 
-    console.log('env', envObject);
+    console.log('env variables:');
+    console.table(envObject);
+    console.log();
 
     if (missingKeys.length) {
-        const errorMessage = `Missing required env variables:${missingKeys.map(k => `\n\t- ${k}`)}`;
+        const errorMessage = `Missing required env variables:${missingKeys.map(k => `\n\t- ${k} `)}`;
         console.error(errorMessage);
         throw new Error(errorMessage);
     }

@@ -26,6 +26,7 @@ type Dependencies = {
 
 export const BattleRunRoom = async (
     { mapSelected, teamList: teamRoomList, playerDataList, playerList: playerRoomList }: RoomStateReady,
+    onBattleEnd: () => void,
     { createMapManager }: Dependencies = { createMapManager: MapManager }
 ) => {
 
@@ -89,6 +90,8 @@ export const BattleRunRoom = async (
             winnerTeamId: team.id
         }));
         playerList.forEach(p => p.socket.close());
+
+        onBattleEnd();
 
         console.log('\n---');
         console.log(`Battle ended. Team ${team.letter} wins !`);
