@@ -202,37 +202,39 @@ export const SpellButton: React.FC<SpellButtonProps> = React.memo(({ spellId }) 
             </Box>
 
             <Tooltip title={spellDescription}>
-                <UIButton className={clsx(classes.btn, {
-                    [classes.btnSelected]: isSelected
-                })} onClick={onBtnClick} disabled={isDisabled}>
+                <span>
+                    <UIButton className={clsx(classes.btn, {
+                        [classes.btnSelected]: isSelected
+                    })} onClick={onBtnClick} disabled={isDisabled}>
 
-                    <Box display='flex' flexWrap='nowrap'>
+                        <Box display='flex' flexWrap='nowrap'>
 
-                        <div className={classes.spellImage}>
-                            <SpellImage spellRole={spellRole} size={48} />
-                        </div>
+                            <div className={classes.spellImage}>
+                                <SpellImage spellRole={spellRole} size={48} />
+                            </div>
 
-                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.25} ml={1.5}>
-                            {renderAttribute('time', formatMsToSeconds(duration) + 's')}
-                            {attack !== undefined && renderAttribute('attack', attack)}
+                            <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.25} ml={1.5}>
+                                {renderAttribute('time', formatMsToSeconds(duration) + 's')}
+                                {attack !== undefined && renderAttribute('attack', attack)}
+                            </Box>
+
+                            <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.25} ml={1.5}>
+                                {renderAttribute('rangeArea', rangeArea >= 0 ? rangeArea : '-')}
+                                {renderAttribute('actionArea', actionArea + 1)}
+                            </Box>
+
                         </Box>
 
-                        <Box display='flex' flexDirection='column' justifyContent='space-between' my={0.25} ml={1.5}>
-                            {renderAttribute('rangeArea', rangeArea >= 0 ? rangeArea : '-')}
-                            {renderAttribute('actionArea', actionArea + 1)}
+                        <Box position='absolute' left={-2} bottom={-5}>
+                            <SpellNumber value={index} />
                         </Box>
 
-                    </Box>
+                        <Box color={palette.background.default} position='absolute' top={2} right={2} display='flex' alignItems='flex-start'>
+                            {renderDisableIcon()}
+                        </Box>
 
-                    <Box position='absolute' left={-2} bottom={-5}>
-                        <SpellNumber value={index} />
-                    </Box>
-
-                    <Box color={palette.background.default} position='absolute' top={2} right={2} display='flex' alignItems='flex-start'>
-                        {renderDisableIcon()}
-                    </Box>
-
-                </UIButton>
+                    </UIButton>
+                </span>
             </Tooltip>
         </Box>
     );

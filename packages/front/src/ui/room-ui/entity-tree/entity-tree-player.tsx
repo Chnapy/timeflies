@@ -25,14 +25,14 @@ export const EntityTreePlayer: React.FC<EntityTreePlayerProps> = ({ playerId }) 
     return (
         <TreeItem nodeId={id} label={<Box display='flex' mb={1}>
             <UITypography variant='body2' style={{ display: 'flex' }}>
-                {isAdmin && <Box display='inline-flex' mr={1} color='primary.main'>
+                {isAdmin && <Box component='span' display='inline-flex' mr={1} color='primary.main'>
                     <StarIcon />
                 </Box>}
                 {name}
-                {isReady && <Box display='inline-flex' ml={1}>
+                {isReady && <Box component='span' display='inline-flex' ml={1}>
                     <CheckIcon />
                 </Box>}
-                {isLoading && <Box display='inline-flex' ml={1}>
+                {isLoading && <Box component='span' display='inline-flex' ml={1}>
                     <SyncIcon />
                 </Box>}
             </UITypography>

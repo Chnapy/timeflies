@@ -53,11 +53,12 @@ export const ReadyButton: React.FC = () => {
 
         return <>
             Everyone is ready!
-            <UITypography variant='body1'>Battle start in <span ref={timeRef} />s</UITypography>
+            <br />
+            <UITypography component='span' variant='body1'>Battle start in <span ref={timeRef} />s</UITypography>
         </>;
-    }, [ charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime ]);
+    }, [charactersEnough, nbrTeamsEnough, isReady, isLoading, launchTime]);
 
-    const message: React.ReactNode = getMessage();
+    const message = getMessage();
 
     React.useEffect(() => {
 
@@ -82,7 +83,7 @@ export const ReadyButton: React.FC = () => {
 
         requestAnimationFrame(animationFunction);
 
-    }, [ launchTime ]);
+    }, [launchTime]);
 
     return <Card>
         <CardContent>

@@ -149,7 +149,7 @@ const TilePlacement: React.FC<TilePlacementProps> = ({ position, team, character
                 backgroundColor: palette.background.level1
             }}
         >
-            {mainRender}
+            {mainRender ?? ' '}
         </UIButton>
 
         <Box position='absolute' left={0} top={0} style={{

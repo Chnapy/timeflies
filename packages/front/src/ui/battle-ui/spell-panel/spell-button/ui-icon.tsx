@@ -39,7 +39,7 @@ export const UIIcon: React.FC<UIIconProps> = React.memo(({ icon, strikeOut, inPi
         return renderIcon();
     }
 
-    return <Box display='inline-flex' flexShrink={0} position='relative' overflow='hidden'>
+    return <Box component='span' display='inline-flex' flexShrink={0} position='relative' overflow='hidden'>
         {renderIcon()}
         {strikeOut && (
             <Box position='absolute' left={0} clone>

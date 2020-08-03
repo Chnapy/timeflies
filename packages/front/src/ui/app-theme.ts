@@ -117,34 +117,6 @@ export const appTheme: Theme = createMuiTheme({
             },
         },
 
-        MuiButton: {
-            // containedPrimary: {
-            //     '&, &:hover': {
-            //         // border: `2px solid ${main}`
-            //     }
-            // },
-            // containedSizeLarge: {
-            //     padding: '6px 20px'
-            // },
-            // outlined: {
-            //     backgroundColor: contrast,
-            //     border: '2px solid currentColor !important'
-            // },
-            // outlinedPrimary: {
-            //     '&:hover': {
-            //         backgroundColor: '#F6F6F6'
-            //     }
-            // },
-            // outlinedSizeLarge: {
-            //     padding: '6px 20px'
-            // },
-            // root: {
-            //     "&$disabled": {
-            //         pointerEvents: "all"
-            //     }
-            // }
-        },
-
         MuiInput: {
             underline: {
                 '&::before': {

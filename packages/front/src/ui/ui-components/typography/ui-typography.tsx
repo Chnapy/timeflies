@@ -11,6 +11,7 @@ type UITypographyVariant = Extract<Variant, 'h1' | 'h2' | 'h3' | 'h4' | 'body1' 
 
 export type UITypographyProps = Omit<TypographyProps, 'variant'> & {
     variant: UITypographyVariant;
+    component?: React.ReactType;
 };
 
 const useStyles = makeStyles(() => ({
