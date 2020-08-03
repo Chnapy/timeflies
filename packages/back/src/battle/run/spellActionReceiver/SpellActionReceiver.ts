@@ -30,7 +30,7 @@ export const SpellActionReceiver = (
 
     const { playerList, get } = stateManager;
 
-    const getLastHash = () => get('battleHashList')[ get('battleHashList').length - 1 ];
+    const getLastHash = () => get('battleHashList')[get('battleHashList').length - 1];
 
     const spellActionChecker = spellActionCheckerCreator(cycle, mapManager);
 
@@ -45,6 +45,7 @@ export const SpellActionReceiver = (
     };
 
     const getOnReceive = (player: Player) => (action: SpellActionCAction): void => {
+        const { spellAction } = action;
 
         const isCheckSuccess = spellActionChecker.check(action, player, get).success;
 
@@ -64,7 +65,7 @@ export const SpellActionReceiver = (
                         })
                     },
                     debug: {
-                        sendHash: action.spellAction.battleHash,
+                        sendHash: spellAction.battleHash,
                     }
                 } as const;
 
@@ -79,7 +80,7 @@ export const SpellActionReceiver = (
 
         if (isCheckSuccess) {
 
-            const applySucceed = stateManager.useSpellAction(action.spellAction, cycle.globalTurn.currentTurn.startTime)
+            const applySucceed = stateManager.useSpellAction(spellAction, cycle.globalTurn.currentTurn.startTime)
                 .onClone()
                 .ifCorrectHash((hash, applyOnCurrentState) => {
 
@@ -91,10 +92,16 @@ export const SpellActionReceiver = (
                         .filter(p => p.id !== player.id)
                         .forEach(p => p.socket.send<NotifySAction>({
                             type: 'notify',
-                            spellActionSnapshot: action.spellAction,
+                            spellActionSnapshot: spellAction,
                         }));
 
-                    notifyDeaths(deaths);
+                    const startTimeDelta = Math.max(Date.now() - spellAction.startTime, 0);
+                    const notifyDeathsTimeout = spellAction.duration - startTimeDelta;
+
+                    // console.log('Notify deaths in (ms)', notifyDeathsTimeout);
+
+                    // eslint-disable-next-line no-restricted-globals
+                    setTimeout(() => notifyDeaths(deaths), notifyDeathsTimeout)
                 });
 
             if (applySucceed) {

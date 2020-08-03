@@ -5,6 +5,7 @@ import { seedGameState } from '../../../game-state.seed';
 import { ReceiveMessageAction, SendMessageAction } from '../../../socket/wsclient-actions';
 import { createStoreManager, getFullStoreMiddlewareList } from '../../../store/store-manager';
 import { getDispatchThenPassTimeouts } from '../../../test-utils';
+import { battleReducer } from '../../../ui/reducers/battle-reducers/battle-reducer';
 import { battleActionReducer } from '../battleState/battle-action-reducer';
 import { TileClickAction } from '../battleState/battle-state-actions';
 import { seedCharacter } from '../entities/character/Character.seed';
@@ -44,6 +45,7 @@ describe('Battleflow', () => {
         const initialState = seedGameState('p1', {
             step: 'battle',
             battle: {
+                ...battleReducer(undefined, {type: ''}),
                 battleActionState: {
                     ...battleActionReducer(undefined, { type: '' }),
                     tiledSchema: seedTiledMap('map_1'),

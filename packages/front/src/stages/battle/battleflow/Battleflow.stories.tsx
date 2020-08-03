@@ -22,7 +22,7 @@ export default {
 export const Default: React.FC = () => {
 
     const initialState = seedGameState('p1', {
-        step: 'battle',
+        step: 'battle'
     });
 
     const assetLoader = createAssetLoader();
@@ -297,7 +297,7 @@ export const Default: React.FC = () => {
             },
             globalTurnSnapshot: {
                 id: 1,
-                order: [ 'c1', 'c2' ],
+                order: ['c1', 'c2'],
                 startTime,
                 currentTurn: {
                     id: 1,
@@ -306,8 +306,8 @@ export const Default: React.FC = () => {
                     startTime
                 }
             },
-            teamSnapshotList: [ t1, t2 ],
-            playerSnapshotList: [ p1, p2 ],
+            teamSnapshotList: [t1, t2],
+            playerSnapshotList: [p1, p2],
             entitiesSnapshot: {
                 battleHash: '',
                 charactersSnapshots: characterList,
@@ -323,6 +323,13 @@ export const Default: React.FC = () => {
             }
         }, () => BattleStageGraphic(app.renderer));
         app.stage.addChild(battleStageGraphic.container);
+
+        // await waitTimeoutPool.createTimeout(8000);
+        // await storeManager.dispatch(ReceiveMessageAction({
+        //     type: 'battle-run/end',
+        //     sendTime: -1,
+        //     winnerTeamId: 't2'
+        // }))
     };
 
     const view = createView({
@@ -343,7 +350,7 @@ export const Default: React.FC = () => {
             spellActionSnapshot: {
                 spellId: 's3',
                 characterId: 'c2',
-                actionArea: normalize([ newPosition ]),
+                actionArea: normalize([newPosition]),
                 position: newPosition,
                 startTime: Date.now() - 100,
                 duration: 600,

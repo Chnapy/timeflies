@@ -171,8 +171,6 @@ export const cycleMiddleware: <S>(deps: Dependencies<S>) => Middleware = ({
                 cancelTimeout();
 
                 await api.dispatch(BattleStateTurnEndAction());
-
-                alert(`Battle ended. Team ${payload.winnerTeamId} wins !`);
             }
 
         } else if (NotifyDeathsAction.match(action)) {
