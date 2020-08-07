@@ -1,9 +1,10 @@
-import { Box, Card, CardContent, Container, IconButton } from "@material-ui/core";
+import { Box, Card, CardContent, Container, Dialog, Grid, IconButton, Link } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import GitHubIcon from '@material-ui/icons/GitHub';
 import React from "react";
 import { UITypography } from "../ui-components/typography/ui-typography";
 import { UIAuthForm } from "./ui-auth-form";
-import GitHubIcon from '@material-ui/icons/GitHub';
+import { UICredits } from './ui-credits';
 
 const repoLink = 'https://github.com/Chnapy/timeflies';
 
@@ -17,6 +18,8 @@ const useStyles = makeStyles(({ palette }) => ({
 export const UIAuth: React.FC = () => {
 
     const classes = useStyles();
+
+    const [ showCredits, setShowCredits ] = React.useState(false);
 
     return (
         <Box className={classes.root} display='flex' flexDirection='column' height='100%'>
@@ -53,11 +56,33 @@ export const UIAuth: React.FC = () => {
 
             </Container>
 
-            <Box textAlign='right'>
-                <IconButton href={repoLink} target='_blank'>
-                    <GitHubIcon fontSize='large'/>
-                </IconButton>
+            <Box display='flex' justifyContent='flex-end' alignItems='center'>
+                <Grid container spacing={2} justify='flex-end' alignItems='center'>
+
+                    <Grid item>
+                        <UITypography variant='body2'>
+                            <Link component='button' style={{ font: 'inherit' }} onClick={() => setShowCredits(true)}>
+                                Credits
+                    </Link>
+                        </UITypography>
+                    </Grid>
+
+                    <Grid item>
+                        <IconButton href={repoLink} target='_blank' rel='noopener' title='Github repository'>
+                            <GitHubIcon fontSize='large' />
+                        </IconButton>
+                    </Grid>
+                </Grid>
             </Box>
+
+            <Dialog
+                open={showCredits}
+                onClose={() => setShowCredits(false)}
+            >
+                <Box py={3} px={4}>
+                    <UICredits />
+                </Box>
+            </Dialog>
         </Box>
     );
 };
