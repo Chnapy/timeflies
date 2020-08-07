@@ -34,3 +34,18 @@ All infos [here](./docs/pages/pages.md).
 Technical infos for developers.
 
 You can see all of them [here](./docs/technical/technical.md).
+
+## :clap: Credits
+
+Games can be complex and hard projects, especially when they're done alone.
+This is why for Timeflies I used several external assets which helped me a lot.
+
+  - [RPG Dungeon Tileset](https://pita.itch.io/rpg-dungeon-tileset) and [RPG Monster Pack](https://pita.itch.io/rpg-monster-pack) 
+  (tileset and characters spritesheets) by [Pita](https://pita.itch.io/),
+
+  - [100 Pixel Icons](https://www.gamedevmarket.net/asset/100-pixel-icons-3836/) 
+  (spells icons) by [Frostwindz](https://www.gamedevmarket.net/member/Frostwindz/),
+
+  - [monogram](https://datagoblin.itch.io/monogram) (font) by [V. Menézio](https://datagoblin.itch.io/),
+
+Thanks to them :+1:
