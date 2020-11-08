@@ -4,7 +4,8 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "postinstall": "cd .. && yarn link && cd demo/ && yarn link \"animated-complex-sprite\""
   },
   "dependencies": {
     "animated-complex-sprite": "file:..",

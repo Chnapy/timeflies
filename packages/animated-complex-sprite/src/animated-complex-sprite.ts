@@ -23,13 +23,13 @@ type Animations = {
 type TimedTexture = {
     texture: Texture;
     duration: number;
+    textureIndex: number;
 };
 
 type TexturesInfos = {
     timedTextures: TimedTexture[];
     tickerInterval: number;
     previousFrame: number;
-    deltaMsSum: number;
 };
 
 const shallowEqual = (objA: any, objB: any): boolean => {
@@ -54,7 +54,9 @@ export class AnimatedComplexSprite<C> extends Sprite {
 
     private animations: Animations;
     private timedTextures: TimedTexture[];
-    private loop: boolean;
+
+    onLoop?: (currentConfig: C) => void;
+    onFrameChange?: (config: C, currentFrame: number, textureIndex: number) => void;
 
     private previousFrame: number;
     private currentTime: number;
@@ -64,7 +66,13 @@ export class AnimatedComplexSprite<C> extends Sprite {
 
     private readonly cache?: Cache<C, TexturesInfos>;
 
-    constructor(spritesheet: Spritesheet, getFramesInfos: FramesInfosGetter<C>, config: C, ticker?: Ticker, cache: Cache<C, TexturesInfos> = createCache()) {
+    constructor(
+        spritesheet: Spritesheet,
+        getFramesInfos: FramesInfosGetter<C>,
+        config: C,
+        ticker?: Ticker,
+        cache: Cache<C, TexturesInfos> = createCache()
+    ) {
         super();
 
         this.config = config;
@@ -73,8 +81,6 @@ export class AnimatedComplexSprite<C> extends Sprite {
         this.getFramesInfos = getFramesInfos;
 
         this.currentTime = 0;
-
-        this.loop = true;
 
         this.tickerManager = createTickerManager(
             this.update.bind(this),
@@ -97,7 +103,8 @@ export class AnimatedComplexSprite<C> extends Sprite {
         const framedTextures = framesOrder.map(index => rawTextures[ index - 1 ])
             .map((texture, frame) => ({
                 texture,
-                frame
+                frame,
+                textureIndex: framesOrder[frame]
             }));
 
         if (pingPong && framedTextures.length > 2) {
@@ -106,9 +113,10 @@ export class AnimatedComplexSprite<C> extends Sprite {
             );
         }
 
-        return framedTextures.map(({ texture, frame }): TimedTexture => ({
+        return framedTextures.map(({ texture, frame, textureIndex }): TimedTexture => ({
             texture,
-            duration: framesDurations[ frame % framesDurations.length ]
+            duration: framesDurations[ frame % framesDurations.length ],
+            textureIndex
         }));
     }
 
@@ -182,19 +190,26 @@ export class AnimatedComplexSprite<C> extends Sprite {
         const infos = {
             timedTextures,
             tickerInterval,
-            previousFrame: 0,
-            deltaMsSum: 0
+            previousFrame: 0
         };
         this.cache?.set(this.config, infos);
 
         return infos;
     }
 
-    setConfig(config: Partial<C>, forceUpdate?: boolean) {
+    setConfig(config: Partial<C>, options: {
+        forceUpdate?: boolean;
+        keepTimeState?: boolean;
+    } = {}) {
         const newConfig = {
             ...this.config,
             ...config
         };
+
+        const {
+            forceUpdate = false,
+            keepTimeState = false,
+        } = options;
 
         if (!forceUpdate && shallowEqual(this.config, newConfig)) {
             return;
@@ -202,12 +217,16 @@ export class AnimatedComplexSprite<C> extends Sprite {
 
         this.config = newConfig;
 
-        const { timedTextures, tickerInterval, previousFrame, deltaMsSum } = this.getTexturesInfos();
+        const { timedTextures, tickerInterval, previousFrame } = this.getTexturesInfos();
 
         this.timedTextures = timedTextures;
         this.tickerInterval = tickerInterval;
         this.previousFrame = previousFrame;
-        this.tickerManager.setDeltaMsSum(deltaMsSum);
+        if (!keepTimeState) {
+            this.currentTime = 0;
+        }
+
+        this.tickerManager.resetDeltaMsSum();
 
         this.updateTexture(true);
     }
@@ -220,7 +239,7 @@ export class AnimatedComplexSprite<C> extends Sprite {
         return this.timedTextures[ this.getCurrentFrame() ].duration;
     }
 
-    update(deltaMs: number): void {
+    private update(deltaMs: number): void {
         const previousFrame = this.getCurrentFrame();
 
         let lag = this.currentTime % 1 * this.getCurrentDuration();
@@ -243,13 +262,12 @@ export class AnimatedComplexSprite<C> extends Sprite {
 
         this.currentTime += lag / this.getCurrentDuration();
 
-        if (this.currentTime < 0 && !this.loop) {
-            this.gotoAndStop(0);
+        if (previousFrame !== this.getCurrentFrame()) {
 
-        } else if (this.currentTime >= this.timedTextures.length && !this.loop) {
-            this.gotoAndStop(this.timedTextures.length - 1);
+            if (this.onLoop && previousFrame === this.timedTextures.length - 1) {
+                this.onLoop(this.config);
+            }
 
-        } else if (previousFrame !== this.getCurrentFrame()) {
             this.updateTexture();
         }
     }
@@ -265,22 +283,14 @@ export class AnimatedComplexSprite<C> extends Sprite {
 
         this.texture = this.timedTextures[ currentFrame ].texture;
         this._cachedTint = 0xFFFFFF;
+
+        if(this.onFrameChange) {
+            this.onFrameChange(this.config, currentFrame, this.timedTextures[ currentFrame ].textureIndex);
+        }
     }
 
     stop() {
         this.tickerManager.stop();
-    }
-
-    gotoAndStop(frameNumber: number) {
-        this.stop();
-
-        const previousFrame = this.getCurrentFrame();
-
-        this.currentTime = frameNumber;
-
-        if (previousFrame !== this.getCurrentFrame()) {
-            this.updateTexture();
-        }
     }
 
     clearCache() {
@@ -291,5 +301,8 @@ export class AnimatedComplexSprite<C> extends Sprite {
         this.stop();
         this.clearCache();
         super.destroy(...args);
+
+        delete this.onLoop;
+        delete this.onFrameChange;
     }
 }

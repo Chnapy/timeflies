@@ -53,8 +53,8 @@ export const createTickerManager = (updateFn: UpdateFn, getTickerInterval: () =>
             }
         },
         isRunning: () => isConnectedToTicker,
-        setDeltaMsSum: (value: number) => {
-            deltaMsSum = value;
+        resetDeltaMsSum: () => {
+            deltaMsSum = 0;
         }
     };
 };

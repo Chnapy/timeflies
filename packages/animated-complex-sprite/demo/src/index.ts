@@ -1,5 +1,5 @@
 import { AnimatedComplexSprite, FlipInfos } from 'animated-complex-sprite';
-import { Application, IResourceDictionary, Loader, SCALE_MODES, settings, Sprite } from 'pixi.js';
+import { Application, IResourceDictionary, Loader, SCALE_MODES, settings, Texture } from 'pixi.js';
 
 const loader = Loader.shared;
 
@@ -31,7 +31,7 @@ const framesDurations: {
       default: [ 300, 100, 100, 200 ]
     },
     hit: {
-      default: [ 120, 80, 80, 80, 80, 240 ]
+      default: [ 120, 80, 80, 80, 80, 120 ]
     }
   }
 };
@@ -102,6 +102,18 @@ const onLoad = (resources: IResourceDictionary) => {
   sprite.scale.set(4);
 
   app.stage.addChild(sprite);
+
+  sprite.onFrameChange = ({ role, state }, currentFrame) => {
+    if (state === 'hit' && currentFrame === 1) {
+      sprite.texture = Texture.EMPTY;
+    }
+  };
+
+  sprite.onLoop = ({ state }) => {
+    if (state === 'hit') {
+      sprite.setConfig({ state: 'idle' });
+    }
+  };
 
   sprite.play();
 
