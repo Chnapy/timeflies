@@ -3,16 +3,16 @@ import { Cache, createCache } from './cache';
 import { createTickerManager, TickerManager } from './ticker-manager';
 
 
-export type FlipInfos<C> = {
+export type FlipInfos<S> = {
     direction: 'horizontal' | 'vertical';
-    baseConfig: C;
+    baseState: S;
 };
 
-type FramesInfosGetter<C> = (config: C) => {
+type FramesInfosGetter<S> = (state: S) => {
     animationPath: string;
     pingPong?: boolean;
     framesOrder?: number[];
-    flip?: FlipInfos<C>;
+    flip?: FlipInfos<S>;
     framesDurations: number[];
 };
 
@@ -44,19 +44,19 @@ const shallowEqual = (objA: any, objB: any): boolean => {
         && keysA.every(key => objA[ key ] === objB[ key ]);
 };
 
-export class AnimatedComplexSprite<C> extends Sprite {
+export class AnimatedComplexSprite<S> extends Sprite {
 
     static durationToInterval = (duration: number) => duration / 3;
 
-    private getFramesInfos: FramesInfosGetter<C>;
+    private getFramesInfos: FramesInfosGetter<S>;
 
-    private config: C;
+    private state: S;
 
     private animations: Animations;
     private timedTextures: TimedTexture[];
 
-    onLoop?: (currentConfig: C) => void;
-    onFrameChange?: (config: C, currentFrame: number, textureIndex: number) => void;
+    onLoop?: (currentState: S) => void;
+    onFrameChange?: (state: S, currentFrame: number, textureIndex: number) => void;
 
     private previousFrame: number;
     private currentTime: number;
@@ -64,18 +64,18 @@ export class AnimatedComplexSprite<C> extends Sprite {
     private readonly tickerManager: TickerManager;
     private tickerInterval: number;
 
-    private readonly cache?: Cache<C, TexturesInfos>;
+    private readonly cache?: Cache<S, TexturesInfos>;
 
     constructor(
         spritesheet: Spritesheet,
-        getFramesInfos: FramesInfosGetter<C>,
-        config: C,
+        getFramesInfos: FramesInfosGetter<S>,
+        state: S,
         ticker?: Ticker,
-        cache: Cache<C, TexturesInfos> = createCache()
+        cache: Cache<S, TexturesInfos> = createCache()
     ) {
         super();
 
-        this.config = config;
+        this.state = state;
 
         this.animations = spritesheet.animations;
         this.getFramesInfos = getFramesInfos;
@@ -134,13 +134,13 @@ export class AnimatedComplexSprite<C> extends Sprite {
         const {
             flip,
             ...restInfos
-        } = this.getFramesInfos(this.config);
+        } = this.getFramesInfos(this.state);
 
         if (flip) {
-            const { flip: innerFlip, ...flipFramesInfos } = this.getFramesInfos(flip.baseConfig);
+            const { flip: innerFlip, ...flipFramesInfos } = this.getFramesInfos(flip.baseState);
 
             if (innerFlip) {
-                throw new Error('Cannot use flip baseConfig also flipped');
+                throw new Error('Cannot use flip baseState also flipped');
             }
 
             return {
@@ -161,7 +161,7 @@ export class AnimatedComplexSprite<C> extends Sprite {
 
     private getTexturesInfos(): TexturesInfos {
 
-        const cachedInfos = this.cache?.getIfExist(this.config);
+        const cachedInfos = this.cache?.getIfExist(this.state);
         if (cachedInfos) {
             return cachedInfos;
         }
@@ -192,18 +192,18 @@ export class AnimatedComplexSprite<C> extends Sprite {
             tickerInterval,
             previousFrame: 0
         };
-        this.cache?.set(this.config, infos);
+        this.cache?.set(this.state, infos);
 
         return infos;
     }
 
-    setConfig(config: Partial<C>, options: {
+    setState(state: Partial<S>, options: {
         forceUpdate?: boolean;
         keepTimeState?: boolean;
     } = {}) {
-        const newConfig = {
-            ...this.config,
-            ...config
+        const newState = {
+            ...this.state,
+            ...state
         };
 
         const {
@@ -211,11 +211,11 @@ export class AnimatedComplexSprite<C> extends Sprite {
             keepTimeState = false,
         } = options;
 
-        if (!forceUpdate && shallowEqual(this.config, newConfig)) {
+        if (!forceUpdate && shallowEqual(this.state, newState)) {
             return;
         }
 
-        this.config = newConfig;
+        this.state = newState;
 
         const { timedTextures, tickerInterval, previousFrame } = this.getTexturesInfos();
 
@@ -265,7 +265,7 @@ export class AnimatedComplexSprite<C> extends Sprite {
         if (previousFrame !== this.getCurrentFrame()) {
 
             if (this.onLoop && previousFrame === this.timedTextures.length - 1) {
-                this.onLoop(this.config);
+                this.onLoop(this.state);
             }
 
             this.updateTexture();
@@ -285,7 +285,7 @@ export class AnimatedComplexSprite<C> extends Sprite {
         this._cachedTint = 0xFFFFFF;
 
         if(this.onFrameChange) {
-            this.onFrameChange(this.config, currentFrame, this.timedTextures[ currentFrame ].textureIndex);
+            this.onFrameChange(this.state, currentFrame, this.timedTextures[ currentFrame ].textureIndex);
         }
     }
 

@@ -53,7 +53,7 @@ const onLoad = (resources: IResourceDictionary) => {
       const getFlip = (): FlipInfos<SpriteConfig> | undefined => {
         if (orientation === 'left') {
           return {
-            baseConfig: { role, state, orientation: 'right' },
+            baseState: { role, state, orientation: 'right' },
             direction: 'horizontal'
           };
         }
@@ -111,7 +111,7 @@ const onLoad = (resources: IResourceDictionary) => {
 
   sprite.onLoop = ({ state }) => {
     if (state === 'hit') {
-      sprite.setConfig({ state: 'idle' });
+      sprite.setState({ state: 'idle' });
     }
   };
 
@@ -130,7 +130,7 @@ const createButton = (name: string, fn: () => void) => {
 };
 
 const createActionButton = (name: string, action: Partial<SpriteConfig>) => createButton(name, () => {
-  sprite.setConfig(action);
+  sprite.setState(action);
 });
 
 [
