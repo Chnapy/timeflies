@@ -8,7 +8,7 @@ export type FlipInfos<S> = {
     baseState: S;
 };
 
-type FramesInfosGetter<S> = (state: S) => {
+export type FramesInfosGetter<S> = (state: S) => {
     animationPath: string;
     pingPong?: boolean;
     framesOrder?: number[];
@@ -26,7 +26,7 @@ type TimedTexture = {
     textureIndex: number;
 };
 
-type TexturesInfos = {
+export type TexturesInfos = {
     timedTextures: TimedTexture[];
     tickerInterval: number;
     previousFrame: number;
@@ -44,7 +44,7 @@ const shallowEqual = (objA: any, objB: any): boolean => {
         && keysA.every(key => objA[ key ] === objB[ key ]);
 };
 
-export class AnimatedComplexSprite<S> extends Sprite {
+export class AnimatedComplexSprite<S = any> extends Sprite {
 
     static durationToInterval = (duration: number) => duration / 3;
 
