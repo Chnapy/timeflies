@@ -3,7 +3,7 @@ import { TilemapComponent } from '@timeflies/tilemap-component';
 import * as PIXI from "pixi.js";
 import { Loader, LoaderResource, Texture } from 'pixi.js';
 import React from 'react';
-import { Sprite, Stage } from 'react-pixi-fiber';
+import { Container, Sprite, Stage } from 'react-pixi-fiber';
 import { TiledMap } from 'tiled-types';
 
 const loader = Loader.shared;
@@ -63,16 +63,18 @@ export const Demo: React.FC = () => {
   const tilesize = 16;
 
   return <Stage options={{ backgroundColor: 0x10bb99, height: 650, width: 800 }}>
-    <TilemapComponent {...data}>
-      {{
-        [ pos.id ]: {
-          id: 'foo',
-          sprite: <Sprite
-            texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
-            x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
-          />
-        }
-      }}
-    </TilemapComponent>
+    <Container scale={2}>
+      <TilemapComponent {...data}>
+        {{
+          [ pos.id ]: {
+            id: 'foo',
+            sprite: <Sprite
+              texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
+              x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
+            />
+          }
+        }}
+      </TilemapComponent>
+    </Container>
   </Stage>;
 };

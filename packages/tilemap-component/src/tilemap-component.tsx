@@ -133,7 +133,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
         </Container>;
     };
 
-    return <Container scale={2}>
+    return <Container>
         {background}
         {renderObstaclesAndEntities()}
         {foreground}
