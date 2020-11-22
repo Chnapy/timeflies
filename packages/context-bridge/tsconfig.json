@@ -16,7 +16,9 @@
     "module": "esnext",
     "moduleResolution": "node",
     "isolatedModules": true,
-    "outDir": "public/dist/foo"
+    "outDir": "lib",
+    "jsx": "react",
+    "declaration": true
   },
   "include": [
     "src"

@@ -15,6 +15,7 @@ const serialize = (obj: any): string => {
 export type Cache<K, V> = {
     set: (key: K, value: V) => void;
     getIfExist: (key: K) => V | undefined;
+    getOrElse: (key: K, fn: () => V) => V;
     clear: () => void;
 };
 
@@ -22,16 +23,31 @@ export const createCache = <K, V>(): Cache<K, V> => {
 
     const cache: Record<string, V | undefined> = {};
 
+    const set = (key, value) => {
+        const cacheKey = serialize(key);
+
+        cache[ cacheKey ] = value;
+    };
+
+    const getIfExist = (key) => {
+        const cacheKey = serialize(key);
+
+        return cache[ cacheKey ];
+    };
+
     return {
-        set: (key, value) => {
-            const cacheKey = serialize(key);
+        set,
+        getIfExist,
+        getOrElse: (key, fn) => {
+            const value = getIfExist(key);
+            if (value !== undefined) {
+                return value;
+            }
 
-            cache[ cacheKey ] = value;
-        },
-        getIfExist: (key) => {
-            const cacheKey = serialize(key);
+            const newValue = fn();
+            set(key, newValue);
 
-            return cache[ cacheKey ];
+            return newValue;
         },
         clear: () => {
             Object.keys(cache)
