@@ -16756,7 +16756,7 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-pixi-fiber@^1.0.0-beta.4:
+react-pixi-fiber@1.0.0-beta.4, react-pixi-fiber@^1.0.0-beta.4:
   version "1.0.0-beta.4"
   resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-1.0.0-beta.4.tgz#aece0e53fbc3d06cf06672090369fccd2f4a8dc5"
   integrity sha512-9wzBxEeNq6TrFJVKyi+hhqHLdXEhS0I769dQWIir9mbi2JCMD/P8wcwvXDB6/5gmWLKKQW+XvoU04e5czS4Mvw==

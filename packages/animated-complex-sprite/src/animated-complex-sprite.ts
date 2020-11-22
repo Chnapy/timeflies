@@ -1,5 +1,5 @@
+import { Cache, createCache } from '@timeflies/cache';
 import { Sprite, Spritesheet, Texture, Ticker } from 'pixi.js';
-import { Cache, createCache } from './cache';
 import { createTickerManager, TickerManager } from './ticker-manager';
 
 
@@ -64,7 +64,7 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
     private readonly tickerManager: TickerManager;
     private tickerInterval: number;
 
-    private readonly cache?: Cache<S, TexturesInfos>;
+    private readonly cache: Cache<S, TexturesInfos>;
 
     constructor(
         spritesheet: Spritesheet,
@@ -160,41 +160,37 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
     }
 
     private getTexturesInfos(): TexturesInfos {
+        return this.cache.getOrElse(this.state, () => {
 
-        const cachedInfos = this.cache?.getIfExist(this.state);
-        if (cachedInfos) {
-            return cachedInfos;
-        }
-
-        const {
-            animationPath,
-            pingPong = false,
-            framesOrder: rawFramesOrder,
-            framesDurations,
-            textureFlipFn
-        } = this.getFinalFramesInfos();
-
-        const rawTextures = this.animations[ animationPath ];
-
-        if (!rawTextures || !rawTextures.length) {
-            throw new Error(`Textures not found with animation path [${animationPath}]`);
-        }
-
-        const textures = rawTextures.map(textureFlipFn);
-
-        const framesOrder = rawFramesOrder ?? textures.map((t, i) => i + 1);
-
-        const timedTextures = this.getTimedTextures(textures, framesOrder, framesDurations, pingPong);
-        const tickerInterval = AnimatedComplexSprite.durationToInterval(Math.min(...timedTextures.map(t => t.duration)));
-
-        const infos = {
-            timedTextures,
-            tickerInterval,
-            previousFrame: 0
-        };
-        this.cache?.set(this.state, infos);
-
-        return infos;
+            const {
+                animationPath,
+                pingPong = false,
+                framesOrder: rawFramesOrder,
+                framesDurations,
+                textureFlipFn
+            } = this.getFinalFramesInfos();
+    
+            const rawTextures = this.animations[ animationPath ];
+    
+            if (!rawTextures || !rawTextures.length) {
+                throw new Error(`Textures not found with animation path [${animationPath}]`);
+            }
+    
+            const textures = rawTextures.map(textureFlipFn);
+    
+            const framesOrder = rawFramesOrder ?? textures.map((t, i) => i + 1);
+    
+            const timedTextures = this.getTimedTextures(textures, framesOrder, framesDurations, pingPong);
+            const tickerInterval = AnimatedComplexSprite.durationToInterval(Math.min(...timedTextures.map(t => t.duration)));
+    
+            const infos = {
+                timedTextures,
+                tickerInterval,
+                previousFrame: 0
+            };
+    
+            return infos;
+        });
     }
 
     setState(state: Partial<S>, options: {
