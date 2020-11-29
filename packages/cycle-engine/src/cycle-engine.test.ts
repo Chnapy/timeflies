@@ -1,5 +1,5 @@
 import { createCycleEngine } from './cycle-engine';
-import { CycleEngineListeners } from './listeners';
+import { CycleEngineListeners, TurnInfos } from './listeners';
 import { timerTester } from './timer-tester';
 
 
@@ -10,46 +10,91 @@ describe('# Cycle engine', () => {
         betweenTurns: 4000
     };
 
+    type PartialArray<A extends any[]> = Partial<A[ number ]>[];
+
+    type ListenerBody<K extends keyof CycleEngineListeners> = PartialArray<Parameters<Required<CycleEngineListeners>[ K ]>>;
+
     const expectListener = <K extends keyof CycleEngineListeners>(name: K, listener: () => void) => ({
-        toHaveBeenCalledWith: (...expectedParams: Parameters<Required<CycleEngineListeners>[ K ]>) =>
-            expect(listener).toHaveBeenCalledWith<Parameters<Required<CycleEngineListeners>[ K ]>>(...expectedParams)
+        calledWithPartial: (...expectedParams: ListenerBody<K>) =>
+            expect(listener).toHaveBeenCalledWith<ListenerBody<K>>(...expectedParams.map(expect.objectContaining))
     });
 
-    it('start first turn after 8s', async () => {
+    const getTimeInfos = (startTime: number, duration: number): Pick<TurnInfos, 'startTime' | 'duration' | 'endTime'> => ({
+        startTime,
+        duration,
+        endTime: startTime + duration,
+    });
 
-        const turnStartListener = jest.fn();
+    describe('engine start', () => {
+        it('start first turn after 8s', async () => {
 
-        const engine = createCycleEngine({
-            charactersDurations: {
-                'foo': 2000,
-                'bar': 1000
-            },
-            charactersDurationsList: [ 'foo', 'bar' ],
-            listeners: {
-                turnStart: turnStartListener
-            }
+            const turnStartListener = jest.fn();
+
+            const engine = createCycleEngine({
+                charactersDurations: {
+                    'foo': 2000,
+                    'bar': 1000
+                },
+                charactersList: [ 'foo', 'bar' ],
+                listeners: {
+                    turnStart: turnStartListener
+                }
+            });
+
+            const enginePromise = engine.start();
+
+            await timerTester.advance(expectedDelays.beforeStart, {
+                runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+            });
+
+            const startTime = timerTester.now();
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                currentTurn: {
+                    turnIndex: 0,
+                    characterIndex: 0,
+                    characterId: 'foo',
+                    ...getTimeInfos(startTime, 2000)
+                }
+            });
+
+            await timerTester.endTimer(enginePromise);
         });
 
-        const enginePromise = engine.start();
+        it('start with given startTime', async () => {
 
-        await timerTester.advance(expectedDelays.beforeStart, {
-            runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+            const turnStartListener = jest.fn();
+
+            const engine = createCycleEngine({
+                charactersDurations: {
+                    'foo': 2000,
+                    'bar': 1000
+                },
+                charactersList: [ 'foo', 'bar' ],
+                listeners: {
+                    turnStart: turnStartListener
+                }
+            });
+
+            const startTime = timerTester.now() + 12543;
+
+            const enginePromise = engine.start(startTime);
+
+            await timerTester.advance(12543, {
+                runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+            });
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                currentTurn: {
+                    turnIndex: 0,
+                    characterIndex: 0,
+                    characterId: 'foo',
+                    ...getTimeInfos(startTime, 2000)
+                }
+            });
+
+            await timerTester.endTimer(enginePromise);
         });
-
-        const startTime = timerTester.now();
-
-        expectListener('turnStart', turnStartListener).toHaveBeenCalledWith({
-            currentTurn: {
-                turnIndex: 0,
-                characterIndex: 0,
-                characterId: 'foo',
-                startTime: startTime,
-                duration: 2000,
-                endTime: startTime + 2000
-            }
-        });
-
-        await timerTester.endTimer(enginePromise);
     });
 
     const getStartedEngine = async () => {
@@ -63,7 +108,7 @@ describe('# Cycle engine', () => {
                 'bar': 1000,
                 'toto': 3000
             },
-            charactersDurationsList: [ 'foo', 'bar', 'toto' ],
+            charactersList: [ 'foo', 'bar', 'toto' ],
             listeners: {
                 turnStart: turnStartListener,
                 turnEnd: turnEndListener
@@ -78,47 +123,90 @@ describe('# Cycle engine', () => {
 
         const startTime = timerTester.now();
 
+        const endFirstTurn = () => timerTester.advance(2000);
+
         return {
             engine,
             enginePromise,
             startTime,
+            endFirstTurn,
             turnStartListener,
             turnEndListener
         };
     };
 
-    it('play next turn 4s after previous one', async () => {
+    describe('play next turn', () => {
+        it('play next turn 4s after previous one', async () => {
 
-        const {
-            engine,
-            enginePromise,
-            turnStartListener
-        } = await getStartedEngine();
+            const {
+                engine,
+                enginePromise,
+                endFirstTurn,
+                turnStartListener
+            } = await getStartedEngine();
 
-        turnStartListener.mockClear();
+            await endFirstTurn();
 
-        await timerTester.advance(2000);
+            turnStartListener.mockClear();
 
-        const nextTurnPromise = engine.startNextTurn();
+            const nextTurnPromise = engine.startNextTurn();
 
-        const nextTurnStartTime = timerTester.now() + expectedDelays.betweenTurns;
+            const nextTurnStartTime = timerTester.now() + expectedDelays.betweenTurns;
 
-        await timerTester.advance(expectedDelays.betweenTurns, {
-            runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+            await timerTester.advance(expectedDelays.betweenTurns, {
+                runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+            });
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                currentTurn: {
+                    turnIndex: 1,
+                    characterIndex: 1,
+                    characterId: 'bar',
+                    ...getTimeInfos(nextTurnStartTime, 1000)
+                }
+            });
+
+            await timerTester.endTimer(nextTurnPromise, enginePromise);
         });
 
-        expectListener('turnStart', turnStartListener).toHaveBeenCalledWith({
-            currentTurn: {
-                turnIndex: 1,
-                characterIndex: 1,
-                characterId: 'bar',
-                startTime: nextTurnStartTime,
-                duration: 1000,
-                endTime: nextTurnStartTime + 1000
-            }
-        });
+        it('play next turn with given props', async () => {
 
-        await timerTester.endTimer(nextTurnPromise, enginePromise);
+            const {
+                engine,
+                enginePromise,
+                endFirstTurn,
+                turnStartListener
+            } = await getStartedEngine();
+
+            await endFirstTurn();
+
+            turnStartListener.mockClear();
+
+            const startTime = timerTester.now() + 12345;
+
+            const nextTurnPromise = engine.startNextTurn({
+                startTime,
+                turnIndex: 6,
+                roundIndex: 1,
+                characterIndex: 2
+            });
+
+            await timerTester.advance(12345, {
+                runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+            });
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                currentTurn: {
+                    turnIndex: 6,
+                    characterIndex: 2,
+                    characterId: 'toto',
+                    ...getTimeInfos(startTime, 3000)
+                },
+                roundIndex: 1
+            });
+
+            await timerTester.endTimer(nextTurnPromise, enginePromise);
+        });
     });
 
     describe('turn duration', () => {
@@ -135,14 +223,12 @@ describe('# Cycle engine', () => {
                 runJustBeforeItEnds: () => expect(turnEndListener).not.toHaveBeenCalled()
             });
 
-            expectListener('turnEnd', turnEndListener).toHaveBeenCalledWith({
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
                 currentTurn: {
                     turnIndex: 0,
                     characterIndex: 0,
                     characterId: 'foo',
-                    startTime: startTime,
-                    duration: 2000,
-                    endTime: startTime + 2000,
+                    ...getTimeInfos(startTime, 2000),
                     endTimeDelta: 0
                 }
             });
@@ -150,7 +236,7 @@ describe('# Cycle engine', () => {
             await timerTester.endTimer(enginePromise);
         });
 
-        it('change current turn duration after character duration change', async () => {
+        it('change current turn duration after character duration changed', async () => {
 
             const {
                 engine,
@@ -169,14 +255,12 @@ describe('# Cycle engine', () => {
                 runJustBeforeItEnds: () => expect(turnEndListener).not.toHaveBeenCalled()
             });
 
-            expectListener('turnEnd', turnEndListener).toHaveBeenCalledWith({
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
                 currentTurn: {
                     turnIndex: 0,
                     characterIndex: 0,
                     characterId: 'foo',
-                    startTime: startTime,
-                    duration: 3000,
-                    endTime: startTime + 3000,
+                    ...getTimeInfos(startTime, 3000),
                     endTimeDelta: 0
                 }
             });
@@ -201,14 +285,12 @@ describe('# Cycle engine', () => {
 
             await timerTester.triggerPromises();
 
-            expectListener('turnEnd', turnEndListener).toHaveBeenCalledWith({
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
                 currentTurn: {
                     turnIndex: 0,
                     characterIndex: 0,
                     characterId: 'foo',
-                    startTime: startTime,
-                    duration: 1200,
-                    endTime: startTime + 1200,
+                    ...getTimeInfos(startTime, 1200),
                     endTimeDelta: 300
                 }
             });
@@ -223,14 +305,15 @@ describe('# Cycle engine', () => {
             const {
                 engine,
                 enginePromise,
+                endFirstTurn,
                 turnStartListener
             } = await getStartedEngine();
 
-            await timerTester.advance(2000);
+            await endFirstTurn();
 
             turnStartListener.mockClear();
 
-            engine.disableCharacter('bar');
+            engine.disableCharacters(['bar']);
 
             const nextTurnPromise = engine.startNextTurn();
             await timerTester.triggerPromises();
@@ -239,14 +322,12 @@ describe('# Cycle engine', () => {
 
             const startTime = timerTester.now();
 
-            expectListener('turnStart', turnStartListener).toHaveBeenCalledWith({
+            expectListener('turnStart', turnStartListener).calledWithPartial({
                 currentTurn: {
                     turnIndex: 1,
                     characterIndex: 2,
                     characterId: 'toto',
-                    startTime: startTime,
-                    duration: 3000,
-                    endTime: startTime + 3000
+                    ...getTimeInfos(startTime, 3000),
                 }
             });
 
@@ -264,20 +345,136 @@ describe('# Cycle engine', () => {
 
             await timerTester.advance(500);
 
-            engine.disableCharacter('foo');
+            engine.disableCharacters(['foo']);
 
             await timerTester.triggerPromises();
 
-            expectListener('turnEnd', turnEndListener).toHaveBeenCalledWith({
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
                 currentTurn: {
                     turnIndex: 0,
                     characterIndex: 0,
                     characterId: 'foo',
-                    startTime: startTime,
-                    duration: 2000,
-                    endTime: startTime + 2000,
+                    ...getTimeInfos(startTime, 2000),
                     endTimeDelta: -1500
                 }
+            });
+
+            await timerTester.endTimer(enginePromise);
+        });
+    });
+
+    describe('round management', () => {
+
+        it('start battle with round 0', async () => {
+            const {
+                enginePromise,
+                turnStartListener
+            } = await getStartedEngine();
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                roundIndex: 0
+            });
+
+            await timerTester.endTimer(enginePromise);
+        });
+
+        it('play next round after last character played', async () => {
+            const {
+                engine,
+                enginePromise,
+                endFirstTurn,
+                turnStartListener,
+                turnEndListener
+            } = await getStartedEngine();
+
+            await endFirstTurn();
+
+            await timerTester.waitTimer(engine.startNextTurn());
+
+            turnStartListener.mockClear();
+            turnEndListener.mockClear();
+
+            await timerTester.waitTimer(engine.startNextTurn());
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                roundIndex: 0,
+                lastRoundTurn: true
+            });
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
+                roundIndex: 0,
+                lastRoundTurn: true
+            });
+
+            turnStartListener.mockClear();
+            turnEndListener.mockClear();
+
+            await timerTester.waitTimer(engine.startNextTurn());
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                roundIndex: 1,
+                lastRoundTurn: false
+            });
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
+                roundIndex: 1,
+                lastRoundTurn: false
+            });
+
+            await timerTester.endTimer(enginePromise);
+        });
+
+        it('change next round turn order', async () => {
+            const {
+                engine,
+                enginePromise,
+                endFirstTurn,
+                turnStartListener
+            } = await getStartedEngine();
+
+            await endFirstTurn();
+
+            await timerTester.waitTimer(engine.startNextTurn());
+            await timerTester.waitTimer(engine.startNextTurn());
+
+            turnStartListener.mockClear();
+
+            engine.setTurnsOrder(['toto', 'bar', 'foo']);
+
+            await timerTester.waitTimer(engine.startNextTurn());
+
+            expectListener('turnStart', turnStartListener).calledWithPartial({
+                currentTurn: expect.objectContaining<Partial<TurnInfos>>({
+                    characterId: 'toto',
+                    characterIndex: 0,
+                    turnIndex: 3
+                }),
+                roundIndex: 1,
+                lastRoundTurn: false
+            });
+            
+            await timerTester.endTimer(enginePromise);
+        });
+    });
+
+    describe('engine stop', () => {
+        it('stops engine correctly', async () => {
+            const {
+                engine,
+                enginePromise,
+                turnEndListener
+            } = await getStartedEngine();
+
+            await timerTester.advance(400);
+
+            await engine.stop();
+
+            expectListener('turnEnd', turnEndListener).calledWithPartial({
+                currentTurn: expect.objectContaining<Partial<TurnInfos>>({
+                    characterId: 'foo',
+                    characterIndex: 0,
+                    turnIndex: 0
+                }),
+                roundIndex: 0,
+                lastRoundTurn: false
             });
 
             await timerTester.endTimer(enginePromise);

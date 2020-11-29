@@ -1,5 +1,5 @@
 
-type TurnInfos = {
+export type TurnInfos = {
     turnIndex: number;
     characterIndex: number;
     characterId: string;
@@ -8,12 +8,16 @@ type TurnInfos = {
     endTime: number;
 };
 
-export type TurnStartParams = {
+type ListenerCommonBody = {
     currentTurn: TurnInfos;
+    roundIndex: number;
+    lastRoundTurn: boolean;
 };
 
-export type TurnEndParams = {
-    currentTurn: TurnInfos & {
+export type TurnStartParams = ListenerCommonBody
+
+export type TurnEndParams = ListenerCommonBody & {
+    currentTurn: {
         endTimeDelta: number;
     };
 };
