@@ -6,8 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "start": "tsc -w",
-    "test": "jest --watch",
-    "test-ci": "jest --passWithNoTests",
+    "test": "echo \"not testable :)\"",
+    "test-ci": "yarn test",
     "lint": "eslint src/ --ext .ts --cache",
     "build": "rm -rf lib && tsc",
     "check-type": "tsc --noEmit"
