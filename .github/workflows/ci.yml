@@ -39,6 +39,12 @@ jobs:
     - name: Install dependencies
       run: yarn --frozen-lockfile
 
+    - name: Build devtools
+      run: yarn workspace @timeflies/devtools build
+
+    - name: Build common
+      run: yarn workspace @timeflies/common build
+
     - name: Build shared
       run: yarn workspace @timeflies/shared build
 
