@@ -1,4 +1,4 @@
-import { getDiffFromNow } from './utils';
+import { getTimeDiffFromNow } from './common';
 
 export type WaitCancelableState = {
     state: 'completed' | 'canceled';
@@ -22,7 +22,7 @@ export const waitCanceleable = (ms: number) => {
 
         const endTime = startTime + duration;
 
-        const delta = getDiffFromNow(endTime);
+        const delta = getTimeDiffFromNow(endTime);
 
         resolve({
             state,
@@ -40,7 +40,7 @@ export const waitCanceleable = (ms: number) => {
 
         clearTimeout(timeout);
         duration = newMs;
-        const diff = getDiffFromNow(startTime);
+        const diff = getTimeDiffFromNow(startTime);
         timeout = setTimeout(() => resolveWith('completed'), duration - diff);
     };
 

@@ -1,5 +1,5 @@
 {
-  "name": "@timeflies/cycle-engine",
+  "name": "@timeflies/common",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "main": "lib/index.js",
@@ -15,7 +15,6 @@
   "peerDependencies": {
   },
   "dependencies": {
-    "@timeflies/common": "1.0.0"
   },
   "devDependencies": {
     "@timeflies/devtools": "1.0.0",

@@ -1,13 +1,8 @@
+import { CharacterDuration, CharacterId, getTimeDiffFromNow, WaitCancelableState, waitCanceleable, waitMs } from '@timeflies/common';
 import { CycleEngineListeners } from './listeners';
-import { getDiffFromNow, waitMs } from './utils';
-import { WaitCancelableState, waitCanceleable } from './wait-cancelable';
-
-type Duration = number;
-
-type CharacterId = string;
 
 type CharacterDurationMap = {
-    [ id in CharacterId ]: Duration;
+    [ id in CharacterId ]: CharacterDuration;
 };
 
 const delays = {
@@ -79,7 +74,7 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
 
         const characterId = charactersList[ characterIndex ];
 
-        const diff = getDiffFromNow(startTime);
+        const diff = getTimeDiffFromNow(startTime);
 
         // if startTime is in future, wait for it
         await waitMs(-diff);
