@@ -1,6 +1,6 @@
 import { createCycleEngine } from './cycle-engine';
 import { CycleEngineListeners, TurnInfos } from './listeners';
-import { timerTester } from './timer-tester';
+import { timerTester } from '@timeflies/devtools';
 
 
 describe('# Cycle engine', () => {

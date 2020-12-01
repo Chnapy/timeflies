@@ -1,4 +1,3 @@
-// TODO put this file in @timeflies/common ?
 
 const nbrPromiseExpectedPerTest = 1000;
 
