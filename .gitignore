@@ -1,6 +1,7 @@
 # System and IDE files
 Thumbs.db
 .DS_Store
+.directory
 .idea
 *.suo
 *.sublime-project
