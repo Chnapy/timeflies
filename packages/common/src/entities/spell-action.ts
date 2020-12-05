@@ -1,6 +1,6 @@
-import { SpellId } from '@timeflies/common';
-
-type Checksum = string;
+import { Position } from '../geo';
+import { Checksum } from './checksum';
+import { SpellId } from './spell';
 
 export type SpellAction = {
     spellId: SpellId;

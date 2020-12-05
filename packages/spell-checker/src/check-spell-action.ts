@@ -1,10 +1,10 @@
+import { SerializableState } from '@timeflies/common';
 import { Checker, CheckerParams } from './checker';
 import { checkCharacter } from './checkers/check-character';
 import { checkChecksum } from './checkers/check-checksum';
 import { checkMap } from './checkers/check-map';
 import { checkPlayer } from './checkers/check-player';
 import { checkTime } from './checkers/check-time';
-import { SerializableState } from './serializable-state';
 
 const checkers: readonly Checker[] = [
     checkChecksum,
@@ -27,7 +27,7 @@ export type CheckSpellActionResult =
         success: false;
     };
 
-export const getCheckSpellAction = (computeNewStateFromSpellAction: ComputeNewStateFromSpellActionFn) =>
+export const getSpellActionChecker = (computeNewStateFromSpellAction: ComputeNewStateFromSpellActionFn) =>
     (params: CheckSpellParams): CheckSpellActionResult => {
 
         const newState = computeNewStateFromSpellAction(params);

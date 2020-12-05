@@ -1,6 +1,4 @@
-import { CharacterId, CharacterRole, PlayerId, SpellId, SpellRole } from '@timeflies/common';
-import { SerializableState } from './serializable-state';
-import { SpellAction } from './spell-action';
+import { CharacterId, CharacterRole, PlayerId, SerializableState, SpellAction, SpellId, SpellRole } from '@timeflies/common';
 
 type ClientContext = {
     playerId: PlayerId;
@@ -30,7 +28,7 @@ type StaticState = {
 };
 
 type MapContext = {
-    getRangeArea: (center: Position, range: number) => Position[];
+    // consider use tilemap-utils
 };
 
 type Context = {
