@@ -23,13 +23,13 @@ export const createCache = <K, V>(): Cache<K, V> => {
 
     const cache: Record<string, V | undefined> = {};
 
-    const set = (key, value) => {
+    const set = (key: K, value: V) => {
         const cacheKey = serialize(key);
 
         cache[ cacheKey ] = value;
     };
 
-    const getIfExist = (key) => {
+    const getIfExist = (key: K) => {
         const cacheKey = serialize(key);
 
         return cache[ cacheKey ];
