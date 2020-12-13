@@ -1,6 +1,8 @@
 
 export type SpellId = string;
 
+export type SpellCategory = 'offensive' | 'support' | 'placement';
+
 export type SpellRole =
     | 'move'
     | 'simpleAttack'    // testing
