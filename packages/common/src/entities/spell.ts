@@ -27,3 +27,5 @@ export type SpellVariables = {
     attack?: number;
     // more..
 };
+
+export type SpellVariableName = keyof SpellVariables;

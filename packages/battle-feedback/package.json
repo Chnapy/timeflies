@@ -1,5 +1,5 @@
 {
-  "name": "@timeflies/app-ui",
+  "name": "@timeflies/battle-feedback",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "main": "lib/index.js",
@@ -10,33 +10,30 @@
     "test-ci": "jest --passWithNoTests",
     "lint": "eslint src/ --ext .ts --cache",
     "build": "rm -rf lib && tsc",
-    "postbuild": "copyfiles -f \"src/**/*.css\" \"lib\"",
     "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -s ./.storybook/public -p 6006",
+    "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.50",
-    "@timeflies/common": "1.0.0",
+    "@timeflies/app-ui": "1.0.0",
     "react": "^17.0.1"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "@babel/core": "^7.12.7",
     "@storybook/addon-actions": "^6.1.2",
     "@storybook/addon-essentials": "^6.1.2",
     "@storybook/addon-links": "^6.1.2",
     "@storybook/react": "^6.1.2",
-    "@timeflies/common": "1.0.0",
     "@types/jest": "^25.2.1",
     "@types/react": "^16.9.53",
     "babel-loader": "^8.2.1",
-    "copyfiles": "^2.4.1",
     "eslint": "^7.4.0",
     "jest": "^25.5.2",
-    "react": "^17.0.1",
     "storybook": "^6.1.2",
     "typescript": "3.9.2"
   }

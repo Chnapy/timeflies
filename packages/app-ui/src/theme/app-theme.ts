@@ -42,10 +42,15 @@ export const appTheme: Theme = createMuiTheme({
         },
         variables: {
             life: '#EB6F6F',
-            time: primary,
+            actionTime: primary,
             rangeArea: '#8875FF',
             actionArea: '#D63551',
-            attack: '#FF8B66'
+            attack: '#FF8B66',
+            duration: primary,
+            // TODO
+            lineOfSight: '',
+            orientation: '',
+            position: ''
         },
         spellCategories: {
             offensive: '#EB5757',

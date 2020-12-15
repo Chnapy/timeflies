@@ -1,7 +1,6 @@
 import { Box, Card, CardContent } from '@material-ui/core';
 import { Meta } from '@storybook/react/types-6-0';
 import React from 'react';
-import { UIThemeProvider } from '../../theme/ui-theme-provider';
 import { UIText } from './ui-text';
 
 export default {

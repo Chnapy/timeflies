@@ -16,6 +16,8 @@ export type CharacterVariables = {
     orientation: Orientation;
 };
 
+export type CharacterVariableName = keyof CharacterVariables;
+
 export module CharacterUtils {
     export const isAlive = (life: number) => life > 0;
 }

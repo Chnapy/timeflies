@@ -15,7 +15,7 @@ export type UITextProps = Omit<TypographyProps, 'variant'> & {
 const useStyles = makeStyles(({ typography }) => ({
     numeric: {
         fontFamily: typography.fontFamilies.numeric,
-        fontWeight: 'bold'
+        fontWeight: 700
     }
 }));
 
