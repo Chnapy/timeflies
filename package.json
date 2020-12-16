@@ -21,7 +21,8 @@
   "devDependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.50"
+    "@material-ui/lab": "^4.0.0-alpha.50",
+    "copyfiles": "^2.4.1"
   },
   "engineStrict": true,
   "engines": {
