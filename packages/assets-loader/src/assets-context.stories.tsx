@@ -32,14 +32,14 @@ export const Default = () => {
     return (
         <AssetsLoader
             spritesheets={{
-                entities: '/spritesheets/spritesheet-entities.json'
+                entities: '/fake/spritesheets/spritesheet-entities.json'
             }}
             maps={maps}
         >
             <RenderUpdateTest />
             <br />
             <button onClick={() => setMaps({
-                dungeon: '/maps/map_dungeon.json'
+                dungeon: '/fake/maps/map_dungeon.json'
             })}>load map dungeon</button>
         </AssetsLoader>
     )

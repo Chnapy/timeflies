@@ -9,8 +9,9 @@ export type AssetsLoaderMap = {
 };
 
 export type LoaderResourceSpritesheet = {
-    spritesheet: Spritesheet;
     resource: LoaderResource;
+    spritesheet: Spritesheet;
+    spritesheetUrl: string;
 };
 
 export type TiledMapAssets = {

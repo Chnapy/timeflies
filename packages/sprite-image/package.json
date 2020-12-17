@@ -1,5 +1,5 @@
 {
-  "name": "@timeflies/tilemap-component",
+  "name": "@timeflies/sprite-image",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "main": "lib/index.js",
@@ -11,17 +11,17 @@
     "lint": "eslint src/ --ext .ts --cache",
     "build": "rm -rf lib && tsc",
     "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -s ./.storybook/public -p 6006",
+    "storybook": "start-storybook -p 6006 -s ../devtools/public,../static-assets/public",
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
-    "react": "^17.0.1",
-    "pixi.js": "^5.2.1",
-    "react-pixi-fiber": "^0.14.2"
+    "@timeflies/animated-complex-sprite": "1.0.0",
+    "@timeflies/assets-loader": "1.0.0",
+    "@timeflies/common": "1.0.0",
+    "@timeflies/static-assets": "1.0.0",
+    "react": "^17.0.1"
   },
   "dependencies": {
-    "@timeflies/cache": "1.0.0",
-    "@timeflies/tilemap-utils": "1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
@@ -34,7 +34,6 @@
     "babel-loader": "^8.2.1",
     "eslint": "^7.4.0",
     "jest": "^25.5.2",
-    "pixi.js": "^5.2.1",
     "storybook": "^6.1.2",
     "typescript": "3.9.2"
   }

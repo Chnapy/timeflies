@@ -8,23 +8,27 @@ const loader = createLoader();
 
 const resourcesToAssetsMap = (loaderMap: AssetsLoaderMap): AssetsMap => {
     return {
-        spritesheets: ObjectTyped.entries(loaderMap.spritesheets).reduce<AssetsMap[ 'spritesheets' ]>((acc, [ name, url ]) => {
+        spritesheets: ObjectTyped.entries(loaderMap.spritesheets).reduce<AssetsMap[ 'spritesheets' ]>((acc, [ name ]) => {
             const resourceName = createResourceName('spritesheets', name);
 
             const resource = loader.resources[ resourceName ];
             if (resource) {
+                const imageResource = loader.resources[ resourceName + '_image' ];
+
+                const spritesheetUrl = imageResource.url;
 
                 const spritesheet = resource.spritesheet!;
 
                 acc[ name ] = {
                     resource,
-                    spritesheet
+                    spritesheet,
+                    spritesheetUrl
                 };
             }
 
             return acc;
         }, {}),
-        maps: ObjectTyped.entries(loaderMap.maps).reduce<AssetsMap[ 'maps' ]>((acc, [ mapName, url ]) => {
+        maps: ObjectTyped.entries(loaderMap.maps).reduce<AssetsMap[ 'maps' ]>((acc, [ mapName ]) => {
             const resourceName = createResourceName('maps', mapName);
 
             const resource = loader.resources[ resourceName ];
@@ -58,8 +62,6 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
     const [ assetsMap, setAssetsMap ] = React.useState<AssetsMap>(generateAssetsMap);
 
     React.useEffect(() => {
-        console.log('resources', loader.resources);
-
         const getResourcesInfos = (category: keyof AssetsLoaderMap, map: {}) => ObjectTyped.entries(map)
             .map(([ name, url ]): [ string, string | undefined ] => ([ createResourceName(category, name), url ]));
 
@@ -70,15 +72,11 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
             .filter(([ resourceName ]) => !loader.resources[ resourceName ]);
 
         if (resourcesToLoad.length) {
-            console.log('reasources-to-load', resourcesToLoad)
-
             resourcesToLoad.forEach(([ resourceName, url ]) => {
                 loader.add({ name: resourceName, url });
             });
 
             loader.load(() => {
-                console.log('loadede', loader.resources);
-                console.log('assetsMap', generateAssetsMap());
                 setAssetsMap(
                     generateAssetsMap()
                 );

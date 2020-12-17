@@ -1,5 +1,5 @@
 {
-  "name": "@timeflies/animated-complex-sprite",
+  "name": "@timeflies/static-assets",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "main": "lib/index.js",
@@ -10,26 +10,18 @@
     "test-ci": "jest --passWithNoTests",
     "lint": "eslint src/ --ext .ts --cache",
     "build": "rm -rf lib && tsc",
-    "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -s ./.storybook/public -p 6006",
-    "build-storybook": "build-storybook"
+    "check-type": "tsc --noEmit"
   },
   "peerDependencies": {
-    "pixi.js": "^5.2.1",
-    "react-pixi-fiber": "^0.14.2"
+    "@timeflies/common": "1.0.0"
   },
   "dependencies": {
-    "@timeflies/cache": "1.0.0"
   },
   "devDependencies": {
+    "@timeflies/devtools": "1.0.0",
     "@types/jest": "^25.2.1",
-    "@storybook/addon-actions": "^6.1.2",
-    "@storybook/addon-essentials": "^6.1.2",
-    "@storybook/addon-links": "^6.1.2",
-    "@storybook/react": "^6.1.2",
     "eslint": "^7.4.0",
     "jest": "^25.5.2",
-    "storybook": "^6.1.2",
     "typescript": "3.9.2"
   }
 }
