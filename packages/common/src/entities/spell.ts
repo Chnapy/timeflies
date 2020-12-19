@@ -1,12 +1,15 @@
+import { inferFn, ObjectTyped } from '../utils';
 
 export type SpellId = string;
 
 export type SpellCategory = 'offensive' | 'support' | 'placement';
 
-export const spellRoleList = [
-    'move',
-    'simpleAttack',     // testing only
-    'switch',
+const spellRoleMap = inferFn<{
+    [role in string]: SpellCategory;
+}>()({
+    'move': 'placement',
+    'simpleAttack': 'offensive',    // testing only
+    'switch': 'placement',
 // | 'incitement'
 // | 'treacherousBlow'
 // | 'pressure'
@@ -16,7 +19,10 @@ export const spellRoleList = [
 // | 'slump'
 // | 'lastResort'
 // | 'motivation'
-] as const;
+});
+
+export const spellRoleList = ObjectTyped.keys(spellRoleMap);
+
 export type SpellRole = typeof spellRoleList[ number ];
 
 export type SpellVariables = {
@@ -30,3 +36,5 @@ export type SpellVariables = {
 };
 
 export type SpellVariableName = keyof SpellVariables;
+
+export const getSpellCategory = (spellRole: SpellRole): SpellCategory => spellRoleMap[spellRole];

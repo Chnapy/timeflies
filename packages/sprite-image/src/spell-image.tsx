@@ -3,7 +3,7 @@ import React from 'react';
 import { SpriteImage, SpriteImageProps } from './sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 
-type SpellImageProps = Omit<SpriteImageProps, 'textureKey'> & {
+export type SpellImageProps = Omit<SpriteImageProps, 'textureKey'> & {
     spellRole: SpellRole
 };
 

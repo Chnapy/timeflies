@@ -8,6 +8,8 @@ type FeedbackContainerProps = {
     bottom?: React.ReactNode;
 };
 
+export const feedbackItemHeight = 20;
+
 const useStyles = makeStyles(({ palette }) => ({
     root: {
         display: 'flex',
@@ -20,7 +22,7 @@ const useStyles = makeStyles(({ palette }) => ({
         justifyContent: 'space-between',
         alignItems: 'stretch',
         flexWrap: 'nowrap',
-        height: 20
+        height: feedbackItemHeight
     },
     bottomContent: {
         display: 'flex',

@@ -11,7 +11,7 @@
     "lint": "eslint src/ --ext .ts --cache",
     "build": "rm -rf lib && tsc",
     "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -p 6006 -s ../devtools/public,../static-assets/public",
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {

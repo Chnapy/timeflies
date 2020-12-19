@@ -1,6 +1,8 @@
 import { Box, Card } from '@material-ui/core';
 import { Meta } from '@storybook/react/types-6-0';
+import { AssetsLoader } from '@timeflies/assets-loader';
 import { createPosition } from '@timeflies/common';
+import { Assets } from '@timeflies/static-assets';
 import React from 'react';
 import { BattleFeedback } from './battle-feedback';
 import { BattleFeedbackContextProvider } from './battle-feedback-context';
@@ -15,70 +17,48 @@ export default {
     title: 'Feedback',
 } as Meta;
 
+const AssetsWrapper: React.FC = ({ children }) => (
+    <AssetsLoader
+        spritesheets={Assets.spritesheets}
+        maps={{}}
+    >
+        {children}
+    </AssetsLoader>
+);
+
 export const Default: React.FC = () => {
     const now = Date.now();
 
     return (
-        <Box display='flex' justifyContent='space-around' p={2}>
-            <BattleFeedback
-                futureEffects={[
-                    {
-                        spellCategory: 'offensive',
-                        variables: {
-                            life: -12,
-                            actionTime: -2100
-                        },
-                        spellInfos: {
-                            spellRole: 'simpleAttack',
-                            startTime: now,
-                            duration: 3123
-                        }
-                    },
-                    {
-                        spellCategory: 'offensive',
-                        variables: {
-                            life: -12,
-                            actionTime: -2100
-                        },
-                        spellInfos: {
-                            spellRole: 'simpleAttack',
-                            startTime: now,
-                            duration: 3123
-                        }
-                    }
-                ]}
-                currentEffects={{
-                    spellCategory: 'offensive',
-                    variables: {
-                        life: -12,
-                        actionTime: -2100
-                    },
-                    spellInfos: {
-                        spellRole: 'simpleAttack',
-                        startTime: now,
-                        duration: 3123
-                    }
-                }}
-                turnInfos={{
-                    startTime: now,
-                    duration: 12087
-                }}
-            />
-
-            <BattleFeedbackContextProvider value={{ previewEnabled: true }}>
+        <AssetsWrapper>
+            <Box display='flex' justifyContent='space-around' p={2}>
                 <BattleFeedback
-                    previewEffects={{
-                        spellCategory: 'offensive',
-                        variables: {
-                            life: -12,
-                            actionTime: -2100
+                    futureEffects={[
+                        {
+                            spellCategory: 'offensive',
+                            variables: {
+                                life: -12,
+                                actionTime: -2100
+                            },
+                            spellInfos: {
+                                spellRole: 'simpleAttack',
+                                startTime: now,
+                                duration: 3123
+                            }
                         },
-                        spellInfos: {
-                            spellRole: 'simpleAttack',
-                            startTime: now,
-                            duration: 3123
+                        {
+                            spellCategory: 'offensive',
+                            variables: {
+                                life: -12,
+                                actionTime: -2100
+                            },
+                            spellInfos: {
+                                spellRole: 'switch',
+                                startTime: now,
+                                duration: 3123
+                            }
                         }
-                    }}
+                    ]}
                     currentEffects={{
                         spellCategory: 'offensive',
                         variables: {
@@ -86,7 +66,7 @@ export const Default: React.FC = () => {
                             actionTime: -2100
                         },
                         spellInfos: {
-                            spellRole: 'simpleAttack',
+                            spellRole: 'switch',
                             startTime: now,
                             duration: 3123
                         }
@@ -97,36 +77,69 @@ export const Default: React.FC = () => {
                     }}
                 />
 
-                <BattleFeedback
-                    previewEffects={{
-                        spellCategory: 'offensive',
-                        variables: {
-                            life: -12,
-                        }
-                    }}
-                    futureEffects={[
-                        {
+                <BattleFeedbackContextProvider value={{ previewEnabled: true }}>
+                    <BattleFeedback
+                        previewEffects={{
+                            spellCategory: 'offensive',
+                            variables: {
+                                life: -12,
+                                actionTime: -2100
+                            },
+                            spellInfos: {
+                                spellRole: 'simpleAttack',
+                                startTime: now,
+                                duration: 3123
+                            }
+                        }}
+                        currentEffects={{
+                            spellCategory: 'offensive',
+                            variables: {
+                                life: -12,
+                                actionTime: -2100
+                            },
+                            spellInfos: {
+                                spellRole: 'switch',
+                                startTime: now,
+                                duration: 3123
+                            }
+                        }}
+                        turnInfos={{
+                            startTime: now,
+                            duration: 12087
+                        }}
+                    />
+
+                    <BattleFeedback
+                        previewEffects={{
                             spellCategory: 'offensive',
                             variables: {
                                 life: -12,
                             }
-                        },
-                        {
+                        }}
+                        futureEffects={[
+                            {
+                                spellCategory: 'offensive',
+                                variables: {
+                                    life: -12,
+                                }
+                            },
+                            {
+                                spellCategory: 'offensive',
+                                variables: {
+                                    life: -12,
+                                }
+                            }
+                        ]}
+                        currentEffects={{
                             spellCategory: 'offensive',
                             variables: {
                                 life: -12,
-                            }
-                        }
-                    ]}
-                    currentEffects={{
-                        spellCategory: 'offensive',
-                        variables: {
-                            life: -12,
-                        },
-                    }}
-                />
-            </BattleFeedbackContextProvider>
-        </Box>
+                            },
+                        }}
+                    />
+                </BattleFeedbackContextProvider>
+            </Box>
+        </AssetsWrapper>
     );
 };
 
@@ -202,22 +215,22 @@ export const Spell: React.FC = () => {
     const before = now - 1230;
 
     return (
-        <Card>
-            <Box p={2}>
-                <FeedbackSpell
-                    spellCategory='placement'
-                    spellRole='move'
-                    startTime={now}
-                    duration={1200}
-                />
-                <FeedbackSpell
-                    spellCategory='offensive'
-                    spellRole='move'
-                    startTime={before}
-                    duration={6200}
-                />
-            </Box>
-        </Card>
+        <AssetsWrapper>
+            <Card>
+                <Box p={2}>
+                    <FeedbackSpell
+                        spellRole='move'
+                        startTime={now}
+                        duration={1200}
+                    />
+                    <FeedbackSpell
+                        spellRole='move'
+                        startTime={before}
+                        duration={6200}
+                    />
+                </Box>
+            </Card>
+        </AssetsWrapper>
     );
 };
 

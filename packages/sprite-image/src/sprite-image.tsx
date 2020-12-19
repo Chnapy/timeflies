@@ -8,7 +8,6 @@ export type SpriteImageProps = {
     textureKey: string;
     size: number;
     fallback?: React.ReactNode;
-    children?: never;
 };
 
 type StyleProps = {

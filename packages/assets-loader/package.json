@@ -15,11 +15,10 @@
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
+    "@timeflies/static-assets": "1.0.0",
     "pixi.js": "^5.2.1",
     "react": "^17.0.1",
     "tiled-types": "^1.1.0"
-  },
-  "dependencies": {
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",

@@ -41,8 +41,9 @@ export const BattleFeedback: React.FC<BattleFeedbackProps> = ({
     };
 
     const renderFutureEffects = () => {
-        return (futureEffects ?? []).map(props => (
+        return (futureEffects ?? []).map((props, i) => (
             <FeedbackEffectsStack
+                key={i}
                 {...props}
                 condensed
                 opacity='low'

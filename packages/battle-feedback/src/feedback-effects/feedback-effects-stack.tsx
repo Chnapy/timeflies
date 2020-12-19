@@ -69,10 +69,7 @@ export const FeedbackEffectsStack: React.FC<FeedbackEffectsStackProps> = ({
             : renderRegularEffects()}
 
         {spellInfos && (
-            <FeedbackSpell
-                spellCategory={spellCategory}
-                {...spellInfos}
-            />
+            <FeedbackSpell {...spellInfos}/>
         )}
     </div>;
 };

@@ -1,25 +1,27 @@
 import { Box } from '@material-ui/core';
-import { VariableValue } from '@timeflies/app-ui';
-import { SpellCategory, SpellRole } from '@timeflies/common';
+import { SpellIcon, VariableValue } from '@timeflies/app-ui';
+import { SpellRole } from '@timeflies/common';
 import React from 'react';
-import { FeedbackContainer } from './feedback-container';
+import { FeedbackContainer, feedbackItemHeight } from './feedback-container';
 
 export type FeedbackSpellProps = {
-    spellCategory: SpellCategory;
     spellRole: SpellRole;
     startTime: number;
     duration: number;
 };
 
-export const FeedbackSpell: React.FC<FeedbackSpellProps> = ({ }) => {
-
-    // TODO create package for image rendering (from spritesheet)
-    const getSpellRoleIcon = () => null;
+export const FeedbackSpell: React.FC<FeedbackSpellProps> = ({ spellRole }) => {
 
     // TODO create package for time components
 
     return <FeedbackContainer
-        left={getSpellRoleIcon()}
+        left={
+            <SpellIcon
+                spellRole={spellRole}
+                size={feedbackItemHeight}
+                padding={2}
+            />
+        }
         right={
             <Box mr={0.5}>
                 <VariableValue variableName='duration' value={2300} />

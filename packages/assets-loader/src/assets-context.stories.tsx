@@ -17,6 +17,9 @@ const RenderUpdateTest = () => {
         countRef.current!.innerHTML = (count + 1) + '';
     });
 
+    console.log('spritesheet entities', entitiesSpritesheet);
+    console.log('map dungeon', dungeonMap);
+
     return (
         <span>
             renders: <span ref={countRef}>0</span>
