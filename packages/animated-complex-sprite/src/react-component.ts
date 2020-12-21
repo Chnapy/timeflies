@@ -19,13 +19,6 @@ type AnimatedComplexSpriteSecondaryProps<S> = Pick<AnimatedComplexSprite<S>, 'on
 export type AnimatedComplexSpriteProps<S = any> = AnimatedComplexSpritePrimaryProps<S>
     & AnimatedComplexSpriteSecondaryProps<S>;
 
-const denyUpdateProps = <P, K extends keyof P>(oldProps: P, newProps: P, ...keys: K[]) => {
-    const unexpectedPropsChanges = keys.filter(key => oldProps[ key ] !== newProps[ key ]);
-    if (unexpectedPropsChanges.length) {
-        throw new Error(`Unexpected props change. These props should NOT change: ${unexpectedPropsChanges.join(', ')}`);
-    }
-};
-
 const getAnimatedComplexSpriteFromProps = ({
     spritesheet, getFramesInfos, state, ticker, cache
 }: AnimatedComplexSpriteProps) => new AnimatedComplexSprite(spritesheet, getFramesInfos, state, ticker, cache);
@@ -35,9 +28,6 @@ const applyAnimatedComplexSpriteProps = (
     oldProps: AnimatedComplexSpriteProps | undefined,
     newProps: AnimatedComplexSpriteProps
 ) => {
-    if (oldProps) {
-        denyUpdateProps(oldProps, newProps, 'spritesheet', 'getFramesInfos', 'ticker', 'cache');
-    }
     const { state, onLoop, onFrameChange, run, keepTimeState } = newProps;
 
     sprite.setState(state, {

@@ -17,7 +17,7 @@
   "peerDependencies": {
     "react": "^17.0.1",
     "pixi.js": "^5.2.1",
-    "react-pixi-fiber": "^1.0.0-beta.4"
+    "react-pixi-fiber": "^0.14.2"
   },
   "dependencies": {
     "@timeflies/cache": "1.0.0",
@@ -35,7 +35,6 @@
     "eslint": "^7.4.0",
     "jest": "^25.5.2",
     "pixi.js": "^5.2.1",
-    "react-pixi-fiber": "^1.0.0-beta.4",
     "storybook": "^6.1.2",
     "typescript": "3.9.2"
   }
