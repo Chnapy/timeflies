@@ -16,14 +16,21 @@ declare module '@material-ui/core/styles/createPalette' {
 
   export type PaletteSpellCategories = Record<SpellCategory, string>;
 
+  export type PaletteTimeItems = {
+    tick: string;
+    tock: string;
+  };
+
   interface Palette {
     variables: PaletteVariables;
     spellCategories: PaletteSpellCategories;
+    timeItems: PaletteTimeItems;
   }
 
   interface PaletteOptions {
     variables: PaletteVariables;
     spellCategories: PaletteSpellCategories;
+    timeItems: PaletteTimeItems;
   }
 }
 

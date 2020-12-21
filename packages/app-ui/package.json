@@ -12,7 +12,7 @@
     "build": "rm -rf lib && tsc",
     "postbuild": "copyfiles -f \"src/**/*.css\" \"lib\"",
     "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -s ./.storybook/public -p 6006",
+    "storybook": "start-storybook -s ../devtools/public,../static-assets/public -p 6006",
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {

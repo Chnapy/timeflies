@@ -1,13 +1,14 @@
 import { Box, withStyles } from '@material-ui/core';
+import { TimeFullProps, TimePartialProps } from '@timeflies/app-ui';
 import React from 'react';
 import { useBattleFeedbackContext } from './battle-feedback-context';
 import { FeedbackEffectsInfos, FeedbackEffectsStack } from './feedback-effects/feedback-effects-stack';
 import { FeedbackTurn, FeedbackTurnProps } from './feedback-turn';
 
 type BattleFeedbackProps = {
-    previewEffects?: FeedbackEffectsInfos;
-    futureEffects?: FeedbackEffectsInfos[];
-    currentEffects?: FeedbackEffectsInfos;
+    previewEffects?: FeedbackEffectsInfos<TimePartialProps>;
+    futureEffects?: FeedbackEffectsInfos<TimePartialProps>[];
+    currentEffects?: FeedbackEffectsInfos<TimeFullProps>;
     turnInfos?: FeedbackTurnProps;
 };
 

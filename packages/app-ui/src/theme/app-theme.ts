@@ -56,6 +56,10 @@ export const appTheme: Theme = createMuiTheme({
             offensive: '#EB5757',
             support: '#80CAFF',
             placement: '#6FCF97'
+        },
+        timeItems: {
+            tick: primary,
+            tock: '#FF8C22'
         }
     },
     shape: {

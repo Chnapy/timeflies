@@ -27,7 +27,7 @@ const AssetsWrapper: React.FC = ({ children }) => (
 );
 
 export const Default: React.FC = () => {
-    const now = Date.now();
+    const now = Date.now() + 9000;
 
     return (
         <AssetsWrapper>
@@ -35,38 +35,33 @@ export const Default: React.FC = () => {
                 <BattleFeedback
                     futureEffects={[
                         {
-                            spellCategory: 'offensive',
+                            spellRole: 'simpleAttack',
                             variables: {
                                 life: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
-                                spellRole: 'simpleAttack',
-                                startTime: now,
                                 duration: 3123
                             }
                         },
                         {
-                            spellCategory: 'offensive',
+                            spellRole: 'switch',
                             variables: {
                                 life: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
-                                spellRole: 'switch',
-                                startTime: now,
                                 duration: 3123
                             }
                         }
                     ]}
                     currentEffects={{
-                        spellCategory: 'offensive',
+                        spellRole: 'switch',
                         variables: {
                             life: -12,
                             actionTime: -2100
                         },
                         spellInfos: {
-                            spellRole: 'switch',
                             startTime: now,
                             duration: 3123
                         }
@@ -80,25 +75,22 @@ export const Default: React.FC = () => {
                 <BattleFeedbackContextProvider value={{ previewEnabled: true }}>
                     <BattleFeedback
                         previewEffects={{
-                            spellCategory: 'offensive',
+                            spellRole: 'simpleAttack',
                             variables: {
                                 life: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
-                                spellRole: 'simpleAttack',
-                                startTime: now,
                                 duration: 3123
                             }
                         }}
                         currentEffects={{
-                            spellCategory: 'offensive',
+                            spellRole: 'switch',
                             variables: {
                                 life: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
-                                spellRole: 'switch',
                                 startTime: now,
                                 duration: 3123
                             }
@@ -111,27 +103,27 @@ export const Default: React.FC = () => {
 
                     <BattleFeedback
                         previewEffects={{
-                            spellCategory: 'offensive',
+                            spellRole: 'simpleAttack',
                             variables: {
                                 life: -12,
                             }
                         }}
                         futureEffects={[
                             {
-                                spellCategory: 'offensive',
+                                spellRole: 'simpleAttack',
                                 variables: {
                                     life: -12,
                                 }
                             },
                             {
-                                spellCategory: 'offensive',
+                                spellRole: 'simpleAttack',
                                 variables: {
                                     life: -12,
                                 }
                             }
                         ]}
                         currentEffects={{
-                            spellCategory: 'offensive',
+                            spellRole: 'simpleAttack',
                             variables: {
                                 life: -12,
                             },
@@ -262,28 +254,26 @@ export const Stack: React.FC = () => {
         <Card>
             <Box display='flex' p={2} justifyContent='space-around'>
                 <FeedbackEffectsStack
-                    spellCategory='offensive'
+                    spellRole='move'
                     variables={{
                         life: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
                     spellInfos={{
-                        spellRole: 'move',
                         startTime: now,
                         duration: 2435
                     }}
                 />
 
                 <FeedbackEffectsStack
-                    spellCategory='offensive'
+                    spellRole='move'
                     variables={{
                         life: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
                     spellInfos={{
-                        spellRole: 'move',
                         startTime: now,
                         duration: 2435
                     }}
@@ -291,14 +281,13 @@ export const Stack: React.FC = () => {
                 />
 
                 <FeedbackEffectsStack
-                    spellCategory='offensive'
+                    spellRole='move'
                     variables={{
                         life: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
                     spellInfos={{
-                        spellRole: 'move',
                         startTime: now,
                         duration: 2435
                     }}
@@ -307,14 +296,13 @@ export const Stack: React.FC = () => {
                 />
 
                 <FeedbackEffectsStack
-                    spellCategory='offensive'
+                    spellRole='move'
                     variables={{
                         life: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
                     spellInfos={{
-                        spellRole: 'move',
                         startTime: now,
                         duration: 2435
                     }}

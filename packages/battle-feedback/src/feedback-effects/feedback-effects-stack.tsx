@@ -1,17 +1,16 @@
 import { makeStyles } from '@material-ui/core';
-import { EntitiesVariables, EntitiesVariablesName, SpellCategory } from '@timeflies/common';
+import { TimeProps } from '@timeflies/app-ui';
+import { EntitiesVariables, EntitiesVariablesName, getSpellCategory, SpellRole } from '@timeflies/common';
+import clsx from 'clsx';
 import React from 'react';
+import { FeedbackSpell } from '../feedback-spell';
 import { FeedbackEffect } from './feedback-effect';
 import { FeedbackEffectCondensed } from './feedback-effect-condensed';
-import { FeedbackSpell, FeedbackSpellProps } from '../feedback-spell';
-import clsx from 'clsx';
 
-export type FeedbackSpellInfos = Omit<FeedbackSpellProps, 'spellCategory'>;
-
-export type FeedbackEffectsInfos = {
-    spellCategory: SpellCategory;
+export type FeedbackEffectsInfos<T extends TimeProps = TimeProps> = {
+    spellRole: SpellRole;
     variables?: Partial<EntitiesVariables>;
-    spellInfos?: FeedbackSpellInfos;
+    spellInfos?: T;
 };
 
 type FeedbackEffectsStackProps = FeedbackEffectsInfos & {
@@ -40,9 +39,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const FeedbackEffectsStack: React.FC<FeedbackEffectsStackProps> = ({
-    spellCategory, variables = {}, spellInfos, condensed, opacity
+    spellRole, variables = {}, spellInfos, condensed, opacity
 }) => {
     const classes = useStyles({ opacity });
+
+    const spellCategory = getSpellCategory(spellRole);
 
     const renderRegularEffects = () => Object.entries(variables)
         .map(([ name, value ]) => (
@@ -69,7 +70,7 @@ export const FeedbackEffectsStack: React.FC<FeedbackEffectsStackProps> = ({
             : renderRegularEffects()}
 
         {spellInfos && (
-            <FeedbackSpell {...spellInfos}/>
+            <FeedbackSpell spellRole={spellRole} {...spellInfos}/>
         )}
     </div>;
 };

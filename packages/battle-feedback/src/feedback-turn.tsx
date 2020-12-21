@@ -1,23 +1,26 @@
-import { FeedbackContainer } from './feedback-container';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import React from 'react';
 import { Box } from '@material-ui/core';
-import { VariableValue } from '@timeflies/app-ui';
+import { TimeCounter, TimeFullProps, TimeGauge, TurnIcon } from '@timeflies/app-ui';
+import React from 'react';
+import { FeedbackContainer } from './feedback-container';
 
-export type FeedbackTurnProps = {
-    startTime: number;
-    duration: number;
-};
+export type FeedbackTurnProps = TimeFullProps;
 
-export const FeedbackTurn: React.FC<FeedbackTurnProps> = ({ }) => {
+export const FeedbackTurn: React.FC<FeedbackTurnProps> = props => {
 
     return <FeedbackContainer
-        left={<PlayArrowIcon />}
+        left={
+            <Box display='flex' p={0.5}>
+                <TurnIcon {...props} />
+            </Box>}
         right={
             <Box mr={0.5}>
-                <VariableValue variableName='duration' value={2300} />
+                <TimeCounter {...props} />
             </Box>
         }
-        bottom={' '}
+        bottom={
+            <Box width='100%' p={0.25}>
+            <TimeGauge {...props} />
+            </Box>
+        }
     />;
 };

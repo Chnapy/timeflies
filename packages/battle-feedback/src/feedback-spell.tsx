@@ -1,18 +1,15 @@
 import { Box } from '@material-ui/core';
-import { SpellIcon, VariableValue } from '@timeflies/app-ui';
+import { SpellIcon, TimeGauge, TimeCounter } from '@timeflies/app-ui';
+import { TimeProps } from '@timeflies/app-ui';
 import { SpellRole } from '@timeflies/common';
 import React from 'react';
 import { FeedbackContainer, feedbackItemHeight } from './feedback-container';
 
-export type FeedbackSpellProps = {
+export type FeedbackSpellProps<T extends TimeProps = TimeProps> = T & {
     spellRole: SpellRole;
-    startTime: number;
-    duration: number;
 };
 
-export const FeedbackSpell: React.FC<FeedbackSpellProps> = ({ spellRole }) => {
-
-    // TODO create package for time components
+export const FeedbackSpell: React.FC<FeedbackSpellProps> = ({ spellRole, ...timeProps }) => {
 
     return <FeedbackContainer
         left={
@@ -24,9 +21,13 @@ export const FeedbackSpell: React.FC<FeedbackSpellProps> = ({ spellRole }) => {
         }
         right={
             <Box mr={0.5}>
-                <VariableValue variableName='duration' value={2300} />
+                <TimeCounter {...timeProps} />
             </Box>
         }
-        bottom={' '}
+        bottom={
+            <Box width='100%' p={0.25}>
+                <TimeGauge {...timeProps} />
+            </Box>
+        }
     />;
 };
