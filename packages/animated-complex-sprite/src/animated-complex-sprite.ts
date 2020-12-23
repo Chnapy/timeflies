@@ -1,3 +1,4 @@
+import { OutlineFilter } from '@pixi/filter-outline';
 import { Cache, createCache } from '@timeflies/cache';
 import { Sprite, Spritesheet, Texture, Ticker } from 'pixi.js';
 import { createTickerManager, TickerManager } from './ticker-manager';
@@ -30,6 +31,11 @@ export type TexturesInfos = {
     timedTextures: TimedTexture[];
     tickerInterval: number;
     previousFrame: number;
+};
+
+export type OutlineInfos = {
+    thickness: number;
+    color: number;
 };
 
 const objectDeepEqual = (objA: any, objB: any): boolean => {
@@ -69,6 +75,8 @@ export class AnimatedComplexSprite extends Sprite {
 
     private readonly cache: Cache<FramesInfos, TexturesInfos>;
 
+    private readonly outlineFilter: OutlineFilter;
+
     constructor(
         spritesheet: Spritesheet,
         framesInfos: FramesInfos,
@@ -89,6 +97,10 @@ export class AnimatedComplexSprite extends Sprite {
         );
 
         this.cache = cache;
+
+        this.outlineFilter = new OutlineFilter(undefined, undefined, 1);
+        this.outlineFilter.enabled = false;
+        this.filters = [ this.outlineFilter ];
 
         const { timedTextures, tickerInterval, previousFrame } = this.getTexturesInfos();
         this.timedTextures = timedTextures;
@@ -220,6 +232,16 @@ export class AnimatedComplexSprite extends Sprite {
         this.tickerManager.resetDeltaMsSum();
 
         this.updateTexture(true);
+    }
+
+    setOutline(outlineInfos?: OutlineInfos) {
+        const { thickness = 0, color = 0x000000 } = outlineInfos ?? {};
+
+        this.outlineFilter.thickness = thickness;
+        this.outlineFilter.color = color;
+        this.outlineFilter.padding = thickness;
+
+        this.outlineFilter.enabled = thickness > 0;
     }
 
     play() {

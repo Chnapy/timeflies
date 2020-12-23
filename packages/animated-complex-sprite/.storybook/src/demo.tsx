@@ -1,14 +1,12 @@
 import React from 'react';
 import { Container, createStageClass } from 'react-pixi-fiber';
-import { InnerCanvas, SpriteConfig } from './inner-canvas';
+import { OutlineInfos } from '../../src';
+import { CanvasProps, InnerCanvas, SpriteConfig } from './inner-canvas';
 
 const Stage = createStageClass();
 
 export const Demo = () => {
-    const [ state, setState ] = React.useState<{
-        state: SpriteConfig;
-        run: boolean;
-    }>({
+    const [ state, setState ] = React.useState<Omit<CanvasProps, 'pos'>>({
         run: true,
         state: {
             role: 'tacka',
@@ -18,7 +16,7 @@ export const Demo = () => {
     });
     const [ pos, setPos ] = React.useState({ x: 4 * 16, y: 3 * 16 });
 
-    const createButton = (name: string, partial: Partial<SpriteConfig>, run: boolean = state.run) => (
+    const createButton = (name: string, partial: Partial<SpriteConfig>, run: boolean = state.run, outline: OutlineInfos = state.outline) => (
         <button
             onClick={() => {
                 console.time('state ' + name)
@@ -28,7 +26,8 @@ export const Demo = () => {
                     state: {
                         ...state.state,
                         ...partial
-                    }
+                    },
+                    outline
                 });
                 console.timeEnd('state ' + name)
             }}
@@ -51,6 +50,8 @@ export const Demo = () => {
                 {createButton('right', { orientation: 'right' })}
                 {createButton('top', { orientation: 'top' })}
                 {createButton('bottom', { orientation: 'bottom' })}
+                {createButton('add outline', {  }, undefined, { thickness: 2, color: 0xFFFFFF })}
+                {createButton('remove outline', {  }, undefined, { thickness: 0, color: 0x000000 })}
 
                 <button
                     onClick={() => {

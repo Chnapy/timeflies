@@ -1,21 +1,19 @@
 import { Cache } from '@timeflies/cache';
 import { Spritesheet, Ticker } from 'pixi.js';
 import { CustomPIXIComponent } from 'react-pixi-fiber';
-import { AnimatedComplexSprite, FramesInfos, TexturesInfos } from './animated-complex-sprite';
+import { AnimatedComplexSprite, FramesInfos, OutlineInfos, TexturesInfos } from './animated-complex-sprite';
 
-type AnimatedComplexSpritePrimaryProps = FramesInfos & {
+
+export type AnimatedComplexSpriteProps = FramesInfos & Pick<AnimatedComplexSprite, 'onLoop' | 'onFrameChange'> & {
     spritesheet: Spritesheet;
     ticker?: Ticker;
     cache?: Cache<FramesInfos, TexturesInfos>;
-};
 
-type AnimatedComplexSpriteSecondaryProps = Pick<AnimatedComplexSprite, 'onLoop' | 'onFrameChange'> & {
     run?: boolean;
     keepTimeState?: boolean;
-};
 
-export type AnimatedComplexSpriteProps = AnimatedComplexSpritePrimaryProps
-    & AnimatedComplexSpriteSecondaryProps;
+    outline?: OutlineInfos;
+};
 
 const extractFramesInfos = ({
     animationPath, pingPong, flip, framesDurations, framesOrder
@@ -33,10 +31,12 @@ const applyAnimatedComplexSpriteProps = (
     newProps: AnimatedComplexSpriteProps
 ) => {
     const {
-        onLoop, onFrameChange, run, keepTimeState, ...rest
+        onLoop, onFrameChange, run, keepTimeState, outline, ...rest
     } = newProps;
 
     sprite.setFramesInfos(extractFramesInfos(rest), { keepTimeState });
+
+    sprite.setOutline(outline);
 
     if (run === false) {
         sprite.stop();

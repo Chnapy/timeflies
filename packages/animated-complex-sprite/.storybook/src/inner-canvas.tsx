@@ -1,7 +1,7 @@
 import path from 'path';
 import { Loader, LoaderResource, SCALE_MODES, settings } from "pixi.js";
 import React from 'react';
-import { AnimatedComplexSpriteProps, AnimatedComplexSpriteReact, FlipInfos, FramesInfos } from '../../src';
+import { AnimatedComplexSpriteProps, AnimatedComplexSpriteReact, FlipInfos, FramesInfos, OutlineInfos } from '../../src';
 
 const loader = Loader.shared;
 
@@ -42,10 +42,11 @@ const name = 'spritesheet';
 export type CanvasProps = {
   run: boolean;
   state: SpriteConfig;
+  outline?: OutlineInfos;
   pos: { x: number; y: number };
 };
 
-export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, pos }) => {
+export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos }) => {
   const [ spritesheetRes, setSpritesheetRes ] = React.useState<LoaderResource | undefined>(loader.resources[ name ]);
 
   React.useEffect(() => {
@@ -118,6 +119,7 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, pos }) => {
   const props: AnimatedComplexSpriteProps | undefined = spritesheet && {
     spritesheet,
     run,
+    outline,
     ...getFramesInfos(state)
   };
 
