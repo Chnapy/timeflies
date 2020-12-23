@@ -1,7 +1,7 @@
 import path from 'path';
 import { Loader, LoaderResource, SCALE_MODES, settings } from "pixi.js";
 import React from 'react';
-import { AnimatedComplexSpriteProps, AnimatedComplexSpriteReact, FlipInfos } from '../../src';
+import { AnimatedComplexSpriteProps, AnimatedComplexSpriteReact, FlipInfos, FramesInfos, OutlineInfos } from '../../src';
 
 const loader = Loader.shared;
 
@@ -40,11 +40,13 @@ const framesDurations: {
 const name = 'spritesheet';
 
 export type CanvasProps = {
-  acsProps: Pick<AnimatedComplexSpriteProps<SpriteConfig>, 'state' | 'run'>;
+  run: boolean;
+  state: SpriteConfig;
+  outline?: OutlineInfos;
   pos: { x: number; y: number };
 };
 
-export const InnerCanvas: React.FC<CanvasProps> = ({ acsProps, pos }) => {
+export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos }) => {
   const [ spritesheetRes, setSpritesheetRes ] = React.useState<LoaderResource | undefined>(loader.resources[ name ]);
 
   React.useEffect(() => {
@@ -59,55 +61,66 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ acsProps, pos }) => {
 
   const spritesheet = spritesheetRes?.spritesheet ?? null;
 
-  const getFramesInfos = React.useCallback(
-    ({ role, state, orientation }: SpriteConfig) => {
+  const getFramesInfos = ({ role, state, orientation }: SpriteConfig): FramesInfos => {
 
-      const getFlip = (): FlipInfos<SpriteConfig> | undefined => {
-        if (orientation === 'left') {
-          return {
-            baseState: { role, state, orientation: 'right' },
-            direction: 'horizontal'
-          };
-        }
-      };
+    const getFlip = (): FlipInfos | undefined => {
+      if (orientation === 'left') {
+        return {
+          baseFramesInfos: getFramesInfos({ role, state, orientation: 'right' }),
+          direction: 'horizontal'
+        };
+      }
+    };
 
-      const getAnimationPath = () => {
-        return `${role}/${state}/${orientation}/${role}_${state}_${orientation}`;
-      };
+    const getAnimationPath = () => {
+      return `${role}/${state}/${orientation}/${role}_${state}_${orientation}`;
+    };
 
-      const pingPong = role === 'tacka' && state === 'idle';
+    const pingPong = role === 'tacka' && state === 'idle';
 
-      const getFramesOrder = () => {
-        if (role === 'tacka' && state === 'hit') {
-          return [ 1, 2, 3, 2, 3, 4 ];
-        }
-      };
+    const getFramesOrder = () => {
+      if (role === 'tacka' && state === 'hit') {
+        return [ 1, 2, 3, 2, 3, 4 ];
+      }
+    };
 
-      const getFramesDurations = (): number[] => {
+    const getFramesDurations = (): number[] => {
 
-        const globalDefault = [ 400 ];
+      const globalDefault = [ 400 ];
 
-        const lvRole = framesDurations[ role ];
-        const lvState = lvRole && lvRole[ state ];
-        if (lvState) {
-          return lvState[ orientation ] ?? lvState.default ?? globalDefault;
-        }
-        return globalDefault;
-      };
+      const lvRole = framesDurations[ role ];
+      const lvState = lvRole && lvRole[ state ];
+      if (lvState) {
+        return lvState[ orientation ] ?? lvState.default ?? globalDefault;
+      }
+      return globalDefault;
+    };
 
-      return {
-        animationPath: getAnimationPath(),
-        pingPong,
-        framesOrder: getFramesOrder(),
-        flip: getFlip(),
-        framesDurations: getFramesDurations()
-      };
-    }, [ spritesheet ]);
+    function removeUndefined<O>(o: O) {
+      return Object.entries(o)
+        .filter(([ key, value ]) => value !== undefined)
+        .reduce((acc, [ key, value ]) => {
 
-  const props: AnimatedComplexSpriteProps<SpriteConfig> | undefined = spritesheet && {
+          acc[ key ] = value;
+
+          return acc;
+        }, {}) as O;
+    }
+
+    return removeUndefined({
+      animationPath: getAnimationPath(),
+      pingPong,
+      framesOrder: getFramesOrder(),
+      flip: getFlip(),
+      framesDurations: getFramesDurations()
+    });
+  };
+
+  const props: AnimatedComplexSpriteProps | undefined = spritesheet && {
     spritesheet,
-    getFramesInfos,
-    ...acsProps
+    run,
+    outline,
+    ...getFramesInfos(state)
   };
 
   return (

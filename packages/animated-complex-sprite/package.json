@@ -19,14 +19,15 @@
     "react-pixi-fiber": "^0.14.2"
   },
   "dependencies": {
+    "@pixi/filter-outline": "^3.1.1",
     "@timeflies/cache": "1.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
     "@storybook/addon-actions": "^6.1.2",
     "@storybook/addon-essentials": "^6.1.2",
     "@storybook/addon-links": "^6.1.2",
     "@storybook/react": "^6.1.2",
+    "@types/jest": "^25.2.1",
     "eslint": "^7.4.0",
     "jest": "^25.5.2",
     "storybook": "^6.1.2",
