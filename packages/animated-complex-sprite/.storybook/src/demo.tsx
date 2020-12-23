@@ -1,13 +1,15 @@
 import React from 'react';
-import { Container, Stage } from 'react-pixi-fiber';
-import { CanvasProps, InnerCanvas, SpriteConfig } from './inner-canvas';
+import { Container, createStageClass } from 'react-pixi-fiber';
+import { InnerCanvas, SpriteConfig } from './inner-canvas';
 
-type State = CanvasProps[ 'acsProps' ] & {
-    run?: boolean;
-};
+const Stage = createStageClass();
 
 export const Demo = () => {
-    const [ state, setState ] = React.useState<State>({
+    const [ state, setState ] = React.useState<{
+        state: SpriteConfig;
+        run: boolean;
+    }>({
+        run: true,
         state: {
             role: 'tacka',
             state: 'walk',
@@ -16,7 +18,7 @@ export const Demo = () => {
     });
     const [ pos, setPos ] = React.useState({ x: 4 * 16, y: 3 * 16 });
 
-    const createButton = (name: string, partial: Partial<SpriteConfig>, run?: boolean) => (
+    const createButton = (name: string, partial: Partial<SpriteConfig>, run: boolean = state.run) => (
         <button
             onClick={() => {
                 console.time('state ' + name)
@@ -60,7 +62,7 @@ export const Demo = () => {
             <div>
                 <Stage options={{ height: 600, width: 800 }}>
                     <Container scale={3}>
-                        <InnerCanvas acsProps={state} pos={pos} />
+                        <InnerCanvas {...state} pos={pos} />
                     </Container>
                 </Stage>
             </div>

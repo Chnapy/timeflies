@@ -1,38 +1,42 @@
 import { Cache } from '@timeflies/cache';
 import { Spritesheet, Ticker } from 'pixi.js';
 import { CustomPIXIComponent } from 'react-pixi-fiber';
-import { AnimatedComplexSprite, FramesInfosGetter, TexturesInfos } from './animated-complex-sprite';
+import { AnimatedComplexSprite, FramesInfos, TexturesInfos } from './animated-complex-sprite';
 
-type AnimatedComplexSpritePrimaryProps<S> = {
+type AnimatedComplexSpritePrimaryProps = FramesInfos & {
     spritesheet: Spritesheet;
-    getFramesInfos: FramesInfosGetter<S>;
-    state: S;
     ticker?: Ticker;
-    cache?: Cache<S, TexturesInfos>;
+    cache?: Cache<FramesInfos, TexturesInfos>;
 };
 
-type AnimatedComplexSpriteSecondaryProps<S> = Pick<AnimatedComplexSprite<S>, 'onLoop' | 'onFrameChange'> & {
+type AnimatedComplexSpriteSecondaryProps = Pick<AnimatedComplexSprite, 'onLoop' | 'onFrameChange'> & {
     run?: boolean;
     keepTimeState?: boolean;
 };
 
-export type AnimatedComplexSpriteProps<S = any> = AnimatedComplexSpritePrimaryProps<S>
-    & AnimatedComplexSpriteSecondaryProps<S>;
+export type AnimatedComplexSpriteProps = AnimatedComplexSpritePrimaryProps
+    & AnimatedComplexSpriteSecondaryProps;
+
+const extractFramesInfos = ({
+    animationPath, pingPong, flip, framesDurations, framesOrder
+}: FramesInfos): FramesInfos => ({
+    animationPath, pingPong, flip, framesDurations, framesOrder
+});
 
 const getAnimatedComplexSpriteFromProps = ({
-    spritesheet, getFramesInfos, state, ticker, cache
-}: AnimatedComplexSpriteProps) => new AnimatedComplexSprite(spritesheet, getFramesInfos, state, ticker, cache);
+    spritesheet, ticker, cache, ...rest
+}: AnimatedComplexSpriteProps) => new AnimatedComplexSprite(spritesheet, extractFramesInfos(rest), ticker, cache);
 
 const applyAnimatedComplexSpriteProps = (
     sprite: AnimatedComplexSprite,
     oldProps: AnimatedComplexSpriteProps | undefined,
     newProps: AnimatedComplexSpriteProps
 ) => {
-    const { state, onLoop, onFrameChange, run, keepTimeState } = newProps;
+    const {
+        onLoop, onFrameChange, run, keepTimeState, ...rest
+    } = newProps;
 
-    sprite.setState(state, {
-        keepTimeState
-    });
+    sprite.setFramesInfos(extractFramesInfos(rest), { keepTimeState });
 
     if (run === false) {
         sprite.stop();
@@ -44,7 +48,7 @@ const applyAnimatedComplexSpriteProps = (
     sprite.onFrameChange = onFrameChange;
 };
 
-export const AnimatedComplexSpriteReact = CustomPIXIComponent<AnimatedComplexSprite<any>, AnimatedComplexSpriteProps<any>>(
+export const AnimatedComplexSpriteReact = CustomPIXIComponent<AnimatedComplexSprite, AnimatedComplexSpriteProps>(
     {
         customDisplayObject: getAnimatedComplexSpriteFromProps,
         customApplyProps: function (this: { applyDisplayObjectProps: (...args: any[]) => void }, sprite, oldProps, newProps) {

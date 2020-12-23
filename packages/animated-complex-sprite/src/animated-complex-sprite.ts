@@ -3,16 +3,16 @@ import { Sprite, Spritesheet, Texture, Ticker } from 'pixi.js';
 import { createTickerManager, TickerManager } from './ticker-manager';
 
 
-export type FlipInfos<S> = {
+export type FlipInfos = {
     direction: 'horizontal' | 'vertical';
-    baseState: S;
+    baseFramesInfos: FramesInfos;
 };
 
-export type FramesInfosGetter<S> = (state: S) => {
+export type FramesInfos = {
     animationPath: string;
-    pingPong?: boolean;
+    pingPong: boolean;
     framesOrder?: number[];
-    flip?: FlipInfos<S>;
+    flip?: FlipInfos;
     framesDurations: number[];
 };
 
@@ -32,31 +32,34 @@ export type TexturesInfos = {
     previousFrame: number;
 };
 
-const shallowEqual = (objA: any, objB: any): boolean => {
+const objectDeepEqual = (objA: any, objB: any): boolean => {
     if (objA === objB) {
         return true;
     }
 
-    const keysA = Object.keys(objA);
-    const keysB = Object.keys(objB);
+    if (objA && objB && typeof objA === 'object' && typeof objB === 'object') {
 
-    return keysA.length === keysB.length
-        && keysA.every(key => objA[ key ] === objB[ key ]);
+        const keysA = Object.keys(objA);
+        const keysB = Object.keys(objB);
+
+        return keysA.length === keysB.length
+            && keysA.every(key => objectDeepEqual(objA[ key ], objB[ key ]));
+    }
+
+    return false;
 };
 
-export class AnimatedComplexSprite<S = any> extends Sprite {
+export class AnimatedComplexSprite extends Sprite {
 
     static durationToInterval = (duration: number) => duration / 3;
 
-    private getFramesInfos: FramesInfosGetter<S>;
-
-    private state: S;
+    private framesInfos: FramesInfos;
 
     private animations: Animations;
     private timedTextures: TimedTexture[];
 
-    onLoop?: (currentState: S) => void;
-    onFrameChange?: (state: S, currentFrame: number, textureIndex: number) => void;
+    onLoop?: () => void;
+    onFrameChange?: (currentFrame: number, textureIndex: number) => void;
 
     private previousFrame: number;
     private currentTime: number;
@@ -64,21 +67,18 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
     private readonly tickerManager: TickerManager;
     private tickerInterval: number;
 
-    private readonly cache: Cache<S, TexturesInfos>;
+    private readonly cache: Cache<FramesInfos, TexturesInfos>;
 
     constructor(
         spritesheet: Spritesheet,
-        getFramesInfos: FramesInfosGetter<S>,
-        state: S,
+        framesInfos: FramesInfos,
         ticker?: Ticker,
-        cache: Cache<S, TexturesInfos> = createCache()
+        cache: Cache<FramesInfos, TexturesInfos> = createCache()
     ) {
         super();
 
-        this.state = state;
-
         this.animations = spritesheet.animations;
-        this.getFramesInfos = getFramesInfos;
+        this.framesInfos = framesInfos;
 
         this.currentTime = 0;
 
@@ -104,7 +104,7 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
             .map((texture, frame) => ({
                 texture,
                 frame,
-                textureIndex: framesOrder[frame]
+                textureIndex: framesOrder[ frame ]
             }));
 
         if (pingPong && framedTextures.length > 2) {
@@ -134,10 +134,10 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
         const {
             flip,
             ...restInfos
-        } = this.getFramesInfos(this.state);
+        } = this.framesInfos;
 
         if (flip) {
-            const { flip: innerFlip, ...flipFramesInfos } = this.getFramesInfos(flip.baseState);
+            const { flip: innerFlip, ...flipFramesInfos } = flip.baseFramesInfos;
 
             if (innerFlip) {
                 throw new Error('Cannot use flip baseState also flipped');
@@ -160,7 +160,7 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
     }
 
     private getTexturesInfos(): TexturesInfos {
-        return this.cache.getOrElse(this.state, () => {
+        return this.cache.getOrElse(this.framesInfos, () => {
 
             const {
                 animationPath,
@@ -169,49 +169,44 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
                 framesDurations,
                 textureFlipFn
             } = this.getFinalFramesInfos();
-    
+
             const rawTextures = this.animations[ animationPath ];
-    
+
             if (!rawTextures || !rawTextures.length) {
                 throw new Error(`Textures not found with animation path [${animationPath}]`);
             }
-    
+
             const textures = rawTextures.map(textureFlipFn);
-    
+
             const framesOrder = rawFramesOrder ?? textures.map((t, i) => i + 1);
-    
+
             const timedTextures = this.getTimedTextures(textures, framesOrder, framesDurations, pingPong);
             const tickerInterval = AnimatedComplexSprite.durationToInterval(Math.min(...timedTextures.map(t => t.duration)));
-    
+
             const infos = {
                 timedTextures,
                 tickerInterval,
                 previousFrame: 0
             };
-    
+
             return infos;
         });
     }
 
-    setState(state: Partial<S>, options: {
+    setFramesInfos(newFramesInfos: FramesInfos, options: {
         forceUpdate?: boolean;
         keepTimeState?: boolean;
     } = {}) {
-        const newState = {
-            ...this.state,
-            ...state
-        };
-
         const {
             forceUpdate = false,
             keepTimeState = false,
         } = options;
 
-        if (!forceUpdate && shallowEqual(this.state, newState)) {
+        if (!forceUpdate && objectDeepEqual(this.framesInfos, newFramesInfos)) {
             return;
         }
 
-        this.state = newState;
+        this.framesInfos = newFramesInfos;
 
         const { timedTextures, tickerInterval, previousFrame } = this.getTexturesInfos();
 
@@ -261,7 +256,7 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
         if (previousFrame !== this.getCurrentFrame()) {
 
             if (this.onLoop && previousFrame === this.timedTextures.length - 1) {
-                this.onLoop(this.state);
+                this.onLoop();
             }
 
             this.updateTexture();
@@ -280,8 +275,8 @@ export class AnimatedComplexSprite<S = any> extends Sprite {
         this.texture = this.timedTextures[ currentFrame ].texture;
         this._cachedTint = 0xFFFFFF;
 
-        if(this.onFrameChange) {
-            this.onFrameChange(this.state, currentFrame, this.timedTextures[ currentFrame ].textureIndex);
+        if (this.onFrameChange) {
+            this.onFrameChange(currentFrame, this.timedTextures[ currentFrame ].textureIndex);
         }
     }
 
