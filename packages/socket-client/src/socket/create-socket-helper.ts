@@ -1,4 +1,4 @@
-import { Message } from '../message';
+import { Message } from '@timeflies/socket-messages';
 
 export const createSocketHelper = (socket: WebSocket) => {
 

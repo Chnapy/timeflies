@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react-hooks';
 import { timerTester } from '@timeflies/devtools';
-import { MessageWithResponse, MessageWithResponseGetter } from '../message';
+import { MessageWithResponse, MessageWithResponseGetter } from '@timeflies/socket-messages';
 import { createFakeSocket, createMessageEvent, describeSocketFailures, renderWithContext } from '../test-utils';
 import { useSocketSendWithResponse } from './use-socket-send-with-response';
 

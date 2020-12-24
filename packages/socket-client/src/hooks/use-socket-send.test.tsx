@@ -1,5 +1,5 @@
 import { act } from '@testing-library/react-hooks';
-import { Message } from '../message';
+import { Message } from '@timeflies/socket-messages';
 import { createFakeSocket, renderWithContext, describeSocketFailures } from '../test-utils';
 import { useSocketSend } from './use-socket-send';
 

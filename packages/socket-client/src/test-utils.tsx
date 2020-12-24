@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
+import { Message } from '@timeflies/socket-messages';
 import React from 'react';
-import { Message } from './message';
 import { SocketContextProvider } from './socket/socket-context';
 
 type WebSocketTestable = WebSocket & {

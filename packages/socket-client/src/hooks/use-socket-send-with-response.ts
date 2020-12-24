@@ -1,4 +1,4 @@
-import { MessageWithResponse, MessageWithResponseGetter } from '../message';
+import { MessageWithResponse, MessageWithResponseGetter } from '@timeflies/socket-messages';
 import { useSocket } from '../socket/socket-context';
 import { useSocketSend } from './use-socket-send';
 

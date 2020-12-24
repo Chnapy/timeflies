@@ -1,4 +1,4 @@
-import { Message } from '../message';
+import { Message } from '@timeflies/socket-messages';
 import { useSocket } from '../socket/socket-context';
 
 export type MessageListenersMap = {
