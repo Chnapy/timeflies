@@ -5,7 +5,7 @@ export type Message<P extends {} = {}> = {
     payload: P;
 };
 
-type MessageCreator<P extends {}> = {
+export type MessageCreator<P extends {} = {}> = {
     (payload: P): Message<P>;
     action: string;
     match: (message: Message<any>) => message is Message<P>;
@@ -35,7 +35,7 @@ export type MessageWithResponseGetter<P extends {}, R extends {}> = {
     _responsePayload?: R;
 };
 
-type MessageWithResponseCreator<P extends {}, R extends {}> = {
+export type MessageWithResponseCreator<P extends {} = {}, R extends {} = {}> = {
     (payload: P): MessageWithResponseGetter<P, R>;
     action: string;
     match: (message: Message<any>) => message is MessageWithResponse<P>;
@@ -59,3 +59,7 @@ const createMessageWithResponse = <P extends {}, R extends {}>(action: string): 
 
     return messageCreator;
 };
+
+export type ExtractMessageFromCreator<C extends MessageCreator | MessageWithResponseCreator> = C extends MessageWithResponseCreator<infer P>
+    ? ReturnType<ReturnType<MessageWithResponseCreator<P>>['get']>
+    : ReturnType<C>;

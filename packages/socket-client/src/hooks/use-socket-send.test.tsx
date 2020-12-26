@@ -1,47 +1,53 @@
 import { act } from '@testing-library/react-hooks';
 import { Message } from '@timeflies/socket-messages';
-import { createFakeSocket, renderWithContext, describeSocketFailures } from '../test-utils';
+import { createFakeSocketHelper, renderWithContext, describeSocketFailures } from '../test-utils';
 import { useSocketSend } from './use-socket-send';
 
 
 describe('# use socket send', () => {
 
-    const message: Message = {
-        action: 'foo',
-        payload: {}
-    };
+    const messages: Message[] = [
+        {
+            action: 'foo',
+            payload: {}
+        },
+        {
+            action: 'bar',
+            payload: {}
+        }
+    ];
 
-    describeSocketFailures(useSocketSend, message);
+    describeSocketFailures(useSocketSend, ...messages);
 
-    it('directly send message with socket open', async () => {
+    it('directly send messages with socket open', async () => {
 
-        const socket = createFakeSocket(WebSocket.OPEN);
+        const socketHelper = createFakeSocketHelper(WebSocket.OPEN);
 
-        const result = renderWithContext(socket, useSocketSend);
+        const result = renderWithContext(socketHelper, useSocketSend);
 
         await act(() =>
-            result.current(message)
+            result.current(...messages)
         );
 
-        expect(socket.send).toHaveBeenNthCalledWith(1, JSON.stringify(message));
+        expect(socketHelper.send).toHaveBeenNthCalledWith(1, messages);
     });
 
-    it('wait socket connecting then send message', async () => {
+    it('wait socket connecting then send messages', async () => {
 
-        const socket = createFakeSocket(WebSocket.CONNECTING);
+        const socketHelper = createFakeSocketHelper(WebSocket.CONNECTING);
 
-        const result = renderWithContext(socket, useSocketSend);
+        const result = renderWithContext(socketHelper, useSocketSend);
 
         const actPromise = act(() =>
-            result.current(message)
+            result.current(...messages)
         );
 
-        expect(socket.send).not.toHaveBeenCalled();
+        expect(socketHelper.send).not.toHaveBeenCalled();
 
-        socket.listeners.open.forEach(fn => fn());
+        socketHelper.listeners.open.forEach(fn => fn());
 
         await actPromise;
 
-        expect(socket.send).toHaveBeenNthCalledWith(1, JSON.stringify(message));
+        expect(socketHelper.send).toHaveBeenNthCalledWith(1, messages);
     });
 });

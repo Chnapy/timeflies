@@ -1,7 +1,7 @@
 import { act } from '@testing-library/react-hooks';
 import { timerTester } from '@timeflies/devtools';
 import { MessageWithResponse, MessageWithResponseGetter } from '@timeflies/socket-messages';
-import { createFakeSocket, createMessageEvent, describeSocketFailures, renderWithContext } from '../test-utils';
+import { createFakeSocketHelper, describeSocketFailures, renderWithContext } from '../test-utils';
 import { useSocketSendWithResponse } from './use-socket-send-with-response';
 
 describe('# use socket send with response', () => {
@@ -26,9 +26,9 @@ describe('# use socket send with response', () => {
 
     it('send message then receive expected response', async () => {
 
-        const socket = createFakeSocket(WebSocket.OPEN);
+        const socketHelper = createFakeSocketHelper(WebSocket.OPEN);
 
-        const result = renderWithContext(socket, useSocketSendWithResponse);
+        const result = renderWithContext(socketHelper, useSocketSendWithResponse);
 
         let hookPromise;
 
@@ -38,14 +38,14 @@ describe('# use socket send with response', () => {
 
         await timerTester.triggerPromises();
 
-        expect(socket.send).toHaveBeenNthCalledWith(1, JSON.stringify(messageGetter.get()));
+        expect(socketHelper.send).toHaveBeenNthCalledWith(1, [ messageGetter.get() ]);
 
         const badResponse = {
             ...response,
             requestId: 'another_id'
         };
 
-        socket.listeners.message.forEach(listener => listener(createMessageEvent(badResponse, response)));
+        socketHelper.listeners.message.forEach(listener => listener([ badResponse, response ]));
 
         expect(await hookPromise).toEqual(response);
     });

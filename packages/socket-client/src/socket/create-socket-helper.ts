@@ -1,45 +1,88 @@
-import { Message } from '@timeflies/socket-messages';
+import { extractMessagesFromEvent, heartbeatMessageValue, Message } from '@timeflies/socket-messages';
 
-export const createSocketHelper = (socket: WebSocket) => {
+export type SocketHelper = ReturnType<ReturnType<typeof getSocketHelperCreator>>;
 
-    const addListener = function <K extends 'open' | 'close' | 'message' | 'error'>(type: K, listener: (event: WebSocketEventMap[ K ]) => void) {
-        socket.addEventListener(type, listener);
+const createEndpoint = (protocol: 'http' | 'ws', url: string) => {
 
-        return () => socket.removeEventListener(type, listener);
-    };
+    const isHttps = url.startsWith('https');
 
-    return {
-        send: (message: Message) => socket.send(JSON.stringify(message)),
-        addOpenListener: (listener: () => void) => {
-            return addListener('open', listener);
-        },
-        addCloseListener: (listener: () => void) => {
-            return addListener('close', listener);
-        },
-        addMessageListener: <M extends Message>(listener: (messageList: M[]) => void) => {
-            const rootListener = ({ data }: MessageEvent) => {
+    const startIndex = url.indexOf('://');
+    if (startIndex !== -1) {
+        url = url.substr(startIndex + 3);
+    }
 
-                if (typeof data !== 'string') {
-                    throw new TypeError(`typeof message not handled: ${typeof data}`);
-                }
+    const prefix = isHttps
+        ? protocol + 's'
+        : protocol;
 
-                let parsedData;
-                try {
-                    parsedData = JSON.parse(data);
-                } catch (e) {
-                    parsedData = data;
-                }
+    return `${prefix}://${url}`;
+};
 
-                if (!Array.isArray(parsedData)) {
-                    throw new Error(`message is not an array of Message: ${JSON.stringify(parsedData)}`);
-                }
 
-                const messageList: M[] = parsedData;
+const createAuthenticatedEndpoint = (token: string, serverUrl: string): string => {
+    const baseEndpoint = createEndpoint('ws', serverUrl);
 
-                listener(messageList);
-            };
+    const url = new URL(baseEndpoint);
+    url.searchParams.set('token', token);
 
-            return addListener('message', rootListener);
-        }
+    return url.href;
+};
+
+export const getSocketHelperCreator = (serverUrl: string) => {
+    return function createSocketHelper(token: string) {
+
+        const endpoint = createAuthenticatedEndpoint(token, serverUrl);
+
+        const socket = new WebSocket(endpoint);
+
+        let heartbeatTimeout: NodeJS.Timeout;
+
+        const startHeartbeatTimeout = () => {
+            clearTimeout(heartbeatTimeout);
+
+            heartbeatTimeout = setTimeout(() => {
+                socket.send(heartbeatMessageValue);
+
+                startHeartbeatTimeout();
+            }, 30_000);
+        };
+
+        const addListener = function <K extends 'open' | 'close' | 'message' | 'error'>(type: K, listener: (event: WebSocketEventMap[ K ]) => void) {
+            socket.addEventListener(type, listener);
+
+            return () => socket.removeEventListener(type, listener);
+        };
+
+        startHeartbeatTimeout();
+
+        return {
+            url: socket.url,
+            getReadyState: () => socket.readyState,
+            close: () => socket.close(),
+            send: (messages: Message[]) => {
+                socket.send(JSON.stringify(messages));
+
+                startHeartbeatTimeout();
+            },
+            addOpenListener: (listener: () => void) => {
+                return addListener('open', listener);
+            },
+            addCloseListener: (listener: () => void) => {
+                return addListener('close', listener);
+            },
+            addMessageListener: <M extends Message>(listener: (messageList: M[]) => void) => {
+                const rootListener = (event: MessageEvent) => {
+                    const { messageList, error } = extractMessagesFromEvent<M>(event);
+
+                    if (error) {
+                        throw new Error(error);
+                    }
+
+                    listener(messageList);
+                };
+
+                return addListener('message', rootListener);
+            }
+        };
     };
 };

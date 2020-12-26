@@ -1,34 +1,32 @@
 import React from 'react';
-import { createSocketHelper } from './create-socket-helper';
+import { SocketHelper } from './create-socket-helper';
 
 
-const socketContext = React.createContext<WebSocket | null>(null);
+const socketContext = React.createContext<SocketHelper | null>(null);
 
 export const SocketContextProvider = socketContext.Provider;
 
-export const useSocket = () => {
-    const socket = React.useContext(socketContext);
+export const useSocketHelper = () => {
+    const socketHelper = React.useContext(socketContext);
 
-    if (!socket) {
+    if (!socketHelper) {
         throw new Error('socket not defined');
     }
 
     return async () => {
-        if ([ WebSocket.CLOSED, WebSocket.CLOSING ].includes(socket.readyState)) {
+        if ([ WebSocket.CLOSED, WebSocket.CLOSING ].includes(socketHelper.getReadyState())) {
             throw new Error('socket closed or closing');
         }
 
-        const helper = createSocketHelper(socket);
-
-        if (socket.readyState === WebSocket.CONNECTING) {
-            await new Promise(resolve => {
-                const removeListener = helper.addOpenListener(() => {
+        if (socketHelper.getReadyState() === WebSocket.CONNECTING) {
+            await new Promise<void>(resolve => {
+                const removeListener = socketHelper.addOpenListener(() => {
                     removeListener();
                     resolve();
                 });
             });
         }
 
-        return helper;
+        return socketHelper;
     };
 };

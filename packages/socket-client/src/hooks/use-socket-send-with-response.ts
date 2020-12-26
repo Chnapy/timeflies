@@ -1,11 +1,11 @@
 import { MessageWithResponse, MessageWithResponseGetter } from '@timeflies/socket-messages';
-import { useSocket } from '../socket/socket-context';
+import { useSocketHelper } from '../socket/socket-context';
 import { useSocketSend } from './use-socket-send';
 
 
 
 export const useSocketSendWithResponse = () => {
-    const getSocket = useSocket();
+    const getSocket = useSocketHelper();
 
     const send = useSocketSend();
 

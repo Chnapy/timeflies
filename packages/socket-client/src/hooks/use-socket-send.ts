@@ -1,13 +1,13 @@
 import { Message } from '@timeflies/socket-messages';
-import { useSocket } from '../socket/socket-context';
+import { useSocketHelper } from '../socket/socket-context';
 
 
 export const useSocketSend = () => {
-    const getSocket = useSocket();
+    const getSocket = useSocketHelper();
 
-    return async <M extends Message>(message: M) => {
+    return async <M extends Message>(...messages: M[]) => {
         const socket = await getSocket();
 
-        socket.send(message);
+        socket.send(messages);
     };
 };

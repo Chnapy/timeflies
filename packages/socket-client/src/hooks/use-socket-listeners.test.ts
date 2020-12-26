@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react-hooks';
 import { Message } from '@timeflies/socket-messages';
-import { createFakeSocket, createMessageEvent, describeSocketFailures, renderWithContext } from '../test-utils';
+import { createFakeSocketHelper, describeSocketFailures, renderWithContext } from '../test-utils';
 import { useSocketListeners } from './use-socket-listeners';
 
 describe('# use socket listeners', () => {
@@ -8,9 +8,9 @@ describe('# use socket listeners', () => {
     describeSocketFailures(useSocketListeners, {});
 
     it('add listeners which can be removed', async () => {
-        const socket = createFakeSocket(WebSocket.OPEN);
+        const socketHelper = createFakeSocketHelper(WebSocket.OPEN);
 
-        const result = renderWithContext(socket, useSocketListeners);
+        const result = renderWithContext(socketHelper, useSocketListeners);
 
         const listeners = {
             'foo': jest.fn(),
@@ -33,9 +33,9 @@ describe('# use socket listeners', () => {
             payload: {}
         };
 
-        const messageEvent = createMessageEvent(messageBar, messageFoo);
+        const messageList = [ messageBar, messageFoo ];
 
-        socket.listeners.message.forEach(fn => fn(messageEvent));
+        socketHelper.listeners.message.forEach(fn => fn(messageList));
 
         expect(listeners.foo).toHaveBeenNthCalledWith(1, messageFoo);
         expect(listeners.bar).toHaveBeenNthCalledWith(1, messageBar);
@@ -45,7 +45,7 @@ describe('# use socket listeners', () => {
         listeners.foo.mockReset();
         listeners.bar.mockReset();
 
-        socket.listeners.message.forEach(fn => fn(messageEvent));
+        socketHelper.listeners.message.forEach(fn => fn(messageList));
 
         expect(listeners.foo).not.toHaveBeenCalled();
         expect(listeners.bar).not.toHaveBeenCalled();
