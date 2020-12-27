@@ -1,7 +1,7 @@
+import { Assets } from '@timeflies/static-assets';
 import { useAssets } from './assets-context';
-import { SpritesheetKey } from './assets-types';
 
-export const useAssetSpritesheet = (key: SpritesheetKey) => {
+export const useAssetSpritesheet = (key: Assets.SpritesheetKey) => {
     const { spritesheets } = useAssets();
 
     return spritesheets[ key ];
