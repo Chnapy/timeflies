@@ -1,5 +1,4 @@
 import { timerTester } from '@timeflies/devtools';
-import { heartbeatMessageValue } from '@timeflies/socket-messages';
 import { getSocketHelperCreator } from './create-socket-helper';
 
 const originalWebSocket = (global as any).WebSocket;
@@ -45,17 +44,8 @@ describe('# create socket helper', () => {
 
             const socket = getSocket();
 
-            await timerTester.advance(30_000);
+            await timerTester.advance(360_000);
 
-            expect(socket.send).toHaveBeenNthCalledWith(1, heartbeatMessageValue);
-
-            await timerTester.advance(30_000);
-
-            expect(socket.send).toHaveBeenNthCalledWith(2, heartbeatMessageValue);
-
-            await timerTester.advance(300_000);
-
-            expect(socket.send).toHaveBeenNthCalledWith(12, heartbeatMessageValue);
             expect(socket.send).toHaveBeenCalledTimes(12);
         });
 
@@ -69,14 +59,15 @@ describe('# create socket helper', () => {
             await timerTester.advance(20_000);
 
             socketHelper.send([ { action: 'foo', payload: {} } ]);
+            (socket.send as jest.Mock).mockClear();
 
             await timerTester.advance(30_000, {
                 runJustBeforeItEnds: () => {
-                    expect(socket.send).not.toHaveBeenCalledWith(heartbeatMessageValue);
+                    expect(socket.send).not.toHaveBeenCalled();
                 }
             });
 
-            expect(socket.send).toHaveBeenCalledWith(heartbeatMessageValue);
+            expect(socket.send).toHaveBeenCalled();
         })
     });
 });
