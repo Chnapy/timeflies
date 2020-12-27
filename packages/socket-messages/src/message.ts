@@ -32,7 +32,7 @@ export type MessageWithResponseGetter<P extends {}, R extends {}> = {
     get: () => MessageWithResponse<P>;
 
     // hack for typing only
-    _responsePayload?: R;
+    _response?: MessageWithResponse<R>;
 };
 
 export type MessageWithResponseCreator<P extends {} = {}, R extends {} = {}> = {
@@ -60,6 +60,10 @@ const createMessageWithResponse = <P extends {}, R extends {}>(action: string): 
     return messageCreator;
 };
 
-export type ExtractMessageFromCreator<C extends MessageCreator | MessageWithResponseCreator> = C extends MessageWithResponseCreator<infer P>
-    ? ReturnType<ReturnType<MessageWithResponseCreator<P>>['get']>
+export type ExtractMessageFromCreator<C extends MessageCreator<any> | MessageWithResponseCreator<any, any>> = C extends MessageWithResponseCreator<infer P>
+    ? ReturnType<ReturnType<MessageWithResponseCreator<P>>[ 'get' ]>
     : ReturnType<C>;
+
+export type ExtractResponseFromCreator<C extends MessageWithResponseCreator<any, any>> = C extends MessageWithResponseCreator<any, infer R>
+    ? MessageWithResponse<R>
+    : never;

@@ -1,4 +1,4 @@
-import { MessageWithResponse, MessageWithResponseGetter } from '@timeflies/socket-messages';
+import { MessageWithResponse, MessageWithResponseGetter, SocketErrorMessage } from '@timeflies/socket-messages';
 import { useSocketHelper } from '../socket/socket-context';
 import { useSocketSend } from './use-socket-send';
 
@@ -16,7 +16,7 @@ export const useSocketSendWithResponse = () => {
 
         await send(message);
 
-        return new Promise<Required<G>[ '_responsePayload' ]>(resolve => {
+        return new Promise<Required<G>[ '_response' ] | SocketErrorMessage>(resolve => {
 
             const removeListener = socket.addMessageListener<MessageWithResponse>(messageList => {
                 const response = messageList.find(res => res.requestId === message.requestId);
