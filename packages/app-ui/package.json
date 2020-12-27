@@ -17,6 +17,7 @@
     "react": "^17.0.1"
   },
   "devDependencies": {
-    "@timeflies/common": "1.0.0"
+    "@timeflies/common": "1.0.0",
+    "@timeflies/devtools": "1.0.0"
   }
 }

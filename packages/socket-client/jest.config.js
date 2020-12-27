@@ -1,7 +1,7 @@
-const rootConfig = require('../../jest.config');
+const rootConfig = require('../../jest.config.base');
 
 module.exports = {
-  ...rootConfig,
+  ...rootConfig(__dirname),
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
     "<rootDir>/src/setup-tests.ts"

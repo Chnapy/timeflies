@@ -1,14 +1,15 @@
+import { characterRoleList, spellRoleList } from '@timeflies/common';
 import fs from 'fs';
+import path from 'path';
 import util from 'util';
 import { Assets } from './assets';
-import { characterRoleList, spellRoleList } from '@timeflies/common';
 import { SpritesheetsUtils } from './spritesheets-utils';
 
 const readFile = util.promisify(fs.readFile);
 
 describe('# assets', () => {
 
-    const loadAsset = (path: string) => readFile('./public' + path, 'utf-8');
+    const loadAsset = (assetPath: string) => readFile(path.join(__dirname, '..', 'public' + assetPath), 'utf-8');
 
     const loadSpritesheetEntities = async () => JSON.parse(await loadAsset(Assets.spritesheets.entities)) as {
         frames: unknown;
