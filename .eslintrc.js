@@ -185,18 +185,15 @@ module.exports = {
             "webkitRequestFileSystem",
             "webkitResolveLocalFileSystemURL",
             "openDatabase",
-            {
-                name: "setTimeout",
-                message: "Use promise-based waitTimeout instead."
-            },
-            {
-                name: "clearTimeout",
-                message: "Use promise-based waitTimeout instead."
-            },
         ],
 
         "import/no-extraneous-dependencies": [ "error", {
-            "devDependencies": [ "**/*.test.{ts,tsx}", "**/setup-tests.ts", "**/*.stories.tsx" ]
+            "devDependencies": [
+                "**/*.test.{ts,tsx}",
+                "**/setup-tests.ts",
+                "**/*.stories.tsx",
+                "**/*.js",
+            ]
         } ],
 
         // Typescript
@@ -204,9 +201,13 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/no-floating-promises": "error",
 
+        // allow type/variable same names
+        "@typescript-eslint/no-redeclare": "off",
+
         // Jest
 
         "jest/no-focused-tests": "error",
         "jest/no-identical-title": "error",
+        "jest/no-interpolation-in-snapshots": "off",
     }
 };

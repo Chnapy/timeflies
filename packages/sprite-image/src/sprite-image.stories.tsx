@@ -15,6 +15,16 @@ export default {
 
 export const Default = () => {
 
+    const state: SpritesheetsUtils.CharacterSpriteConfig = {
+        role: 'tacka',
+        state: 'idle',
+        orientation: 'bottom'
+    };
+
+    const animationPath = SpritesheetsUtils.getCharacterAnimationPath(state);
+
+    const framesDurations = SpritesheetsUtils.getCharacterFramesDurations(state);
+
     return (
         <AssetsLoader
             spritesheets={Assets.spritesheets}
@@ -32,22 +42,9 @@ export const Default = () => {
                 size={48}
                 scale={2}
                 fallback='loading...'
-                state={{
-                    role: 'tacka',
-                    state: 'idle',
-                    orientation: 'bottom'
-                }}
-                getFramesInfos={state => {
-                    const animationPath = SpritesheetsUtils.getCharacterAnimationPath(state);
-
-                    const framesDurations = SpritesheetsUtils.getCharacterFramesDurations(state);
-
-                    return {
-                        animationPath,
-                        framesDurations,
-                        pingPong: true
-                    };
-                }}
+                animationPath={animationPath}
+                framesDurations={framesDurations}
+                pingPong
             />
         </AssetsLoader>
     );

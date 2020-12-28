@@ -34,7 +34,7 @@ export function useCadencedTime<V>(memo: (time: number) => V) {
             enable = false;
             cancelAnimationFrame(request);
         };
-    }, []);
+    }, [  ]);
 
     return value;
 };

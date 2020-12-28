@@ -117,7 +117,7 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
             });
         }
 
-        promise.then(() => {
+        return promise.then(status => {
             if (listeners.turnEnd) {
                 listeners.turnEnd({
                     currentTurn: {
@@ -133,9 +133,9 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
                     lastRoundTurn: isLastCharacterEnabled(characterIndex)
                 });
             }
-        });
 
-        return promise;
+            return status;
+        });
     };
 
     const start = async (

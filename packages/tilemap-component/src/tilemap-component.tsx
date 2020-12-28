@@ -92,7 +92,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
         return React.useMemo(
             () => layerList.map(layer => (
                 <Container key={layer.name}>
-                    {layer.data
+                    {(layer.data as number[])
                         .map((d, i) => getTileGraphic(d, i, layer, interactive))}
                 </Container>)),
             [
@@ -121,7 +121,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
                     </Container>);
                 }
 
-                const tile = getTileGraphic(obstaclesLayer.data[ index ], index, obstaclesLayer);
+                const tile = getTileGraphic((obstaclesLayer.data as number[])[ index ], index, obstaclesLayer);
                 if (tile) {
                     tiles.push(tile);
                 }
