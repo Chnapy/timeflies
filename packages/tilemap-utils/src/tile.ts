@@ -1,5 +1,5 @@
 import { TiledMap, TiledTileset, TiledLayerTilelayer, TiledFrame } from 'tiled-types';
-import { createPosition, Position } from '@timeflies/shared';
+import { createPosition, Position } from '@timeflies/common';
 import { Layer } from './layer';
 
 export module Tile {

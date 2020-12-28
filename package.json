@@ -4,7 +4,7 @@
   "repository": "https://github.com/Chnapy/timeflies.git",
   "author": "Chnapy <richardhaddad@hotmail.fr>",
   "workspaces": [
-    "packages/*"
+    "packages/!(back|front|shared)"
   ],
   "resolutions": {
     "immer": "6.0.8"
@@ -22,12 +22,6 @@
     "p:copyfiles": "cd $INIT_CWD && copyfiles",
     "heroku-postbuild": "yarn workspace @timeflies/shared run build && yarn workspace @timeflies/back run build"
   },
-  "cacheDirectories": [
-    "node_modules",
-    "packages/shared/node_modules",
-    "packages/back/node_modules",
-    "packages/front/node_modules"
-  ],
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
@@ -66,6 +60,7 @@
     "react-pixi-fiber": "^0.14.2",
     "react-test-renderer": "^17.0.1",
     "storybook": "^6.1.2",
+    "tiled-types": "^1.2.1",
     "typescript": "3.9.2",
     "webpack": "^5.11.0"
   },
