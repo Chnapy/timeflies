@@ -6,9 +6,17 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/static-assets": "1.0.0",
+    "@timeflies/common": "*",
+    "@timeflies/static-assets": "*",
     "pixi.js": "^5.2.1",
     "react": "^17.0.1",
     "tiled-types": "^1.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "*",
+    "@storybook/react": "*",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "react": "*",
+    "react-dom": "*"
   }
 }

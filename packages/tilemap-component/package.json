@@ -6,10 +6,19 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/cache": "1.0.0",
-    "@timeflies/tilemap-utils": "1.0.0",
+    "@timeflies/cache": "*",
+    "@timeflies/common": "*",
+    "@timeflies/tilemap-utils": "*",
     "pixi.js": "^5.2.1",
     "react": "^17.0.1",
-    "react-pixi-fiber": "^0.14.2"
+    "react-pixi-fiber": "^0.14.2",
+    "tiled-types": "*"
+  },
+  "devDependencies": {
+    "@babel/core": "*",
+    "@storybook/react": "*",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "react": "*",
+    "react-dom": "*"
   }
 }

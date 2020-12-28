@@ -6,8 +6,11 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "1.0.0",
+    "@timeflies/common": "*",
     "crypto-js": "^4.0.0",
     "immer": "^8.0.0"
+  },
+  "devDependencies": {
+    "@timeflies/devtools": "workspace:packages/devtools"
   }
 }

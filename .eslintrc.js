@@ -3,7 +3,7 @@ module.exports = {
     extends: [ "react-app", "react-app/jest" ],
     parser: "@typescript-eslint/parser",
     parserOptions: {
-        project: ['./tsconfig.json', './packages/*/tsconfig.json'],
+        project: [ './tsconfig.json', './packages/*/tsconfig.json' ],
         ecmaVersion: 2018,
         sourceType: 'module',
         ecmaFeatures: {

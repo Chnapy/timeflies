@@ -6,8 +6,13 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "1.0.0",
-    "@timeflies/messages": "1.0.0",
+    "@timeflies/common": "*",
+    "@timeflies/socket-messages": "*",
     "ws": "7.4.1"
+  },
+  "devDependencies": {
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/socket-messages": "workspace:packages/socket-messages"
   }
 }

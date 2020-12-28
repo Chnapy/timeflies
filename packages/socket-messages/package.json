@@ -6,9 +6,9 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "1.0.0"
+    "@timeflies/common": "*"
   },
   "devDependencies": {
-    "@timeflies/devtools": "1.0.0"
+    "@timeflies/devtools": "workspace:packages/devtools"
   }
 }

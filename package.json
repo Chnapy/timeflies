@@ -48,6 +48,7 @@
     "babel-eslint": "^10.0.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.1",
+    "clsx": "^1.1.1",
     "copyfiles": "^2.4.1",
     "eslint": "^7.16.0",
     "eslint-config-react-app": "^6.0.0",
@@ -65,7 +66,8 @@
     "react-pixi-fiber": "^0.14.2",
     "react-test-renderer": "^17.0.1",
     "storybook": "^6.1.2",
-    "typescript": "3.9.2"
+    "typescript": "3.9.2",
+    "webpack": "^5.11.0"
   },
   "engineStrict": true,
   "engines": {

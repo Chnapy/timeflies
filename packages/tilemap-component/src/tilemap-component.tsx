@@ -1,5 +1,5 @@
 import { createCache } from '@timeflies/cache';
-import { createPosition } from '@timeflies/shared';
+import { createPosition } from '@timeflies/common';
 import { Layer, Tile } from '@timeflies/tilemap-utils';
 import * as PIXI from 'pixi.js';
 import React from 'react';

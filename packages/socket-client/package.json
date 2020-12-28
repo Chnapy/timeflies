@@ -6,12 +6,16 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "1.0.0",
-    "@timeflies/socket-messages": "1.0.0",
+    "@timeflies/common": "*",
+    "@timeflies/socket-messages": "*",
     "react": "^17.0.1"
   },
   "devDependencies": {
-    "@timeflies/devtools": "1.0.0",
-    "@timeflies/socket-messages": "1.0.0"
+    "@testing-library/react-hooks": "*",
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/socket-messages": "workspace:packages/socket-messages",
+    "react": "*",
+    "react-test-renderer": "*"
   }
 }

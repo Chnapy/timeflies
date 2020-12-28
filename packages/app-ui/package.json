@@ -5,19 +5,24 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "yarn p:build && yarn postbuild",
-    "postbuild": "yarn p:copyfiles -f \"src/**/*.css\" \"lib\""
+    "build": "yarn p:build && yarn afterbuild",
+    "afterbuild": "yarn p:copyfiles -f \"src/**/*.css\" \"lib\""
   },
   "peerDependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.50",
-    "@timeflies/common": "1.0.0",
-    "@timeflies/sprite-image": "1.0.0",
+    "@timeflies/common": "*",
+    "@timeflies/sprite-image": "*",
+    "clsx": "*",
     "react": "^17.0.1"
   },
   "devDependencies": {
-    "@timeflies/common": "1.0.0",
-    "@timeflies/devtools": "1.0.0"
+    "@babel/core": "*",
+    "@storybook/react": "*",
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "react": "*",
+    "react-dom": "*"
   }
 }

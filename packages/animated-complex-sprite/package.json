@@ -6,7 +6,9 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/cache": "1.0.0",
+    "@pixi/core": "*",
+    "@pixi/utils": "*",
+    "@timeflies/cache": "*",
     "pixi.js": "^5.2.1",
     "react-pixi-fiber": "^0.14.2"
   },
@@ -14,6 +16,6 @@
     "@pixi/filter-outline": "^3.1.1"
   },
   "devDependencies": {
-    "@timeflies/devtools": "1.0.0"
+    "@timeflies/devtools": "workspace:packages/devtools"
   }
 }

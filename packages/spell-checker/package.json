@@ -6,6 +6,9 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "dependencies": {
-    "@timeflies/common": "1.0.0"
+    "@timeflies/common": "workspace:packages/common"
+  },
+  "devDependencies": {
+    "@timeflies/devtools": "workspace:packages/devtools"
   }
 }
