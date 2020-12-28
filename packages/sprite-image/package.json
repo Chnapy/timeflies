@@ -6,10 +6,17 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
+    "@material-ui/core": "*",
     "@timeflies/animated-complex-sprite": "1.0.0",
     "@timeflies/assets-loader": "1.0.0",
     "@timeflies/common": "1.0.0",
     "@timeflies/static-assets": "1.0.0",
-    "react": "^17.0.1"
+    "clsx": "*",
+    "pixi.js": "*",
+    "react": "^17.0.1",
+    "react-pixi-fiber": "*"
+  },
+  "devDependencies": {
+    "@timeflies/devtools": "workspace:packages/devtools"
   }
 }

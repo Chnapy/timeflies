@@ -9,5 +9,9 @@
     "@timeflies/common": "1.0.0",
     "@timeflies/socket-messages": "1.0.0",
     "react": "^17.0.1"
+  },
+  "devDependencies": {
+    "@timeflies/devtools": "1.0.0",
+    "@timeflies/socket-messages": "1.0.0"
   }
 }

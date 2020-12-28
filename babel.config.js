@@ -9,4 +9,5 @@ module.exports = {
         } ],
         '@babel/preset-react'
     ],
+    ignore: [ 'node_modules' ],
 };
