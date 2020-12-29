@@ -19,7 +19,11 @@
   "devDependencies": {
     "@babel/core": "*",
     "@storybook/react": "*",
+    "@timeflies/app-ui": "workspace:packages/app-ui",
+    "@timeflies/assets-loader": "workspace:packages/assets-loader",
+    "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/static-assets": "workspace:packages/static-assets",
     "react": "*",
     "react-dom": "*"
   }

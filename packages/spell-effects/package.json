@@ -11,6 +11,7 @@
     "immer": "^8.0.0"
   },
   "devDependencies": {
+    "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/crypto-js": "^4.0.1",
     "crypto-js": "^4.0.0"

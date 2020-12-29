@@ -13,6 +13,7 @@
     "bresenham": "0.0.4"
   },
   "devDependencies": {
+    "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/bresenham": "^0.0.0"
   }

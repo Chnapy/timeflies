@@ -12,7 +12,7 @@ env:
 
 jobs:
   prepare-cache:
-    name: Prepare Cache
+    name: Prepare CI Cache & Matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

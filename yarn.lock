@@ -3765,6 +3765,7 @@ __metadata:
   resolution: "@timeflies/animated-complex-sprite@workspace:packages/animated-complex-sprite"
   dependencies:
     "@pixi/filter-outline": ^3.1.1
+    "@timeflies/cache": "workspace:packages/cache"
     "@timeflies/devtools": "workspace:packages/devtools"
   peerDependencies:
     "@pixi/core": "*"
@@ -3783,6 +3784,7 @@ __metadata:
     "@storybook/react": "*"
     "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/sprite-image": "workspace:packages/sprite-image"
     react: "*"
     react-dom: "*"
   peerDependencies:
@@ -3802,7 +3804,9 @@ __metadata:
   dependencies:
     "@babel/core": "*"
     "@storybook/react": "*"
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/static-assets": "workspace:packages/static-assets"
     react: "*"
     react-dom: "*"
   peerDependencies:
@@ -3820,7 +3824,11 @@ __metadata:
   dependencies:
     "@babel/core": "*"
     "@storybook/react": "*"
+    "@timeflies/app-ui": "workspace:packages/app-ui"
+    "@timeflies/assets-loader": "workspace:packages/assets-loader"
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/static-assets": "workspace:packages/static-assets"
     react: "*"
     react-dom: "*"
   peerDependencies:
@@ -3864,6 +3872,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@timeflies/cycle-engine@workspace:packages/cycle-engine"
   dependencies:
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
   peerDependencies:
     "@timeflies/common": "*"
@@ -3897,6 +3906,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@timeflies/socket-messages@workspace:packages/socket-messages"
   dependencies:
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
   peerDependencies:
     "@timeflies/common": "*"
@@ -3930,6 +3940,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@timeflies/spell-effects@workspace:packages/spell-effects"
   dependencies:
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
     "@types/crypto-js": ^4.0.1
     crypto-js: ^4.0.0
@@ -3946,7 +3957,11 @@ __metadata:
   dependencies:
     "@babel/core": "*"
     "@storybook/react": "*"
+    "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite"
+    "@timeflies/assets-loader": "workspace:packages/assets-loader"
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/static-assets": "workspace:packages/static-assets"
     react: "*"
     react-dom: "*"
   peerDependencies:
@@ -3966,6 +3981,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@timeflies/static-assets@workspace:packages/static-assets"
   dependencies:
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
   peerDependencies:
     "@timeflies/common": "*"
@@ -3978,7 +3994,10 @@ __metadata:
   dependencies:
     "@babel/core": "*"
     "@storybook/react": "*"
+    "@timeflies/cache": "workspace:packages/cache"
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils"
     react: "*"
     react-dom: "*"
   peerDependencies:
@@ -3996,6 +4015,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@timeflies/tilemap-utils@workspace:packages/tilemap-utils"
   dependencies:
+    "@timeflies/common": "workspace:packages/common"
     "@timeflies/devtools": "workspace:packages/devtools"
     "@types/bresenham": ^0.0.0
     bresenham: 0.0.4

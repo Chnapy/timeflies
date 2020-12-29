@@ -9,6 +9,7 @@
     "@timeflies/common": "workspace:packages/common"
   },
   "devDependencies": {
+    "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools"
   }
 }

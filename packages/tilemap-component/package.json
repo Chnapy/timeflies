@@ -17,7 +17,10 @@
   "devDependencies": {
     "@babel/core": "*",
     "@storybook/react": "*",
+    "@timeflies/cache": "workspace:packages/cache",
+    "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils",
     "react": "*",
     "react-dom": "*"
   }

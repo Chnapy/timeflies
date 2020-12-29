@@ -22,6 +22,7 @@
     "@storybook/react": "*",
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/sprite-image": "workspace:packages/sprite-image",
     "react": "*",
     "react-dom": "*"
   }
