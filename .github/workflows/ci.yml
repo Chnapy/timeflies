@@ -45,8 +45,8 @@ jobs:
     needs: prepare-cache
     name: Prepare CI matrix
     runs-on: ubuntu-18.04
-    # outputs:
-    #   matrix: ${{ steps.set-matrix.outputs.matrix }}
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -61,9 +61,11 @@ jobs:
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ hashFiles('yarn.lock') }}
+      - name: Install
+        run: yarn install
       - id: set-matrix
-        run: yarn foo
-        # run: echo "::set-output name=matrix::$(yarn node ../scripts/get-ci-packages.js)"
+        # run: yarn foo
+        run: echo "::set-output name=matrix::$(yarn node ./scripts/get-ci-packages.js)"
 
   checks:
     needs: prepare-matrix
