@@ -8,30 +8,62 @@ on:
     branches: [ master ]
 
 jobs:
-  global-setup:
-    runs-on: ubuntu-18.04
-    name: Global setup
-
+  prepare-cache:
+    name: Prepare Cache
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Use node 12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    # - name: Install dependencies
-    #   run: yarn --immutable
+      - name: Use Node 12
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-
+
+      - name: Check Yarn dedupe
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: |
+          yarn dedupe --check
+
+      - name: Check or update Yarn cache
+        run: |
+          yarn install --immutable --skip-builds
 
   prepare-matrix:
-    needs: global-setup
+    needs: prepare-cache
     name: Prepare CI matrix
-    runs-on: ubuntu-18.04    
+    runs-on: ubuntu-18.04
     # outputs:
     #   matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-    - id: set-matrix
-      run: yarn foo
-      # run: echo "::set-output name=matrix::$(yarn node ../scripts/get-ci-packages.js)"
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Use Node.js latest
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('yarn.lock') }}
+      - id: set-matrix
+        run: yarn foo
+        # run: echo "::set-output name=matrix::$(yarn node ../scripts/get-ci-packages.js)"
 
   checks:
     needs: prepare-matrix
