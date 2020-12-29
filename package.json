@@ -10,7 +10,6 @@
     "immer": "6.0.8"
   },
   "scripts": {
-    "foo": "ls",
     "p:start": "cd $INIT_CWD && tsc -w",
     "p:test": "cd $INIT_CWD && jest --watch",
     "p:test-ci": "cd $INIT_CWD && jest --passWithNoTests",
