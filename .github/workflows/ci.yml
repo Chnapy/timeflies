@@ -12,12 +12,10 @@ jobs:
     # name: Prepare CI matrix
     runs-on: ubuntu-18.04    
     outputs:
-      matrix:
-        node-version: [12.x]
-        package: ${{ steps.set-matrix.outputs.packages }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: echo "::set-output name=packages::$(yarn node ./scripts/get-ci-packages.js)"
+      run: echo "::set-output name=matrix::$(yarn node ./scripts/get-ci-packages.js)"
 
   checks:
     needs: prepare-matrix
@@ -31,10 +29,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Use node ${{ matrix.node-version }}
+    - name: Use node 12
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 12
 
     # - name: Get yarn cache directory path
     #   id: yarn-cache-dir-path

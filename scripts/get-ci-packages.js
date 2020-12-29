@@ -10,13 +10,13 @@ const matches = glob.sync(workspacesGlob);
  * should log this structure:
  * {
  *  include: {
- *      packagePath: string;
+ *      package: string;
  *  }[];
  * }
  */
 
 const matrix = {
-    include: matches.map(packagePath => ({ packagePath }))
+    include: matches.map(package => ({ package }))
 };
 
 console.log(
