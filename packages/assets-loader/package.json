@@ -18,7 +18,12 @@
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/static-assets": "workspace:packages/static-assets",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "@types/react": "^17.0.0",
+    "pixi.js": "^5.3.7",
     "react": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "tiled-types": "^1.2.1"
   }
 }

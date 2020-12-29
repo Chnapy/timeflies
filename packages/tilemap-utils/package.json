@@ -15,6 +15,9 @@
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
-    "@types/bresenham": "^0.0.0"
+    "@types/bresenham": "^0.0.0",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "tiled-types": "^1.2.1"
   }
 }

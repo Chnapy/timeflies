@@ -18,13 +18,28 @@
   },
   "devDependencies": {
     "@babel/core": "*",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
+    "@pixi/core": "^5.3.7",
+    "@pixi/utils": "^5.3.7",
     "@storybook/react": "*",
+    "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite",
     "@timeflies/app-ui": "workspace:packages/app-ui",
     "@timeflies/assets-loader": "workspace:packages/assets-loader",
+    "@timeflies/cache": "workspace:packages/cache",
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/sprite-image": "workspace:packages/sprite-image",
     "@timeflies/static-assets": "workspace:packages/static-assets",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "@types/react": "^17.0.0",
+    "clsx": "^1.1.1",
+    "pixi.js": "^5.3.7",
     "react": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "react-pixi-fiber": "^0.14.2",
+    "tiled-types": "^1.2.1"
   }
 }

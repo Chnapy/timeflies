@@ -4,5 +4,9 @@
   "license": "UNLICENSED",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {}
+  "scripts": {},
+  "devDependencies": {
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16"
+  }
 }

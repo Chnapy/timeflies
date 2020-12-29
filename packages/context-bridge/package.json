@@ -7,5 +7,10 @@
   "scripts": {},
   "peerDependencies": {
     "react": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "@types/react": "^17.0.0"
   }
 }

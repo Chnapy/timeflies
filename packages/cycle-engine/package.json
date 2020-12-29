@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
-    "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@types/jest": "^26.0.19"
   }
 }
