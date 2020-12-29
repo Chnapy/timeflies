@@ -81,16 +81,16 @@ jobs:
         run: yarn install --immutable --skip-builds
 
       - name: Access package ${{ matrix.package.name }}
-          run: cd ${{ matrix.package.path }}
+        run: cd ${{ matrix.package.path }}
 
       - name: Build recursive
         run: yarn p:build-recursive
 
       - name: Test
-          run: yarn p:test-ci
+        run: yarn p:test-ci
 
       - name: Check lint
-          run: yarn p:check-lint
+        run: yarn p:check-lint
 
       - name: Check dependencies
-          run: yarn p:check-deps
+        run: yarn p:check-deps
