@@ -19,8 +19,8 @@ jobs:
       with:
         node-version: 12
 
-    - name: Install dependencies
-      run: yarn --immutable
+    # - name: Install dependencies
+    #   run: yarn --immutable
 
   prepare-matrix:
     needs: global-setup
@@ -30,7 +30,7 @@ jobs:
     #   matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: ls
+      run: yarn foo
       # run: echo "::set-output name=matrix::$(yarn node ../scripts/get-ci-packages.js)"
 
   checks:
