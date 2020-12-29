@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  CI: true
+
 jobs:
   prepare-cache:
     name: Prepare Cache
@@ -46,32 +49,6 @@ jobs:
       - id: set-matrix
         run: echo "::set-output name=matrix::$(yarn node ./scripts/get-ci-packages.js)"
 
-  # prepare-matrix:
-  #   needs: prepare-cache
-  #   name: Prepare CI matrix
-  #   runs-on: ubuntu-18.04
-  #   # outputs:
-  #   #   matrix: ${{ steps.set-matrix.outputs.matrix }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
-  #     - name: Use Node.js latest
-  #       uses: actions/setup-node@v2
-  #       with:
-  #         node-version: '12'
-  #     - name: Get yarn cache directory path
-  #       id: yarn-cache-dir-path
-  #       run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-  #     - uses: actions/cache@v2
-  #       with:
-  #         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-  #         key: yarn-${{ hashFiles('yarn.lock') }}
-  #     - name: Install
-  #       run: yarn install
-  #     - id: set-matrix
-  #       # run: yarn foo
-  #       run: echo "::set-output name=matrix::$(yarn node ./scripts/get-ci-packages.js)"
-
   checks:
     needs: prepare-cache
     runs-on: ubuntu-18.04
@@ -79,25 +56,31 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.prepare-cache.outputs.matrix)}}
 
-    name: ${{ matrix.package }} - Checks
+    name: ${{ matrix.package.name }} - Checks
 
     steps:
-    # - name: Get yarn cache directory path
-    #   id: yarn-cache-dir-path
-    #   run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    # - uses: actions/cache@v2
-    #   id: yarn-cache
-    #   with:
-    #     path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-    #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-yarn-
+      - name: Use Node 12
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
 
-    - name: Check type + lint + dependencies
-      run: cd ${{ matrix.package }} && yarn p:check-all
-      env:
-        CI: true
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          
+      - name: Install
+        run: yarn install
+
+      - name: Check type + lint + dependencies
+        run: cd ${{ matrix.package.path }} && yarn p:check-all
       
   # test:
   #   name: Test
