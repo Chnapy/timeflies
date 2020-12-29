@@ -11,6 +11,8 @@ jobs:
   prepare-cache:
     name: Prepare Cache
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -41,38 +43,41 @@ jobs:
         run: |
           yarn install --immutable --skip-builds
 
-  prepare-matrix:
-    needs: prepare-cache
-    name: Prepare CI matrix
-    runs-on: ubuntu-18.04
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Use Node.js latest
-        uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-      - uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ hashFiles('yarn.lock') }}
-      - name: Install
-        run: yarn install
       - id: set-matrix
-        # run: yarn foo
         run: echo "::set-output name=matrix::$(yarn node ./scripts/get-ci-packages.js)"
 
+  # prepare-matrix:
+  #   needs: prepare-cache
+  #   name: Prepare CI matrix
+  #   runs-on: ubuntu-18.04
+  #   # outputs:
+  #   #   matrix: ${{ steps.set-matrix.outputs.matrix }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Use Node.js latest
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: '12'
+  #     - name: Get yarn cache directory path
+  #       id: yarn-cache-dir-path
+  #       run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+  #         key: yarn-${{ hashFiles('yarn.lock') }}
+  #     - name: Install
+  #       run: yarn install
+  #     - id: set-matrix
+  #       # run: yarn foo
+  #       run: echo "::set-output name=matrix::$(yarn node ./scripts/get-ci-packages.js)"
+
   checks:
-    needs: prepare-matrix
+    needs: prepare-cache
     runs-on: ubuntu-18.04
 
     strategy:
-      matrix: ${{fromJson(needs.prepareMatrix.outputs.matrix)}}
+      matrix: ${{fromJson(needs.prepare-cache.outputs.matrix)}}
 
     name: ${{ matrix.package }} - Checks
 
