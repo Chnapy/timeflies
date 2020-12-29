@@ -77,20 +77,17 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ hashFiles('yarn.lock') }}
 
-      - name: Install
+      - name: Install dependencies (cache)
         run: yarn install --immutable --skip-builds
 
-      - name: Access package ${{ matrix.package.name }}
-        run: cd ${{ matrix.package.path }}
-
       - name: Build recursive
-        run: yarn p:build-recursive
+        run: cd ${{ matrix.package.path }} && yarn p:build-recursive
 
       - name: Test
-        run: yarn p:test-ci
+        run: cd ${{ matrix.package.path }} && yarn p:test-ci
 
       - name: Check lint
-        run: yarn p:check-lint
+        run: cd ${{ matrix.package.path }} && yarn p:check-lint
 
       - name: Check dependencies
-        run: yarn p:check-deps
+        run: cd ${{ matrix.package.path }} && yarn p:check-deps
