@@ -8,8 +8,23 @@ on:
     branches: [ master ]
 
 jobs:
+  global-setup:
+    runs-on: ubuntu-18.04
+    name: Global setup
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use node 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+
+    - name: Install dependencies
+      run: yarn --immutable
+
   prepare-matrix:
-    # name: Prepare CI matrix
+    needs: global-setup
+    name: Prepare CI matrix
     runs-on: ubuntu-18.04    
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -27,13 +42,6 @@ jobs:
     name: ${{ matrix.package }} - Checks
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Use node 12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-
     # - name: Get yarn cache directory path
     #   id: yarn-cache-dir-path
     #   run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -45,9 +53,6 @@ jobs:
     #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
     #     restore-keys: |
     #       ${{ runner.os }}-yarn-
-
-    - name: Install dependencies
-      run: yarn --immutable
 
     - name: Check type + lint + dependencies
       run: cd ${{ matrix.package }} && yarn p:check-all
