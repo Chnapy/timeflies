@@ -26,11 +26,12 @@ jobs:
     needs: global-setup
     name: Prepare CI matrix
     runs-on: ubuntu-18.04    
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    # outputs:
+    #   matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: echo "::set-output name=matrix::$(yarn node ../scripts/get-ci-packages.js)"
+      run: ls
+      # run: echo "::set-output name=matrix::$(yarn node ../scripts/get-ci-packages.js)"
 
   checks:
     needs: prepare-matrix
