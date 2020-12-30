@@ -1,43 +1,56 @@
 {
   "name": "@timeflies/app-ui",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "start": "tsc -w",
-    "test": "jest --watch",
-    "test-ci": "jest --passWithNoTests",
-    "lint": "eslint src/ --ext .ts --cache",
-    "build": "rm -rf lib && tsc",
-    "postbuild": "copyfiles -f \"src/**/*.css\" \"lib\"",
-    "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -s ../devtools/public,../static-assets/public -p 6006",
-    "build-storybook": "build-storybook"
+    "build": "yarn p:build && yarn afterbuild",
+    "afterbuild": "yarn p:copyfiles -f \"src/**/*.css\" \"lib\""
   },
   "peerDependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.50",
-    "@timeflies/common": "1.0.0",
-    "@timeflies/sprite-image": "1.0.0",
+    "@timeflies/common": "*",
+    "@timeflies/sprite-image": "*",
+    "clsx": "*",
     "react": "^17.0.1"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.12.7",
-    "@storybook/addon-actions": "^6.1.2",
-    "@storybook/addon-essentials": "^6.1.2",
-    "@storybook/addon-links": "^6.1.2",
-    "@storybook/react": "^6.1.2",
-    "@timeflies/common": "1.0.0",
-    "@types/jest": "^25.2.1",
-    "@types/react": "^16.9.53",
-    "babel-loader": "^8.2.1",
-    "eslint": "^7.4.0",
-    "jest": "^25.5.2",
+    "@babel/core": "^7.12.10",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
+    "@pixi/core": "^5.3.7",
+    "@pixi/utils": "^5.3.7",
+    "@storybook/addon-actions": "^6.2.0-alpha.10",
+    "@storybook/addon-essentials": "^6.2.0-alpha.10",
+    "@storybook/addon-links": "^6.2.0-alpha.10",
+    "@storybook/react": "^6.2.0-alpha.10",
+    "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite",
+    "@timeflies/assets-loader": "workspace:packages/assets-loader",
+    "@timeflies/cache": "workspace:packages/cache",
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/sprite-image": "workspace:packages/sprite-image",
+    "@timeflies/static-assets": "workspace:packages/static-assets",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "@types/react": "^17.0.0",
+    "clsx": "^1.1.1",
+    "pixi.js": "^5.3.7",
     "react": "^17.0.1",
-    "storybook": "^6.1.2",
-    "typescript": "3.9.2"
+    "react-dom": "^17.0.1",
+    "react-pixi-fiber": "^0.14.2",
+    "tiled-types": "^1.2.1"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/app-ui",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

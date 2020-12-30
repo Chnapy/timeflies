@@ -1,41 +1,45 @@
 {
   "name": "@timeflies/tilemap-component",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {
-    "start": "tsc -w",
-    "test": "jest --watch",
-    "test-ci": "jest --passWithNoTests",
-    "lint": "eslint src/ --ext .ts --cache",
-    "build": "rm -rf lib && tsc",
-    "check-type": "tsc --noEmit",
-    "storybook": "start-storybook -s ./.storybook/public -p 6006",
-    "build-storybook": "build-storybook"
-  },
+  "scripts": {},
   "peerDependencies": {
-    "react": "^17.0.1",
+    "@timeflies/cache": "*",
+    "@timeflies/common": "*",
+    "@timeflies/tilemap-utils": "*",
     "pixi.js": "^5.2.1",
-    "react-pixi-fiber": "^0.14.2"
-  },
-  "dependencies": {
-    "@timeflies/cache": "1.0.0",
-    "@timeflies/tilemap-utils": "1.0.0"
+    "react": "^17.0.1",
+    "react-pixi-fiber": "^0.14.2",
+    "tiled-types": "*"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.7",
-    "@storybook/addon-actions": "^6.1.2",
-    "@storybook/addon-essentials": "^6.1.2",
-    "@storybook/addon-links": "^6.1.2",
-    "@storybook/react": "^6.1.2",
-    "@types/jest": "^25.2.1",
-    "@types/react": "^16.9.53",
-    "babel-loader": "^8.2.1",
-    "eslint": "^7.4.0",
-    "jest": "^25.5.2",
-    "pixi.js": "^5.2.1",
-    "storybook": "^6.1.2",
-    "typescript": "3.9.2"
+    "@babel/core": "^7.12.10",
+    "@storybook/addon-actions": "^6.2.0-alpha.10",
+    "@storybook/addon-essentials": "^6.2.0-alpha.10",
+    "@storybook/addon-links": "^6.2.0-alpha.10",
+    "@storybook/react": "^6.2.0-alpha.10",
+    "@timeflies/cache": "workspace:packages/cache",
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "@types/react": "^17.0.0",
+    "pixi.js": "^5.3.7",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-pixi-fiber": "^0.14.2",
+    "tiled-types": "^1.2.1"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/tilemap-component",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

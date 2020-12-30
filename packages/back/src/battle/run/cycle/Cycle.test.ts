@@ -1,4 +1,5 @@
 import { BRunGlobalTurnStartSAction, denormalize, GLOBALTURN_DELAY, Normalized, ServerAction, TimerTester, TURN_DELAY } from '@timeflies/shared';
+import WebSocket from 'ws';
 import { WSSocket } from '../../../transport/ws/WSSocket';
 import { seedWebSocket } from '../../../transport/ws/WSSocket.seed';
 import { EntitiesGetter } from '../battleStateManager/BattleStateManager';
@@ -8,7 +9,6 @@ import { Player } from '../entities/player/Player';
 import { seedPlayer } from '../entities/player/Player.seed';
 import { Cycle } from './Cycle';
 import { GlobalTurn, GlobalTurnState } from './turn/GlobalTurn';
-import WebSocket = require('ws');
 
 describe('# Cycle', () => {
 

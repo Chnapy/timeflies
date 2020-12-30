@@ -34,7 +34,7 @@ describe('# use socket send with response', () => {
 
         act(() => {
             hookPromise = result.current(messageGetter);
-        });
+        }) as unknown as void;
 
         await timerTester.triggerPromises();
 

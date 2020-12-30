@@ -1,12 +1,9 @@
 import { AnimatedComplexSpriteProps, AnimatedComplexSpriteReact } from '@timeflies/animated-complex-sprite';
 import { useAssetSpritesheet } from '@timeflies/assets-loader';
-import { SpritesheetsUtils } from '@timeflies/static-assets';
 import React from 'react';
 import { Stage } from 'react-pixi-fiber';
 
-export type CharacterAnimatedImageProps = Omit<AnimatedComplexSpriteProps<
-    SpritesheetsUtils.CharacterSpriteConfig
->, 'spritesheet'> & {
+export type CharacterAnimatedImageProps = Omit<AnimatedComplexSpriteProps, 'spritesheet'> & {
     size: number;
     scale?: number;
     fallback?: React.ReactNode;

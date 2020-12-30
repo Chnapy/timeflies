@@ -7,6 +7,14 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
+# yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
 # Vendors
 node_modules/
 coverage/

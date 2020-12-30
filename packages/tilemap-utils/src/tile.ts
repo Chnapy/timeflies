@@ -1,5 +1,5 @@
 import { TiledMap, TiledTileset, TiledLayerTilelayer, TiledFrame } from 'tiled-types';
-import { createPosition, Position } from '@timeflies/shared';
+import { createPosition, Position } from '@timeflies/common';
 import { Layer } from './layer';
 
 export module Tile {
@@ -45,7 +45,7 @@ export module Tile {
 
     const getTileIdFromPosition = ({ data, width }: TiledLayerTilelayer, { x, y }: Position): number => {
         const index = x + y * width;
-        return data[ index ];
+        return (data as number[])[ index ];
     };
 
     const hasTileFromLayer = (layer: TiledLayerTilelayer, position: Position): boolean => {

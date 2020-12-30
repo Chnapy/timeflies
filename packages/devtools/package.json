@@ -1,25 +1,22 @@
 {
   "name": "@timeflies/devtools",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {
-    "start": "tsc -w",
-    "test": "echo \"not testable :)\"",
-    "test-ci": "yarn test",
-    "lint": "eslint src/ --ext .ts --cache",
-    "build": "rm -rf lib && tsc",
-    "check-type": "tsc --noEmit"
-  },
-  "peerDependencies": {
-  },
-  "dependencies": {
-  },
+  "scripts": {},
   "devDependencies": {
-    "@types/jest": "^25.2.1",
-    "eslint": "^7.4.0",
-    "jest": "^25.5.2",
-    "typescript": "3.9.2"
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "supports-color": "^8.1.0"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/devtools",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

@@ -19,7 +19,7 @@ const createTimerTester = () => {
         return now;
     };
 
-    const triggerPromises = () => new Promise(resolve => {
+    const triggerPromises = () => new Promise<void>(resolve => {
         const recursiveImmediates = (callback: () => void, i: number = 0) => {
             return setImmediate(() => {
                 if (i < nbrPromiseExpectedPerTest) {
@@ -35,16 +35,6 @@ const createTimerTester = () => {
     });
 
     const advance = async (ms: number) => {
-        const recursiveImmediates = (callback: () => void, i: number = 0) => {
-            return setImmediate(() => {
-                if (i < nbrPromiseExpectedPerTest) {
-                    recursiveImmediates(callback, i + 1);
-                } else {
-                    callback();
-                }
-            });
-        };
-
         now = getNow() + ms;
         jest.advanceTimersByTime(ms);
         await triggerPromises();

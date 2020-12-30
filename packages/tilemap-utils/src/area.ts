@@ -1,4 +1,4 @@
-import { createPosition, Normalized, Position } from '@timeflies/shared';
+import { createPosition, Normalized, Position } from '@timeflies/common';
 import { TiledMap } from 'tiled-types';
 import { Tile } from './tile';
 import bresenham from 'bresenham';

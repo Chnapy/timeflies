@@ -1,31 +1,34 @@
 {
   "name": "@timeflies/socket-client",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {
-    "start": "tsc -w",
-    "test": "jest --watch",
-    "test-ci": "jest --passWithNoTests",
-    "lint": "eslint src/ --ext .ts --cache",
-    "build": "rm -rf lib && tsc",
-    "check-type": "tsc --noEmit"
-  },
+  "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "1.0.0",
-    "@timeflies/socket-messages": "1.0.0",
+    "@timeflies/common": "*",
+    "@timeflies/socket-messages": "*",
     "react": "^17.0.1"
   },
-  "dependencies": {
-  },
   "devDependencies": {
-    "@babel/core": "^7.12.7",
-    "@types/jest": "^25.2.1",
-    "@types/react": "^16.9.53",
-    "babel-loader": "^8.2.1",
-    "eslint": "^7.4.0",
-    "jest": "^25.5.2",
-    "typescript": "3.9.2"
+    "@testing-library/react-hooks": "^3.7.0",
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/socket-messages": "workspace:packages/socket-messages",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.16",
+    "@types/react": "^17.0.0",
+    "@types/testing-library__react-hooks": "^3.4.1",
+    "react": "^17.0.1",
+    "react-test-renderer": "^17.0.1"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/socket-client",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

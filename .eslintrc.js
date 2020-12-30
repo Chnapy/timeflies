@@ -1,8 +1,15 @@
+
 module.exports = {
-    extends: [
-        "react-app"
-    ],
+    extends: [ "react-app", "react-app/jest" ],
     parser: "@typescript-eslint/parser",
+    parserOptions: {
+        project: [ './tsconfig.json', './packages/*/tsconfig.json' ],
+        ecmaVersion: 2018,
+        sourceType: 'module',
+        ecmaFeatures: {
+            jsx: true,
+        },
+    },
     plugins: [ "@typescript-eslint", "jest" ],
     rules: {
         "no-restricted-globals": [
@@ -178,30 +185,29 @@ module.exports = {
             "webkitRequestFileSystem",
             "webkitResolveLocalFileSystemURL",
             "openDatabase",
-            {
-                name: "setTimeout",
-                message: "Use promise-based waitTimeout instead."
-            },
-            {
-                name: "clearTimeout",
-                message: "Use promise-based waitTimeout instead."
-            },
         ],
+
+        "import/no-extraneous-dependencies": [ "error", {
+            "devDependencies": [
+                "**/*.test.{ts,tsx}",
+                "**/setup-tests.ts",
+                "**/*.stories.tsx",
+                "**/*.js",
+            ]
+        } ],
 
         // Typescript
 
-        "@typescript-eslint/no-unused-vars": [
-            "warn",
-            {
-                args: "none",
-                varsIgnorePattern: "^_"
-            }
-        ],
+        "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/no-floating-promises": "error",
 
+        // allow type/variable same names
+        "@typescript-eslint/no-redeclare": "off",
+
         // Jest
-        
+
         "jest/no-focused-tests": "error",
         "jest/no-identical-title": "error",
+        "jest/no-interpolation-in-snapshots": "off",
     }
 };
