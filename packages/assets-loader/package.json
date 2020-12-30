@@ -13,8 +13,11 @@
     "tiled-types": "^1.1.0"
   },
   "devDependencies": {
-    "@babel/core": "*",
-    "@storybook/react": "*",
+    "@babel/core": "^7.12.10",
+    "@storybook/addon-actions": "^6.2.0-alpha.10",
+    "@storybook/addon-essentials": "^6.2.0-alpha.10",
+    "@storybook/addon-links": "^6.2.0-alpha.10",
+    "@storybook/react": "^6.2.0-alpha.10",
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/static-assets": "workspace:packages/static-assets",
@@ -22,8 +25,8 @@
     "@types/node": "^14.14.16",
     "@types/react": "^17.0.0",
     "pixi.js": "^5.3.7",
-    "react": "*",
-    "react-dom": "*",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "tiled-types": "^1.2.1"
   }
 }

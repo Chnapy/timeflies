@@ -17,13 +17,16 @@
     "react": "*"
   },
   "devDependencies": {
-    "@babel/core": "*",
+    "@babel/core": "^7.12.10",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@pixi/core": "^5.3.7",
     "@pixi/utils": "^5.3.7",
-    "@storybook/react": "*",
+    "@storybook/addon-actions": "^6.2.0-alpha.10",
+    "@storybook/addon-essentials": "^6.2.0-alpha.10",
+    "@storybook/addon-links": "^6.2.0-alpha.10",
+    "@storybook/react": "^6.2.0-alpha.10",
     "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite",
     "@timeflies/app-ui": "workspace:packages/app-ui",
     "@timeflies/assets-loader": "workspace:packages/assets-loader",
@@ -37,8 +40,8 @@
     "@types/react": "^17.0.0",
     "clsx": "^1.1.1",
     "pixi.js": "^5.3.7",
-    "react": "*",
-    "react-dom": "*",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "react-pixi-fiber": "^0.14.2",
     "tiled-types": "^1.2.1"
   }

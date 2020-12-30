@@ -13,10 +13,14 @@
     "react-pixi-fiber": "^0.14.2"
   },
   "dependencies": {
-    "@pixi/filter-outline": "^3.1.1"
+    "@pixi/filter-outline": "^3.2.0"
   },
   "devDependencies": {
     "@pixi/core": "^5.3.7",
+    "@storybook/addon-actions": "^6.2.0-alpha.10",
+    "@storybook/addon-essentials": "^6.2.0-alpha.10",
+    "@storybook/addon-links": "^6.2.0-alpha.10",
+    "@storybook/react": "^6.2.0-alpha.10",
     "@timeflies/cache": "workspace:packages/cache",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/jest": "^26.0.19",
