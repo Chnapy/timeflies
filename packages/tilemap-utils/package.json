@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/tilemap-utils",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -19,5 +19,14 @@
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.16",
     "tiled-types": "^1.2.1"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/tilemap-utils",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

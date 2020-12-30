@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/tilemap-component",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -32,5 +32,14 @@
     "react-dom": "^17.0.1",
     "react-pixi-fiber": "^0.14.2",
     "tiled-types": "^1.2.1"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/tilemap-component",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

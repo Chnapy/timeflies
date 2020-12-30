@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/static-assets",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -13,5 +13,14 @@
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.16"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/static-assets",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

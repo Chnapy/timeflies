@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/socket-server",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -17,5 +17,14 @@
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.16",
     "@types/ws": "^7.4.0"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/socket-server",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

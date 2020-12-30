@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/assets-loader",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -28,5 +28,14 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "tiled-types": "^1.2.1"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/assets-loader",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

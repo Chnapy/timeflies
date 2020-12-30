@@ -1,9 +1,14 @@
 {
   "name": "timeflies",
   "private": true,
-  "repository": "https://github.com/Chnapy/timeflies.git",
+  "repository": {
+    "directory": ".",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
+  },
   "author": "Chnapy <richardhaddad@hotmail.fr>",
   "workspaces": [
+    "packages/!(back|front|shared)",
     "packages/!(back|front|shared)"
   ],
   "resolutions": {
@@ -78,5 +83,6 @@
     "open@7.3.0": {
       "unplugged": true
     }
-  }
+  },
+  "license": "MIT"
 }

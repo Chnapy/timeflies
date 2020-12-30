@@ -1,12 +1,21 @@
 {
   "name": "@timeflies/cache",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
   "devDependencies": {
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.16"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/cache",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

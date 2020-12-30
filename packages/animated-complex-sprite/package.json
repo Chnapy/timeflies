@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/animated-complex-sprite",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -29,5 +29,14 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-pixi-fiber": "^0.14.2"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/animated-complex-sprite",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }

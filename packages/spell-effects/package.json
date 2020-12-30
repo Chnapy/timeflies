@@ -1,7 +1,7 @@
 {
   "name": "@timeflies/spell-effects",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
@@ -18,5 +18,14 @@
     "@types/node": "^14.14.16",
     "crypto-js": "^4.0.0",
     "immer": "^8.0.0"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/spell-effects",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
   }
 }
