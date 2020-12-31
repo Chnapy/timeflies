@@ -26,7 +26,7 @@ export const produceStateFromSpellEffect = (
             .forEach(([ characterId, characterDelta ]) => {
                 const defineProp = getDefineProp(draft.characters[ characterId ], characterDelta);
 
-                defineProp('life', (prevValue, deltaValue) => prevValue + deltaValue);
+                defineProp('health', (prevValue, deltaValue) => prevValue + deltaValue);
                 defineProp('actionTime', (prevValue, deltaValue) => prevValue + deltaValue);
                 defineProp('orientation', (prevValue, deltaValue) => deltaValue);
                 defineProp('position', (prevValue, deltaValue) => deltaValue);

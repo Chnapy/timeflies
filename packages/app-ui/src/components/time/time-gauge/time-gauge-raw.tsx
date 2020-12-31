@@ -59,5 +59,5 @@ export const TimeGaugeRaw: React.FC<TimePartialProps> = ({ duration }) => {
                     [ classes.tickSpace ]: i !== 0
                 })} />
             ))}
-    </Box>
+    </Box>;
 };

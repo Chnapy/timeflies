@@ -6,7 +6,7 @@ This character is focused in time management.
 
 | Attribute | Value |
 | --- | --- |
-| Life | 90 |
+| Health | 90 |
 | Action time | 10s |
 
 ## Spells
@@ -49,7 +49,7 @@ This spell attacks target with damage depending of current remaining time. The l
 
 ### Motivation
 
-This spell boosts others characters action time, in exchange of launcher life. Life spent is shared as action time to others characters.
+This spell boosts others characters action time, in exchange of launcher health. Health spent is shared as action time to others characters.
 
 | Attribute | Value |
 | --- | --- |
@@ -57,5 +57,5 @@ This spell boosts others characters action time, in exchange of launcher life. L
 | Range area | 4 |
 | Line of sight | yes |
 | Action area | 2 |
-| Life removed (launcher) | 20 |
-| Action time gained for 10 life points (others) | 1s |
+| Health removed (launcher) | 20 |
+| Action time gained for 10 health points (others) | 1s |

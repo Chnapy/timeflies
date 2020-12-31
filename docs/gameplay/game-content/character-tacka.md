@@ -6,7 +6,7 @@ This character is focused in attack & heal.
 
 | Attribute | Value |
 | --- | --- |
-| Life | 120 |
+| Health | 120 |
 | Action time | 14s |
 
 ## Spells

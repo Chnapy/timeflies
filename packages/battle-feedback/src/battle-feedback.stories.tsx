@@ -37,7 +37,7 @@ export const Default: React.FC = () => {
                         {
                             spellRole: 'simpleAttack',
                             variables: {
-                                life: -12,
+                                health: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
@@ -47,7 +47,7 @@ export const Default: React.FC = () => {
                         {
                             spellRole: 'switch',
                             variables: {
-                                life: -12,
+                                health: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
@@ -58,7 +58,7 @@ export const Default: React.FC = () => {
                     currentEffects={{
                         spellRole: 'switch',
                         variables: {
-                            life: -12,
+                            health: -12,
                             actionTime: -2100
                         },
                         spellInfos: {
@@ -77,7 +77,7 @@ export const Default: React.FC = () => {
                         previewEffects={{
                             spellRole: 'simpleAttack',
                             variables: {
-                                life: -12,
+                                health: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
@@ -87,7 +87,7 @@ export const Default: React.FC = () => {
                         currentEffects={{
                             spellRole: 'switch',
                             variables: {
-                                life: -12,
+                                health: -12,
                                 actionTime: -2100
                             },
                             spellInfos: {
@@ -105,27 +105,27 @@ export const Default: React.FC = () => {
                         previewEffects={{
                             spellRole: 'simpleAttack',
                             variables: {
-                                life: -12,
+                                health: -12,
                             }
                         }}
                         futureEffects={[
                             {
                                 spellRole: 'simpleAttack',
                                 variables: {
-                                    life: -12,
+                                    health: -12,
                                 }
                             },
                             {
                                 spellRole: 'simpleAttack',
                                 variables: {
-                                    life: -12,
+                                    health: -12,
                                 }
                             }
                         ]}
                         currentEffects={{
                             spellRole: 'simpleAttack',
                             variables: {
-                                life: -12,
+                                health: -12,
                             },
                         }}
                     />
@@ -161,7 +161,7 @@ export const Effect: React.FC = () => {
             <Box p={2}>
                 <FeedbackEffect
                     spellCategory='offensive'
-                    variableName='life'
+                    variableName='health'
                     value={-12}
                 />
                 <FeedbackEffect
@@ -191,11 +191,11 @@ export const EffectCondensed: React.FC = () => {
             <Box p={2}>
                 <FeedbackEffectCondensed
                     spellCategory='offensive'
-                    variableNameList={[ 'life', 'actionTime' ]}
+                    variableNameList={[ 'health', 'actionTime' ]}
                 />
                 <FeedbackEffectCondensed
                     spellCategory='support'
-                    variableNameList={[ 'life', 'position', 'orientation', 'actionTime' ]}
+                    variableNameList={[ 'health', 'position', 'orientation', 'actionTime' ]}
                 />
             </Box>
         </Card>
@@ -256,7 +256,7 @@ export const Stack: React.FC = () => {
                 <FeedbackEffectsStack
                     spellRole='move'
                     variables={{
-                        life: -12,
+                        health: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
@@ -269,7 +269,7 @@ export const Stack: React.FC = () => {
                 <FeedbackEffectsStack
                     spellRole='move'
                     variables={{
-                        life: -12,
+                        health: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
@@ -283,7 +283,7 @@ export const Stack: React.FC = () => {
                 <FeedbackEffectsStack
                     spellRole='move'
                     variables={{
-                        life: -12,
+                        health: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}
@@ -298,7 +298,7 @@ export const Stack: React.FC = () => {
                 <FeedbackEffectsStack
                     spellRole='move'
                     variables={{
-                        life: -12,
+                        health: -12,
                         actionTime: 2100,
                         orientation: 'left'
                     }}

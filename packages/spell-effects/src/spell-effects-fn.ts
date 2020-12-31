@@ -30,7 +30,7 @@ export const createSpellEffectHelper = ({ spellAction, context }: SpellEffectFnP
         },
         getHitCharactersAlive: () => {
             return getHitCharacters()
-                .filter(character => CharacterUtils.isAlive(character.life));
+                .filter(character => CharacterUtils.isAlive(character.health));
         },
         targetPos: spellAction.targetPos,
     };

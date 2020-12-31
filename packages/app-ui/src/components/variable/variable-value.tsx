@@ -32,7 +32,7 @@ export const VariableValue: React.FC<VariableValueProps> = ({ variableName, valu
     );
 
     return switchUtil(variableName, {
-        life: renderNumeric,
+        health: renderNumeric,
         actionTime: renderNumeric,
         position: renderNull,
         orientation: renderText,

@@ -22,7 +22,7 @@ export const VariableIcon: React.FC<VariableIconProps> = props => {
     // TODO
     const Component = switchUtil(props.variableName, {
         // character
-        life: () => FavoriteIcon,
+        health: () => FavoriteIcon,
         actionTime: () => HourglassFullIcon,
         position: () => NoopComponent,
         orientation: () => NoopComponent,

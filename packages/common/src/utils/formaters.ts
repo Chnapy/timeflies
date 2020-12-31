@@ -19,7 +19,7 @@ const variableFormatters: {
     [ name in EntitiesVariablesName ]: (value: VariableValue<name>) => string
 } = {
     // character
-    life: String,
+    health: String,
     actionTime: timeFormat,
     position: noopFormat,
     orientation: String,

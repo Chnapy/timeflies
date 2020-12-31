@@ -30,7 +30,7 @@ Several attributes compose a spell. All of them are statics, and cannot change d
 
 - Attack
 
-    When a character receive this spell, how many life points it removes (or add). Can be null, a spell doesn't necessarily have to attack/heal.
+    When a character receive this spell, how many health points it removes (or add). Can be null, a spell doesn't necessarily have to attack/heal.
 
 ## Spell prepare & launch
 
@@ -48,7 +48,7 @@ Any spell launched without respecting these condition will be rejected.
 ## Spell effects
 
 Spells can affect many character attributes:
-- Life
+- Health
 - Action time (only if not current character)
 - Position
 - Orientation
@@ -56,7 +56,7 @@ Spells can affect many character attributes:
 > Note that any change is permanent, there is not temporary effects even for action time.
 
 There effects can also depend of these attributes, from targets, of launcher. There are many possibilities, some random samples:
-- an offensive spell that attacks a character, and absorb half of removed life points
+- an offensive spell that attacks a character, and absorb half of removed health points
 - a placing spell that moves the launcher symmetrically from a pivot targeted character
 - an offensive spell that triple its damages if target is from the back
-- a support spell that boost others characters action time in exchange of its own life points
+- a support spell that boost others characters action time in exchange of its own health points

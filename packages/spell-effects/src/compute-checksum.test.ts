@@ -10,7 +10,7 @@ describe('# compute checksum', () => {
                     actionTime: 234
                 } as any,
                 bar: {
-                    life: 100
+                    health: 100
                 } as any
             },
             spells: {
@@ -30,7 +30,7 @@ describe('# compute checksum', () => {
                     actionTime: 234
                 } as any,
                 bar: {
-                    life: 100
+                    health: 100
                 } as any
             },
             spells: {}
@@ -40,7 +40,7 @@ describe('# compute checksum', () => {
             spells: {},
             characters: {
                 bar: {
-                    life: 100
+                    health: 100
                 } as any,
                 foo: {
                     actionTime: 234
