@@ -11,7 +11,7 @@ export const simpleAttackEffect: SpellEffectFn = ({
 
     const characters = targets.reduce<SpellEffectCharacters>((acc, v) => {
         acc[ v.id ] = {
-            life: -attack
+            health: -attack
         };
         return acc;
     }, {});

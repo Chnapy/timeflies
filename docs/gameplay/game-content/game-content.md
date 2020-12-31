@@ -12,7 +12,7 @@ For comparaison this is default attributes values:
 
 | Attribute | Default value |
 | --- | --- |
-| Life | 100 |
+| Health | 100 |
 | Action time | 10s |
 
 Each role has 4 spells, generally composed of:

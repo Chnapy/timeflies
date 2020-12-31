@@ -6,7 +6,7 @@ This character is focused in placement & map control.
 
 | Attribute | Value |
 | --- | --- |
-| Life | 80 |
+| Health | 80 |
 | Action time | 20s |
 
 ## Spells
@@ -37,7 +37,7 @@ Target is moved to 3 tiles. If any obstacle is encounter, move is interrupted at
 
 ### Treacherous blow
 
-This spell attacks its target, removing life points. If target is from the back (from launcher point of view), then damages are considerably increased. Also change target orientation towards launcher.
+This spell attacks its target, removing health points. If target is from the back (from launcher point of view), then damages are considerably increased. Also change target orientation towards launcher.
 
 | Attribute | Value |
 | --- | --- |
@@ -49,7 +49,7 @@ This spell attacks its target, removing life points. If target is from the back 
 
 ### Pressure
 
-If target is an enemy, this spell removes life points from him. If target is an ally, this spell boosts him in action time.
+If target is an enemy, this spell removes health points from him. If target is an ally, this spell boosts him in action time.
 This spell does nothing if target orientation is not toward launcher.
 
 | Attribute | Value |

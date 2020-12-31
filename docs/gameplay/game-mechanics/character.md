@@ -9,9 +9,9 @@ Characters can be very different depending of there **roles**, representing all 
 
 Characters have several attributes:
 
-- **Life**
+- **Health**
 
-    To play a character, he has to be alive. His life has to be more than 0, otherwise he dies and cannot be played again. 
+    To play a character, he has to be alive. His health has to be more than 0, otherwise he dies and cannot be played again. 
 
 - **Action time**
 

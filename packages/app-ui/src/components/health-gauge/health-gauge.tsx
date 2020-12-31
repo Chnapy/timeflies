@@ -31,7 +31,7 @@ const useStyles = makeStyles(({ palette }) => ({
     }),
     tick: ({ direction }: Pick<HealthGaugeProps, 'direction'>) => ({
         flexGrow: 1,
-        backgroundColor: palette.variables.life,
+        backgroundColor: palette.variables.health,
         ...switchUtil(direction, {
             horizontal: {
                 height: '100%',

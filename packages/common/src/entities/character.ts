@@ -10,7 +10,7 @@ export const characterRoleList = [
 ] as const;
 
 export type CharacterVariables = {
-    life: number;
+    health: number;
     actionTime: number;
     position: Position;
     orientation: Orientation;
@@ -19,5 +19,5 @@ export type CharacterVariables = {
 export type CharacterVariableName = keyof CharacterVariables;
 
 export module CharacterUtils {
-    export const isAlive = (life: number) => life > 0;
+    export const isAlive = (health: number) => health > 0;
 }

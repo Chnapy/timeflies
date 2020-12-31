@@ -41,7 +41,7 @@ export const appTheme: Theme = createMuiTheme({
             level1: bgMain
         },
         variables: {
-            life: '#EB6F6F',
+            health: '#EB6F6F',
             actionTime: primary,
             rangeArea: '#8875FF',
             actionArea: '#D63551',

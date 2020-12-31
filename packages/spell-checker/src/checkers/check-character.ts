@@ -6,7 +6,7 @@ const getHelper = ({ context }: CheckerParams) => ({
     isCharacterAlive: (characterId: CharacterId) => {
         const characterVariables = context.state.characters[ characterId ];
 
-        return CharacterUtils.isAlive(characterVariables.life);
+        return CharacterUtils.isAlive(characterVariables.health);
     }
 })
 
