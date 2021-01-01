@@ -18,7 +18,7 @@
     "p:start": "cd $INIT_CWD && tsc -w",
     "p:test": "cd $INIT_CWD && jest --watch",
     "p:test-ci": "cd $INIT_CWD && jest --passWithNoTests",
-    "p:build": "cd $INIT_CWD && rm -rf lib && tsc",
+    "p:build": "cd $INIT_CWD && rm -rf lib && tsc && yarn workspaces foreach run afterbuild",
     "p:build-recursive": "cd $INIT_CWD && yarn workspaces foreach -vR --topological-dev run p:build",
     "p:check-type": "cd $INIT_CWD && tsc --noEmit",
     "p:check-lint": "cd $INIT_CWD && eslint src/ --ext .ts,.tsx,.js --cache",
