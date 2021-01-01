@@ -10,6 +10,7 @@ export type SpellButtonProps = {
     imageSize: number;
     selected: boolean;
     disabled: boolean;
+    onClick: () => void;
 };
 
 type StyleProps = Pick<SpellButtonProps, 'selected' | 'disabled'>;
@@ -49,7 +50,7 @@ const useStyles = makeStyles(({ palette, transitions }) => ({
 }));
 
 export const SpellButton: React.FC<SpellButtonProps> = ({
-    spellRole, duration, imageSize, selected, disabled
+    spellRole, duration, imageSize, selected, disabled, onClick
 }) => {
     const classes = useStyles({ selected, disabled });
 
@@ -58,7 +59,7 @@ export const SpellButton: React.FC<SpellButtonProps> = ({
             <div className={classes.timeGauge}>
                 <TimeGauge duration={duration} />
             </div>
-            <ButtonBase className={classes.button} disabled={disabled}>
+            <ButtonBase className={classes.button} onClick={onClick} disabled={disabled}>
                 <SpellIcon size={imageSize} spellRole={spellRole} padding={4} />
             </ButtonBase>
         </div>

@@ -1,4 +1,5 @@
 import { Box, Card } from '@material-ui/core';
+import { action } from '@storybook/addon-actions';
 import { Meta } from '@storybook/react/types-6-0';
 import { AssetsLoader } from '@timeflies/assets-loader';
 import { Assets } from '@timeflies/static-assets';
@@ -31,6 +32,7 @@ export const Default: React.FC = () => {
                         imageSize={56}
                         selected={false}
                         disabled={false}
+                        onClick={action('move')}
                     />
 
                     <SpellButton
@@ -39,6 +41,7 @@ export const Default: React.FC = () => {
                         imageSize={56}
                         selected
                         disabled={false}
+                        onClick={action('switch')}
                     />
 
                     <SpellButton
@@ -47,6 +50,7 @@ export const Default: React.FC = () => {
                         imageSize={56}
                         selected={false}
                         disabled
+                        onClick={action('switch')}
                     />
 
                 </Box>
@@ -59,19 +63,22 @@ export const Default: React.FC = () => {
                             spellRole: 'move',
                             duration: 800,
                             selected: false,
-                            disabled: false
+                            disabled: false,
+                            onClick: action('move')
                         },
                         simpleAttack: {
                             spellRole: 'simpleAttack',
                             duration: 2500,
                             selected: false,
-                            disabled: true
+                            disabled: true,
+                            onClick: action('simpleAttack')
                         },
                         switch: {
                             spellRole: 'switch',
                             duration: 9605,
                             selected: true,
-                            disabled: false
+                            disabled: false,
+                            onClick: action('switch')
                         }
                     }}
                     spellRoleList={[ 'move', 'simpleAttack', 'switch', 'switch' ]}
