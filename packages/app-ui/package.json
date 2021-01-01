@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "p:afterbuild": "yarn p:copyfiles -f \"src/**/*.css\" \"lib\""
+    "afterbuild": "yarn p:copyfiles -f \"src/**/*.css\" \"lib\""
   },
   "peerDependencies": {
     "@material-ui/core": "^4.9.11",
