@@ -1,25 +1,25 @@
 {
-  "name": "@timeflies/app-ui",
+  "name": "@timeflies/spell-button-panel",
   "version": "1.0.0",
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {
-    "p:afterbuild": "yarn p:copyfiles -f \"src/**/*.css\" \"lib\""
-  },
+  "scripts": {},
   "peerDependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.50",
+    "@timeflies/app-ui": "*",
+    "@timeflies/assets-loader": "*",
     "@timeflies/common": "*",
-    "@timeflies/sprite-image": "*",
     "clsx": "*",
-    "react": "^17.0.1"
+    "react": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "@pixi/core": "^5.3.7",
     "@pixi/utils": "^5.3.7",
     "@storybook/addon-actions": "^6.2.0-alpha.10",
@@ -27,6 +27,7 @@
     "@storybook/addon-links": "^6.2.0-alpha.10",
     "@storybook/react": "^6.2.0-alpha.10",
     "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite",
+    "@timeflies/app-ui": "workspace:packages/app-ui",
     "@timeflies/assets-loader": "workspace:packages/assets-loader",
     "@timeflies/cache": "workspace:packages/cache",
     "@timeflies/common": "workspace:packages/common",
@@ -48,7 +49,7 @@
     "node": ">=12"
   },
   "repository": {
-    "directory": "packages/app-ui",
+    "directory": "packages/spell-button-panel",
     "type": "git",
     "url": "https://github.com/Chnapy/timeflies.git"
   }
