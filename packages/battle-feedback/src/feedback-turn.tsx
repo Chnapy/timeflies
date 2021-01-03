@@ -1,5 +1,6 @@
 import { Box } from '@material-ui/core';
-import { TimeCounter, TimeFullProps, TimeGauge, TurnIcon } from '@timeflies/app-ui';
+import { TimeFullProps, TurnIcon } from '@timeflies/app-ui';
+import { TimeCounter, TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
 import { FeedbackContainer } from './feedback-container';
 
@@ -19,7 +20,7 @@ export const FeedbackTurn: React.FC<FeedbackTurnProps> = props => {
         }
         bottom={
             <Box width='100%' p={0.25}>
-            <TimeGauge {...props} />
+                <TimeGauge {...props} />
             </Box>
         }
     />;
