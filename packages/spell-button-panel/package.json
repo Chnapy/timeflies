@@ -12,6 +12,7 @@
     "@timeflies/app-ui": "*",
     "@timeflies/assets-loader": "*",
     "@timeflies/common": "*",
+    "@timeflies/time-gauge-panel": "*",
     "clsx": "*",
     "react": "*"
   },
@@ -34,6 +35,7 @@
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/sprite-image": "workspace:packages/sprite-image",
     "@timeflies/static-assets": "workspace:packages/static-assets",
+    "@timeflies/time-gauge-panel": "workspace:packages/time-gauge-panel",
     "@types/jest": "^26.0.19",
     "@types/node": "^14.14.16",
     "@types/react": "^17.0.0",

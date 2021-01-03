@@ -1,7 +1,8 @@
 import { ButtonBase, makeStyles } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { SpellIcon, TimeGauge } from '@timeflies/app-ui';
+import { SpellIcon } from '@timeflies/app-ui';
 import { SpellRole } from '@timeflies/common';
+import { TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
 
 export type SpellButtonProps = {

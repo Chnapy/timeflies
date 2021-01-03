@@ -8,6 +8,9 @@ import { TimeGaugeBig } from '../time-gauge/time-gauge-big';
 export type TimeGaugePanelProps = SpellGaugeListProps;
 
 const useStyles = makeStyles(({ palette, spacing }) => ({
+    root: {
+        pointerEvents: 'none'
+    },
     background: {
         position: 'absolute',
         left: 0,
@@ -17,11 +20,13 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
         opacity: 0.5
     },
     gaugesWrapper: {
+        pointerEvents: 'all',
         position: 'relative',
         backgroundColor: palette.background.paper,
         padding: spacing(1)
     },
     counterWrapper: {
+        pointerEvents: 'all',
         position: 'relative',
         backgroundColor: palette.background.paper,
         minWidth: 56,
@@ -57,7 +62,7 @@ export const TimeGaugePanel: React.FC<TimeGaugePanelProps> = ({
         <div className={classes.background} />
     );
 
-    return <Grid container direction='column' alignItems='stretch'>
+    return <Grid className={classes.root} container direction='column' alignItems='stretch'>
         <Grid item xs={12}>
             <div className={classes.gaugesWrapper}>
                 {background}
