@@ -1,4 +1,4 @@
 export * from './time-props';
-export * from './time-counter';
-export * from './time-gauge/time-gauge';
+export * from './time-hooks';
+export * from './time-utils';
 export * from './turn-icon';

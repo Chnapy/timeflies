@@ -2,13 +2,18 @@ import React from 'react';
 
 
 export function useCadencedTime<V>(memo: (time: number) => V) {
-    const getMemoValue = () => memo(Date.now());
+    const getMemoValue = React.useCallback(
+        () => memo(Date.now()),
+        [ memo ]
+    );
     const [ value, setValue ] = React.useState(getMemoValue);
 
+    const requestRef = React.useRef<number>();
+
     React.useEffect(() => {
+        cancelAnimationFrame(requestRef.current!);
 
         let enable = true;
-        let request: number;
 
         // handle time between setValue() and next render
         let tempValue = value;
@@ -25,16 +30,16 @@ export function useCadencedTime<V>(memo: (time: number) => V) {
                 setValue(memoNow);
             }
 
-            request = requestAnimationFrame(update);
+            requestRef.current = requestAnimationFrame(update);
         };
 
-        request = requestAnimationFrame(update);
+        requestRef.current = requestAnimationFrame(update);
 
         return () => {
             enable = false;
-            cancelAnimationFrame(request);
+            cancelAnimationFrame(requestRef.current!);
         };
-    }, [  ]);
+    }, [ getMemoValue, value ]);
 
     return value;
 };

@@ -1,7 +1,7 @@
 import { Box } from '@material-ui/core';
-import { SpellIcon, TimeGauge, TimeCounter } from '@timeflies/app-ui';
-import { TimeProps } from '@timeflies/app-ui';
+import { SpellIcon, TimeProps } from '@timeflies/app-ui';
 import { SpellRole } from '@timeflies/common';
+import { TimeCounter, TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
 import { FeedbackContainer, feedbackItemHeight } from './feedback-container';
 

@@ -3660,6 +3660,7 @@ __metadata:
     "@timeflies/devtools": "workspace:packages/devtools"
     "@timeflies/sprite-image": "workspace:packages/sprite-image"
     "@timeflies/static-assets": "workspace:packages/static-assets"
+    "@timeflies/time-gauge-panel": "workspace:packages/time-gauge-panel"
     "@types/jest": ^26.0.19
     "@types/node": ^14.14.16
     "@types/react": ^17.0.0
@@ -3677,6 +3678,7 @@ __metadata:
     "@timeflies/assets-loader": "*"
     "@timeflies/common": "*"
     "@timeflies/static-assets": "*"
+    "@timeflies/time-gauge-panel": "*"
     clsx: "*"
     react: "*"
   languageName: unknown
@@ -3959,6 +3961,49 @@ __metadata:
   peerDependencies:
     "@timeflies/common": "*"
     tiled-types: ^1.2.1
+  languageName: unknown
+  linkType: soft
+
+"@timeflies/time-gauge-panel@workspace:packages/time-gauge-panel":
+  version: 0.0.0-use.local
+  resolution: "@timeflies/time-gauge-panel@workspace:packages/time-gauge-panel"
+  dependencies:
+    "@babel/core": ^7.12.10
+    "@material-ui/core": ^4.11.2
+    "@material-ui/icons": ^4.11.2
+    "@material-ui/lab": ^4.0.0-alpha.57
+    "@pixi/core": ^5.3.7
+    "@pixi/utils": ^5.3.7
+    "@storybook/addon-actions": ^6.2.0-alpha.10
+    "@storybook/addon-essentials": ^6.2.0-alpha.10
+    "@storybook/addon-links": ^6.2.0-alpha.10
+    "@storybook/react": ^6.2.0-alpha.10
+    "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite"
+    "@timeflies/app-ui": "workspace:packages/app-ui"
+    "@timeflies/assets-loader": "workspace:packages/assets-loader"
+    "@timeflies/cache": "workspace:packages/cache"
+    "@timeflies/common": "workspace:packages/common"
+    "@timeflies/devtools": "workspace:packages/devtools"
+    "@timeflies/sprite-image": "workspace:packages/sprite-image"
+    "@timeflies/static-assets": "workspace:packages/static-assets"
+    "@types/jest": ^26.0.19
+    "@types/node": ^14.14.16
+    "@types/react": ^17.0.0
+    clsx: ^1.1.1
+    pixi.js: ^5.3.7
+    react: ^17.0.1
+    react-dom: ^17.0.1
+    react-pixi-fiber: ^0.14.2
+    tiled-types: ^1.2.1
+  peerDependencies:
+    "@material-ui/core": ^4.9.11
+    "@material-ui/icons": ^4.9.1
+    "@material-ui/lab": ^4.0.0-alpha.50
+    "@timeflies/app-ui": "*"
+    "@timeflies/assets-loader": "*"
+    "@timeflies/common": "*"
+    clsx: "*"
+    react: "*"
   languageName: unknown
   linkType: soft
 

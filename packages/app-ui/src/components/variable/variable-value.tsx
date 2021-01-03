@@ -3,7 +3,7 @@ import { EntitiesVariables, EntitiesVariablesName, formatVariableValue, switchUt
 import React from 'react';
 import { UIText } from '../ui-text/ui-text';
 
-type VariableValueProps<N extends EntitiesVariablesName = EntitiesVariablesName> = {
+export type VariableValueProps<N extends EntitiesVariablesName = EntitiesVariablesName> = {
     variableName: N;
     value: Required<EntitiesVariables>[ N ];
     relative?: boolean;
