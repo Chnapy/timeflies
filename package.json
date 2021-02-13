@@ -22,12 +22,11 @@
     "p:build-recursive": "cd $INIT_CWD && yarn workspaces foreach -vR --topological-dev run p:build",
     "p:check-type": "cd $INIT_CWD && tsc --noEmit",
     "p:check-lint": "cd $INIT_CWD && eslint src/ --ext .ts,.tsx,.js --cache",
-    "p:check-deps": "yarn dlx @yarnpkg/doctor $(yarn p:cwd)",
+    "p:check-deps": "bash -c scripts/check-deps.sh",
     "p:check-all": "cd $INIT_CWD && concurrently --kill-others-on-fail --names \"check-type,check-lint,check-deps\" -c \"cyan.dim,yellow.dim,magenta.dim\" \"yarn p:check-type\" \"yarn p:check-lint\" \"yarn p:check-deps\"",
     "p:storybook": "cd $INIT_CWD && start-storybook -s ../devtools/public,../static-assets/public -p 6006",
     "p:build-storybook": "cd $INIT_CWD && build-storybook",
     "p:copyfiles": "cd $INIT_CWD && copyfiles",
-    "p:cwd": "bash -c scripts/get-cwd.sh",
     "foreach-check-all": "yarn workspaces foreach -v --exclude '**/timeflies' run p:check-all",
     "foreach-build-all": "yarn workspaces foreach -v --exclude '**/timeflies' run p:build-recursive",
     "heroku-postbuild": "yarn workspace @timeflies/shared run build && yarn workspace @timeflies/back run build"
