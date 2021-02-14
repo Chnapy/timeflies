@@ -21,16 +21,24 @@ declare module '@material-ui/core/styles/createPalette' {
     tock: string;
   };
 
+  export type PalettePlayerRelations = {
+    me: string;
+    ally: string;
+    enemy: string;
+  };
+
   interface Palette {
     variables: PaletteVariables;
     spellCategories: PaletteSpellCategories;
     timeItems: PaletteTimeItems;
+    playerRelations: PalettePlayerRelations;
   }
 
   interface PaletteOptions {
     variables: PaletteVariables;
     spellCategories: PaletteSpellCategories;
     timeItems: PaletteTimeItems;
+    playerRelations: PalettePlayerRelations;
   }
 }
 
