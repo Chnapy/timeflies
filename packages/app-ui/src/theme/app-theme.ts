@@ -60,6 +60,11 @@ export const appTheme: Theme = createMuiTheme({
         timeItems: {
             tick: primary,
             tock: '#FF8C22'
+        },
+        playerRelations: {
+            me: white,
+            ally: '#5DAEE9',
+            enemy: '#EB5757'
         }
     },
     shape: {
