@@ -12,7 +12,17 @@ const assertBattleState = (battleState: GameState[ 'battle' ]): asserts battleSt
 
 export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
     [ BattleLoadAction.type ]: (state, { payload }: BattleLoadAction): BattleState => {
-        const { myPlayerId, tiledMapLinks, players, characters, spells, startTime, turnsOrder } = payload;
+        const { myPlayerId, tiledMapInfos: mapInfos, players, characters, spells, startTime, turnsOrder } = payload;
+
+        const getTiledMap = () => {
+            const { name, schemaLink } = mapInfos;
+            const tiledMapInfos: BattleState[ 'tiledMapInfos' ] = {
+                name,
+                schemaLink
+            };
+
+            return { tiledMapInfos };
+        };
 
         const getPlayers = () => {
             const staticPlayers = players.reduce<BattleState[ 'staticPlayers' ]>((acc, { playerId, playerName, teamColor }) => {
@@ -109,10 +119,12 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             return { staticSpells, currentSpells, futureSpells, spellLists };
         };
 
-        const playingCharacterId = turnsOrder[0];
+        const playingCharacterId = turnsOrder[ 0 ];
 
         return {
             myPlayerId,
+
+            ...getTiledMap(),
 
             ...getPlayers(),
 

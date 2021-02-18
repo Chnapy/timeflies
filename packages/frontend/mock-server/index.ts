@@ -1,12 +1,30 @@
 import { createPosition } from '@timeflies/common';
 import { BattleLoadMessage } from '@timeflies/socket-messages';
+import * as cors from "cors";
+import * as express from 'express';
+import * as http from 'http';
+
+const app = express() as any;
+
+app.use(
+    cors({ allowedHeaders: '*' }),
+);
+
+app.use('/public', express.static('mock-server/public'));
+
+const server = http.createServer(app);
 
 const WebSocketServer = require('ws').Server;
 
 const port = 40510;
-const wss = new WebSocketServer({ port });
+const wss = new WebSocketServer({ server });
 
-console.log('Mock server started - Port', port);
+console.log('Mock server started');
+
+server.listen(port, () => {
+    console.log('server listening address', server.address());
+    console.log('ws listening address', wss.address());
+});
 
 wss.on('connection', function (ws) {
     const send = action => {
@@ -25,9 +43,12 @@ wss.on('connection', function (ws) {
             if (BattleLoadMessage.match(message)) {
                 const response = BattleLoadMessage.createResponse(message.requestId, {
                     myPlayerId: 'p1',
-                    tiledMapLinks: {
-                        schema: 'schema-url',
-                        images: {}
+                    tiledMapInfos: {
+                        name: 'dungeon',
+                        schemaLink: 'http://localhost:40510/public/maps/map_dungeon.json',
+                        imagesLinks: {
+                            "tiles_dungeon_v1.1": 'http://localhost:40510/public/maps/map_dungeon.png'
+                        }
                     },
                     players: [
                         {

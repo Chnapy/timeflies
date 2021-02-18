@@ -39,6 +39,11 @@ export type SpellAction = TimeFullProps & {
 export type BattleState = {
     myPlayerId: PlayerId;
 
+    tiledMapInfos: {
+        name: string;
+        schemaLink: string;
+    };
+
     // players
 
     staticPlayers: { [ playerId in PlayerId ]: StaticPlayer };

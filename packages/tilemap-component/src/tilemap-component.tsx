@@ -53,7 +53,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
         return texture;
     });
 
-    const getTileGraphic = (id: number, index: number, layer: TiledLayerTilelayer, interactive?: boolean) => {
+    const getTileGraphic = (id: number, index: number, layer: TiledLayerTilelayer, interactive: boolean = false) => {
 
         const tileset = Tile.getTilesetFromTileId(id, mapSheet);
         if (!tileset) {

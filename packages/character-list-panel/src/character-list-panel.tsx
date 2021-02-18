@@ -28,7 +28,7 @@ export const CharacterListPanel: React.FC<CharacterListPanelProps> = ({
     const classes = useStyles();
 
     return (
-        <Box position='relative' display='inline-flex' p={2}>
+        <Box position='relative' display='inline-flex' p={2} zIndex={0}>
             <Paper className={classes.background} />
 
             <Grid container direction='column' spacing={1}>

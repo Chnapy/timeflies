@@ -1,9 +1,10 @@
 import { CharacterId, CharacterRole, CharacterVariables, PlayerId, SpellId, SpellRole, SpellVariables } from '@timeflies/common';
 import { createMessage } from '../message';
 
-type TiledMapLinks = {
-    schema: string;
-    images: Record<string, string>;
+type TiledMapInfos = {
+    name: string;
+    schemaLink: string;
+    imagesLinks: Record<string, string>;
 };
 
 type PlayerData = {
@@ -30,7 +31,7 @@ type SpellData = {
 export type BattleLoadData = {
     myPlayerId: PlayerId;
 
-    tiledMapLinks: TiledMapLinks;
+    tiledMapInfos: TiledMapInfos;
 
     players: PlayerData[];
 
