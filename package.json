@@ -11,9 +11,6 @@
     "packages/!(back|front|shared)",
     "packages/!(back|front|shared)"
   ],
-  "resolutions": {
-    "immer": "6.0.8"
-  },
   "scripts": {
     "p:start": "cd $INIT_CWD && tsc -w",
     "p:test": "cd $INIT_CWD && jest --watch",
