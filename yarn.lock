@@ -4433,6 +4433,7 @@ __metadata:
     clsx: ^1.1.1
     cors: ^2.8.5
     express: ^4.17.1
+    pixi-viewport: ^4.18.1
     pixi.js: ^5.3.7
     react: ^17.0.1
     react-dom: ^17.0.1
@@ -16122,6 +16123,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"penner@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "penner@npm:0.1.3"
+  checksum: 98f2588e6785bcb18d421b80f64f93b8626db1f02702d2597a4074280019996cb8360d673c1eee88de8192c79428a86e61e117b9435a05d441ee56760ed4c18b
+  languageName: node
+  linkType: hard
+
 "performance-now@npm:^2.1.0":
   version: 2.1.0
   resolution: "performance-now@npm:2.1.0"
@@ -16179,6 +16187,17 @@ fsevents@~2.1.2:
   dependencies:
     node-modules-regexp: ^1.0.0
   checksum: 21604008c36ab6e14ac458e1a267dd7322cfd36b9e1042e9e277dd064582717e30b9aba8c0a47d738bf004ee7946ed27f6b982d30968534f2c6b5b168a52b555
+  languageName: node
+  linkType: hard
+
+"pixi-viewport@npm:^4.18.1":
+  version: 4.18.1
+  resolution: "pixi-viewport@npm:4.18.1"
+  dependencies:
+    penner: ^0.1.3
+  peerDependencies:
+    pixi.js: ">=4.6.0"
+  checksum: 288ef609fb23fe3eb060a4e50dcbb9addecfdd1c959875999789fd7c27ddf8d95f285307921b6933a4c0d00c87da0b7dc42ea6071b15e3541b87b8a0963e8f17
   languageName: node
   linkType: hard
 

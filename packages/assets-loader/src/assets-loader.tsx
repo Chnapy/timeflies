@@ -1,7 +1,7 @@
 import { ObjectTyped } from '@timeflies/common';
 import { Loader } from 'pixi.js';
 import React from 'react';
-import { AssetsContextProvider } from './assets-context';
+import { AssetsContext } from './assets-context';
 import { AssetsLoaderMap, AssetsMap } from './assets-types';
 import { createLoader, createResourceName, mapStringUtil } from './create-loader';
 
@@ -95,8 +95,8 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
     }, [ spritesheets, maps ]);
 
     return (
-        <AssetsContextProvider value={assetsMap}>
+        <AssetsContext.Provider value={assetsMap}>
             {children}
-        </AssetsContextProvider>
+        </AssetsContext.Provider>
     );
 };

@@ -1,23 +1,18 @@
 import { makeStyles } from '@material-ui/core';
-import { useAssetMap } from '@timeflies/assets-loader';
-import { TilemapComponent } from '@timeflies/tilemap-component';
-import { Texture } from 'pixi.js';
+import { AssetsContext, useAssetMap } from '@timeflies/assets-loader';
+import { ContextBridge } from '@timeflies/context-bridge';
 import React from 'react';
-import { Container, Stage } from 'react-pixi-fiber';
+import { Stage } from 'react-pixi-fiber';
+import { ReactReduxContext } from 'react-redux';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { BattleTilemap } from './battle-tilemap';
+import { BattleViewport } from './battle-viewport';
 
 const useStyles = makeStyles(() => ({
     root: {
         height: '100vh'
     }
 }));
-
-const imagesLinksToTextures = (links: Record<string, string>) => {
-    return Object.entries(links).reduce<Record<string, Texture>>((acc, [ key, source ]) => {
-        acc[ key ] = Texture.from(source);
-        return acc;
-    }, {});
-};
 
 export const BattleCanvas: React.FC = () => {
     const classes = useStyles();
@@ -27,18 +22,27 @@ export const BattleCanvas: React.FC = () => {
 
     return (
         <div ref={rootRef} className={classes.root}>
-            {tiledMapAssets && rootRef.current && <Stage options={{
-                resizeTo: rootRef.current, 
-            }}>
-                <Container scale={3}>
-                    <TilemapComponent
-                        mapSheet={tiledMapAssets.schema}
-                        mapTexture={imagesLinksToTextures(tiledMapAssets.images)}
-                    >
-                        {{}}
-                    </TilemapComponent>
-                </Container>
-            </Stage>}
+            {tiledMapAssets && rootRef.current && (
+                <ContextBridge
+                    contexts={[
+                        ReactReduxContext,
+                        AssetsContext
+                    ]}
+                    barrierRender={children => {
+                        return (
+                            <Stage options={{
+                                resizeTo: rootRef.current!,
+                            }}>
+                                {children}
+                            </Stage>
+                        );
+                    }}
+                >
+                    <BattleViewport>
+                        <BattleTilemap/>
+                    </BattleViewport>
+                </ContextBridge>
+            )}
         </div>
     );
 };
