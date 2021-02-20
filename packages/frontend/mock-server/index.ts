@@ -57,7 +57,7 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
                 actionTime: 10000,
                 health: 100,
                 orientation: 'bottom',
-                position: createPosition(1, 1),
+                position: createPosition(8, 3),
             },
         },
         {
@@ -69,7 +69,7 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
                 actionTime: 12000,
                 health: 120,
                 orientation: 'left',
-                position: createPosition(2, 1),
+                position: createPosition(10, 3),
             },
         },
         {
@@ -80,8 +80,8 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
             initialVariables: {
                 actionTime: 9000,
                 health: 110,
-                orientation: 'bottom',
-                position: createPosition(3, 1),
+                orientation: 'top',
+                position: createPosition(9, 11),
             },
         }
     ],

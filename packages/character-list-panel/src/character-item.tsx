@@ -1,12 +1,10 @@
 import { Grid, makeStyles } from '@material-ui/core';
 import { HealthGauge, UIText } from '@timeflies/app-ui';
-import { CharacterRole, CharacterUtils, switchUtil } from '@timeflies/common';
+import { CharacterRole, CharacterUtils, PlayerRelation, switchUtil } from '@timeflies/common';
 import { CharacterAnimatedImage } from '@timeflies/sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import clsx from 'clsx';
 import React from 'react';
-
-export type PlayerRelation = 'me' | 'ally' | 'enemy';
 
 export type CharacterItemProps = {
     playerName: string;
