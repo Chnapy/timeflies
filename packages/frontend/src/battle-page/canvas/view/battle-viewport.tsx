@@ -1,5 +1,6 @@
 import { useAssetMap } from '@timeflies/assets-loader';
 import { Viewport, ViewportOptions } from 'pixi-viewport';
+import * as PIXI from 'pixi.js';
 import React from 'react';
 import { CustomPIXIComponent, usePixiApp } from 'react-pixi-fiber';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
@@ -30,6 +31,8 @@ const ViewportComponent = CustomPIXIComponent<Viewport, ViewportOptions>({
     }
 }, 'ViewportComponent');
 
+const getScreenSize = ({ renderer }: PIXI.Application) => [ renderer.screen.width, renderer.screen.height ];
+
 export const BattleViewport: React.FC = ({ children }) => {
     const app = usePixiApp();
     const tiledMapName = useBattleSelector(battle => battle.tiledMapInfos.name);
@@ -37,19 +40,18 @@ export const BattleViewport: React.FC = ({ children }) => {
 
     const { renderer } = app;
 
-    const getScreenSize = () => [ renderer.screen.width, renderer.screen.height ];
-    const [ screenSize, setScreenSize ] = React.useState(getScreenSize);
+    const [ screenSize, setScreenSize ] = React.useState(() => getScreenSize(app));
 
     React.useEffect(() => {
         const resizeListener = () => {
             setImmediate(() => {
-                setScreenSize(getScreenSize());
+                setScreenSize(getScreenSize(app));
             });
         };
         window.addEventListener('resize', resizeListener);
 
         return () => window.removeEventListener('resize', resizeListener);
-    }, []);
+    }, [ app ]);
 
     const getWorldSize = (): ViewportOptions => {
         if (!tiledMapSchema) {

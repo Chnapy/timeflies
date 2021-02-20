@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAsyncEffect } from 'use-async-effect';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { useCycleEngine } from '../view/cycle-engine-context';
 
@@ -14,9 +15,11 @@ export const useCycleLogic = () => {
 
     const cycleEngine = useCycleEngine();
 
-    React.useEffect(() => {
-        cycleEngine.start(turnStartTime);
-    }, []);
+    useAsyncEffect(async () => {
+        if (!cycleEngine.isStarted()) {
+            await cycleEngine.start(turnStartTime);
+        }
+    }, [ cycleEngine, turnStartTime ]);
 
     React.useEffect(() => {
         if (firstRenderRef.current) {
@@ -24,7 +27,7 @@ export const useCycleLogic = () => {
         }
 
         cycleEngine.setTurnsOrder(turnsOrder);
-    }, [ turnsOrder ]);
+    }, [ cycleEngine, turnsOrder ]);
 
     React.useEffect(() => {
         if (firstRenderRef.current) {
@@ -32,22 +35,22 @@ export const useCycleLogic = () => {
         }
 
         cycleEngine.setCharacterDuration(charactersDurations);
-    }, [ charactersDurations ]);
+    }, [ cycleEngine, charactersDurations ]);
 
-    React.useEffect(() => {
+    useAsyncEffect(async () => {
         if (firstRenderRef.current || !playingCharacterId) {
             return;
         }
 
         const characterIndex = turnsOrder.indexOf(playingCharacterId);
 
-        cycleEngine.startNextTurn({
+        await cycleEngine.startNextTurn({
             characterIndex,
             startTime: turnStartTime,
             roundIndex,
             turnIndex,
         });
-    }, [ turnStartTime, playingCharacterId, roundIndex, turnIndex ]);
+    }, [ cycleEngine, turnStartTime, playingCharacterId, roundIndex, turnIndex ]);
 
     React.useEffect(() => {
         firstRenderRef.current = false;

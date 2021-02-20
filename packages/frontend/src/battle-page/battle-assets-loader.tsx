@@ -9,7 +9,7 @@ export const BattleAssetsLoader: React.FC = ({ children }) => {
 
     const maps = React.useMemo(() => tiledMapInfos
         ? { [ tiledMapInfos.name ]: tiledMapInfos.schemaLink }
-        : {}, [ tiledMapInfos?.name, tiledMapInfos?.schemaLink ]);
+        : {}, [ tiledMapInfos ]);
 
     return (
         <AssetsLoader
