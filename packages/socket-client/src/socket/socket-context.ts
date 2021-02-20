@@ -3,6 +3,7 @@ import { SocketHelper } from './create-socket-helper';
 
 
 const socketContext = React.createContext<SocketHelper | null>(null);
+socketContext.displayName = 'SocketContext';
 
 export const SocketContextProvider = socketContext.Provider;
 

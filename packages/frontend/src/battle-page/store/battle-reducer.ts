@@ -1,18 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { ObjectTyped } from '@timeflies/common';
 import { GameState } from '../../store/game-state';
+import { cycleCaseReducers } from '../cycle/store/cycle-case-reducers';
 import { BattleLoadAction } from './battle-actions';
 import { BattleState, CharacterVariablesMap, SpellVariablesMap } from './battle-state';
 
-const assertBattleState = (battleState: GameState[ 'battle' ]): asserts battleState is BattleState => {
-    if (battleState === null) {
-        throw new Error('battleState not defined');
-    }
-};
-
 export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
+    ...cycleCaseReducers,
     [ BattleLoadAction.type ]: (state, { payload }: BattleLoadAction): BattleState => {
-        const { myPlayerId, tiledMapInfos: mapInfos, players, characters, spells, startTime, turnsOrder } = payload;
+        const { myPlayerId, tiledMapInfos: mapInfos, players, characters, spells, turnInfos } = payload;
 
         const getTiledMap = () => {
             const { name, schemaLink } = mapInfos;
@@ -119,7 +115,17 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             return { staticSpells, currentSpells, futureSpells, spellLists };
         };
 
-        const playingCharacterId = turnsOrder[ 0 ];
+        const getTurnInfos = () => {
+            const { startTime, turnsOrder, roundIndex, turnIndex } = turnInfos;
+
+            return {
+                turnStartTime: startTime,
+                turnsOrder,
+                playingCharacterId: turnsOrder[ 0 ],
+                roundIndex,
+                turnIndex
+            };
+        };
 
         return {
             myPlayerId,
@@ -137,10 +143,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             spellActions: {},
             spellActionList: [],
 
-            playingCharacterId,
-
-            turnsOrder,
-            turnStartTime: startTime
+            ...getTurnInfos()
         };
     }
 });

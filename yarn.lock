@@ -4430,6 +4430,7 @@ __metadata:
     "@types/react-redux": ^7.1.16
     "@types/react-router-dom": ^5.1.7
     "@types/redux-logger": ^3.0.8
+    "@types/ws": ^7.4.0
     clsx: ^1.1.1
     cors: ^2.8.5
     express: ^4.17.1

@@ -25,6 +25,7 @@ const useStyles = makeStyles(({ spacing }) => ({
         right: 0,
         bottom: 0,
         top: 0,
+        zIndex: -1,
         opacity: 0.5
     },
     mobileFirstButton: {
@@ -80,7 +81,7 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
     };
 
     return (
-        <Box position='relative' display='inline-flex' p={2}>
+        <Box position='relative' display='inline-flex' p={2} zIndex={0}>
             <Paper className={classes.background} />
             {isMobile
                 ? getMobileContent()

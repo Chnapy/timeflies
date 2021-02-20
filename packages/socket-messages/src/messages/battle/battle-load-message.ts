@@ -1,5 +1,5 @@
 import { CharacterId, CharacterRole, CharacterVariables, PlayerId, SpellId, SpellRole, SpellVariables } from '@timeflies/common';
-import { createMessage } from '../message';
+import { createMessage } from '../../message';
 
 type TiledMapInfos = {
     name: string;
@@ -28,6 +28,13 @@ type SpellData = {
     initialVariables: SpellVariables;
 };
 
+type TurnInfos = {
+    turnsOrder: CharacterId[];
+    startTime: number;
+    roundIndex: number;
+    turnIndex: number;
+};
+
 export type BattleLoadData = {
     myPlayerId: PlayerId;
 
@@ -39,8 +46,7 @@ export type BattleLoadData = {
 
     spells: SpellData[];
 
-    turnsOrder: CharacterId[];
-    startTime: number;
+    turnInfos: TurnInfos;
 };
 
 export const BattleLoadMessage = createMessage<{ battleId: string }>('battle/load')

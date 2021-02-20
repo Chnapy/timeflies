@@ -56,8 +56,6 @@ export type BattleState = {
     futureCharacters: CharacterVariablesMap;
     characterList: CharacterId[];
 
-    playingCharacterId: CharacterId | null;
-
     // spells
 
     staticSpells: { [ spellId in SpellId ]: StaticSpell };
@@ -72,4 +70,7 @@ export type BattleState = {
 
     turnsOrder: CharacterId[];
     turnStartTime: number;
+    playingCharacterId: CharacterId | null;
+    roundIndex: number;
+    turnIndex: number;
 };

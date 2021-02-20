@@ -41,10 +41,16 @@ describe('# Cycle engine', () => {
                 }
             });
 
+            expect(engine.isStarted()).toEqual(false);
+
             const enginePromise = engine.start();
 
+            expect(engine.isStarted()).toEqual(true);
+
             await timerTester.advance(expectedDelays.beforeStart, {
-                runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+                runJustBeforeItEnds: () => {
+                    expect(turnStartListener).not.toHaveBeenCalled();
+                }
             });
 
             const startTime = timerTester.now();
@@ -78,10 +84,16 @@ describe('# Cycle engine', () => {
 
             const startTime = timerTester.now() + 12543;
 
+            expect(engine.isStarted()).toEqual(false);
+
             const enginePromise = engine.start(startTime);
 
+            expect(engine.isStarted()).toEqual(true);
+
             await timerTester.advance(12543, {
-                runJustBeforeItEnds: () => expect(turnStartListener).not.toHaveBeenCalled()
+                runJustBeforeItEnds: () => {
+                    expect(turnStartListener).not.toHaveBeenCalled();
+                }
             });
 
             expectListener('turnStart', turnStartListener).calledWithPartial({
@@ -313,7 +325,7 @@ describe('# Cycle engine', () => {
 
             turnStartListener.mockClear();
 
-            engine.disableCharacters(['bar']);
+            engine.disableCharacters([ 'bar' ]);
 
             const nextTurnPromise = engine.startNextTurn();
             await timerTester.triggerPromises();
@@ -345,7 +357,7 @@ describe('# Cycle engine', () => {
 
             await timerTester.advance(500);
 
-            engine.disableCharacters(['foo']);
+            engine.disableCharacters([ 'foo' ]);
 
             await timerTester.triggerPromises();
 
@@ -437,7 +449,7 @@ describe('# Cycle engine', () => {
 
             turnStartListener.mockClear();
 
-            engine.setTurnsOrder(['toto', 'bar', 'foo']);
+            engine.setTurnsOrder([ 'toto', 'bar', 'foo' ]);
 
             await timerTester.waitTimer(engine.startNextTurn());
 
@@ -450,7 +462,7 @@ describe('# Cycle engine', () => {
                 roundIndex: 1,
                 lastRoundTurn: false
             });
-            
+
             await timerTester.endTimer(enginePromise);
         });
     });
