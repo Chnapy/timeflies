@@ -65,6 +65,10 @@ export const appTheme: Theme = createMuiTheme({
             me: white,
             ally: '#5DAEE9',
             enemy: '#EB5757'
+        },
+        tileStates: {
+            range: '#8875FF',
+            action: '#D63551'
         }
     },
     shape: {

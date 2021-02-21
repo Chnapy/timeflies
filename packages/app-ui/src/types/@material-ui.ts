@@ -23,11 +23,17 @@ declare module '@material-ui/core/styles/createPalette' {
 
   export type PalettePlayerRelations = Record<PlayerRelation, string>;
 
+  export type PaletteTileStates = {
+    range: string;
+    action: string;
+  };
+
   interface Palette {
     variables: PaletteVariables;
     spellCategories: PaletteSpellCategories;
     timeItems: PaletteTimeItems;
     playerRelations: PalettePlayerRelations;
+    tileStates: PaletteTileStates;
   }
 
   interface PaletteOptions {
@@ -35,6 +41,7 @@ declare module '@material-ui/core/styles/createPalette' {
     spellCategories: PaletteSpellCategories;
     timeItems: PaletteTimeItems;
     playerRelations: PalettePlayerRelations;
+    tileStates: PaletteTileStates;
   }
 }
 

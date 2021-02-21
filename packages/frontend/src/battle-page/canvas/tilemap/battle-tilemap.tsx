@@ -20,7 +20,7 @@ export const BattleTilemap: React.FC = () => {
     const characterList = useBattleSelector(battle => battle.characterList);
     const positions = useBattleSelector(battle => battle.currentCharacters.position);
     const characterMap = characterList.reduce<TilemapComponentProps[ 'children' ]>((acc, characterId) => {
-        acc[ positions[characterId].id ] = {
+        acc[ positions[ characterId ].id ] = {
             id: characterId,
             sprite: <BattleCharacterSprite characterId={characterId} />
         };
@@ -33,6 +33,12 @@ export const BattleTilemap: React.FC = () => {
             {tiledMapAssets && <TilemapComponent
                 mapSheet={tiledMapAssets.schema}
                 mapTexture={imagesLinksToTextures(tiledMapAssets.images)}
+                tilesRange={[]}
+                tilesAction={[]}
+                tilesCurrentAction={[]}
+                onTileMouseHover={pos => {
+                    console.log('tile', pos?.id);
+                }}
             >
                 {characterMap}
             </TilemapComponent>}

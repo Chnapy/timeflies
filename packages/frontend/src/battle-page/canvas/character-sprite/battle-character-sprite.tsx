@@ -1,13 +1,12 @@
 import { useTheme } from '@material-ui/core';
 import { AnimatedComplexSpriteReact } from '@timeflies/animated-complex-sprite';
 import { useAssetMap, useAssetSpritesheet } from '@timeflies/assets-loader';
-import { CharacterId, switchUtil } from '@timeflies/common';
+import { CharacterId, colorStringToHex, switchUtil } from '@timeflies/common';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
-import { colorStringToHex } from '../color-string-to-hex';
 
 type BattleCharacterSprite = {
     characterId: CharacterId;

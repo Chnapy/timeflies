@@ -1,10 +1,12 @@
-import { createPosition } from '@timeflies/shared';
-import { TilemapComponent } from '@timeflies/tilemap-component';
+import { ThemeProvider } from '@material-ui/core';
+import { appTheme } from '@timeflies/app-ui';
+import { createPosition } from '@timeflies/common';
 import * as PIXI from "pixi.js";
 import { Loader, LoaderResource, Texture } from 'pixi.js';
 import React from 'react';
 import { Container, Sprite, Stage } from 'react-pixi-fiber';
 import { TiledMap } from 'tiled-types';
+import { TilemapComponent } from '../../src';
 
 const loader = Loader.shared;
 
@@ -38,11 +40,11 @@ export const Demo: React.FC = () => {
       loader.add([
         {
           name: 'map_json',
-          url: 'assets/map_dungeon.json'
+          url: 'fake/maps/map_dungeon.json'
         },
         {
           name: 'map_img',
-          url: 'assets/map_dungeon.png',
+          url: 'fake/maps/map_dungeon.png',
           loadType: LoaderResource.LOAD_TYPE.IMAGE
         }
       ])
@@ -64,17 +66,25 @@ export const Demo: React.FC = () => {
 
   return <Stage options={{ backgroundColor: 0x10bb99, height: 650, width: 800 }}>
     <Container scale={2}>
-      <TilemapComponent {...data}>
-        {{
-          [ pos.id ]: {
-            id: 'foo',
-            sprite: <Sprite
-              texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
-              x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
-            />
-          }
-        }}
-      </TilemapComponent>
+      <ThemeProvider theme={appTheme}>
+        <TilemapComponent
+          {...data}
+          onTileMouseHover={console.log}
+          tilesRange={[ '8:8', '9:8', '10:8', '11:8' ]}
+          tilesAction={[ '11:8', '11:9', '11:10' ]}
+          tilesCurrentAction={[ '11:9', '10:9', '12:9' ]}
+        >
+          {{
+            [ pos.id ]: {
+              id: 'foo',
+              sprite: <Sprite
+                texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
+                x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
+              />
+            }
+          }}
+        </TilemapComponent>
+      </ThemeProvider>
     </Container>
   </Stage>;
 };

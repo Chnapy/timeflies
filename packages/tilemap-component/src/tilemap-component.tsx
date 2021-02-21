@@ -1,9 +1,10 @@
+import { useTheme } from '@material-ui/core';
 import { createCache } from '@timeflies/cache';
-import { createPosition } from '@timeflies/common';
+import { colorStringToHex, createPosition, Position } from '@timeflies/common';
 import { Layer, Tile } from '@timeflies/tilemap-utils';
 import * as PIXI from 'pixi.js';
 import React from 'react';
-import { Container, CustomPIXIComponent, Sprite } from 'react-pixi-fiber';
+import { Container, CustomPIXIComponent, DisplayObjectProps, Sprite } from 'react-pixi-fiber';
 import { TiledLayerTilelayer, TiledMap, TiledTileset } from 'tiled-types';
 
 const textureCache = createCache<number, PIXI.Texture>();
@@ -19,9 +20,28 @@ const AnimatedSprite = CustomPIXIComponent({
     }
 }, 'AnimatedSprite');
 
+const TileHighlight = CustomPIXIComponent<PIXI.Graphics, DisplayObjectProps<PIXI.Graphics> & { color: number | null; alpha: number | null; }>({
+    customDisplayObject: () => new PIXI.Graphics(),
+    customApplyProps: function (this: { applyDisplayObjectProps: (...args: any[]) => void }, graphics, oldProps, newProps) {
+        const { color, alpha, x = 0, y = 0, width, height } = newProps;
+
+        graphics.clear();
+        if (color) {
+            graphics.beginFill(color, alpha);
+            graphics.drawRect(x, y, width!, height!);
+            graphics.endFill();
+        }
+    }
+}, 'TileHighlight');
+
 export type TilemapComponentProps = {
     mapSheet: TiledMap;
     mapTexture: { [ name: string ]: PIXI.Texture };
+    onTileMouseHover: (tilePos: Position | null) => void;
+    tilesRange: Position[ 'id' ][];
+    tilesAction: Position[ 'id' ][];
+    tilesCurrentAction: Position[ 'id' ][];
+
     children: {
         [ position in string ]?: {
             id: string;
@@ -30,9 +50,15 @@ export type TilemapComponentProps = {
     };
 };
 
-export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, mapTexture, children }) => {
+export const TilemapComponent: React.FC<TilemapComponentProps> = ({
+    mapSheet, mapTexture, onTileMouseHover, tilesRange, tilesAction, tilesCurrentAction, children
+}) => {
 
     const { width, height } = mapSheet;
+
+    const tileStatesColors = useTheme().palette.tileStates;
+    const rangeColor = colorStringToHex(tileStatesColors.range);
+    const actionColor = colorStringToHex(tileStatesColors.action);
 
     const getTextureFromId = (id: number, tileset: TiledTileset): PIXI.Texture => textureCache.getOrElse(id, () => {
 
@@ -53,6 +79,42 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
         return texture;
     });
 
+    const getTileHighlight = (tilePos: Position, size: number) => {
+        const isRange = tilesRange.includes(tilePos.id);
+        const isAction = tilesAction.includes(tilePos.id);
+        const isCurrentAction = tilesCurrentAction.includes(tilePos.id);
+
+        const mainColor = isAction || isCurrentAction
+            ? actionColor
+            : (isRange
+                ? rangeColor
+                : null);
+        const mainAlpha = isAction
+            ? 0.75
+            : (isRange
+                ? 0.5
+                : (isCurrentAction
+                    ? 0.25
+                    : 0));
+
+        const innerColor = isAction && isRange
+            ? rangeColor
+            : null;
+        const innerAlpha = isAction && isRange
+            ? 0.75
+            : 0;
+
+        const innerSize = size * 2 / 3;
+        const innerPos = (size - innerSize) / 2;
+
+        return (
+            <Container>
+                <TileHighlight width={size} height={height} color={mainColor} alpha={mainAlpha} />
+                <TileHighlight x={innerPos} y={innerPos} width={innerSize} height={innerSize} color={innerColor} alpha={innerAlpha} />
+            </Container>
+        );
+    };
+
     const getTileGraphic = (id: number, index: number, layer: TiledLayerTilelayer, interactive: boolean = false) => {
 
         const tileset = Tile.getTilesetFromTileId(id, mapSheet);
@@ -62,9 +124,8 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
 
         const texture = getTextureFromId(id, tileset);
 
-        const worldPos = Tile.getWorldPositionFromTilePosition(
-            Tile.getTilePositionFromIndex(index, mapSheet), tileset, layer
-        );
+        const tilePos = Tile.getTilePositionFromIndex(index, mapSheet);
+        const worldPos = Tile.getWorldPositionFromTilePosition(tilePos, tileset, layer);
 
         const { tilewidth, tileheight } = tileset;
 
@@ -79,8 +140,21 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
             />
             : <Sprite texture={texture} width={tilewidth} height={tileheight} />;
 
-        return <Container key={layer.name + ':' + worldPos.x + ':' + worldPos.y} x={worldPos.x} y={worldPos.y} interactive={interactive}>
+        const tileHighlight = interactive
+            ? getTileHighlight(tilePos, tileheight)
+            : null;
+
+        return <Container
+            key={layer.name + ':' + worldPos.x + ':' + worldPos.y}
+            x={worldPos.x}
+            y={worldPos.y}
+            interactive={interactive}
+            mouseover={() => {
+                onTileMouseHover(tilePos);
+            }}
+        >
             {sprite}
+            {tileHighlight}
         </Container>;
     };
 
@@ -133,7 +207,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({ mapSheet, ma
         </Container>;
     };
 
-    return <Container>
+    return <Container interactive mouseout={() => onTileMouseHover(null)}>
         {background}
         {renderObstaclesAndEntities()}
         {foreground}
