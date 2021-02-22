@@ -7,8 +7,10 @@ import { Stage } from 'react-pixi-fiber';
 import { ReactReduxContext } from 'react-redux';
 import { CycleEngineContext } from '../../cycle/view/cycle-engine-context';
 import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
+import { ActionAreaContext } from '../tilemap/action-area/view/action-area-context';
 import { BattleTilemap } from '../tilemap/battle-tilemap';
 import { RangeAreaContext } from '../tilemap/range-area/view/range-area-context';
+import { TileHoverContext, TileHoverDispatchContext } from '../tilemap/tile-hover/view/tile-hover-context';
 import { BattleViewport } from './battle-viewport';
 
 const useStyles = makeStyles(() => ({
@@ -30,7 +32,10 @@ export const BattleCanvas: React.FC = () => {
                         ReactReduxContext,
                         AssetsContext,
                         CycleEngineContext,
-                        RangeAreaContext
+                        TileHoverContext,
+                        TileHoverDispatchContext,
+                        RangeAreaContext,
+                        ActionAreaContext,
                     ]}
                     barrierRender={children => {
                         return (

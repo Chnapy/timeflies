@@ -16,9 +16,7 @@ RangeAreaContext.displayName = 'RangeAreaContext';
 export const RangeAreaContextProvider: React.FC = ({ children }) => {
     const rangeArea = useComputeRangeArea();
 
-    return <RangeAreaContext.Provider value={{
-        rangeArea
-    }}>
+    return <RangeAreaContext.Provider value={{ rangeArea }}>
         {children}
     </RangeAreaContext.Provider>;
 };

@@ -5,7 +5,9 @@ import { Container } from 'react-pixi-fiber';
 import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { BattleCharacterSprite } from '../character-sprite/battle-character-sprite';
+import { useActionAreaContext } from './action-area/view/action-area-context';
 import { useRangeAreaContext } from './range-area/view/range-area-context';
+import { useTileHoverDispatchContext } from './tile-hover/view/tile-hover-context';
 
 const imagesLinksToTextures = (links: Record<string, string>) => {
     return Object.entries(links).reduce<Record<string, Texture>>((acc, [ key, source ]) => {
@@ -19,9 +21,16 @@ export const BattleTilemap: React.FC = () => {
 
     const characterList = useBattleSelector(battle => battle.characterList);
     const positions = useBattleSelector(battle => battle.currentCharacters.position);
+    const dispatchTileHover = useTileHoverDispatchContext();
     const { rangeArea } = useRangeAreaContext();
+    const { actionArea } = useActionAreaContext();
 
     const tilesRange = rangeArea.reduce<TilemapComponentProps[ 'tilesRange' ]>((acc, pos) => {
+        acc[ pos.id ] = true;
+        return acc;
+    }, {});
+    
+    const tilesAction = actionArea.reduce<TilemapComponentProps[ 'tilesAction' ]>((acc, pos) => {
         acc[ pos.id ] = true;
         return acc;
     }, {});
@@ -38,10 +47,9 @@ export const BattleTilemap: React.FC = () => {
                 mapSheet={tiledMapAssets.schema}
                 mapTexture={imagesLinksToTextures(tiledMapAssets.images)}
                 tilesRange={tilesRange}
-                tilesAction={{}}
+                tilesAction={tilesAction}
                 tilesCurrentAction={{}}
-                onTileMouseHover={pos => {
-                }}
+                onTileMouseHover={dispatchTileHover}
             >
                 {characterMap}
             </TilemapComponent>}
