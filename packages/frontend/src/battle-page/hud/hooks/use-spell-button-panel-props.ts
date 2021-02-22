@@ -1,6 +1,7 @@
 import { SpellId } from '@timeflies/common';
 import { SpellButtonPanelProps } from '@timeflies/spell-button-panel';
-import { useSelectedSpellContext, useSelectedSpellDispatchContext } from '../../spell-select/view/selected-spell-context';
+import { useIsMyCharacterPlaying } from '../../hooks/use-is-my-character-playing';
+import { useSelectSpell } from '../../spell-select/hooks/use-select-spell';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 
 const emptyArray: SpellId[] = [];
@@ -13,12 +14,10 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
     const defaultSpellId = useBattleSelector(battle => playingCharacterId
         ? battle.staticCharacters[ playingCharacterId ].defaultSpellId
         : null);
-    const isMyCharacter = useBattleSelector(battle => playingCharacterId
-        ? battle.staticCharacters[ playingCharacterId ].playerId === battle.myPlayerId
-        : false);
+    const isMyCharacter = useIsMyCharacterPlaying();
 
-    const { selectedSpellId } = useSelectedSpellContext();
-    const dispatchSelectedSpellId = useSelectedSpellDispatchContext();
+    const selectedSpellId = useBattleSelector(battle => battle.selectedSpellId);
+    const selectSpell = useSelectSpell();
 
     if (spellList.length === 0 || !defaultSpellId) {
         return null;
@@ -33,7 +32,7 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
             duration: spellsDuration[ spellId ],
             disabled: !isMyCharacter,
             onClick: () => {
-                dispatchSelectedSpellId({ selectedSpellId: spellId });
+                selectSpell(spellId);
             }
         };
 

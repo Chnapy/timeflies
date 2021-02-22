@@ -65,6 +65,8 @@ export type BattleState = {
 
     spellActions: { [startTime in number]: SpellAction };
     spellActionList: number[];
+    
+    selectedSpellId: SpellId | null;
 
     turnsOrder: CharacterId[];
     turnStartTime: number;

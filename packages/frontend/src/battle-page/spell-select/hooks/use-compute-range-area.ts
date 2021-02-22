@@ -2,10 +2,9 @@ import { Position } from '@timeflies/common';
 import { Area, Tile } from '@timeflies/tilemap-utils';
 import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
-import { useSelectedSpellContext } from '../view/selected-spell-context';
 
 export const useComputeRangeArea = () => {
-    const { selectedSpellId } = useSelectedSpellContext();
+    const selectedSpellId = useBattleSelector(battle => battle.selectedSpellId);
     const tiledMapSchema = useTiledMapAssets()?.schema;
     const playingCharacterId = useBattleSelector(battle => battle.playingCharacterId);
     const characterList = useBattleSelector(battle => battle.characterList);

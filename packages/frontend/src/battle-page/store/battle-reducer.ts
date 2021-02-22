@@ -2,11 +2,13 @@ import { createReducer } from '@reduxjs/toolkit';
 import { ObjectTyped } from '@timeflies/common';
 import { GameState } from '../../store/game-state';
 import { cycleCaseReducers } from '../cycle/store/cycle-case-reducers';
+import { spellSelectCaseReducers } from '../spell-select/store/spell-select-case-reducers';
 import { BattleLoadAction } from './battle-actions';
 import { BattleState, CharacterVariablesMap, SpellVariablesMap } from './battle-state';
 
 export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
     ...cycleCaseReducers,
+    ...spellSelectCaseReducers,
     [ BattleLoadAction.type ]: (state, { payload }: BattleLoadAction): BattleState => {
         const { myPlayerId, tiledMapInfos: mapInfos, players, characters, spells, turnInfos } = payload;
 
@@ -140,6 +142,8 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
 
             spellActions: {},
             spellActionList: [],
+
+            selectedSpellId: null,
 
             ...getTurnInfos()
         };

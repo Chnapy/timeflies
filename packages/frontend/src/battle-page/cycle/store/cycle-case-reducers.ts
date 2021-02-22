@@ -1,7 +1,8 @@
 import { CaseReducer } from '@reduxjs/toolkit';
 import { GameState } from '../../../store/game-state';
+import { isMyCharacterPlayingSelector } from '../../hooks/use-is-my-character-playing';
 import { assertBattleState } from '../../store/assert-battle-state';
-import { BattlePrepareTurnStartAction } from './cycle-actions';
+import { BattlePrepareTurnStartAction, BattleTurnEndAction } from './cycle-actions';
 
 export const cycleCaseReducers: Record<string, CaseReducer<GameState[ 'battle' ], any>> = {
     [ BattlePrepareTurnStartAction.type ]: (state, { payload }: BattlePrepareTurnStartAction) => {
@@ -13,5 +14,16 @@ export const cycleCaseReducers: Record<string, CaseReducer<GameState[ 'battle' ]
         state.turnIndex = turnIndex;
         state.playingCharacterId = characterId;
         state.turnStartTime = startTime;
+        
+        const isMyCharacterPlaying = isMyCharacterPlayingSelector(state);
+
+        const { defaultSpellId } = state.staticCharacters[ payload.characterId ];
+
+        state.selectedSpellId = isMyCharacterPlaying ? defaultSpellId : null;
+    },
+    [ BattleTurnEndAction.type ]: (state, action) => {
+        assertBattleState(state);
+
+        state.selectedSpellId = null;
     },
 };
