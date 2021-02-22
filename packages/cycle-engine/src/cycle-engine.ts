@@ -49,15 +49,9 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
 
     const disabledCharacters = new Set<CharacterId>();
 
-    let started = false;
+    let firstTurnStartTime: number | null = null;
 
     let currentTurn: Turn | undefined;
-
-    function assertCurrentTurnIsDefined(currentTurn: Turn | undefined): asserts currentTurn is Turn {
-        if (!currentTurn) {
-            throw new Error('Cycle engine current turn required. Engine need to be started');
-        }
-    }
 
     const isCharacterDisabled = (id: CharacterId) => disabledCharacters.has(id);
 
@@ -95,6 +89,10 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
 
         // if startTime is in future, wait for it
         await waitMs(-diff);
+
+        if(currentTurn) {
+            currentTurn.cancel();
+        }
 
         const duration = charactersDurations[ characterId ];
 
@@ -155,21 +153,19 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
         });
     };
 
-    const start = async (startTime?: number) => {
-        started = true;
-        await playTurn(getNextTurnProps(startTime));
+    const start = async (startTime: number = Date.now() + delays.battleStart) => {
+        firstTurnStartTime = startTime;
+        await playTurn(getNextTurnProps());
     };
 
-    const getNextTurnProps = (
-        firstTurnStartTime: number = Date.now() + delays.battleStart
-    ): PlayTurnProps => {
+    const getNextTurnProps = (): PlayTurnProps => {
         // first turn
         if (!currentTurn) {
             return {
                 turnIndex: 0,
                 roundIndex: 0,
                 characterIndex: 0,
-                startTime: firstTurnStartTime
+                startTime: firstTurnStartTime!
             };
         }
 
@@ -184,9 +180,9 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
     };
 
     const startNextTurn = async (nextTurnProps?: PlayTurnProps) => {
-        assertCurrentTurnIsDefined(currentTurn);
-
-        await currentTurn.promise;
+        if(!firstTurnStartTime) {
+            firstTurnStartTime = nextTurnProps?.startTime ?? null;
+        }
 
         await playTurn(nextTurnProps
             ? nextTurnProps
@@ -238,9 +234,7 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
         }
     };
 
-    const isStarted = () => {
-        return started;
-    };
+    const isStarted = () => firstTurnStartTime !== null;
 
     return {
         start,

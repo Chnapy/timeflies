@@ -1,6 +1,6 @@
 import { Position } from '@timeflies/common';
 import React from 'react';
-import { useComputeRangeArea } from '../../spell-select/hooks/use-compute-range-area';
+import { useComputeRangeArea } from '../hooks/use-compute-range-area';
 
 type RangeAreaContextValue = {
     rangeArea: Position[];

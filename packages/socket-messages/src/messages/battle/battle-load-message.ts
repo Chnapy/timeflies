@@ -28,11 +28,8 @@ type SpellData = {
     initialVariables: SpellVariables;
 };
 
-type TurnInfos = {
+type CycleInfos = {
     turnsOrder: CharacterId[];
-    startTime: number;
-    roundIndex: number;
-    turnIndex: number;
 };
 
 export type BattleLoadData = {
@@ -46,7 +43,7 @@ export type BattleLoadData = {
 
     spells: SpellData[];
 
-    turnInfos: TurnInfos;
+    cycleInfos: CycleInfos;
 };
 
 export const BattleLoadMessage = createMessage<{ battleId: string }>('battle/load')

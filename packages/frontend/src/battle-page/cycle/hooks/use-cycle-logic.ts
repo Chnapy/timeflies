@@ -15,12 +15,6 @@ export const useCycleLogic = () => {
 
     const cycleEngine = useCycleEngine();
 
-    useAsyncEffect(async () => {
-        if (!cycleEngine.isStarted()) {
-            await cycleEngine.start(turnStartTime);
-        }
-    }, [ cycleEngine, turnStartTime ]);
-
     React.useEffect(() => {
         if (firstRenderRef.current) {
             return;
@@ -38,7 +32,7 @@ export const useCycleLogic = () => {
     }, [ cycleEngine, charactersDurations ]);
 
     useAsyncEffect(async () => {
-        if (firstRenderRef.current || !playingCharacterId) {
+        if (!playingCharacterId) {
             return;
         }
 

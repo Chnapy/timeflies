@@ -1,15 +1,16 @@
+import { CycleEngineListeners } from '@timeflies/cycle-engine';
 import { useSocketListeners } from '@timeflies/socket-client';
 import { BattleTurnStartMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsyncEffect } from 'use-async-effect';
-import { BattlePrepareTurnStartAction } from '../store/cycle-actions';
+import { BattlePrepareTurnStartAction, BattleTurnEndAction } from '../store/cycle-actions';
 
 type ListenersRefValue = {
     onTurnStart: (message: ReturnType<typeof BattleTurnStartMessage>) => void;
 };
 
-export const useCycleListener = () => {
+export const useCycleMessageListeners = () => {
     const addSocketListeners = useSocketListeners();
     const dispatch = useDispatch();
 
@@ -28,4 +29,14 @@ export const useCycleListener = () => {
     },
         removeListeners => removeListeners && removeListeners(),
         [ listenersRef ]);
+};
+
+export const useCycleEngineListeners = () => {
+    const dispatch = useDispatch();
+
+    return (): CycleEngineListeners => ({
+        turnEnd: () => {
+            dispatch(BattleTurnEndAction());
+        }
+    });
 };

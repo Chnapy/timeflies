@@ -10,7 +10,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
     ...cycleCaseReducers,
     ...spellSelectCaseReducers,
     [ BattleLoadAction.type ]: (state, { payload }: BattleLoadAction): BattleState => {
-        const { myPlayerId, tiledMapInfos: mapInfos, players, characters, spells, turnInfos } = payload;
+        const { myPlayerId, tiledMapInfos: mapInfos, players, characters, spells, cycleInfos } = payload;
 
         const getTiledMap = () => {
             const { name, schemaLink } = mapInfos;
@@ -117,15 +117,15 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             return { staticSpells, currentSpells, futureSpells, spellLists };
         };
 
-        const getTurnInfos = () => {
-            const { startTime, turnsOrder, roundIndex, turnIndex } = turnInfos;
+        const getCycleInfos = () => {
+            const { turnsOrder } = cycleInfos;
 
             return {
-                turnStartTime: startTime,
+                turnStartTime: -1,
                 turnsOrder,
-                playingCharacterId: turnsOrder[ 0 ],
-                roundIndex,
-                turnIndex
+                playingCharacterId: null,
+                roundIndex: 0,
+                turnIndex: 0
             };
         };
 
@@ -145,7 +145,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
 
             selectedSpellId: null,
 
-            ...getTurnInfos()
+            ...getCycleInfos()
         };
     }
 });

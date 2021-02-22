@@ -1,7 +1,7 @@
 import { Position } from '@timeflies/common';
 import { Area, Tile } from '@timeflies/tilemap-utils';
-import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
-import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { useTiledMapAssets } from '../../../../hooks/use-tiled-map-assets';
+import { useBattleSelector } from '../../../../store/hooks/use-battle-selector';
 
 export const useComputeRangeArea = () => {
     const selectedSpellId = useBattleSelector(battle => battle.selectedSpellId);

@@ -8,7 +8,7 @@ import { ReactReduxContext } from 'react-redux';
 import { CycleEngineContext } from '../../cycle/view/cycle-engine-context';
 import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
 import { BattleTilemap } from '../tilemap/battle-tilemap';
-import { RangeAreaContext } from '../tilemap/range-area-context';
+import { RangeAreaContext } from '../tilemap/range-area/view/range-area-context';
 import { BattleViewport } from './battle-viewport';
 
 const useStyles = makeStyles(() => ({

@@ -1,17 +1,15 @@
 import { createCycleEngine, CycleEngine } from '@timeflies/cycle-engine';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
-import { useCycleListener } from '../hooks/use-cycle-listener';
+import { useCycleEngineListeners, useCycleMessageListeners } from '../hooks/use-cycle-listeners';
 import { useCycleLogic } from '../hooks/use-cycle-logic';
-import { BattleTurnEndAction } from '../store/cycle-actions';
 
 export const CycleEngineContext = React.createContext<CycleEngine | null>(null);
 CycleEngineContext.displayName = 'CycleEngineContext';
 
 const CycleEngineLogic: React.FC = () => {
     useCycleLogic();
-    useCycleListener();
+    useCycleMessageListeners();
 
     return null;
 };
@@ -19,16 +17,12 @@ const CycleEngineLogic: React.FC = () => {
 export const CycleEngineProvider: React.FC = ({ children }) => {
     const turnsOrder = useBattleSelector(battle => battle.turnsOrder);
     const charactersDurations = useBattleSelector(battle => battle.currentCharacters.actionTime);
-    const dispatch = useDispatch();
+    const getCycleEngineListeners = useCycleEngineListeners();
 
     const createEngine = () => createCycleEngine({
         charactersList: turnsOrder,
         charactersDurations,
-        listeners: {
-            turnEnd: () => {
-                dispatch(BattleTurnEndAction());
-            }
-        }
+        listeners: getCycleEngineListeners()
     });
 
     const [ cycleEngine ] = React.useState<CycleEngine>(createEngine);

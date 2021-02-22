@@ -26,7 +26,9 @@ server.listen(port, () => {
     console.log('ws listening address', wss.address());
 });
 
-const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
+const turnsOrder = [ 'c2', 'c1', 'c3' ];
+
+const battleLoadData: BattleLoadData = {
     myPlayerId: 'p1',
     tiledMapInfos: {
         name: 'dungeon',
@@ -153,6 +155,9 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
             }
         }
     ],
+    cycleInfos: {
+        turnsOrder
+    }
 };
 
 const sendAll = action => {
@@ -162,8 +167,6 @@ const sendAll = action => {
     });
 };
 
-const turnsOrder = [ 'c2', 'c1', 'c3' ];
-
 const cycleEngine = createCycleEngine({
     charactersList: turnsOrder,
     charactersDurations: battleLoadData.characters.reduce((acc, { characterId, initialVariables }) => {
@@ -172,20 +175,20 @@ const cycleEngine = createCycleEngine({
     }, {}),
     listeners: {
         turnEnd: params => {
-            sendAll(
-                BattleTurnStartMessage(cycleEngine.getNextTurnInfos())
-            );
+            sendAllNextTurnInfos();
             cycleEngine.startNextTurn();
         }
     }
 });
 
+const sendAllNextTurnInfos = () => setTimeout(() =>
+    sendAll(
+        BattleTurnStartMessage(cycleEngine.getNextTurnInfos())
+    ), 200);
+
 wss.on('connection', function (ws) {
 
-    const turnInfos = {
-        startTime: Date.now() + 5000,
-        turnsOrder
-    };
+    const startTime = Date.now() + 5000;
 
     const send = action => {
         console.log('send: %s', JSON.stringify(action));
@@ -199,25 +202,16 @@ wss.on('connection', function (ws) {
         }
 
         if (!cycleEngine.isStarted()) {
-            cycleEngine.start(turnInfos.startTime);
+            cycleEngine.start(startTime);
         }
 
         const actionList = JSON.parse(message);
         actionList.forEach(message => {
             if (BattleLoadMessage.match(message)) {
 
-                const { roundIndex, turnIndex, characterId, startTime } = cycleEngine.getNextTurnInfos();
-
-                const response = BattleLoadMessage.createResponse(message.requestId, {
-                    ...battleLoadData,
-                    turnInfos: {
-                        ...turnInfos,
-                        roundIndex,
-                        turnIndex,
-                        startTime
-                    }
-                });
+                const response = BattleLoadMessage.createResponse(message.requestId, battleLoadData);
                 send(response);
+                sendAllNextTurnInfos();
             }
         });
     });
