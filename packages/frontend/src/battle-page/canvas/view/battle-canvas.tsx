@@ -1,12 +1,13 @@
 import { makeStyles, ThemeProvider } from '@material-ui/core';
 import { appTheme } from '@timeflies/app-ui';
-import { AssetsContext, useAssetMap } from '@timeflies/assets-loader';
+import { AssetsContext } from '@timeflies/assets-loader';
 import { ContextBridge } from '@timeflies/context-bridge';
 import React from 'react';
 import { Stage } from 'react-pixi-fiber';
 import { ReactReduxContext } from 'react-redux';
 import { CycleEngineContext } from '../../cycle/view/cycle-engine-context';
-import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
+import { SelectedSpellContext, SelectedSpellDispatchContext } from '../../spell-select/view/selected-spell-context';
 import { BattleTilemap } from '../tilemap/battle-tilemap';
 import { BattleViewport } from './battle-viewport';
 
@@ -19,8 +20,7 @@ const useStyles = makeStyles(() => ({
 export const BattleCanvas: React.FC = () => {
     const classes = useStyles();
     const rootRef = React.useRef<HTMLDivElement>(null);
-    const tiledMapName = useBattleSelector(battle => battle.tiledMapInfos.name);
-    const tiledMapAssets = useAssetMap(tiledMapName);
+    const tiledMapAssets = useTiledMapAssets();
 
     return (
         <div ref={rootRef} className={classes.root}>
@@ -30,6 +30,8 @@ export const BattleCanvas: React.FC = () => {
                         ReactReduxContext,
                         AssetsContext,
                         CycleEngineContext,
+                        SelectedSpellContext,
+                        SelectedSpellDispatchContext
                     ]}
                     barrierRender={children => {
                         return (

@@ -52,12 +52,12 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
 
         const getCharacters = () => {
             const staticCharacters = characters.reduce<BattleState[ 'staticCharacters' ]>((acc, {
-                characterId, characterRole, playerId, defaultSpellRole
+                characterId, characterRole, playerId, defaultSpellId
             }) => {
                 acc[ characterId ] = {
                     characterId,
                     characterRole,
-                    defaultSpellRole,
+                    defaultSpellId,
                     playerId
                 };
 
@@ -137,8 +137,6 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             ...getCharacters(),
 
             ...getSpells(),
-
-            selectedSpellId: null,
 
             spellActions: {},
             spellActionList: [],

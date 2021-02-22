@@ -11,7 +11,7 @@ export type StaticCharacter = {
     characterId: CharacterId;
     playerId: PlayerId;
     characterRole: CharacterRole;
-    defaultSpellRole: SpellRole;
+    defaultSpellId: SpellId;
 };
 
 export type CharacterVariablesMap = {
@@ -62,8 +62,6 @@ export type BattleState = {
     currentSpells: SpellVariablesMap;
     futureSpells: SpellVariablesMap;
     spellLists: { [ characterId in CharacterId ]: SpellId[] };
-
-    selectedSpellId: SpellId | null;
 
     spellActions: { [startTime in number]: SpellAction };
     spellActionList: number[];

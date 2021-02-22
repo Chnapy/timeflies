@@ -6,7 +6,7 @@ import { BattlePrepareTurnStartAction } from './cycle-actions';
 export const cycleCaseReducers: Record<string, CaseReducer<GameState[ 'battle' ], any>> = {
     [ BattlePrepareTurnStartAction.type ]: (state, { payload }: BattlePrepareTurnStartAction) => {
         assertBattleState(state);
-        
+
         const { roundIndex, turnIndex, characterId, startTime } = payload;
 
         state.roundIndex = roundIndex;

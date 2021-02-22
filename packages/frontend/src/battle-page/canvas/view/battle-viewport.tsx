@@ -1,9 +1,8 @@
-import { useAssetMap } from '@timeflies/assets-loader';
 import { Viewport, ViewportOptions } from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { CustomPIXIComponent, usePixiApp } from 'react-pixi-fiber';
-import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
 
 const ViewportComponent = CustomPIXIComponent<Viewport, ViewportOptions>({
     customDisplayObject: props => {
@@ -35,8 +34,7 @@ const getScreenSize = ({ renderer }: PIXI.Application) => [ renderer.screen.widt
 
 export const BattleViewport: React.FC = ({ children }) => {
     const app = usePixiApp();
-    const tiledMapName = useBattleSelector(battle => battle.tiledMapInfos.name);
-    const tiledMapSchema = useAssetMap(tiledMapName);
+    const tiledMapAssets = useTiledMapAssets();
 
     const { renderer } = app;
 
@@ -54,11 +52,11 @@ export const BattleViewport: React.FC = ({ children }) => {
     }, [ app ]);
 
     const getWorldSize = (): ViewportOptions => {
-        if (!tiledMapSchema) {
+        if (!tiledMapAssets) {
             return {};
         }
 
-        const { width, height, tilewidth, tileheight } = tiledMapSchema.schema;
+        const { width, height, tilewidth, tileheight } = tiledMapAssets.schema;
 
         return {
             worldWidth: tilewidth * width,

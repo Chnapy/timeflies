@@ -1,5 +1,6 @@
 import { SpellId } from '@timeflies/common';
 import { SpellButtonPanelProps } from '@timeflies/spell-button-panel';
+import { useSelectedSpellContext, useSelectedSpellDispatchContext } from '../../spell-select/view/selected-spell-context';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 
 const emptyArray: SpellId[] = [];
@@ -9,26 +10,31 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
     const spellList = useBattleSelector(battle => playingCharacterId ? battle.spellLists[ playingCharacterId ] : emptyArray);
     const staticSpells = useBattleSelector(battle => battle.staticSpells);
     const spellsDuration = useBattleSelector(battle => battle.currentSpells.duration);
-    const selectedSpellId = useBattleSelector(battle => battle.selectedSpellId);
-    const defaultSpellRole = useBattleSelector(battle => playingCharacterId
-        ? battle.staticCharacters[ playingCharacterId ].defaultSpellRole
+    const defaultSpellId = useBattleSelector(battle => playingCharacterId
+        ? battle.staticCharacters[ playingCharacterId ].defaultSpellId
         : null);
+    const isMyCharacter = useBattleSelector(battle => playingCharacterId
+        ? battle.staticCharacters[ playingCharacterId ].playerId === battle.myPlayerId
+        : false);
 
-    if(spellList.length === 0 || !defaultSpellRole) {
+    const { selectedSpellId } = useSelectedSpellContext();
+    const dispatchSelectedSpellId = useSelectedSpellDispatchContext();
+
+    if (spellList.length === 0 || !defaultSpellId) {
         return null;
     }
-
-    const spellRoleList = spellList.map(spellId => staticSpells[ spellId ].spellRole);
 
     const spellsProps = spellList.reduce((acc, spellId) => {
         const { spellRole } = staticSpells[ spellId ];
 
-        acc[ spellRole ] = {
+        acc[ spellId ] = {
             spellRole,
             selected: spellId === selectedSpellId,
             duration: spellsDuration[ spellId ],
-            disabled: false,    // TODO
-            onClick: () => { }   // TODO
+            disabled: !isMyCharacter,
+            onClick: () => {
+                dispatchSelectedSpellId({ selectedSpellId: spellId });
+            }
         };
 
         return acc;
@@ -36,7 +42,7 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
 
     return {
         spellsProps,
-        spellRoleList,
-        defaultSpellRole
+        spellList,
+        defaultSpellId
     };
 };

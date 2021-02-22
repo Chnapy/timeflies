@@ -17,7 +17,7 @@ type CharacterData = {
     characterId: CharacterId;
     playerId: PlayerId;
     characterRole: CharacterRole;
-    defaultSpellRole: SpellRole;
+    defaultSpellId: SpellId;
     initialVariables: CharacterVariables;
 };
 

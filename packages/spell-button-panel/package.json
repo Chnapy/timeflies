@@ -43,7 +43,7 @@
     "pixi.js": "^5.3.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-pixi-fiber": "^0.14.2",
+    "react-pixi-fiber": "^1.0.0-beta.7",
     "tiled-types": "^1.2.1"
   },
   "engineStrict": true,

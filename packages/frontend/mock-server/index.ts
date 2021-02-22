@@ -52,7 +52,7 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
             characterId: 'c1',
             characterRole: 'tacka',
             playerId: 'p1',
-            defaultSpellRole: 'move',
+            defaultSpellId: 's1',
             initialVariables: {
                 actionTime: 10000,
                 health: 100,
@@ -64,7 +64,7 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
             characterId: 'c2',
             characterRole: 'meti',
             playerId: 'p1',
-            defaultSpellRole: 'switch',
+            defaultSpellId: 's3',
             initialVariables: {
                 actionTime: 12000,
                 health: 120,
@@ -76,7 +76,7 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
             characterId: 'c3',
             characterRole: 'vemo',
             playerId: 'p2',
-            defaultSpellRole: 'move',
+            defaultSpellId: 's5',
             initialVariables: {
                 actionTime: 9000,
                 health: 110,
@@ -94,7 +94,7 @@ const battleLoadData: Omit<BattleLoadData, 'turnInfos'> = {
                 actionArea: 1,
                 duration: 1000,
                 lineOfSight: true,
-                rangeArea: 1,
+                rangeArea: 10,
             }
         },
         {

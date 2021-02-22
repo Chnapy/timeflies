@@ -59,21 +59,21 @@ export const Default: React.FC = () => {
             <Box mt={2} display='flex' justifyContent='flex-end'>
                 <SpellButtonPanel
                     spellsProps={{
-                        move: {
+                        s1: {
                             spellRole: 'move',
                             duration: 800,
                             selected: false,
                             disabled: false,
                             onClick: action('move')
                         },
-                        simpleAttack: {
+                        s2: {
                             spellRole: 'simpleAttack',
                             duration: 2500,
                             selected: false,
                             disabled: true,
                             onClick: action('simpleAttack')
                         },
-                        switch: {
+                        s3: {
                             spellRole: 'switch',
                             duration: 9605,
                             selected: true,
@@ -81,8 +81,8 @@ export const Default: React.FC = () => {
                             onClick: action('switch')
                         }
                     }}
-                    spellRoleList={[ 'move', 'simpleAttack', 'switch', 'switch' ]}
-                    defaultSpellRole='move'
+                    spellList={[ 's1', 's2', 's3', 's3' ]}
+                    defaultSpellId='s1'
                 />
             </Box>
 

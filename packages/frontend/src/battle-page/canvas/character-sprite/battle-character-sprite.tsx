@@ -1,11 +1,12 @@
 import { useTheme } from '@material-ui/core';
 import { AnimatedComplexSpriteReact } from '@timeflies/animated-complex-sprite';
-import { useAssetMap, useAssetSpritesheet } from '@timeflies/assets-loader';
+import { useAssetSpritesheet } from '@timeflies/assets-loader';
 import { CharacterId, colorStringToHex, switchUtil } from '@timeflies/common';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
+import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 
 type BattleCharacterSprite = {
@@ -17,8 +18,7 @@ export const BattleCharacterSprite: React.FC<BattleCharacterSprite> = ({ charact
     const orientation = useBattleSelector(battle => battle.currentCharacters.orientation[ characterId ]);
     const position = useBattleSelector(battle => battle.currentCharacters.position[ characterId ]);
 
-    const tiledMapName = useBattleSelector(battle => battle.tiledMapInfos.name);
-    const tiledMapAssets = useAssetMap(tiledMapName) ?? null;
+    const tiledMapAssets = useTiledMapAssets();
 
     const spritesheet = useAssetSpritesheet('entities')?.spritesheet;
 
