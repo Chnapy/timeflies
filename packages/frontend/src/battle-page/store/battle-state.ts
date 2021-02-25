@@ -1,40 +1,4 @@
-import { TimeFullProps } from '@timeflies/app-ui';
-import { PlayerId, CharacterId, CharacterRole, SpellId, SpellRole, CharacterVariables, SpellVariables, CharacterVariableName, SpellVariableName } from '@timeflies/common';
-
-export type StaticPlayer = {
-    playerId: PlayerId;
-    playerName: string;
-    teamColor: string;
-};
-
-export type StaticCharacter = {
-    characterId: CharacterId;
-    playerId: PlayerId;
-    characterRole: CharacterRole;
-    defaultSpellId: SpellId;
-};
-
-export type CharacterVariablesMap = {
-    [ name in CharacterVariableName ]: {
-        [ characterId in CharacterId ]: CharacterVariables[ name ];
-    };
-};
-
-export type StaticSpell = {
-    spellId: SpellId;
-    characterId: CharacterId;
-    spellRole: SpellRole;
-};
-
-export type SpellVariablesMap = {
-    [ name in SpellVariableName ]: {
-        [ spellId in SpellId ]: SpellVariables[ name ];
-    };
-};
-
-export type SpellAction = TimeFullProps & {
-    spellId: SpellId;
-};
+import { CharacterId, PlayerId, SerializableState, SpellAction, SpellId, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
 
 export type BattleState = {
     myPlayerId: PlayerId;
@@ -52,20 +16,22 @@ export type BattleState = {
     // characters
 
     staticCharacters: { [ characterId in CharacterId ]: StaticCharacter };
-    currentCharacters: CharacterVariablesMap;
-    futureCharacters: CharacterVariablesMap;
     characterList: CharacterId[];
+
+    // serializable
+
+    currentTime: number;
+    serializableStates: { [ startTime in number ]: SerializableState };
+    serializableStateList: number[];
+    spellActions: { [ startTime in number ]: SpellAction };
+    spellActionList: number[];
 
     // spells
 
     staticSpells: { [ spellId in SpellId ]: StaticSpell };
-    currentSpells: SpellVariablesMap;
-    futureSpells: SpellVariablesMap;
     spellLists: { [ characterId in CharacterId ]: SpellId[] };
 
-    spellActions: { [startTime in number]: SpellAction };
-    spellActionList: number[];
-    
+
     selectedSpellId: SpellId | null;
 
     turnsOrder: CharacterId[];

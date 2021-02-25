@@ -1,7 +1,7 @@
 import { AssetsLoader } from '@timeflies/assets-loader';
 import { Assets } from '@timeflies/static-assets';
 import React from 'react';
-import { useGameSelector } from '../store/hooks/use-game-selector';
+import { useGameSelector } from '../../../store/hooks/use-game-selector';
 
 export const BattleAssetsLoader: React.FC = ({ children }) => {
 

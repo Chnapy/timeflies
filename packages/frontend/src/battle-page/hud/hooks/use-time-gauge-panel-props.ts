@@ -1,11 +1,12 @@
 import { getSpellCategory } from '@timeflies/common';
 import { TimeGaugePanelProps } from '@timeflies/time-gauge-panel';
+import { currentEntitiesSelector } from '../../hooks/use-entities';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 
 export const useTimeGaugePanelProps = (): TimeGaugePanelProps => {
     const startTime = useBattleSelector(battle => battle.turnStartTime);
     const playingCharacterId = useBattleSelector(battle => battle.playingCharacterId);
-    const duration = useBattleSelector(battle => playingCharacterId ? battle.currentCharacters.actionTime[playingCharacterId] : 0);
+    const duration = useBattleSelector(battle => playingCharacterId ? currentEntitiesSelector(battle).characters.actionTime[playingCharacterId] : 0);
     const staticSpells = useBattleSelector(battle => battle.staticSpells);
     const spellActionList = useBattleSelector(battle => battle.spellActionList);
     const spellActions = useBattleSelector(battle => battle.spellActions);

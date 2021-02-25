@@ -1,30 +1,32 @@
-import { SerializableState, SpellRole } from '@timeflies/common';
+import { CharacterId, SerializableState, SpellRole } from '@timeflies/common';
 import produce from 'immer';
 import { computeChecksum } from './compute-checksum';
 import { createSpellEffectHelper } from './spell-effects-fn';
 import { getSpellEffectFn } from './spell-effects-map';
 import { SpellEffect, SpellEffectFnParams } from './spell-effects-params';
 
-const getDefineProp = <O>(source: O, delta: Partial<O>) =>
-    <K extends keyof O>(key: K, computeFn: (prevValue: O[ K ], deltaValue: NonNullable<O[ K ]>) => O[ K ]) => {
+const getDefineProp = <M extends { [ k in keyof V ]: any }, V>(source: M, characterId: CharacterId, delta: Partial<V>) =>
+    <K extends keyof V>(key: K, computeFn: (prevValue: V[ K ], deltaValue: NonNullable<V[ K ]>) => V[ K ]) => {
 
         const deltaValue = delta[ key ];
 
         if (deltaValue !== undefined) {
-            const prevValue = source[ key ];
+            const variables = source[ key ] as { [ k in string ]: V[ K ] };
 
-            source[ key ] = computeFn(prevValue, deltaValue as NonNullable<O[ K ]>);
+            const prevValue = variables[ characterId ];
+
+            variables[ characterId ] = computeFn(prevValue, deltaValue as NonNullable<V[ K ]>);
         }
     };
 
 export const produceStateFromSpellEffect = (
     spellEffect: SpellEffect, spellEffectParams: SpellEffectFnParams
 ): SerializableState => {
-    return produce(spellEffectParams.context.state, draft => {
+    return produce(spellEffectParams.context.state as SerializableState, draft => {
 
         Object.entries(spellEffect.characters ?? {})
             .forEach(([ characterId, characterDelta ]) => {
-                const defineProp = getDefineProp(draft.characters[ characterId ], characterDelta);
+                const defineProp = getDefineProp(draft.characters, characterId, characterDelta);
 
                 defineProp('health', (prevValue, deltaValue) => prevValue + deltaValue);
                 defineProp('actionTime', (prevValue, deltaValue) => prevValue + deltaValue);
@@ -34,7 +36,7 @@ export const produceStateFromSpellEffect = (
 
         Object.entries(spellEffect.spells ?? {})
             .forEach(([ spellId, spellDelta ]) => {
-                const defineProp = getDefineProp(draft.spells[ spellId ], spellDelta);
+                const defineProp = getDefineProp(draft.spells, spellId, spellDelta);
 
                 defineProp('duration', (prevValue, deltaValue) => prevValue + deltaValue);
                 defineProp('lineOfSight', (prevValue, deltaValue) => deltaValue);
@@ -44,18 +46,23 @@ export const produceStateFromSpellEffect = (
                 defineProp('attack', (prevValue, deltaValue) => (prevValue ?? 0) + deltaValue);
             });
 
+        draft.time = spellEffectParams.spellAction.launchTime;
         draft.checksum = computeChecksum(draft);
     });
+};
+
+export const getSpellEffectFromSpellRole = (spellRole: SpellRole, spellEffectParams: SpellEffectFnParams) => {
+    const spellEffectFn = getSpellEffectFn(spellRole);
+
+    const helper = createSpellEffectHelper(spellEffectParams);
+
+    return spellEffectFn(helper);
 };
 
 export const produceStateFromSpellRole = (
     spellRole: SpellRole, spellEffectParams: SpellEffectFnParams
 ) => {
-    const spellEffectFn = getSpellEffectFn(spellRole);
-
-    const helper = createSpellEffectHelper(spellEffectParams);
-
-    const spellEffect = spellEffectFn(helper);
+    const spellEffect = getSpellEffectFromSpellRole(spellRole, spellEffectParams);
 
     return produceStateFromSpellEffect(spellEffect, spellEffectParams);
 };

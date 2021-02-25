@@ -1,12 +1,12 @@
-import { Checker, CheckerParams } from '../checker';
 import { CharacterId, CharacterUtils } from '@timeflies/common';
+import { Checker, CheckerParams } from '../checker';
 
 const getHelper = ({ context }: CheckerParams) => ({
     isTurnCharacter: (characterId: CharacterId) => characterId === context.currentTurn.characterId,
     isCharacterAlive: (characterId: CharacterId) => {
-        const characterVariables = context.state.characters[ characterId ];
+        const { health } = context.state.characters;
 
-        return CharacterUtils.isAlive(characterVariables.health);
+        return CharacterUtils.isAlive(health[ characterId ]);
     }
 })
 

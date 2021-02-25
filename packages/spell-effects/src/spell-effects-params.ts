@@ -1,4 +1,4 @@
-import { CharacterId, CharacterRole, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellRole, SpellVariables } from '@timeflies/common';
+import { CharacterId, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellVariables, StaticCharacter, StaticSpell } from '@timeflies/common';
 
 export type SpellEffectCharacters = {
     [ characterId in CharacterId ]: Partial<CharacterVariables>;
@@ -17,23 +17,11 @@ export type TurnContext = {
     playerId: PlayerId;
     characterId: CharacterId;
     startTime: number;
-    endTime: number;
 };
 
 export type StaticState = {
-    characters: {
-        [ characterId in CharacterId ]: {
-            id: CharacterId;
-            role: CharacterRole;
-        };
-    };
-    spells: {
-        [ spellId in SpellId ]: {
-            id: SpellId;
-            characterId: CharacterId;
-            spellType: SpellRole;
-        };
-    };
+    characters: { [ characterId in CharacterId ]: Pick<StaticCharacter, 'characterId' | 'characterRole'> };
+    spells: { [ spellId in SpellId ]: Pick<StaticSpell, 'spellId' | 'characterId' | 'spellRole'> };
 };
 
 export type MapContext = {
@@ -42,12 +30,12 @@ export type MapContext = {
 
 export type SpellEffectFnContext = {
     currentTurn: TurnContext;
-    state: SerializableState;
+    state: Omit<SerializableState, 'checksum'>;
     staticState: StaticState;
     map: MapContext;
 };
 
 export type SpellEffectFnParams = {
-    spellAction: SpellAction;
+    spellAction: Omit<SpellAction, 'checksum'>;
     context: SpellEffectFnContext;
 };

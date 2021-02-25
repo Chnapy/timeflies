@@ -10,7 +10,7 @@ export const simpleAttackEffect: SpellEffectFn = ({
     const { attack = 0 } = getSpell();
 
     const characters = targets.reduce<SpellEffectCharacters>((acc, v) => {
-        acc[ v.id ] = {
+        acc[ v.characterId ] = {
             health: -attack
         };
         return acc;

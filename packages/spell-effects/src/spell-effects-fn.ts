@@ -1,4 +1,4 @@
-import { CharacterId, CharacterUtils } from '@timeflies/common';
+import { CharacterId, CharacterUtils, CharacterVariables, ObjectTyped, SpellVariables } from '@timeflies/common';
 import { SpellEffect, SpellEffectFnParams } from './spell-effects-params';
 
 export const createSpellEffectHelper = ({ spellAction, context }: SpellEffectFnParams) => {
@@ -6,14 +6,19 @@ export const createSpellEffectHelper = ({ spellAction, context }: SpellEffectFnP
 
     const getCharacterById = (characterId: CharacterId) => ({
         ...staticState.characters[ characterId ],
-        ...state.characters[ characterId ]
+        ...ObjectTyped.entries(state.characters)
+            .reduce((acc, [ variableName, variableMap ]) => {
+                (acc[ variableName ] as any) = variableMap[ characterId ];
+
+                return acc;
+            }, {} as CharacterVariables)
     });
 
     const getHitCharacters = () => {
         const { actionArea } = context.map;
 
-        return Object.entries(state.characters)
-            .filter(([ characterId, { position } ]) =>
+        return Object.entries(state.characters.position)
+            .filter(([ characterId, position ]) =>
                 actionArea.some(pos => pos.id === position.id))
             .map(([ characterId ]) => getCharacterById(characterId));
     };
@@ -25,7 +30,12 @@ export const createSpellEffectHelper = ({ spellAction, context }: SpellEffectFnP
 
             return {
                 ...staticState.spells[ spellId ],
-                ...state.spells[ spellId ]
+                ...ObjectTyped.entries(state.spells)
+                    .reduce((acc, [ variableName, variableMap ]) => {
+                        (acc[ variableName ] as any) = variableMap[ spellId ];
+
+                        return acc;
+                    }, {} as SpellVariables)
             };
         },
         getHitCharactersAlive: () => {

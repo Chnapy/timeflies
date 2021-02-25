@@ -1,4 +1,5 @@
 import { CharacterItemProps, CharacterListPanelProps } from '@timeflies/character-list-panel';
+import { useCurrentEntities } from '../../hooks/use-entities';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 
@@ -7,7 +8,7 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
     const characterList = useBattleSelector(battleState => battleState.characterList);
     const staticPlayers = useBattleSelector(battleState => battleState.staticPlayers);
     const staticCharacters = useBattleSelector(battleState => battleState.staticCharacters);
-    const currentCharactersHealth = useBattleSelector(battleState => battleState.currentCharacters.health);
+    const currentCharactersHealth = useCurrentEntities(({ characters }) => characters.health);
     const playingCharacterId = useBattleSelector(battleState => battleState.playingCharacterId);
 
     const getPlayerRelationFrom = usePlayerRelationFrom();

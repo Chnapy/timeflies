@@ -1,31 +1,10 @@
-import { CharacterId, CharacterRole, CharacterVariables, PlayerId, SpellId, SpellRole, SpellVariables } from '@timeflies/common';
+import { CharacterId, PlayerId, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
 import { createMessage } from '../../message';
 
 type TiledMapInfos = {
     name: string;
     schemaLink: string;
     imagesLinks: Record<string, string>;
-};
-
-type PlayerData = {
-    playerId: PlayerId;
-    playerName: string;
-    teamColor: string;
-};
-
-type CharacterData = {
-    characterId: CharacterId;
-    playerId: PlayerId;
-    characterRole: CharacterRole;
-    defaultSpellId: SpellId;
-    initialVariables: CharacterVariables;
-};
-
-type SpellData = {
-    spellId: SpellId;
-    characterId: CharacterId;
-    spellRole: SpellRole;
-    initialVariables: SpellVariables;
 };
 
 type CycleInfos = {
@@ -37,11 +16,11 @@ export type BattleLoadData = {
 
     tiledMapInfos: TiledMapInfos;
 
-    players: PlayerData[];
+    staticPlayers: StaticPlayer[];
+    staticCharacters: StaticCharacter[];
+    staticSpells: StaticSpell[];
 
-    characters: CharacterData[];
-
-    spells: SpellData[];
+    initialSerializableState: SerializableState;
 
     cycleInfos: CycleInfos;
 };

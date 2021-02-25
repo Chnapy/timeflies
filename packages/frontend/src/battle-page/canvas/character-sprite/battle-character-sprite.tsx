@@ -5,8 +5,9 @@ import { CharacterId, colorStringToHex, switchUtil } from '@timeflies/common';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import * as PIXI from 'pixi.js';
 import React from 'react';
+import { useCurrentEntities } from '../../hooks/use-entities';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
-import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
+import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 
 type BattleCharacterSprite = {
@@ -15,8 +16,9 @@ type BattleCharacterSprite = {
 
 export const BattleCharacterSprite: React.FC<BattleCharacterSprite> = ({ characterId }) => {
     const { characterRole, playerId } = useBattleSelector(battle => battle.staticCharacters[ characterId ]);
-    const orientation = useBattleSelector(battle => battle.currentCharacters.orientation[ characterId ]);
-    const position = useBattleSelector(battle => battle.currentCharacters.position[ characterId ]);
+    const orientation = useCurrentEntities(({ characters }) => characters.orientation[ characterId ]);
+    const position = useCurrentEntities(({ characters }) => characters.position[ characterId ]);
+    const isPlaying = useBattleSelector(battle => battle.playingCharacterId === characterId);
 
     const tiledMapAssets = useTiledMapAssets();
 
@@ -59,7 +61,7 @@ export const BattleCharacterSprite: React.FC<BattleCharacterSprite> = ({ charact
             scale={0.75}
             anchor={0.5}
             position={mapPosition}
-            outline={{ color: outlineColor, thickness: 1 }}
+            outline={{ color: outlineColor, thickness: isPlaying ? 2 : 1 }}
         />
     </>;
 };

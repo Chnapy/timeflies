@@ -2,7 +2,7 @@ import { Viewport, ViewportOptions } from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { CustomPIXIComponent, usePixiApp } from 'react-pixi-fiber';
-import { useTiledMapAssets } from '../../hooks/use-tiled-map-assets';
+import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 
 const ViewportComponent = CustomPIXIComponent<Viewport, ViewportOptions>({
     customDisplayObject: props => {

@@ -11,7 +11,7 @@ export const moveEffect: SpellEffectFn = ({
 
     return {
         characters: {
-            [ launcher.id ]: {
+            [ launcher.characterId ]: {
                 position: targetPos,
                 orientation
             }

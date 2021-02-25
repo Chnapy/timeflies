@@ -37,7 +37,7 @@ const battleLoadData: BattleLoadData = {
             "tiles_dungeon_v1.1": 'http://localhost:40510/public/maps/map_dungeon.png'
         }
     },
-    players: [
+    staticPlayers: [
         {
             playerId: 'p1',
             playerName: 'chnapy',
@@ -49,112 +49,123 @@ const battleLoadData: BattleLoadData = {
             teamColor: '#00FF00'
         }
     ],
-    characters: [
+    staticCharacters: [
         {
             characterId: 'c1',
             characterRole: 'tacka',
             playerId: 'p1',
             defaultSpellId: 's1',
-            initialVariables: {
-                actionTime: 10000,
-                health: 100,
-                orientation: 'bottom',
-                position: createPosition(8, 3),
-            },
         },
         {
             characterId: 'c2',
             characterRole: 'meti',
             playerId: 'p1',
             defaultSpellId: 's3',
-            initialVariables: {
-                actionTime: 12000,
-                health: 120,
-                orientation: 'left',
-                position: createPosition(10, 3),
-            },
         },
         {
             characterId: 'c3',
             characterRole: 'vemo',
             playerId: 'p2',
             defaultSpellId: 's5',
-            initialVariables: {
-                actionTime: 9000,
-                health: 110,
-                orientation: 'top',
-                position: createPosition(9, 11),
-            },
         }
     ],
-    spells: [
+    staticSpells: [
         {
             characterId: 'c1',
             spellId: 's1',
             spellRole: 'move',
-            initialVariables: {
-                actionArea: 1,
-                duration: 1000,
-                lineOfSight: true,
-                rangeArea: 10,
-            }
         },
         {
             characterId: 'c1',
             spellId: 's2',
             spellRole: 'simpleAttack',
-            initialVariables: {
-                actionArea: 2,
-                duration: 2000,
-                lineOfSight: true,
-                rangeArea: 6,
-            }
         },
         {
             characterId: 'c2',
             spellId: 's3',
             spellRole: 'switch',
-            initialVariables: {
-                actionArea: 1,
-                duration: 800,
-                lineOfSight: false,
-                rangeArea: 2,
-            }
         },
         {
             characterId: 'c2',
             spellId: 's4',
             spellRole: 'simpleAttack',
-            initialVariables: {
-                actionArea: 2,
-                duration: 2000,
-                lineOfSight: true,
-                rangeArea: 6,
-            }
         },
         {
             characterId: 'c3',
             spellId: 's5',
             spellRole: 'move',
-            initialVariables: {
-                actionArea: 1,
-                duration: 1000,
-                lineOfSight: true,
-                rangeArea: 1,
-            }
         },
         {
             characterId: 'c3',
             spellId: 's6',
             spellRole: 'simpleAttack',
-            initialVariables: {
-                actionArea: 2,
-                duration: 2000,
-                lineOfSight: true,
-                rangeArea: 6,
-            }
         }
     ],
+    initialSerializableState: {
+        checksum: '',
+        time: Date.now(),
+        characters: {
+            actionTime: {
+                c1: 10000,
+                c2: 12000,
+                c3: 9000
+            },
+            health: {
+                c1: 100,
+                c2: 110,
+                c3: 120
+            },
+            orientation: {
+                c1: 'bottom',
+                c2: 'left',
+                c3: 'top'
+            },
+            position: {
+                c1: createPosition(8, 3),
+                c2: createPosition(10, 3),
+                c3: createPosition(9, 11)
+            }
+        },
+        spells: {
+            duration: {
+                s1: 1000,
+                s2: 2000,
+                s3: 800,
+                s4: 2000,
+                s5: 1000,
+                s6: 2000,
+            },
+            rangeArea: {
+                s1: 10,
+                s2: 6,
+                s3: 2,
+                s4: 6,
+                s5: 1,
+                s6: 6,
+            },
+            actionArea: {
+                s1: 1,
+                s2: 2,
+                s3: 1,
+                s4: 2,
+                s5: 1,
+                s6: 2,
+            },
+            lineOfSight: {
+                s1: true,
+                s2: true,
+                s3: false,
+                s4: true,
+                s5: true,
+                s6: true,
+            },
+            attack: {
+                s2: 20,
+                s4: 20,
+                s6: 20,
+            }
+        }
+    },
     cycleInfos: {
         turnsOrder
     }
@@ -169,10 +180,7 @@ const sendAll = action => {
 
 const cycleEngine = createCycleEngine({
     charactersList: turnsOrder,
-    charactersDurations: battleLoadData.characters.reduce((acc, { characterId, initialVariables }) => {
-        acc[ characterId ] = initialVariables.actionTime;
-        return acc;
-    }, {}),
+    charactersDurations: battleLoadData.initialSerializableState.characters.actionTime,
     listeners: {
         turnEnd: params => {
             sendAllNextTurnInfos();
@@ -184,7 +192,7 @@ const cycleEngine = createCycleEngine({
 const sendAllNextTurnInfos = () => setTimeout(() =>
     sendAll(
         BattleTurnStartMessage(cycleEngine.getNextTurnInfos())
-    ), 200);
+    ), 1000);
 
 wss.on('connection', function (ws) {
 

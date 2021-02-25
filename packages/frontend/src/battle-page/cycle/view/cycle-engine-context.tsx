@@ -1,5 +1,6 @@
 import { createCycleEngine, CycleEngine } from '@timeflies/cycle-engine';
 import React from 'react';
+import { useCurrentEntities } from '../../hooks/use-entities';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { useCycleEngineListeners, useCycleMessageListeners } from '../hooks/use-cycle-listeners';
 import { useCycleLogic } from '../hooks/use-cycle-logic';
@@ -16,7 +17,7 @@ const CycleEngineLogic: React.FC = () => {
 
 export const CycleEngineProvider: React.FC = ({ children }) => {
     const turnsOrder = useBattleSelector(battle => battle.turnsOrder);
-    const charactersDurations = useBattleSelector(battle => battle.currentCharacters.actionTime);
+    const charactersDurations = useCurrentEntities(({ characters }) => characters.actionTime);
     const getCycleEngineListeners = useCycleEngineListeners();
 
     const createEngine = () => createCycleEngine({

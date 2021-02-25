@@ -12,7 +12,7 @@ export const switchEffect: SpellEffectFn = ({
 
     const targetEffects = target
         ? {
-            [target.id]: {
+            [target.characterId]: {
                 position: launcherFirstPosition
             }
         }
@@ -20,7 +20,7 @@ export const switchEffect: SpellEffectFn = ({
 
     return {
         characters: {
-            [launcher.id]: {
+            [launcher.characterId]: {
                 position: targetPos
             },
             ...targetEffects

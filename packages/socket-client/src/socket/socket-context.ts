@@ -2,13 +2,13 @@ import React from 'react';
 import { SocketHelper } from './create-socket-helper';
 
 
-const socketContext = React.createContext<SocketHelper | null>(null);
-socketContext.displayName = 'SocketContext';
+export const SocketContext = React.createContext<SocketHelper | null>(null);
+SocketContext.displayName = 'SocketContext';
 
-export const SocketContextProvider = socketContext.Provider;
+export const SocketContextProvider = SocketContext.Provider;
 
 export const useSocketHelper = () => {
-    const socketHelper = React.useContext(socketContext);
+    const socketHelper = React.useContext(SocketContext);
 
     if (!socketHelper) {
         throw new Error('socket not defined');

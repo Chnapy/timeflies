@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useGameSelector } from '../store/hooks/use-game-selector';
-import { BattleAssetsLoader } from './battle-assets-loader';
+import { BattleAssetsLoader } from './assets-loader/view/battle-assets-loader';
 import { BattleView } from './battle-view';
 import { useBattleLoad } from './loading/hooks/use-battle-load';
 import { BattleLoading } from './loading/view/battle-loading';

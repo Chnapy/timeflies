@@ -1,9 +1,8 @@
-import { CaseReducer } from '@reduxjs/toolkit';
-import { GameState } from '../../../store/game-state';
+import { GameCaseReducers } from '../../../store/game-case-reducers';
 import { assertBattleState } from '../../store/assert-battle-state';
 import { SpellSelectAction } from './spell-select-actions';
 
-export const spellSelectCaseReducers: Record<string, CaseReducer<GameState[ 'battle' ], any>> = {
+export const spellSelectCaseReducers: GameCaseReducers<'battle'> = {
     [ SpellSelectAction.type ]: (state, { payload }: SpellSelectAction) => {
         assertBattleState(state);
 

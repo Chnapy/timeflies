@@ -1,5 +1,6 @@
 import { SpellId } from '@timeflies/common';
 import { SpellButtonPanelProps } from '@timeflies/spell-button-panel';
+import { useCurrentEntities } from '../../hooks/use-entities';
 import { useIsMyCharacterPlaying } from '../../hooks/use-is-my-character-playing';
 import { useSelectSpell } from '../../spell-select/hooks/use-select-spell';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
@@ -10,7 +11,7 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
     const playingCharacterId = useBattleSelector(battle => battle.playingCharacterId);
     const spellList = useBattleSelector(battle => playingCharacterId ? battle.spellLists[ playingCharacterId ] : emptyArray);
     const staticSpells = useBattleSelector(battle => battle.staticSpells);
-    const spellsDuration = useBattleSelector(battle => battle.currentSpells.duration);
+    const spellsDuration = useCurrentEntities(({ spells }) => spells.duration);
     const defaultSpellId = useBattleSelector(battle => playingCharacterId
         ? battle.staticCharacters[ playingCharacterId ].defaultSpellId
         : null);

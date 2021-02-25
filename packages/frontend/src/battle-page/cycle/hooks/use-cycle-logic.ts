@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAsyncEffect } from 'use-async-effect';
+import { useCurrentEntities } from '../../hooks/use-entities';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { useCycleEngine } from '../view/cycle-engine-context';
 
 export const useCycleLogic = () => {
     const turnsOrder = useBattleSelector(battle => battle.turnsOrder);
-    const charactersDurations = useBattleSelector(battle => battle.currentCharacters.actionTime);
+    const charactersDurations = useCurrentEntities(({ characters }) => characters.actionTime);
     const turnStartTime = useBattleSelector(battle => battle.turnStartTime);
     const playingCharacterId = useBattleSelector(battle => battle.playingCharacterId);
     const roundIndex = useBattleSelector(battle => battle.roundIndex);
