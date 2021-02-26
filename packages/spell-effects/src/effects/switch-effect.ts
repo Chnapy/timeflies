@@ -1,6 +1,6 @@
 import { SpellEffectFn } from '../spell-effects-fn';
 
-export const switchEffect: SpellEffectFn = ({ 
+export const switchEffect: SpellEffectFn = async ({ 
     getLauncher, getHitCharactersAlive,
     targetPos
  }) => {

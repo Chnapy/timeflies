@@ -1,4 +1,5 @@
 import { CharacterId, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellVariables, StaticCharacter, StaticSpell } from '@timeflies/common';
+import { TiledMap } from 'tiled-types';
 
 export type SpellEffectCharacters = {
     [ characterId in CharacterId ]: Partial<CharacterVariables>;
@@ -9,6 +10,8 @@ export type SpellEffectSpells = {
 };
 
 export type SpellEffect = {
+    actionArea: Position[];
+    duration: number;
     characters?: SpellEffectCharacters;
     spells?: SpellEffectSpells;
 };
@@ -25,7 +28,8 @@ export type StaticState = {
 };
 
 export type MapContext = {
-    actionArea: Position[];
+    tiledMap: TiledMap;
+    rangeArea: Position[];
 };
 
 export type SpellEffectFnContext = {
@@ -35,7 +39,9 @@ export type SpellEffectFnContext = {
     map: MapContext;
 };
 
+export type ParamPartialSpellAction = Omit<SpellAction, 'checksum' | 'duration'>;  // duration may be computed by effect
+
 export type SpellEffectFnParams = {
-    spellAction: Omit<SpellAction, 'checksum'>;
+    partialSpellAction: ParamPartialSpellAction;
     context: SpellEffectFnContext;
 };

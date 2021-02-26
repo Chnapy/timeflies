@@ -3,13 +3,15 @@ import { Texture } from 'pixi.js';
 import React from 'react';
 import { Container } from 'react-pixi-fiber';
 import { useActionPreviewContext } from '../../action-preview/view/action-preview-context';
-import { useCurrentEntities } from '../../hooks/use-entities';
 import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
+import { useCurrentEntities, useFutureEntities } from '../../hooks/use-entities';
 import { useRangeAreaContext } from '../../range-area/view/range-area-context';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { useTileClick } from '../../tile-interactive/hooks/use-tile-click';
 import { useTileHoverDispatchContext } from '../../tile-interactive/view/tile-hover-context';
-import { BattleCharacterSprite } from '../character-sprite/battle-character-sprite';
+import { BattleCharacterCurrentSprite } from '../character-sprite/battle-character-current-sprite';
+import { BattleCharacterFutureSprite } from '../character-sprite/battle-character-future-sprite';
+import {useCurrentActionArea} from '../../action-preview/hooks/use-current-action-area';
 
 const imagesLinksToTextures = (links: Record<string, string>) => {
     return Object.entries(links).reduce<Record<string, Texture>>((acc, [ key, source ]) => {
@@ -22,13 +24,15 @@ export const BattleTilemap: React.FC = () => {
     const tiledMapAssets = useTiledMapAssets();
 
     const characterList = useBattleSelector(battle => battle.characterList);
-    const positions = useCurrentEntities(({ characters }) => characters.position);
+    const currentPositions = useCurrentEntities(({ characters }) => characters.position);
+    const futurePositions = useFutureEntities(({ characters }) => characters.position);
 
     const dispatchTileHover = useTileHoverDispatchContext();
     const tileClick = useTileClick();
 
     const { rangeArea } = useRangeAreaContext();
-    const { actionArea } = useActionPreviewContext();
+    const { actionArea } = useActionPreviewContext().spellEffectPreview;
+    const currentActionArea = useCurrentActionArea();
 
     const tilesRange = rangeArea.reduce<TilemapComponentProps[ 'tilesRange' ]>((acc, pos) => {
         acc[ pos.id ] = true;
@@ -40,8 +44,25 @@ export const BattleTilemap: React.FC = () => {
         return acc;
     }, {});
 
+    const tilesCurrentAction = currentActionArea.reduce<TilemapComponentProps[ 'tilesCurrentAction' ]>((acc, pos) => {
+        acc[ pos.id ] = true;
+        return acc;
+    }, {});
+
     const characterMap = characterList.reduce<TilemapComponentProps[ 'children' ]>((acc, characterId) => {
-        acc[ positions[ characterId ].id ] = <BattleCharacterSprite characterId={characterId} />;
+
+        const currentPos = currentPositions[ characterId ];
+        const futurePos = futurePositions[ characterId ];
+
+        acc[ (currentPos || futurePos).id ] = <>
+            {currentPos && (
+                <BattleCharacterCurrentSprite characterId={characterId} />
+            )}
+            {futurePos && (
+                <BattleCharacterFutureSprite characterId={characterId} />
+            )}
+        </>;
+
         return acc;
     }, {});
 
@@ -52,7 +73,7 @@ export const BattleTilemap: React.FC = () => {
                 mapTexture={imagesLinksToTextures(tiledMapAssets.images)}
                 tilesRange={tilesRange}
                 tilesAction={tilesAction}
-                tilesCurrentAction={{}}
+                tilesCurrentAction={tilesCurrentAction}
                 onTileMouseHover={dispatchTileHover}
             >
                 {characterMap}

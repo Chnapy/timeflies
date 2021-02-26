@@ -14,7 +14,7 @@ type BattleCharacterSprite = {
     characterId: CharacterId;
 };
 
-export const BattleCharacterSprite: React.FC<BattleCharacterSprite> = ({ characterId }) => {
+export const BattleCharacterCurrentSprite: React.FC<BattleCharacterSprite> = ({ characterId }) => {
     const { characterRole, playerId } = useBattleSelector(battle => battle.staticCharacters[ characterId ]);
     const orientation = useCurrentEntities(({ characters }) => characters.orientation[ characterId ]);
     const position = useCurrentEntities(({ characters }) => characters.position[ characterId ]);

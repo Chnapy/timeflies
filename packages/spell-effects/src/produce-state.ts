@@ -46,23 +46,37 @@ export const produceStateFromSpellEffect = (
                 defineProp('attack', (prevValue, deltaValue) => (prevValue ?? 0) + deltaValue);
             });
 
-        draft.time = spellEffectParams.spellAction.launchTime;
+        draft.time = spellEffectParams.partialSpellAction.launchTime;
         draft.checksum = computeChecksum(draft);
     });
 };
 
-export const getSpellEffectFromSpellRole = (spellRole: SpellRole, spellEffectParams: SpellEffectFnParams) => {
+export const getSpellEffectFromSpellRole = async (spellRole: SpellRole, spellEffectParams: SpellEffectFnParams): Promise<SpellEffect> => {
+
     const spellEffectFn = getSpellEffectFn(spellRole);
 
     const helper = createSpellEffectHelper(spellEffectParams);
 
-    return spellEffectFn(helper);
+    const defaultActionArea = helper.getActionArea();
+    if (defaultActionArea.length === 0) {
+        return { actionArea: [], duration: -1 };
+    }
+
+    const defaultDuration = helper.getDefaultDuration();
+
+    const spellEffect = await spellEffectFn(helper);
+
+    return {
+        actionArea: defaultActionArea,
+        duration: defaultDuration,
+        ...spellEffect
+    };
 };
 
-export const produceStateFromSpellRole = (
+export const produceStateFromSpellRole = async (
     spellRole: SpellRole, spellEffectParams: SpellEffectFnParams
 ) => {
-    const spellEffect = getSpellEffectFromSpellRole(spellRole, spellEffectParams);
+    const spellEffect = await getSpellEffectFromSpellRole(spellRole, spellEffectParams);
 
     return produceStateFromSpellEffect(spellEffect, spellEffectParams);
 };

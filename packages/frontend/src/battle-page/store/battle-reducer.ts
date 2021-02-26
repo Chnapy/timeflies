@@ -87,8 +87,8 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
 
             ...getSerializableInfos(),
 
-            spellActions: {},
-            spellActionList: [],
+            spellActionEffects: {},
+            spellActionEffectList: [],
 
             selectedSpellId: null,
 

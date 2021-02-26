@@ -10,15 +10,15 @@ export const cycleCaseReducers: GameCaseReducers<'battle'> = {
 
         const { roundIndex, turnIndex, characterId, startTime } = payload;
 
-        state.spellActions = {};
-        state.spellActionList = [];
+        state.spellActionEffects = {};
+        state.spellActionEffectList = [];
 
         state.serializableStateList
             .slice(0, state.serializableStateList.length - 1)
             .forEach(time => {
                 delete state.serializableStates[ time ];
             });
-        state.serializableStateList = [ ArrayUtils.last(state.serializableStateList)! ]
+        state.serializableStateList = [ ArrayUtils.last(state.serializableStateList)! ];
 
         state.roundIndex = roundIndex;
         state.turnIndex = turnIndex;

@@ -1,7 +1,7 @@
 import { SpellEffectFn } from '../spell-effects-fn';
 import { SpellEffectCharacters } from '../spell-effects-params';
 
-export const simpleAttackEffect: SpellEffectFn = ({
+export const simpleAttackEffect: SpellEffectFn = async ({
     getHitCharactersAlive, getSpell
 }) => {
 

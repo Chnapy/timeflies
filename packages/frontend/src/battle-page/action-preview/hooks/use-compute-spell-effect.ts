@@ -1,18 +1,25 @@
-import { ArrayUtils } from '@timeflies/common';
+import { ArrayUtils, Position } from '@timeflies/common';
 import { getSpellEffectFromSpellRole, SpellEffect, SpellEffectFnParams } from '@timeflies/spell-effects';
+import React from 'react';
+import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 import { useFutureEntities } from '../../hooks/use-entities';
+import { useRangeAreaContext } from '../../range-area/view/range-area-context';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
-import { ActionPreviewContextValueGeo } from '../view/action-preview-context';
+import { useTileHoverContext } from '../../tile-interactive/view/tile-hover-context';
 
 export type ComputeSpellEffect = {
+    targetPosition: Position;
     spellEffect: SpellEffect;
     spellEffectParams: SpellEffectFnParams;
 };
 
-export const useComputeSpellEffect = ({ targetPosition, actionArea }: ActionPreviewContextValueGeo) => {
-    const spellId = useBattleSelector(battle => battle.selectedSpellId);
-    const spell = useBattleSelector(battle => spellId
-        ? battle.staticSpells[ spellId ]
+export const useComputeSpellEffect = () => {
+    const tiledMap = useTiledMapAssets()?.schema;
+    const { rangeArea } = useRangeAreaContext();
+    const targetPosition = useTileHoverContext();
+
+    const spell = useBattleSelector(battle => battle.selectedSpellId
+        ? battle.staticSpells[ battle.selectedSpellId ]
         : null);
 
     const staticCharacters = useBattleSelector(battle => battle.staticCharacters);
@@ -21,28 +28,26 @@ export const useComputeSpellEffect = ({ targetPosition, actionArea }: ActionPrev
     const futureState = useFutureEntities(state => state);
 
     const turnStartTime = useBattleSelector(battle => battle.turnStartTime);
-    const spellActionList = useBattleSelector(battle => battle.spellActionList);
-    const spellActions = useBattleSelector(battle => battle.spellActions);
+    const lastSpellActionEndTime = useBattleSelector(battle => {
+        const startTime = ArrayUtils.last(battle.spellActionEffectList);
+        return startTime
+            ? startTime + battle.spellActionEffects[ startTime ].spellAction.duration
+            : null;
+    });
 
-    return (): ComputeSpellEffect | null => {
-        if (!spellId || !spell || !targetPosition) {
+    return React.useCallback(async (): Promise<ComputeSpellEffect | null> => {
+        if (!tiledMap || !spell || !targetPosition) {
             return null;
         }
 
-        const getLastSpellActionEndTime = () => {
-            const startTime = ArrayUtils.last(spellActionList)!;
-            return startTime + spellActions[ startTime ].duration;
-        };
-
-        const launchTime = spellActionList.length > 0
-            ? Math.max(getLastSpellActionEndTime(), Date.now())
+        const launchTime = lastSpellActionEndTime
+            ? Math.max(lastSpellActionEndTime, Date.now())
             : Date.now();
 
         const spellEffectParams: SpellEffectFnParams = {
-            spellAction: {
-                spellId,
+            partialSpellAction: {
+                spellId: spell.spellId,
                 launchTime,
-                duration: futureState.spells.duration[ spellId ],
                 targetPos: targetPosition
             },
             context: {
@@ -57,14 +62,25 @@ export const useComputeSpellEffect = ({ targetPosition, actionArea }: ActionPrev
                     startTime: turnStartTime
                 },
                 map: {
-                    actionArea
+                    tiledMap,
+                    rangeArea
                 }
             }
         };
 
+        const spellEffect = await getSpellEffectFromSpellRole(spell.spellRole, spellEffectParams);
+
+        if (spellEffect.actionArea.length === 0) {
+            return null;
+        }
+
         return {
-            spellEffect: getSpellEffectFromSpellRole(spell.spellRole, spellEffectParams),
+            targetPosition,
+            spellEffect,
             spellEffectParams
         };
-    };
+    }, [
+        futureState, rangeArea, spell, lastSpellActionEndTime,
+        staticCharacters, staticSpells, targetPosition, tiledMap, turnStartTime
+    ]);
 };

@@ -1,4 +1,5 @@
 import { CharacterId, PlayerId, SerializableState, SpellAction, SpellId, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
+import { SpellEffect } from '@timeflies/spell-effects';
 
 export type BattleState = {
     myPlayerId: PlayerId;
@@ -23,8 +24,13 @@ export type BattleState = {
     currentTime: number;
     serializableStates: { [ startTime in number ]: SerializableState };
     serializableStateList: number[];
-    spellActions: { [ startTime in number ]: SpellAction };
-    spellActionList: number[];
+    spellActionEffects: {
+        [ startTime in number ]: {
+            spellAction: SpellAction;
+            spellEffect: SpellEffect;
+        };
+    };
+    spellActionEffectList: number[];
 
     // spells
 

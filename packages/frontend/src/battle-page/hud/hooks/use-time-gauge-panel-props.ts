@@ -8,11 +8,11 @@ export const useTimeGaugePanelProps = (): TimeGaugePanelProps => {
     const playingCharacterId = useBattleSelector(battle => battle.playingCharacterId);
     const duration = useBattleSelector(battle => playingCharacterId ? currentEntitiesSelector(battle).characters.actionTime[playingCharacterId] : 0);
     const staticSpells = useBattleSelector(battle => battle.staticSpells);
-    const spellActionList = useBattleSelector(battle => battle.spellActionList);
-    const spellActions = useBattleSelector(battle => battle.spellActions);
+    const spellActionEffectList = useBattleSelector(battle => battle.spellActionEffectList);
+    const spellActionEffects = useBattleSelector(battle => battle.spellActionEffects);
 
-    const spellDurationList = spellActionList.map((startTime): TimeGaugePanelProps['spellDurationList'][number] => {
-        const { spellId, duration } = spellActions[startTime];
+    const spellDurationList = spellActionEffectList.map((startTime): TimeGaugePanelProps['spellDurationList'][number] => {
+        const { spellId, duration } = spellActionEffects[startTime].spellAction;
 
         return {
             startTime,

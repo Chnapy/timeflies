@@ -11,10 +11,13 @@ export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
     [ BattleCommitAction.type ]: (state, { payload }: BattleCommitAction) => {
         assertBattleState(state);
 
-        const { spellAction, futureState } = payload;
+        const { spellAction, futureState, spellEffect } = payload;
 
-        state.spellActions[ spellAction.launchTime ] = spellAction;
-        state.spellActionList.push(spellAction.launchTime);
+        state.spellActionEffects[ spellAction.launchTime ] = {
+            spellAction,
+            spellEffect
+        };
+        state.spellActionEffectList.push(spellAction.launchTime);
 
         state.serializableStates[ futureState.time ] = futureState;
         state.serializableStateList.push(futureState.time);
@@ -24,7 +27,7 @@ export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
 
         const { lastState } = payload;
 
-        state.spellActionList = state.spellActionList.filter(time => time <= lastState.time);
+        state.spellActionEffectList = state.spellActionEffectList.filter(time => time <= lastState.time);
         state.serializableStateList = state.serializableStateList.filter(time => time <= lastState.time);
     }
 };

@@ -6,13 +6,16 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
+    "@timeflies/cache": "*",
     "@timeflies/common": "*",
     "tiled-types": "^1.2.1"
   },
   "dependencies": {
-    "bresenham": "0.0.4"
+    "bresenham": "0.0.4",
+    "easystarjs": "^0.4.4"
   },
   "devDependencies": {
+    "@timeflies/cache": "workspace:packages/cache",
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/bresenham": "^0.0.0",

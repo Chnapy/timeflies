@@ -1,5 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { SerializableState, SpellAction } from '@timeflies/common';
+import { SpellEffect } from '@timeflies/spell-effects';
 
 export type BattleTimeUpdateAction = ReturnType<typeof BattleTimeUpdateAction>;
 export const BattleTimeUpdateAction = createAction<{
@@ -10,7 +11,7 @@ export type BattleCommitAction = ReturnType<typeof BattleCommitAction>;
 export const BattleCommitAction = createAction<{
     spellAction: SpellAction;
     futureState: SerializableState;
-    // spellEffect: SpellEffect;    // for feedback component
+    spellEffect: SpellEffect;
 }>('battle/commit');
 
 export type BattleRollbackAction = ReturnType<typeof BattleRollbackAction>;

@@ -4,18 +4,16 @@ import { BattleSpellActionMessage, SocketErrorMessage } from '@timeflies/socket-
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import { useDispatch } from 'react-redux';
 import { useComputeSpellEffect } from '../../action-preview/hooks/use-compute-spell-effect';
-import { useActionPreviewContext } from '../../action-preview/view/action-preview-context';
 import { BattleCommitAction, BattleRollbackAction, BattleTimeUpdateAction } from '../store/battle-state-actions';
 
 export const useTileClick = () => {
-    const actionPreviewProps = useActionPreviewContext();
-    const computeSpellEffect = useComputeSpellEffect(actionPreviewProps);
+    const computeSpellEffect = useComputeSpellEffect();
     const sendWithResponse = useSocketSendWithResponse();
     const dispatch = useDispatch();
 
     return async () => {
         // compute again, because time values may have changed
-        const spellEffectInfos = computeSpellEffect();
+        const spellEffectInfos = await computeSpellEffect();
         if (!spellEffectInfos) {
             return;
         }
@@ -24,7 +22,8 @@ export const useTileClick = () => {
         const futureState = produceStateFromSpellEffect(spellEffect, spellEffectParams);
 
         const spellAction: SpellAction = {
-            ...spellEffectParams.spellAction,
+            ...spellEffectParams.partialSpellAction,
+            duration: spellEffect.duration,
             checksum: futureState.checksum
         };
 
@@ -34,7 +33,8 @@ export const useTileClick = () => {
 
         dispatch(BattleCommitAction({
             spellAction,
-            futureState
+            futureState,
+            spellEffect
         }));
 
         const deltaTime = getTimeDiffFromNow(spellAction.launchTime);
