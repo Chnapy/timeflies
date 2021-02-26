@@ -9,7 +9,8 @@
     "@timeflies/common": "*",
     "@timeflies/tilemap-utils": "*",
     "crypto-js": "^4.0.0",
-    "immer": "^8.0.0"
+    "immer": "^8.0.0",
+    "tiled-types": "^1.3.0"
   },
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
