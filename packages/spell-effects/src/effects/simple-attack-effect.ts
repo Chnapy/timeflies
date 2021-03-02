@@ -1,22 +1,24 @@
-import { SpellEffectFn } from '../spell-effects-fn';
+import { SpellEffectItem } from '../spell-effects-fn';
 import { SpellEffectCharacters } from '../spell-effects-params';
 
-export const simpleAttackEffect: SpellEffectFn = async ({
-    getHitCharactersAlive, getSpell
-}) => {
+export const simpleAttackEffect: SpellEffectItem = {
+    effect: async ({
+        getHitCharactersAlive, getSpell
+    }) => {
 
-    const targets = getHitCharactersAlive();
+        const targets = getHitCharactersAlive();
 
-    const { attack = 0 } = getSpell();
+        const { attack = 0 } = getSpell();
 
-    const characters = targets.reduce<SpellEffectCharacters>((acc, v) => {
-        acc[ v.characterId ] = {
-            health: -attack
+        const characters = targets.reduce<SpellEffectCharacters>((acc, v) => {
+            acc[ v.characterId ] = {
+                health: -attack
+            };
+            return acc;
+        }, {});
+
+        return {
+            characters
         };
-        return acc;
-    }, {});
-
-    return {
-        characters
-    };
+    }
 };

@@ -1,6 +1,7 @@
 import { CharacterId, CharacterUtils, CharacterVariables, ObjectTyped, Position, SpellVariables } from '@timeflies/common';
 import { Area } from '@timeflies/tilemap-utils';
 import { computeActionArea } from './compute-action-area';
+import { CheckTileFn } from './compute-range-area';
 import { SpellEffect, SpellEffectFnParams } from './spell-effects-params';
 
 export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
@@ -71,3 +72,8 @@ export type SpellEffectHelper = ReturnType<typeof createSpellEffectHelper>;
 type PartialSpellEffect = Partial<SpellEffect>;
 
 export type SpellEffectFn = (helper: SpellEffectHelper) => Promise<PartialSpellEffect>;
+
+export type SpellEffectItem = {
+    rangeArea?: CheckTileFn;
+    effect: SpellEffectFn;
+};

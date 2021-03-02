@@ -1,8 +1,9 @@
 import { CharacterId, SerializableState, SpellRole } from '@timeflies/common';
 import produce from 'immer';
 import { computeChecksum } from './compute-checksum';
+import { computeRangeArea, ComputeRangeAreaParams } from './compute-range-area';
 import { createSpellEffectHelper } from './spell-effects-fn';
-import { getSpellEffectFn } from './spell-effects-map';
+import { getSpellEffectFn, getSpellRangeAreaFn } from './spell-effects-map';
 import { SpellEffect, SpellEffectFnParams } from './spell-effects-params';
 
 const getDefineProp = <M extends { [ k in keyof V ]: any }, V>(source: M, characterId: CharacterId, delta: Partial<V>) =>
@@ -79,4 +80,10 @@ export const produceStateFromSpellRole = async (
     const spellEffect = await getSpellEffectFromSpellRole(spellRole, spellEffectParams);
 
     return produceStateFromSpellEffect(spellEffect, spellEffectParams);
+};
+
+export const getSpellRangeArea = (spellRole: SpellRole, params: ComputeRangeAreaParams) => {
+    const checkTileFn = getSpellRangeAreaFn(spellRole);
+
+    return computeRangeArea(params, checkTileFn);
 };
