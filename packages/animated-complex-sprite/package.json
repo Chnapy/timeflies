@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@pixi/core": "^5.3.7",
+    "@pixi/utils": "^6.0.0",
     "@storybook/addon-actions": "^6.2.0-alpha.10",
     "@storybook/addon-essentials": "^6.2.0-alpha.10",
     "@storybook/addon-links": "^6.2.0-alpha.10",

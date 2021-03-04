@@ -2484,6 +2484,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pixi/constants@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@pixi/constants@npm:6.0.0"
+  checksum: 27261c7c9a06195ef4ec271b5acb8a0b5893c2abd6c64ae07dc2ea47a0a75fe689b41145b2f06a469d7b7c457c38f515ac17a98aaa52a91056e40e2aa9a28fb4
+  languageName: node
+  linkType: hard
+
 "@pixi/core@npm:5.3.8, @pixi/core@npm:^5.3.7":
   version: 5.3.8
   resolution: "@pixi/core@npm:5.3.8"
@@ -2744,6 +2751,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pixi/settings@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@pixi/settings@npm:6.0.0"
+  dependencies:
+    ismobilejs: ^1.1.0
+  checksum: 33005fe7fa49b77b889038d97905f5b9ecd89078610f1b73ddd7893f4db08f7349744aa3af3e7d66c26a5db5d177db5721740761ba792a8be856a82ba639cec6
+  languageName: node
+  linkType: hard
+
 "@pixi/sprite-animated@npm:5.3.8":
   version: 5.3.8
   resolution: "@pixi/sprite-animated@npm:5.3.8"
@@ -2843,6 +2859,21 @@ __metadata:
     eventemitter3: ^3.1.0
     url: ^0.11.0
   checksum: dd750e95696b1166cd18c3091cdf9cce6c5a16252fbd53a1ce903df066fa35aa79b5febb685ece4fdc544fa3fbd0500050820e0a5552039496fc783fc1f93def
+  languageName: node
+  linkType: hard
+
+"@pixi/utils@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@pixi/utils@npm:6.0.0"
+  dependencies:
+    "@pixi/constants": 6.0.0
+    "@pixi/settings": 6.0.0
+    "@types/earcut": ^2.1.0
+    "@types/node": ^12.0.0
+    earcut: ^2.2.2
+    eventemitter3: ^3.1.0
+    url: ^0.11.0
+  checksum: 6656b502575d7bc7f6ac3bb181ca57f5cf3ef918de094208e8e9b2d22bf377cfae1bccd319186b908bc5ec6dafb0f49cfc45be34117cd387c3d6011d9e39537a
   languageName: node
   linkType: hard
 
@@ -4152,6 +4183,7 @@ __metadata:
   dependencies:
     "@pixi/core": ^5.3.7
     "@pixi/filter-outline": ^3.2.0
+    "@pixi/utils": ^6.0.0
     "@storybook/addon-actions": ^6.2.0-alpha.10
     "@storybook/addon-essentials": ^6.2.0-alpha.10
     "@storybook/addon-links": ^6.2.0-alpha.10
@@ -4819,6 +4851,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/earcut@npm:^2.1.0":
+  version: 2.1.1
+  resolution: "@types/earcut@npm:2.1.1"
+  checksum: ef87855eefa58dd8974208c73cca09b0f00fea27779e0dc2c22e94d696ac06d83930c20bee91db1a17d49d2369b64c64e9c1541810a9905608d52c62665b8001
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.0":
   version: 3.7.0
   resolution: "@types/eslint-scope@npm:3.7.0"
@@ -5032,6 +5071,13 @@ __metadata:
   version: 14.14.16
   resolution: "@types/node@npm:14.14.16"
   checksum: 220a7496ec73861ad7fb4ae762618bb46ac9d5d5f92f3a2fcebfd1a81a509ff558eface7bcd1d632598a8a28f856a74b324e7165918e8334a59c221cb06d15e3
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^12.0.0":
+  version: 12.20.4
+  resolution: "@types/node@npm:12.20.4"
+  checksum: 16d002434239f11379819fc3d2a85f0c2652cf9fb0dcaf581e8652b85aef3816bba915552388d7db72f4f6d079822ab0f16a571980eeedb2acceedf2a9e5c940
   languageName: node
   linkType: hard
 
@@ -9614,7 +9660,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"earcut@npm:^2.1.5":
+"earcut@npm:^2.1.5, earcut@npm:^2.2.2":
   version: 2.2.2
   resolution: "earcut@npm:2.2.2"
   checksum: 030e091437c4fae34c4538e0886a1d7c68f67c3ec3ba793210b280df24b329221ed81179e300742abf7aa2c394332a77395133c5163717b1806cebab6aa6c88c

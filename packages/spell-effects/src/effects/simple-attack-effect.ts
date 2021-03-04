@@ -1,10 +1,12 @@
+import { getOrientationFromTo } from '@timeflies/common';
 import { SpellEffectItem } from '../spell-effects-fn';
 import { SpellEffectCharacters } from '../spell-effects-params';
 
 export const simpleAttackEffect: SpellEffectItem = {
     effect: async ({
-        getHitCharactersAlive, getSpell
+        getHitCharactersAlive, getSpell, targetPos, getLauncher
     }) => {
+        const launcher = getLauncher();
 
         const targets = getHitCharactersAlive();
 
@@ -16,6 +18,13 @@ export const simpleAttackEffect: SpellEffectItem = {
             };
             return acc;
         }, {});
+
+        const orientation = getOrientationFromTo(launcher.position, targetPos);
+
+        characters[ launcher.characterId ] = {
+            ...characters[ launcher.characterId ],
+            orientation
+        };
 
         return {
             characters

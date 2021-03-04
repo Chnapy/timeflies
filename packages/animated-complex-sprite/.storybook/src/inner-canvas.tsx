@@ -32,7 +32,7 @@ const framesDurations: {
       default: [ 300, 100, 100, 200 ]
     },
     hit: {
-      default: [ 120, 80, 80, 80, 80, 120 ]
+      default: [ 360, 80, 80, 80, 50, 50 ]
     }
   }
 };
@@ -52,7 +52,7 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos })
   React.useEffect(() => {
     if (!spritesheetRes) {
       loader
-        .add(name, path.join(process.env.PUBLIC_URL, 'assets', 'spritesheet-characters.json'))
+        .add(name, path.join(process.env.PUBLIC_URL, 'static', 'spritesheets', 'spritesheet-entities.json'))
         .load((l, resources) => {
           setSpritesheetRes(resources[ name ]);
         });
@@ -73,13 +73,13 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos })
     };
 
     const getAnimationPath = () => {
-      return `${role}/${state}/${orientation}/${role}_${state}_${orientation}`;
+      return `characters/${role}/${state}/${orientation}/${role}_${state}_${orientation}`;
     };
 
     const pingPong = role === 'tacka' && state === 'idle';
 
     const getFramesOrder = () => {
-      if (role === 'tacka' && state === 'hit') {
+      if (state === 'hit') {
         return [ 1, 2, 3, 2, 3, 4 ];
       }
     };
@@ -88,7 +88,7 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos })
 
       const globalDefault = [ 400 ];
 
-      const lvRole = framesDurations[ role ];
+      const lvRole = framesDurations[ 'tacka' ];
       const lvState = lvRole && lvRole[ state ];
       if (lvState) {
         return lvState[ orientation ] ?? lvState.default ?? globalDefault;
@@ -124,6 +124,17 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos })
   };
 
   return (
-    props && <AnimatedComplexSpriteReact {...props} position={[ pos.x, pos.y ]} anchor={1 / 3} />
+    props && <>
+      <AnimatedComplexSpriteReact {...props} position={[ pos.x, pos.y ]} anchor={1 / 3} />
+      <AnimatedComplexSpriteReact {...{
+        spritesheet,
+        run,
+        outline
+      }} {...getFramesInfos({
+        role: 'tacka',
+        orientation: 'right',
+        state: 'attack'
+      })} position={[ pos.x - 20, pos.y ]} anchor={1 / 3} />
+    </>
   );
 };
