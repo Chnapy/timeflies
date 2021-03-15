@@ -70,7 +70,11 @@ export const useComputeSpellEffect = () => {
 
         const spellEffect = await getSpellEffectFromSpellRole(spell.spellRole, spellEffectParams);
 
-        if (spellEffect.actionArea.length === 0) {
+        const turnEndTime = turnStartTime + futureState.characters.actionTime[ spell.characterId ];
+        const effectEndTime = launchTime + spellEffect.duration;
+
+        if (spellEffect.actionArea.length === 0
+            || effectEndTime > turnEndTime) {
             return null;
         }
 

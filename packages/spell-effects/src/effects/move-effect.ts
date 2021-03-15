@@ -2,21 +2,39 @@ import { getOrientationFromTo, Position } from '@timeflies/common';
 import { Area } from '@timeflies/tilemap-utils';
 import { isTileInRangeArea } from '../compute-action-area';
 import { SpellEffectHelper, SpellEffectItem } from '../spell-effects-fn';
+import { SpellEffect } from '../spell-effects-params';
 
 const pathfinder = Area.getPathfinderInstance();
+
+const getEmptyEffect = (): Partial<SpellEffect> => ({ actionArea: [] });
 
 export const moveEffect: SpellEffectItem = {
     effect: async (helper) => {
 
         // compute path, which is specific for 'move' spell
-        const actionArea = await computeActionArea(helper);
-        if (actionArea.length === 0) {
-            return {};
+        const rawActionArea = await computeActionArea(helper);
+        if (rawActionArea.length === 0) {
+            return getEmptyEffect();
         }
 
-        const duration = actionArea.length * helper.getDefaultDuration();
-
         const launcher = helper.getLauncher();
+
+        const turnStartTime = helper.params.context.currentTurn.startTime;
+        const { launchTime } = helper.params.partialSpellAction;
+
+        const turnEndTime = turnStartTime + launcher.actionTime;
+        const remainingTime = turnEndTime - launchTime;
+
+        const nbrTiles = Math.min(
+            rawActionArea.length,
+            Math.floor(remainingTime / helper.getDefaultDuration())
+        );
+        if (nbrTiles === 0) {
+            return getEmptyEffect();
+        }
+
+        const actionArea = rawActionArea.slice(0, nbrTiles);
+        const duration = actionArea.length * helper.getDefaultDuration();
 
         const fullActionArea = [ launcher.position, ...actionArea ];
         const [ beforeLastPos, lastPos ] = fullActionArea.slice(fullActionArea.length - 2);
@@ -28,7 +46,7 @@ export const moveEffect: SpellEffectItem = {
             actionArea,
             characters: {
                 [ launcher.characterId ]: {
-                    position: helper.targetPos,
+                    position: lastPos,
                     orientation
                 }
             },
