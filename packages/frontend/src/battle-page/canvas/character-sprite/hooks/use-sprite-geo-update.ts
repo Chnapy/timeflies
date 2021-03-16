@@ -5,6 +5,7 @@ import * as PIXI from 'pixi.js';
 import React from 'react';
 import { useTiledMapAssets } from '../../../assets-loader/hooks/use-tiled-map-assets';
 import { useCurrentEntities } from '../../../hooks/use-entities';
+import { useCharactersPositionsDispatchContext } from '../../../hud/character-hud/view/characters-positions-context';
 import { useBattleSelector } from '../../../store/hooks/use-battle-selector';
 
 const isMoveState = (spellRole: SpellRole | null) => spellRole === 'move';
@@ -12,6 +13,8 @@ const isAttackState = (spellRole: SpellRole | null) => spellRole && getSpellCate
 
 export const useSpriteGeoUpdate = (characterId: CharacterId) => {
     const tiledMapAssets = useTiledMapAssets();
+    
+    const characterPositionDispatch = useCharactersPositionsDispatchContext(characterId);
 
     const { characterRole } = useBattleSelector(battle => battle.staticCharacters[ characterId ]);
     const position = useCurrentEntities(({ characters }) => characters.position[ characterId ]);
@@ -34,9 +37,9 @@ export const useSpriteGeoUpdate = (characterId: CharacterId) => {
     const isTargeted = spellActionEffect && !isActing && spellActionEffect.spellEffect.actionArea.some(p => p.id === position.id);
 
     const finalOrientation = useCurrentEntities(({ characters }) => {
-        if(isAttackState(spellRole)) {
-            const nextOrientation = (spellActionEffect?.spellEffect.characters ?? {})[characterId]?.orientation;
-            if(nextOrientation) {
+        if (isAttackState(spellRole)) {
+            const nextOrientation = (spellActionEffect?.spellEffect.characters ?? {})[ characterId ]?.orientation;
+            if (nextOrientation) {
                 return nextOrientation;
             }
         }
@@ -65,13 +68,18 @@ export const useSpriteGeoUpdate = (characterId: CharacterId) => {
             return;
         }
 
-        const computePosition = (x: number, y: number) => new PIXI.Point(
+        const computePosition = (x: number, y: number) => [
             x * tilesize + tilesize / 2,
             y * tilesize + tilesize / 3
-        );
+        ];
+
+        const updateSpritePosition = (x: number, y: number) => {
+            sprite.position.set(...computePosition(x, y));
+            characterPositionDispatch(sprite);
+        };
 
         const resetPosition = () => {
-            sprite.position = computePosition(position.x, position.y);
+            updateSpritePosition(position.x, position.y);
         };
         resetPosition();
 
@@ -95,7 +103,7 @@ export const useSpriteGeoUpdate = (characterId: CharacterId) => {
             const [ prevPos, nextPos ] = [ fullActionArea[ index ], fullActionArea[ index + 1 ] ];
 
             if (nextPos) {
-                sprite.position = computePosition(
+                updateSpritePosition(
                     prevPos.x + (nextPos.x - prevPos.x) * stepElapsedPercent,
                     prevPos.y + (nextPos.y - prevPos.y) * stepElapsedPercent
                 );
@@ -111,12 +119,12 @@ export const useSpriteGeoUpdate = (characterId: CharacterId) => {
         tickerRef.current.start();
 
         return destroyTicker;
-    }, [ spellActionEffect, spellRole, position, isActing, tilesize ]);
+    }, [ spellActionEffect, spellRole, position, isActing, tilesize, characterPositionDispatch ]);
 
     const moveState = isMoveState(spellRole);
 
     const getState = (): SpritesheetsUtils.CharacterSpriteState => {
-        if(isTargeted) {
+        if (isTargeted) {
             return 'hit';
         }
 

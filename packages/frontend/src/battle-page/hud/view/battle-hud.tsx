@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
+import { CharacterHudPool } from '../character-hud/view/character-hud-pool';
 import { CharacterListPanelConnected } from './character-list-panel-connected';
 import { SpellButtonPanelConnected } from './spell-button-panel-connected';
 import { TimeGaugePanelConnected } from './time-gauge-panel-connected';
@@ -35,6 +36,8 @@ export const BattleHud: React.FC = () => {
     const classes = useStyles();
 
     return <>
+        <CharacterHudPool />
+
         <div className={classes.characterList}>
             <CharacterListPanelConnected />
         </div>

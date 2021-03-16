@@ -18,25 +18,24 @@ export const TilemapLayer: React.FC<TilemapLayerProps> = React.memo(({
 
     return (
         <Container>
-            {layerData.map((id, index) => {
+            {layerData.flatMap((id, index) => {
                 const pos = Tile.getTilePositionFromIndex(index, mapSheet);
 
                 const child = characters[ pos.id ];
 
-                return (
-                    <React.Fragment key={layer.name + ':' + index}>
-                        {child}
-                        <TilemapTile
-                            id={id}
-                            index={index}
-                            mapSheet={mapSheet}
-                            mapTexture={mapTexture}
-                            onTileMouseHover={onTileMouseHover}
-                            layer={layer}
-                            interactive={interactive}
-                        />
-                    </React.Fragment>
-                );
+                return [
+                    child,
+                    <TilemapTile
+                        key={layer.name + ':' + index}
+                        id={id}
+                        index={index}
+                        mapSheet={mapSheet}
+                        mapTexture={mapTexture}
+                        onTileMouseHover={onTileMouseHover}
+                        layer={layer}
+                        interactive={interactive}
+                    />
+                ];
             })}
         </Container>
     );
