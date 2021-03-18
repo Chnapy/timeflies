@@ -66,8 +66,13 @@ export const BattleTilemap: React.FC = () => {
         return acc;
     }, {});
 
+    const onTouchEnd = () => {
+        tileClick();
+        dispatchTileHover(null);
+    };
+
     return (
-        <Container interactive click={tileClick}>
+        <Container interactive click={tileClick} touchend={onTouchEnd}>
             {tiledMapAssets && <TilemapComponent
                 mapSheet={tiledMapAssets.schema}
                 mapTexture={imagesLinksToTextures(tiledMapAssets.images)}

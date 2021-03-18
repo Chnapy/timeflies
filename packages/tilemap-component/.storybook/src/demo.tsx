@@ -76,34 +76,36 @@ const InnerDemo: React.FC = () => {
   return (
     <Container scale={2}>
       <ThemeProvider theme={appTheme}>
-        <TilemapComponent
-          {...data}
-          onTileMouseHover={p => console.log(p)}
-          tilesRange={tilesRange}
-          tilesAction={{ '11:8': true, '11:9': true, '11:10': true }}
-          tilesCurrentAction={{ '11:9': true, '10:9': true, '12:9': true }}
-        >
-          {{
-            [ pos.id ]: <Sprite
-              texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
-              x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
-            />
-          }}
-        </TilemapComponent>
-        <Sprite
-          texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
-          x={0} y={0} width={tilesize} height={tilesize}
-          interactive click={() => {
-            setPos(createPosition(pos.x - 1, pos.y));
-            setTilesRange(
-              ArrayUtils.range(40).map(i => Math.floor(Math.random() * 10) + ':' + Math.floor(Math.random() * 10))
-                .reduce((acc, v) => {
-                  acc[ v ] = true;
-                  return acc;
-                }, {})
-            );
-          }}
-        />
+        <Container x={50}>
+          <TilemapComponent
+            {...data}
+            onTileMouseHover={p => console.log(p)}
+            tilesRange={tilesRange}
+            tilesAction={{ '11:8': true, '11:9': true, '11:10': true }}
+            tilesCurrentAction={{ '11:9': true, '10:9': true, '12:9': true }}
+          >
+            {{
+              [ pos.id ]: <Sprite
+                texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
+                x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
+              />
+            }}
+          </TilemapComponent>
+          <Sprite
+            texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
+            x={0} y={0} width={tilesize} height={tilesize}
+            interactive click={() => {
+              setPos(createPosition(pos.x - 1, pos.y));
+              setTilesRange(
+                ArrayUtils.range(40).map(i => Math.floor(Math.random() * 10) + ':' + Math.floor(Math.random() * 10))
+                  .reduce((acc, v) => {
+                    acc[ v ] = true;
+                    return acc;
+                  }, {})
+              );
+            }}
+          />
+        </Container>
       </ThemeProvider>
     </Container>
   );

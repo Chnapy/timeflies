@@ -28,6 +28,8 @@ export type TilemapTileProps = TilemapCommonProps & {
 export const TilemapTile: React.FC<TilemapTileProps> = ({
     id, index, mapSheet, mapTexture, onTileMouseHover, layer, interactive
 }) => {
+    const [ touchStarted, setTouchStarted ] = React.useState(false);
+
     const getTextureFromId = textureFromIdGetter({ mapSheet, mapTexture });
     const getTileInfos = tileInfosGetter({ mapSheet, layer });
 
@@ -53,12 +55,33 @@ export const TilemapTile: React.FC<TilemapTileProps> = ({
         />
         : <Sprite texture={texture} width={tilewidth} height={tileheight} />;
 
+    const triggerHover = () => {
+        onTileMouseHover(tilePos);
+    };
+
     return <Container
         x={worldPos.x}
         y={worldPos.y}
         interactive={interactive}
-        mouseover={() => {
-            onTileMouseHover(tilePos);
+        mouseover={triggerHover}
+        touchstart={() => {
+            setTouchStarted(true);
+            triggerHover();
+        }}
+        touchend={() => {
+            setTouchStarted(false);
+        }}
+        touchmove={e => {
+            const { a: scale, tx, ty } = e.currentTarget.transform.worldTransform;
+            const p = e.data.global;
+
+            const isInTileBounds = p.x >= tx && p.x < tx + tilewidth * scale
+                && p.y >= ty && p.y < ty + tileheight * scale;
+
+            if (touchStarted && !isInTileBounds) {
+                setTouchStarted(false);
+                onTileMouseHover(null);
+            }
         }}
     >
         {sprite}

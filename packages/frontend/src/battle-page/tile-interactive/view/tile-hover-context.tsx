@@ -10,7 +10,11 @@ export const TileHoverDispatchContext = React.createContext<React.Dispatch<TileH
 TileHoverDispatchContext.displayName = 'TileHoverDispatchContext';
 
 export const TileHoverContextProvider: React.FC = ({ children }) => {
-    const [ value, dispatch ] = React.useState<TileHoverContextValue>(null);
+    const [ value, dispatch ] = React.useReducer((state: TileHoverContextValue, newState: TileHoverContextValue): TileHoverContextValue => {
+        return newState?.id !== state?.id
+            ? newState
+            : state;
+    }, null);
 
     return <TileHoverContext.Provider value={value}>
         <TileHoverDispatchContext.Provider value={dispatch}>

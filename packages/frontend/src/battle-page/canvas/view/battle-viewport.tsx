@@ -20,8 +20,6 @@ const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>(
 
         this.applyDisplayObjectProps(oldProps, newProps);
 
-        viewport.removeAllListeners();
-
         viewport
             .clamp({
                 direction: 'all',
@@ -29,9 +27,14 @@ const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>(
                 left: -100
             })
             .drag({
-                wheel: false
+                wheel: false,
             })
             .scale.set(3);
+
+        if (oldProps?.charactersPositionsDispatch) {
+            viewport.off('zoomed-end', oldProps.charactersPositionsDispatch);
+            viewport.off('drag-end', oldProps.charactersPositionsDispatch);
+        }
 
         viewport.on('zoomed-end', newProps.charactersPositionsDispatch);
         viewport.on('drag-end', newProps.charactersPositionsDispatch);
