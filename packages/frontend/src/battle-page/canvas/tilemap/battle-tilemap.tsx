@@ -66,8 +66,8 @@ export const BattleTilemap: React.FC = () => {
         return acc;
     }, {});
 
-    const onTouchEnd = () => {
-        tileClick();
+    const onTouchEnd = async () => {
+        await tileClick();
         dispatchTileHover(null);
     };
 
