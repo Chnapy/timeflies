@@ -33,6 +33,9 @@ export const cycleCaseReducers: GameCaseReducers<'battle'> = {
     },
     [ BattleTurnEndAction.type ]: (state, action) => {
         assertBattleState(state);
+        
+        // remove future spell actions
+        state.spellActionEffectList = state.spellActionEffectList.filter(time => time <= state.currentTime);
 
         state.selectedSpellId = null;
     },

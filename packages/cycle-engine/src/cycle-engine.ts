@@ -220,7 +220,7 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
     };
 
     const setTurnsOrder = (newCharactersList: CharacterId[]) => {
-        if (!currentTurn || !isLastCharacterEnabled(currentTurn?.characterIndex)) {
+        if (!currentTurn || !isLastCharacterEnabled(currentTurn.characterIndex)) {
             throw new Error(`Cycle setTurnsOrder should be call after last character turn [${currentTurn?.characterIndex}/${charactersList.length - 1}]`);
         }
 

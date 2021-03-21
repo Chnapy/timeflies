@@ -1,6 +1,7 @@
 import { AnimatedComplexSprite, AnimatedComplexSpriteReact } from '@timeflies/animated-complex-sprite';
 import { CharacterId } from '@timeflies/common';
 import React from 'react';
+import { useCharacterDeathFade } from './hooks/use-character-death-fade';
 import { useCharacterSpriteInfos } from './hooks/use-character-sprite-infos';
 import { useSpriteConfigUpdate } from './hooks/use-sprite-config-update';
 import { useSpritePositionUpdate } from './hooks/use-sprite-position-update';
@@ -16,6 +17,8 @@ export const BattleCharacterCurrentSprite: React.FC<BattleCharacterSprite> = ({ 
     const config = useSpriteConfigUpdate(characterId);
     const { x, y } = useSpritePositionUpdate(characterId);
 
+    const alpha = useCharacterDeathFade(characterId);
+
     const partialProps = getPartialProps(config);
 
     if (!partialProps) {
@@ -27,6 +30,7 @@ export const BattleCharacterCurrentSprite: React.FC<BattleCharacterSprite> = ({ 
             ref={spriteRef as any}
             position={[ x, y ]}
             {...partialProps}
+            alpha={alpha}
         />
     </>;
 };
