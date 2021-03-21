@@ -3,11 +3,9 @@ import * as PIXI from 'pixi.js';
 import React from 'react';
 import { CustomPIXIComponent, usePixiApp } from 'react-pixi-fiber';
 import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
-import { useCharactersPositionsDispatchContext } from '../../hud/character-hud/view/characters-positions-context';
 import { useBattleViewportDispatchContext } from './battle-viewport-context';
 
 type ViewportComponentProps = ViewportOptions & {
-    charactersPositionsDispatch: () => void;
     onMoved: (data: MovedEventData) => void;
 };
 
@@ -33,15 +31,11 @@ const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>(
             })
             .scale.set(3);
 
-        if (oldProps?.charactersPositionsDispatch && oldProps.onMoved) {
+        if (oldProps?.onMoved) {
             viewport.off('moved', oldProps.onMoved);
-            viewport.off('zoomed-end', oldProps.charactersPositionsDispatch);
-            viewport.off('drag-end', oldProps.charactersPositionsDispatch);
         }
 
         viewport.on('moved', newProps.onMoved);
-        viewport.on('zoomed-end', newProps.charactersPositionsDispatch);
-        viewport.on('drag-end', newProps.charactersPositionsDispatch);
 
         viewport.resize(newProps.screenWidth!, newProps.screenHeight!);
     },
@@ -56,7 +50,6 @@ export const BattleViewport: React.FC = ({ children }) => {
     const app = usePixiApp();
     const tiledMapAssets = useTiledMapAssets();
     const viewportDispatch = useBattleViewportDispatchContext();
-    const charactersPositionsDispatch = useCharactersPositionsDispatchContext();
 
     const { renderer } = app;
 
@@ -66,15 +59,12 @@ export const BattleViewport: React.FC = ({ children }) => {
         const resizeListener = () => {
             setImmediate(() => {
                 setScreenSize(getScreenSize(app));
-                charactersPositionsDispatch();
             });
         };
         window.addEventListener('resize', resizeListener);
 
-        setImmediate(charactersPositionsDispatch);
-
         return () => window.removeEventListener('resize', resizeListener);
-    }, [ app, charactersPositionsDispatch ]);
+    }, [ app ]);
 
     const getWorldSize = (): ViewportOptions => {
         if (!tiledMapAssets) {
@@ -102,7 +92,6 @@ export const BattleViewport: React.FC = ({ children }) => {
             disableOnContextMenu={false}
             interaction={renderer.plugins.interaction}
             {...getWorldSize()}
-            charactersPositionsDispatch={charactersPositionsDispatch}
             onMoved={onMoved}
         >
             {children}

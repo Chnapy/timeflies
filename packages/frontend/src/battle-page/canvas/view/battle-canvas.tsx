@@ -9,7 +9,6 @@ import { ReactReduxContext } from 'react-redux';
 import { ActionPreviewContext } from '../../action-preview/view/action-preview-context';
 import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 import { CycleEngineContext } from '../../cycle/view/cycle-engine-context';
-import { CharactersPositionsContext, CharactersPositionsDispatchContext } from '../../hud/character-hud/view/characters-positions-context';
 import { RangeAreaContext } from '../../range-area/view/range-area-context';
 import { TileHoverContext, TileHoverDispatchContext } from '../../tile-interactive/view/tile-hover-context';
 import { BattleTilemap } from '../tilemap/battle-tilemap';
@@ -40,8 +39,6 @@ export const BattleCanvas: React.FC = () => {
                         TileHoverDispatchContext,
                         RangeAreaContext,
                         ActionPreviewContext,
-                        CharactersPositionsContext,
-                        CharactersPositionsDispatchContext,
                         BattleViewportContext,
                         BattleViewportDispatchContext,
                     ]}

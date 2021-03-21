@@ -2,6 +2,8 @@ import { makeStyles } from '@material-ui/core';
 import { HealthGauge } from '@timeflies/app-ui';
 import { CharacterId } from '@timeflies/common';
 import React from 'react';
+import { useSpritePositionUpdate } from '../../../canvas/character-sprite/hooks/use-sprite-position-update';
+import { useBattleViewportContext } from '../../../canvas/view/battle-viewport-context';
 import { useCurrentEntities } from '../../../hooks/use-entities';
 import { CharacterHudFeedback } from './character-hud-feedback';
 
@@ -31,9 +33,17 @@ const useStyles = makeStyles(({ palette }) => ({
 
 export const CharacterHud: React.FC<CharacterHudProps> = ({ characterId }) => {
     const classes = useStyles();
+
+    const { scale, dx, dy } = useBattleViewportContext();
+    const { x, y } = useSpritePositionUpdate(characterId);
+
     const health = useCurrentEntities(entities => entities.characters.health[ characterId ]);
 
-    return <div className={classes.root}>
+    return <div
+        className={classes.root}
+        style={{
+            transform: `translate(${x * scale + dx}px,${y * scale + dy}px)`
+        }}>
         <div className={classes.healthGauge}>
             <HealthGauge
                 direction='horizontal'

@@ -2,7 +2,6 @@ import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import { useBattleSelector } from '../../../store/hooks/use-battle-selector';
 import { CharacterHud } from './character-hud';
-import { useCharactersPositionsContext } from './characters-positions-context';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -24,22 +23,17 @@ export const CharacterHudPool: React.FC = () => {
     const classes = useStyles();
 
     const characterList = useBattleSelector(battle => battle.characterList);
-    const positions = useCharactersPositionsContext();
 
     return <div className={classes.root}>
         {characterList.map(characterId => {
-            const pos = positions[ characterId ];
 
-            return pos
-                ? <div
+            return <div
                     key={characterId}
-                    className={classes.hudWrapper}
-                    style={{ transform: `translate(${pos.x}px,${pos.y}px)` }}>
+                    className={classes.hudWrapper}>
                     <CharacterHud
                         characterId={characterId}
                     />
-                </div>
-                : null;
+                </div>;
         })}
     </div>;
 };
