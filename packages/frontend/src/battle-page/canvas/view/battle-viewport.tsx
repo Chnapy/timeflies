@@ -1,12 +1,14 @@
-import { Viewport, ViewportOptions } from 'pixi-viewport';
+import { MovedEventData, Viewport, ViewportOptions } from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { CustomPIXIComponent, usePixiApp } from 'react-pixi-fiber';
 import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 import { useCharactersPositionsDispatchContext } from '../../hud/character-hud/view/characters-positions-context';
+import { useBattleViewportDispatchContext } from './battle-viewport-context';
 
 type ViewportComponentProps = ViewportOptions & {
     charactersPositionsDispatch: () => void;
+    onMoved: (data: MovedEventData) => void;
 };
 
 const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>({
@@ -31,11 +33,13 @@ const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>(
             })
             .scale.set(3);
 
-        if (oldProps?.charactersPositionsDispatch) {
+        if (oldProps?.charactersPositionsDispatch && oldProps.onMoved) {
+            viewport.off('moved', oldProps.onMoved);
             viewport.off('zoomed-end', oldProps.charactersPositionsDispatch);
             viewport.off('drag-end', oldProps.charactersPositionsDispatch);
         }
 
+        viewport.on('moved', newProps.onMoved);
         viewport.on('zoomed-end', newProps.charactersPositionsDispatch);
         viewport.on('drag-end', newProps.charactersPositionsDispatch);
 
@@ -51,6 +55,7 @@ const getScreenSize = ({ renderer }: PIXI.Application) => [ renderer.screen.widt
 export const BattleViewport: React.FC = ({ children }) => {
     const app = usePixiApp();
     const tiledMapAssets = useTiledMapAssets();
+    const viewportDispatch = useBattleViewportDispatchContext();
     const charactersPositionsDispatch = useCharactersPositionsDispatchContext();
 
     const { renderer } = app;
@@ -84,6 +89,12 @@ export const BattleViewport: React.FC = ({ children }) => {
         };
     };
 
+    const onMoved = ({ viewport }: MovedEventData) => viewportDispatch({
+        dx: viewport.x,
+        dy: viewport.y,
+        scale: viewport.scale.x
+    });
+
     return (
         <ViewportComponent
             screenWidth={screenSize[ 0 ]}
@@ -92,6 +103,7 @@ export const BattleViewport: React.FC = ({ children }) => {
             interaction={renderer.plugins.interaction}
             {...getWorldSize()}
             charactersPositionsDispatch={charactersPositionsDispatch}
+            onMoved={onMoved}
         >
             {children}
         </ViewportComponent>

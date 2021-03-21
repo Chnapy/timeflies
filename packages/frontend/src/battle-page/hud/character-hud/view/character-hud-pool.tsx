@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core';
+import React from 'react';
 import { useBattleSelector } from '../../../store/hooks/use-battle-selector';
 import { CharacterHud } from './character-hud';
 import { useCharactersPositionsContext } from './characters-positions-context';
@@ -12,7 +13,7 @@ const useStyles = makeStyles(() => ({
         right: 0,
         pointerEvents: 'none'
     },
-    hubWrapper: {
+    hudWrapper: {
         position: 'absolute',
         left: 0,
         top: 0
@@ -32,7 +33,7 @@ export const CharacterHudPool: React.FC = () => {
             return pos
                 ? <div
                     key={characterId}
-                    className={classes.hubWrapper}
+                    className={classes.hudWrapper}
                     style={{ transform: `translate(${pos.x}px,${pos.y}px)` }}>
                     <CharacterHud
                         characterId={characterId}
@@ -42,4 +43,3 @@ export const CharacterHudPool: React.FC = () => {
         })}
     </div>;
 };
-

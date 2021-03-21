@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
+import { BattleFeedbackPool } from '../battle-feedbacks/view/battle-feedback-pool';
 import { CharacterHudPool } from '../character-hud/view/character-hud-pool';
 import { CharacterListPanelConnected } from './character-list-panel-connected';
 import { SpellButtonPanelConnected } from './spell-button-panel-connected';
@@ -37,6 +38,7 @@ export const BattleHud: React.FC = () => {
 
     return <>
         <CharacterHudPool />
+        <BattleFeedbackPool />
 
         <div className={classes.characterList}>
             <CharacterListPanelConnected />

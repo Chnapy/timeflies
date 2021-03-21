@@ -14,7 +14,7 @@ const useStyles = makeStyles(({ palette }) => ({
     root: {
         display: 'flex',
         flexDirection: 'column',
-        width: 100,
+        width: 64,
         backgroundColor: palette.background.default
     },
     topContent: {

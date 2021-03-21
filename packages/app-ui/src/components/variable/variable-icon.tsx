@@ -2,6 +2,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { EntitiesVariablesName, switchUtil } from '@timeflies/common';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import HourglassFullIcon from '@material-ui/icons/HourglassFull';
+import OpenWithIcon from '@material-ui/icons/OpenWith';
+import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 import React from 'react';
 
 type VariableIconProps = {
@@ -24,8 +26,8 @@ export const VariableIcon: React.FC<VariableIconProps> = props => {
         // character
         health: () => FavoriteIcon,
         actionTime: () => HourglassFullIcon,
-        position: () => NoopComponent,
-        orientation: () => NoopComponent,
+        position: () => OpenWithIcon,
+        orientation: () => ZoomOutMapIcon,
 
         // spell
         duration: () => HourglassFullIcon,

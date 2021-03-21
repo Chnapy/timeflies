@@ -14,6 +14,7 @@ import { RangeAreaContext } from '../../range-area/view/range-area-context';
 import { TileHoverContext, TileHoverDispatchContext } from '../../tile-interactive/view/tile-hover-context';
 import { BattleTilemap } from '../tilemap/battle-tilemap';
 import { BattleViewport } from './battle-viewport';
+import { BattleViewportContext, BattleViewportDispatchContext } from './battle-viewport-context';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -41,6 +42,8 @@ export const BattleCanvas: React.FC = () => {
                         ActionPreviewContext,
                         CharactersPositionsContext,
                         CharactersPositionsDispatchContext,
+                        BattleViewportContext,
+                        BattleViewportDispatchContext,
                     ]}
                     barrierRender={children => {
                         return (

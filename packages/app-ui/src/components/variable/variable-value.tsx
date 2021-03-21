@@ -1,5 +1,9 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { EntitiesVariables, EntitiesVariablesName, formatVariableValue, switchUtil } from '@timeflies/common';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { EntitiesVariables, EntitiesVariablesName, formatVariableValue, Orientation, switchUtil } from '@timeflies/common';
 import React from 'react';
 import { UIText } from '../ui-text/ui-text';
 
@@ -27,15 +31,22 @@ export const VariableValue: React.FC<VariableValueProps> = ({ variableName, valu
         <UIText className={classes.root} variant='numeric'>{formattedValue}</UIText>
     );
 
-    const renderText = () => (
-        <UIText className={classes.root} variant='body2'>{formattedValue}</UIText>
-    );
+    // const renderText = () => (
+    //     <UIText className={classes.root} variant='body2'>{formattedValue}</UIText>
+    // );
+
+    const renderOrientation = () => switchUtil(value as Orientation, {
+        bottom: <KeyboardArrowDownIcon />,
+        top: <KeyboardArrowUpIcon />,
+        left: <KeyboardArrowLeftIcon />,
+        right: <KeyboardArrowRightIcon />
+    });
 
     return switchUtil(variableName, {
         health: renderNumeric,
         actionTime: renderNumeric,
         position: renderNull,
-        orientation: renderText,
+        orientation: renderOrientation,
         duration: renderNumeric,
         rangeArea: renderNumeric,
         lineOfSight: renderNull,
