@@ -65,9 +65,10 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             };
         };
 
-        const getSerializableInfos = (): Pick<BattleState, 'serializableStates' | 'serializableStateList' | 'currentTime'> => {
+        const getSerializableInfos = (): Pick<BattleState, 'initialSerializableState' | 'serializableStates' | 'serializableStateList' | 'currentTime'> => {
 
             return {
+                initialSerializableState,
                 serializableStates: normalize([initialSerializableState], 'time'),
                 serializableStateList: [initialSerializableState.time],
                 currentTime: initialSerializableState.time

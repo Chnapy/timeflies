@@ -4,6 +4,7 @@ import { useCurrentEntities } from '../../hooks/use-entities';
 import { useIsMyCharacterPlaying } from '../../hooks/use-is-my-character-playing';
 import { useSelectSpell } from '../../spell-select/hooks/use-select-spell';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { useDetailsLogic } from '../details-panel/details-context';
 
 const emptyArray: SpellId[] = [];
 
@@ -19,6 +20,7 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
 
     const selectedSpellId = useBattleSelector(battle => battle.selectedSpellId);
     const selectSpell = useSelectSpell();
+    const { spellHover } = useDetailsLogic();
 
     if (spellList.length === 0 || !defaultSpellId) {
         return null;
@@ -34,7 +36,10 @@ export const useSpellButtonPanelProps = (): SpellButtonPanelProps | null => {
             disabled: !isMyCharacter,
             onClick: () => {
                 selectSpell(spellId);
-            }
+                spellHover(null);
+            },
+            onMouseEnter: () => spellHover(spellId),
+            onMouseLeave: () => spellHover(null)
         };
 
         return acc;

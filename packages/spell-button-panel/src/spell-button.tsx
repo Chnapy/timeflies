@@ -1,22 +1,15 @@
-import { ButtonBase, makeStyles } from '@material-ui/core';
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { SpellIcon } from '@timeflies/app-ui';
-import { SpellRole } from '@timeflies/common';
+import { makeStyles } from '@material-ui/core';
 import { TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
+import { SpellButtonSimple, SpellButtonSimpleProps } from './spell-button-simple';
 
-export type SpellButtonProps = {
-    spellRole: SpellRole;
+export type SpellButtonProps = SpellButtonSimpleProps & {
     duration: number;
-    imageSize: number;
-    selected: boolean;
-    disabled: boolean;
-    onClick: () => void;
 };
 
-type StyleProps = Pick<SpellButtonProps, 'selected' | 'disabled'>;
+type StyleProps = Pick<SpellButtonProps, 'disabled'>;
 
-const useStyles = makeStyles(({ palette, transitions }) => ({
+const useStyles = makeStyles(({ palette }) => ({
     root: ({ disabled }: StyleProps) => ({
         display: 'flex',
         flexDirection: 'column',
@@ -25,44 +18,29 @@ const useStyles = makeStyles(({ palette, transitions }) => ({
     timeGauge: {
         padding: 2,
         backgroundColor: palette.background.default
-    },
-    button: ({ selected }: StyleProps) => {
-
-        const commonStyles: CSSProperties = {
-            transition: transitions.create([ 'opacity', 'filter' ], {
-                duration: transitions.duration.shortest
-            }),
-        };
-
-        if (selected) {
-            return {
-                ...commonStyles,
-                filter: 'brightness(2)'
-            };
-        }
-
-        return ({
-            ...commonStyles,
-            '&:hover': {
-                filter: 'brightness(1.5)'
-            }
-        });
     }
 }));
 
 export const SpellButton: React.FC<SpellButtonProps> = ({
-    spellRole, duration, imageSize, selected, disabled, onClick
+    spellRole, duration, imageSize, selected, disabled, onClick, onMouseEnter, onMouseLeave
 }) => {
-    const classes = useStyles({ selected, disabled });
+    const classes = useStyles({ disabled });
 
     return (
         <div className={classes.root}>
             <div className={classes.timeGauge}>
                 <TimeGauge duration={duration} />
             </div>
-            <ButtonBase className={classes.button} onClick={onClick} disabled={disabled}>
-                <SpellIcon size={imageSize} spellRole={spellRole} padding={4} />
-            </ButtonBase>
+
+            <SpellButtonSimple
+                onClick={onClick}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+                disabled={disabled}
+                imageSize={imageSize}
+                spellRole={spellRole}
+                selected={selected}
+            />
         </div>
     );
 };

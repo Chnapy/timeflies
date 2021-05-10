@@ -1,3 +1,4 @@
+import { action } from '@storybook/addon-actions';
 import { Meta } from '@storybook/react/types-6-0';
 import { AssetsLoader } from '@timeflies/assets-loader';
 import { Assets } from '@timeflies/static-assets';
@@ -21,6 +22,12 @@ const AssetsWrapper: React.FC = ({ children }) => (
 );
 
 export const Default: React.FC = () => {
+    const extraProps = {
+        onMouseEnter: action('onMouseEnter'),
+        onMouseLeave: action('onMouseLeave'),
+        onClick: action('onClick')
+    };
+
     return (
         <AssetsWrapper>
 
@@ -52,6 +59,7 @@ export const Default: React.FC = () => {
                     }
                 }}
                 characterList={['toto', 'tata', 'tutu']}
+                {...extraProps}
             />
         </AssetsWrapper>
     );

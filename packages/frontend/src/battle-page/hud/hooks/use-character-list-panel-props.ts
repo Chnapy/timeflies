@@ -2,6 +2,7 @@ import { CharacterItemProps, CharacterListPanelProps } from '@timeflies/characte
 import { useCurrentEntities } from '../../hooks/use-entities';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { useDetailsLogic } from '../details-panel/details-context';
 
 export const useCharacterListPanelProps = (): CharacterListPanelProps => {
 
@@ -12,6 +13,8 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
     const playingCharacterId = useBattleSelector(battleState => battleState.playingCharacterId);
 
     const getPlayerRelationFrom = usePlayerRelationFrom();
+
+    const { characterHover, characterClick } = useDetailsLogic();
 
     const characterMap = characterList.reduce<CharacterListPanelProps[ 'characterMap' ]>((acc, characterId) => {
         const { characterRole, playerId } = staticCharacters[ characterId ];
@@ -35,6 +38,9 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
 
     return {
         characterList,
-        characterMap
+        characterMap,
+        onMouseEnter: characterHover,
+        onMouseLeave: () => characterHover(null),
+        onClick: characterClick
     };
 };

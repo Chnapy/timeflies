@@ -32,7 +32,9 @@ export const Default: React.FC = () => {
                         imageSize={56}
                         selected={false}
                         disabled={false}
-                        onClick={action('move')}
+                        onClick={action('move - click')}
+                        onMouseEnter={action('move - onMouseEnter')}
+                        onMouseLeave={action('move - onMouseLeave')}
                     />
 
                     <SpellButton
@@ -41,7 +43,9 @@ export const Default: React.FC = () => {
                         imageSize={56}
                         selected
                         disabled={false}
-                        onClick={action('switch')}
+                        onClick={action('switch - click')}
+                        onMouseEnter={action('switch - onMouseEnter')}
+                        onMouseLeave={action('switch - onMouseLeave')}
                     />
 
                     <SpellButton
@@ -50,7 +54,9 @@ export const Default: React.FC = () => {
                         imageSize={56}
                         selected={false}
                         disabled
-                        onClick={action('switch')}
+                        onClick={action('switch - click')}
+                        onMouseEnter={action('switch - onMouseEnter')}
+                        onMouseLeave={action('switch - onMouseLeave')}
                     />
 
                 </Box>
@@ -64,21 +70,27 @@ export const Default: React.FC = () => {
                             duration: 800,
                             selected: false,
                             disabled: false,
-                            onClick: action('move')
+                            onClick: action('move - click'),
+                            onMouseEnter: action('move - onMouseEnter'),
+                            onMouseLeave: action('move - onMouseLeave')
                         },
                         s2: {
                             spellRole: 'simpleAttack',
                             duration: 2500,
                             selected: false,
                             disabled: true,
-                            onClick: action('simpleAttack')
+                            onClick: action('simpleAttack - click'),
+                            onMouseEnter: action('simpleAttack - onMouseEnter'),
+                            onMouseLeave: action('simpleAttack - onMouseLeave')
                         },
                         s3: {
                             spellRole: 'switch',
                             duration: 9605,
                             selected: true,
                             disabled: false,
-                            onClick: action('switch')
+                            onClick: action('switch - click'),
+                            onMouseEnter: action('switch - onMouseEnter'),
+                            onMouseLeave: action('switch - onMouseLeave')
                         }
                     }}
                     spellList={[ 's1', 's2', 's3', 's3' ]}

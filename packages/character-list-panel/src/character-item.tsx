@@ -15,6 +15,12 @@ export type CharacterItemProps = {
     isPlaying: boolean;
 };
 
+type CharacterItemExtraProps = {
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+    onClick: () => void;
+};
+
 const height = 48;
 const spriteSize = 32;
 const teamRectWidth = 4;
@@ -36,6 +42,7 @@ const useStyles = makeStyles(({ palette }) => ({
     content: ({ isPlaying }: StyleProps) => ({
         display: 'inline-flex',
         height,
+        cursor: 'pointer',
         outlineColor: isPlaying ? palette.common.white : 'transparent',
         outlineWidth: 2,
         outlineStyle: 'solid',
@@ -65,8 +72,8 @@ const useStyles = makeStyles(({ palette }) => ({
     }
 }));
 
-export const CharacterItem: React.FC<CharacterItemProps> = ({
-    playerName, teamColor, playerRelation, characterRole, health, isPlaying
+export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProps> = ({
+    playerName, teamColor, playerRelation, characterRole, health, isPlaying, onMouseEnter, onMouseLeave, onClick
 }) => {
     const isAlive = CharacterUtils.isAlive(health);
     const classes = useStyles({ teamColor, playerRelation, isPlaying, isAlive });
@@ -90,7 +97,12 @@ export const CharacterItem: React.FC<CharacterItemProps> = ({
         </Grid>
 
         <Grid item>
-            <div className={classes.content}>
+            <div
+                className={classes.content}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+                onClick={onClick}
+            >
                 <div className={classes.teamRect} />
 
                 <div className={classes.spriteRect}>

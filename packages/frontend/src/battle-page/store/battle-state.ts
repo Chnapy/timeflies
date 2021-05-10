@@ -22,6 +22,7 @@ export type BattleState = {
     // serializable
 
     currentTime: number;
+    initialSerializableState: SerializableState;
     serializableStates: { [ startTime in number ]: SerializableState };
     serializableStateList: number[];
     spellActionEffects: {
