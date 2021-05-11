@@ -11,7 +11,7 @@
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
-    "@types/jest": "^26.0.19"
+    "@types/jest": "^26.0.23"
   },
   "engineStrict": true,
   "engines": {
