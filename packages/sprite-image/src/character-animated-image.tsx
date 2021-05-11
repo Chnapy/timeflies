@@ -21,7 +21,7 @@ export const CharacterAnimatedImage: React.FC<CharacterAnimatedImageProps> = ({
     return <Stage options={{
         width: size,
         height: size,
-        transparent: true
+        backgroundAlpha: 0
     }}>
         <AnimatedComplexSpriteReact
             spritesheet={asset.spritesheet}

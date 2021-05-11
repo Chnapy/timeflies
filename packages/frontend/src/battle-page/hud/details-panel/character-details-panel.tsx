@@ -111,7 +111,7 @@ const InnerCharacterDetailsPanel: React.FC<InnerCharacterDetailsPanelProps> = Re
                         <Grid item>
                             <div className={classes.teamRect} />
                         </Grid>
-                        <Grid item alignItems='center'>
+                        <Grid item>
                             <div className={classes.spriteRect}>
                                 <PersonIcon fontSize='inherit' />
                             </div>

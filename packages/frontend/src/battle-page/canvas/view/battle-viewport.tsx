@@ -1,20 +1,27 @@
-import { MovedEventData, Viewport, ViewportOptions } from 'pixi-viewport';
+import { IViewportOptions, Viewport } from 'pixi-viewport';
 import * as PIXI from 'pixi.js';
 import React from 'react';
 import { CustomPIXIComponent, usePixiApp } from 'react-pixi-fiber';
 import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 import { useBattleViewportDispatchContext } from './battle-viewport-context';
 
-type ViewportComponentProps = ViewportOptions & {
+// type Viewport is quite broken
+type IViewport = PIXI.DisplayObject & Viewport;
+
+type MovedEventData = {
+    viewport: IViewport;
+};
+
+type ViewportComponentProps = IViewportOptions & {
     onMoved: (data: MovedEventData) => void;
 };
 
-const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>({
+const ViewportComponent = CustomPIXIComponent<IViewport, ViewportComponentProps>({
     customDisplayObject: props => {
 
         const viewport = new Viewport(props);
 
-        return viewport;
+        return viewport as IViewport;
     },
     customApplyProps: function (this: { applyDisplayObjectProps: (...args: any[]) => void }, viewport, oldProps, newProps) {
 
@@ -29,13 +36,16 @@ const ViewportComponent = CustomPIXIComponent<Viewport, ViewportComponentProps>(
             .drag({
                 wheel: false,
             })
-            .scale.set(3);
+            .scaled = 3;
 
         if (oldProps?.onMoved) {
             viewport.off('moved', oldProps.onMoved);
         }
 
         viewport.on('moved', newProps.onMoved);
+
+        // for first render
+        newProps.onMoved({ viewport });
 
         viewport.resize(newProps.screenWidth!, newProps.screenHeight!);
     },
@@ -55,18 +65,7 @@ export const BattleViewport: React.FC = ({ children }) => {
 
     const [ screenSize, setScreenSize ] = React.useState(() => getScreenSize(app));
 
-    React.useEffect(() => {
-        const resizeListener = () => {
-            setImmediate(() => {
-                setScreenSize(getScreenSize(app));
-            });
-        };
-        window.addEventListener('resize', resizeListener);
-
-        return () => window.removeEventListener('resize', resizeListener);
-    }, [ app ]);
-
-    const getWorldSize = (): ViewportOptions => {
+    const getWorldSize = (): IViewportOptions => {
         if (!tiledMapAssets) {
             return {};
         }
@@ -84,6 +83,17 @@ export const BattleViewport: React.FC = ({ children }) => {
         dy: viewport.y,
         scale: viewport.scale.x
     });
+
+    React.useEffect(() => {
+        const resizeListener = () => {
+            setImmediate(() => {
+                setScreenSize(getScreenSize(app));
+            });
+        };
+        window.addEventListener('resize', resizeListener);
+
+        return () => window.removeEventListener('resize', resizeListener);
+    }, [ app ]);
 
     return (
         <ViewportComponent

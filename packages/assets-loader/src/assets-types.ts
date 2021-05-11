@@ -1,5 +1,5 @@
 import { Assets } from '@timeflies/static-assets';
-import { LoaderResource, Spritesheet } from 'pixi.js';
+import { ILoaderResource, Spritesheet } from 'pixi.js';
 import TiledMap from 'tiled-types';
 
 export type AssetsLoaderMap = {
@@ -8,7 +8,7 @@ export type AssetsLoaderMap = {
 };
 
 export type LoaderResourceSpritesheet = {
-    resource: LoaderResource;
+    resource: ILoaderResource;
     spritesheet: Spritesheet;
     spritesheetUrl: string;
 };

@@ -1,5 +1,5 @@
 import { Tile } from '@timeflies/tilemap-utils';
-import * as PIXI from 'pixi.js';
+import { AnimatedSprite as PixiAnimatedSprite, FrameObject } from 'pixi.js';
 import React from 'react';
 import { Container, CustomPIXIComponent, Sprite } from 'react-pixi-fiber';
 import { TiledLayerTilelayer } from 'tiled-types';
@@ -9,9 +9,9 @@ import { tileInfosGetter } from './utils/tile-infos-getter';
 
 const AnimatedSprite = CustomPIXIComponent({
     customDisplayObject: ({ frameObjects }: {
-        frameObjects: PIXI.AnimatedSprite.FrameObject[]
+        frameObjects: FrameObject[]
     }) => {
-        const sprite = new PIXI.AnimatedSprite(frameObjects, true);
+        const sprite = new PixiAnimatedSprite(frameObjects, true);
         sprite.play();
 
         return sprite;
@@ -48,7 +48,7 @@ export const TilemapTile: React.FC<TilemapTileProps> = ({
 
     const sprite = animationFrameObjects
         ? <AnimatedSprite
-            frameObjects={animationFrameObjects.map(({ tileid, duration }): PIXI.AnimatedSprite.FrameObject => ({
+            frameObjects={animationFrameObjects.map(({ tileid, duration }): FrameObject => ({
                 texture: getTextureFromId(tileid, tileset),
                 time: duration
             }))}
