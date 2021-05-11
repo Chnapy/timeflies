@@ -3,6 +3,8 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { EntitiesVariables, EntitiesVariablesName, formatVariableValue, Orientation, switchUtil } from '@timeflies/common';
 import React from 'react';
 import { UIText } from '../ui-text/ui-text';
@@ -31,6 +33,10 @@ export const VariableValue: React.FC<VariableValueProps> = ({ variableName, valu
         <UIText className={classes.root} variant='numeric'>{formattedValue}</UIText>
     );
 
+    const renderLineOfSight = () => formattedValue
+        ? <VisibilityIcon fontSize='inherit' />
+        : <VisibilityOffIcon fontSize='inherit' />;
+
     // const renderText = () => (
     //     <UIText className={classes.root} variant='body2'>{formattedValue}</UIText>
     // );
@@ -49,7 +55,7 @@ export const VariableValue: React.FC<VariableValueProps> = ({ variableName, valu
         orientation: renderOrientation,
         duration: renderNumeric,
         rangeArea: renderNumeric,
-        lineOfSight: renderNull,
+        lineOfSight: renderLineOfSight,
         actionArea: renderNumeric,
         attack: renderNumeric
     })();

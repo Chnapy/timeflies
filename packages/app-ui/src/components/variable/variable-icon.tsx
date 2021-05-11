@@ -1,9 +1,12 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { EntitiesVariablesName, switchUtil } from '@timeflies/common';
+import BorderAllIcon from '@material-ui/icons/BorderAll';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import FlareIcon from '@material-ui/icons/Flare';
 import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import OpenWithIcon from '@material-ui/icons/OpenWith';
+import SignalWifi4BarIcon from '@material-ui/icons/SignalWifi4Bar';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
+import { EntitiesVariablesName, switchUtil } from '@timeflies/common';
 import React from 'react';
 
 type VariableIconProps = {
@@ -16,12 +19,11 @@ const useStyles = makeStyles(({ palette }) => ({
     })
 }));
 
+const NoopComponent: React.FC = () => null;
+
 export const VariableIcon: React.FC<VariableIconProps> = props => {
     const classes = useStyles(props);
 
-    const NoopComponent: React.FC = () => null;
-
-    // TODO
     const Component = switchUtil(props.variableName, {
         // character
         health: () => FavoriteIcon,
@@ -31,10 +33,10 @@ export const VariableIcon: React.FC<VariableIconProps> = props => {
 
         // spell
         duration: () => HourglassFullIcon,
-        rangeArea: () => NoopComponent,
-        actionArea: () => NoopComponent,
+        rangeArea: () => SignalWifi4BarIcon,
+        actionArea: () => BorderAllIcon,
         lineOfSight: () => NoopComponent,
-        attack: () => NoopComponent,
+        attack: () => FlareIcon,
     })();
 
     return <Component className={classes.root} fontSize='inherit' />;
