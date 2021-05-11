@@ -11,14 +11,14 @@
     "react": "^17.0.1"
   },
   "devDependencies": {
-    "@testing-library/react-hooks": "^3.7.0",
+    "@testing-library/react-hooks": "^5.1.2",
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/socket-messages": "workspace:packages/socket-messages",
     "@types/jest": "^26.0.23",
-    "@types/node": "^14.14.44",
+    "@types/node": "^15.0.2",
     "@types/react": "^17.0.5",
-    "@types/testing-library__react-hooks": "^3.4.1",
+    "@types/testing-library__react-hooks": "^4.0.0",
     "react": "^17.0.2",
     "react-test-renderer": "^17.0.2"
   },

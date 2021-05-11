@@ -7,8 +7,8 @@
   "scripts": {},
   "devDependencies": {
     "@types/jest": "^26.0.23",
-    "@types/node": "^14.14.44",
-    "supports-color": "^8.1.1"
+    "@types/node": "^15.0.2",
+    "supports-color": "^9.0.0"
   },
   "engineStrict": true,
   "engines": {
