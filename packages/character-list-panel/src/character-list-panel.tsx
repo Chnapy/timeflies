@@ -8,6 +8,9 @@ export type CharacterListPanelProps = {
         [ characterId in CharacterId ]: CharacterItemProps;
     };
     characterList: CharacterId[];
+    onMouseEnter: (characterId: CharacterId) => void;
+    onMouseLeave: () => void;
+    onClick: (characterId: CharacterId) => void;
 };
 
 const useStyles = makeStyles(() => ({
@@ -23,18 +26,23 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const CharacterListPanel: React.FC<CharacterListPanelProps> = ({
-    characterMap, characterList
+    characterMap, characterList, onMouseEnter, onMouseLeave, onClick
 }) => {
     const classes = useStyles();
 
     return (
-        <Box position='relative' display='inline-flex' p={2}>
+        <Box position='relative' display='inline-flex' p={2} zIndex={0}>
             <Paper className={classes.background} />
 
             <Grid container direction='column' spacing={1}>
                 {characterList.map(characterId => (
                     <Grid key={characterId} item>
-                        <CharacterItem {...characterMap[ characterId ]} />
+                        <CharacterItem
+                            {...characterMap[ characterId ]}
+                            onMouseEnter={() => onMouseEnter(characterId)}
+                            onMouseLeave={onMouseLeave}
+                            onClick={() => onClick(characterId)}
+                        />
                     </Grid>
                 ))}
             </Grid>

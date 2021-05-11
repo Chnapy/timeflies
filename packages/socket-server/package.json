@@ -14,9 +14,9 @@
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/socket-messages": "workspace:packages/socket-messages",
-    "@types/jest": "^26.0.19",
-    "@types/node": "^14.14.16",
-    "@types/ws": "^7.4.0"
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.0.2",
+    "@types/ws": "^7.4.4"
   },
   "engineStrict": true,
   "engines": {

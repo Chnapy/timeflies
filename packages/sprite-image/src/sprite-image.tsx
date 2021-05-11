@@ -1,6 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { LoaderResourceSpritesheet, useAssetSpritesheet } from '@timeflies/assets-loader';
 import clsx from 'clsx';
+import { Rectangle, Texture } from 'pixi.js';
 import React from 'react';
 
 
@@ -13,7 +14,7 @@ export type SpriteImageProps = {
 type StyleProps = {
     size: number;
     url?: string;
-    frame?: PIXI.Rectangle;
+    frame?: Rectangle;
     rotate: boolean;
 };
 
@@ -64,7 +65,7 @@ const useStyles = makeStyles(() => ({
 const getStyleProps = (asset: LoaderResourceSpritesheet | undefined, textureKey: string, size: number): StyleProps => {
 
     const url = asset?.spritesheetUrl;
-    const texture: PIXI.Texture | undefined = asset?.spritesheet.textures[ textureKey ];
+    const texture: Texture | undefined = asset?.spritesheet.textures[ textureKey ];
     const frame = texture?.frame;
     const rotate = !!texture?.rotate;
 

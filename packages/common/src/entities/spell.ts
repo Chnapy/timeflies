@@ -1,4 +1,5 @@
 import { inferFn, ObjectTyped } from '../utils';
+import { CharacterId } from './character';
 
 export type SpellId = string;
 
@@ -36,5 +37,19 @@ export type SpellVariables = {
 };
 
 export type SpellVariableName = keyof SpellVariables;
+
+export type SpellVariablesInnerMap<N extends SpellVariableName> = {
+    [ spellId in SpellId ]: SpellVariables[ N ];
+};
+
+export type SpellVariablesMap = {
+    [ name in SpellVariableName ]: SpellVariablesInnerMap<name>;
+};
+
+export type StaticSpell = {
+    spellId: SpellId;
+    characterId: CharacterId;
+    spellRole: SpellRole;
+};
 
 export const getSpellCategory = (spellRole: SpellRole): SpellCategory => spellRoleMap[spellRole];

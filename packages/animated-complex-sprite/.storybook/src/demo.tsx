@@ -9,9 +9,9 @@ export const Demo = () => {
     const [ state, setState ] = React.useState<Omit<CanvasProps, 'pos'>>({
         run: true,
         state: {
-            role: 'tacka',
-            state: 'walk',
-            orientation: 'right'
+            role: 'meti',
+            state: 'hit',
+            orientation: 'left'
         }
     });
     const [ pos, setPos ] = React.useState({ x: 4 * 16, y: 3 * 16 });

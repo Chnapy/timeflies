@@ -1,4 +1,4 @@
-import { EntitiesVariablesName, SpellCategory } from '@timeflies/common';
+import { EntitiesVariablesName, SpellCategory, PlayerRelation } from '@timeflies/common';
 
 declare module '@material-ui/core/styles/createPalette' {
 
@@ -21,10 +21,11 @@ declare module '@material-ui/core/styles/createPalette' {
     tock: string;
   };
 
-  export type PalettePlayerRelations = {
-    me: string;
-    ally: string;
-    enemy: string;
+  export type PalettePlayerRelations = Record<PlayerRelation, string>;
+
+  export type PaletteTileStates = {
+    range: string;
+    action: string;
   };
 
   interface Palette {
@@ -32,6 +33,7 @@ declare module '@material-ui/core/styles/createPalette' {
     spellCategories: PaletteSpellCategories;
     timeItems: PaletteTimeItems;
     playerRelations: PalettePlayerRelations;
+    tileStates: PaletteTileStates;
   }
 
   interface PaletteOptions {
@@ -39,6 +41,7 @@ declare module '@material-ui/core/styles/createPalette' {
     spellCategories: PaletteSpellCategories;
     timeItems: PaletteTimeItems;
     playerRelations: PalettePlayerRelations;
+    tileStates: PaletteTileStates;
   }
 }
 

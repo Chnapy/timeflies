@@ -1,16 +1,16 @@
 import { Box, Grid, makeStyles, Paper } from '@material-ui/core';
 import { useIsMobile } from '@timeflies/app-ui';
-import { SpellRole } from '@timeflies/common';
+import { SpellId } from '@timeflies/common';
 import clsx from 'clsx';
 import React from 'react';
 import { SpellButton, SpellButtonProps } from './spell-button';
 
 export type SpellButtonPanelProps = {
     spellsProps: {
-        [ spellRole in SpellRole ]: Omit<SpellButtonProps, 'imageSize'>;
+        [ spellId in SpellId ]: Omit<SpellButtonProps, 'imageSize'>;
     };
-    spellRoleList: SpellRole[];
-    defaultSpellRole: SpellRole;
+    spellList: SpellId[];
+    defaultSpellId: SpellId;
 };
 
 const buttonSizes = {
@@ -25,6 +25,7 @@ const useStyles = makeStyles(({ spacing }) => ({
         right: 0,
         bottom: 0,
         top: 0,
+        zIndex: -1,
         opacity: 0.5
     },
     mobileFirstButton: {
@@ -34,19 +35,19 @@ const useStyles = makeStyles(({ spacing }) => ({
 }));
 
 export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
-    spellsProps, spellRoleList, defaultSpellRole
+    spellsProps, spellList, defaultSpellId
 }) => {
     const classes = useStyles();
     const isMobile = useIsMobile();
 
-    const spellRoleListWithoutDefault = spellRoleList.filter(spellRole => spellRole !== defaultSpellRole);
+    const spellListWithoutDefault = spellList.filter(spellId => spellId !== defaultSpellId);
 
     const getDesktopContent = () => (
         <Grid container spacing={2}>
-            {[ defaultSpellRole, ...spellRoleListWithoutDefault ].map(spellRole => (
-                <Grid key={spellRole} item>
+            {[ defaultSpellId, ...spellListWithoutDefault ].map(spellId => (
+                <Grid key={spellId} item>
                     <SpellButton
-                        {...spellsProps[ spellRole ]}
+                        {...spellsProps[ spellId ]}
                         imageSize={buttonSizes.main}
                     />
                 </Grid>
@@ -55,21 +56,21 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
     );
 
     const getMobileContent = () => {
-        const firstLine = spellRoleListWithoutDefault.slice(0, 2);
+        const firstLine = spellListWithoutDefault.slice(0, 2);
 
-        const secondLine = [ spellRoleListWithoutDefault[ 2 ], defaultSpellRole ];
+        const secondLine = [ spellListWithoutDefault[ 2 ], defaultSpellId ];
 
         return (
             <Grid container direction='column' spacing={2}>
                 {[ firstLine, secondLine ].map((line, lineIndex) => (
                     <Grid key={lineIndex} item container alignItems='flex-end' justify='flex-end' spacing={2}>
-                        {line.map((spellRole) => (
-                            <Grid key={spellRole} className={clsx({
-                                [ classes.mobileFirstButton ]: spellRole === firstLine[ 0 ]
+                        {line.map((spellId) => (
+                            <Grid key={spellId} className={clsx({
+                                [ classes.mobileFirstButton ]: spellId === firstLine[ 0 ]
                             })} item>
                                 <SpellButton
-                                    {...spellsProps[ spellRole ]}
-                                    imageSize={spellRole === defaultSpellRole ? buttonSizes.main : buttonSizes.secondary}
+                                    {...spellsProps[ spellId ]}
+                                    imageSize={spellId === defaultSpellId ? buttonSizes.main : buttonSizes.secondary}
                                 />
                             </Grid>
                         ))}
@@ -80,7 +81,7 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
     };
 
     return (
-        <Box position='relative' display='inline-flex' p={2}>
+        <Box position='relative' display='inline-flex' p={2} zIndex={0}>
             <Paper className={classes.background} />
             {isMobile
                 ? getMobileContent()

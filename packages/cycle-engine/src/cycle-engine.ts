@@ -20,7 +20,7 @@ type PlayTurnProps = {
 type Turn = {
     turnIndex: number;
     characterIndex: number;
-    characterId: string;
+    characterId: CharacterId;
     roundIndex: number;
     promise: Promise<WaitCancelableState>;
     startTime: number;
@@ -30,15 +30,26 @@ type Turn = {
     cancel: () => void;
 };
 
+export type NextTurnInfos = {
+    turnIndex: number;
+    roundIndex: number;
+    characterId: CharacterId;
+    startTime: number;
+};
+
 export type CycleEngineProps = {
     charactersDurations: CharacterDurationMap;
     charactersList: CharacterId[];
     listeners: CycleEngineListeners;
 };
 
+export type CycleEngine = ReturnType<typeof createCycleEngine>;
+
 export const createCycleEngine = ({ charactersDurations, charactersList, listeners }: CycleEngineProps) => {
 
     const disabledCharacters = new Set<CharacterId>();
+
+    let firstTurnStartTime: number | null = null;
 
     let currentTurn: Turn | undefined;
 
@@ -78,6 +89,10 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
 
         // if startTime is in future, wait for it
         await waitMs(-diff);
+
+        if(currentTurn) {
+            currentTurn.cancel();
+        }
 
         const duration = charactersDurations[ characterId ];
 
@@ -138,36 +153,51 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
         });
     };
 
-    const start = async (
-        startTime: number = Date.now() + delays.battleStart
-    ) => {
-        await playTurn({
-            turnIndex: 0,
-            roundIndex: 0,
-            characterIndex: 0,
-            startTime
-        });
+    const start = async (startTime: number = Date.now() + delays.battleStart) => {
+        firstTurnStartTime = startTime;
+        await playTurn(getNextTurnProps());
+    };
+
+    const getNextTurnProps = (): PlayTurnProps => {
+        // first turn
+        if (!currentTurn) {
+            return {
+                turnIndex: 0,
+                roundIndex: 0,
+                characterIndex: 0,
+                startTime: firstTurnStartTime!
+            };
+        }
+
+        const { characterIndex, roundIndex } = getEnabledCharacterIndex(currentTurn.characterIndex + 1, currentTurn.roundIndex);
+
+        return {
+            turnIndex: currentTurn.turnIndex + 1,
+            roundIndex,
+            characterIndex,
+            startTime: currentTurn.getEndTime() + delays.betweenTurns
+        };
     };
 
     const startNextTurn = async (nextTurnProps?: PlayTurnProps) => {
-        if (!currentTurn) {
-            throw new Error('Cycle engine current turn required. Engine need to be started');
+        if(!firstTurnStartTime) {
+            firstTurnStartTime = nextTurnProps?.startTime ?? null;
         }
 
-        await currentTurn.promise;
+        await playTurn(nextTurnProps
+            ? nextTurnProps
+            : getNextTurnProps());
+    };
 
-        if (nextTurnProps) {
-            await playTurn(nextTurnProps);
-        } else {
-            const { characterIndex, roundIndex } = getEnabledCharacterIndex(currentTurn.characterIndex + 1, currentTurn.roundIndex);
+    const getNextTurnInfos = (): NextTurnInfos => {
+        const { roundIndex, turnIndex, characterIndex, startTime } = getNextTurnProps();
 
-            await playTurn({
-                turnIndex: currentTurn.turnIndex + 1,
-                roundIndex,
-                characterIndex,
-                startTime: currentTurn.getEndTime() + delays.betweenTurns
-            });
-        }
+        return {
+            roundIndex,
+            turnIndex,
+            characterId: charactersList[ characterIndex ],
+            startTime
+        };
     };
 
     const disableCharacters = (idList: CharacterId[]) => {
@@ -190,7 +220,7 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
     };
 
     const setTurnsOrder = (newCharactersList: CharacterId[]) => {
-        if (!currentTurn || !isLastCharacterEnabled(currentTurn?.characterIndex)) {
+        if (!currentTurn || !isLastCharacterEnabled(currentTurn.characterIndex)) {
             throw new Error(`Cycle setTurnsOrder should be call after last character turn [${currentTurn?.characterIndex}/${charactersList.length - 1}]`);
         }
 
@@ -204,12 +234,16 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
         }
     };
 
+    const isStarted = () => firstTurnStartTime !== null;
+
     return {
         start,
         stop,
         startNextTurn,
+        getNextTurnInfos,
         setCharacterDuration,
         disableCharacters,
-        setTurnsOrder
+        setTurnsOrder,
+        isStarted
     };
 };

@@ -1,12 +1,11 @@
 import { ObjectTyped } from '@timeflies/common';
+import { Loader } from 'pixi.js';
 import React from 'react';
-import { AssetsContextProvider } from './assets-context';
+import { AssetsContext } from './assets-context';
 import { AssetsLoaderMap, AssetsMap } from './assets-types';
 import { createLoader, createResourceName, mapStringUtil } from './create-loader';
 
-const loader = createLoader();
-
-const resourcesToAssetsMap = (loaderMap: AssetsLoaderMap): AssetsMap => {
+const resourcesToAssetsMap = (loader: Loader, loaderMap: AssetsLoaderMap): AssetsMap => {
     return {
         spritesheets: ObjectTyped.entries(loaderMap.spritesheets).reduce<AssetsMap[ 'spritesheets' ]>((acc, [ name ]) => {
             const resourceName = createResourceName('spritesheets', name);
@@ -39,7 +38,7 @@ const resourcesToAssetsMap = (loaderMap: AssetsLoaderMap): AssetsMap => {
                     .reduce<Record<string, string>>((acc, [ name, resource ]) => {
                         const imageName = mapStringUtil.extractMapImageName(name, resourceName);
 
-                        acc[ imageName ] = resource.url; 
+                        acc[ imageName ] = resource.url;
 
                         return acc;
                     }, {});
@@ -58,10 +57,16 @@ const resourcesToAssetsMap = (loaderMap: AssetsLoaderMap): AssetsMap => {
 export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
     spritesheets, maps, children
 }) => {
-    const generateAssetsMap = () => resourcesToAssetsMap({ spritesheets, maps });
+    const generateAssetsMap = (loader: Loader = Loader.shared) => resourcesToAssetsMap(loader, { spritesheets, maps });
     const [ assetsMap, setAssetsMap ] = React.useState<AssetsMap>(generateAssetsMap);
+    const currentLoaderRef = React.useRef<Loader>();
 
     React.useEffect(() => {
+        currentLoaderRef.current?.reset();
+
+        const loader = createLoader();
+        currentLoaderRef.current = loader;
+
         const getResourcesInfos = (category: keyof AssetsLoaderMap, map: {}) => ObjectTyped.entries(map)
             .map(([ name, url ]): [ string, string | undefined ] => ([ createResourceName(category, name), url ]));
 
@@ -69,7 +74,7 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
             ...getResourcesInfos('spritesheets', spritesheets),
             ...getResourcesInfos('maps', maps),
         ]
-            .filter(([ resourceName ]) => !loader.resources[ resourceName ]);
+        // .filter(([ resourceName ]) => !loader.resources[ resourceName ]);
 
         if (resourcesToLoad.length) {
             resourcesToLoad.forEach(([ resourceName, url ]) => {
@@ -77,8 +82,12 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
             });
 
             loader.load(() => {
+                if (currentLoaderRef.current !== loader) {
+                    return;
+                }
+
                 setAssetsMap(
-                    generateAssetsMap()
+                    generateAssetsMap(loader)
                 );
             });
         }
@@ -86,8 +95,8 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
     }, [ spritesheets, maps ]);
 
     return (
-        <AssetsContextProvider value={assetsMap}>
+        <AssetsContext.Provider value={assetsMap}>
             {children}
-        </AssetsContextProvider>
+        </AssetsContext.Provider>
     );
 };

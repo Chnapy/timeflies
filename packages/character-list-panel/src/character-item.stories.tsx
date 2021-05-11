@@ -1,4 +1,5 @@
 import { Box, Card } from '@material-ui/core';
+import { action } from '@storybook/addon-actions';
 import { Meta } from '@storybook/react/types-6-0';
 import { AssetsLoader } from '@timeflies/assets-loader';
 import { Assets } from '@timeflies/static-assets';
@@ -22,6 +23,12 @@ const AssetsWrapper: React.FC = ({ children }) => (
 );
 
 export const Default: React.FC = () => {
+    const extraProps = {
+        onMouseEnter: action('onMouseEnter'),
+        onMouseLeave: action('onMouseLeave'),
+        onClick: action('onClick')
+    };
+
     return (
         <AssetsWrapper>
             <Card>
@@ -34,6 +41,7 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={85}
                         isPlaying={false}
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -43,6 +51,7 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={65}
                         isPlaying={false}
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -52,6 +61,7 @@ export const Default: React.FC = () => {
                         teamColor='#FFFF44'
                         health={25}
                         isPlaying={false}
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -61,6 +71,7 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={0}
                         isPlaying={false}
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -70,6 +81,7 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={85}
                         isPlaying
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -79,6 +91,7 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={65}
                         isPlaying
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -88,6 +101,7 @@ export const Default: React.FC = () => {
                         teamColor='#FFFF44'
                         health={25}
                         isPlaying
+                        {...extraProps}
                     />
 
                     <CharacterItem
@@ -97,6 +111,7 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={0}
                         isPlaying
+                        {...extraProps}
                     />
 
                 </Box>

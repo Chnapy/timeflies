@@ -14,7 +14,7 @@ type ListenerCommonBody = {
     lastRoundTurn: boolean;
 };
 
-export type TurnStartParams = ListenerCommonBody
+export type TurnStartParams = ListenerCommonBody;
 
 export type TurnEndParams = ListenerCommonBody & {
     currentTurn: {

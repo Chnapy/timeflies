@@ -28,6 +28,6 @@ const stringify = (obj: unknown): string => {
 
 const digest = (obj: unknown) => crypto(stringify(obj)).toString();
 
-export const computeChecksum = ({ characters, spells }: Pick<SerializableState, 'characters' | 'spells'>): string => {
-    return digest({ characters, spells });
+export const computeChecksum = ({ characters, spells, time }: Pick<SerializableState, 'characters' | 'spells' | 'time'>): string => {
+    return digest({ characters, spells, time });
 };

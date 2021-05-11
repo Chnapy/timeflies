@@ -2,7 +2,7 @@ import { Message } from '@timeflies/socket-messages';
 import { useSocketHelper } from '../socket/socket-context';
 
 export type MessageListenersMap = {
-    [ action in Message[ 'action' ] ]: <M extends Message>(message: M) => void;
+    [ action in Message[ 'action' ] ]: (message: Message<any>) => void;
 };
 
 export const useSocketListeners = () => {

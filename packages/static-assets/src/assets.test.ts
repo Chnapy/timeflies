@@ -1,4 +1,4 @@
-import { characterRoleList, spellRoleList } from '@timeflies/common';
+import { characterRoleList, Orientation, spellRoleList } from '@timeflies/common';
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
@@ -35,21 +35,22 @@ describe('# assets', () => {
         }
     });
 
-    // TODO add missing assets
-    it.skip('check if all characters animations are presents', async () => {
+    it('check if all characters animations are presents', async () => {
         const schema = await loadSpritesheetEntities();
 
         for (const characterRole of characterRoleList) {
             for (const characterSpriteState of SpritesheetsUtils.characterSpriteStateList) {
+                for (const orientation of ['top', 'bottom', 'right'] as Orientation[]) {
 
-                expect(schema.animations).toHaveProperty(
-                    [ SpritesheetsUtils.getCharacterAnimationPath({
-                        role: characterRole,
-                        state: characterSpriteState,
-                        orientation: 'bottom'
-                    }) ],
-                    expect.any(Object)
-                );
+                    expect(schema.animations).toHaveProperty(
+                        [ SpritesheetsUtils.getCharacterAnimationPath({
+                            role: characterRole,
+                            state: characterSpriteState,
+                            orientation
+                        }) ],
+                        expect.any(Object)
+                    );
+                }
             }
         }
     });

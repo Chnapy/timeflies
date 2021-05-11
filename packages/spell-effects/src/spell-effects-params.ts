@@ -1,4 +1,5 @@
-import { CharacterId, CharacterRole, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellRole, SpellVariables } from '@timeflies/common';
+import { CharacterId, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellVariables, StaticCharacter, StaticSpell } from '@timeflies/common';
+import { TiledMap } from 'tiled-types';
 
 export type SpellEffectCharacters = {
     [ characterId in CharacterId ]: Partial<CharacterVariables>;
@@ -9,6 +10,8 @@ export type SpellEffectSpells = {
 };
 
 export type SpellEffect = {
+    actionArea: Position[];
+    duration: number;
     characters?: SpellEffectCharacters;
     spells?: SpellEffectSpells;
 };
@@ -17,37 +20,28 @@ export type TurnContext = {
     playerId: PlayerId;
     characterId: CharacterId;
     startTime: number;
-    endTime: number;
 };
 
 export type StaticState = {
-    characters: {
-        [ characterId in CharacterId ]: {
-            id: CharacterId;
-            role: CharacterRole;
-        };
-    };
-    spells: {
-        [ spellId in SpellId ]: {
-            id: SpellId;
-            characterId: CharacterId;
-            spellType: SpellRole;
-        };
-    };
+    characters: { [ characterId in CharacterId ]: Pick<StaticCharacter, 'characterId' | 'characterRole'> };
+    spells: { [ spellId in SpellId ]: Pick<StaticSpell, 'spellId' | 'characterId' | 'spellRole'> };
 };
 
 export type MapContext = {
-    actionArea: Position[];
+    tiledMap: TiledMap;
+    rangeArea: Position[];
 };
 
 export type SpellEffectFnContext = {
     currentTurn: TurnContext;
-    state: SerializableState;
+    state: Omit<SerializableState, 'checksum'>;
     staticState: StaticState;
     map: MapContext;
 };
 
+export type ParamPartialSpellAction = Omit<SpellAction, 'checksum' | 'duration'>;  // duration may be computed by effect
+
 export type SpellEffectFnParams = {
-    spellAction: SpellAction;
+    partialSpellAction: ParamPartialSpellAction;
     context: SpellEffectFnContext;
 };

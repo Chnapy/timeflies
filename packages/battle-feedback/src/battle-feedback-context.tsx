@@ -7,6 +7,7 @@ type BattleFeedbackContext = {
 const battleFeedbackContext = React.createContext<BattleFeedbackContext>({
     previewEnabled: false
 });
+battleFeedbackContext.displayName = 'BattleFeedbackContext';
 
 export const BattleFeedbackContextProvider = battleFeedbackContext.Provider;
 

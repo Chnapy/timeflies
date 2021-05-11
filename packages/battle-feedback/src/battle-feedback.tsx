@@ -5,7 +5,7 @@ import { useBattleFeedbackContext } from './battle-feedback-context';
 import { FeedbackEffectsInfos, FeedbackEffectsStack } from './feedback-effects/feedback-effects-stack';
 import { FeedbackTurn, FeedbackTurnProps } from './feedback-turn';
 
-type BattleFeedbackProps = {
+export type BattleFeedbackProps = {
     previewEffects?: FeedbackEffectsInfos<TimePartialProps>;
     futureEffects?: FeedbackEffectsInfos<TimePartialProps>[];
     currentEffects?: FeedbackEffectsInfos<TimeFullProps>;

@@ -1,6 +1,10 @@
 import { Meta } from '@storybook/react/types-6-0';
-export { Demo } from './demo';
+import { Demo as InnerDemo } from './demo';
 
 export default {
   title: 'Demo',
 } as Meta;
+
+export const Demo = () => (
+  <InnerDemo />
+);

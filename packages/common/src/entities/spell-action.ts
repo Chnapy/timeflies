@@ -6,5 +6,6 @@ export type SpellAction = {
     spellId: SpellId;
     targetPos: Position;
     launchTime: number;
+    duration: number;
     checksum: Checksum;
 };

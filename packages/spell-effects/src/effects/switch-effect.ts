@@ -1,29 +1,39 @@
-import { SpellEffectFn } from '../spell-effects-fn';
+import { SpellEffectItem } from '../spell-effects-fn';
 
-export const switchEffect: SpellEffectFn = ({ 
-    getLauncher, getHitCharactersAlive,
-    targetPos
- }) => {
-    const launcher = getLauncher();
+export const switchEffect: SpellEffectItem = {
+    rangeArea: (position, { playingCharacterId, charactersPositions }) => {
+        const characterPosition = charactersPositions[ playingCharacterId ];
 
-    const target = getHitCharactersAlive()[0];
+        const dx = Math.abs(characterPosition.x - position.x);
+        const dy = Math.abs(characterPosition.y - position.y);
 
-    const launcherFirstPosition = launcher.position;
+        return dx === dy;
+    },
+    effect: async ({
+        getLauncher, getHitCharactersAlive,
+        targetPos
+    }) => {
+        const launcher = getLauncher();
 
-    const targetEffects = target
-        ? {
-            [target.id]: {
-                position: launcherFirstPosition
+        const target = getHitCharactersAlive()[ 0 ];
+
+        const launcherFirstPosition = launcher.position;
+
+        const targetEffects = target
+            ? {
+                [ target.characterId ]: {
+                    position: launcherFirstPosition
+                }
             }
-        }
-        : {};
+            : {};
 
-    return {
-        characters: {
-            [launcher.id]: {
-                position: targetPos
-            },
-            ...targetEffects
-        }
-    };
+        return {
+            characters: {
+                [ launcher.characterId ]: {
+                    position: targetPos
+                },
+                ...targetEffects
+            }
+        };
+    }
 };

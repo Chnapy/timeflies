@@ -1,4 +1,4 @@
-import { Loader, LoaderResource } from 'pixi.js';
+import { ILoaderResource, Loader } from 'pixi.js';
 import TiledMap from 'tiled-types';
 import { AssetsLoaderMap } from './assets-types';
 
@@ -24,7 +24,7 @@ export const mapStringUtil = {
     )
 } as const;
 
-const mapLoaderMiddleware = function (this: Loader, resource: LoaderResource, next: () => void): void {
+const mapLoaderMiddleware = function (this: Loader, resource: ILoaderResource, next: () => void): void {
     if (!mapStringUtil.isMap(resource.name)) {
         return next();
     }
