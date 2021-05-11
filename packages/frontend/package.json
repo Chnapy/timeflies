@@ -53,7 +53,7 @@
     "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils",
     "@timeflies/time-gauge-panel": "workspace:packages/time-gauge-panel",
     "clsx": "^1.1.1",
-    "pixi-viewport": "^4.18.1",
+    "pixi-viewport": "4.18.1",
     "pixi.js": "^5.3.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -86,7 +86,6 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "tiled-types": "^1.2.1",
-    "typescript": "^4.1.5",
     "ws": "^7.4.3"
   },
   "engineStrict": true,

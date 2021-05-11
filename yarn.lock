@@ -4557,7 +4557,7 @@ __metadata:
     clsx: ^1.1.1
     cors: ^2.8.5
     express: ^4.17.1
-    pixi-viewport: ^4.18.1
+    pixi-viewport: 4.18.1
     pixi.js: ^5.3.7
     react: ^17.0.1
     react-dom: ^17.0.1
@@ -4568,7 +4568,6 @@ __metadata:
     redux: ^4.0.5
     redux-logger: ^3.0.6
     tiled-types: ^1.2.1
-    typescript: ^4.1.5
     use-async-effect: ^2.2.2
     web-vitals: ^1.0.1
     ws: ^7.4.3
@@ -16305,17 +16304,14 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"pixi-viewport@npm:^4.18.1":
-  version: 4.31.0
-  resolution: "pixi-viewport@npm:4.31.0"
+"pixi-viewport@npm:4.18.1":
+  version: 4.18.1
+  resolution: "pixi-viewport@npm:4.18.1"
   dependencies:
     penner: ^0.1.3
   peerDependencies:
-    "@pixi/display": ^6.0.0
-    "@pixi/interaction": ^6.0.0
-    "@pixi/math": ^6.0.0
-    "@pixi/ticker": ^6.0.0
-  checksum: 8d55d182071fb8e341930c0859cbd234d1008936e8d34e0c1e207b17d9646d81a126c5a85a5a6cb6e4f6e2ed83e4849ef1786fcad293173e830df499618d69b2
+    pixi.js: ">=4.6.0"
+  checksum: 288ef609fb23fe3eb060a4e50dcbb9addecfdd1c959875999789fd7c27ddf8d95f285307921b6933a4c0d00c87da0b7dc42ea6071b15e3541b87b8a0963e8f17
   languageName: node
   linkType: hard
 
@@ -20776,7 +20772,7 @@ resolve@^2.0.0-next.3:
     react-test-renderer: ^17.0.1
     storybook: ^6.2.9
     tiled-types: ^1.2.1
-    typescript: ^4.1.3
+    typescript: ^4.2.4
     webpack: ^5.11.1
   dependenciesMeta:
     open@7.3.0:
@@ -21154,7 +21150,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"typescript@^4.1.3, typescript@^4.1.5":
+typescript@^4.2.4:
   version: 4.2.4
   resolution: "typescript@npm:4.2.4"
   bin:
@@ -21164,7 +21160,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.1.3#builtin<compat/typescript>, typescript@patch:typescript@^4.1.5#builtin<compat/typescript>":
+"typescript@patch:typescript@^4.2.4#builtin<compat/typescript>":
   version: 4.2.4
   resolution: "typescript@patch:typescript@npm%3A4.2.4#builtin<compat/typescript>::version=4.2.4&hash=a45b0e"
   bin:
