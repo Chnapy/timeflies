@@ -5477,11 +5477,11 @@ __metadata:
   linkType: hard
 
 "@types/ws@npm:^7.4.0":
-  version: 7.4.3
-  resolution: "@types/ws@npm:7.4.3"
+  version: 7.4.4
+  resolution: "@types/ws@npm:7.4.4"
   dependencies:
     "@types/node": "*"
-  checksum: 09eff954df035c7435d9763ec24b0caef41fae3374567f2f44be7e1a9b75c4ac698382e1d8adddc02ec7c4d099dbb17adc7f7f676c9c93243d541afb2a67e6d6
+  checksum: 6a02b3164250813510c5e73998a2bbca1fb98dc23428d70c2c6d664dfbac3fde32cd8d4eb34c335a0221f49a6f02d71b09645b236b01de1aea85f80352f67e1f
   languageName: node
   linkType: hard
 
