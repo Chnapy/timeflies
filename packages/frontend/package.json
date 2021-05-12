@@ -36,7 +36,7 @@
     "@reduxjs/toolkit": "^1.5.1",
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
-    "@testing-library/user-event": "^13.1.8",
+    "@testing-library/user-event": "^13.1.9",
     "@timeflies/animated-complex-sprite": "workspace:packages/animated-complex-sprite",
     "@timeflies/app-ui": "workspace:packages/app-ui",
     "@timeflies/assets-loader": "workspace:packages/assets-loader",
@@ -71,7 +71,7 @@
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.0",
+    "@babel/core": "^7.14.2",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@storybook/addon-actions": "^6.2.9",
@@ -80,7 +80,7 @@
     "@storybook/react": "^6.2.9",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
+    "@types/node": "^15.0.3",
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.4",
     "@types/react-redux": "^7.1.16",

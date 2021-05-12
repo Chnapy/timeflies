@@ -18,7 +18,7 @@
     "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils",
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
+    "@types/node": "^15.0.3",
     "crypto-js": "^4.0.0",
     "immer": "^9.0.2",
     "tiled-types": "^1.3.0"

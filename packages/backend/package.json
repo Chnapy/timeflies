@@ -1,0 +1,35 @@
+{
+  "name": "@timeflies/backend",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "serve": "node lib/index.js"
+  },
+  "dependencies": {
+    "@timeflies/common": "workspace:packages/common",
+    "@timeflies/cycle-engine": "workspace:packages/cycle-engine",
+    "@timeflies/socket-messages": "workspace:packages/socket-messages",
+    "@timeflies/socket-server": "workspace:packages/socket-server",
+    "@timeflies/spell-checker": "workspace:packages/spell-checker",
+    "@timeflies/spell-effects": "workspace:packages/spell-effects",
+    "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils",
+    "ws": "7.4.5"
+  },
+  "devDependencies": {
+    "@timeflies/devtools": "workspace:packages/devtools",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.0.3",
+    "@types/ws": "^7.4.4"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "repository": {
+    "directory": "packages/backend",
+    "type": "git",
+    "url": "https://github.com/Chnapy/timeflies.git"
+  }
+}
