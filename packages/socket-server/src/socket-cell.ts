@@ -6,11 +6,11 @@ type RemoveListenerFn = () => void;
 
 type MayBePromise<V> = V | Promise<V>;
 
-type ListenerFn<M extends MessageCreator | MessageWithResponseCreator> = (message: ExtractMessageFromCreator<M>) => MayBePromise<
-    M extends MessageWithResponseCreator ? ExtractResponseFromCreator<M> : void
+type ListenerFn<M extends MessageCreator<any> | MessageWithResponseCreator<any, any>> = (message: ExtractMessageFromCreator<M>) => MayBePromise<
+    M extends MessageWithResponseCreator<any, any> ? ExtractResponseFromCreator<M> : void
 >;
 
-type AddListenerFn = <M extends MessageCreator | MessageWithResponseCreator>(
+type AddListenerFn = <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(
     messageCreator: Pick<M, 'match'>,
     listener: ListenerFn<M>
 ) => RemoveListenerFn;

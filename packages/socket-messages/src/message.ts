@@ -60,7 +60,7 @@ const createMessageWithResponse = <P extends {}, R extends {}>(action: string): 
     return messageCreator;
 };
 
-export type ExtractMessageFromCreator<C extends MessageCreator<any> | MessageWithResponseCreator<any, any>> = C extends MessageWithResponseCreator<infer P>
+export type ExtractMessageFromCreator<C extends MessageCreator<any> | MessageWithResponseCreator<any, any>> = C extends MessageWithResponseCreator<infer P, any>
     ? ReturnType<ReturnType<MessageWithResponseCreator<P>>[ 'get' ]>
     : ReturnType<C>;
 
