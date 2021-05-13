@@ -122,9 +122,11 @@ export const createBattle = ({ services }: GlobalEntities, { playerIdList }: Roo
 
     const startBattle = () => {
         console.log('! Battle start !')
-        cycleEngine.start();
+        const promise = cycleEngine.start();
 
         beforeNextTurn();
+
+        return promise;
     };
 
     return {
