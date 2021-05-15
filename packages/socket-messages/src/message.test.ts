@@ -43,9 +43,7 @@ describe('# Message creator', () => {
 
     describe('With response message creator', () => {
 
-        const createFooMessageWithResponse = () => createFooMessage().withResponse<{ toto: 2 }>(joi.object({
-            toto: 2
-        }));
+        const createFooMessageWithResponse = () => createFooMessage().withResponse<{ toto: 2 }>();
 
         it('create message with unique ID', () => {
             const messageCreator = createFooMessageWithResponse();
@@ -103,17 +101,6 @@ describe('# Message creator', () => {
                 payload: { toto: 2 },
                 requestId: 'foo_id'
             })
-        });
-
-        it('generates correct response schema validation', () => {
-            const messageCreator = createFooMessageWithResponse();
-
-            const correctAction: MessageWithResponse<{ toto: 2 }> = { action: 'foo', payload: { toto: 2 }, requestId: '123' };
-
-            expect(messageCreator.responseSchema.validate({ action: 'bad-action', payload: { toto: 2 }, requestId: '123' })).toBeDefined();
-            expect(messageCreator.responseSchema.validate({ action: 'foo', payload: { toto: 42 }, requestId: '123' })).toBeDefined();
-            expect(messageCreator.responseSchema.validate({ action: 'foo', payload: { toto: 2 }, requestId: '' }).error).toBeDefined();
-            expect(messageCreator.responseSchema.validate(correctAction).error).toBeUndefined();
         });
     });
 });

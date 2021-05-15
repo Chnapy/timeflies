@@ -29,4 +29,4 @@ export type BattleLoadData = {
 export const BattleLoadMessage = createMessage<{ battleId: string }>('battle/load', Joi.object({
     battleId: Joi.string().required()
 }))
-    .withResponse<BattleLoadData>(Joi.any());
+    .withResponse<BattleLoadData>();

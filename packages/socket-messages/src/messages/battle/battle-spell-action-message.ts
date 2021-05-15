@@ -1,4 +1,4 @@
-import { SerializableState, serializableStateSchema, SpellAction, spellActionSchema } from '@timeflies/common';
+import { SerializableState, SpellAction, spellActionSchema } from '@timeflies/common';
 import * as joi from 'joi';
 import { createMessage } from '../../message';
 
@@ -16,10 +16,4 @@ export type BattleSpellActionResponseData =
 export const BattleSpellActionMessage = createMessage<BattleSpellActionData>('battle/spell-action', joi.object({
     spellAction: spellActionSchema
 }))
-    .withResponse<BattleSpellActionResponseData>(joi.alternatives([
-        joi.object<BattleSpellActionResponseData>({ success: true }),
-        joi.object<BattleSpellActionResponseData>({
-            success: false,
-            lastState: serializableStateSchema
-        })
-    ]));
+    .withResponse<BattleSpellActionResponseData>();
