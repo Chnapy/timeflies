@@ -1,4 +1,6 @@
 import { createId } from '@timeflies/common';
+import * as joi from 'joi';
+import { Schema } from 'joi';
 
 export type Message<P extends {} = {}> = {
     action: string;
@@ -9,17 +11,24 @@ export type MessageCreator<P extends {} = {}> = {
     (payload: P): Message<P>;
     action: string;
     match: (message: Message<any>) => message is Message<P>;
-    withResponse: <R extends {}>() => MessageWithResponseCreator<P, R>;
+    schema: Schema<Message<P>>;
+    withResponse: <R extends {}>(responsePayloadSchema: Schema<R>) => MessageWithResponseCreator<P, R>;
 };
 
-export const createMessage = <P extends {}>(action: string): MessageCreator<P> => {
+export const createMessage = <P extends {}>(action: string, payloadSchema: Schema<P>): MessageCreator<P> => {
     const messageCreator = (payload: P): Message<P> => ({ action, payload });
 
     messageCreator.action = action;
 
     messageCreator.match = (message: Message<any>): message is ReturnType<typeof messageCreator> => message.action === action;
 
-    messageCreator.withResponse = <R>() => createMessageWithResponse<P, R>(action);
+    messageCreator.schema = joi.object<Message<P>>({
+        action,
+        payload: payloadSchema
+    });
+
+    // any to avoid ts error due to performance
+    messageCreator.withResponse = <R>(responsePayloadSchema: any) => createMessageWithResponse<P, R>(action, payloadSchema, responsePayloadSchema);
 
     return messageCreator;
 };
@@ -39,10 +48,12 @@ export type MessageWithResponseCreator<P extends {} = {}, R extends {} = {}> = {
     (payload: P): MessageWithResponseGetter<P, R>;
     action: string;
     match: (message: Message<any>) => message is MessageWithResponse<P>;
+    schema: Schema<Message<P>>;
+    responseSchema: Schema<MessageWithResponse<R>>;
     createResponse: (requestId: string, payload: R) => MessageWithResponse<R>;
 };
 
-const createMessageWithResponse = <P extends {}, R extends {}>(action: string): MessageWithResponseCreator<P, R> => {
+const createMessageWithResponse = <P extends {}, R extends {}>(action: string, messagePayloadSchema: Schema<P>, responsePayloadSchema: Schema<R>): MessageWithResponseCreator<P, R> => {
     const messageCreator = (payload: P): MessageWithResponseGetter<P, R> => ({
         get: (): MessageWithResponse<P> => ({
             action,
@@ -54,6 +65,18 @@ const createMessageWithResponse = <P extends {}, R extends {}>(action: string): 
     messageCreator.action = action;
 
     messageCreator.match = (message: Message<any>): message is MessageWithResponse<P> => message.action === action;
+
+    messageCreator.schema = joi.object<MessageWithResponse<P>>({
+        action,
+        payload: messagePayloadSchema,
+        requestId: joi.string().required()
+    });
+
+    messageCreator.responseSchema = joi.object<MessageWithResponse<R>>({
+        action,
+        payload: responsePayloadSchema,
+        requestId: joi.string().required()
+    });
 
     messageCreator.createResponse = (requestId: string, payload: R): MessageWithResponse<R> => ({ action, payload, requestId });
 

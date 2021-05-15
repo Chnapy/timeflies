@@ -1,9 +1,11 @@
-import { any, boolean, number, object, string } from 'joi';
-import { inferFn, ObjectTyped } from '../utils';
-import { CharacterId, characterIdSchema } from './character';
+import * as joi from 'joi';
+import { SchemaMapRequired } from 'joi';
+import { inferFn } from '../utils/inferFn';
+import { ObjectTyped } from '../utils/object';
+import { CharacterId, characterIdSchema } from './character-basics';
 
 export type SpellId = string;
-export const spellIdSchema = string().required().min(1);
+export const spellIdSchema = joi.string().required().min(1);
 
 export type SpellCategory = typeof spellCategoryList[ number ];
 export const spellCategoryList = [ 'offensive', 'support', 'placement' ] as const;
@@ -39,27 +41,28 @@ export type SpellVariables = {
     attack?: number;
     // more..
 };
-export const spellVariablesSchema = object<SpellVariables>({
-    duration: number().required().integer().min(0),
-    lineOfSight: boolean().required(),
-    rangeArea: number().required().integer().min(0),
-    actionArea: number().required().integer().min(0),
-    attack: number().required().integer()
-});
+const spellvariablesSchemaContent: SchemaMapRequired<SpellVariables> = {
+    duration: joi.number().required().integer().min(0),
+    lineOfSight: joi.boolean().required(),
+    rangeArea: joi.number().required().integer().min(0),
+    actionArea: joi.number().required().integer().min(0),
+    attack: joi.number().required().integer()
+};
+export const spellVariablesSchema = joi.object<SpellVariables>(spellvariablesSchemaContent);
 
 export type SpellVariableName = keyof SpellVariables;
-export const spellVariableNameSchema = ObjectTyped.keys(spellVariablesSchema.describe().keys) as SpellVariableName[];
+export const spellVariableNameSchema = ObjectTyped.keys(spellvariablesSchemaContent);
 
 export type SpellVariablesInnerMap<N extends SpellVariableName> = {
     [ spellId in SpellId ]: SpellVariables[ N ];
 };
-export const spellVariablesInnerMapSchema = object<SpellVariablesInnerMap<SpellVariableName>>({})
-    .pattern(spellIdSchema, any());
+export const spellVariablesInnerMapSchema = joi.object<SpellVariablesInnerMap<SpellVariableName>>({})
+    .pattern(spellIdSchema, joi.any());
 
 export type SpellVariablesMap = {
     [ name in SpellVariableName ]: SpellVariablesInnerMap<name>;
 };
-export const spellVariablesMapSchema = object<SpellVariablesInnerMap<SpellVariableName>>({})
+export const spellVariablesMapSchema = joi.object<SpellVariablesInnerMap<SpellVariableName>>({})
     .pattern(spellVariableNameSchema, spellVariablesInnerMapSchema);
 
 export type StaticSpell = {
@@ -67,7 +70,7 @@ export type StaticSpell = {
     characterId: CharacterId;
     spellRole: SpellRole;
 };
-export const staticSpellSchema = object<StaticSpell>({
+export const staticSpellSchema = joi.object<StaticSpell>({
     spellId: spellIdSchema,
     characterId: characterIdSchema,
     spellRole: spellRoleSchema

@@ -16,8 +16,6 @@ export const joinBattleService = createService(({ currentBattleMap }) => {
     };
 
     const onBattleLoadMessage = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleLoadMessage>(BattleLoadMessage, ({ payload, requestId }) => {
-        console.log('battle-load-message', payload);
-
         const battle = getBattle(payload.battleId);
 
         const { mapInfos, staticPlayers, staticCharacters, staticSpells, initialSerializableState, cycleInfos } = battle;

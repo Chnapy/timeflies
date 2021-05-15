@@ -1,20 +1,10 @@
-import { any, number, object, string } from 'joi';
+import * as joi from 'joi';
+import { SchemaMapRequired } from 'joi';
 import { Orientation, orientationSchema, Position, positionSchema } from '../geo';
-import { ObjectTyped } from '../utils';
+import { ObjectTyped } from '../utils/object';
+import { CharacterId, characterIdSchema, CharacterRole, characterRoleSchema } from './character-basics';
 import { PlayerId, playerIdSchema } from './player';
 import { SpellId, spellIdSchema } from './spell';
-
-export type CharacterId = string;
-export const characterIdSchema = string().required().min(1);
-
-export type CharacterDuration = number;
-export const characterDurationSchema = number().required().integer().min(0);
-
-export type CharacterRole = typeof characterRoleList[ number ];
-export const characterRoleList = [
-    'vemo', 'tacka', 'meti'
-] as const;
-export const characterRoleSchema = characterRoleList;
 
 export type CharacterVariables = {
     health: number;
@@ -22,26 +12,27 @@ export type CharacterVariables = {
     position: Position;
     orientation: Orientation;
 };
-export const characterVariablesSchema = object<CharacterVariables>({
-    health: number().required().integer().min(0),
-    actionTime: number().required().integer().min(0),
+const characterVariablesSchemaContent: SchemaMapRequired<CharacterVariables> = {
+    health: joi.number().required().integer().min(0),
+    actionTime: joi.number().required().integer().min(0),
     position: positionSchema,
     orientation: orientationSchema
-});
+};
+export const characterVariablesSchema = joi.object<CharacterVariables>(characterVariablesSchemaContent);
 
 export type CharacterVariableName = keyof CharacterVariables;
-export const characterVariableNameSchema = ObjectTyped.keys(characterVariablesSchema.describe().keys) as CharacterVariableName[];
+export const characterVariableNameSchema = ObjectTyped.keys(characterVariablesSchemaContent);
 
 export type CharacterVariablesInnerMap<N extends CharacterVariableName> = {
     [ characterId in CharacterId ]: CharacterVariables[ N ];
 };
-export const characterVariablesInnerMapSchema = object<CharacterVariablesInnerMap<CharacterVariableName>>({})
-    .pattern(characterIdSchema, any());
+export const characterVariablesInnerMapSchema = joi.object<CharacterVariablesInnerMap<CharacterVariableName>>({})
+    .pattern(characterIdSchema, joi.any());
 
 export type CharacterVariablesMap = {
     [ name in CharacterVariableName ]: CharacterVariablesInnerMap<name>;
 };
-export const characterVariablesMapSchema = object<CharacterVariablesInnerMap<CharacterVariableName>>({})
+export const characterVariablesMapSchema = joi.object<CharacterVariablesInnerMap<CharacterVariableName>>({})
     .pattern(characterVariableNameSchema, characterVariablesInnerMapSchema);
 
 export type StaticCharacter = {
@@ -50,7 +41,7 @@ export type StaticCharacter = {
     characterRole: CharacterRole;
     defaultSpellId: SpellId;
 };
-export const staticCharacterSchema = object<StaticCharacter>({
+export const staticCharacterSchema = joi.object<StaticCharacter>({
     characterId: characterIdSchema,
     playerId: playerIdSchema,
     characterRole: characterRoleSchema,

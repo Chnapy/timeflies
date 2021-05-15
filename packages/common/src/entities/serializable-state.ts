@@ -1,5 +1,5 @@
-import { number, object } from 'joi';
-import { CharacterVariablesMap, characterVariablesMapSchema } from './character';
+import * as joi from 'joi';
+import { CharacterVariablesMap, characterVariablesMapSchema } from './character-details';
 import { Checksum, checksumSchema } from './checksum';
 import { SpellVariablesMap, spellVariablesMapSchema } from './spell';
 
@@ -9,9 +9,9 @@ export type SerializableState = {
     characters: CharacterVariablesMap;
     spells: SpellVariablesMap;
 };
-export const serializableStateSchema = object<SerializableState>({
+export const serializableStateSchema = joi.object<SerializableState>({
     checksum: checksumSchema,
-    time: number().required().integer().min(0),
+    time: joi.number().required().integer().min(0),
     characters: characterVariablesMapSchema,
     spells: spellVariablesMapSchema
 });

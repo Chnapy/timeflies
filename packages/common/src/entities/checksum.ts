@@ -1,4 +1,4 @@
-import { string } from 'joi';
+import * as joi from 'joi';
 
 export type Checksum = string;
-export const checksumSchema = string().required().min(1);
+export const checksumSchema = joi.string().required().min(1);

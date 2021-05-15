@@ -11,7 +11,7 @@ type ListenerFn<M extends MessageCreator<any> | MessageWithResponseCreator<any, 
 >;
 
 type AddListenerFn = <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(
-    messageCreator: Pick<M, 'match'>,
+    messageCreator: Pick<M, 'match' | 'schema'>,
     listener: ListenerFn<M>
 ) => RemoveListenerFn;
 
@@ -38,6 +38,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
     };
 
     const send: SocketCell[ 'send' ] = (...messages) => {
+        console.log('Send messages:\n', ...messages)
         socket.send(JSON.stringify(
             messages
         ));
@@ -63,7 +64,13 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                 messageList
                     .filter(messageCreator.match)
                     .map(async message => {
+                        console.log('Message received:\n', message);
                         try {
+                            const check = messageCreator.schema.validate(message);
+                            if (check.error) {
+                                throw new SocketError(400, check.error.stack ?? check.error + '');
+                            }
+
                             const response = await listener(message as any);
 
                             if (response) {
@@ -73,6 +80,8 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                             const socketError = err instanceof SocketError
                                 ? err
                                 : new SocketError(500, (err as Error).stack ?? err + '');
+
+                            console.error('Error:\n', err);
 
                             sendError(socketError);
                         }

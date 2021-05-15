@@ -6,13 +6,15 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "*"
+    "@timeflies/common": "*",
+    "joi": "*"
   },
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.3"
+    "@types/node": "^15.0.3",
+    "joi": "^17.4.0"
   },
   "engineStrict": true,
   "engines": {
