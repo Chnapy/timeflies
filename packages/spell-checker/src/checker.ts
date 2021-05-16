@@ -1,42 +1,13 @@
-import { CharacterId, CharacterRole, PlayerId, SerializableState, SpellAction, SpellId, SpellRole } from '@timeflies/common';
+import { PlayerId, SerializableState, SpellAction } from '@timeflies/common';
+import { SpellEffectFnContext } from '@timeflies/spell-effects';
 
 type ClientContext = {
     playerId: PlayerId;
 };
 
-type TurnContext = {
-    playerId: PlayerId;
-    characterId: CharacterId;
-    startTime: number;
-    endTime: number;
-};
-
-type StaticState = {
-    characters: {
-        [ characterId in CharacterId ]: {
-            id: CharacterId;
-            role: CharacterRole;
-        };
-    };
-    spells: {
-        [ spellId in SpellId ]: {
-            id: SpellId;
-            characterId: CharacterId;
-            spellType: SpellRole;
-        };
-    };
-};
-
-type MapContext = {
-    // consider use tilemap-utils
-};
-
-type Context = {
+type Context = Omit<SpellEffectFnContext, 'state'> & {
     clientContext: ClientContext;
-    currentTurn: TurnContext;
     state: SerializableState;
-    staticState: StaticState;
-    map: MapContext;
 };
 
 export type CheckerParams = {

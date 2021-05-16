@@ -7,14 +7,9 @@ import http from 'http';
 import WebSocket from 'ws';
 import { createGlobalEntities } from './main/global-entities';
 import { createBattle } from './services/battle/battle';
+import { getEnv } from './utils/env';
 
-// Env variables
-
-if (!process.env.PORT) {
-    throw new Error('env PORT missing.');
-}
-
-const port = Number(process.env.PORT);
+const port = Number(getEnv('PORT'));
 
 // Express
 
@@ -35,8 +30,14 @@ const server = http.createServer(app);
 const ws = new WebSocket.Server({ server });
 
 const globalEntities = createGlobalEntities();
-globalEntities.currentBattleMap[ 'battleId' ] = createBattle(globalEntities, {
+
+// TODO remove mock
+void createBattle(globalEntities, {
     playerIdList: [ 'p1', 'p2' ]
+}).then(mockBattle => {
+    globalEntities.currentBattleMap.mapById[ 'battleId' ] = mockBattle;
+    globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ] = mockBattle;
+    globalEntities.currentBattleMap.mapByPlayerId[ 'p2' ] = mockBattle;
 });
 
 // Start
@@ -49,7 +50,7 @@ server.listen(port, () => {
         console.log('new connection')
         i++;
 
-        ObjectTyped.entries(globalEntities.services).forEach(([key, service]) => service.onSocketConnect(
+        ObjectTyped.entries(globalEntities.services).forEach(([ key, service ]) => service.onSocketConnect(
             createSocketCell(socket),
             'p' + i
         ));

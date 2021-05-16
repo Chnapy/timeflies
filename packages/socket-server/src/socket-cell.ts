@@ -11,7 +11,7 @@ type ListenerFn<M extends MessageCreator<any> | MessageWithResponseCreator<any, 
 >;
 
 type AddListenerFn = <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(
-    messageCreator: Pick<M, 'match' | 'schema'>,
+    messageCreator: Pick<M, 'action' | 'match' | 'schema'>,
     listener: ListenerFn<M>
 ) => RemoveListenerFn;
 

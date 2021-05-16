@@ -1,8 +1,20 @@
-import { CharacterId, createPosition, PlayerId, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
-import { createCycleEngine } from '@timeflies/cycle-engine';
+import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
+import { createCycleEngine, TurnInfos } from '@timeflies/cycle-engine';
+import fs from 'fs';
+import type TiledMap from 'tiled-types';
+import util from 'util';
 import { GlobalEntities } from '../../main/global-entities';
+import { assetUrl, AssetUrl } from '../../utils/asset-url';
+
+const readFile = util.promisify(fs.readFile);
 
 export type BattleId = string;
+
+export type StaticState = {
+    players: { [ playerId in PlayerId ]: StaticPlayer };
+    characters: { [ characterId in CharacterId ]: StaticCharacter };
+    spells: { [ spellId in SpellId ]: StaticSpell };
+};
 
 export type MapInfos = {
     mapId: string;
@@ -17,28 +29,115 @@ export type CycleInfos = {
 
 export type Battle = {
     battleId: BattleId;
-    mapInfos: MapInfos;
+
     staticPlayers: StaticPlayer[];
     staticCharacters: StaticCharacter[];
     staticSpells: StaticSpell[];
-    initialSerializableState: SerializableState;
-    cycleInfos: CycleInfos;
+
+    tiledMap: TiledMap;
+    staticState: StaticState;
 
     playerJoin: (playerId: PlayerId) => void;
+    getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
+    getCycleInfos: () => CycleInfos;
+    getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
+    getCurrentState: () => SerializableState;
+    addNewState: (state: SerializableState) => void;
 };
 
 type RoomInfos = {
     playerIdList: PlayerId[];
 };
 
-export const createBattle = ({ services }: GlobalEntities, { playerIdList }: RoomInfos): Battle => {
+export const createBattle = async ({ services }: GlobalEntities, { playerIdList }: RoomInfos): Promise<Battle> => {
     const battleId = 'battleId';
     // TODO
     // const battleId = createId();
 
+    // TODO remove mock
+    const rawMapInfos: MapInfos = {
+        mapId: 'azerty',
+        name: 'dungeon',
+        schemaLink: '/maps/map_dungeon.json',
+        imagesLinks: {
+            "tiles_dungeon_v1.1": '/maps/map_dungeon.png'
+        }
+    };
+
+    const staticPlayers: StaticPlayer[] = [
+        {
+            playerId: 'p1',
+            playerName: 'chnapy',
+            teamColor: '#FF0000'
+        },
+        {
+            playerId: 'p2',
+            playerName: 'yoshi2oeuf',
+            teamColor: '#00FF00'
+        }
+    ];
+
+    const staticCharacters: StaticCharacter[] = [
+        {
+            characterId: 'c1',
+            characterRole: 'tacka',
+            playerId: 'p1',
+            defaultSpellId: 's1',
+        },
+        {
+            characterId: 'c2',
+            characterRole: 'meti',
+            playerId: 'p1',
+            defaultSpellId: 's3',
+        },
+        {
+            characterId: 'c3',
+            characterRole: 'vemo',
+            playerId: 'p2',
+            defaultSpellId: 's5',
+        }
+    ];
+
+    const staticSpells: StaticSpell[] = [
+        {
+            characterId: 'c1',
+            spellId: 's1',
+            spellRole: 'move',
+        },
+        {
+            characterId: 'c1',
+            spellId: 's2',
+            spellRole: 'simpleAttack',
+        },
+        {
+            characterId: 'c2',
+            spellId: 's3',
+            spellRole: 'switch',
+        },
+        {
+            characterId: 'c2',
+            spellId: 's4',
+            spellRole: 'simpleAttack',
+        },
+        {
+            characterId: 'c3',
+            spellId: 's5',
+            spellRole: 'move',
+        },
+        {
+            characterId: 'c3',
+            spellId: 's6',
+            spellRole: 'simpleAttack',
+        }
+    ];
+
+    const tiledMapRaw = await readFile(assetUrl.toBackend(rawMapInfos.schemaLink), 'utf-8');
+    const tiledMap: TiledMap = JSON.parse(tiledMapRaw);
+
     const waitingPlayerList = new Set(playerIdList);
 
     const turnsOrder = [ 'c2', 'c1', 'c3' ];
+    let currentTurnInfos: TurnInfos | null = null;
 
     const initialSerializableState: SerializableState = {
         checksum: '',
@@ -106,12 +205,17 @@ export const createBattle = ({ services }: GlobalEntities, { playerIdList }: Roo
         }
     };
 
+    const stateStack: SerializableState[] = [ initialSerializableState ];
+
     const beforeNextTurn = () => services.cycleBattleService.beforeTurnStart(cycleEngine.getNextTurnInfos(), playerIdList);
 
     const cycleEngine = createCycleEngine({
         charactersList: turnsOrder,
         charactersDurations: initialSerializableState.characters.actionTime,
         listeners: {
+            turnStart: ({ currentTurn }) => {
+                currentTurnInfos = currentTurn;
+            },
             turnEnd: ({ currentTurn }) => {
                 console.log('Turn end', currentTurn.turnIndex);
                 beforeNextTurn();
@@ -129,8 +233,47 @@ export const createBattle = ({ services }: GlobalEntities, { playerIdList }: Roo
         return promise;
     };
 
+    const staticState: StaticState = {
+        players: normalize(staticPlayers, 'playerId'),
+        characters: normalize(staticCharacters, 'characterId'),
+        spells: normalize(staticSpells, 'spellId')
+    };
+
     return {
         battleId,
+
+        staticPlayers,
+        staticCharacters,
+        staticSpells,
+
+        tiledMap,
+        staticState,
+
+        getMapInfos: parseUrlMode => {
+            const parseUrl = assetUrl[ parseUrlMode ];
+
+            return {
+                ...rawMapInfos,
+                schemaLink: parseUrl(rawMapInfos.schemaLink),
+                imagesLinks: ObjectTyped.entries(rawMapInfos.imagesLinks)
+                    .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
+                        acc[ key ] = parseUrl(value);
+                        return acc;
+                    }, {})
+            };
+        },
+
+        getCycleInfos: () => ({
+            turnsOrder
+        }),
+
+        getCurrentTurnInfos: () => currentTurnInfos,
+
+        getCurrentState: () => ArrayUtils.last(stateStack)!,
+
+        addNewState: state => {
+            stateStack.push(state);
+        },
 
         playerJoin: playerId => {
             waitingPlayerList.delete(playerId);
@@ -139,84 +282,5 @@ export const createBattle = ({ services }: GlobalEntities, { playerIdList }: Roo
                 return startBattle();
             }
         },
-
-        // TODO remove mock
-
-        mapInfos: {
-            mapId: 'azerty',
-            name: 'dungeon',
-            schemaLink: 'http://localhost:40510/static/maps/map_dungeon.json',
-            imagesLinks: {
-                "tiles_dungeon_v1.1": 'http://localhost:40510/static/maps/map_dungeon.png'
-            }
-        },
-        staticPlayers: [
-            {
-                playerId: 'p1',
-                playerName: 'chnapy',
-                teamColor: '#FF0000'
-            },
-            {
-                playerId: 'p2',
-                playerName: 'yoshi2oeuf',
-                teamColor: '#00FF00'
-            }
-        ],
-        staticCharacters: [
-            {
-                characterId: 'c1',
-                characterRole: 'tacka',
-                playerId: 'p1',
-                defaultSpellId: 's1',
-            },
-            {
-                characterId: 'c2',
-                characterRole: 'meti',
-                playerId: 'p1',
-                defaultSpellId: 's3',
-            },
-            {
-                characterId: 'c3',
-                characterRole: 'vemo',
-                playerId: 'p2',
-                defaultSpellId: 's5',
-            }
-        ],
-        staticSpells: [
-            {
-                characterId: 'c1',
-                spellId: 's1',
-                spellRole: 'move',
-            },
-            {
-                characterId: 'c1',
-                spellId: 's2',
-                spellRole: 'simpleAttack',
-            },
-            {
-                characterId: 'c2',
-                spellId: 's3',
-                spellRole: 'switch',
-            },
-            {
-                characterId: 'c2',
-                spellId: 's4',
-                spellRole: 'simpleAttack',
-            },
-            {
-                characterId: 'c3',
-                spellId: 's5',
-                spellRole: 'move',
-            },
-            {
-                characterId: 'c3',
-                spellId: 's6',
-                spellRole: 'simpleAttack',
-            }
-        ],
-        initialSerializableState,
-        cycleInfos: {
-            turnsOrder
-        }
     };
 };

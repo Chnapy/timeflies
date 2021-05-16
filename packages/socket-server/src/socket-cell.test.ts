@@ -84,6 +84,7 @@ describe('# Socket cell', () => {
             const listener = jest.fn();
 
             const removeListener = cell.addMessageListener({
+                action: '',
                 match: (message): message is any => message.action === 'foo',
                 schema: Joi.any()
             }, listener);
@@ -109,6 +110,7 @@ describe('# Socket cell', () => {
                 const listener = jest.fn(listenerFn);
 
                 cell.addMessageListener({
+                    action: '',
                     match: (message): message is any => message.action === 'foo',
                     schema: Joi.object({ action: Joi.string(), payload: Joi.object() })
                 }, listener);
@@ -163,6 +165,7 @@ describe('# Socket cell', () => {
             });
 
             cell.addMessageListener<MessageWithResponseCreator>({
+                action: '',
                 match: (message): message is any => true,
                 schema: Joi.any()
             }, listener);
@@ -225,6 +228,7 @@ describe('# Socket cell', () => {
         const listener = jest.fn();
 
         cell.addMessageListener({
+            action: '',
             match: (message): message is any => true,
             schema: Joi.any()
         }, listener);

@@ -21,9 +21,9 @@ const getDefineProp = <M extends { [ k in keyof V ]: any }, V>(source: M, charac
     };
 
 export const produceStateFromSpellEffect = (
-    spellEffect: SpellEffect, spellEffectParams: SpellEffectFnParams
+    spellEffect: SpellEffect, state: Omit<SerializableState, 'checksum'>, spellActionLaunchTime: number
 ): SerializableState => {
-    return produce(spellEffectParams.context.state as SerializableState, draft => {
+    return produce(state as SerializableState, draft => {
 
         Object.entries(spellEffect.characters ?? {})
             .forEach(([ characterId, characterDelta ]) => {
@@ -47,7 +47,7 @@ export const produceStateFromSpellEffect = (
                 defineProp('attack', (prevValue, deltaValue) => (prevValue ?? 0) + deltaValue);
             });
 
-        draft.time = spellEffectParams.partialSpellAction.launchTime;
+        draft.time = spellActionLaunchTime;
         draft.checksum = computeChecksum(draft);
     });
 };
@@ -79,7 +79,7 @@ export const produceStateFromSpellRole = async (
 ) => {
     const spellEffect = await getSpellEffectFromSpellRole(spellRole, spellEffectParams);
 
-    return produceStateFromSpellEffect(spellEffect, spellEffectParams);
+    return produceStateFromSpellEffect(spellEffect, spellEffectParams.context.state, spellEffectParams.partialSpellAction.launchTime);
 };
 
 export const getSpellRangeArea = (spellRole: SpellRole, params: ComputeRangeAreaParams) => {

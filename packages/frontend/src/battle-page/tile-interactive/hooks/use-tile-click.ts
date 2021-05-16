@@ -19,7 +19,11 @@ export const useTileClick = () => {
         }
 
         const { spellEffect, spellEffectParams } = spellEffectInfos;
-        const futureState = produceStateFromSpellEffect(spellEffect, spellEffectParams);
+        const futureState = produceStateFromSpellEffect(
+            spellEffect,
+            spellEffectParams.context.state,
+            spellEffectParams.partialSpellAction.launchTime
+        );
 
         const spellAction: SpellAction = {
             ...spellEffectParams.partialSpellAction,
