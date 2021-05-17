@@ -48,7 +48,7 @@ describe('join battle service', () => {
                 }));
             });
 
-            it('join player to battle', () => {
+            it('join player to battle', async () => {
                 
                 const battle = createFakeBattle();
                 const socketCell = createFakeSocketCell();
@@ -59,7 +59,7 @@ describe('join battle service', () => {
 
                 const listener = socketCell.getFirstListener(BattleLoadMessage);
 
-                listener(BattleLoadMessage({
+                await listener(BattleLoadMessage({
                     battleId: 'battle'
                 }).get());
 

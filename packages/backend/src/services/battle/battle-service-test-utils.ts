@@ -2,7 +2,7 @@ import { ArrayUtils, createPosition, SerializableState } from '@timeflies/common
 import { Message, MessageCreator, MessageWithResponseCreator } from '@timeflies/socket-messages';
 import { ListenerFn, SocketCell } from '@timeflies/socket-server';
 import { computeChecksum } from '@timeflies/spell-effects';
-import { TiledLayer } from 'tiled-types';
+import type { TiledLayer } from 'tiled-types';
 import { GlobalEntitiesNoServices } from '../../main/global-entities';
 import { Battle } from './battle';
 
