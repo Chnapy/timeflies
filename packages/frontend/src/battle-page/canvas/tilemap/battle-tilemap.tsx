@@ -2,16 +2,16 @@ import { TilemapComponent, TilemapComponentProps } from '@timeflies/tilemap-comp
 import { Texture } from 'pixi.js';
 import React from 'react';
 import { Container } from 'react-pixi-fiber';
+import { useCurrentActionArea } from '../../action-preview/hooks/use-current-action-area';
 import { useActionPreviewContext } from '../../action-preview/view/action-preview-context';
 import { useTiledMapAssets } from '../../assets-loader/hooks/use-tiled-map-assets';
 import { useCurrentEntities, useFutureEntities } from '../../hooks/use-entities';
 import { useRangeAreaContext } from '../../range-area/view/range-area-context';
+import { useLaunchSpellAction } from '../../spell-action/hooks/use-launch-spell-action';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
-import { useTileClick } from '../../tile-interactive/hooks/use-tile-click';
 import { useTileHoverDispatchContext } from '../../tile-interactive/view/tile-hover-context';
 import { BattleCharacterCurrentSprite } from '../character-sprite/battle-character-current-sprite';
 import { BattleCharacterFutureSprite } from '../character-sprite/battle-character-future-sprite';
-import {useCurrentActionArea} from '../../action-preview/hooks/use-current-action-area';
 
 const imagesLinksToTextures = (links: Record<string, string>) => {
     return Object.entries(links).reduce<Record<string, Texture>>((acc, [ key, source ]) => {
@@ -28,7 +28,7 @@ export const BattleTilemap: React.FC = () => {
     const futurePositions = useFutureEntities(({ characters }) => characters.position);
 
     const dispatchTileHover = useTileHoverDispatchContext();
-    const tileClick = useTileClick();
+    const launchSpellAction = useLaunchSpellAction();
 
     const { rangeArea } = useRangeAreaContext();
     const { actionArea } = useActionPreviewContext().spellEffectPreview;
@@ -67,12 +67,12 @@ export const BattleTilemap: React.FC = () => {
     }, {});
 
     const onTouchEnd = async () => {
-        await tileClick();
+        await launchSpellAction();
         dispatchTileHover(null);
     };
 
     return (
-        <Container interactive click={tileClick} touchend={onTouchEnd}>
+        <Container interactive click={launchSpellAction} touchend={onTouchEnd}>
             {tiledMapAssets && <TilemapComponent
                 mapSheet={tiledMapAssets.schema}
                 mapTexture={imagesLinksToTextures(tiledMapAssets.images)}

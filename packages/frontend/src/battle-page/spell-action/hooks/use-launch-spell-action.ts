@@ -1,15 +1,17 @@
-import { getTimeDiffFromNow, SpellAction, waitCanceleable } from '@timeflies/common';
+import { SpellAction } from '@timeflies/common';
 import { useSocketSendWithResponse } from '@timeflies/socket-client';
 import { BattleSpellActionMessage, SocketErrorMessage } from '@timeflies/socket-messages';
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import { useDispatch } from 'react-redux';
 import { useComputeSpellEffect } from '../../action-preview/hooks/use-compute-spell-effect';
-import { BattleCommitAction, BattleRollbackAction, BattleTimeUpdateAction } from '../store/battle-state-actions';
+import { BattleRollbackAction } from '../../tile-interactive/store/battle-state-actions';
+import { useDispatchNewState } from './use-dispatch-new-state';
 
-export const useTileClick = () => {
+export const useLaunchSpellAction = () => {
     const computeSpellEffect = useComputeSpellEffect();
     const sendWithResponse = useSocketSendWithResponse();
     const dispatch = useDispatch();
+    const dispatchNewState = useDispatchNewState();
 
     return async () => {
         // compute again, because time values may have changed
@@ -35,26 +37,10 @@ export const useTileClick = () => {
             BattleSpellActionMessage({ spellAction })
         );
 
-        dispatch(BattleCommitAction({
-            spellAction,
-            futureState,
-            spellEffect
-        }));
-
-        const deltaTime = getTimeDiffFromNow(spellAction.launchTime);
-
-        const { promise, cancel } = waitCanceleable(spellAction.duration - deltaTime);
+        const { promise, cancel } = dispatchNewState(spellEffect, futureState, spellAction);
 
         await Promise.all([
-            promise.then(waitInfos => {
-                if (waitInfos.state === 'canceled') {
-                    return;
-                }
-
-                dispatch(BattleTimeUpdateAction({
-                    currentTime: futureState.time
-                }));
-            }),
+            promise,
             request.then(response => {
 
                 if (SocketErrorMessage.match(response)) {
