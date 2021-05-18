@@ -26,7 +26,7 @@ export type BattleLoadData = {
     cycleInfos: CycleInfos;
 };
 
-export const BattleLoadMessage = createMessage<{ battleId: string }>('battle/load', Joi.object({
+export const BattleLoadMessage = createMessage('battle/load', Joi.object<{ battleId: string }>({
     battleId: Joi.string().required()
 }))
     .withResponse<BattleLoadData>();

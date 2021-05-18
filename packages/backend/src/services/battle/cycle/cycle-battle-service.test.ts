@@ -2,14 +2,14 @@ import { ArrayUtils } from '@timeflies/common';
 import { NextTurnInfos } from '@timeflies/cycle-engine';
 import { BattleTurnStartMessage } from '@timeflies/socket-messages';
 import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle-service-test-utils';
-import { cycleBattleService } from './cycle-battle-service';
+import { CycleBattleService } from './cycle-battle-service';
 
 describe('cycle battle service', () => {
 
     it('before turn start, send turn start infos to every players', () => {
         const battle = createFakeBattle();
 
-        const service = cycleBattleService(createFakeGlobalEntitiesNoService(battle));
+        const service = new CycleBattleService(createFakeGlobalEntitiesNoService(battle));
 
         const playerList = ArrayUtils.range(3).map(i => {
             const socketCell = createFakeSocketCell();

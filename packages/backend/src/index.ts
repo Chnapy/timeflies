@@ -1,6 +1,4 @@
-import { ObjectTyped } from '@timeflies/common';
 import { logger } from '@timeflies/devtools';
-import { createSocketCell } from '@timeflies/socket-server';
 import { json, urlencoded } from 'body-parser';
 import cors from "cors";
 import express from 'express';
@@ -8,6 +6,7 @@ import http from 'http';
 import WebSocket from 'ws';
 import { createGlobalEntities } from './main/global-entities';
 import { createBattle } from './services/battle/battle';
+import { onAllServicesSocketConnect } from './services/services';
 import { getEnv } from './utils/env';
 
 const port = Number(getEnv('PORT'));
@@ -52,9 +51,6 @@ server.listen(port, () => {
         logger.net('new socket connection');
         i++;
 
-        ObjectTyped.entries(globalEntities.services).forEach(([ key, service ]) => service.onSocketConnect(
-            createSocketCell(socket),
-            'p' + i
-        ));
+        onAllServicesSocketConnect(globalEntities.services, socket, 'p' + i);
     });
 });

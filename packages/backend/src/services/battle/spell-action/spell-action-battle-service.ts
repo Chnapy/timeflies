@@ -1,25 +1,17 @@
 import { ObjectTyped, PlayerId } from '@timeflies/common';
 import { BattleNotifyMessage, BattleSpellActionMessage } from '@timeflies/socket-messages';
-import { SocketCell, SocketError } from '@timeflies/socket-server';
+import { SocketCell } from '@timeflies/socket-server';
 import { CheckSpellParams, spellActionCheck } from '@timeflies/spell-checker';
 import { getSpellRangeArea } from '@timeflies/spell-effects';
-import { createService } from '../../service';
+import { Service } from '../../service';
 
-export const spellActionBattleService = createService(({ currentBattleMap }) => {
-
-    const playerSocketMap: { [ playerId in PlayerId ]: SocketCell } = {};
-
-    const getBattleByPlayerId = (playerId: PlayerId) => {
-        const battle = currentBattleMap.mapByPlayerId[ playerId ];
-        if (!battle) {
-            throw new SocketError(400, 'player is not in battle: ' + playerId);
-        }
-
-        return battle;
+export class SpellActionBattleService extends Service {
+    afterSocketConnect = (socketCell: SocketCell, currentPlayerId: PlayerId) => {
+        this.addBattleSpellActionMessageListener(socketCell, currentPlayerId);
     };
 
-    const addBattleSpellActionMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleSpellActionMessage>(BattleSpellActionMessage, async ({ payload, requestId }) => {
-        const battle = getBattleByPlayerId(currentPlayerId);
+    private addBattleSpellActionMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleSpellActionMessage>(BattleSpellActionMessage, async ({ payload, requestId }) => {
+        const battle = this.getBattleByPlayerId(currentPlayerId);
 
         const { tiledMap, staticState, getCurrentTurnInfos, getCurrentState } = battle;
         const { spellAction } = payload;
@@ -74,7 +66,7 @@ export const spellActionBattleService = createService(({ currentBattleMap }) => 
 
         battle.staticPlayers
             .filter(player => player.playerId !== currentPlayerId)
-            .map(player => playerSocketMap[ player.playerId ])
+            .map(player => this.playerSocketMap[ player.playerId ])
             .forEach(playerSocketCell => {
                 playerSocketCell.send(BattleNotifyMessage({
                     spellAction,
@@ -84,16 +76,4 @@ export const spellActionBattleService = createService(({ currentBattleMap }) => 
 
         return BattleSpellActionMessage.createResponse(requestId, { success: true });
     });
-
-    return {
-        onSocketConnect: (socketCell, currentPlayerId) => {
-            playerSocketMap[ currentPlayerId ] = socketCell;
-
-            socketCell.addDisconnectListener(() => {
-                delete playerSocketMap[ currentPlayerId ];
-            });
-
-            addBattleSpellActionMessageListener(socketCell, currentPlayerId);
-        }
-    };
-});
+} 

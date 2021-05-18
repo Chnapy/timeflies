@@ -13,7 +13,7 @@ export type BattleSpellActionResponseData =
         lastState: SerializableState;
     };
 
-export const BattleSpellActionMessage = createMessage<BattleSpellActionData>('battle/spell-action', joi.object({
+export const BattleSpellActionMessage = createMessage('battle/spell-action', joi.object<BattleSpellActionData>({
     spellAction: spellActionSchema
 }))
     .withResponse<BattleSpellActionResponseData>();

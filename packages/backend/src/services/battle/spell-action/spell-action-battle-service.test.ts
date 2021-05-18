@@ -2,7 +2,7 @@ import { createPosition, SpellAction } from '@timeflies/common';
 import { BattleNotifyMessage, BattleSpellActionMessage } from '@timeflies/socket-messages';
 import { SpellEffect } from '@timeflies/spell-effects';
 import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle-service-test-utils';
-import { spellActionBattleService } from './spell-action-battle-service';
+import { SpellActionBattleService } from './spell-action-battle-service';
 
 describe('spell action battle service', () => {
 
@@ -11,7 +11,7 @@ describe('spell action battle service', () => {
 
             const socketCell = createFakeSocketCell();
             const battle = createFakeBattle();
-            const service = spellActionBattleService(createFakeGlobalEntitiesNoService(battle));
+            const service = new SpellActionBattleService(createFakeGlobalEntitiesNoService(battle));
 
             service.onSocketConnect(socketCell, 'p10');
 
@@ -31,7 +31,7 @@ describe('spell action battle service', () => {
         const getDefaultEntities = () => {
             const socketCell = createFakeSocketCell();
             const battle = createFakeBattle();
-            const service = spellActionBattleService(createFakeGlobalEntitiesNoService(battle));
+            const service = new SpellActionBattleService(createFakeGlobalEntitiesNoService(battle));
 
             service.onSocketConnect(socketCell, 'p1');
 
