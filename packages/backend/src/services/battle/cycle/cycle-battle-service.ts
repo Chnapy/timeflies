@@ -17,8 +17,6 @@ export const cycleBattleService = createService(() => {
             });
         },
         beforeTurnStart: ({ roundIndex, turnIndex, characterId, startTime }: NextTurnInfos, playerIdList: PlayerId[]) => {
-            console.log('Turn start', turnIndex);
-
             playerIdList.forEach(playerId => {
 
                 const socketCell = playerSocketMap[ playerId ];

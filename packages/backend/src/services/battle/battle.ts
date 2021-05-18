@@ -1,5 +1,6 @@
 import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
 import { createCycleEngine, TurnInfos } from '@timeflies/cycle-engine';
+import { logger } from '@timeflies/devtools';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
 import util from 'util';
@@ -215,9 +216,12 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
         listeners: {
             turnStart: ({ currentTurn }) => {
                 currentTurnInfos = currentTurn;
+
+                logger.info('Turn start', currentTurn);
             },
             turnEnd: ({ currentTurn }) => {
-                console.log('Turn end', currentTurn.turnIndex);
+                logger.info('Turn end', currentTurn);
+
                 beforeNextTurn();
                 return cycleEngine.startNextTurn();
             }
@@ -225,7 +229,8 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     });
 
     const startBattle = () => {
-        console.log('! Battle start !')
+        logger.info('Battle [' + battleId + '] start');
+
         const promise = cycleEngine.start();
 
         beforeNextTurn();

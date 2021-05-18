@@ -2,15 +2,19 @@ import colors from 'colors/safe';
 
 type ActionLike = { action: string; payload: unknown; };
 
+type MessageLike = string | ActionLike | object;
+
 type LogInfos = {
     level: 'info' | 'net' | 'warn' | 'error';
     label?: string;
-    message: string | ActionLike;
+    messages: MessageLike[];
 };
 
 const isNodeJsContext = typeof module === 'object';
 
-const logFn = ({ level, label, message }: LogInfos) => {
+const isMessageActionLike = (message: any): message is ActionLike => 'action' in message;
+
+const logFn = ({ level, label, messages }: LogInfos) => {
     const timestamp = new Date().toLocaleString();
 
     const getLevel = () => {
@@ -25,12 +29,18 @@ const logFn = ({ level, label, message }: LogInfos) => {
     if (isNodeJsContext) {
 
         const getMessage = (): string => {
-            if (typeof message === 'string')
-                return message;
+            return messages.map(message => {
+                if (typeof message === 'string')
+                    return message;
 
-            const { action, payload } = message;
+                if (isMessageActionLike(message)) {
+                    const { action, payload } = message;
 
-            return `${colors.bold(action)} ${JSON.stringify(payload)}`;
+                    return `${colors.bold(action)} ${JSON.stringify(payload)}`;
+                }
+
+                return JSON.stringify(message);
+            }).join(' ');
         };
 
         const stream = level === 'error' || level === 'warn' ? process.stderr : process.stdout;
@@ -39,12 +49,18 @@ const logFn = ({ level, label, message }: LogInfos) => {
     } else {
 
         const getMessage = (): unknown[] => {
-            if (typeof message === 'string')
-                return [ message ];
+            return messages.flatMap(message => {
+                if (typeof message === 'string')
+                    return [ message ];
 
-            const { action, payload } = message;
+                if (isMessageActionLike(message)) {
+                    const { action, payload } = message;
 
-            return [ colors.bold(action), payload ];
+                    return [ colors.bold(action), payload ];
+                }
+
+                return message;
+            });
         };
 
         const stream = console[ level === 'net' ? 'info' : level ];
@@ -54,18 +70,30 @@ const logFn = ({ level, label, message }: LogInfos) => {
 };
 
 export const logger = {
+    info: (...messages: MessageLike[]) => {
+        logFn({
+            level: 'info',
+            messages
+        });
+    },
+    net: (...messages: MessageLike[]) => {
+        logFn({
+            level: 'net',
+            messages
+        });
+    },
     error: (err: Error) => {
         if (!(err as any).code || (err as any).code === 500) {
             logFn({
                 level: 'error',
-                message: err.stack ?? err + ''
+                messages: [ err.stack ?? err + '' ]
             });
         } else {
             logFn({
                 level: 'warn',
-                message: err.stack
+                messages: [ err.stack
                     ? err.stack.split('\n').slice(0, 2).join('\n')
-                    : err + ''
+                    : err + '' ]
             });
         }
     },
@@ -73,7 +101,7 @@ export const logger = {
         actionLikeList.forEach(actionLike => {
             logFn({
                 level: 'info',
-                message: actionLike
+                messages: [ actionLike ]
             });
         });
     },
@@ -82,7 +110,7 @@ export const logger = {
             logFn({
                 level: 'net',
                 label: (colors as any).brightMagenta.bold('in'),
-                message: actionLike
+                messages: [ actionLike ]
             });
         });
     },
@@ -91,7 +119,7 @@ export const logger = {
             logFn({
                 level: 'net',
                 label: (colors.magenta as any).bold('out'),
-                message: actionLike
+                messages: [ actionLike ]
             });
         });
     }

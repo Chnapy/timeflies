@@ -1,4 +1,5 @@
 import { ObjectTyped } from '@timeflies/common';
+import { logger } from '@timeflies/devtools';
 import { createSocketCell } from '@timeflies/socket-server';
 import { json, urlencoded } from 'body-parser';
 import cors from "cors";
@@ -43,11 +44,12 @@ void createBattle(globalEntities, {
 // Start
 
 server.listen(port, () => {
-    console.log('server listening address', server.address());
-    console.log('ws listening address', ws.address());
+    logger.net('http server listening', server.address()!);
+    logger.net('websocket server listening', ws.address());
+
     let i = 0;
     ws.on('connection', socket => {
-        console.log('new connection')
+        logger.net('new socket connection');
         i++;
 
         ObjectTyped.entries(globalEntities.services).forEach(([ key, service ]) => service.onSocketConnect(
