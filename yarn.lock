@@ -4586,6 +4586,7 @@ __metadata:
   dependencies:
     "@types/jest": ^26.0.23
     "@types/node": ^15.0.3
+    colors: ^1.4.0
     supports-color: ^9.0.0
   languageName: unknown
   linkType: soft
@@ -4713,6 +4714,7 @@ __metadata:
     joi: ^17.4.0
   peerDependencies:
     "@timeflies/common": "*"
+    "@timeflies/devtools": "*"
     "@timeflies/socket-messages": "*"
     ws: 7.4.1
   languageName: unknown
@@ -8328,7 +8330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"colors@npm:^1.1.2":
+"colors@npm:^1.1.2, colors@npm:^1.4.0":
   version: 1.4.0
   resolution: "colors@npm:1.4.0"
   checksum: a0f266ac041a9774d92cc9624a984707678d2eeec125d54e8d8231075ce36c24c5352fb5d0f90c6ee420d0f63e354417cec716386ad341309334aad18e32b933

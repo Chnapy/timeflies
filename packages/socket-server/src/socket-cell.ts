@@ -1,3 +1,4 @@
+import { logger } from '@timeflies/devtools';
 import { ExtractMessageFromCreator, extractMessagesFromEvent, ExtractResponseFromCreator, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
 import WebSocket from 'ws';
 import { SocketError } from './socket-error';
@@ -37,10 +38,10 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
         return () => socket.removeEventListener(type, listener);
     };
 
-    const send: SocketCell[ 'send' ] = (...messages) => {
-        console.log('Send messages:\n', ...messages)
+    const send: SocketCell[ 'send' ] = (...messageList) => {
+        logger.logMessageSent(messageList);
         socket.send(JSON.stringify(
-            messages
+            messageList
         ));
     };
 
@@ -60,11 +61,12 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                 return;
             }
 
+            logger.logMessageReceived(messageList);
+
             await Promise.all(
                 messageList
                     .filter(messageCreator.match)
                     .map(async message => {
-                        console.log('Message received:\n', message);
                         try {
                             const check = messageCreator.schema.validate(message);
                             if (check.error) {
@@ -81,7 +83,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                                 ? err
                                 : new SocketError(500, (err as Error).stack ?? err + '');
 
-                            console.error('Error:\n', err);
+                            logger.error(err);
 
                             sendError(socketError);
                         }

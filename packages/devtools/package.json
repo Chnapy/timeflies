@@ -18,5 +18,8 @@
     "directory": "packages/devtools",
     "type": "git",
     "url": "https://github.com/Chnapy/timeflies.git"
+  },
+  "dependencies": {
+    "colors": "^1.4.0"
   }
 }

@@ -7,6 +7,7 @@
   "scripts": {},
   "peerDependencies": {
     "@timeflies/common": "*",
+    "@timeflies/devtools": "*",
     "@timeflies/socket-messages": "*",
     "ws": "7.4.1"
   },
