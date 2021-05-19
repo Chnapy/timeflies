@@ -51,5 +51,8 @@
     "directory": "packages/app-ui",
     "type": "git",
     "url": "https://github.com/Chnapy/timeflies.git"
+  },
+  "dependencies": {
+    "react-hotkeys-hook": "^3.3.1"
   }
 }

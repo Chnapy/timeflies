@@ -28,6 +28,7 @@ export const Default: React.FC = () => {
 
                     <SpellButton
                         spellRole='move'
+                        index={0}
                         duration={800}
                         imageSize={56}
                         selected={false}
@@ -39,6 +40,7 @@ export const Default: React.FC = () => {
 
                     <SpellButton
                         spellRole='switch'
+                        index={1}
                         duration={2100}
                         imageSize={56}
                         selected
@@ -50,6 +52,7 @@ export const Default: React.FC = () => {
 
                     <SpellButton
                         spellRole='switch'
+                        index={2}
                         duration={9000}
                         imageSize={56}
                         selected={false}

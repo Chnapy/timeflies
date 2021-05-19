@@ -1,9 +1,11 @@
 import { makeStyles } from '@material-ui/core';
+import { useHotkeys } from '@timeflies/app-ui';
 import { TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
 import { SpellButtonSimple, SpellButtonSimpleProps } from './spell-button-simple';
 
 export type SpellButtonProps = SpellButtonSimpleProps & {
+    index: number;
     duration: number;
 };
 
@@ -21,10 +23,14 @@ const useStyles = makeStyles(({ palette }) => ({
     }
 }));
 
+const hotkeysCodes = [ 'KeyQ', 'KeyW', 'KeyE', 'KeyR' ];
+
 export const SpellButton: React.FC<SpellButtonProps> = ({
-    spellRole, duration, imageSize, selected, disabled, onClick, onMouseEnter, onMouseLeave
+    spellRole, index, duration, imageSize, selected, disabled, onClick, onMouseEnter, onMouseLeave
 }) => {
     const classes = useStyles({ disabled });
+
+    useHotkeys(hotkeysCodes[ index ], onClick);
 
     return (
         <div className={classes.root}>
