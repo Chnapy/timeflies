@@ -3,6 +3,7 @@ import { createSocketCell } from '@timeflies/socket-server';
 import WebSocket from 'ws';
 import { GlobalEntitiesNoServices } from '../main/global-entities';
 import { CycleBattleService } from './battle/cycle/cycle-battle-service';
+import { EndBattleService } from './battle/end-battle/end-battle-service';
 import { JoinBattleService } from './battle/join/join-battle-service';
 import { SpellActionBattleService } from './battle/spell-action/spell-action-battle-service';
 import { ChatService } from './chat/chat-service';
@@ -13,6 +14,7 @@ export const createServices = (globalEntitiesNoServices: GlobalEntitiesNoService
     joinBattleService: new JoinBattleService(globalEntitiesNoServices),
     cycleBattleService: new CycleBattleService(globalEntitiesNoServices),
     spellActionBattleService: new SpellActionBattleService(globalEntitiesNoServices),
+    endBattleService: new EndBattleService(globalEntitiesNoServices),
     chatService: new ChatService(globalEntitiesNoServices)
 });
 

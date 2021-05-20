@@ -1,4 +1,4 @@
-import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
+import { ArrayUtils, CharacterId, createPosition, getTimeDiffFromNow, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
 import { createCycleEngine, TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
 import fs from 'fs';
@@ -43,7 +43,7 @@ export type Battle = {
     getCycleInfos: () => CycleInfos;
     getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
     getCurrentState: () => SerializableState;
-    addNewState: (state: SerializableState) => void;
+    addNewState: (state: SerializableState, stateEndTime: number) => Promise<void>;
 };
 
 type RoomInfos = {
@@ -54,6 +54,8 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     const battleId = 'battleId';
     // TODO
     // const battleId = createId();
+
+    let battleRunning = true;
 
     // TODO remove mock
     const rawMapInfos: MapInfos = {
@@ -222,8 +224,10 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
             turnEnd: ({ currentTurn }) => {
                 logger.info('Turn end', currentTurn);
 
-                beforeNextTurn();
-                return cycleEngine.startNextTurn();
+                if (battleRunning) {
+                    beforeNextTurn();
+                    return cycleEngine.startNextTurn();
+                }
             }
         }
     });
@@ -242,6 +246,24 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
         players: normalize(staticPlayers, 'playerId'),
         characters: normalize(staticCharacters, 'characterId'),
         spells: normalize(staticSpells, 'spellId')
+    };
+
+    const battleEnd = async (winnerTeamColor: string, stateEndTime: number) => {
+        battleRunning = false;
+
+        const timeBeforeEnd = getTimeDiffFromNow(stateEndTime);
+        await waitMs(timeBeforeEnd);
+
+        services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime);
+        const cycleEnginePromise = cycleEngine.stop();
+
+        logger.info('Battle [' + battleId + '] ending...');
+
+        // TODO trigger battle-end parent callback
+
+        await cycleEnginePromise;
+
+        logger.info('Battle [' + battleId + '] ended.');
     };
 
     return {
@@ -276,8 +298,13 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
 
         getCurrentState: () => ArrayUtils.last(stateStack)!,
 
-        addNewState: state => {
+        addNewState: async (state, stateEndTime) => {
             stateStack.push(state);
+
+            const winnerTeamColor = services.endBattleService.isBattleEnded(state, staticState);
+            if (winnerTeamColor) {
+                await battleEnd(winnerTeamColor, stateEndTime);
+            }
         },
 
         playerJoin: playerId => {

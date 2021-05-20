@@ -62,7 +62,7 @@ export class SpellActionBattleService extends Service {
             });
         }
 
-        battle.addNewState(checkResult.newState);
+        const stateEndTime = spellAction.launchTime + spellAction.duration;
 
         battle.staticPlayers
             .filter(player => player.playerId !== currentPlayerId)
@@ -74,6 +74,8 @@ export class SpellActionBattleService extends Service {
                 }))
             });
 
+        void battle.addNewState(checkResult.newState, stateEndTime);
+
         return BattleSpellActionMessage.createResponse(requestId, { success: true });
     });
-} 
+}
