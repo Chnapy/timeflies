@@ -6,7 +6,10 @@ export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
     [ BattleTimeUpdateAction.type ]: (state, { payload }: BattleTimeUpdateAction) => {
         assertBattleState(state);
 
-        state.currentTime = payload.currentTime;
+        // handle case when a prepare-turn-start action is dispatched between commit & time-update action
+        if (payload.currentTime > state.currentTime) {
+            state.currentTime = payload.currentTime;
+        }
     },
     [ BattleCommitAction.type ]: (state, { payload }: BattleCommitAction) => {
         assertBattleState(state);
@@ -22,7 +25,7 @@ export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
         state.serializableStates[ futureState.time ] = futureState;
         state.serializableStateList.push(futureState.time);
     },
-    [BattleRollbackAction.type]: (state, {payload}: BattleRollbackAction) => {
+    [ BattleRollbackAction.type ]: (state, { payload }: BattleRollbackAction) => {
         assertBattleState(state);
 
         const { lastState } = payload;

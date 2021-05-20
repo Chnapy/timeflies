@@ -25,10 +25,12 @@ export const moveEffect: SpellEffectItem = {
         const turnEndTime = turnStartTime + launcher.actionTime;
         const remainingTime = turnEndTime - launchTime;
 
-        const nbrTiles = Math.min(
-            rawActionArea.length,
-            Math.floor(remainingTime / helper.getDefaultDuration())
-        );
+        const nbrTiles = Math.max(
+            Math.min(
+                rawActionArea.length,
+                Math.floor(remainingTime / helper.getDefaultDuration())
+            ),
+            0);
         if (nbrTiles === 0) {
             return getEmptyEffect();
         }

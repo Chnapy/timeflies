@@ -1,5 +1,7 @@
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
+import { BattleEndContextProvider } from '../battle-end-panel/battle-end-context';
+import { BattleEndPanel } from '../battle-end-panel/battle-end-panel';
 import { BattleFeedbackPool } from '../battle-feedbacks/view/battle-feedback-pool';
 import { CharacterHudPool } from '../character-hud/view/character-hud-pool';
 import { CharacterListPanelConnected } from './character-list-panel-connected';
@@ -49,5 +51,9 @@ export const BattleHud: React.FC = () => {
         <div className={classes.timeGauge}>
             <TimeGaugePanelConnected />
         </div>
+
+        <BattleEndContextProvider>
+            <BattleEndPanel />
+        </BattleEndContextProvider>
     </>;
 };

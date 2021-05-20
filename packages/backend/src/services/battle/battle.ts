@@ -251,7 +251,7 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     const battleEnd = async (winnerTeamColor: string, stateEndTime: number) => {
         battleRunning = false;
 
-        const timeBeforeEnd = getTimeDiffFromNow(stateEndTime);
+        const timeBeforeEnd = stateEndTime - Date.now();
         await waitMs(timeBeforeEnd);
 
         services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime);

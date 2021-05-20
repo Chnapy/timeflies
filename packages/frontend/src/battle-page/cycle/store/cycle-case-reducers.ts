@@ -19,6 +19,7 @@ export const cycleCaseReducers: GameCaseReducers<'battle'> = {
                 delete state.serializableStates[ time ];
             });
         state.serializableStateList = [ ArrayUtils.last(state.serializableStateList)! ];
+        state.currentTime = state.serializableStateList[0];
 
         state.roundIndex = roundIndex;
         state.turnIndex = turnIndex;
