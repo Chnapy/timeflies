@@ -23,9 +23,7 @@ export const useCycleMessageListeners = () => {
         onTurnStart: ({ payload }) => {
             dispatch(BattlePrepareTurnStartAction(payload));
         },
-        onBattleEnd: () => {
-            cycleEngine.stop();
-        }
+        onBattleEnd: () => cycleEngine.stop()
     };
 
     useAsyncEffect(() => {
