@@ -69,8 +69,11 @@ const computeActionArea = async (helper: SpellEffectHelper): Promise<Position[]>
     }
 
     const path = await pathfinder.calculatePath(
-        map.tiledMap, state.characters.position,
-        launcher.position, helper.targetPos
+        map.tiledMap,
+        helper.getAllCharacterAliveIdList(),
+        state.characters.position,
+        launcher.position,
+        helper.targetPos
     );
     return path.slice(1);
 };

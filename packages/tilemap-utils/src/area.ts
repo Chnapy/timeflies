@@ -1,5 +1,5 @@
 import { createCache } from '@timeflies/cache';
-import { CharacterVariablesMap, createPosition, Normalized, ObjectTyped, Position } from '@timeflies/common';
+import { CharacterId, CharacterVariablesMap, createPosition, Normalized, Position } from '@timeflies/common';
 import bresenham from 'bresenham';
 import EasyStar from 'easystarjs';
 import { TiledMap } from 'tiled-types';
@@ -79,10 +79,9 @@ export module Area {
         // cache grid calculation
         const gridCache = createCache<CharacterVariablesMap[ 'position' ], null>();
 
-        const computePathfinderGrid = (tiledMap: TiledMap, charactersPositions: CharacterVariablesMap[ 'position' ]) => {
+        const computePathfinderGrid = (tiledMap: TiledMap, characterAliveList: CharacterId[], charactersPositions: CharacterVariablesMap[ 'position' ]) => {
             const characterPositionsSet = new Set(
-                ObjectTyped.entries(charactersPositions)
-                    .map(([ characterId, position ]) => position.id)
+                characterAliveList.map(characterId => charactersPositions[ characterId ].id)
             );
 
             const getTileID = (p: Position): number => {
@@ -106,12 +105,12 @@ export module Area {
             return pathfinderGrid;
         };
 
-        const refreshGridIfNeeded = (tiledMap: TiledMap, charactersPositions: CharacterVariablesMap[ 'position' ]) => {
+        const refreshGridIfNeeded = (tiledMap: TiledMap, characterAliveList: CharacterId[], charactersPositions: CharacterVariablesMap[ 'position' ]) => {
             gridCache.getOrElse(charactersPositions, () => {
                 gridCache.clear();
 
                 pathfinder.setGrid(
-                    computePathfinderGrid(tiledMap, charactersPositions)
+                    computePathfinderGrid(tiledMap, characterAliveList, charactersPositions)
                 );
                 pathfinder.setAcceptableTiles(acceptableTiles);
 
@@ -120,10 +119,10 @@ export module Area {
         };
 
         const calculatePath = (
-            tiledMap: TiledMap, charactersPositions: CharacterVariablesMap[ 'position' ],
+            tiledMap: TiledMap, characterAliveList: CharacterId[], charactersPositions: CharacterVariablesMap[ 'position' ],
             { x: startX, y: startY }: Position, { x: endX, y: endY }: Position
         ) => new Promise<Position[]>(resolve => {
-            refreshGridIfNeeded(tiledMap, charactersPositions);
+            refreshGridIfNeeded(tiledMap, characterAliveList, charactersPositions);
 
             pathfinder.findPath(startX, startY, endX, endY, path => {
                 resolve((path ?? []).map(({ x, y }) => createPosition(x, y)));

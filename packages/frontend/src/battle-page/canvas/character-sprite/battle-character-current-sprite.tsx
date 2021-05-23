@@ -21,7 +21,7 @@ export const BattleCharacterCurrentSprite: React.FC<BattleCharacterSprite> = ({ 
 
     const partialProps = getPartialProps(config);
 
-    if (!partialProps) {
+    if (!partialProps || alpha === 0) {
         return null;
     }
 

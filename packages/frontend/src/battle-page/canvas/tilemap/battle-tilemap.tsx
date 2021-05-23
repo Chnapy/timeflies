@@ -54,7 +54,7 @@ export const BattleTilemap: React.FC = () => {
         const currentPos = currentPositions[ characterId ];
         const futurePos = futurePositions[ characterId ];
 
-        acc[ (currentPos || futurePos).id ] = <React.Fragment key={characterId}>
+        const characterFragment = <React.Fragment key={characterId}>
             {currentPos && (
                 <BattleCharacterCurrentSprite characterId={characterId} />
             )}
@@ -62,6 +62,10 @@ export const BattleTilemap: React.FC = () => {
                 <BattleCharacterFutureSprite characterId={characterId} />
             )}
         </React.Fragment>;
+
+        const characterMapId = (currentPos || futurePos).id;
+        acc[characterMapId] = acc[characterMapId] ?? [];
+        acc[characterMapId]!.push(characterFragment);
 
         return acc;
     }, {});

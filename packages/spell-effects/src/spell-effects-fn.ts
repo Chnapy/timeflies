@@ -35,10 +35,10 @@ export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
             .map(([ characterId ]) => getCharacterById(characterId));
     };
 
-    const getBresenhamLine = (start: Position, end: Position) => 
-        Area.getBresenhamLine(start,end,map.tiledMap);
+    const getBresenhamLine = (start: Position, end: Position) =>
+        Area.getBresenhamLine(start, end, map.tiledMap);
 
-    const getDefaultDuration = () => state.spells.duration[spellAction.spellId];
+    const getDefaultDuration = () => state.spells.duration[ spellAction.spellId ];
 
     return {
         params,
@@ -63,6 +63,11 @@ export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
         getHitCharactersAlive: () => {
             return getHitCharacters()
                 .filter(character => CharacterUtils.isAlive(character.health));
+        },
+        getAllCharacterAliveIdList: () => {
+            return Object.entries(state.characters.health)
+                .filter(([ characterId, health ]) => CharacterUtils.isAlive(health))
+                .map(([ characterId ]) => characterId);
         },
         targetPos: spellAction.targetPos,
     };

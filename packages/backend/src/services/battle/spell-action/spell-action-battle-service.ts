@@ -1,4 +1,4 @@
-import { ObjectTyped, PlayerId } from '@timeflies/common';
+import { CharacterUtils, ObjectTyped, PlayerId } from '@timeflies/common';
 import { BattleNotifyMessage, BattleSpellActionMessage } from '@timeflies/socket-messages';
 import { SocketCell } from '@timeflies/socket-server';
 import { CheckSpellParams, spellActionCheck } from '@timeflies/spell-checker';
@@ -23,7 +23,9 @@ export class SpellActionBattleService extends Service {
 
         const spellRangeArea = lastState.spells.rangeArea[ staticSpell.spellId ];
         const spellLineOfSight = lastState.spells.lineOfSight[ staticSpell.spellId ];
-        const characterList = ObjectTyped.keys(staticState.characters);
+        const characterAliveList = ObjectTyped.entries(lastState.characters.health)
+            .filter(([ characterId, health ]) => CharacterUtils.isAlive(health))
+            .map(([ characterId ]) => characterId);
         const charactersPositions = lastState.characters.position;
 
         const context: CheckSpellParams[ 'context' ] = {
@@ -41,7 +43,7 @@ export class SpellActionBattleService extends Service {
                     tiledMap,
                     rangeArea: spellRangeArea,
                     lineOfSight: spellLineOfSight,
-                    characterList,
+                    characterList: characterAliveList,
                     charactersPositions,
                     playingCharacterId: turnInfos.characterId
                 })
