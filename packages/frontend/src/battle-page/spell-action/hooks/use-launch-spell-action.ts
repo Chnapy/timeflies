@@ -4,6 +4,7 @@ import { BattleSpellActionMessage, SocketErrorMessage } from '@timeflies/socket-
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import { useDispatch } from 'react-redux';
 import { useComputeSpellEffect } from '../../action-preview/hooks/use-compute-spell-effect';
+import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { BattleRollbackAction } from '../../tile-interactive/store/battle-state-actions';
 import { useDispatchNewState } from './use-dispatch-new-state';
 
@@ -12,8 +13,13 @@ export const useLaunchSpellAction = () => {
     const sendWithResponse = useSocketSendWithResponse();
     const dispatch = useDispatch();
     const dispatchNewState = useDispatchNewState();
+    const turnStartTime = useBattleSelector(battle => battle.turnStartTime);
 
     return async () => {
+        if (turnStartTime > Date.now()) {
+            return;
+        }
+
         // compute again, because time values may have changed
         const spellEffectInfos = await computeSpellEffect();
         if (!spellEffectInfos) {
