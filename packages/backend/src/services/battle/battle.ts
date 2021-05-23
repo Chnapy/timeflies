@@ -1,5 +1,5 @@
-import { ArrayUtils, CharacterId, createPosition, getTimeDiffFromNow, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
-import { createCycleEngine, TurnInfos } from '@timeflies/cycle-engine';
+import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
+import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
@@ -54,8 +54,6 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     const battleId = 'battleId';
     // TODO
     // const battleId = createId();
-
-    let battleRunning = true;
 
     // TODO remove mock
     const rawMapInfos: MapInfos = {
@@ -140,7 +138,6 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     const waitingPlayerList = new Set(playerIdList);
 
     const turnsOrder = [ 'c2', 'c1', 'c3' ];
-    let currentTurnInfos: TurnInfos | null = null;
 
     const initialSerializableState: SerializableState = {
         checksum: '',
@@ -210,36 +207,17 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
 
     const stateStack: SerializableState[] = [ initialSerializableState ];
 
-    const beforeNextTurn = () => services.cycleBattleService.beforeTurnStart(cycleEngine.getNextTurnInfos(), playerIdList);
-
-    const cycleEngine = createCycleEngine({
+    const cycleEngine = services.cycleBattleService.createCycleEngineOverlay({
+        battleId,
+        playerIdList,
         charactersList: turnsOrder,
-        charactersDurations: initialSerializableState.characters.actionTime,
-        listeners: {
-            turnStart: ({ currentTurn }) => {
-                currentTurnInfos = currentTurn;
-
-                logger.info('Turn start', currentTurn);
-            },
-            turnEnd: ({ currentTurn }) => {
-                logger.info('Turn end', currentTurn);
-
-                if (battleRunning) {
-                    beforeNextTurn();
-                    return cycleEngine.startNextTurn();
-                }
-            }
-        }
+        charactersDurations: initialSerializableState.characters.actionTime
     });
 
     const startBattle = () => {
         logger.info('Battle [' + battleId + '] start');
 
-        const promise = cycleEngine.start();
-
-        beforeNextTurn();
-
-        return promise;
+        return cycleEngine.start();
     };
 
     const staticState: StaticState = {
@@ -249,21 +227,14 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     };
 
     const battleEnd = async (winnerTeamColor: string, stateEndTime: number) => {
-        battleRunning = false;
-
-        const timeBeforeEnd = stateEndTime - Date.now();
-        await waitMs(timeBeforeEnd);
-
-        services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime);
-        const cycleEnginePromise = cycleEngine.stop();
-
         logger.info('Battle [' + battleId + '] ending...');
 
-        // TODO trigger battle-end parent callback
+        await cycleEngine.stop();
 
-        await cycleEnginePromise;
-
+        services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime);
         logger.info('Battle [' + battleId + '] ended.');
+
+        // TODO trigger battle-end parent callback
     };
 
     return {
@@ -290,16 +261,20 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
             };
         },
 
-        getCycleInfos: () => ({
-            turnsOrder
-        }),
+        getCycleInfos: () => ({ turnsOrder }),
 
-        getCurrentTurnInfos: () => currentTurnInfos,
+        getCurrentTurnInfos: () => cycleEngine.getCurrentTurnInfos(),
 
         getCurrentState: () => ArrayUtils.last(stateStack)!,
 
         addNewState: async (state, stateEndTime) => {
             stateStack.push(state);
+
+            // wait current spell action to end
+            const timeBeforeEnd = stateEndTime - Date.now();
+            await waitMs(timeBeforeEnd);
+
+            cycleEngine.onNewState(state);
 
             const winnerTeamColor = services.endBattleService.isBattleEnded(state, staticState);
             if (winnerTeamColor) {
