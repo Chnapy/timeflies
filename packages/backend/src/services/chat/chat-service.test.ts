@@ -21,12 +21,14 @@ describe('chat service', () => {
                 return { playerId, socketCell };
             });
 
-            const listener = playerList[ 0 ].socketCell.getFirstListener(ChatSendMessage);
+            const { socketCell } = playerList[ 0 ];
+
+            const listener = socketCell.getFirstListener(ChatSendMessage);
 
             await expect(listener(ChatSendMessage({
                 message: 'foo',
                 time: 1621373414976
-            }).get())).rejects.toBeDefined();
+            }).get(), socketCell.send)).rejects.toBeDefined();
         });
 
         const createEntities = () => {
@@ -42,37 +44,41 @@ describe('chat service', () => {
                 return { playerId, socketCell };
             });
 
-            const listener = playerList[ 0 ].socketCell.getFirstListener(ChatSendMessage);
+            const { socketCell } = playerList[ 0 ];
 
-            return { playerList, listener };
+            const listener = socketCell.getFirstListener(ChatSendMessage);
+
+            return { playerList, listener, socketCell };
         };
 
         it('throw error if wrong time', async () => {
-            const { listener } = createEntities();
+            const { listener, socketCell } = createEntities();
 
             await expect(listener(ChatSendMessage({
                 message: 'future',
                 time: Date.now() + 1000
-            }).get())).rejects.toBeDefined();
+            }).get(), socketCell.send)).rejects.toBeDefined();
         });
 
         describe('on success', () => {
             it('send correct response', async () => {
-                const { listener } = createEntities();
-
-                await expect(listener(ChatSendMessage({
-                    message: 'future',
-                    time: 5
-                }).get())).resolves.toEqual(ChatSendMessage.createResponse(expect.any(String), { success: true }));
-            });
-
-            it('send chat-notify message to others players', async () => {
-                const { listener, playerList } = createEntities();
+                const { listener, socketCell } = createEntities();
 
                 await listener(ChatSendMessage({
                     message: 'future',
                     time: 5
-                }).get());
+                }).get(), socketCell.send);
+
+                expect(socketCell.send).toHaveBeenCalledWith(ChatSendMessage.createResponse(expect.any(String), { success: true }));
+            });
+
+            it('send chat-notify message to others players', async () => {
+                const { listener, playerList, socketCell } = createEntities();
+
+                await listener(ChatSendMessage({
+                    message: 'future',
+                    time: 5
+                }).get(), socketCell.send);
 
                 for (const { socketCell } of playerList.slice(1)) {
                     expect(socketCell.send).toHaveBeenCalledWith(ChatNotifyMessage({

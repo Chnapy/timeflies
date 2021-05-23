@@ -8,14 +8,12 @@ export class JoinBattleService extends Service {
         this.addBattleLoadMessageListener(socketCell, currentPlayerId);
     };
 
-    private addBattleLoadMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleLoadMessage>(BattleLoadMessage, ({ payload, requestId }) => {
+    private addBattleLoadMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleLoadMessage>(BattleLoadMessage, ({ payload, requestId }, send) => {
         const battle = this.getBattleById(payload.battleId);
 
         const { staticPlayers, staticCharacters, staticSpells, getCurrentState, getMapInfos, getCycleInfos } = battle;
 
-        battle.playerJoin(currentPlayerId);
-
-        return BattleLoadMessage.createResponse(requestId, {
+        send(BattleLoadMessage.createResponse(requestId, {
             tiledMapInfos: getMapInfos('toFrontend'),
             staticPlayers,
             staticCharacters,
@@ -24,6 +22,8 @@ export class JoinBattleService extends Service {
             cycleInfos: getCycleInfos(),
 
             myPlayerId: currentPlayerId
-        });
+        }));
+
+        battle.playerJoin(currentPlayerId);
     });
 }

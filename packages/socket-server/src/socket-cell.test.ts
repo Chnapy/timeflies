@@ -92,7 +92,7 @@ describe('# Socket cell', () => {
             await socketHelper.triggerMessageListeners(messages);
 
             expect(listener).toHaveBeenCalledTimes(1);
-            expect(listener).toHaveBeenCalledWith(messageFoo);
+            expect(listener).toHaveBeenCalledWith(messageFoo, expect.anything());
 
             listener.mockClear();
 
@@ -153,11 +153,11 @@ describe('# Socket cell', () => {
             );
         });
 
-        it('send response if any returned by listener', async () => {
+        it('send response using arg callback', async () => {
             const { socketHelper, cell } = createSocketAndCell();
 
-            const listener = jest.fn(async (): Promise<MessageWithResponse> => {
-                return Promise.resolve({
+            const listener = jest.fn(async (message, send) => {
+                send({
                     action: 'toto',
                     payload: {},
                     requestId: 'bar_id'

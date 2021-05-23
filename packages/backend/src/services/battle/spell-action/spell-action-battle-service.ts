@@ -10,7 +10,7 @@ export class SpellActionBattleService extends Service {
         this.addBattleSpellActionMessageListener(socketCell, currentPlayerId);
     };
 
-    private addBattleSpellActionMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleSpellActionMessage>(BattleSpellActionMessage, async ({ payload, requestId }) => {
+    private addBattleSpellActionMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleSpellActionMessage>(BattleSpellActionMessage, async ({ payload, requestId }, send) => {
         const battle = this.getBattleByPlayerId(currentPlayerId);
 
         const { tiledMap, staticState, getCurrentTurnInfos, getCurrentState } = battle;
@@ -58,10 +58,10 @@ export class SpellActionBattleService extends Service {
         });
 
         if (!checkResult.success) {
-            return BattleSpellActionMessage.createResponse(requestId, {
+            return send(BattleSpellActionMessage.createResponse(requestId, {
                 success: false,
                 lastState
-            });
+            }));
         }
 
         const stateEndTime = spellAction.launchTime + spellAction.duration;
@@ -76,8 +76,8 @@ export class SpellActionBattleService extends Service {
                 }))
             });
 
-        void battle.addNewState(checkResult.newState, stateEndTime);
+        send(BattleSpellActionMessage.createResponse(requestId, { success: true }));
 
-        return BattleSpellActionMessage.createResponse(requestId, { success: true });
+        return battle.addNewState(checkResult.newState, stateEndTime);
     });
 }

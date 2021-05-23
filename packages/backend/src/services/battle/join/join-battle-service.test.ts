@@ -18,38 +18,12 @@ describe('join battle service', () => {
             expect(() =>
                 listener(BattleLoadMessage({
                     battleId: 'wrong-battle-id'
-                }).get())
+                }).get(), socketCell.send)
             ).toThrowError();
         });
 
         describe('if correct battle id', () => {
-            it('response with battle load data', () => {
-                const battle = createFakeBattle();
-                const socketCell = createFakeSocketCell();
-
-                const service = new JoinBattleService(createFakeGlobalEntitiesNoService(battle));
-
-                service.onSocketConnect(socketCell, 'p1');
-
-                const listener = socketCell.getFirstListener(BattleLoadMessage);
-
-                const response = listener(BattleLoadMessage({
-                    battleId: 'battle'
-                }).get());
-
-                expect(response).toEqual(BattleLoadMessage.createResponse(expect.any(String), {
-                    initialSerializableState: battle.getCurrentState(),
-                    staticCharacters: battle.staticCharacters,
-                    staticPlayers: battle.staticPlayers,
-                    staticSpells: battle.staticSpells,
-                    cycleInfos: battle.getCycleInfos(),
-                    tiledMapInfos: battle.getMapInfos('toFrontend'),
-                    myPlayerId: 'p1'
-                }));
-            });
-
-            it('join player to battle', async () => {
-                
+            it('response with battle load data', async () => {
                 const battle = createFakeBattle();
                 const socketCell = createFakeSocketCell();
 
@@ -61,9 +35,42 @@ describe('join battle service', () => {
 
                 await listener(BattleLoadMessage({
                     battleId: 'battle'
-                }).get());
+                }).get(), socketCell.send);
+
+                expect(socketCell.send).toHaveBeenCalledWith(BattleLoadMessage.createResponse(expect.any(String), {
+                    initialSerializableState: battle.getCurrentState(),
+                    staticCharacters: battle.staticCharacters,
+                    staticPlayers: battle.staticPlayers,
+                    staticSpells: battle.staticSpells,
+                    cycleInfos: battle.getCycleInfos(),
+                    tiledMapInfos: battle.getMapInfos('toFrontend'),
+                    myPlayerId: 'p1'
+                }));
+            });
+
+            it('join player to battle, after responding', async () => {
+
+                const battle = createFakeBattle();
+                const socketCell = createFakeSocketCell();
+
+                const service = new JoinBattleService(createFakeGlobalEntitiesNoService(battle));
+
+                const callOrder: string[] = [];
+
+                battle.playerJoin = jest.fn(() => callOrder.push('playerJoin'));
+                socketCell.send = jest.fn(() => callOrder.push('response'));
+
+                service.onSocketConnect(socketCell, 'p1');
+
+                const listener = socketCell.getFirstListener(BattleLoadMessage);
+
+                await listener(BattleLoadMessage({
+                    battleId: 'battle'
+                }).get(), socketCell.send);
 
                 expect(battle.playerJoin).toHaveBeenCalledWith('p1');
+
+                expect(callOrder).toEqual([ 'response', 'playerJoin' ]);
             });
         });
     });

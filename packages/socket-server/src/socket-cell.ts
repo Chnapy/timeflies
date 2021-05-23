@@ -1,15 +1,16 @@
 import { logger } from '@timeflies/devtools';
-import { ExtractMessageFromCreator, extractMessagesFromEvent, ExtractResponseFromCreator, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
+import { ExtractMessageFromCreator, extractMessagesFromEvent, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
 import WebSocket from 'ws';
 import { SocketError } from './socket-error';
+
+type SendFn = <M extends Message>(...messages: M[]) => void;
 
 type RemoveListenerFn = () => void;
 
 type MayBePromise<V> = V | Promise<V>;
 
-export type ListenerFn<M extends MessageCreator<any> | MessageWithResponseCreator<any, any>> = (message: ExtractMessageFromCreator<M>) => MayBePromise<
-    M extends MessageWithResponseCreator<any, any> ? ExtractResponseFromCreator<M> : void
->;
+export type ListenerFn<M extends MessageCreator<any> | MessageWithResponseCreator<any, any>> =
+    (message: ExtractMessageFromCreator<M>, send: SendFn) => MayBePromise<void>;
 
 type AddListenerFn = <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(
     messageCreator: Pick<M, 'action' | 'match' | 'schema'>,
@@ -19,7 +20,7 @@ type AddListenerFn = <M extends MessageCreator<any> | MessageWithResponseCreator
 export type SocketCell = {
     addMessageListener: AddListenerFn;
     addDisconnectListener: (listener: () => void) => RemoveListenerFn;
-    send: <M extends Message>(...messages: M[]) => void;
+    send: SendFn;
     clearAllListeners: () => void;
     closeSocket: (error?: SocketError) => void;
     createCell: () => SocketCell;
@@ -73,11 +74,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                                 throw new SocketError(400, check.error.stack ?? check.error + '');
                             }
 
-                            const response = await listener(message as any);
-
-                            if (response) {
-                                send(response as Exclude<typeof response, void>);
-                            }
+                            await listener(message as any, send);
                         } catch (err) {
                             const socketError = err instanceof SocketError
                                 ? err

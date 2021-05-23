@@ -25,7 +25,7 @@ describe('spell action battle service', () => {
                     launchTime: 1,
                     targetPos: createPosition(0, 0)
                 }
-            }).get())).rejects.toBeDefined();
+            }).get(), socketCell.send)).rejects.toBeDefined();
         });
 
         const getDefaultEntities = () => {
@@ -50,7 +50,7 @@ describe('spell action battle service', () => {
 
             it('do not change battle state stack', async () => {
 
-                const { spellActionListener, battle } = getDefaultEntities();
+                const { spellActionListener, battle, socketCell } = getDefaultEntities();
 
                 await spellActionListener(BattleSpellActionMessage({
                     spellAction: {
@@ -60,16 +60,16 @@ describe('spell action battle service', () => {
                         launchTime: 1,
                         targetPos: createPosition(1, 0)
                     }
-                }).get());
+                }).get(), socketCell.send);
 
                 expect(battle.addNewState).not.toHaveBeenCalled();
             });
 
             it('response with fail & last state', async () => {
 
-                const { spellActionListener, battle } = getDefaultEntities();
+                const { spellActionListener, battle, socketCell } = getDefaultEntities();
 
-                const response = await spellActionListener(BattleSpellActionMessage({
+                await spellActionListener(BattleSpellActionMessage({
                     spellAction: {
                         checksum: 'wrong-checksum',
                         spellId: 's1',
@@ -77,9 +77,9 @@ describe('spell action battle service', () => {
                         launchTime: 1,
                         targetPos: createPosition(1, 0)
                     }
-                }).get());
+                }).get(), socketCell.send);
 
-                expect(response).toEqual(BattleSpellActionMessage.createResponse(expect.any(String), {
+                expect(socketCell.send).toHaveBeenCalledWith(BattleSpellActionMessage.createResponse(expect.any(String), {
                     success: false,
                     lastState: battle.getCurrentState()
                 }));
@@ -91,7 +91,7 @@ describe('spell action battle service', () => {
 
             it('add new state to battle state stack', async () => {
 
-                const { spellActionListener, battle } = getDefaultEntities();
+                const { spellActionListener, battle, socketCell } = getDefaultEntities();
 
                 const previousChecksum = battle.getCurrentState().checksum;
 
@@ -103,16 +103,16 @@ describe('spell action battle service', () => {
                         launchTime: 1,
                         targetPos: createPosition(0, 0)
                     }
-                }).get());
+                }).get(), socketCell.send);
 
                 expect(battle.addNewState).toHaveBeenCalled();
             });
 
             it('response with success', async () => {
 
-                const { spellActionListener, battle } = getDefaultEntities();
+                const { spellActionListener, battle, socketCell } = getDefaultEntities();
 
-                const response = await spellActionListener(BattleSpellActionMessage({
+                await spellActionListener(BattleSpellActionMessage({
                     spellAction: {
                         checksum: battle.getCurrentState().checksum,
                         spellId: 's1',
@@ -120,9 +120,9 @@ describe('spell action battle service', () => {
                         launchTime: 1,
                         targetPos: createPosition(0, 0)
                     }
-                }).get());
+                }).get(), socketCell.send);
 
-                expect(response).toEqual(BattleSpellActionMessage.createResponse(expect.any(String), {
+                expect(socketCell.send).toHaveBeenCalledWith(BattleSpellActionMessage.createResponse(expect.any(String), {
                     success: true
                 }));
             });
@@ -141,7 +141,7 @@ describe('spell action battle service', () => {
 
                 await spellActionListener(BattleSpellActionMessage({
                     spellAction
-                }).get());
+                }).get(), socketCellP1.send);
 
                 for (const socketCell of [ socketCellP2, socketCellP3 ]) {
                     expect(socketCell.send).toHaveBeenCalledWith(BattleNotifyMessage({
@@ -156,6 +156,34 @@ describe('spell action battle service', () => {
                 expect(socketCellP1.send).not.toHaveBeenCalledWith(BattleNotifyMessage(expect.anything()));
             });
 
+            it('send messages in correct order: notify, response, then the rest', async () => {
+
+                const { spellActionListener, battle, socketCell, socketCellP2 } = getDefaultEntities();
+
+                const callOrder: string[] = [];
+
+                socketCell.send = jest.fn(message => callOrder.push(message.action));
+                socketCellP2.send = jest.fn(message => callOrder.push(message.action));
+                battle.addNewState = jest.fn((): any => callOrder.push('new-state'));
+
+                const spellAction: SpellAction = {
+                    checksum: battle.getCurrentState().checksum,
+                    spellId: 's1',
+                    duration: 1,
+                    launchTime: 1,
+                    targetPos: createPosition(0, 0)
+                };
+
+                await spellActionListener(BattleSpellActionMessage({
+                    spellAction
+                }).get(), socketCell.send);
+
+                expect(callOrder).toEqual([
+                    BattleNotifyMessage.action,
+                    BattleSpellActionMessage.action,
+                    'new-state'
+                ]);
+            });
         });
     });
 
