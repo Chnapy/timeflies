@@ -1,0 +1,28 @@
+import { PlayerId, Position, StaticCharacter, StaticPlayer } from '@timeflies/common';
+
+export type MapInfos = {
+    mapId: string;
+    name: string;
+    nbrTeams: number;
+    nbrTeamCharacters: number;
+    schemaLink: string;
+    imagesLinks: Record<string, string>;
+};
+
+export type RoomStaticPlayer = Omit<StaticPlayer, 'teamColor'> & {
+    teamColor: string | null;
+    ready: boolean;
+};
+
+export type RoomStaticCharacter = Omit<StaticCharacter, 'defaultSpellId'> & {
+    placement: Position | null;
+};
+
+export type RoomStateData = {
+    roomId: string;
+    mapInfos: MapInfos | null;
+    playerAdminId: PlayerId;
+    teamColorList: string[];
+    staticPlayerList: RoomStaticPlayer[];
+    staticCharacterList: RoomStaticCharacter[];
+};

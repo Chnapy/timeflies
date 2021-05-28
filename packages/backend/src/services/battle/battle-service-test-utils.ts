@@ -1,36 +1,7 @@
 import { ArrayUtils, createPosition, SerializableState } from '@timeflies/common';
-import { Message, MessageCreator, MessageWithResponseCreator } from '@timeflies/socket-messages';
-import { ListenerFn, SocketCell } from '@timeflies/socket-server';
 import { computeChecksum } from '@timeflies/spell-effects';
 import type { TiledLayer } from 'tiled-types';
-import { GlobalEntitiesNoServices } from '../../main/global-entities';
 import { Battle } from './battle';
-
-type SocketCellTestable = SocketCell & {
-    _listeners: { [ type in Message[ 'action' ] ]: Array<ListenerFn<any>> };
-    getFirstListener: <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(messageCreator: M) => ListenerFn<M>;
-};
-
-export const createFakeSocketCell = (): SocketCellTestable => {
-
-    const _listeners: SocketCellTestable[ '_listeners' ] = {};
-
-    return {
-        addMessageListener: (messageCreator, listener) => {
-            _listeners[ messageCreator.action ] = _listeners[ messageCreator.action ] ?? [];
-            _listeners[ messageCreator.action ].push(listener);
-
-            return jest.fn();
-        },
-        addDisconnectListener: jest.fn(),
-        clearAllListeners: jest.fn(),
-        closeSocket: jest.fn(),
-        createCell: jest.fn(),
-        send: jest.fn(),
-        _listeners,
-        getFirstListener: messageCreator => _listeners[ messageCreator.action ][ 0 ]
-    };
-};
 
 export const createFakeBattle = (): Battle => ({
     battleId: 'battle',
@@ -123,17 +94,4 @@ export const createFakeBattle = (): Battle => ({
         startTime: 1
     })),
     addNewState: jest.fn()
-});
-
-export const createFakeGlobalEntitiesNoService = (battle: Battle): GlobalEntitiesNoServices => ({
-    currentBattleMap: {
-        mapById: {
-            battle
-        },
-        mapByPlayerId: {
-            p1: battle,
-            p2: battle,
-            p3: battle
-        }
-    }
 });

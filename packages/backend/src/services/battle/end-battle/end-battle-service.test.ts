@@ -1,6 +1,7 @@
 import { ArrayUtils } from '@timeflies/common';
 import { BattleEndMessage } from '@timeflies/socket-messages';
-import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle-service-test-utils';
+import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../../service-test-utils';
+import { createFakeBattle } from '../battle-service-test-utils';
 import { EndBattleService } from './end-battle-service';
 
 describe('end battle service', () => {
@@ -8,7 +9,7 @@ describe('end battle service', () => {
     describe('is battle ended function', () => {
         it('does not consider battle as ended if remaining at least 2 teams alive', () => {
             const battle = createFakeBattle();
-            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(battle);
+            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(undefined, battle);
             const service = new EndBattleService(globalEntitiesNoServices);
 
             expect(service.isBattleEnded({
@@ -20,7 +21,7 @@ describe('end battle service', () => {
 
         it('consider battle as ended if remaining only 1 team alive', () => {
             const battle = createFakeBattle();
-            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(battle);
+            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(undefined, battle);
             const service = new EndBattleService(globalEntitiesNoServices);
 
             expect(service.isBattleEnded({
@@ -34,7 +35,7 @@ describe('end battle service', () => {
     describe('on battle end', () => {
         it('send end-battle message to every players', () => {
             const battle = createFakeBattle();
-            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(battle);
+            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(undefined, battle);
             const service = new EndBattleService(globalEntitiesNoServices);
 
             const playerList = ArrayUtils.range(3).map(i => {

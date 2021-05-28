@@ -1,5 +1,6 @@
 import { BattleLoadMessage } from '@timeflies/socket-messages';
-import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle-service-test-utils';
+import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../../service-test-utils';
+import { createFakeBattle } from '../battle-service-test-utils';
 import { JoinBattleService } from './join-battle-service';
 
 describe('join battle service', () => {
@@ -9,7 +10,7 @@ describe('join battle service', () => {
             const battle = createFakeBattle();
             const socketCell = createFakeSocketCell();
 
-            const service = new JoinBattleService(createFakeGlobalEntitiesNoService(battle));
+            const service = new JoinBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
 
             service.onSocketConnect(socketCell, 'p1');
 
@@ -27,7 +28,7 @@ describe('join battle service', () => {
                 const battle = createFakeBattle();
                 const socketCell = createFakeSocketCell();
 
-                const service = new JoinBattleService(createFakeGlobalEntitiesNoService(battle));
+                const service = new JoinBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
 
                 service.onSocketConnect(socketCell, 'p1');
 
@@ -53,7 +54,7 @@ describe('join battle service', () => {
                 const battle = createFakeBattle();
                 const socketCell = createFakeSocketCell();
 
-                const service = new JoinBattleService(createFakeGlobalEntitiesNoService(battle));
+                const service = new JoinBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
 
                 const callOrder: string[] = [];
 

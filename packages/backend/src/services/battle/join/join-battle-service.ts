@@ -24,6 +24,8 @@ export class JoinBattleService extends Service {
             myPlayerId: currentPlayerId
         }));
 
+        // TODO should be done before response
+        // because player should be added to staticPlayers
         battle.playerJoin(currentPlayerId);
     });
 }

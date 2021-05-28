@@ -1,6 +1,7 @@
 import { ArrayUtils } from '@timeflies/common';
 import { ChatNotifyMessage, ChatSendMessage } from '@timeflies/socket-messages';
-import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle/battle-service-test-utils';
+import { createFakeBattle } from '../battle/battle-service-test-utils';
+import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../service-test-utils';
 import { ChatService } from './chat-service';
 
 describe('chat service', () => {
@@ -10,7 +11,7 @@ describe('chat service', () => {
         it('throw error if player not in room or battle', async () => {
             const battle = createFakeBattle();
 
-            const globalEntities = createFakeGlobalEntitiesNoService(battle);
+            const globalEntities = createFakeGlobalEntitiesNoService(undefined, battle);
             delete globalEntities.currentBattleMap.mapByPlayerId.p1;
             const service = new ChatService(globalEntities);
 
@@ -34,7 +35,7 @@ describe('chat service', () => {
         const createEntities = () => {
             const battle = createFakeBattle();
 
-            const globalEntities = createFakeGlobalEntitiesNoService(battle);
+            const globalEntities = createFakeGlobalEntitiesNoService(undefined, battle);
             const service = new ChatService(globalEntities);
 
             const playerList = ArrayUtils.range(3).map(i => {

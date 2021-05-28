@@ -1,7 +1,8 @@
 import { createPosition, SpellAction } from '@timeflies/common';
 import { BattleNotifyMessage, BattleSpellActionMessage } from '@timeflies/socket-messages';
 import { SpellEffect } from '@timeflies/spell-effects';
-import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle-service-test-utils';
+import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../../service-test-utils';
+import { createFakeBattle } from '../battle-service-test-utils';
 import { SpellActionBattleService } from './spell-action-battle-service';
 
 describe('spell action battle service', () => {
@@ -11,11 +12,11 @@ describe('spell action battle service', () => {
 
             const socketCell = createFakeSocketCell();
             const battle = createFakeBattle();
-            const service = new SpellActionBattleService(createFakeGlobalEntitiesNoService(battle));
+            const service = new SpellActionBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
 
             service.onSocketConnect(socketCell, 'p10');
 
-            const listener = socketCell._listeners[ BattleSpellActionMessage.action ][ 0 ];
+            const listener = socketCell.getFirstListener(BattleSpellActionMessage);
 
             await expect(listener(BattleSpellActionMessage({
                 spellAction: {
@@ -31,7 +32,7 @@ describe('spell action battle service', () => {
         const getDefaultEntities = () => {
             const socketCell = createFakeSocketCell();
             const battle = createFakeBattle();
-            const service = new SpellActionBattleService(createFakeGlobalEntitiesNoService(battle));
+            const service = new SpellActionBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
 
             service.onSocketConnect(socketCell, 'p1');
 

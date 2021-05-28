@@ -1,7 +1,8 @@
 import { ArrayUtils } from '@timeflies/common';
 import { CycleEngine, CycleEngineListeners, TurnInfos } from '@timeflies/cycle-engine';
 import { BattleTurnStartMessage } from '@timeflies/socket-messages';
-import { createFakeBattle, createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../battle-service-test-utils';
+import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../../service-test-utils';
+import { createFakeBattle } from '../battle-service-test-utils';
 import { CycleBattleService } from './cycle-battle-service';
 
 describe('cycle battle service', () => {
@@ -11,7 +12,7 @@ describe('cycle battle service', () => {
         const getCycleEngineOverlay = () => {
             const battle = createFakeBattle();
 
-            const service = new CycleBattleService(createFakeGlobalEntitiesNoService(battle));
+            const service = new CycleBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
 
             const playerList = ArrayUtils.range(3).map(i => {
                 const socketCell = createFakeSocketCell();

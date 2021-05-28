@@ -1,6 +1,7 @@
 import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
 import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
+import { MapInfos } from '@timeflies/socket-messages';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
 import util from 'util';
@@ -15,13 +16,6 @@ export type StaticState = {
     players: { [ playerId in PlayerId ]: StaticPlayer };
     characters: { [ characterId in CharacterId ]: StaticCharacter };
     spells: { [ spellId in SpellId ]: StaticSpell };
-};
-
-export type MapInfos = {
-    mapId: string;
-    name: string;
-    schemaLink: string;
-    imagesLinks: Record<string, string>;
 };
 
 export type CycleInfos = {
@@ -59,6 +53,8 @@ export const createBattle = async ({ services }: GlobalEntities, { playerIdList 
     const rawMapInfos: MapInfos = {
         mapId: 'azerty',
         name: 'dungeon',
+        nbrTeams: 3,
+        nbrTeamCharacters: 4,
         schemaLink: '/maps/map_dungeon.json',
         imagesLinks: {
             "tiles_dungeon_v1.1": '/maps/map_dungeon.png'
