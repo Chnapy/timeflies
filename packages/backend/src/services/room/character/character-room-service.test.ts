@@ -110,7 +110,7 @@ describe('character room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', () => {
+        it('answers with room state, and send update to other players', async () => {
             const { socketCellP1, connectSocket, room, expectPlayersAnswers } = getEntities();
 
             connectSocket();
@@ -135,14 +135,14 @@ describe('character room service', () => {
                 ]
             }));
 
-            listener(RoomCharacterSelectMessage({
+            await listener(RoomCharacterSelectMessage({
                 characterRole: 'tacka'
             }).get(), socketCellP1.send);
 
             expectPlayersAnswers(RoomCharacterSelectMessage);
         });
 
-        it('select character, before answering', () => {
+        it('select character, before answering', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             const callOrder: string[] = [];
@@ -164,7 +164,7 @@ describe('character room service', () => {
                 } ]
             }));
 
-            listener(RoomCharacterSelectMessage({
+            await listener(RoomCharacterSelectMessage({
                 characterRole: 'tacka'
             }).get(), socketCellP1.send);
 
@@ -238,21 +238,21 @@ describe('character room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', () => {
+        it('answers with room state, and send update to other players', async () => {
             const { socketCellP1, connectSocket, expectPlayersAnswers } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomCharacterRemoveMessage);
 
-            listener(RoomCharacterRemoveMessage({
+            await listener(RoomCharacterRemoveMessage({
                 characterId: 'c1'
             }).get(), socketCellP1.send);
 
             expectPlayersAnswers(RoomCharacterRemoveMessage);
         });
 
-        it('select character, before answering', () => {
+        it('select character, before answering', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             const callOrder: string[] = [];
@@ -264,7 +264,7 @@ describe('character room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomCharacterRemoveMessage);
 
-            listener(RoomCharacterRemoveMessage({
+            await listener(RoomCharacterRemoveMessage({
                 characterId: 'c1'
             }).get(), socketCellP1.send);
 
@@ -414,7 +414,7 @@ describe('character room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', () => {
+        it('answers with room state, and send update to other players', async () => {
             const { socketCellP1, connectSocket, room, expectPlayersAnswers } = getEntities();
 
             connectSocket();
@@ -451,7 +451,7 @@ describe('character room service', () => {
                 '#000': [ createPosition(1, 1) ]
             }));
 
-            listener(RoomCharacterPlacementMessage({
+            await listener(RoomCharacterPlacementMessage({
                 characterId: 'c1',
                 position: createPosition(1, 1)
             }).get(), socketCellP1.send);
@@ -459,7 +459,7 @@ describe('character room service', () => {
             expectPlayersAnswers(RoomCharacterPlacementMessage);
         });
 
-        it('select character, before answering', () => {
+        it('select character, before answering', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             const callOrder: string[] = [];
@@ -493,7 +493,7 @@ describe('character room service', () => {
                 '#000': [ createPosition(1, 1) ]
             }));
 
-            listener(RoomCharacterPlacementMessage({
+            await listener(RoomCharacterPlacementMessage({
                 characterId: 'c1',
                 position: createPosition(1, 1)
             }).get(), socketCellP1.send);

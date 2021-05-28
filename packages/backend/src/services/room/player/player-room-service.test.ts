@@ -71,21 +71,21 @@ describe('player room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', () => {
+        it('answers with room state, and send update to other players', async () => {
             const { socketCellP1, connectSocket, expectPlayersAnswers } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
 
-            listener(RoomPlayerJoinMessage({
+            await listener(RoomPlayerJoinMessage({
                 roomId: 'room'
             }).get(), socketCellP1.send);
 
             expectPlayersAnswers(RoomPlayerJoinMessage);
         });
 
-        it('join player to room, before answering', () => {
+        it('join player to room, before answering', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             const callOrder: string[] = [];
@@ -97,7 +97,7 @@ describe('player room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
 
-            listener(RoomPlayerJoinMessage({
+            await listener(RoomPlayerJoinMessage({
                 roomId: 'room'
             }).get(), socketCellP1.send);
 
@@ -145,7 +145,7 @@ describe('player room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', () => {
+        it('answers with room state, and send update to other players', async () => {
             const { socketCellP1, connectSocket, room, expectPlayersAnswers } = getEntities();
 
             connectSocket();
@@ -162,14 +162,14 @@ describe('player room service', () => {
                 } ]
             }));
 
-            listener(RoomPlayerReadyMessage({
+            await listener(RoomPlayerReadyMessage({
                 ready: true
             }).get(), socketCellP1.send);
 
             expectPlayersAnswers(RoomPlayerReadyMessage);
         });
 
-        it('join player to room, before answering', () => {
+        it('join player to room, before answering', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             const callOrder: string[] = [];
@@ -191,7 +191,7 @@ describe('player room service', () => {
                 } ]
             }));
 
-            listener(RoomPlayerReadyMessage({
+            await listener(RoomPlayerReadyMessage({
                 ready: true
             }).get(), socketCellP1.send);
 
@@ -201,7 +201,7 @@ describe('player room service', () => {
 
     describe('on player leave message', () => {
 
-        it('leave player from room', () => {
+        it('leave player from room', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             room.playerLeave = jest.fn(room.playerLeave);
@@ -210,19 +210,19 @@ describe('player room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
 
-            listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
+            await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
 
             expect(room.playerLeave).toHaveBeenCalledWith('p1');
         });
 
-        it('send update to other players', () => {
+        it('send update to other players', async () => {
             const { socketCellP1, socketCellP2, connectSocket, room } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
 
-            listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
+            await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
 
             expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
         });

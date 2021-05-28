@@ -8,14 +8,14 @@ describe('map room service', () => {
     const getEntities = () => getFakeRoomEntities(MapRoomService);
 
     describe('on map list get message', () => {
-        it('answers with map infos list', () => {
+        it('answers with map infos list', async () => {
             const { socketCellP1, connectSocket } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomMapListGetMessage);
 
-            listener(RoomMapListGetMessage({}).get(), socketCellP1.send);
+            await listener(RoomMapListGetMessage({}).get(), socketCellP1.send);
 
             expect(socketCellP1.send).toHaveBeenCalledWith(RoomMapListGetMessage.createResponse(
                 expect.anything(),

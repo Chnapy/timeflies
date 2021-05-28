@@ -62,7 +62,7 @@ export class PlayerRoomService extends Service {
         });
 
     private addRoomPlayerLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerLeaveMessage>(
-        RoomPlayerLeaveMessage, ({ }, send) => {
+        RoomPlayerLeaveMessage, () => {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 

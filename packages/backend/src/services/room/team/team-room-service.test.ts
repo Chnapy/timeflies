@@ -47,22 +47,22 @@ describe('team room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', () => {
+        it('answers with room state, and send update to other players', async () => {
             const { socketCellP1, connectSocket, expectPlayersAnswers } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomTeamJoinMessage);
 
-            listener(RoomTeamJoinMessage({
+            await listener(RoomTeamJoinMessage({
                 teamColor: '#FFF'
             }).get(), socketCellP1.send);
 
             expectPlayersAnswers(RoomTeamJoinMessage);
         });
 
-        it('join team, before answering', () => {
-            const { socketCellP1, connectSocket, room, service } = getEntities();
+        it('join team, before answering', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
 
             const callOrder: string[] = [];
 
@@ -73,7 +73,7 @@ describe('team room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomTeamJoinMessage);
 
-            listener(RoomTeamJoinMessage({
+            await listener(RoomTeamJoinMessage({
                 teamColor: '#FFF'
             }).get(), socketCellP1.send);
 
