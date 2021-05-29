@@ -8,6 +8,7 @@ import { JoinBattleService } from './battle/join/join-battle-service';
 import { SpellActionBattleService } from './battle/spell-action/spell-action-battle-service';
 import { ChatService } from './chat/chat-service';
 import { CharacterRoomService } from './room/character/character-room-service';
+import { EntityListGetRoomService } from './room/entity-list-get/entity-list-get-room-service';
 import { MapRoomService } from './room/map/map-room-service';
 import { PlayerRoomService } from './room/player/player-room-service';
 import { TeamRoomService } from './room/team/team-room-service';
@@ -23,7 +24,8 @@ export const createServices = (globalEntitiesNoServices: GlobalEntitiesNoService
     playerRoomService: new PlayerRoomService(globalEntitiesNoServices),
     mapRoomService: new MapRoomService(globalEntitiesNoServices),
     teamRoomService: new TeamRoomService(globalEntitiesNoServices),
-    characterRoomService: new CharacterRoomService(globalEntitiesNoServices)
+    characterRoomService: new CharacterRoomService(globalEntitiesNoServices),
+    entityListGetRoomService: new EntityListGetRoomService(globalEntitiesNoServices)
 });
 
 export const onAllServicesSocketConnect = (services: Services, socket: WebSocket, playerId: PlayerId) => {

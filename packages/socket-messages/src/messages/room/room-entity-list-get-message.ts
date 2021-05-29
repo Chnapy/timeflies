@@ -14,7 +14,7 @@ export type RoomListSpell = {
     variables: SpellVariables;
 };
 
-type RoomEntityListGetMessageData = {
+export type RoomEntityListGetMessageData = {
     characterList: RoomListCharacter[];
     spellList: RoomListSpell[];
 };
