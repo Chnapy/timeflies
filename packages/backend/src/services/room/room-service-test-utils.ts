@@ -47,7 +47,8 @@ export const createFakeRoom = (): Room => ({
     characterSelect: jest.fn(),
     characterRemove: jest.fn(),
     characterPlacement: jest.fn(),
-    getMapPlacementTiles: jest.fn(() => ({}))
+    computeMapPlacementTiles: jest.fn(),
+    getMapPlacementTiles: jest.fn(async () => ({}))
 });
 
 export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(serviceCreator: S) => {
