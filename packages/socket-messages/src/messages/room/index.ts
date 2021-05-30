@@ -1,3 +1,4 @@
+export * from './room-battle-start-message';
 export * from './room-character-placement-message';
 export * from './room-character-remove-message';
 export * from './room-character-select-message';

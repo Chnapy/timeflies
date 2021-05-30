@@ -33,7 +33,10 @@ const globalEntities = createGlobalEntities();
 
 // TODO remove mock
 void createBattle(globalEntities, {
-    playerIdList: [ 'p1', 'p2' ]
+    staticPlayerList: [
+        { playerId: 'p1' } as any,
+        { playerId: 'p2' } as any,
+    ]
 }).then(mockBattle => {
     globalEntities.currentBattleMap.mapById[ 'battleId' ] = mockBattle;
     globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ] = mockBattle;

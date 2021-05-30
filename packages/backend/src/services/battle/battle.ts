@@ -1,7 +1,7 @@
 import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
 import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
-import { MapInfos } from '@timeflies/socket-messages';
+import { MapInfos, RoomStateData } from '@timeflies/socket-messages';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
 import util from 'util';
@@ -40,14 +40,12 @@ export type Battle = {
     addNewState: (state: SerializableState, stateEndTime: number) => Promise<void>;
 };
 
-type RoomInfos = {
-    playerIdList: PlayerId[];
-};
-
-export const createBattle = async ({ services }: GlobalEntities, { playerIdList }: RoomInfos): Promise<Battle> => {
+export const createBattle = async ({ services }: GlobalEntities, { staticPlayerList }: Pick<RoomStateData, 'staticPlayerList'>): Promise<Battle> => {
     const battleId = 'battleId';
     // TODO
     // const battleId = createId();
+
+    const playerIdList = staticPlayerList.map(player => player.playerId);
 
     // TODO remove mock
     const rawMapInfos: MapInfos = {

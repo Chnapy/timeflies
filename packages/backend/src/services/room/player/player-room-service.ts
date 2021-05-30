@@ -1,5 +1,5 @@
 import { PlayerId, StaticPlayer } from '@timeflies/common';
-import { RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage } from '@timeflies/socket-messages';
+import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { Service } from '../../service';
 
@@ -37,7 +37,7 @@ export class PlayerRoomService extends Service {
         });
 
     private addRoomPlayerReadyMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerReadyMessage>(
-        RoomPlayerReadyMessage, ({ payload, requestId }, send) => {
+        RoomPlayerReadyMessage, async ({ payload, requestId }, send) => {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 
@@ -59,6 +59,18 @@ export class PlayerRoomService extends Service {
             send(RoomPlayerReadyMessage.createResponse(requestId, room.getRoomStateData()));
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
+
+            const everyPlayersReady = room.getRoomStateData().staticPlayerList.every(player => player.ready);
+            
+            if (everyPlayersReady) {
+                const battleId = await room.waitThenCreateBattle();
+                if (battleId) {
+                    this.sendToEveryPlayersExcept(
+                        RoomBattleStartMessage({ battleId }),
+                        room
+                    );
+                }
+            }
         });
 
     private addRoomPlayerLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerLeaveMessage>(

@@ -1,10 +1,12 @@
-import { CharacterId, ObjectTyped, PlayerId, Position } from '@timeflies/common';
+import { CharacterId, ObjectTyped, PlayerId, Position, waitCanceleable } from '@timeflies/common';
 import { MapInfos, RoomStateData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
 import { Layer, Tile } from '@timeflies/tilemap-utils';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
 import util from 'util';
+import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl } from '../../utils/asset-url';
+import { Battle, createBattle } from '../battle/battle';
 
 export type RoomId = string;
 
@@ -25,11 +27,12 @@ export type Room = {
     characterPlacement: (characterId: CharacterId, position: Position | null) => void;
     mapSelect: (mapInfos: MapInfos) => void;
     computeMapPlacementTiles: () => void;
+    waitThenCreateBattle: () => Promise<string | null>;
 };
 
 const allTeamColorList = [ '#3BA92A', '#FFD74A', '#A93B2A', '#3BA9A9' ];
 
-export const createRoom = (): Room => {
+export const createRoom = (globalEntities: GlobalEntities): Room => {
     const roomId = 'roomId';
     // TODO createId();
 
@@ -38,6 +41,9 @@ export const createRoom = (): Room => {
     let playerAdminId: PlayerId = '';
     const staticPlayerList: RoomStaticPlayer[] = [];
     let staticCharacterList: RoomStaticCharacter[] = [];
+
+    let battle: Battle | null = null;
+    let battlePromiseCancel = () => { };
 
     const getTeamColorList = () => mapInfos
         ? allTeamColorList.slice(0, mapInfos.nbrTeams)
@@ -84,10 +90,16 @@ export const createRoom = (): Room => {
             if (staticPlayerList.length === 1) {
                 playerAdminId = playerInfos.playerId;
             }
+
+            battlePromiseCancel();
         },
         playerReady: (playerId, ready) => {
             const player = staticPlayerList.find(p => p.playerId === playerId);
             player!.ready = ready;
+
+            if (!ready) {
+                battlePromiseCancel();
+            }
         },
         playerLeave: playerId => {
             staticPlayerList.splice(
@@ -101,6 +113,8 @@ export const createRoom = (): Room => {
                     ? staticPlayerList[ 0 ].playerId
                     : '';
             }
+
+            battlePromiseCancel();
         },
         teamJoin: (playerId, teamColor) => {
             const player = staticPlayerList.find(p => p.playerId === playerId);
@@ -127,6 +141,20 @@ export const createRoom = (): Room => {
 
             tiledMapPromise = readFile(assetUrl.toBackend(mapInfos!.schemaLink), 'utf-8')
                 .then<TiledMap>(JSON.parse);
+        },
+        waitThenCreateBattle: async () => {
+            const { promise, cancel } = waitCanceleable(5000);
+
+            battlePromiseCancel = cancel;
+
+            const { state } = await promise;
+
+            if (state === 'canceled') {
+                return null;
+            }
+
+            battle = await createBattle(globalEntities, getRoomStateData());
+            return battle.battleId;
         }
     };
 };

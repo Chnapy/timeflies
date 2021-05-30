@@ -1,15 +1,24 @@
 import { createPosition } from '@timeflies/common';
+import { timerTester } from '@timeflies/devtools';
 import { MapInfos, RoomStateData, RoomStaticPlayer } from '@timeflies/socket-messages';
 import fs from 'fs';
-import TiledMap from 'tiled-types/types';
+import TiledMap from 'tiled-types';
+import { createFakeGlobalEntitiesNoService } from '../service-test-utils';
+import { createServices } from '../services';
 import { createRoom } from './room';
 
-jest.mock('fs');
 
 describe('room', () => {
 
+    jest.mock('fs');
+
+    const getRoom = () => createRoom({
+        ...createFakeGlobalEntitiesNoService(),
+        services: createServices(createFakeGlobalEntitiesNoService())
+    });
+
     it('getRoomStateData gives room state', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         expect(room.getRoomStateData()).toEqual<RoomStateData>({
             roomId: expect.any(String),
@@ -22,7 +31,7 @@ describe('room', () => {
     });
 
     it('playerJoin add player to list', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
@@ -40,7 +49,7 @@ describe('room', () => {
     });
 
     it('playerAdminId is defined by first player join', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
@@ -60,7 +69,7 @@ describe('room', () => {
     });
 
     it('playerReady change player ready', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
@@ -78,7 +87,7 @@ describe('room', () => {
     });
 
     it('teamJoin change player team', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
@@ -96,7 +105,7 @@ describe('room', () => {
     });
 
     it('characterSelect add character to list', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.characterSelect({
             characterId: 'c1',
@@ -114,7 +123,7 @@ describe('room', () => {
     });
 
     it('characterRemove remove character from list', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.characterSelect({
             characterId: 'c1',
@@ -129,7 +138,7 @@ describe('room', () => {
     });
 
     it('characterPlacement change character position', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.characterSelect({
             characterId: 'c1',
@@ -149,7 +158,7 @@ describe('room', () => {
     });
 
     it('playerLeave remove player and its characters', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
@@ -172,7 +181,7 @@ describe('room', () => {
     });
 
     it('playerLeave change player admin if needed', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
@@ -194,7 +203,7 @@ describe('room', () => {
     });
 
     it('mapSelect change map', () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.mapSelect({
             mapId: 'm1',
@@ -216,7 +225,7 @@ describe('room', () => {
     });
 
     it('computeMapPlacementTiles and getMapPlacementTiles computes and gives map placement tiles', async () => {
-        const room = createRoom();
+        const room = getRoom();
 
         room.mapSelect({
             mapId: 'm1',
@@ -271,5 +280,61 @@ describe('room', () => {
         });
 
         fsReadFileSpy.mockRestore();
+    });
+
+    it('waitThenCreateBattle create battle after some time and give battle id', async () => {
+        const room = getRoom();
+
+        const battleId = await timerTester.waitTimer(room.waitThenCreateBattle());
+
+        expect(battleId).toEqual(expect.any(String));
+    });
+
+    it('playerJoin cancel battle launch if any', async () => {
+        const room = getRoom();
+
+        const promise = room.waitThenCreateBattle();
+
+        room.playerJoin({
+            playerId: 'p4',
+            playerName: 'p-4',
+            ready: false,
+            teamColor: ''
+        });
+
+        const battleId = await timerTester.waitTimer(promise);
+
+        expect(battleId).toEqual(null);
+    });
+
+    it('playerLeave cancel battle launch if any', async () => {
+        const room = getRoom();
+
+        const promise = room.waitThenCreateBattle();
+
+        room.playerLeave('p1');
+
+        const battleId = await timerTester.waitTimer(promise);
+
+        expect(battleId).toEqual(null);
+    });
+
+    it('playerReady cancel battle launch if any', async () => {
+        const room = getRoom();
+
+        room.playerJoin({
+            playerId: 'p1',
+            playerName: '',
+            ready: false,
+            teamColor: ''
+        });
+
+        const promise = room.waitThenCreateBattle();
+
+        room.playerReady('p1', false);
+
+        const battleId = await timerTester.waitTimer(promise);
+
+        expect(battleId).toEqual(null);
     });
 });

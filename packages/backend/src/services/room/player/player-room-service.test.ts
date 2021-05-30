@@ -1,5 +1,5 @@
 import { createPosition } from '@timeflies/common';
-import { RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage, RoomStateMessage } from '@timeflies/socket-messages';
+import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage, RoomStateMessage } from '@timeflies/socket-messages';
 import { SocketError } from '@timeflies/socket-server';
 import { createFakeRoom, getFakeRoomEntities } from '../room-service-test-utils';
 import { PlayerRoomService } from './player-room-service';
@@ -107,21 +107,21 @@ describe('player room service', () => {
 
     describe('on player ready message', () => {
 
-        it('throw error if no characters selected', () => {
+        it('throw error if no characters selected', async () => {
             const { socketCellP1, connectSocket } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
 
-            expect(() =>
+            await expect(
                 listener(RoomPlayerReadyMessage({
                     ready: true
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('throw error if some player characters not placed', () => {
+        it('throw error if some player characters not placed', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             connectSocket();
@@ -138,11 +138,11 @@ describe('player room service', () => {
                 } ]
             }));
 
-            expect(() =>
+            await expect(
                 listener(RoomPlayerReadyMessage({
                     ready: true
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
         it('answers with room state, and send update to other players', async () => {
@@ -196,6 +196,52 @@ describe('player room service', () => {
             }).get(), socketCellP1.send);
 
             expect(callOrder).toEqual([ 'player-ready', RoomPlayerReadyMessage.action ]);
+        });
+
+        it('launch battle after some time when every players are ready', async () => {
+            const { socketCellP1, connectSocket, room, expectEveryPlayersReceived } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
+
+            room.getRoomStateData = jest.fn(() => ({
+                ...createFakeRoom().getRoomStateData(),
+                staticPlayerList: [
+                    {
+                        playerId: 'p1',
+                        playerName: 'p1',
+                        teamColor: null,
+                        ready: true
+                    },
+                    {
+                        playerId: 'p2',
+                        playerName: 'p2',
+                        teamColor: null,
+                        ready: true
+                    },
+                    {
+                        playerId: 'p3',
+                        playerName: 'p3',
+                        teamColor: null,
+                        ready: true
+                    }
+                ],
+                staticCharacterList: [ {
+                    characterId: 'c1',
+                    characterRole: 'tacka',
+                    playerId: 'p1',
+                    placement: createPosition(1, 1)
+                } ]
+            }));
+
+            room.waitThenCreateBattle = jest.fn(async () => 'battleId');
+
+            await listener(RoomPlayerReadyMessage({
+                ready: true
+            }).get(), socketCellP1.send);
+
+            expectEveryPlayersReceived(RoomBattleStartMessage({ battleId: 'battleId' }));
         });
     });
 
