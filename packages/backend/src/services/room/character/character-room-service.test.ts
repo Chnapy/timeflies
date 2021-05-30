@@ -275,37 +275,37 @@ describe('character room service', () => {
 
     describe('on character placement message', () => {
 
-        it('throw error if wrong character id', () => {
+        it('throw error if wrong character id', async () => {
             const { socketCellP1, connectSocket } = getEntities();
 
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomCharacterPlacementMessage);
 
-            expect(() =>
+            await expect(
                 listener(RoomCharacterPlacementMessage({
                     characterId: 'wrong-id',
                     position: null
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('throw error if not character of player', () => {
+        it('throw error if not character of player', async () => {
             const { socketCellP1, service } = getEntities();
 
             service.onSocketConnect(socketCellP1, 'p2');
 
             const listener = socketCellP1.getFirstListener(RoomCharacterPlacementMessage);
 
-            expect(() =>
+            await expect(
                 listener(RoomCharacterPlacementMessage({
                     characterId: 'c1',
                     position: null
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('throw error if player is ready', () => {
+        it('throw error if player is ready', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             connectSocket();
@@ -328,15 +328,15 @@ describe('character room service', () => {
                 } ]
             }));
 
-            expect(() =>
+            await expect(
                 listener(RoomCharacterPlacementMessage({
                     characterId: 'c1',
                     position: null
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('throw error if position not in placement tile', () => {
+        it('throw error if position not in placement tile', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             connectSocket();
@@ -359,19 +359,19 @@ describe('character room service', () => {
                 } ]
             }));
 
-            room.getMapPlacementTiles = jest.fn(() => ({
+            room.getMapPlacementTiles = jest.fn(async () => ({
                 '#000': [ createPosition(2, 1) ]
             }));
 
-            expect(() =>
+            await expect(
                 listener(RoomCharacterPlacementMessage({
                     characterId: 'c1',
                     position: createPosition(1, 1)
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('throw error if position occupied by other character', () => {
+        it('throw error if position occupied by other character', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             connectSocket();
@@ -402,16 +402,16 @@ describe('character room service', () => {
                 ]
             }));
 
-            room.getMapPlacementTiles = jest.fn(() => ({
+            room.getMapPlacementTiles = jest.fn(async () => ({
                 '#000': [ createPosition(1, 1) ]
             }));
 
-            expect(() =>
+            await expect(
                 listener(RoomCharacterPlacementMessage({
                     characterId: 'c1',
                     position: createPosition(1, 1)
                 }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            ).rejects.toBeInstanceOf(SocketError);
         });
 
         it('answers with room state, and send update to other players', async () => {
@@ -447,7 +447,7 @@ describe('character room service', () => {
                 ]
             }));
 
-            room.getMapPlacementTiles = jest.fn(() => ({
+            room.getMapPlacementTiles = jest.fn(async () => ({
                 '#000': [ createPosition(1, 1) ]
             }));
 
@@ -489,7 +489,7 @@ describe('character room service', () => {
                 ]
             }));
 
-            room.getMapPlacementTiles = jest.fn(() => ({
+            room.getMapPlacementTiles = jest.fn(async () => ({
                 '#000': [ createPosition(1, 1) ]
             }));
 
