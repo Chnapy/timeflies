@@ -73,6 +73,27 @@ describe('join battle service', () => {
 
                 expect(callOrder).toEqual([ 'response', 'playerJoin' ]);
             });
+
+            it('add player to global battle map', async () => {
+                const battle = createFakeBattle();
+                const socketCell = createFakeSocketCell();
+
+                const globalEntities = createFakeGlobalEntitiesNoService(undefined, battle);
+
+                delete globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ];
+
+                const service = new JoinBattleService(globalEntities);
+
+                service.onSocketConnect(socketCell, 'p1');
+
+                const listener = socketCell.getFirstListener(BattleLoadMessage);
+
+                await listener(BattleLoadMessage({
+                    battleId: 'battle'
+                }).get(), socketCell.send);
+
+                expect(globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ]).toBe(battle);
+            });
         });
     });
 });

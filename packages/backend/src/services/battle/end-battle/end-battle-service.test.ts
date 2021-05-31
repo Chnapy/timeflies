@@ -45,13 +45,32 @@ describe('end battle service', () => {
                 return { socketCell, playerId };
             });
 
-            service.onBattleEnd('#00FF00', 12);
+            service.onBattleEnd('#00FF00', 12, playerList.map(p => p.playerId));
 
             for (const { socketCell } of playerList) {
                 expect(socketCell.send).toHaveBeenCalledWith(BattleEndMessage({
                     winnerTeamColor: '#00FF00',
                     endTime: 12
                 }));
+            }
+        });
+
+        it('remove players from global battle map', () => {
+            const battle = createFakeBattle();
+            const globalEntitiesNoServices = createFakeGlobalEntitiesNoService(undefined, battle);
+            const service = new EndBattleService(globalEntitiesNoServices);
+
+            const playerList = ArrayUtils.range(3).map(i => {
+                const socketCell = createFakeSocketCell();
+                const playerId = 'p' + i;
+                service.onSocketConnect(socketCell, playerId);
+                return { socketCell, playerId };
+            });
+
+            service.onBattleEnd('#00FF00', 12, playerList.map(p => p.playerId));
+
+            for (const { playerId } of playerList) {
+                expect(globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ playerId ]).toBeUndefined();
             }
         });
     });

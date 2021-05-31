@@ -1,4 +1,5 @@
 import { Message, MessageWithResponseCreator, RoomStateMessage } from '@timeflies/socket-messages';
+import { createFakeBattle } from '../battle/battle-service-test-utils';
 import { Service } from '../service';
 import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../service-test-utils';
 import { Room } from './room';
@@ -49,7 +50,10 @@ export const createFakeRoom = (): Room => ({
     characterPlacement: jest.fn(),
     computeMapPlacementTiles: jest.fn(),
     getMapPlacementTiles: jest.fn(async () => ({})),
-    waitThenCreateBattle: jest.fn(async () => null)
+    waitForBattle: jest.fn(async () => 'completed'),
+    createBattle: jest.fn(async () => createFakeBattle()),
+    removeBattle: jest.fn(),
+    isInBattle: jest.fn(() => false)
 });
 
 export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(serviceCreator: S) => {
@@ -57,7 +61,8 @@ export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(
     const socketCellP2 = createFakeSocketCell();
     const socketCellP3 = createFakeSocketCell();
     const room = createFakeRoom();
-    const service = new serviceCreator(createFakeGlobalEntitiesNoService(room));
+    const globalEntities = createFakeGlobalEntitiesNoService(room);
+    const service = new serviceCreator(globalEntities);
 
     const connectSocket = () => {
         service.onSocketConnect(socketCellP1, 'p1');
@@ -77,5 +82,5 @@ export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(
         expect(socketCellP3.send).toHaveBeenCalledWith(message);
     };
 
-    return { socketCellP1, socketCellP2, room, service, connectSocket, expectPlayersAnswers, expectEveryPlayersReceived };
+    return { socketCellP1, socketCellP2, room, globalEntities, service, connectSocket, expectPlayersAnswers, expectEveryPlayersReceived };
 };

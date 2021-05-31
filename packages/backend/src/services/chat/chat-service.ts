@@ -11,10 +11,9 @@ export class ChatService extends Service {
     private addChatMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof ChatSendMessage>(ChatSendMessage, async ({ payload, requestId }, send) => {
 
         const battle = this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ];
+        const room = this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
 
-        if (!battle) {
-            //TODO handle room case
-
+        if (!room && !battle) {
             throw new SocketError(403, 'Player trying to send chat message outside of room or battle: ' + currentPlayerId);
         }
 
@@ -22,16 +21,27 @@ export class ChatService extends Service {
             throw new SocketError(400, 'Chat send message received from future: ' + payload.time);
         }
 
-        battle.staticPlayers
-            .filter(player => player.playerId !== currentPlayerId)
-            .map(player => this.playerSocketMap[ player.playerId ])
-            .forEach(playerSocketCell => {
-                playerSocketCell.send(ChatNotifyMessage({
+        if (battle) {
+            this.sendToEveryPlayersExcept(
+                ChatNotifyMessage({
                     message: payload.message,
                     playerId: currentPlayerId,
                     time: payload.time
-                }))
-            });
+                }),
+                battle.staticPlayers,
+                currentPlayerId
+            );
+        } else if (room) {
+            this.sendToEveryPlayersExcept(
+                ChatNotifyMessage({
+                    message: payload.message,
+                    playerId: currentPlayerId,
+                    time: payload.time
+                }),
+                room.getRoomStateData().staticPlayerList,
+                currentPlayerId
+            );
+        }
 
         send(ChatSendMessage.createResponse(requestId, { success: true }));
     });

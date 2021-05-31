@@ -6,11 +6,13 @@ import { Room } from './room/room';
 
 type SocketCellTestable = SocketCell & {
     getFirstListener: <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(messageCreator: M) => ListenerFn<M>;
+    getDisconnectListener: () => (() => void) | null;
 };
 
 export const createFakeSocketCell = (): SocketCellTestable => {
 
     const _listeners: { [ type in Message[ 'action' ] ]: Array<ListenerFn<any>> } = {};
+    let disconnectListener: (() => void) | null = null;
 
     return {
         addMessageListener: (messageCreator, listener) => {
@@ -19,12 +21,16 @@ export const createFakeSocketCell = (): SocketCellTestable => {
 
             return jest.fn();
         },
-        addDisconnectListener: jest.fn(),
+        addDisconnectListener: jest.fn(listener => {
+            disconnectListener = listener;
+            return jest.fn();
+        }),
         clearAllListeners: jest.fn(),
         closeSocket: jest.fn(),
         createCell: jest.fn(),
         send: jest.fn(),
-        getFirstListener: messageCreator => _listeners[ messageCreator.action ][ 0 ]
+        getFirstListener: messageCreator => _listeners[ messageCreator.action ][ 0 ],
+        getDisconnectListener: () => disconnectListener
     };
 };
 

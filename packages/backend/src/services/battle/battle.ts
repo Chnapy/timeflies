@@ -1,12 +1,13 @@
-import { ArrayUtils, CharacterId, createPosition, normalize, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
+import { ArrayUtils, CharacterId, createId, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
 import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
-import { MapInfos, RoomStateData } from '@timeflies/socket-messages';
+import { MapInfos, RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-messages';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
 import util from 'util';
 import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl, AssetUrl } from '../../utils/asset-url';
+import { getBattleStaticData } from './get-battle-static-data';
 
 const readFile = util.promisify(fs.readFile);
 
@@ -40,164 +41,26 @@ export type Battle = {
     addNewState: (state: SerializableState, stateEndTime: number) => Promise<void>;
 };
 
-export const createBattle = async ({ services }: GlobalEntities, { staticPlayerList }: Pick<RoomStateData, 'staticPlayerList'>): Promise<Battle> => {
-    const battleId = 'battleId';
-    // TODO
-    // const battleId = createId();
+export const createBattle = async (
+    { services }: GlobalEntities,
+    roomState: RoomStateData,
+    entityListData: RoomEntityListGetMessageData,
+    onBattleEnd: () => void
+): Promise<Battle> => {
+    const battleId = createId();
 
-    const playerIdList = staticPlayerList.map(player => player.playerId);
+    const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(roomState, entityListData);
 
-    // TODO remove mock
-    const rawMapInfos: MapInfos = {
-        mapId: 'azerty',
-        name: 'dungeon',
-        nbrTeams: 3,
-        nbrTeamCharacters: 4,
-        schemaLink: '/maps/map_dungeon.json',
-        imagesLinks: {
-            "tiles_dungeon_v1.1": '/maps/map_dungeon.png'
-        }
-    };
+    const playerIdList = roomState.staticPlayerList.map(player => player.playerId);
 
-    const staticPlayers: StaticPlayer[] = [
-        {
-            playerId: 'p1',
-            playerName: 'chnapy',
-            teamColor: '#FF0000'
-        },
-        {
-            playerId: 'p2',
-            playerName: 'yoshi2oeuf',
-            teamColor: '#00FF00'
-        }
-    ];
-
-    const staticCharacters: StaticCharacter[] = [
-        {
-            characterId: 'c1',
-            characterRole: 'tacka',
-            playerId: 'p1',
-            defaultSpellId: 's1',
-        },
-        {
-            characterId: 'c2',
-            characterRole: 'meti',
-            playerId: 'p1',
-            defaultSpellId: 's3',
-        },
-        {
-            characterId: 'c3',
-            characterRole: 'vemo',
-            playerId: 'p2',
-            defaultSpellId: 's5',
-        }
-    ];
-
-    const staticSpells: StaticSpell[] = [
-        {
-            characterId: 'c1',
-            spellId: 's1',
-            spellRole: 'move',
-        },
-        {
-            characterId: 'c1',
-            spellId: 's2',
-            spellRole: 'simpleAttack',
-        },
-        {
-            characterId: 'c2',
-            spellId: 's3',
-            spellRole: 'switch',
-        },
-        {
-            characterId: 'c2',
-            spellId: 's4',
-            spellRole: 'simpleAttack',
-        },
-        {
-            characterId: 'c3',
-            spellId: 's5',
-            spellRole: 'move',
-        },
-        {
-            characterId: 'c3',
-            spellId: 's6',
-            spellRole: 'simpleAttack',
-        }
-    ];
+    const rawMapInfos = roomState.mapInfos!;
 
     const tiledMapRaw = await readFile(assetUrl.toBackend(rawMapInfos.schemaLink), 'utf-8');
     const tiledMap: TiledMap = JSON.parse(tiledMapRaw);
 
     const waitingPlayerList = new Set(playerIdList);
 
-    const turnsOrder = [ 'c2', 'c1', 'c3' ];
-
-    const initialSerializableState: SerializableState = {
-        checksum: '',
-        time: Date.now(),
-        characters: {
-            actionTime: {
-                c1: 10000,
-                c2: 12000,
-                c3: 9000
-            },
-            health: {
-                c1: 100,
-                c2: 110,
-                c3: 120
-            },
-            orientation: {
-                c1: 'bottom',
-                c2: 'left',
-                c3: 'top'
-            },
-            position: {
-                c1: createPosition(8, 3),
-                c2: createPosition(10, 3),
-                c3: createPosition(9, 11)
-            }
-        },
-        spells: {
-            duration: {
-                s1: 1000,
-                s2: 2000,
-                s3: 800,
-                s4: 2000,
-                s5: 1000,
-                s6: 2000,
-            },
-            rangeArea: {
-                s1: 10,
-                s2: 6,
-                s3: 2,
-                s4: 6,
-                s5: 1,
-                s6: 6,
-            },
-            actionArea: {
-                s1: 1,
-                s2: 2,
-                s3: 1,
-                s4: 2,
-                s5: 1,
-                s6: 2,
-            },
-            lineOfSight: {
-                s1: true,
-                s2: true,
-                s3: false,
-                s4: true,
-                s5: true,
-                s6: true,
-            },
-            attack: {
-                s2: 20,
-                s4: 20,
-                s6: 20,
-            }
-        }
-    };
+    const turnsOrder = staticCharacters.map(character => character.characterId);
 
     const stateStack: SerializableState[] = [ initialSerializableState ];
 
@@ -214,21 +77,15 @@ export const createBattle = async ({ services }: GlobalEntities, { staticPlayerL
         return cycleEngine.start();
     };
 
-    const staticState: StaticState = {
-        players: normalize(staticPlayers, 'playerId'),
-        characters: normalize(staticCharacters, 'characterId'),
-        spells: normalize(staticSpells, 'spellId')
-    };
-
     const battleEnd = async (winnerTeamColor: string, stateEndTime: number) => {
         logger.info('Battle [' + battleId + '] ending...');
 
         await cycleEngine.stop();
 
-        services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime);
+        services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime, playerIdList);
         logger.info('Battle [' + battleId + '] ended.');
 
-        // TODO trigger battle-end parent callback
+        onBattleEnd();
     };
 
     return {

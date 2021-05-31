@@ -1,4 +1,4 @@
-import { ObjectTyped, SerializableState } from '@timeflies/common';
+import { ObjectTyped, PlayerId, SerializableState } from '@timeflies/common';
 import { BattleEndMessage } from '@timeflies/socket-messages';
 import { Service } from '../../service';
 import { StaticState } from '../battle';
@@ -29,13 +29,16 @@ export class EndBattleService extends Service {
         return teamColorAliveList[ 0 ];
     };
 
-    onBattleEnd = (winnerTeamColor: string, endTime: number) => {
-        ObjectTyped.entries(this.playerSocketMap)
-            .forEach(([ playerId, socketCell ]) => {
-                socketCell.send(BattleEndMessage({
-                    winnerTeamColor,
-                    endTime
-                }))
-            });
+    onBattleEnd = (winnerTeamColor: string, endTime: number, playerIdList: PlayerId[]) => {
+        playerIdList.forEach(playerId => {
+            const socketCell = this.playerSocketMap[ playerId ];
+
+            socketCell.send(BattleEndMessage({
+                winnerTeamColor,
+                endTime
+            }));
+
+            delete this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ playerId ];
+        });
     };
 }

@@ -3,7 +3,7 @@ import { Message, RoomStateMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { GlobalEntitiesNoServices } from '../main/global-entities';
 import { BattleId } from './battle/battle';
-import { Room, RoomId } from './room/room';
+import { RoomId } from './room/room';
 
 export type PlayerSocketMap = { [ playerId in PlayerId ]: SocketCell };
 
@@ -59,13 +59,13 @@ export abstract class Service {
 
         this.sendToEveryPlayersExcept(
             RoomStateMessage(room.getRoomStateData()),
-            room,
+            room.getRoomStateData().staticPlayerList,
             currentPlayerId
         );
     };
 
-    protected sendToEveryPlayersExcept = <M extends Message<any>>(message: M, room: Room, currentPlayerId?: PlayerId) => {
-        room.getRoomStateData().staticPlayerList
+    protected sendToEveryPlayersExcept = <M extends Message<any>>(message: M, playerList: { playerId: PlayerId }[], currentPlayerId?: PlayerId) => {
+        playerList
             .filter(player => player.playerId !== currentPlayerId)
             .forEach(player => {
                 const cell = this.playerSocketMap[ player.playerId ];

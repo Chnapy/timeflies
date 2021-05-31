@@ -1,16 +1,22 @@
+// should be first
+jest.mock('../battle/battle');
+jest.mock('fs');
+
+/* eslint-disable import/first */
 import { createPosition } from '@timeflies/common';
 import { timerTester } from '@timeflies/devtools';
 import { MapInfos, RoomStateData, RoomStaticPlayer } from '@timeflies/socket-messages';
 import fs from 'fs';
 import TiledMap from 'tiled-types';
+import { createBattle } from '../battle/battle';
+import { createFakeBattle } from '../battle/battle-service-test-utils';
 import { createFakeGlobalEntitiesNoService } from '../service-test-utils';
 import { createServices } from '../services';
 import { createRoom } from './room';
+/* eslint-enable import/first */
 
 
 describe('room', () => {
-
-    jest.mock('fs');
 
     const getRoom = () => createRoom({
         ...createFakeGlobalEntitiesNoService(),
@@ -282,18 +288,37 @@ describe('room', () => {
         fsReadFileSpy.mockRestore();
     });
 
-    it('waitThenCreateBattle create battle after some time and give battle id', async () => {
+    it('waitForBattle wait for some time', async () => {
         const room = getRoom();
 
-        const battleId = await timerTester.waitTimer(room.waitThenCreateBattle());
+        const promiseState = await timerTester.waitTimer(room.waitForBattle());
 
-        expect(battleId).toEqual(expect.any(String));
+        expect(promiseState).toEqual('completed');
     });
 
-    it('playerJoin cancel battle launch if any', async () => {
+    it('createBattle give new battle', async () => {
+        (createBattle as unknown as jest.MockInstance<any, any>).mockImplementation(createFakeBattle);
+
         const room = getRoom();
 
-        const promise = room.waitThenCreateBattle();
+        room.mapSelect({
+            mapId: 'm1',
+            name: 'm-1',
+            nbrTeams: 3,
+            nbrTeamCharacters: 4,
+            schemaLink: 'foo',
+            imagesLinks: {}
+        });
+
+        const battle = await room.createBattle();
+
+        expect(battle).toEqual(expect.objectContaining({ battleId: expect.any(String) }));
+    });
+
+    it('playerJoin cancel battle waiting if any', async () => {
+        const room = getRoom();
+
+        const promise = room.waitForBattle();
 
         room.playerJoin({
             playerId: 'p4',
@@ -302,21 +327,21 @@ describe('room', () => {
             teamColor: ''
         });
 
-        const battleId = await timerTester.waitTimer(promise);
+        const promiseState = await timerTester.waitTimer(promise);
 
-        expect(battleId).toEqual(null);
+        expect(promiseState).toEqual('canceled');
     });
 
     it('playerLeave cancel battle launch if any', async () => {
         const room = getRoom();
 
-        const promise = room.waitThenCreateBattle();
+        const promise = room.waitForBattle();
 
         room.playerLeave('p1');
 
-        const battleId = await timerTester.waitTimer(promise);
+        const promiseState = await timerTester.waitTimer(promise);
 
-        expect(battleId).toEqual(null);
+        expect(promiseState).toEqual('canceled');
     });
 
     it('playerReady cancel battle launch if any', async () => {
@@ -329,12 +354,12 @@ describe('room', () => {
             teamColor: ''
         });
 
-        const promise = room.waitThenCreateBattle();
+        const promise = room.waitForBattle();
 
         room.playerReady('p1', false);
 
-        const battleId = await timerTester.waitTimer(promise);
+        const promiseState = await timerTester.waitTimer(promise);
 
-        expect(battleId).toEqual(null);
+        expect(promiseState).toEqual('canceled');
     });
 });

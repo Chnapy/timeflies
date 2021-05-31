@@ -1,4 +1,4 @@
-import { CharacterId, ObjectTyped, PlayerId, Position, waitCanceleable } from '@timeflies/common';
+import { CharacterId, createId, ObjectTyped, PlayerId, Position, WaitCancelableState, waitCanceleable } from '@timeflies/common';
 import { MapInfos, RoomStateData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
 import { Layer, Tile } from '@timeflies/tilemap-utils';
 import fs from 'fs';
@@ -27,14 +27,16 @@ export type Room = {
     characterPlacement: (characterId: CharacterId, position: Position | null) => void;
     mapSelect: (mapInfos: MapInfos) => void;
     computeMapPlacementTiles: () => void;
-    waitThenCreateBattle: () => Promise<string | null>;
+    waitForBattle: () => Promise<WaitCancelableState[ 'state' ]>;
+    createBattle: () => Promise<Battle>;
+    removeBattle: () => void;
+    isInBattle: () => boolean;
 };
 
 const allTeamColorList = [ '#3BA92A', '#FFD74A', '#A93B2A', '#3BA9A9' ];
 
 export const createRoom = (globalEntities: GlobalEntities): Room => {
-    const roomId = 'roomId';
-    // TODO createId();
+    const roomId = createId();
 
     let mapInfos: MapInfos | null = null;
     let tiledMapPromise: Promise<TiledMap> | null = null;
@@ -142,19 +144,29 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
             tiledMapPromise = readFile(assetUrl.toBackend(mapInfos!.schemaLink), 'utf-8')
                 .then<TiledMap>(JSON.parse);
         },
-        waitThenCreateBattle: async () => {
+        waitForBattle: async () => {
             const { promise, cancel } = waitCanceleable(5000);
 
             battlePromiseCancel = cancel;
 
             const { state } = await promise;
+            return state;
+        },
+        createBattle: async () => {
+            const entityLists = globalEntities.services.entityListGetRoomService.getEntityLists();
 
-            if (state === 'canceled') {
-                return null;
-            }
+            battle = await createBattle(
+                globalEntities,
+                getRoomStateData(),
+                entityLists,
+                () => globalEntities.services.playerRoomService.onBattleEnd(roomId, battle!.battleId)
+            );
 
-            battle = await createBattle(globalEntities, getRoomStateData());
-            return battle.battleId;
-        }
+            return battle!;
+        },
+        removeBattle: () => {
+            battle = null;
+        },
+        isInBattle: () => battle !== null
     };
 };
