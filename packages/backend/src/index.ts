@@ -5,7 +5,6 @@ import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
 import { createGlobalEntities } from './main/global-entities';
-import { createBattle } from './services/battle/battle';
 import { onAllServicesSocketConnect } from './services/services';
 import { getEnv } from './utils/env';
 
@@ -32,16 +31,16 @@ const ws = new WebSocket.Server({ server });
 const globalEntities = createGlobalEntities();
 
 // TODO remove mock
-void createBattle(globalEntities, {
-    staticPlayerList: [
-        { playerId: 'p1' } as any,
-        { playerId: 'p2' } as any,
-    ]
-}).then(mockBattle => {
-    globalEntities.currentBattleMap.mapById[ 'battleId' ] = mockBattle;
-    globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ] = mockBattle;
-    globalEntities.currentBattleMap.mapByPlayerId[ 'p2' ] = mockBattle;
-});
+// void createBattle(globalEntities, {
+//     staticPlayerList: [
+//         { playerId: 'p1' } as any,
+//         { playerId: 'p2' } as any,
+//     ]
+// }).then(mockBattle => {
+//     globalEntities.currentBattleMap.mapById[ 'battleId' ] = mockBattle;
+//     globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ] = mockBattle;
+//     globalEntities.currentBattleMap.mapByPlayerId[ 'p2' ] = mockBattle;
+// });
 
 // Start
 
@@ -54,6 +53,7 @@ server.listen(port, () => {
         logger.net('new socket connection');
         i++;
 
+        // TODO
         onAllServicesSocketConnect(globalEntities.services, socket, 'p' + i);
     });
 });
