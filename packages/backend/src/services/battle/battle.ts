@@ -2,14 +2,10 @@ import { ArrayUtils, CharacterId, createId, ObjectTyped, PlayerId, SerializableS
 import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
 import { MapInfos, RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-messages';
-import fs from 'fs';
 import type TiledMap from 'tiled-types';
-import util from 'util';
 import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl, AssetUrl } from '../../utils/asset-url';
 import { getBattleStaticData } from './get-battle-static-data';
-
-const readFile = util.promisify(fs.readFile);
 
 export type BattleId = string;
 
@@ -41,12 +37,13 @@ export type Battle = {
     addNewState: (state: SerializableState, stateEndTime: number) => Promise<void>;
 };
 
-export const createBattle = async (
+export const createBattle = (
     { services }: GlobalEntities,
     roomState: RoomStateData,
     entityListData: RoomEntityListGetMessageData,
+    tiledMap: TiledMap,
     onBattleEnd: () => void
-): Promise<Battle> => {
+): Battle => {
     const battleId = createId();
 
     const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(roomState, entityListData);
@@ -54,9 +51,6 @@ export const createBattle = async (
     const playerIdList = roomState.staticPlayerList.map(player => player.playerId);
 
     const rawMapInfos = roomState.mapInfos!;
-
-    const tiledMapRaw = await readFile(assetUrl.toBackend(rawMapInfos.schemaLink), 'utf-8');
-    const tiledMap: TiledMap = JSON.parse(tiledMapRaw);
 
     const waitingPlayerList = new Set(playerIdList);
 

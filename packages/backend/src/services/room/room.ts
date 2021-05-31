@@ -153,12 +153,15 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
             return state;
         },
         createBattle: async () => {
+            const tiledMap = await tiledMapPromise!;
+
             const entityLists = globalEntities.services.entityListGetRoomService.getEntityLists();
 
-            battle = await createBattle(
+            battle = createBattle(
                 globalEntities,
                 getRoomStateData(),
                 entityLists,
+                tiledMap,
                 () => globalEntities.services.playerRoomService.onBattleEnd(roomId, battle!.battleId)
             );
 
