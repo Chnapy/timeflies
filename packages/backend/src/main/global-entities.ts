@@ -38,8 +38,10 @@ export const createGlobalEntities = (): GlobalEntities => {
 
     const services = createServices(globalEntitiesNoServices);
 
-    return {
+    const globalEntities: GlobalEntities = {
         ...globalEntitiesNoServices,
         services
     };
+
+    return globalEntities;
 };

@@ -4,10 +4,13 @@ import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { GlobalEntitiesNoServices } from '../main/global-entities';
 import { BattleId } from './battle/battle';
 import { RoomId } from './room/room';
+import { Services } from './services';
 
 export type PlayerSocketMap = { [ playerId in PlayerId ]: SocketCell };
 
 export abstract class Service {
+
+    services!: Services;
 
     protected globalEntitiesNoServices: GlobalEntitiesNoServices;
     protected playerSocketMap: PlayerSocketMap = {};
