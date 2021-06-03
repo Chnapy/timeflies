@@ -1,7 +1,13 @@
 import { PlayerId } from '@timeflies/common';
+import { PlayerCredentials } from '@timeflies/socket-messages';
 import { Battle, BattleId } from '../services/battle/battle';
 import { Room, RoomId } from '../services/room/room';
 import { createServices, Services } from '../services/services';
+
+export type PlayerCredentialsMap = {
+    mapByToken: { [ token in string ]: PlayerCredentials };
+    mapByPlayerName: { [ playerName in string ]: PlayerCredentials };
+};
 
 type RoomMapById = { [ roomId in RoomId ]?: Room };
 type RoomMapByPlayerId = { [ playerId in PlayerId ]?: Room };
@@ -18,6 +24,7 @@ export type CurrentBattleMap = {
 };
 
 export type GlobalEntities = {
+    readonly playerCredentialsMap: PlayerCredentialsMap;
     readonly currentRoomMap: CurrentRoomMap;
     readonly currentBattleMap: CurrentBattleMap;
     readonly services: Services;
@@ -26,6 +33,10 @@ export type GlobalEntitiesNoServices = Omit<GlobalEntities, 'services'>;
 
 export const createGlobalEntities = (): GlobalEntities => {
     const globalEntitiesNoServices: GlobalEntitiesNoServices = {
+        playerCredentialsMap: {
+            mapByToken: {},
+            mapByPlayerName: {}
+        },
         currentRoomMap: {
             mapById: {},
             mapByPlayerId: {}

@@ -1,5 +1,5 @@
 
-const requiredKeys = [ 'PORT', 'HOST_URL' ] as const;
+const requiredKeys = [ 'PORT', 'HOST_URL', 'JWT_PRIVATE_KEY' ] as const;
 
 console.table(requiredKeys.reduce<Record<string, any>>((acc, key) => {
     acc[ key ] = process.env[ key ];

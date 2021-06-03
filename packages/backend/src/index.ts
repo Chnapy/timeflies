@@ -1,4 +1,6 @@
 import { logger } from '@timeflies/devtools';
+import { authEndpoint } from '@timeflies/socket-messages';
+import { createSocketCell, SocketError } from '@timeflies/socket-server';
 import { json, urlencoded } from 'body-parser';
 import cors from "cors";
 import express from 'express';
@@ -22,25 +24,15 @@ app.use(
 
 app.use('/static', express.static('static'));
 
+const globalEntities = createGlobalEntities();
+
+app.post(authEndpoint, globalEntities.services.authService.httpAuthRoute);
+
 const server = http.createServer(app);
 
 // Websocket
 
 const ws = new WebSocket.Server({ server });
-
-const globalEntities = createGlobalEntities();
-
-// TODO remove mock
-// void createBattle(globalEntities, {
-//     staticPlayerList: [
-//         { playerId: 'p1' } as any,
-//         { playerId: 'p2' } as any,
-//     ]
-// }).then(mockBattle => {
-//     globalEntities.currentBattleMap.mapById[ 'battleId' ] = mockBattle;
-//     globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ] = mockBattle;
-//     globalEntities.currentBattleMap.mapByPlayerId[ 'p2' ] = mockBattle;
-// });
 
 // Start
 
@@ -48,12 +40,19 @@ server.listen(port, () => {
     logger.net('http server listening', server.address()!);
     logger.net('websocket server listening', ws.address());
 
-    let i = 0;
-    ws.on('connection', socket => {
-        logger.net('new socket connection');
-        i++;
+    ws.on('connection', (socket, request) => {
 
-        // TODO
-        onAllServicesSocketConnect(globalEntities.services, socket, 'p' + i);
+        const socketCell = createSocketCell(socket);
+        try {
+            const playerId = globalEntities.services.authService.onSocketFirstConnect(socketCell, request);
+
+            onAllServicesSocketConnect(globalEntities.services, socket, playerId);
+        } catch (err) {
+            logger.error(err);
+            socketCell.closeSocket(err instanceof SocketError
+                ? err
+                : new SocketError(500, (err as Error).stack ?? err + '')
+            );
+        }
     });
 });

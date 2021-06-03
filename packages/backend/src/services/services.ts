@@ -2,6 +2,7 @@ import { PlayerId } from '@timeflies/common';
 import { createSocketCell } from '@timeflies/socket-server';
 import WebSocket from 'ws';
 import { GlobalEntitiesNoServices } from '../main/global-entities';
+import { AuthService } from './auth/auth-service';
 import { CycleBattleService } from './battle/cycle/cycle-battle-service';
 import { EndBattleService } from './battle/end-battle/end-battle-service';
 import { JoinBattleService } from './battle/join/join-battle-service';
@@ -29,7 +30,8 @@ const createServicesRaw = (globalEntitiesNoServices: GlobalEntitiesNoServices) =
     characterRoomService: new CharacterRoomService(globalEntitiesNoServices),
     entityListGetRoomService: new EntityListGetRoomService(globalEntitiesNoServices),
     getRoomListService: new GetRoomListService(globalEntitiesNoServices),
-    createRoomListService: new CreateRoomListService(globalEntitiesNoServices)
+    createRoomListService: new CreateRoomListService(globalEntitiesNoServices),
+    authService: new AuthService(globalEntitiesNoServices)
 });
 
 export const createServices = (globalEntitiesNoServices: GlobalEntitiesNoServices): Services => {
