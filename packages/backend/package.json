@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "start": "PORT=40510 HOST_URL=http://localhost:40510 ts-node src/index.ts",
+    "start": "PORT=40510 HOST_URL=http://localhost:40510 JWT_PRIVATE_KEY=foo ts-node src/index.ts",
     "serve": "node lib/index.js"
   },
   "dependencies": {
