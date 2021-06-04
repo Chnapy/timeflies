@@ -1,4 +1,5 @@
 import { ErrorCode, Message, MessageWithResponse, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
+import Joi from 'joi';
 import WebSocket from 'ws';
 import { createSocketCell } from './socket-cell';
 import { SocketError } from './socket-error';
@@ -83,13 +84,15 @@ describe('# Socket cell', () => {
             const listener = jest.fn();
 
             const removeListener = cell.addMessageListener({
-                match: (message): message is any => message.action === 'foo'
+                action: '',
+                match: (message): message is any => message.action === 'foo',
+                schema: Joi.any()
             }, listener);
 
             await socketHelper.triggerMessageListeners(messages);
 
             expect(listener).toHaveBeenCalledTimes(1);
-            expect(listener).toHaveBeenCalledWith(messageFoo);
+            expect(listener).toHaveBeenCalledWith(messageFoo, expect.anything());
 
             listener.mockClear();
 
@@ -107,7 +110,9 @@ describe('# Socket cell', () => {
                 const listener = jest.fn(listenerFn);
 
                 cell.addMessageListener({
-                    match: (message): message is any => message.action === 'foo'
+                    action: '',
+                    match: (message): message is any => message.action === 'foo',
+                    schema: Joi.object({ action: Joi.string(), payload: Joi.object() })
                 }, listener);
 
                 await socketHelper.triggerMessageListeners(messages);
@@ -134,18 +139,25 @@ describe('# Socket cell', () => {
             );
         });
 
-        it('send socket error 400 if bad message format', async () => {
+        it('send socket error 400 if bad message list format', async () => {
             await expectSendErrorMessage(400).with(
                 () => { },
                 'dirty-content'
             );
         });
 
-        it('send response if any returned by listener', async () => {
+        it('send socket error 400 if bad message format', async () => {
+            await expectSendErrorMessage(400).with(
+                () => { },
+                [ { ...messageFoo, payload: 42 } ]
+            );
+        });
+
+        it('send response using arg callback', async () => {
             const { socketHelper, cell } = createSocketAndCell();
 
-            const listener = jest.fn(async (): Promise<MessageWithResponse> => {
-                return Promise.resolve({
+            const listener = jest.fn(async (message, send) => {
+                send({
                     action: 'toto',
                     payload: {},
                     requestId: 'bar_id'
@@ -153,7 +165,9 @@ describe('# Socket cell', () => {
             });
 
             cell.addMessageListener<MessageWithResponseCreator>({
-                match: (message): message is any => true
+                action: '',
+                match: (message): message is any => true,
+                schema: Joi.any()
             }, listener);
 
             await socketHelper.triggerMessageListeners([ messageBar ]);
@@ -214,7 +228,9 @@ describe('# Socket cell', () => {
         const listener = jest.fn();
 
         cell.addMessageListener({
-            match: (message): message is any => true
+            action: '',
+            match: (message): message is any => true,
+            schema: Joi.any()
         }, listener);
 
         cell.addDisconnectListener(listener);

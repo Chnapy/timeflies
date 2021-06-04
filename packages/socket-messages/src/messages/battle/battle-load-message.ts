@@ -1,4 +1,5 @@
 import { CharacterId, PlayerId, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
+import Joi from 'joi';
 import { createMessage } from '../../message';
 
 type TiledMapInfos = {
@@ -25,5 +26,7 @@ export type BattleLoadData = {
     cycleInfos: CycleInfos;
 };
 
-export const BattleLoadMessage = createMessage<{ battleId: string }>('battle/load')
+export const BattleLoadMessage = createMessage('battle/load', Joi.object<{ battleId: string }>({
+    battleId: Joi.string().required()
+}))
     .withResponse<BattleLoadData>();

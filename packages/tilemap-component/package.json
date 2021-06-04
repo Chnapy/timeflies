@@ -19,7 +19,7 @@
     "tiled-types": "*"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.0",
+    "@babel/core": "^7.14.2",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.58",
@@ -33,7 +33,7 @@
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
+    "@types/node": "^15.0.3",
     "@types/react": "^17.0.5",
     "pixi.js": "^6.0.4",
     "react": "^17.0.2",

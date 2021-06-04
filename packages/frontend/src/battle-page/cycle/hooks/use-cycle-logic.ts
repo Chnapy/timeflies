@@ -1,6 +1,6 @@
-import { CharacterUtils, ObjectTyped } from '@timeflies/common';
 import React from 'react';
 import { useAsyncEffect } from 'use-async-effect';
+import { characterDeadListSelector } from '../../hooks/character-alive-list-selector';
 import { useCurrentEntities } from '../../hooks/use-entities';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { useCycleEngine } from '../view/cycle-engine-context';
@@ -12,7 +12,7 @@ export const useCycleLogic = () => {
     const playingCharacterId = useBattleSelector(battle => battle.playingCharacterId);
     const roundIndex = useBattleSelector(battle => battle.roundIndex);
     const turnIndex = useBattleSelector(battle => battle.turnIndex);
-    const charactersHealths = useCurrentEntities(entities => entities.characters.health);
+    const characterDeadList = useCurrentEntities(characterDeadListSelector);
 
     const firstRenderRef = React.useRef(true);
 
@@ -39,11 +39,8 @@ export const useCycleLogic = () => {
             return;
         }
 
-        const disableCharacterList = ObjectTyped.keys(charactersHealths)
-            .filter(characterId => !CharacterUtils.isAlive(charactersHealths[ characterId ]));
-
-        cycleEngine.disableCharacters(disableCharacterList);
-    }, [ cycleEngine, charactersHealths ])
+        cycleEngine.disableCharacters(characterDeadList);
+    }, [ cycleEngine, characterDeadList ])
 
     useAsyncEffect(async () => {
         if (!playingCharacterId) {

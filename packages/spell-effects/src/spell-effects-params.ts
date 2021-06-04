@@ -22,7 +22,7 @@ export type TurnContext = {
     startTime: number;
 };
 
-export type StaticState = {
+export type StaticStatePartial = {
     characters: { [ characterId in CharacterId ]: Pick<StaticCharacter, 'characterId' | 'characterRole'> };
     spells: { [ spellId in SpellId ]: Pick<StaticSpell, 'spellId' | 'characterId' | 'spellRole'> };
 };
@@ -35,7 +35,7 @@ export type MapContext = {
 export type SpellEffectFnContext = {
     currentTurn: TurnContext;
     state: Omit<SerializableState, 'checksum'>;
-    staticState: StaticState;
+    staticState: StaticStatePartial;
     map: MapContext;
 };
 

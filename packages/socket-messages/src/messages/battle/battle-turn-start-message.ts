@@ -1,4 +1,5 @@
-import { CharacterId } from '@timeflies/common';
+import { CharacterId, characterIdSchema } from '@timeflies/common';
+import * as joi from 'joi';
 import { createMessage } from '../../message';
 
 export type BattleTurnStartData = {
@@ -8,4 +9,9 @@ export type BattleTurnStartData = {
     turnIndex: number;
 };
 
-export const BattleTurnStartMessage = createMessage<BattleTurnStartData>('battle/turn-start');
+export const BattleTurnStartMessage = createMessage('battle/turn-start', joi.object<BattleTurnStartData>({
+    characterId: characterIdSchema,
+    startTime: joi.number().required().integer().min(0),
+    roundIndex: joi.number().required().integer().min(0),
+    turnIndex: joi.number().required().integer().min(0)
+}));

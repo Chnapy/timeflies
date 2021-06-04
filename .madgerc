@@ -1,0 +1,3 @@
+{
+    "excludeRegExp": [".*(.d.ts)$"]
+}

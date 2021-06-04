@@ -3,6 +3,7 @@ import { Position } from '@timeflies/common';
 import React from 'react';
 import { useTiledMapAssets } from '../../../assets-loader/hooks/use-tiled-map-assets';
 import { useBattleViewportContext } from '../../../canvas/view/battle-viewport-context';
+import { characterAliveListSelector } from '../../../hooks/character-alive-list-selector';
 import { useCurrentEntities } from '../../../hooks/use-entities';
 import { useBattleSelector } from '../../../store/hooks/use-battle-selector';
 import { BattleFeedbackTarget } from './battle-feedback-target';
@@ -28,7 +29,7 @@ export const BattleFeedbackPool: React.FC = () => {
     const tilesize = useTiledMapAssets()?.schema.tileheight;
     const { dx, dy, scale } = useBattleViewportContext();
 
-    const characterList = useBattleSelector(battle => battle.characterList);
+    const characterAliveList = useCurrentEntities(characterAliveListSelector);
     const charactersPositions = useCurrentEntities(entities => entities.characters.position);
 
     const spellActionEffectList = useBattleSelector(battle => battle.spellActionEffectList);
@@ -38,7 +39,7 @@ export const BattleFeedbackPool: React.FC = () => {
         return null;
     }
 
-    const isTargetingCharacters = (targetPos: Position) => characterList.some(characterId => charactersPositions[ characterId ].id === targetPos.id);
+    const isTargetingCharacters = (targetPos: Position) => characterAliveList.some(characterId => charactersPositions[ characterId ].id === targetPos.id);
 
     const spellActionsPos = spellActionEffectList
         .map(startTime => spellActionEffects[ startTime ].spellAction.targetPos)

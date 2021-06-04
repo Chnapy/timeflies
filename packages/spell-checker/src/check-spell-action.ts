@@ -1,4 +1,5 @@
 import { SerializableState } from '@timeflies/common';
+import { getSpellEffectFromSpellRole, produceStateFromSpellEffect, SpellEffect } from '@timeflies/spell-effects';
 import { Checker, CheckerParams } from './checker';
 import { checkCharacter } from './checkers/check-character';
 import { checkChecksum } from './checkers/check-checksum';
@@ -14,37 +15,48 @@ const checkers: readonly Checker[] = [
     checkMap
 ];
 
-type ComputeNewStateFromSpellActionFn = (params: CheckSpellParams) => SerializableState;
-
 export type CheckSpellParams = Pick<CheckerParams, 'spellAction' | 'context'>;
 
 export type CheckSpellActionResult =
     | {
         success: true;
         newState: SerializableState;
+        spellEffect: SpellEffect;
     }
     | {
         success: false;
     };
 
-export const getSpellActionChecker = (computeNewStateFromSpellAction: ComputeNewStateFromSpellActionFn) =>
-    (params: CheckSpellParams): CheckSpellActionResult => {
+export const spellActionCheck = async (params: CheckSpellParams): Promise<CheckSpellActionResult> => {
+    const { spellAction, context } = params;
 
-        const newState = computeNewStateFromSpellAction(params);
+    const { spellRole } = context.staticState.spells[ spellAction.spellId ];
 
-        const checkerParams: CheckerParams = {
-            ...params,
-            newState
-        };
+    const spellEffect = await getSpellEffectFromSpellRole(spellRole, {
+        partialSpellAction: spellAction,
+        context
+    });
 
-        const checked = checkers.every(check => check(checkerParams));
+    const newState = produceStateFromSpellEffect(
+        spellEffect,
+        context.state,
+        spellAction.launchTime
+    );
 
-        return checked
-            ? {
-                success: true,
-                newState
-            }
-            : {
-                success: false
-            };
+    const checkerParams: CheckerParams = {
+        ...params,
+        newState
     };
+
+    const checked = checkers.every(check => check(checkerParams));
+
+    return checked
+        ? {
+            success: true,
+            newState,
+            spellEffect
+        }
+        : {
+            success: false
+        };
+};

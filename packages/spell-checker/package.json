@@ -5,14 +5,18 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {},
+  "peerDependencies": {
+    "@timeflies/spell-effects": "*"
+  },
   "dependencies": {
     "@timeflies/common": "workspace:packages/common"
   },
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/spell-effects": "workspace:packages/spell-effects",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2"
+    "@types/node": "^15.0.3"
   },
   "engineStrict": true,
   "engines": {

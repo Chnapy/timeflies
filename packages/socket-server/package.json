@@ -7,6 +7,7 @@
   "scripts": {},
   "peerDependencies": {
     "@timeflies/common": "*",
+    "@timeflies/devtools": "*",
     "@timeflies/socket-messages": "*",
     "ws": "7.4.1"
   },
@@ -15,8 +16,9 @@
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/socket-messages": "workspace:packages/socket-messages",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
-    "@types/ws": "^7.4.4"
+    "@types/node": "^15.0.3",
+    "@types/ws": "^7.4.4",
+    "joi": "^17.4.0"
   },
   "engineStrict": true,
   "engines": {

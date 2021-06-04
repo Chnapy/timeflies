@@ -1,17 +1,25 @@
-import { getTimeDiffFromNow, SpellAction, waitCanceleable } from '@timeflies/common';
+import { SpellAction } from '@timeflies/common';
 import { useSocketSendWithResponse } from '@timeflies/socket-client';
 import { BattleSpellActionMessage, SocketErrorMessage } from '@timeflies/socket-messages';
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import { useDispatch } from 'react-redux';
 import { useComputeSpellEffect } from '../../action-preview/hooks/use-compute-spell-effect';
-import { BattleCommitAction, BattleRollbackAction, BattleTimeUpdateAction } from '../store/battle-state-actions';
+import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { BattleRollbackAction } from '../../tile-interactive/store/battle-state-actions';
+import { useDispatchNewState } from './use-dispatch-new-state';
 
-export const useTileClick = () => {
+export const useLaunchSpellAction = () => {
     const computeSpellEffect = useComputeSpellEffect();
     const sendWithResponse = useSocketSendWithResponse();
     const dispatch = useDispatch();
+    const dispatchNewState = useDispatchNewState();
+    const turnStartTime = useBattleSelector(battle => battle.turnStartTime);
 
     return async () => {
+        if (turnStartTime > Date.now()) {
+            return;
+        }
+
         // compute again, because time values may have changed
         const spellEffectInfos = await computeSpellEffect();
         if (!spellEffectInfos) {
@@ -19,7 +27,11 @@ export const useTileClick = () => {
         }
 
         const { spellEffect, spellEffectParams } = spellEffectInfos;
-        const futureState = produceStateFromSpellEffect(spellEffect, spellEffectParams);
+        const futureState = produceStateFromSpellEffect(
+            spellEffect,
+            spellEffectParams.context.state,
+            spellEffectParams.partialSpellAction.launchTime
+        );
 
         const spellAction: SpellAction = {
             ...spellEffectParams.partialSpellAction,
@@ -31,26 +43,10 @@ export const useTileClick = () => {
             BattleSpellActionMessage({ spellAction })
         );
 
-        dispatch(BattleCommitAction({
-            spellAction,
-            futureState,
-            spellEffect
-        }));
-
-        const deltaTime = getTimeDiffFromNow(spellAction.launchTime);
-
-        const { promise, cancel } = waitCanceleable(spellAction.duration - deltaTime);
+        const { promise, cancel } = dispatchNewState(spellEffect, futureState, spellAction);
 
         await Promise.all([
-            promise.then(waitInfos => {
-                if (waitInfos.state === 'canceled') {
-                    return;
-                }
-
-                dispatch(BattleTimeUpdateAction({
-                    currentTime: futureState.time
-                }));
-            }),
+            promise,
             request.then(response => {
 
                 if (SocketErrorMessage.match(response)) {

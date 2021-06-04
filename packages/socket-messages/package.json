@@ -6,13 +6,17 @@
   "types": "lib/index.d.ts",
   "scripts": {},
   "peerDependencies": {
-    "@timeflies/common": "*"
+    "@timeflies/common": "*",
+    "@timeflies/spell-effects": "*",
+    "joi": "*"
   },
   "devDependencies": {
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/devtools": "workspace:packages/devtools",
+    "@timeflies/spell-effects": "workspace:packages/spell-effects",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2"
+    "@types/node": "^15.0.3",
+    "joi": "^17.4.0"
   },
   "engineStrict": true,
   "engines": {

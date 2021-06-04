@@ -7,7 +7,7 @@
   "scripts": {},
   "devDependencies": {
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
+    "@types/node": "^15.0.3",
     "supports-color": "^9.0.0"
   },
   "engineStrict": true,
@@ -18,5 +18,8 @@
     "directory": "packages/devtools",
     "type": "git",
     "url": "https://github.com/Chnapy/timeflies.git"
+  },
+  "dependencies": {
+    "colors": "^1.4.0"
   }
 }

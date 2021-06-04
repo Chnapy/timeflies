@@ -21,10 +21,10 @@ export const TilemapLayer: React.FC<TilemapLayerProps> = React.memo(({
             {layerData.flatMap((id, index) => {
                 const pos = Tile.getTilePositionFromIndex(index, mapSheet);
 
-                const child = characters[ pos.id ];
+                const children = characters[ pos.id ] ?? [];
 
                 return [
-                    child,
+                    ...children,
                     <TilemapTile
                         key={layer.name + ':' + index}
                         id={id}

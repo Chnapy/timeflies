@@ -1,6 +1,8 @@
 import { Position } from './position';
 
-export type Orientation = 'left' | 'right' | 'top' | 'bottom';
+export type Orientation = typeof orientationList[ number ];
+export const orientationList = [ 'left', 'right', 'top', 'bottom' ] as const;
+export const orientationSchema = orientationList;
 
 export const getOrientationFromTo = (
     from: Position,

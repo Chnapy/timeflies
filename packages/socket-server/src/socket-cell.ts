@@ -1,24 +1,26 @@
-import { ExtractMessageFromCreator, extractMessagesFromEvent, ExtractResponseFromCreator, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
+import { logger } from '@timeflies/devtools';
+import { ExtractMessageFromCreator, extractMessagesFromEvent, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
 import WebSocket from 'ws';
 import { SocketError } from './socket-error';
+
+type SendFn = <M extends Message>(...messages: M[]) => void;
 
 type RemoveListenerFn = () => void;
 
 type MayBePromise<V> = V | Promise<V>;
 
-type ListenerFn<M extends MessageCreator | MessageWithResponseCreator> = (message: ExtractMessageFromCreator<M>) => MayBePromise<
-    M extends MessageWithResponseCreator ? ExtractResponseFromCreator<M> : void
->;
+export type ListenerFn<M extends MessageCreator<any> | MessageWithResponseCreator<any, any>> =
+    (message: ExtractMessageFromCreator<M>, send: SendFn) => MayBePromise<void>;
 
-type AddListenerFn = <M extends MessageCreator | MessageWithResponseCreator>(
-    messageCreator: Pick<M, 'match'>,
+type AddListenerFn = <M extends MessageCreator<any> | MessageWithResponseCreator<any, any>>(
+    messageCreator: Pick<M, 'action' | 'match' | 'schema'>,
     listener: ListenerFn<M>
 ) => RemoveListenerFn;
 
 export type SocketCell = {
     addMessageListener: AddListenerFn;
     addDisconnectListener: (listener: () => void) => RemoveListenerFn;
-    send: <M extends Message>(...messages: M[]) => void;
+    send: SendFn;
     clearAllListeners: () => void;
     closeSocket: (error?: SocketError) => void;
     createCell: () => SocketCell;
@@ -37,9 +39,10 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
         return () => socket.removeEventListener(type, listener);
     };
 
-    const send: SocketCell[ 'send' ] = (...messages) => {
+    const send: SocketCell[ 'send' ] = (...messageList) => {
+        logger.logMessageSent(messageList);
         socket.send(JSON.stringify(
-            messages
+            messageList
         ));
     };
 
@@ -59,20 +62,25 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                 return;
             }
 
+            logger.logMessageReceived(messageList);
+
             await Promise.all(
                 messageList
                     .filter(messageCreator.match)
                     .map(async message => {
                         try {
-                            const response = await listener(message as any);
-
-                            if (response) {
-                                send(response as Exclude<typeof response, void>);
+                            const check = messageCreator.schema.validate(message);
+                            if (check.error) {
+                                throw new SocketError(400, check.error.stack ?? check.error + '');
                             }
+
+                            await listener(message as any, send);
                         } catch (err) {
                             const socketError = err instanceof SocketError
                                 ? err
                                 : new SocketError(500, (err as Error).stack ?? err + '');
+
+                            logger.error(err);
 
                             sendError(socketError);
                         }

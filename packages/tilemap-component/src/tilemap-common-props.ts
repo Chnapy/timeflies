@@ -9,7 +9,7 @@ export type TilemapCommonProps = {
 };
 
 export type TilemapCharacters = {
-    [ positionId in Position['id'] ]?: React.ReactElement;
+    [ positionId in Position['id'] ]?: React.ReactElement[];
 };
 
 export type TilemapTileState = {

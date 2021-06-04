@@ -1,4 +1,4 @@
-import { CharacterVariables } from './character';
+import { CharacterVariables } from './character-details';
 import { SpellVariables } from './spell';
 
 export type EntitiesVariables = CharacterVariables & SpellVariables;

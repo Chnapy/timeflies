@@ -1,6 +1,7 @@
 import { BattleFeedbackContextProvider } from '@timeflies/battle-feedback';
 import React from 'react';
 import { ActionPreviewContextProvider } from './action-preview/view/action-preview-context';
+import { BattleListeners } from './battle-listeners';
 import { BattleCanvas } from './canvas/view/battle-canvas';
 import { BattleViewportContextProvider } from './canvas/view/battle-viewport-context';
 import { CycleEngineProvider } from './cycle/view/cycle-engine-context';
@@ -15,11 +16,13 @@ export const BattleView: React.FC = () => {
                 <ActionPreviewContextProvider>
                     <CycleEngineProvider>
                         <BattleFeedbackContextProvider value={{ previewEnabled: true }}>
-                                <BattleViewportContextProvider>
-                                    <BattleCanvas />
+                            <BattleViewportContextProvider>
+                                <BattleListeners />
 
-                                    <BattleHud />
-                                </BattleViewportContextProvider>
+                                <BattleCanvas />
+
+                                <BattleHud />
+                            </BattleViewportContextProvider>
                         </BattleFeedbackContextProvider>
                     </CycleEngineProvider>
                 </ActionPreviewContextProvider>

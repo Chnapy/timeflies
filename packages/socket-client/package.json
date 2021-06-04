@@ -16,7 +16,7 @@
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/socket-messages": "workspace:packages/socket-messages",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
+    "@types/node": "^15.0.3",
     "@types/react": "^17.0.5",
     "@types/testing-library__react-hooks": "^4.0.0",
     "react": "^17.0.2",

@@ -7,7 +7,7 @@ import { SpellButton, SpellButtonProps } from './spell-button';
 
 export type SpellButtonPanelProps = {
     spellsProps: {
-        [ spellId in SpellId ]: Omit<SpellButtonProps, 'imageSize'>;
+        [ spellId in SpellId ]: Omit<SpellButtonProps, 'index' | 'imageSize'>;
     };
     spellList: SpellId[];
     defaultSpellId: SpellId;
@@ -44,10 +44,11 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
 
     const getDesktopContent = () => (
         <Grid container spacing={2}>
-            {[ defaultSpellId, ...spellListWithoutDefault ].map(spellId => (
+            {[ defaultSpellId, ...spellListWithoutDefault ].map((spellId, index) => (
                 <Grid key={spellId} item>
                     <SpellButton
                         {...spellsProps[ spellId ]}
+                        index={index}
                         imageSize={buttonSizes.main}
                     />
                 </Grid>
@@ -64,12 +65,13 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
             <Grid container direction='column' spacing={2}>
                 {[ firstLine, secondLine ].map((line, lineIndex) => (
                     <Grid key={lineIndex} item container alignItems='flex-end' justify='flex-end' spacing={2}>
-                        {line.map((spellId) => (
+                        {line.map((spellId, index) => (
                             <Grid key={spellId} className={clsx({
                                 [ classes.mobileFirstButton ]: spellId === firstLine[ 0 ]
                             })} item>
                                 <SpellButton
                                     {...spellsProps[ spellId ]}
+                                    index={index}
                                     imageSize={spellId === defaultSpellId ? buttonSizes.main : buttonSizes.secondary}
                                 />
                             </Grid>
