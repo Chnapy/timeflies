@@ -3,7 +3,7 @@ import { RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-m
 import { Battle, StaticState } from './battle';
 
 export const getBattleStaticData = (
-    roomState: RoomStateData,
+    roomState: Pick<RoomStateData, 'staticPlayerList' | 'staticCharacterList'>,
     entityListData: RoomEntityListGetMessageData
 ): Pick<Battle, 'staticPlayers' | 'staticCharacters' | 'staticSpells' | 'staticState'> & { initialSerializableState: SerializableState } => {
 
@@ -33,27 +33,6 @@ export const getBattleStaticData = (
 
     const staticCharacters: StaticCharacter[] = [];
     const staticSpells: StaticSpell[] = [];
-
-    // const staticCharacters: StaticCharacter[] = [
-    //     {
-    //         characterId: 'c1',
-    //         characterRole: 'tacka',
-    //         playerId: 'p1',
-    //         defaultSpellId: 's1',
-    //     },
-    //     {
-    //         characterId: 'c2',
-    //         characterRole: 'meti',
-    //         playerId: 'p1',
-    //         defaultSpellId: 's3',
-    //     },
-    //     {
-    //         characterId: 'c3',
-    //         characterRole: 'vemo',
-    //         playerId: 'p2',
-    //         defaultSpellId: 's5',
-    //     }
-    // ];
 
     for (const { characterId, characterRole, playerId, placement } of roomState.staticCharacterList) {
 
@@ -93,39 +72,6 @@ export const getBattleStaticData = (
             defaultSpellId
         });
     }
-
-    // const staticSpells: StaticSpell[] = [
-    //     {
-    //         characterId: 'c1',
-    //         spellId: 's1',
-    //         spellRole: 'move',
-    //     },
-    //     {
-    //         characterId: 'c1',
-    //         spellId: 's2',
-    //         spellRole: 'simpleAttack',
-    //     },
-    //     {
-    //         characterId: 'c2',
-    //         spellId: 's3',
-    //         spellRole: 'switch',
-    //     },
-    //     {
-    //         characterId: 'c2',
-    //         spellId: 's4',
-    //         spellRole: 'simpleAttack',
-    //     },
-    //     {
-    //         characterId: 'c3',
-    //         spellId: 's5',
-    //         spellRole: 'move',
-    //     },
-    //     {
-    //         characterId: 'c3',
-    //         spellId: 's6',
-    //         spellRole: 'simpleAttack',
-    //     }
-    // ];
 
     const staticState: StaticState = {
         players: normalize(staticPlayers, 'playerId'),

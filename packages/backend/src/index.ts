@@ -6,6 +6,7 @@ import cors from "cors";
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
+import { config } from './main/config';
 import { createGlobalEntities } from './main/global-entities';
 import { onAllServicesSocketConnect } from './services/services';
 import { getEnv } from './utils/env';
@@ -22,7 +23,7 @@ app.use(
     json()
 );
 
-app.use('/static', express.static('static'));
+app.use('/static', express.static(config.staticFolderName));
 
 const globalEntities = createGlobalEntities();
 

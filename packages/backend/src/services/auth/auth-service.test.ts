@@ -15,7 +15,7 @@ describe('auth service', () => {
     describe('on http route', () => {
 
         it('answers with error if wrong request body', () => {
-            const { service, globalEntities } = getEntities();
+            const { service } = getEntities();
 
             const response = {
                 status: jest.fn(() => response),
@@ -63,7 +63,7 @@ describe('auth service', () => {
         });
 
         it('answers with player credentials', () => {
-            const { service, globalEntities } = getEntities();
+            const { service } = getEntities();
 
             const response = {
                 status: jest.fn(() => response),
@@ -115,7 +115,7 @@ describe('auth service', () => {
     describe('on socket first connect', () => {
 
         it('throw error if wrong params format', () => {
-            const { service, globalEntities } = getEntities();
+            const { service } = getEntities();
 
             const socketCell = createFakeSocketCell();
 
@@ -125,7 +125,7 @@ describe('auth service', () => {
         });
 
         it('throw error if wrong token', () => {
-            const { service, globalEntities } = getEntities();
+            const { service } = getEntities();
 
             const socketCell = createFakeSocketCell();
 
