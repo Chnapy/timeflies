@@ -1,6 +1,8 @@
 import { getSocketHelperCreator, SocketHelper } from '@timeflies/socket-client';
+import { SocketErrorMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { ErrorListAddAction } from '../error-list/store/error-list-actions';
 import { CredentialsLoginAction } from '../login-page/store/credentials-actions';
 import { useGameSelector } from '../store/hooks/use-game-selector';
 
@@ -24,10 +26,20 @@ export const useConnectedSocketHelper = () => {
             socketHelper.addCloseListener(() => {
                 dispatch(CredentialsLoginAction(null));
             });
+
+            socketHelper.addMessageListener(messageList => {
+                messageList.forEach(message => {
+                    if (SocketErrorMessage.match(message)) {
+                        dispatch(ErrorListAddAction({
+                            code: message.payload.code
+                        }));
+                    }
+                });
+            });
         } else {
             setSocketHelper(null);
         }
-    }, [ credentialsToken ]);
+    }, [ credentialsToken, socketHelper, dispatch ]);
 
     return socketHelper;
 };

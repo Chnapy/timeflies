@@ -5,6 +5,7 @@ import { SpritesheetsUtils } from '@timeflies/static-assets';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
 import { routes } from '../../routes';
 import { CredentialsLoginAction } from '../store/credentials-actions';
 
@@ -78,10 +79,10 @@ export const useLoginFormState = () => {
             logger.error(e);
 
             setLoading(false);
-            setErrors([ 'An unknown error happen...' ]);
+            dispatch(ErrorListAddAction({ code: 500 }));
         }
 
-    }, [ loading ]);
+    }, [ loading, dispatch, history ]);
 
     const onTextFieldChange: React.ChangeEventHandler<HTMLInputElement> = e => {
         setWriting(true);

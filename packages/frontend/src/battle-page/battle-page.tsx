@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useGameSelector } from '../store/hooks/use-game-selector';
-import { BattleAssetsLoader } from './assets-loader/view/battle-assets-loader';
 import { BattleView } from './battle-view';
 import { useBattleLoad } from './loading/hooks/use-battle-load';
 import { BattleLoading } from './loading/view/battle-loading';
@@ -17,7 +16,7 @@ export const BattlePage: React.FC = () => {
     const { isLoading, errorCode } = useBattleLoad(battleId);
 
     return (
-        <BattleAssetsLoader>
+        <>
             {hasBattleData
                 ? (
                     <BattleView />
@@ -30,6 +29,6 @@ export const BattlePage: React.FC = () => {
                         {errorCode && <div>Error {errorCode}</div>}
                     </div>
                 )}
-        </BattleAssetsLoader>
+        </>
     );
 };
