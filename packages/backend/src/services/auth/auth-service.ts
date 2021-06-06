@@ -78,16 +78,18 @@ export class AuthService extends Service {
             throw new SocketError(500, 'socket url is undefined');
         }
 
-        const socketQueryParams: SocketQueryParams = {
-            token: new URLSearchParams(new URL(url).search).get('token')!
-        };
+        const token = new URLSearchParams(
+            url.startsWith('/?')  // localhost
+                ? url.substring(2)
+                : new URL(url).search
+        ).get('token')!;
+
+        const socketQueryParams: SocketQueryParams = { token };
 
         const validateResult = socketQueryParamsSchema.validate(socketQueryParams);
         if (validateResult.error) {
             throw new SocketError(401, validateResult.error.message);
         }
-
-        const { token } = socketQueryParams;
 
         const playerCredentials = this.globalEntitiesNoServices.playerCredentialsMap.mapByToken[ token ];
         if (!playerCredentials) {

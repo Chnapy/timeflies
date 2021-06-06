@@ -1,41 +1,45 @@
 import { UIThemeProvider } from '@timeflies/app-ui';
-import { getSocketHelperCreator, SocketContextProvider } from '@timeflies/socket-client';
 import { SCALE_MODES, settings } from 'pixi.js';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { BattlePage } from './battle-page/battle-page';
+import { ConnectedSocketContextProvider } from './connected-socket/connected-socket-context-provider';
+import { NeedAuth } from './connected-socket/need-auth';
 import './fonts-import.css';
+import { routes } from './routes';
 import { createStoreManager } from './store/store-manager';
 
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
 const store = createStoreManager();
 
-const createSocketHelper = getSocketHelperCreator('ws://localhost:40510');
-
-const socketHelper = createSocketHelper('token');
-
 export const App: React.FC = () => {
 
     return (
         <Provider store={store}>
             <UIThemeProvider>
-                <SocketContextProvider value={socketHelper}>
+                <ConnectedSocketContextProvider>
                     <BrowserRouter>
                         <Switch>
-                            <Route path='/' exact>
-                                <div>
-                                    Home<br />
-                                    <Link to='/battle/battleId'>battle:battleId</Link>
-                                </div>
+                            <Route path={routes.roomListPage} exact>
+                                <NeedAuth>
+                                    <div>TODO room list</div>
+                                </NeedAuth>
                             </Route>
-                            <Route path='/battle/:battleId'>
-                                <BattlePage />
+                            <Route path={routes.roomPage}>
+                                <NeedAuth>
+                                    <div>TODO room</div>
+                                </NeedAuth>
+                            </Route>
+                            <Route path={routes.battlePage}>
+                                <NeedAuth>
+                                    <BattlePage />
+                                </NeedAuth>
                             </Route>
                         </Switch>
                     </BrowserRouter>
-                </SocketContextProvider>
+                </ConnectedSocketContextProvider>
             </UIThemeProvider>
         </Provider>
     );

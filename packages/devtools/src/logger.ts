@@ -10,7 +10,7 @@ type LogInfos = {
     messages: MessageLike[];
 };
 
-const isNodeJsContext = typeof module === 'object';
+const isNodeJsContext = typeof (globalThis as any).window === 'undefined';
 
 const isMessageActionLike = (message: any): message is ActionLike => 'action' in message;
 

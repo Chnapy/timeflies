@@ -128,28 +128,6 @@ export const appTheme: Theme = createMuiTheme({
             },
         },
 
-        MuiInput: {
-            underline: {
-                '&::before': {
-                    borderWidth: 2
-                }
-            }
-        },
-
-        MuiFilledInput: {
-            underline: {
-                '&::before': {
-                    borderWidth: '2px !important'
-                }
-            }
-        },
-
-        MuiOutlinedInput: {
-            notchedOutline: {
-                borderWidth: 2
-            }
-        },
-
         MuiTooltip: {
             tooltip: {
                 backgroundColor: bgDark,

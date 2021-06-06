@@ -102,7 +102,10 @@ export class PlayerRoomService extends Service {
 
     private getPlayerLeaveFn = (currentPlayerId: string) => () => {
 
-        const room = this.getRoomByPlayerId(currentPlayerId);
+        const room = this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
+        if (!room) {
+            return;
+        }
 
         room.playerLeave(currentPlayerId);
 

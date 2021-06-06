@@ -43,6 +43,8 @@ server.listen(port, () => {
 
     ws.on('connection', (socket, request) => {
 
+        socket.setMaxListeners(20); // fix console warning due to multiple services listeners
+
         const socketCell = createSocketCell(socket);
         try {
             const playerId = globalEntities.services.authService.onSocketFirstConnect(socketCell, request);
