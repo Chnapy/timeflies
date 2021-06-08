@@ -1,6 +1,6 @@
 
 export const routes = {
-    roomListPage: '/',
-    roomPage: '/room/:roomId',
-    battlePage: '/battle/:battleId'
+    roomListPage: () => '/',
+    roomPage: ({ roomId }: { roomId?: string }) => `/room/${roomId ?? ':roomId'}`,
+    battlePage: ({ battleId }: { battleId?: string }) => `/battle/${battleId ?? ':battleId'}`
 };

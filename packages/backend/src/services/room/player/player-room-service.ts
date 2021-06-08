@@ -1,3 +1,4 @@
+import { PlayerId } from '@timeflies/common';
 import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { Service } from '../../service';
@@ -29,19 +30,28 @@ export class PlayerRoomService extends Service {
                 throw new SocketError(400, 'Cannot access room if player in another room: ' + room.roomId);
             }
 
-            room.playerJoin({
-                playerId: currentPlayerId,
-                playerName: 'name_' + currentPlayerId,
-                teamColor: null,
-                ready: false
-            });
+            this.playerJoinToRoom(room, currentPlayerId);
 
             send(RoomPlayerJoinMessage.createResponse(requestId, room.getRoomStateData()));
 
-            this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] = room;
-
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
+
+    playerJoinToRoom = (room: Room, currentPlayerId: PlayerId) => {
+
+        if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]) {
+            return;
+        }
+
+        room.playerJoin({
+            playerId: currentPlayerId,
+            playerName: 'name_' + currentPlayerId,
+            teamColor: null,
+            ready: false
+        });
+
+        this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] = room;
+    };
 
     private addRoomPlayerReadyMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerReadyMessage>(
         RoomPlayerReadyMessage, async ({ payload, requestId }, send) => {
@@ -112,5 +122,9 @@ export class PlayerRoomService extends Service {
         this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
 
         delete this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
+
+        if (room.getRoomStateData().staticPlayerList.length === 0) {
+            delete this.globalEntitiesNoServices.currentRoomMap.mapById[ room.roomId ];
+        }
     };
 }

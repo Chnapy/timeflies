@@ -7,10 +7,21 @@ import { CreateRoomListService } from './create-room-list-service';
 
 describe('create room list-service', () => {
 
+    const getEntities = () => {
+        const entities = getFakeRoomListEntities(CreateRoomListService);
+
+        const playerJoinToRoom = jest.fn();
+        entities.service.services = {
+            playerRoomService: { playerJoinToRoom }
+        } as any;
+
+        return { ...entities, playerJoinToRoom };
+    };
+
     describe('on create room message', () => {
 
         it('throw error if player already in room', () => {
-            const { socketCellP1, connectSocket, globalEntities } = getFakeRoomListEntities(CreateRoomListService);
+            const { socketCellP1, connectSocket, globalEntities } = getEntities();
 
             const room = createFakeRoom();
             globalEntities.currentRoomMap.mapById[ room.roomId ] = room;
@@ -26,7 +37,7 @@ describe('create room list-service', () => {
         });
 
         it('throw error if player already in battle', () => {
-            const { socketCellP1, connectSocket, globalEntities } = getFakeRoomListEntities(CreateRoomListService);
+            const { socketCellP1, connectSocket, globalEntities } = getEntities();
 
             const battle = createFakeBattle();
             globalEntities.currentBattleMap.mapById[ battle.battleId ] = battle;
@@ -42,7 +53,7 @@ describe('create room list-service', () => {
         });
 
         it('answer with room id', async () => {
-            const { socketCellP1, connectSocket } = getFakeRoomListEntities(CreateRoomListService);
+            const { socketCellP1, connectSocket } = getEntities();
 
             connectSocket();
 
@@ -56,7 +67,7 @@ describe('create room list-service', () => {
         });
 
         it('add new room to global entities', async () => {
-            const { socketCellP1, connectSocket, globalEntities } = getFakeRoomListEntities(CreateRoomListService);
+            const { socketCellP1, connectSocket, globalEntities } = getEntities();
 
             connectSocket();
 
@@ -68,6 +79,23 @@ describe('create room list-service', () => {
             await listener(RoomListCreateRoomMessage({}).get(), socketCellP1.send);
 
             expect(globalEntities.currentRoomMap.mapById[ roomId ]).toMatchObject({ roomId: expect.any(String) });
+        });
+
+        it('add player to room and global entities', async () => {
+            const { socketCellP1, connectSocket, playerJoinToRoom, globalEntities } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomListCreateRoomMessage);
+
+            let roomId: string = '';
+            socketCellP1.send = jest.fn((m: any) => roomId = m.payload.roomId);
+
+            await listener(RoomListCreateRoomMessage({}).get(), socketCellP1.send);
+
+            const room = globalEntities.currentRoomMap.mapById[ roomId ]!;
+
+            expect(playerJoinToRoom).toHaveBeenCalledWith(room, 'p1');
         });
     });
 });

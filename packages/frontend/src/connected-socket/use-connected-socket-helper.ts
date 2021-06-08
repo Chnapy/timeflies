@@ -2,44 +2,51 @@ import { getSocketHelperCreator, SocketHelper } from '@timeflies/socket-client';
 import { SocketErrorMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { getEnv } from '../env';
 import { ErrorListAddAction } from '../error-list/store/error-list-actions';
 import { CredentialsLoginAction } from '../login-page/store/credentials-actions';
 import { useGameSelector } from '../store/hooks/use-game-selector';
 
-const createSocketHelper = getSocketHelperCreator('ws://localhost:40510');  // TODO url
+const getWsUrl = () => {
+    const httpUrl = getEnv('REACT_APP_SERVER_URL');
+    const cutStartIndex = httpUrl.indexOf('://') + 3;
+    return 'ws://' + httpUrl.substr(cutStartIndex);
+};
+
+const createSocketHelper = getSocketHelperCreator(getWsUrl());
 
 export const useConnectedSocketHelper = () => {
-    const [ socketHelper, setSocketHelper ] = React.useState<SocketHelper | null>(null);
     const credentialsToken = useGameSelector(state => state.credentials?.token);
     const dispatch = useDispatch();
 
-    React.useEffect(() => {
-        socketHelper?.close();
+    const getSocketHelper = (token: string) => {
+        const socketHelper = createSocketHelper(token);
 
-        if (credentialsToken) {
-            const socketHelper = createSocketHelper(credentialsToken);
+        socketHelper.addCloseListener(() => {
+            dispatch(CredentialsLoginAction(null));
+        });
 
-            socketHelper.addOpenListener(() => {
-                setSocketHelper(socketHelper);
+        socketHelper.addMessageListener(messageList => {
+            messageList.forEach(message => {
+                if (SocketErrorMessage.match(message)) {
+                    dispatch(ErrorListAddAction({
+                        code: message.payload.code
+                    }));
+                }
             });
+        });
 
-            socketHelper.addCloseListener(() => {
-                dispatch(CredentialsLoginAction(null));
-            });
+        return socketHelper;
+    };
 
-            socketHelper.addMessageListener(messageList => {
-                messageList.forEach(message => {
-                    if (SocketErrorMessage.match(message)) {
-                        dispatch(ErrorListAddAction({
-                            code: message.payload.code
-                        }));
-                    }
-                });
-            });
-        } else {
-            setSocketHelper(null);
-        }
-    }, [ credentialsToken, socketHelper, dispatch ]);
+    const socketRef = React.useRef<SocketHelper | null>(null);
 
-    return socketHelper;
+    if (!socketRef.current && credentialsToken) {
+        socketRef.current = getSocketHelper(credentialsToken);
+    } else if (!credentialsToken) {
+        socketRef.current?.close();
+        socketRef.current = null;
+    }
+
+    return socketRef.current;
 };

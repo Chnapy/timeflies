@@ -4,14 +4,13 @@ import { CharacterAnimatedImageProps } from '@timeflies/sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { getEnv } from '../../env';
 import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
-import { routes } from '../../routes';
 import { CredentialsLoginAction } from '../store/credentials-actions';
 
 const authUrl = new URL(
     authEndpoint,
-    process.env.REACT_APP_SERVER_URL    // TODO use getEnv() like in backend
+    getEnv('REACT_APP_SERVER_URL')
 ).href;
 
 const playerNameInputName = 'playerName';
@@ -21,7 +20,6 @@ export const useLoginFormState = () => {
     const [ loading, setLoading ] = React.useState(false);
     const [ writing, setWriting ] = React.useState(false);
     const [ characterIgnoreErrors, setCharacterIgnoreErrors ] = React.useState(false);
-    const history = useHistory();
     const dispatch = useDispatch();
 
     const setErrors: typeof setErrorsRaw = errors => {
@@ -73,8 +71,6 @@ export const useLoginFormState = () => {
 
             dispatch(CredentialsLoginAction(responseData.playerCredentials));
 
-            history.push(routes.roomListPage);
-
         } catch (e) {
             logger.error(e);
 
@@ -82,7 +78,7 @@ export const useLoginFormState = () => {
             dispatch(ErrorListAddAction({ code: 500 }));
         }
 
-    }, [ loading, dispatch, history ]);
+    }, [ loading, dispatch ]);
 
     const onTextFieldChange: React.ChangeEventHandler<HTMLInputElement> = e => {
         setWriting(true);

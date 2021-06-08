@@ -37,7 +37,23 @@ export const createFakeSocketCell = (): SocketCellTestable => {
 export const createFakeGlobalEntitiesNoService = (room?: Room, battle?: Battle): GlobalEntitiesNoServices => ({
     playerCredentialsMap: {
         mapByToken: {},
-        mapByPlayerName: {}
+        mapByPlayerName: {
+            p1: {
+                playerId: 'p1',
+                playerName: 'p-1',
+                token: '---'
+            },
+            p2: {
+                playerId: 'p2',
+                playerName: 'p-2',
+                token: '---'
+            },
+            p3: {
+                playerId: 'p3',
+                playerName: 'p-3',
+                token: '---'
+            }
+        }
     },
     currentRoomMap: {
         mapById: {

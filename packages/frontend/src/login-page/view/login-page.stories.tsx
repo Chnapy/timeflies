@@ -20,7 +20,7 @@ export const Default: React.FC = () => {
                 <BrowserRouter>
 
                     <Switch>
-                        <Route path={routes.roomListPage}>
+                        <Route path={routes.roomListPage()}>
                             <div>Room-list page</div>
                         </Route>
                         <Route >

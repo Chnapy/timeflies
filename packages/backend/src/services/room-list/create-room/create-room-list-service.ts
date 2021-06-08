@@ -24,6 +24,8 @@ export class CreateRoomListService extends Service {
                 services: this.services
             });
 
+            this.services.playerRoomService.playerJoinToRoom(room, currentPlayerId);
+
             send(RoomListCreateRoomMessage.createResponse(requestId, { roomId: room.roomId }));
 
             this.globalEntitiesNoServices.currentRoomMap.mapById[ room.roomId ] = room;
