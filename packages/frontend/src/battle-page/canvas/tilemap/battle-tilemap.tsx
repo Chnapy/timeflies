@@ -13,7 +13,7 @@ import { useTileHoverDispatchContext } from '../../tile-interactive/view/tile-ho
 import { BattleCharacterCurrentSprite } from '../character-sprite/battle-character-current-sprite';
 import { BattleCharacterFutureSprite } from '../character-sprite/battle-character-future-sprite';
 
-const imagesLinksToTextures = (links: Record<string, string>) => {
+export const imagesLinksToTextures = (links: Record<string, string>) => {
     return Object.entries(links).reduce<Record<string, Texture>>((acc, [ key, source ]) => {
         acc[ key ] = Texture.from(source);
         return acc;

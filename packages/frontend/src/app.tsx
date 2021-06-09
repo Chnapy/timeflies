@@ -10,6 +10,7 @@ import { NeedAuth } from './connected-socket/need-auth';
 import { ErrorList } from './error-list/view/error-list';
 import './fonts-import.css';
 import { RoomListPage } from './room-list-page/view/room-list-page';
+import { RoomPage } from './room-page/view/room-page';
 import { routes } from './routes';
 import { createStoreManager } from './store/store-manager';
 
@@ -26,17 +27,17 @@ export const App: React.FC = () => {
                     <BrowserRouter>
                         <BattleAssetsLoader>
                             <Switch>
-                                <Route path={routes.roomListPage()} exact>
+                                <Route {...routes.roomListPage()}>
                                     <NeedAuth>
                                         <RoomListPage />
                                     </NeedAuth>
                                 </Route>
-                                <Route path={routes.roomPage({})}>
+                                <Route {...routes.roomPage({})}>
                                     <NeedAuth>
-                                        <div>TODO room</div>
+                                        <RoomPage />
                                     </NeedAuth>
                                 </Route>
-                                <Route path={routes.battlePage({})}>
+                                <Route {...routes.battlePage({})}>
                                     <NeedAuth>
                                         <BattlePage />
                                     </NeedAuth>

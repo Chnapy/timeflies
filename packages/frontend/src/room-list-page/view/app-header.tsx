@@ -5,7 +5,7 @@ import { UIText } from '@timeflies/app-ui';
 import { switchUtil } from '@timeflies/common';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useRouteMatch } from 'react-router-dom';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { routes } from '../../routes';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
@@ -13,6 +13,10 @@ import { useGameSelector } from '../../store/hooks/use-game-selector';
 const useStyles = makeStyles(({ palette, spacing }) => ({
     root: {
         backgroundColor: palette.background.paper
+    },
+    title: {
+        cursor: 'pointer',
+        userSelect: 'none'
     },
     btn: {
         textTransform: 'none',
@@ -23,18 +27,22 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
 
 export const AppHeader: React.FC = () => {
     const classes = useStyles();
+    const history = useHistory();
     const playerName = useGameSelector(state => state.credentials?.playerName);
-    const match = useRouteMatch([
-        routes.roomListPage(),
-        routes.roomPage({}),
-        routes.battlePage({}),
-    ]);
+
+    const routePath = [
+        useRouteMatch(routes.roomListPage()),
+        useRouteMatch(routes.roomPage({})),
+        useRouteMatch(routes.battlePage({}))
+    ]
+        .find(m => m !== null)?.path;
+
     const dispatch = useDispatch();
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
 
-    const title = switchUtil(match!.path, {
-        [ routes.roomListPage() ]: 'Room list',
-        [ routes.roomPage({}) ]: 'Room'
+    const title = switchUtil(routePath!, {
+        [ routes.roomListPage().path ]: 'Room list',
+        [ routes.roomPage({}).path ]: 'Room'
     });
 
     const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -45,9 +53,14 @@ export const AppHeader: React.FC = () => {
         setAnchorEl(null);
     };
 
+    const onTitleClick = () => {
+        history.push(routes.roomListPage().path);
+    };
+
     const handleLogout = () => {
         handleClose();
         dispatch(CredentialsLoginAction(null));
+        history.push(routes.roomListPage().path);
     };
 
     return (
@@ -57,7 +70,7 @@ export const AppHeader: React.FC = () => {
                     <Grid container alignItems='baseline' spacing={2}>
 
                         <Grid item>
-                            <UIText variant='h3'>timeflies</UIText>
+                            <UIText className={classes.title} variant='h3' onClick={onTitleClick}>timeflies</UIText>
                         </Grid>
 
                         <Grid item xs>

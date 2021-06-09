@@ -64,7 +64,7 @@ export const RoomListTable: React.FC = () => {
     const sendWithResponse = useSocketSendWithResponse();
 
     const getOnRoomSelect = (roomId: string) => () => {
-        history.push(routes.roomPage({ roomId }));
+        history.push(routes.roomPage({ roomId }).path);
     };
 
     const onCreateRoom = async () => {
@@ -74,9 +74,9 @@ export const RoomListTable: React.FC = () => {
             return;
         }
 
-        history.push(routes.roomPage({
-            roomId: response.payload.roomId
-        }));
+        history.push(
+            routes.roomPage({ roomId: response.payload.roomId }).path
+        );
     };
 
     useAsyncEffect(async function fetchListEveryInterval(isMounted): Promise<void> {

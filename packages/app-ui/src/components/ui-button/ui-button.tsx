@@ -40,7 +40,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', class
             size='large'
             {...rest}
         >
-            <UIText className={classes.text} variant='body1'>{children}</UIText>
+            <UIText className={classes.text} variant='body1' component='div'>{children}</UIText>
         </Button>
     );
 };

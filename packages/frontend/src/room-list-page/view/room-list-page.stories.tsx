@@ -4,7 +4,7 @@ import { SocketContextProvider, SocketHelper } from '@timeflies/socket-client';
 import { RoomListGetListMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { MemoryRouter, Route, Switch } from 'react-router-dom';
 import { BattleAssetsLoader } from '../../battle-page/assets-loader/view/battle-assets-loader';
 import { ErrorList } from '../../error-list/view/error-list';
 import { routes } from '../../routes';
@@ -62,10 +62,10 @@ export const Default: React.FC = () => {
         <Provider store={store}>
             <SocketContextProvider value={socketHelper}>
                 <BattleAssetsLoader>
-                    <BrowserRouter>
+                    <MemoryRouter initialEntries={[ '/' ]}>
 
                         <Switch>
-                            <Route path={routes.roomPage({})}>
+                            <Route {...routes.roomPage({})}>
                                 <div>Room page</div>
                             </Route>
                             <Route >
@@ -74,7 +74,7 @@ export const Default: React.FC = () => {
                         </Switch>
 
                         <ErrorList />
-                    </BrowserRouter>
+                    </MemoryRouter>
                 </BattleAssetsLoader>
             </SocketContextProvider>
         </Provider>
