@@ -1,11 +1,19 @@
 import { Box, Paper } from '@material-ui/core';
 import { UIButton, UIText } from '@timeflies/app-ui';
 import React from 'react';
+import { useMyPlayerId } from '../../login-page/hooks/use-my-player-id';
 import { useRoomSelector } from '../hooks/use-room-selector';
 import { RoomMapButton } from './room-map-button';
+import { RoomMapList } from './room-map-list';
 
 export const RoomMapPanel: React.FC = () => {
     const mapInfos = useRoomSelector(state => state.mapInfos);
+    const myPlayerId = useMyPlayerId();
+    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
+    const [ mapListOpen, setMapListOpen ] = React.useState(false);
+
+    const onMapListClose = () => setMapListOpen(false);
+    const onMapListOpen = () => setMapListOpen(true);
 
     return (
         <Paper>
@@ -13,9 +21,12 @@ export const RoomMapPanel: React.FC = () => {
                 <UIText variant='body1' align='center' gutterBottom>Map</UIText>
 
                 {mapInfos
-                    ? <RoomMapButton mapInfos={mapInfos} onClick={() => { }} />
-                    : <UIButton>select map</UIButton>
-                }
+                    ? <RoomMapButton mapInfos={mapInfos} disabled={!isAdmin} onClick={onMapListOpen} />
+                    : (isAdmin
+                        ? <UIButton onClick={onMapListOpen}>select map</UIButton>
+                        : <UIText variant='body2'>no map selected</UIText>)}
+
+                <RoomMapList open={mapListOpen} onClose={onMapListClose} />
             </Box>
         </Paper>
     );

@@ -10,10 +10,12 @@ import { RoomTeamPlayerLine } from './room-team-player-line';
 
 export type RoomTeamProps = {
     teamColor: string;
+    onCharacterListOpen: () => void;
 };
 
 const useStyles = makeStyles(({ spacing }) => ({
     root: ({ teamColor }: Pick<RoomTeamProps, 'teamColor'>) => ({
+        minWidth: 200,
         borderLeftWidth: 8,
         borderLeftStyle: 'solid',
         borderLeftColor: teamColor,
@@ -21,7 +23,7 @@ const useStyles = makeStyles(({ spacing }) => ({
     })
 }));
 
-export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor }) => {
+export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor, onCharacterListOpen }) => {
     const classes = useStyles({ teamColor });
 
     const sendRoomUpdate = useSendRoomUpdate();
@@ -43,6 +45,7 @@ export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor }) => {
                         <RoomTeamPlayerLine
                             key={playerId}
                             playerId={playerId}
+                            onCharacterListOpen={onCharacterListOpen}
                         />
                     </Grid>
                 ))}

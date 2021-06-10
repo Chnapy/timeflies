@@ -26,7 +26,8 @@ export class PlayerRoomService extends Service {
                 throw new SocketError(400, 'Cannot access room if player in battle: ' + room.roomId);
             }
 
-            if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]) {
+            if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]
+                && this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] !== room) {
                 throw new SocketError(400, 'Cannot access room if player in another room: ' + room.roomId);
             }
 
@@ -43,9 +44,11 @@ export class PlayerRoomService extends Service {
             return;
         }
 
+        const { playerName } = this.globalEntitiesNoServices.playerCredentialsMap.mapById[ currentPlayerId ];
+
         room.playerJoin({
             playerId: currentPlayerId,
-            playerName: 'name_' + currentPlayerId,
+            playerName,
             teamColor: null,
             ready: false
         });

@@ -75,5 +75,5 @@ export const RoomCharacter: React.FC<RoomCharacterProps> = ({ characterId }) => 
                 pingPong
             />
         </UIButton>
-    )
+    );
 };

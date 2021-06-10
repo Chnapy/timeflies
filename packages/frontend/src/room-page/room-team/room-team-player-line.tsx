@@ -9,6 +9,7 @@ import { RoomCharacter } from './room-character';
 
 type RoomTeamPlayerLineProps = {
     playerId: PlayerId;
+    onCharacterListOpen: () => void;
 };
 
 const useStyles = makeStyles(({ palette, spacing }) => ({
@@ -28,7 +29,7 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
     }
 }));
 
-export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId }) => {
+export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId, onCharacterListOpen }) => {
     const classes = useStyles();
     const myPlayerId = useMyPlayerId();
     const playerName = useRoomSelector(state => state.staticPlayerList[ playerId ].playerName);
@@ -39,8 +40,6 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
     const characterIdList = ObjectTyped.entries(staticCharacterList)
         .filter(([ characterId, character ]) => character.playerId === playerId)
         .map(([ characterId ]) => characterId);
-
-    // const onAdd = () => sendRoomUpdate(RoomCharacterAddMessage({  }));
 
     return (
         <Grid container direction='column'>
@@ -57,7 +56,7 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
 
                     {isMyPlayer && (
                         <Grid item>
-                            <UIButton className={classes.addBtn}>
+                            <UIButton className={classes.addBtn} onClick={onCharacterListOpen}>
                                 <AddIcon className={classes.addBtnIcon} />
                             </UIButton>
                         </Grid>
@@ -67,11 +66,3 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
         </Grid>
     );
 };
-function sendRoomUpdate(arg0: any) {
-    throw new Error('Function not implemented.');
-}
-
-function RoomCharacterAddMessage(arg0: { characterId: any; }): any {
-    throw new Error('Function not implemented.');
-}
-

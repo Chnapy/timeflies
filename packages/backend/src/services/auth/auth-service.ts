@@ -15,6 +15,7 @@ export class AuthService extends Service {
     protected afterSocketConnect = () => { };
 
     private addPlayerCredentials = (playerCredentials: PlayerCredentials) => {
+        this.globalEntitiesNoServices.playerCredentialsMap.mapById[ playerCredentials.playerId ] = playerCredentials;
         this.globalEntitiesNoServices.playerCredentialsMap.mapByToken[ playerCredentials.token ] = playerCredentials;
         this.globalEntitiesNoServices.playerCredentialsMap.mapByPlayerName[ playerCredentials.playerName ] = playerCredentials;
     };

@@ -16,6 +16,7 @@ export const SpellButtonSimpleConnected: React.FC<SpellButtonSimpleConnectedProp
     return (
         <SpellButtonSimple
             imageSize={28}
+            padding={2}
             spellRole={spellRole}
             onClick={() => spellClick(spellId)}
             onMouseEnter={() => spellHover(spellId)}

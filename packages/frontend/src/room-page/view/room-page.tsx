@@ -3,7 +3,7 @@ import React from 'react';
 import { AppHeader } from '../../room-list-page/view/app-header';
 import { RoomContent } from './room-content';
 
-const useStyles = makeStyles(({spacing}) => ({
+const useStyles = makeStyles(({ spacing }) => ({
     root: {
         display: 'flex',
         flexDirection: 'column',
@@ -11,6 +11,7 @@ const useStyles = makeStyles(({spacing}) => ({
     },
     container: {
         flexGrow: 1,
+        overflow: 'hidden',
         marginTop: spacing(2),
         marginBottom: spacing(1)
     }

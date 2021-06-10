@@ -51,9 +51,17 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         ? allTeamColorList.slice(0, mapInfos.nbrTeams)
         : [];
 
+    const getMapInfosFrontend = () => {
+        if (!mapInfos) {
+            return null;
+        }
+
+        return globalEntities.services.mapRoomService.getMapInfosFrontend(mapInfos);
+    };
+
     const getRoomStateData = (): RoomStateData => ({
         roomId,
-        mapInfos,
+        mapInfos: getMapInfosFrontend(),
         playerAdminId,
         teamColorList: getTeamColorList(),
         staticPlayerList,

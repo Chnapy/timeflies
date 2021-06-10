@@ -108,6 +108,7 @@ describe('auth service', () => {
                 playerName: 'player',
                 token: expect.any(String)
             });
+            expect(globalEntities.playerCredentialsMap.mapById[ credentials.playerId ]).toBe(credentials);
             expect(globalEntities.playerCredentialsMap.mapByToken[ credentials.token ]).toBe(credentials);
         });
     });

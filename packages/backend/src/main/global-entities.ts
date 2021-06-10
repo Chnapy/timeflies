@@ -5,6 +5,7 @@ import { Room, RoomId } from '../services/room/room';
 import { createServices, Services } from '../services/services';
 
 export type PlayerCredentialsMap = {
+    mapById: { [ playerId in PlayerId ]: PlayerCredentials };
     mapByToken: { [ token in string ]: PlayerCredentials };
     mapByPlayerName: { [ playerName in string ]: PlayerCredentials };
 };
@@ -34,6 +35,7 @@ export type GlobalEntitiesNoServices = Omit<GlobalEntities, 'services'>;
 export const createGlobalEntities = (): GlobalEntities => {
     const globalEntitiesNoServices: GlobalEntitiesNoServices = {
         playerCredentialsMap: {
+            mapById: {},
             mapByToken: {},
             mapByPlayerName: {}
         },

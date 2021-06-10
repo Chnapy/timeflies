@@ -225,7 +225,7 @@ describe('room', () => {
             name: 'm-1',
             nbrTeams: 3,
             nbrTeamCharacters: 4,
-            schemaLink: 'foo',
+            schemaLink: 'https://host.com/static/foo',
             imagesLinks: {}
         });
     });

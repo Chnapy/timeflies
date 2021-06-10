@@ -9,15 +9,16 @@ export type SpellButtonSimpleProps = {
     imageSize: number;
     selected: boolean;
     disabled: boolean;
-    onClick: () => void;
-    onMouseEnter: () => void;
-    onMouseLeave: () => void;
+    padding: number;
+    onClick?: () => void;
+    onMouseEnter?: React.EventHandler<any>;
+    onMouseLeave?: () => void;
 };
 
-type StyleProps = Pick<SpellButtonSimpleProps, 'selected'>;
+type StyleProps = Pick<SpellButtonSimpleProps, 'selected'> & { clickable: boolean };
 
 const useStyles = makeStyles(({ transitions }) => ({
-    root: ({ selected }: StyleProps) => {
+    root: ({ selected, clickable }: StyleProps) => {
 
         const commonStyles: CSSProperties = {
             transition: transitions.create([ 'opacity', 'filter' ], {
@@ -32,6 +33,12 @@ const useStyles = makeStyles(({ transitions }) => ({
             };
         }
 
+        if (!clickable) {
+            return {
+                cursor: 'default'
+            };
+        }
+
         return ({
             ...commonStyles,
             '&:hover': {
@@ -42,9 +49,9 @@ const useStyles = makeStyles(({ transitions }) => ({
 }));
 
 export const SpellButtonSimple: React.FC<SpellButtonSimpleProps> = ({
-    spellRole, imageSize, selected, disabled, onClick, onMouseEnter, onMouseLeave
+    spellRole, imageSize, selected, disabled, padding, onClick, onMouseEnter, onMouseLeave
 }) => {
-    const classes = useStyles({ selected });
+    const classes = useStyles({ selected, clickable: !!onClick });
 
     return (
         <ButtonBase
@@ -56,7 +63,7 @@ export const SpellButtonSimple: React.FC<SpellButtonSimpleProps> = ({
             onPointerUp={onMouseLeave}
             disabled={disabled}
         >
-            <SpellIcon size={imageSize} spellRole={spellRole} padding={4} />
+            <SpellIcon size={imageSize} spellRole={spellRole} padding={padding} />
         </ButtonBase>
     );
 };

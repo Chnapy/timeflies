@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Meta } from '@storybook/react/types-6-0';
 import { AssetsLoader } from '@timeflies/assets-loader';
 import { SocketContextProvider, SocketHelper } from '@timeflies/socket-client';
-import { RoomPlayerJoinMessage } from '@timeflies/socket-messages';
+import { RoomEntityListGetMessage, RoomMapListGetMessage, RoomPlayerJoinMessage } from '@timeflies/socket-messages';
 import { Assets } from '@timeflies/static-assets';
 import React from 'react';
 import { Provider } from 'react-redux';
@@ -33,65 +33,159 @@ export const Default: React.FC = () => {
         url: '',
         addCloseListener: () => () => { },
         addMessageListener: listener => {
-            setImmediate(() =>
-                listener([
-                    RoomPlayerJoinMessage.createResponse(message.requestId, {
-                        roomId: 'roomId',
-                        mapInfos: {
-                            mapId: 'm1',
-                            name: 'dungeon',
-                            nbrTeams: 2,
-                            nbrTeamCharacters: 3,
-                            schemaLink: 'fake/maps/map_dungeon.json',
-                            imagesLinks: {
-                                "tiles_dungeon_v1.1": 'fake/maps/map_dungeon.png'
+            setImmediate(() => {
+
+                if (RoomMapListGetMessage.match(message)) {
+                    listener([
+                        RoomMapListGetMessage.createResponse(message.requestId, [
+                            {
+                                mapId: 'm1',
+                                name: 'dungeon',
+                                nbrTeams: 2,
+                                nbrTeamCharacters: 3,
+                                schemaLink: 'fake/maps/map_dungeon.json',
+                                imagesLinks: {
+                                    "tiles_dungeon_v1.1": 'fake/maps/map_dungeon.png'
+                                }
+                            },
+                            {
+                                mapId: 'm2',
+                                name: 'dungeon2',
+                                nbrTeams: 4,
+                                nbrTeamCharacters: 3,
+                                schemaLink: 'fake/maps/map_dungeon.json',
+                                imagesLinks: {
+                                    "tiles_dungeon_v1.1": 'fake/maps/map_dungeon.png'
+                                }
+                            },
+                            {
+                                mapId: 'm3',
+                                name: 'dungeon',
+                                nbrTeams: 2,
+                                nbrTeamCharacters: 1,
+                                schemaLink: 'fake/maps/map_dungeon.json',
+                                imagesLinks: {
+                                    "tiles_dungeon_v1.1": 'fake/maps/map_dungeon.png'
+                                }
                             }
-                        },
-                        playerAdminId: 'p1',
-                        teamColorList: [ '#F00', '#0F0' ],
-                        staticPlayerList: [
-                            {
-                                playerId: 'p1',
-                                playerName: 'chnapy',
-                                ready: false,
-                                teamColor: '#0F0'
+                        ]) as any
+                    ]);
+
+                } else if (RoomEntityListGetMessage.match(message)) {
+                    listener([
+                        RoomEntityListGetMessage.createResponse(message.requestId, {
+                            characterList: [
+                                {
+                                    characterRole: 'tacka',
+                                    defaultSpellRole: 'move',
+                                    variables: {
+                                        health: 100,
+                                        actionTime: 9000
+                                    }
+                                },
+                                {
+                                    characterRole: 'vemo',
+                                    defaultSpellRole: 'switch',
+                                    variables: {
+                                        health: 90,
+                                        actionTime: 8000
+                                    }
+                                },
+                                {
+                                    characterRole: 'meti',
+                                    defaultSpellRole: 'move',
+                                    variables: {
+                                        health: 80,
+                                        actionTime: 9000
+                                    }
+                                }
+                            ],
+                            spellList: [
+                                {
+                                    characterRole: 'tacka',
+                                    spellRole: 'move',
+                                    variables: {
+                                        duration: 800,
+                                        rangeArea: 6,
+                                        actionArea: 1,
+                                        lineOfSight: true
+                                    }
+                                },
+                                {
+                                    characterRole: 'tacka',
+                                    spellRole: 'simpleAttack',
+                                    variables: {
+                                        duration: 1500,
+                                        rangeArea: 7,
+                                        actionArea: 2,
+                                        lineOfSight: true
+                                    }
+                                }
+                            ]
+                        }) as any
+                    ]);
+
+                } else {
+
+                    listener([
+                        RoomPlayerJoinMessage.createResponse(message.requestId, {
+                            roomId: 'roomId',
+                            mapInfos: {
+                                mapId: 'm1',
+                                name: 'dungeon',
+                                nbrTeams: 2,
+                                nbrTeamCharacters: 3,
+                                schemaLink: 'fake/maps/map_dungeon.json',
+                                imagesLinks: {
+                                    "tiles_dungeon_v1.1": 'fake/maps/map_dungeon.png'
+                                }
                             },
-                            {
-                                playerId: 'p2',
-                                playerName: 'yoshi2oeuf',
-                                ready: false,
-                                teamColor: '#0F0'
-                            }
-                        ],
-                        staticCharacterList: [
-                            {
-                                characterId: 'c1',
-                                playerId: 'p1',
-                                characterRole: 'tacka',
-                                placement: null
-                            },
-                            {
-                                characterId: 'c2',
-                                playerId: 'p1',
-                                characterRole: 'vemo',
-                                placement: null
-                            },
-                            {
-                                characterId: 'c3',
-                                playerId: 'p1',
-                                characterRole: 'meti',
-                                placement: null
-                            },
-                            {
-                                characterId: 'c4',
-                                playerId: 'p2',
-                                characterRole: 'tacka',
-                                placement: null
-                            }
-                        ]
-                    }) as any
-                ])
-            );
+                            playerAdminId: 'p1',
+                            teamColorList: [ '#F00', '#0F0' ],
+                            staticPlayerList: [
+                                {
+                                    playerId: 'p1',
+                                    playerName: 'chnapy',
+                                    ready: false,
+                                    teamColor: '#0F0'
+                                },
+                                {
+                                    playerId: 'p2',
+                                    playerName: 'yoshi2oeuf',
+                                    ready: false,
+                                    teamColor: '#0F0'
+                                }
+                            ],
+                            staticCharacterList: [
+                                {
+                                    characterId: 'c1',
+                                    playerId: 'p1',
+                                    characterRole: 'tacka',
+                                    placement: null
+                                },
+                                {
+                                    characterId: 'c2',
+                                    playerId: 'p1',
+                                    characterRole: 'vemo',
+                                    placement: null
+                                },
+                                {
+                                    characterId: 'c3',
+                                    playerId: 'p1',
+                                    characterRole: 'meti',
+                                    placement: null
+                                },
+                                {
+                                    characterId: 'c4',
+                                    playerId: 'p2',
+                                    characterRole: 'tacka',
+                                    placement: null
+                                }
+                            ]
+                        }) as any
+                    ]);
+                }
+            });
 
             return () => { };
         },

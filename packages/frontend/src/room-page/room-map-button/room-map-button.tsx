@@ -1,12 +1,11 @@
 import { Grid, makeStyles } from '@material-ui/core';
-import { UIButton, UIText } from '@timeflies/app-ui';
+import { UIButton, UIButtonProps, UIText } from '@timeflies/app-ui';
 import { MapInfos } from '@timeflies/socket-messages';
 import React from 'react';
 import { RoomMapButtonImage } from './room-map-button-image';
 
-type RoomMapButtonProps = {
+type RoomMapButtonProps = Pick<UIButtonProps, 'disabled' | 'onClick'> & {
     mapInfos: MapInfos;
-    onClick: () => void;
 };
 
 const width = 200;
@@ -36,11 +35,11 @@ const useStyles = makeStyles(({spacing}) => ({
     }
 }));
 
-export const RoomMapButton: React.FC<RoomMapButtonProps> = ({ mapInfos, onClick }) => {
+export const RoomMapButton: React.FC<RoomMapButtonProps> = ({ mapInfos, ...rest }) => {
     const classes = useStyles();
 
     return (
-        <UIButton className={classes.root} onClick={onClick}>
+        <UIButton className={classes.root} {...rest}>
             <Grid className={classes.content} container>
 
                 <Grid item>

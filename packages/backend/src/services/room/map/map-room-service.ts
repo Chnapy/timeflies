@@ -1,5 +1,7 @@
+import { ObjectTyped } from '@timeflies/common';
 import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
+import { assetUrl } from '../../../utils/asset-url';
 import { Service } from '../../service';
 
 export class MapRoomService extends Service {
@@ -11,7 +13,9 @@ export class MapRoomService extends Service {
     private addRoomMapListGetMessageListener = (socketCell: SocketCell) => socketCell.addMessageListener<typeof RoomMapListGetMessage>(
         RoomMapListGetMessage, ({ requestId }, send) => {
 
-            send(RoomMapListGetMessage.createResponse(requestId, getMapList()));
+            const mapList = getMapList().map(this.getMapInfosFrontend);
+
+            send(RoomMapListGetMessage.createResponse(requestId, mapList));
         });
 
     private addRoomMapSelectMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomMapSelectMessage>(
@@ -42,6 +46,18 @@ export class MapRoomService extends Service {
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
+
+    getMapInfosFrontend = (mapInfos: MapInfos) => {
+        return {
+            ...mapInfos,
+            schemaLink: assetUrl.toFrontend(mapInfos.schemaLink),
+            imagesLinks: ObjectTyped.entries(mapInfos.imagesLinks)
+                .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
+                    acc[ key ] = assetUrl.toFrontend(value);
+                    return acc;
+                }, {})
+        };
+    };
 }
 
 // MOCKs
