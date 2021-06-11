@@ -16,6 +16,7 @@ export const createFakeRoom = (): Room => ({
             schemaLink: '',
             imagesLinks: {}
         },
+        mapPlacementTiles: {},
         playerAdminId: 'p1',
         teamColorList: [ '#FFF', '#000' ],
         staticPlayerList: [
@@ -44,12 +45,10 @@ export const createFakeRoom = (): Room => ({
     playerReady: jest.fn(),
     playerLeave: jest.fn(),
     teamJoin: jest.fn(),
-    mapSelect: jest.fn(),
+    mapSelect: jest.fn(async () => {}),
     characterSelect: jest.fn(),
     characterRemove: jest.fn(),
     characterPlacement: jest.fn(),
-    computeMapPlacementTiles: jest.fn(),
-    getMapPlacementTiles: jest.fn(async () => ({})),
     waitForBattle: jest.fn(async () => 'completed'),
     createBattle: jest.fn(async () => createFakeBattle()),
     removeBattle: jest.fn(),

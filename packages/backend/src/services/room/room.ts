@@ -1,5 +1,5 @@
 import { CharacterId, createId, ObjectTyped, PlayerId, Position, WaitCancelableState, waitCanceleable } from '@timeflies/common';
-import { MapInfos, RoomStateData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
+import { MapInfos, MapPlacementTiles, RoomStateData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
 import { Layer, Tile } from '@timeflies/tilemap-utils';
 import fs from 'fs';
 import type TiledMap from 'tiled-types';
@@ -10,13 +10,10 @@ import { Battle, createBattle } from '../battle/battle';
 
 export type RoomId = string;
 
-type MapPlacementTiles = { [ teamColor: string ]: Position[] };
-
 export type Room = {
     roomId: RoomId;
 
     getRoomStateData: () => RoomStateData;
-    getMapPlacementTiles: () => Promise<MapPlacementTiles>;
 
     playerJoin: (playerInfos: RoomStaticPlayer) => void;
     playerReady: (playerId: PlayerId, ready: boolean) => void;
@@ -25,8 +22,7 @@ export type Room = {
     characterSelect: (staticCharacter: RoomStaticCharacter) => void;
     characterRemove: (characterId: CharacterId) => void;
     characterPlacement: (characterId: CharacterId, position: Position | null) => void;
-    mapSelect: (mapInfos: MapInfos) => void;
-    computeMapPlacementTiles: () => void;
+    mapSelect: (mapInfos: MapInfos) => Promise<void>;
     waitForBattle: () => Promise<WaitCancelableState[ 'state' ]>;
     createBattle: () => Promise<Battle>;
     removeBattle: () => void;
@@ -40,6 +36,7 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
 
     let mapInfos: MapInfos | null = null;
     let tiledMapPromise: Promise<TiledMap> | null = null;
+    let placementTiles: MapPlacementTiles = {};
     let playerAdminId: PlayerId = '';
     const staticPlayerList: RoomStaticPlayer[] = [];
     let staticCharacterList: RoomStaticCharacter[] = [];
@@ -59,9 +56,44 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         return globalEntities.services.mapRoomService.getMapInfosFrontend(mapInfos);
     };
 
+    const getMapPlacementTiles = async (tiledMap: TiledMap): Promise<MapPlacementTiles> => {
+
+        const placementLayer = Layer.getTilelayer('placement', tiledMap);
+        const tilePositionsMap: MapPlacementTiles = {};
+
+        (placementLayer.data as number[]).forEach((tileId, index) => {
+            if (tileId) {
+                tilePositionsMap[ tileId ] = tilePositionsMap[ tileId ] ?? [];
+                tilePositionsMap[ tileId ].push(Tile.getTilePositionFromIndex(index, tiledMap));
+            }
+        });
+
+        return ObjectTyped.entries(tilePositionsMap)
+            .reduce<MapPlacementTiles>((acc, [ tileId, positionList ], index) => {
+
+                acc[ allTeamColorList[ index ] ] = positionList;
+
+                return acc;
+            }, {});
+    };
+
+    const computeMapPlacementTiles = () => {
+        const readFile = util.promisify(fs.readFile);
+
+        tiledMapPromise = readFile(assetUrl.toBackend(mapInfos!.schemaLink), 'utf-8')
+            .then<TiledMap>(JSON.parse)
+            .then<TiledMap>(async (tiledMap) => {
+                placementTiles = await getMapPlacementTiles(tiledMap);
+
+                return tiledMap;
+            });
+        return tiledMapPromise;
+    };
+
     const getRoomStateData = (): RoomStateData => ({
         roomId,
         mapInfos: getMapInfosFrontend(),
+        mapPlacementTiles: placementTiles,
         playerAdminId,
         teamColorList: getTeamColorList(),
         staticPlayerList,
@@ -72,27 +104,6 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         roomId,
 
         getRoomStateData,
-        getMapPlacementTiles: async () => {
-            const tiledMap = await tiledMapPromise!;
-
-            const placementLayer = Layer.getTilelayer('placement', tiledMap);
-            const tilePositionsMap: MapPlacementTiles = {};
-
-            (placementLayer.data as number[]).forEach((tileId, index) => {
-                if (tileId) {
-                    tilePositionsMap[ tileId ] = tilePositionsMap[ tileId ] ?? [];
-                    tilePositionsMap[ tileId ].push(Tile.getTilePositionFromIndex(index, tiledMap));
-                }
-            });
-
-            return ObjectTyped.entries(tilePositionsMap)
-                .reduce<MapPlacementTiles>((acc, [ tileId, positionList ], index) => {
-
-                    acc[ allTeamColorList[ index ] ] = positionList;
-
-                    return acc;
-                }, {});
-        },
 
         playerJoin: playerInfos => {
             staticPlayerList.push(playerInfos);
@@ -143,14 +154,9 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
             const character = staticCharacterList.find(char => char.characterId === characterId);
             character!.placement = position;
         },
-        mapSelect: (selectedMapInfos) => {
+        mapSelect: async (selectedMapInfos) => {
             mapInfos = selectedMapInfos;
-        },
-        computeMapPlacementTiles: () => {
-            const readFile = util.promisify(fs.readFile);
-
-            tiledMapPromise = readFile(assetUrl.toBackend(mapInfos!.schemaLink), 'utf-8')
-                .then<TiledMap>(JSON.parse);
+            await computeMapPlacementTiles();
         },
         waitForBattle: async () => {
             const { promise, cancel } = waitCanceleable(5000);

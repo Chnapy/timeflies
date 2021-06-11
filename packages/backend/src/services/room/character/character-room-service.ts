@@ -82,11 +82,11 @@ export class CharacterRoomService extends Service {
         });
 
     private addRoomCharacterPlacementMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomCharacterPlacementMessage>(
-        RoomCharacterPlacementMessage, async ({ payload, requestId }, send) => {
+        RoomCharacterPlacementMessage, ({ payload, requestId }, send) => {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 
-            const { staticPlayerList, staticCharacterList } = room.getRoomStateData();
+            const { staticPlayerList, staticCharacterList, mapPlacementTiles } = room.getRoomStateData();
 
             const currentPlayer = staticPlayerList.find(p => p.playerId === currentPlayerId)!;
             if (currentPlayer.ready) {
@@ -108,7 +108,7 @@ export class CharacterRoomService extends Service {
                     throw new SocketError(400, 'Position occupied by other character: ' + payload.position.id);
                 }
 
-                const placementTiles = (await room.getMapPlacementTiles())[ currentPlayer.teamColor! ];
+                const placementTiles = mapPlacementTiles[ currentPlayer.teamColor! ];
                 if (!placementTiles.some(tile => tile.id === payload.position!.id)) {
                     throw new SocketError(400, 'Position not in placement tiles: ' + payload.position.id);
                 }
