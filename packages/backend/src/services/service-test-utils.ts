@@ -40,17 +40,23 @@ export const createFakeGlobalEntitiesNoService = (room?: Room, battle?: Battle):
             p1: {
                 playerId: 'p1',
                 playerName: 'p-1',
-                token: '---'
+                token: '---',
+                lastConnectedTime: -1,
+                isOnline: true
             },
             p2: {
                 playerId: 'p2',
                 playerName: 'p-2',
-                token: '---'
+                token: '---',
+                lastConnectedTime: -1,
+                isOnline: true
             },
             p3: {
                 playerId: 'p3',
                 playerName: 'p-3',
-                token: '---'
+                token: '---',
+                lastConnectedTime: -1,
+                isOnline: true
             }
         },
         mapByToken: {},
@@ -58,17 +64,23 @@ export const createFakeGlobalEntitiesNoService = (room?: Room, battle?: Battle):
             'p-1': {
                 playerId: 'p1',
                 playerName: 'p-1',
-                token: '---'
+                token: '---',
+                lastConnectedTime: -1,
+                isOnline: true
             },
             'p-2': {
                 playerId: 'p2',
                 playerName: 'p-2',
-                token: '---'
+                token: '---',
+                lastConnectedTime: -1,
+                isOnline: true
             },
             'p-3': {
                 playerId: 'p3',
                 playerName: 'p-3',
-                token: '---'
+                token: '---',
+                lastConnectedTime: -1,
+                isOnline: true
             }
         }
     },

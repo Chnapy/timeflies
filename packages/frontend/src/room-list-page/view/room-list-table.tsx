@@ -81,12 +81,12 @@ export const RoomListTable: React.FC = () => {
 
     useAsyncEffect(async function fetchListEveryInterval(isMounted): Promise<void> {
         const response = await sendWithResponse(RoomListGetListMessage({}));
-
         if (SocketErrorMessage.match(response)) {
             dispatch(ErrorListAddAction({ code: response.payload.code }));
-        } else {
-            setRoomList(response.payload);
+            return;
         }
+
+        setRoomList(response.payload);
 
         await waitMs(5000);
 

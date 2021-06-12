@@ -1,10 +1,20 @@
-import { AuthRequestBody, AuthResponseBody, PlayerCredentials } from '@timeflies/socket-messages';
+import { timerTester } from '@timeflies/devtools';
+import { AuthRequestBody, AuthResponseBody } from '@timeflies/socket-messages';
 import { SocketError } from '@timeflies/socket-server';
 import { Request } from 'express';
+import { PlayerCredentialsTimed } from '../../main/global-entities';
 import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../service-test-utils';
 import { AuthService } from './auth-service';
 
 describe('auth service', () => {
+
+    beforeEach(() => {
+        timerTester.beforeTest();
+    });
+
+    afterEach(() => {
+        timerTester.afterTest();
+    });
 
     const getEntities = () => {
         const globalEntities = createFakeGlobalEntitiesNoService();
@@ -46,7 +56,9 @@ describe('auth service', () => {
             globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ] = {
                 playerId: 'p1',
                 playerName: 'player',
-                token: ''
+                token: '',
+                lastConnectedTime: timerTester.now(),
+                isOnline: true
             };
 
             service.httpAuthRoute(
@@ -103,13 +115,42 @@ describe('auth service', () => {
 
             const credentials = globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ];
 
-            expect(credentials).toEqual<PlayerCredentials>({
+            expect(credentials).toEqual<PlayerCredentialsTimed>({
                 playerId: expect.any(String),
                 playerName: 'player',
-                token: expect.any(String)
+                token: expect.any(String),
+                lastConnectedTime: timerTester.now(),
+                isOnline: false
             });
             expect(globalEntities.playerCredentialsMap.mapById[ credentials.playerId ]).toBe(credentials);
             expect(globalEntities.playerCredentialsMap.mapByToken[ credentials.token ]).toBe(credentials);
+        });
+
+        it('replace previous credentials if expired', () => {
+            const { service, globalEntities } = getEntities();
+
+            const response = {
+                status: jest.fn(() => response),
+                json: jest.fn(() => response)
+            } as any;
+
+            const previousCredentials: PlayerCredentialsTimed = {
+                playerId: 'p1',
+                playerName: 'player',
+                token: '',
+                lastConnectedTime: -1,
+                isOnline: false
+            };
+
+            globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ] = previousCredentials;
+
+            service.httpAuthRoute(
+                { body: { playerName: 'player' } } as Request<never, any, AuthRequestBody>,
+                response,
+                jest.fn()
+            );
+
+            expect(globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ]).not.toEqual(previousCredentials);
         });
     });
 
@@ -135,15 +176,65 @@ describe('auth service', () => {
             ).toThrowError(SocketError);
         });
 
+        it('throw error if expired credentials', () => {
+            const { service, globalEntities } = getEntities();
+
+            globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ] = {
+                playerId: 'p1',
+                playerName: 'player',
+                token: 'token',
+                lastConnectedTime: -1,
+                isOnline: false
+            };
+            globalEntities.playerCredentialsMap.mapByToken[ 'token' ] = globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ];
+            globalEntities.playerCredentialsMap.mapById[ 'p1' ] = globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ];
+
+            const socketCell = createFakeSocketCell();
+
+            expect(() =>
+                service.onSocketFirstConnect(socketCell, { url: 'http://foo.com?token=token' })
+            ).toThrowError(SocketError);
+        });
+
+        it('change credentials timed data on disconnect', async () => {
+            const { service, globalEntities } = getEntities();
+
+            const credentials: PlayerCredentialsTimed = {
+                playerId: 'p1',
+                playerName: 'player',
+                token: 'token',
+                lastConnectedTime: timerTester.now(),
+                isOnline: false
+            };
+
+            globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ] = credentials;
+            globalEntities.playerCredentialsMap.mapByToken[ 'token' ] = credentials;
+            globalEntities.playerCredentialsMap.mapById[ 'p1' ] = credentials;
+
+            const socketCell = createFakeSocketCell();
+
+            service.onSocketFirstConnect(socketCell, { url: 'http://foo.com?token=token' });
+            expect(credentials.isOnline).toEqual(true);
+
+            await timerTester.advance(1000);
+
+            socketCell.getDisconnectListener()!();
+            expect(credentials.isOnline).toEqual(false);
+            expect(credentials.lastConnectedTime).toEqual(timerTester.now());
+        });
+
         it('returns player id', () => {
             const { service, globalEntities } = getEntities();
 
             globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ] = {
                 playerId: 'p1',
                 playerName: 'player',
-                token: 'token'
+                token: 'token',
+                lastConnectedTime: timerTester.now(),
+                isOnline: false
             };
             globalEntities.playerCredentialsMap.mapByToken[ 'token' ] = globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ];
+            globalEntities.playerCredentialsMap.mapById[ 'p1' ] = globalEntities.playerCredentialsMap.mapByPlayerName[ 'player' ];
 
             const socketCell = createFakeSocketCell();
 

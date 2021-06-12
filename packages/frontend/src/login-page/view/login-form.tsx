@@ -56,8 +56,7 @@ export const LoginForm: React.FC = () => {
                         <UIButton
                             variant='primary'
                             type='submit'
-                            disabled={loading}
-                            startIcon={loading && <CircularProgress color='inherit' size='1em' />}
+                            loading={loading}
                         >play</UIButton>
                     </Grid>
 

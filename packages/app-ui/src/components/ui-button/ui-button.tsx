@@ -6,6 +6,7 @@ import { UIText } from '../ui-text/ui-text';
 
 export type UIButtonProps = Omit<ButtonProps, 'variant' | 'color'> & {
     variant?: Extract<PropTypes.Color, 'primary' | 'secondary'>;
+    loading?: boolean;
 };
 
 const useStyles = makeStyles(({ palette }) => ({
@@ -34,9 +35,11 @@ const useStyles = makeStyles(({ palette }) => ({
     }
 }));
 
-export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', className, onClick, disabled, children, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', className, onClick, disabled, loading: controlledLoading, children, ...rest }) => {
     const classes = useStyles();
     const [ loading, setLoading ] = React.useState(false);
+
+    const realLoading = controlledLoading ?? loading;
 
     const onClickWrapper: typeof onClick = (...args) => {
         if (!onClick) {
@@ -58,13 +61,13 @@ export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', class
             color={variant}
             size='large'
             onClick={onClickWrapper}
-            disabled={disabled || loading}
+            disabled={disabled || realLoading}
             {...rest}
         >
             <UIText className={classes.text} variant='body1' component='div'>
                 {children}
 
-                <Backdrop className={classes.backdrop} open={loading}>
+                <Backdrop className={classes.backdrop} open={realLoading}>
                     <CircularProgress size='1em' color='inherit' />
                 </Backdrop>
             </UIText>
