@@ -10,6 +10,7 @@ const useStyles = makeStyles(({ spacing }) => ({
         height: '100vh'
     },
     container: {
+        display: 'flex',
         flexGrow: 1,
         overflow: 'hidden',
         marginTop: spacing(2),

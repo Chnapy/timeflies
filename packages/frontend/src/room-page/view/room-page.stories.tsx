@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { Meta } from '@storybook/react/types-6-0';
 import { AssetsLoader } from '@timeflies/assets-loader';
+import { createPosition } from '@timeflies/common';
 import { SocketContextProvider, SocketHelper } from '@timeflies/socket-client';
 import { RoomEntityListGetMessage, RoomMapListGetMessage, RoomPlayerJoinMessage } from '@timeflies/socket-messages';
 import { Assets } from '@timeflies/static-assets';
@@ -140,6 +141,20 @@ export const Default: React.FC = () => {
                                     "tiles_dungeon_v1.1": 'fake/maps/map_dungeon.png'
                                 }
                             },
+                            mapPlacementTiles: {
+                                '#F00': [
+                                    createPosition(8, 3),
+                                    createPosition(9, 2),
+                                    createPosition(10, 3),
+                                    createPosition(9, 4)
+                                ],
+                                '#0F0': [
+                                    createPosition(8, 9),
+                                    createPosition(9, 8),
+                                    createPosition(10, 9),
+                                    createPosition(9, 10)
+                                ]
+                            },
                             playerAdminId: 'p1',
                             teamColorList: [ '#F00', '#0F0' ],
                             staticPlayerList: [
@@ -154,6 +169,12 @@ export const Default: React.FC = () => {
                                     playerName: 'yoshi2oeuf',
                                     ready: false,
                                     teamColor: '#0F0'
+                                },
+                                {
+                                    playerId: 'p3',
+                                    playerName: 'toto',
+                                    ready: false,
+                                    teamColor: '#F00'
                                 }
                             ],
                             staticCharacterList: [
@@ -161,7 +182,7 @@ export const Default: React.FC = () => {
                                     characterId: 'c1',
                                     playerId: 'p1',
                                     characterRole: 'tacka',
-                                    placement: null
+                                    placement: createPosition(8, 9)
                                 },
                                 {
                                     characterId: 'c2',
@@ -180,6 +201,12 @@ export const Default: React.FC = () => {
                                     playerId: 'p2',
                                     characterRole: 'tacka',
                                     placement: null
+                                },
+                                {
+                                    characterId: 'c5',
+                                    playerId: 'p3',
+                                    characterRole: 'tacka',
+                                    placement: createPosition(8, 3)
                                 }
                             ]
                         }) as any

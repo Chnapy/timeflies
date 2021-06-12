@@ -14,7 +14,10 @@ type RoomMapButtonImageProps = {
 };
 
 export const RoomMapButtonImage: React.FC<RoomMapButtonImageProps> = React.memo(({ mapInfos, width, height }) => {
-    const [ assetsLoaderProps ] = React.useState<AssetsLoaderMap>({ spritesheets: {}, maps: { [ mapInfos.name ]: mapInfos.schemaLink } });
+    const assetsLoaderProps = React.useMemo<AssetsLoaderMap>(() => ({
+        spritesheets: {},
+        maps: { [ mapInfos.name ]: mapInfos.schemaLink }
+    }), [ mapInfos ]);
 
     return (
         <Stage options={{ width, height, backgroundAlpha: 0 }}>

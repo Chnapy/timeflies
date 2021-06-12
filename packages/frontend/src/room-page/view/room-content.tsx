@@ -6,16 +6,18 @@ import useAsyncEffect from 'use-async-effect';
 import { routes } from '../../routes';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
 import { useSendRoomUpdate } from '../hooks/use-send-room-update';
+import { RoomButtonsPanel } from '../room-buttons/room-buttons-panel';
 import { RoomMapPanel } from '../room-map-button/room-map-panel';
 import { RoomNoTeamPlayerList } from '../room-no-team-player-list/room-no-team-player-list';
 import { RoomTeamList } from '../room-team/room-team-list';
 
 const useStyles = makeStyles(() => ({
-    root: {
+    teamListWrapper: {
+        display: 'flex',
         height: '100%'
     },
     teamList: {
-        height: '100%',
+        flexGrow: 1,
         overflowY: 'auto'
     }
 }));
@@ -34,7 +36,7 @@ export const RoomContent: React.FC = () => {
         return null;
     }
 
-    return <Grid className={classes.root} container spacing={2}>
+    return <Grid container spacing={2}>
 
         <Grid item>
             <Grid container direction='column' alignItems='flex-start'>
@@ -46,15 +48,17 @@ export const RoomContent: React.FC = () => {
             </Grid>
         </Grid>
 
-        <Grid className={classes.teamList} item xs>
-            <Grid container direction='column' spacing={1}>
+        <Grid className={classes.teamListWrapper} item xs>
+            <Grid container direction='column' wrap='nowrap' spacing={1}>
 
-                <Grid item>
-                    <RoomNoTeamPlayerList />
+                <RoomNoTeamPlayerList />
+
+                <Grid className={classes.teamList} item>
+                    <RoomTeamList />
                 </Grid>
 
                 <Grid item>
-                    <RoomTeamList />
+                    <RoomButtonsPanel />
                 </Grid>
 
             </Grid>

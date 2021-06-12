@@ -18,17 +18,23 @@ export const RoomNoTeamPlayerList: React.FC = () => {
         .filter(([ playerId, player ]) => player.teamColor === null)
         .map(([ playerId, player ]) => player.playerName);
 
-    return <Paper className={classes.root}>
-        <Grid container alignItems='baseline' spacing={1}>
+    if (playerNameList.length === 0) {
+        return null;
+    }
 
-            <Grid item>
-                <UIText variant='body1'>Not in team:</UIText>
+    return <Grid item>
+        <Paper className={classes.root}>
+            <Grid container alignItems='baseline' spacing={1}>
+
+                <Grid item>
+                    <UIText variant='body1'>Not in team:</UIText>
+                </Grid>
+
+                {playerNameList.map(playerName => <Grid key={playerName} item>
+                    <UIText variant='body2'>{playerName}</UIText>
+                </Grid>)}
+
             </Grid>
-
-            {playerNameList.map(playerName => <Grid key={playerName} item>
-                <UIText variant='body2'>{playerName}</UIText>
-            </Grid>)}
-
-        </Grid>
-    </Paper>;
+        </Paper>
+    </Grid>;
 };
