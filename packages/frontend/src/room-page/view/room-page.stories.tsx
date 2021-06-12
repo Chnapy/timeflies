@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { Meta } from '@storybook/react/types-6-0';
 import { AssetsLoader } from '@timeflies/assets-loader';
-import { createPosition } from '@timeflies/common';
+import { createPosition, waitMs } from '@timeflies/common';
 import { SocketContextProvider, SocketHelper } from '@timeflies/socket-client';
 import { RoomEntityListGetMessage, RoomMapListGetMessage, RoomPlayerJoinMessage } from '@timeflies/socket-messages';
 import { Assets } from '@timeflies/static-assets';
@@ -34,7 +34,8 @@ export const Default: React.FC = () => {
         url: '',
         addCloseListener: () => () => { },
         addMessageListener: listener => {
-            setImmediate(() => {
+            setImmediate(async () => {
+                await waitMs(2000);
 
                 if (RoomMapListGetMessage.match(message)) {
                     listener([
@@ -167,13 +168,13 @@ export const Default: React.FC = () => {
                                 {
                                     playerId: 'p2',
                                     playerName: 'yoshi2oeuf',
-                                    ready: false,
+                                    ready: true,
                                     teamColor: '#0F0'
                                 },
                                 {
                                     playerId: 'p3',
                                     playerName: 'toto',
-                                    ready: false,
+                                    ready: true,
                                     teamColor: '#F00'
                                 }
                             ],
@@ -188,13 +189,13 @@ export const Default: React.FC = () => {
                                     characterId: 'c2',
                                     playerId: 'p1',
                                     characterRole: 'vemo',
-                                    placement: null
+                                    placement: createPosition(9, 8)
                                 },
                                 {
                                     characterId: 'c3',
                                     playerId: 'p1',
                                     characterRole: 'meti',
-                                    placement: null
+                                    placement: createPosition(10, 9)
                                 },
                                 {
                                     characterId: 'c4',

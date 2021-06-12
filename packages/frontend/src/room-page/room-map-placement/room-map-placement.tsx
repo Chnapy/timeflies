@@ -59,7 +59,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
         character.playerId === myPlayerId && !character.placement
     );
 
-    const getPlacementSelect = (characterId: CharacterId, position: Position) => async () => {
+    const getPlacementSelect = (characterId: CharacterId, position: Position | null) => async () => {
         await sendRoomUpdate(RoomCharacterPlacementMessage({
             characterId,
             position
@@ -83,13 +83,16 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
             const y = position.y * tileRealSize;
 
             const presentCharacter = characterList.find(character => character.placement?.id === position.id);
+            const canRemove = presentCharacter?.playerId === myPlayerId;
             const canAdd = !!selectedCharacterId
                 && isMyTeam
-                && (!presentCharacter || presentCharacter.playerId === myPlayerId);
+                && !presentCharacter;
 
             const onClick = selectedCharacterId
                 ? getPlacementSelect(selectedCharacterId, position)
-                : undefined;
+                : (presentCharacter
+                    ? getPlacementSelect(presentCharacter.characterId, null)
+                    : undefined);
 
             return (
                 <RoomMapPlacementTile
@@ -101,7 +104,8 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
                     teamColor={teamColor}
                     characterId={presentCharacter?.characterId}
                     onClick={onClick}
-                    disabled={!canAdd}
+                    disabledAdd={!canAdd}
+                    disabledRemove={!canRemove}
                 />
             );
         });

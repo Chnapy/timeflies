@@ -10,7 +10,10 @@ export const RoomMapPanel: React.FC = () => {
     const mapInfos = useRoomSelector(state => state.mapInfos);
     const myPlayerId = useMyPlayerId();
     const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
+    const isReady = useRoomSelector(state => state.staticPlayerList[myPlayerId].ready);
     const [ mapListOpen, setMapListOpen ] = React.useState(false);
+
+    const disabled = !isAdmin || isReady;
 
     const onMapListClose = () => setMapListOpen(false);
     const onMapListOpen = () => setMapListOpen(true);
@@ -21,9 +24,9 @@ export const RoomMapPanel: React.FC = () => {
                 <UIText variant='body1' align='center' gutterBottom>Map</UIText>
 
                 {mapInfos
-                    ? <RoomMapButton mapInfos={mapInfos} disabled={!isAdmin} onClick={onMapListOpen} />
+                    ? <RoomMapButton mapInfos={mapInfos} disabled={disabled} onClick={onMapListOpen} />
                     : (isAdmin
-                        ? <UIButton onClick={onMapListOpen}>select map</UIButton>
+                        ? <UIButton onClick={onMapListOpen} disabled={disabled}>select map</UIButton>
                         : <UIText variant='body2'>no map selected</UIText>)}
 
                 <RoomMapList open={mapListOpen} onClose={onMapListClose} />

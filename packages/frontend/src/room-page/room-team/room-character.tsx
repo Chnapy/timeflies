@@ -13,6 +13,7 @@ type RoomCharacterProps = {
 export const RoomCharacter: React.FC<RoomCharacterProps> = ({ characterId }) => {
     const myPlayerId = useMyPlayerId();
     const isMyCharacter = useRoomSelector(state => state.staticCharacterList[ characterId ].playerId === myPlayerId);
+    const isReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
 
     const sendRoomUpdate = useSendRoomUpdate();
     const onRemove = () => sendRoomUpdate(RoomCharacterRemoveMessage({ characterId }));
@@ -29,7 +30,7 @@ export const RoomCharacter: React.FC<RoomCharacterProps> = ({ characterId }) => 
         <RoomCharacterButton
             characterId={characterId}
             {...sizingProps}
-            disabled={!isMyCharacter}
+            disabled={!isMyCharacter || isReady}
             onClick={onRemove}
         />
     );

@@ -260,6 +260,8 @@ describe('room', () => {
         });
     });
 
+    it.todo('mapSelect reset all characters position');
+
     it('mapSelect computes map placement tiles', async () => {
 
         const room = getRoom();

@@ -6,6 +6,7 @@ import React from 'react';
 import { useMyPlayerId } from '../../login-page/hooks/use-my-player-id';
 import { useRoomSelector } from '../hooks/use-room-selector';
 import { RoomCharacter } from './room-character';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
 type RoomTeamPlayerLineProps = {
     playerId: PlayerId;
@@ -18,6 +19,11 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
         outlineWidth: 1,
         outlineStyle: 'solid',
         outlineColor: palette.background.level1
+    },
+    readyIcon: {
+        width: '1.5rem',
+        height: '1.5rem',
+        verticalAlign: 'text-bottom'
     },
     addBtn: {
         minWidth: 0,
@@ -33,7 +39,9 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
     const classes = useStyles();
     const myPlayerId = useMyPlayerId();
     const playerName = useRoomSelector(state => state.staticPlayerList[ playerId ].playerName);
+    const isReady = useRoomSelector(state => state.staticPlayerList[ playerId ].ready);
     const staticCharacterList = useRoomSelector(state => state.staticCharacterList);
+    const isMyPlayerReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
 
     const isMyPlayer = myPlayerId === playerId;
 
@@ -43,8 +51,13 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
 
     return (
         <Grid container direction='column'>
-            <Grid item>
-                <UIText variant='body2'>{playerName}</UIText>
+            <Grid item container spacing={1}>
+                <Grid item>
+                    <UIText variant='body2'>{playerName}</UIText>
+                </Grid>
+                {isReady && <Grid item>
+                    <CheckCircleOutlineIcon className={classes.readyIcon} />
+                </Grid>}
             </Grid>
             <Grid className={classes.characterWrapper} item>
                 <Grid container spacing={1}>
@@ -54,7 +67,7 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
                         </Grid>
                     ))}
 
-                    {isMyPlayer && (
+                    {isMyPlayer && !isMyPlayerReady && (
                         <Grid item>
                             <UIButton className={classes.addBtn} onClick={onCharacterListOpen}>
                                 <AddIcon className={classes.addBtnIcon} />

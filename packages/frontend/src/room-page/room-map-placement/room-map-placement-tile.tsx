@@ -5,18 +5,20 @@ import { CharacterId } from '@timeflies/common';
 import React from 'react';
 import { RoomCharacterButton } from '../room-team/room-character-button';
 
-type RoomMapPlacementTileProps = Pick<UIButtonProps, 'onClick' | 'disabled'> & {
+type RoomMapPlacementTileProps = Pick<UIButtonProps, 'onClick'> & {
     x: number;
     y: number;
     size: number;
     teamColor: string;
     characterId?: CharacterId;
     showIcon?: boolean;
+    disabledAdd?: boolean;
+    disabledRemove?: boolean;
 };
 
 type StyleProps = Pick<RoomMapPlacementTileProps, 'x' | 'y' | 'size' | 'teamColor'>;
 
-const outlineWidth = 2;
+const outlineWidth = 1;
 
 const useStyles = makeStyles(() => ({
     root: ({ x, y, size, teamColor }: StyleProps) => ({
@@ -41,7 +43,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-export const RoomMapPlacementTile: React.FC<RoomMapPlacementTileProps> = ({ x, y, size, teamColor, onClick, disabled, characterId, showIcon }) => {
+export const RoomMapPlacementTile: React.FC<RoomMapPlacementTileProps> = ({ x, y, size, teamColor, onClick, disabledAdd, disabledRemove, characterId, showIcon }) => {
     const classes = useStyles({ x, y, size, teamColor });
 
     const getContent = () => {
@@ -50,7 +52,7 @@ export const RoomMapPlacementTile: React.FC<RoomMapPlacementTileProps> = ({ x, y
                 <RoomCharacterButton
                     characterId={characterId}
                     onClick={onClick}
-                    disabled={disabled}
+                    disabled={disabledRemove}
                     size={size - outlineWidth * 2}
                     borderWidth={3}
                     scale={1.2}
@@ -61,7 +63,7 @@ export const RoomMapPlacementTile: React.FC<RoomMapPlacementTileProps> = ({ x, y
         return (
             <UIButton
                 className={classes.btn}
-                disabled={disabled}
+                disabled={disabledAdd}
                 onClick={onClick}
             >
                 {showIcon && <CropFreeIcon className={classes.btnIcon} />}

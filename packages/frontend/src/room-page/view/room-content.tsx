@@ -1,4 +1,5 @@
-import { Grid, makeStyles } from '@material-ui/core';
+import { Backdrop, Grid, makeStyles } from '@material-ui/core';
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { RoomPlayerJoinMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useRouteMatch } from 'react-router-dom';
@@ -33,7 +34,9 @@ export const RoomContent: React.FC = () => {
     }, []);
 
     if (!hasRoomState) {
-        return null;
+        return <Backdrop open>
+            <CircularProgress color='inherit' />
+        </Backdrop>;
     }
 
     return <Grid container spacing={2}>

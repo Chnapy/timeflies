@@ -28,6 +28,7 @@ export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor, onChar
 
     const sendRoomUpdate = useSendRoomUpdate();
     const myPlayerId = useMyPlayerId();
+    const isReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
     const isMyTeam = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].teamColor === teamColor);
     const staticPlayerList = useRoomSelector(state => state.staticPlayerList);
     const playerIdList = ObjectTyped.entries(staticPlayerList)
@@ -50,7 +51,7 @@ export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor, onChar
                     </Grid>
                 ))}
 
-                {!isMyTeam && (
+                {!isMyTeam && !isReady && (
                     <Grid item>
                         <UIButton onClick={onTeamJoin} fullWidth>
                             join
