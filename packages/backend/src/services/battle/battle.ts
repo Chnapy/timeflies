@@ -1,11 +1,19 @@
 import { ArrayUtils, CharacterId, createId, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
 import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
-import { MapInfos, RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-messages';
+import { MapInfos, RoomEntityListGetMessageData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
 import type TiledMap from 'tiled-types';
 import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl, AssetUrl } from '../../utils/asset-url';
 import { getBattleStaticData } from './get-battle-static-data';
+
+export type BattlePayload = {
+    entityListData: RoomEntityListGetMessageData;
+    staticPlayerList: RoomStaticPlayer[];
+    staticCharacterList: RoomStaticCharacter[];
+    mapInfos: MapInfos;
+    tiledMap: TiledMap;
+};
 
 export type BattleId = string;
 
@@ -39,18 +47,15 @@ export type Battle = {
 
 export const createBattle = (
     { services }: GlobalEntities,
-    roomState: RoomStateData,
-    entityListData: RoomEntityListGetMessageData,
-    tiledMap: TiledMap,
+    battlePayload: BattlePayload,
     onBattleEnd: () => void
 ): Battle => {
     const battleId = createId();
 
-    const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(roomState, entityListData);
+    const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(battlePayload);
+    const { staticPlayerList, mapInfos, tiledMap } = battlePayload;
 
-    const playerIdList = roomState.staticPlayerList.map(player => player.playerId);
-
-    const rawMapInfos = roomState.mapInfos!;
+    const playerIdList = staticPlayerList.map(player => player.playerId);
 
     const waitingPlayerList = new Set(playerIdList);
 
@@ -96,9 +101,9 @@ export const createBattle = (
             const parseUrl = assetUrl[ parseUrlMode ];
 
             return {
-                ...rawMapInfos,
-                schemaLink: parseUrl(rawMapInfos.schemaLink),
-                imagesLinks: ObjectTyped.entries(rawMapInfos.imagesLinks)
+                ...mapInfos,
+                schemaLink: parseUrl(mapInfos.schemaLink),
+                imagesLinks: ObjectTyped.entries(mapInfos.imagesLinks)
                     .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
                         acc[ key ] = parseUrl(value);
                         return acc;

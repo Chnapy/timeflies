@@ -3,7 +3,7 @@ import { TiledMap, TiledLayerTilelayer } from 'tiled-types';
 export module Layer {
 
     const layerNamesMap = {
-        placement: 'init',
+        placement: 'placement',
         background: 'background',
         obstacles: 'obstacles'
     };
@@ -16,7 +16,7 @@ export module Layer {
     };
 
     export const getTilelayer = (name: LayerName, { layers }: Pick<TiledMap, 'layers'>): TiledLayerTilelayer => {
-        return layers.find((layer): layer is TiledLayerTilelayer => layer.name === name)!;
+        return layers.find((layer): layer is TiledLayerTilelayer => layer.name === layerNamesMap[name])!;
     };
 
     export const getForegroundLayers = ({ layers }: Pick<TiledMap, 'layers'>) => {

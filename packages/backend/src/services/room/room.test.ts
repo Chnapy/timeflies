@@ -260,7 +260,30 @@ describe('room', () => {
         });
     });
 
-    it.todo('mapSelect reset all characters position');
+    it('mapSelect reset all characters position', async () => {
+
+        const room = getRoom();
+
+        room.characterSelect({
+            characterId: 'c1',
+            playerId: 'p1',
+            characterRole: 'tacka',
+            placement: createPosition(1, 1)
+        });
+
+        await room.mapSelect({
+            mapId: 'm1',
+            name: 'm-1',
+            nbrTeams: 3,
+            nbrTeamCharacters: 3,
+            schemaLink: 'foo',
+            imagesLinks: {}
+        });
+
+        expect(room.getRoomStateData().staticCharacterList).toEqual([
+            expect.objectContaining({ placement: null })
+        ]);
+    });
 
     it('mapSelect computes map placement tiles', async () => {
 

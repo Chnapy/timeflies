@@ -1,7 +1,14 @@
+import { logger } from '@timeflies/devtools';
 import { Checker } from '../checker';
 
 export const checkChecksum: Checker = ({
     spellAction, newState
 }) => {
-    return spellAction.checksum === newState.checksum;
+
+    if (spellAction.checksum !== newState.checksum) {
+        logger.info('Spell check failed: wrong checksum.');
+        return false;
+    }
+
+    return true;
 };

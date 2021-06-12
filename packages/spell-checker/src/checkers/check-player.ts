@@ -1,3 +1,4 @@
+import { logger } from '@timeflies/devtools';
 import { Checker } from '../checker';
 
 export const checkPlayer: Checker = ({
@@ -5,5 +6,10 @@ export const checkPlayer: Checker = ({
 }) => {
     const { clientContext, currentTurn } = context;
 
-    return clientContext.playerId === currentTurn.playerId;
+    if (clientContext.playerId !== currentTurn.playerId) {
+        logger.info('Spell check failed: wrong player id.');
+        return false;
+    }
+
+    return true;
 };

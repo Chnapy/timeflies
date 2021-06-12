@@ -1,7 +1,6 @@
 import { createPosition, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
 import { timerTester } from '@timeflies/devtools';
-import { RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-messages';
-import { StaticState } from './battle';
+import { BattlePayload, StaticState } from './battle';
 import { getBattleStaticData } from './get-battle-static-data';
 
 describe('get battle static data', () => {
@@ -14,7 +13,7 @@ describe('get battle static data', () => {
         timerTester.afterTest();
     });
 
-    const roomState: Pick<RoomStateData, 'staticPlayerList' | 'staticCharacterList'> = {
+    const battlePayload: Pick<BattlePayload, 'staticPlayerList' | 'staticCharacterList' | 'entityListData'> = {
         staticPlayerList: [
             {
                 playerId: 'p1',
@@ -48,83 +47,82 @@ describe('get battle static data', () => {
                 placement: createPosition(3, 3),
                 playerId: 'p2'
             },
-        ]
-    };
-
-    const entityListData: RoomEntityListGetMessageData = {
-        characterList: [
-            {
-                characterRole: 'meti',
-                defaultSpellRole: 'move',
-                variables: {
-                    health: 100,
-                    actionTime: 9000
-                }
-            },
-            {
-                characterRole: 'tacka',
-                defaultSpellRole: 'move',
-                variables: {
-                    health: 90,
-                    actionTime: 10000
-                }
-            },
-            {
-                characterRole: 'vemo',
-                defaultSpellRole: 'switch',
-                variables: {
-                    health: 80,
-                    actionTime: 8000
-                }
-            },
         ],
-        spellList: [
-            {
-                spellRole: 'move',
-                characterRole: 'meti',
-                variables: {
-                    duration: 1000,
-                    lineOfSight: true,
-                    rangeArea: 6,
-                    actionArea: 1
+        entityListData: {
+            characterList: [
+                {
+                    characterRole: 'meti',
+                    defaultSpellRole: 'move',
+                    variables: {
+                        health: 100,
+                        actionTime: 9000
+                    }
+                },
+                {
+                    characterRole: 'tacka',
+                    defaultSpellRole: 'move',
+                    variables: {
+                        health: 90,
+                        actionTime: 10000
+                    }
+                },
+                {
+                    characterRole: 'vemo',
+                    defaultSpellRole: 'switch',
+                    variables: {
+                        health: 80,
+                        actionTime: 8000
+                    }
+                },
+            ],
+            spellList: [
+                {
+                    spellRole: 'move',
+                    characterRole: 'meti',
+                    variables: {
+                        duration: 1000,
+                        lineOfSight: true,
+                        rangeArea: 6,
+                        actionArea: 1
+                    }
+                },
+                {
+                    spellRole: 'move',
+                    characterRole: 'tacka',
+                    variables: {
+                        duration: 1000,
+                        lineOfSight: true,
+                        rangeArea: 7,
+                        actionArea: 1
+                    }
+                },
+                {
+                    spellRole: 'switch',
+                    characterRole: 'vemo',
+                    variables: {
+                        duration: 1500,
+                        lineOfSight: false,
+                        rangeArea: 4,
+                        actionArea: 1
+                    }
+                },
+                {
+                    spellRole: 'simpleAttack',
+                    characterRole: 'tacka',
+                    variables: {
+                        duration: 1200,
+                        lineOfSight: true,
+                        rangeArea: 5,
+                        actionArea: 2,
+                        attack: 15
+                    }
                 }
-            },
-            {
-                spellRole: 'move',
-                characterRole: 'tacka',
-                variables: {
-                    duration: 1000,
-                    lineOfSight: true,
-                    rangeArea: 7,
-                    actionArea: 1
-                }
-            },
-            {
-                spellRole: 'switch',
-                characterRole: 'vemo',
-                variables: {
-                    duration: 1500,
-                    lineOfSight: false,
-                    rangeArea: 4,
-                    actionArea: 1
-                }
-            },
-            {
-                spellRole: 'simpleAttack',
-                characterRole: 'tacka',
-                variables: {
-                    duration: 1200,
-                    lineOfSight: true,
-                    rangeArea: 5,
-                    actionArea: 2,
-                    attack: 15
-                }
-            }
-        ]
+            ]
+        }
     };
 
     it('gives correct staticPlayers', () => {
-        const { staticPlayers } = getBattleStaticData(roomState, entityListData);
+        const { staticPlayers } = getBattleStaticData(battlePayload);
 
         expect(staticPlayers).toEqual<StaticPlayer[]>([
             {
@@ -141,7 +139,7 @@ describe('get battle static data', () => {
     });
 
     it('gives correct staticCharacters', () => {
-        const { staticCharacters } = getBattleStaticData(roomState, entityListData);
+        const { staticCharacters } = getBattleStaticData(battlePayload);
 
         expect(staticCharacters).toEqual<StaticCharacter[]>([
             {
@@ -166,7 +164,7 @@ describe('get battle static data', () => {
     });
 
     it('gives correct staticSpells', () => {
-        const { staticSpells } = getBattleStaticData(roomState, entityListData);
+        const { staticSpells } = getBattleStaticData(battlePayload);
 
         expect(staticSpells).toEqual(expect.arrayContaining<StaticSpell>([
             {
@@ -193,7 +191,7 @@ describe('get battle static data', () => {
     });
 
     it('gives correct staticState', () => {
-        const { staticState } = getBattleStaticData(roomState, entityListData);
+        const { staticState } = getBattleStaticData(battlePayload);
 
         expect(staticState).toEqual<StaticState>({
             players: {
@@ -256,7 +254,7 @@ describe('get battle static data', () => {
     });
 
     it('gives correct initialSerializableState', () => {
-        const { initialSerializableState } = getBattleStaticData(roomState, entityListData);
+        const { initialSerializableState } = getBattleStaticData(battlePayload);
 
         expect(initialSerializableState).toEqual<SerializableState>({
             checksum: expect.any(String),

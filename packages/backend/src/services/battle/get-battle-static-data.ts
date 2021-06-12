@@ -1,11 +1,13 @@
 import { createId, normalize, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
-import { RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-messages';
-import { Battle, StaticState } from './battle';
+import { Battle, BattlePayload, StaticState } from './battle';
 
-export const getBattleStaticData = (
-    roomState: Pick<RoomStateData, 'staticPlayerList' | 'staticCharacterList'>,
-    entityListData: RoomEntityListGetMessageData
-): Pick<Battle, 'staticPlayers' | 'staticCharacters' | 'staticSpells' | 'staticState'> & { initialSerializableState: SerializableState } => {
+type BattleStaticData = Pick<Battle, 'staticPlayers' | 'staticCharacters' | 'staticSpells' | 'staticState'> & {
+    initialSerializableState: SerializableState;
+};
+
+export const getBattleStaticData = ({
+    entityListData, staticPlayerList, staticCharacterList
+}: Pick<BattlePayload, 'staticPlayerList' | 'staticCharacterList' | 'entityListData'>): BattleStaticData => {
 
     const initialSerializableState: SerializableState = {
         checksum: '-initial-state-',
@@ -25,7 +27,7 @@ export const getBattleStaticData = (
         }
     };
 
-    const staticPlayers = roomState.staticPlayerList.map(({ playerId, playerName, teamColor }): StaticPlayer => ({
+    const staticPlayers = staticPlayerList.map(({ playerId, playerName, teamColor }): StaticPlayer => ({
         playerId,
         playerName,
         teamColor: teamColor!
@@ -34,7 +36,7 @@ export const getBattleStaticData = (
     const staticCharacters: StaticCharacter[] = [];
     const staticSpells: StaticSpell[] = [];
 
-    for (const { characterId, characterRole, playerId, placement } of roomState.staticCharacterList) {
+    for (const { characterId, characterRole, playerId, placement } of staticCharacterList) {
 
         const { defaultSpellRole, variables: characterVariables } = entityListData.characterList.find(character => character.characterRole === characterRole)!;
 
@@ -43,11 +45,11 @@ export const getBattleStaticData = (
         for (const { spellRole, variables: spellVariables } of entityListData.spellList.filter(spell => characterRole === spell.characterRole)) {
             const spellId = createId();
 
-            initialSerializableState.spells.duration[spellId] = spellVariables.duration;
-            initialSerializableState.spells.rangeArea[spellId] = spellVariables.rangeArea;
-            initialSerializableState.spells.actionArea[spellId] = spellVariables.actionArea;
-            initialSerializableState.spells.lineOfSight[spellId] = spellVariables.lineOfSight;
-            initialSerializableState.spells.attack[spellId] = spellVariables.attack;
+            initialSerializableState.spells.duration[ spellId ] = spellVariables.duration;
+            initialSerializableState.spells.rangeArea[ spellId ] = spellVariables.rangeArea;
+            initialSerializableState.spells.actionArea[ spellId ] = spellVariables.actionArea;
+            initialSerializableState.spells.lineOfSight[ spellId ] = spellVariables.lineOfSight;
+            initialSerializableState.spells.attack[ spellId ] = spellVariables.attack;
 
             staticSpells.push({
                 spellId,

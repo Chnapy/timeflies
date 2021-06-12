@@ -6,7 +6,7 @@ import type TiledMap from 'tiled-types';
 import util from 'util';
 import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl } from '../../utils/asset-url';
-import { Battle, createBattle } from '../battle/battle';
+import { Battle, createBattle, BattlePayload } from '../battle/battle';
 
 export type RoomId = string;
 
@@ -100,6 +100,14 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         staticCharacterList
     });
 
+    const getBattlePayload = async (): Promise<BattlePayload> => ({
+        staticPlayerList,
+        staticCharacterList,
+        entityListData: globalEntities.services.entityListGetRoomService.getEntityLists(),
+        mapInfos: mapInfos!,
+        tiledMap: await tiledMapPromise!
+    });
+
     return {
         roomId,
 
@@ -156,6 +164,10 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         },
         mapSelect: async (selectedMapInfos) => {
             mapInfos = selectedMapInfos;
+            staticCharacterList.forEach(character => {
+                character.placement = null;
+            });
+
             await computeMapPlacementTiles();
         },
         waitForBattle: async () => {
@@ -167,15 +179,12 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
             return state;
         },
         createBattle: async () => {
-            const tiledMap = await tiledMapPromise!;
-
-            const entityLists = globalEntities.services.entityListGetRoomService.getEntityLists();
+            
+            const payload = await getBattlePayload();
 
             battle = createBattle(
                 globalEntities,
-                getRoomStateData(),
-                entityLists,
-                tiledMap,
+                payload,
                 () => globalEntities.services.playerRoomService.onBattleEnd(roomId, battle!.battleId)
             );
 
