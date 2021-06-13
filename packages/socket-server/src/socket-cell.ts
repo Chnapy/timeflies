@@ -30,13 +30,38 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
 
     type ListenerType = 'message' | 'close';
 
-    const listeners: [ ListenerType, () => any ][] = [];
+    const listeners: { [ type in ListenerType ]: Set<(...args: any[]) => any> } = {
+        message: new Set(),
+        close: new Set()
+    };
+
+    socket.addEventListener('close', event => {
+        listeners.close.forEach(listener => {
+            listener(event);
+        });
+    });
+
+    socket.addEventListener('message', event => {
+        if (listeners.message.size === 0) {
+            return;
+        }
+
+        const { messageList, error } = extractMessagesFromEvent(event);
+
+        if (error) {
+            sendError(new SocketError(400, error));
+            return;
+        }
+
+        listeners.message.forEach(listener => {
+            listener(messageList);
+        });
+    });
 
     const addListener = (type: ListenerType, listener: (...args: any[]) => any): RemoveListenerFn => {
-        listeners.push([ type, listener ]);
-        socket.addEventListener(type, listener);
+        listeners[ type ].add(listener);
 
-        return () => socket.removeEventListener(type, listener);
+        return () => listeners[ type ].delete(listener);
     };
 
     const send: SocketCell[ 'send' ] = (...messageList) => {
@@ -51,17 +76,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
     };
 
     const addMessageListener: SocketCell[ 'addMessageListener' ] = (messageCreator, listener) => {
-        const rootListener = async (event: { data: unknown }) => {
-
-            const { messageList, error } = extractMessagesFromEvent(event);
-
-            if (error) {
-                sendError(new SocketError(400, error));
-                return;
-            }
-
-            logger.logMessageReceived(messageList);
-
+        const rootListener = async (messageList: Message<any>[]) => {
             await Promise.all(
                 messageList
                     .filter(messageCreator.match)
@@ -94,8 +109,9 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
     };
 
     const clearAllListeners: SocketCell[ 'clearAllListeners' ] = () => {
-        listeners.forEach(([ type, listener ]) => socket.removeEventListener(type, listener));
-        listeners.splice(0, Infinity);
+        Object.values(listeners).forEach(listenerList => {
+            listenerList.clear();
+        });
     };
 
     const closeSocket: SocketCell[ 'closeSocket' ] = error => {

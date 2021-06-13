@@ -37,9 +37,17 @@ const useStyles = makeStyles(({ palette }) => ({
 
 export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', className, onClick, disabled, loading: controlledLoading, children, ...rest }) => {
     const classes = useStyles();
+    const isMountedRef = React.useRef(true);
     const [ loading, setLoading ] = React.useState(false);
 
     const realLoading = controlledLoading ?? loading;
+
+    React.useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     const onClickWrapper: typeof onClick = (...args) => {
         if (!onClick) {
@@ -49,7 +57,11 @@ export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', class
         const result: unknown = onClick(...args);
         if (result instanceof Promise) {
             setLoading(true);
-            result.finally(() => setLoading(false));
+            result.finally(() => {
+                if (isMountedRef.current) {
+                    setLoading(false);
+                }
+            });
         }
     };
 
