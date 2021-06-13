@@ -50,7 +50,7 @@ export const createBattle = (
     battlePayload: BattlePayload,
     onBattleEnd: () => void
 ): Battle => {
-    const battleId = createId();
+    const battleId = createId('short');
 
     const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(battlePayload);
     const { staticPlayerList, mapInfos, tiledMap } = battlePayload;

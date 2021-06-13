@@ -32,7 +32,7 @@ export type Room = {
 const allTeamColorList = [ '#3BA92A', '#FFD74A', '#A93B2A', '#3BA9A9' ];
 
 export const createRoom = (globalEntities: GlobalEntities): Room => {
-    const roomId = createId();
+    const roomId = createId('short');
 
     let mapInfos: MapInfos | null = null;
     let tiledMapPromise: Promise<TiledMap> | null = null;

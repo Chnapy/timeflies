@@ -4551,9 +4551,8 @@ __metadata:
     "@timeflies/devtools": "workspace:packages/devtools"
     "@types/jest": ^26.0.23
     "@types/node": ^15.0.3
-    "@types/uuid": ^8.3.0
     joi: ^17.4.0
-    uuid: ^8.3.2
+    nanoid: ^3.1.23
   peerDependencies:
     joi: "*"
   languageName: unknown
@@ -5621,13 +5620,6 @@ __metadata:
   version: 4.0.0
   resolution: "@types/url-join@npm:4.0.0"
   checksum: 324a992dc0303f4dc9f231994db02d011b901f5a29c6a688727e092131c48d1d869f5cef26d12da9594776bc5a13f5ee1b67543193dca30de3e41008b0cbdaf5
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:^8.3.0":
-  version: 8.3.0
-  resolution: "@types/uuid@npm:8.3.0"
-  checksum: 620985aed8fdb4aed153daca5235f4303457a67a4d181efac0021712eabd9edd7e88895f79730c0e651effde7633b1b61e49a81519ac8d4e75019d2ac9b6412f
   languageName: node
   linkType: hard
 
@@ -22466,7 +22458,7 @@ typescript@^4.2.4:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.3.0, uuid@npm:^8.3.2":
+"uuid@npm:^8.3.0":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:
