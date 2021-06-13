@@ -1,11 +1,10 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { normalize } from '@timeflies/common';
-import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { GameState } from '../../store/game-state';
 import { cycleCaseReducers } from '../cycle/store/cycle-case-reducers';
 import { spellSelectCaseReducers } from '../spell-select/store/spell-select-case-reducers';
 import { battleStateCaseReducers } from '../tile-interactive/store/battle-state-case-reducers';
-import { BattleLoadAction } from './battle-actions';
+import { BattleLoadAction, BattleResetAction } from './battle-actions';
 import { BattleState } from './battle-state';
 
 export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
@@ -14,7 +13,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
     ...battleStateCaseReducers,
     [ BattleLoadAction.type ]: (state, { payload }: BattleLoadAction): BattleState => {
         const {
-            myPlayerId, tiledMapInfos: mapInfos,
+            roomId, tiledMapInfos: mapInfos,
             staticPlayers: players, staticCharacters: characters, staticSpells: spells,
             initialSerializableState, cycleInfos
         } = payload;
@@ -77,7 +76,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
         };
 
         return {
-            myPlayerId,
+            roomId,
 
             ...getTiledMap(),
 
@@ -97,7 +96,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             ...getCycleInfos()
         };
     },
-    [ CredentialsLoginAction.type ]: () => {
+    [ BattleResetAction.type ]: () => {
         return null;
     }
 });

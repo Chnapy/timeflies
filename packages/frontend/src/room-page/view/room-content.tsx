@@ -56,12 +56,16 @@ export const RoomContent: React.FC = () => {
                 dispatch(RoomSetAction(payload));
             },
             [ RoomBattleStartMessage.action ]: ({ payload }: ReturnType<typeof RoomBattleStartMessage>) => {
-                dispatch(RoomSetAction(null));
                 history.push(routes.battlePage({ battleId: payload.battleId }).path);
             }
         });
     },
-        removeListeners => removeListeners && removeListeners(),
+        removeListeners => {
+            if (removeListeners) {
+                removeListeners();
+            }
+            dispatch(RoomSetAction(null));
+        },
         []);
 
     if (hasWrongId) {

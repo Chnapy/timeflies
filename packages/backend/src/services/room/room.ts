@@ -101,6 +101,7 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
     });
 
     const getBattlePayload = async (): Promise<BattlePayload> => ({
+        roomId,
         staticPlayerList,
         staticCharacterList,
         entityListData: globalEntities.services.entityListGetRoomService.getEntityLists(),
@@ -179,7 +180,7 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
             return state;
         },
         createBattle: async () => {
-            
+
             const payload = await getBattlePayload();
 
             battle = createBattle(
@@ -192,6 +193,10 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         },
         removeBattle: () => {
             battle = null;
+
+            staticPlayerList.forEach(player => {
+                player.ready = false;
+            });
         },
         isInBattle: () => battle !== null
     };

@@ -5,6 +5,7 @@ import { Battle } from './battle';
 
 export const createFakeBattle = (): Battle => ({
     battleId: 'battle',
+    roomId: 'room',
     staticPlayers: [
         { playerId: 'p1' } as any,
         { playerId: 'p2' } as any,

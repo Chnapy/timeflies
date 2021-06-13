@@ -9,7 +9,7 @@ import { NotFoundPanel } from '../components/not-found-panel';
 import { useSocketSendWithResponseError } from '../connected-socket/hooks/use-socket-send-with-response-error';
 import { useGameSelector } from '../store/hooks/use-game-selector';
 import { BattleView } from './battle-view';
-import { BattleLoadAction } from './store/battle-actions';
+import { BattleLoadAction, BattleResetAction } from './store/battle-actions';
 
 type BattlePageParams = {
     battleId: string;
@@ -44,7 +44,9 @@ export const BattlePage: React.FC = () => {
         }
 
         dispatch(BattleLoadAction(response.payload));
-    }, []);
+    },
+        () => dispatch(BattleResetAction()),
+        []);
 
     if (hasWrongId) {
         return (

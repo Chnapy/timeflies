@@ -39,13 +39,13 @@ describe('join battle service', () => {
                 }).get(), socketCell.send);
 
                 expect(socketCell.send).toHaveBeenCalledWith(BattleLoadMessage.createResponse(expect.any(String), {
+                    roomId: battle.roomId,
                     initialSerializableState: battle.getCurrentState(),
                     staticCharacters: battle.staticCharacters,
                     staticPlayers: battle.staticPlayers,
                     staticSpells: battle.staticSpells,
                     cycleInfos: battle.getCycleInfos(),
-                    tiledMapInfos: battle.getMapInfos('toFrontend'),
-                    myPlayerId: 'p1'
+                    tiledMapInfos: battle.getMapInfos('toFrontend')
                 }));
             });
 

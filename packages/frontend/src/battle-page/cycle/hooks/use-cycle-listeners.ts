@@ -4,6 +4,7 @@ import { BattleEndMessage, BattleTurnStartMessage } from '@timeflies/socket-mess
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsyncEffect } from 'use-async-effect';
+import { useMyPlayerId } from '../../../login-page/hooks/use-my-player-id';
 import { BattlePrepareTurnStartAction, BattleTurnEndAction } from '../store/cycle-actions';
 import { useCycleEngine } from '../view/cycle-engine-context';
 
@@ -15,13 +16,14 @@ type ListenersRefValue = {
 export const useCycleMessageListeners = () => {
     const addSocketListeners = useSocketListeners();
     const dispatch = useDispatch();
+    const myPlayerId = useMyPlayerId();
 
     const cycleEngine = useCycleEngine();
 
     const listenersRef = React.useRef<ListenersRefValue>();
     listenersRef.current = {
         onTurnStart: ({ payload }) => {
-            dispatch(BattlePrepareTurnStartAction(payload));
+            dispatch(BattlePrepareTurnStartAction({ ...payload, myPlayerId }));
         },
         onBattleEnd: () => cycleEngine.stop()
     };

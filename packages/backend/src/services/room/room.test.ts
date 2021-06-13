@@ -346,6 +346,41 @@ describe('room', () => {
         expect(battle).toEqual(expect.objectContaining({ battleId: expect.any(String) }));
     });
 
+    it('removeBattle set players ready to false', async () => {
+        const room = getRoom();
+
+        room.playerJoin({
+            playerId: 'p1',
+            playerName: 'p-1',
+            ready: true,
+            teamColor: null
+        });
+
+        room.playerJoin({
+            playerId: 'p2',
+            playerName: 'p-2',
+            ready: true,
+            teamColor: null
+        });
+
+        room.removeBattle();
+
+        expect(room.getRoomStateData().staticPlayerList).toEqual<RoomStaticPlayer[]>([
+            {
+                playerId: 'p1',
+                playerName: 'p-1',
+                ready: false,
+                teamColor: null
+            },
+            {
+                playerId: 'p2',
+                playerName: 'p-2',
+                ready: false,
+                teamColor: null
+            }
+        ]);
+    });
+
     it('playerJoin cancel battle waiting if any', async () => {
         const room = getRoom();
 

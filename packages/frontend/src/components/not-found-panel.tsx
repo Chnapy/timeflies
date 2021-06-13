@@ -1,8 +1,8 @@
 import { makeStyles, Paper } from '@material-ui/core';
-import { UIButton, UIText } from '@timeflies/app-ui';
+import { UIText } from '@timeflies/app-ui';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import { routes } from '../routes';
+import { ButtonLink } from './button-link';
 
 type NotFoundPanelProps = {
     title: string;
@@ -18,11 +18,6 @@ const useStyles = makeStyles(({ spacing }) => ({
 
 export const NotFoundPanel: React.FC<NotFoundPanelProps> = ({ title, reasons }) => {
     const classes = useStyles();
-    const history = useHistory();
-
-    const onBackClick = () => {
-        history.push(routes.roomListPage().path);
-    };
 
     return (
         <Paper className={classes.wrongIdPanel}>
@@ -35,9 +30,9 @@ export const NotFoundPanel: React.FC<NotFoundPanelProps> = ({ title, reasons }) 
                 </ul>
             </UIText>
 
-            <UIButton onClick={onBackClick} fullWidth>
+            <ButtonLink to={routes.roomListPage().path} fullWidth>
                 back to room list
-            </UIButton>
+            </ButtonLink>
         </Paper>
     );
 };

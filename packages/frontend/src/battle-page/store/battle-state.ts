@@ -2,7 +2,7 @@ import { CharacterId, PlayerId, SerializableState, SpellAction, SpellId, StaticC
 import { SpellEffect } from '@timeflies/spell-effects';
 
 export type BattleState = {
-    myPlayerId: PlayerId;
+    roomId: string;
 
     tiledMapInfos: {
         name: string;

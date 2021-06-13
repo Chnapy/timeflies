@@ -8,6 +8,7 @@ import { assetUrl, AssetUrl } from '../../utils/asset-url';
 import { getBattleStaticData } from './get-battle-static-data';
 
 export type BattlePayload = {
+    roomId: string;
     entityListData: RoomEntityListGetMessageData;
     staticPlayerList: RoomStaticPlayer[];
     staticCharacterList: RoomStaticCharacter[];
@@ -29,6 +30,7 @@ export type CycleInfos = {
 
 export type Battle = {
     battleId: BattleId;
+    roomId: string;
 
     staticPlayers: StaticPlayer[];
     staticCharacters: StaticCharacter[];
@@ -53,7 +55,7 @@ export const createBattle = (
     const battleId = createId('short');
 
     const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(battlePayload);
-    const { staticPlayerList, mapInfos, tiledMap } = battlePayload;
+    const { roomId, staticPlayerList, mapInfos, tiledMap } = battlePayload;
 
     const playerIdList = staticPlayerList.map(player => player.playerId);
 
@@ -89,6 +91,7 @@ export const createBattle = (
 
     return {
         battleId,
+        roomId,
 
         staticPlayers,
         staticCharacters,
