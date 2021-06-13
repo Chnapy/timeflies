@@ -6,9 +6,9 @@ import { switchUtil } from '@timeflies/common';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
-import { routes } from '../../routes';
-import { useGameSelector } from '../../store/hooks/use-game-selector';
+import { CredentialsLoginAction } from '../login-page/store/credentials-actions';
+import { routes } from '../routes';
+import { useGameSelector } from '../store/hooks/use-game-selector';
 
 const useStyles = makeStyles(({ palette, spacing }) => ({
     root: {

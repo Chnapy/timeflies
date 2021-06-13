@@ -1,15 +1,13 @@
 import { Dialog, Grid, IconButton, makeStyles } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import { UIText } from '@timeflies/app-ui';
-import { useSocketSendWithResponse } from '@timeflies/socket-client';
-import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage, SocketErrorMessage } from '@timeflies/socket-messages';
+import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import useAsyncEffect from 'use-async-effect';
-import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
+import { useSocketSendWithResponseError } from '../../connected-socket/hooks/use-socket-send-with-response-error';
 import { useRoomSelector } from '../hooks/use-room-selector';
 import { useSendRoomUpdate } from '../hooks/use-send-room-update';
 import { RoomMapButton } from './room-map-button';
-import CloseIcon from '@material-ui/icons/Close';
 
 type RoomMapListProps = {
     open: boolean;
@@ -39,8 +37,7 @@ const emptyArray: MapInfos[] = [];
 
 export const RoomMapList: React.FC<RoomMapListProps> = ({ open, onClose }) => {
     const classes = useStyles();
-    const sendWithResponse = useSocketSendWithResponse();
-    const dispatch = useDispatch();
+    const sendWithResponse = useSocketSendWithResponseError();
     const sendRoomUpdate = useSendRoomUpdate();
     const selectedMapId = useRoomSelector(state => state.mapInfos?.mapId);
     const [ mapList, setMapList ] = React.useState<MapInfos[]>(emptyArray);
@@ -51,14 +48,8 @@ export const RoomMapList: React.FC<RoomMapListProps> = ({ open, onClose }) => {
             return;
         }
 
-        const response = await sendWithResponse(RoomMapListGetMessage({}));
-
-        if (!isMounted()) {
-            return;
-        }
-
-        if (SocketErrorMessage.match(response)) {
-            dispatch(ErrorListAddAction({ code: response.payload.code }));
+        const response = await sendWithResponse(RoomMapListGetMessage({}), isMounted);
+        if (!response) {
             return;
         }
 

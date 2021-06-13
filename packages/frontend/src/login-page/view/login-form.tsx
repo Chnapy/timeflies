@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, makeStyles, Paper } from '@material-ui/core';
+import { Grid, makeStyles, Paper } from '@material-ui/core';
 import { UIButton, UIText, UITextField } from '@timeflies/app-ui';
 import { CharacterAnimatedImage } from '@timeflies/sprite-image';
 import React from 'react';

@@ -2,12 +2,10 @@ import { Dialog, Grid, IconButton, makeStyles } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { UIText } from '@timeflies/app-ui';
 import { CharacterRole } from '@timeflies/common';
-import { useSocketSendWithResponse } from '@timeflies/socket-client';
-import { RoomCharacterSelectMessage, RoomEntityListGetMessage, RoomEntityListGetMessageData, SocketErrorMessage } from '@timeflies/socket-messages';
+import { RoomCharacterSelectMessage, RoomEntityListGetMessage, RoomEntityListGetMessageData } from '@timeflies/socket-messages';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import useAsyncEffect from 'use-async-effect';
-import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
+import { useSocketSendWithResponseError } from '../../connected-socket/hooks/use-socket-send-with-response-error';
 import { useSendRoomUpdate } from '../hooks/use-send-room-update';
 import { RoomCharacterCard } from './room-character-card';
 
@@ -39,8 +37,7 @@ const emptyList: RoomEntityListGetMessageData = { characterList: [], spellList: 
 
 export const RoomCharacterList: React.FC<RoomCharacterListProps> = ({ open, onClose }) => {
     const classes = useStyles();
-    const sendWithResponse = useSocketSendWithResponse();
-    const dispatch = useDispatch();
+    const sendWithResponse = useSocketSendWithResponseError();
     const sendRoomUpdate = useSendRoomUpdate();
     const [ entityList, setEntityList ] = React.useState<RoomEntityListGetMessageData>(emptyList);
 
@@ -50,14 +47,8 @@ export const RoomCharacterList: React.FC<RoomCharacterListProps> = ({ open, onCl
             return;
         }
 
-        const response = await sendWithResponse(RoomEntityListGetMessage({}));
-
-        if (!isMounted()) {
-            return;
-        }
-
-        if (SocketErrorMessage.match(response)) {
-            dispatch(ErrorListAddAction({ code: response.payload.code }));
+        const response = await sendWithResponse(RoomEntityListGetMessage({}), isMounted);
+        if (!response) {
             return;
         }
 

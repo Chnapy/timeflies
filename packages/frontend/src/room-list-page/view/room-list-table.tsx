@@ -1,13 +1,11 @@
 import { Box, lighten, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { UIButton, UIText } from '@timeflies/app-ui';
 import { waitMs } from '@timeflies/common';
-import { useSocketSendWithResponse } from '@timeflies/socket-client';
-import { RoomInfos, RoomListCreateRoomMessage, RoomListGetListMessage, SocketErrorMessage } from '@timeflies/socket-messages';
+import { RoomInfos, RoomListCreateRoomMessage, RoomListGetListMessage } from '@timeflies/socket-messages';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import useAsyncEffect from 'use-async-effect';
-import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
+import { useSocketSendWithResponseError } from '../../connected-socket/hooks/use-socket-send-with-response-error';
 import { routes } from '../../routes';
 
 const useStyles = makeStyles(({ palette, spacing }) => ({
@@ -60,8 +58,7 @@ export const RoomListTable: React.FC = () => {
     const classes = useStyles();
     const [ roomList, setRoomList ] = React.useState<RoomInfos[]>([]);
     const history = useHistory();
-    const dispatch = useDispatch();
-    const sendWithResponse = useSocketSendWithResponse();
+    const sendWithResponse = useSocketSendWithResponseError();
 
     const getOnRoomSelect = (roomId: string) => () => {
         history.push(routes.roomPage({ roomId }).path);
@@ -69,8 +66,7 @@ export const RoomListTable: React.FC = () => {
 
     const onCreateRoom = async () => {
         const response = await sendWithResponse(RoomListCreateRoomMessage({}));
-        if (SocketErrorMessage.match(response)) {
-            dispatch(ErrorListAddAction({ code: response.payload.code }));
+        if (!response) {
             return;
         }
 
@@ -80,9 +76,8 @@ export const RoomListTable: React.FC = () => {
     };
 
     useAsyncEffect(async function fetchListEveryInterval(isMounted): Promise<void> {
-        const response = await sendWithResponse(RoomListGetListMessage({}));
-        if (SocketErrorMessage.match(response)) {
-            dispatch(ErrorListAddAction({ code: response.payload.code }));
+        const response = await sendWithResponse(RoomListGetListMessage({}), isMounted);
+        if (!response) {
             return;
         }
 
@@ -90,9 +85,11 @@ export const RoomListTable: React.FC = () => {
 
         await waitMs(5000);
 
-        if (isMounted()) {
-            return fetchListEveryInterval(isMounted);
+        if (!isMounted()) {
+            return;
         }
+
+        return fetchListEveryInterval(isMounted);
     }, []);
 
     return (

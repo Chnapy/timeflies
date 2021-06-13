@@ -1,5 +1,5 @@
 import { logger } from '@timeflies/devtools';
-import { ExtractMessageFromCreator, extractMessagesFromEvent, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
+import { ExtractMessageFromCreator, extractMessagesFromEvent, Message, MessageCreator, MessageWithResponse, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
 import WebSocket from 'ws';
 import { SocketError } from './socket-error';
 
@@ -46,10 +46,8 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
         ));
     };
 
-    const sendError = (error: SocketError) => {
-        send(SocketErrorMessage({
-            code: error.code
-        }));
+    const sendError = (error: SocketError, requestId?: string) => {
+        send(SocketErrorMessage({ code: error.code }, requestId));
     };
 
     const addMessageListener: SocketCell[ 'addMessageListener' ] = (messageCreator, listener) => {
@@ -82,7 +80,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
 
                             logger.error(err);
 
-                            sendError(socketError);
+                            sendError(socketError, (message as MessageWithResponse<any>).requestId);
                         }
                     })
             );

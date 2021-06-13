@@ -1,6 +1,6 @@
 import { Container, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { AppHeader } from './app-header';
+import { AppHeader } from '../../components/app-header';
 import { RoomListTable } from './room-list-table';
 
 const useStyles = makeStyles(() => ({

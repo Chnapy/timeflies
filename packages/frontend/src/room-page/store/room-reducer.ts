@@ -1,6 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { CharacterId, normalize, PlayerId } from '@timeflies/common';
 import { RoomStateData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
+import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { RoomSetAction } from './room-actions';
 
 export type RoomState = Omit<RoomStateData, 'staticPlayerList' | 'staticCharacterList'> & {
@@ -22,5 +23,8 @@ export const roomReducer = createReducer<RoomState | null>(null, {
             staticPlayerList,
             staticCharacterList
         };
+    },
+    [ CredentialsLoginAction.type ]: () => {
+        return null;
     }
 });

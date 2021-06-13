@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { normalize } from '@timeflies/common';
+import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { GameState } from '../../store/game-state';
 import { cycleCaseReducers } from '../cycle/store/cycle-case-reducers';
 import { spellSelectCaseReducers } from '../spell-select/store/spell-select-case-reducers';
@@ -69,8 +70,8 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
 
             return {
                 initialSerializableState,
-                serializableStates: normalize([initialSerializableState], 'time'),
-                serializableStateList: [initialSerializableState.time],
+                serializableStates: normalize([ initialSerializableState ], 'time'),
+                serializableStateList: [ initialSerializableState.time ],
                 currentTime: initialSerializableState.time
             };
         };
@@ -95,5 +96,8 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
 
             ...getCycleInfos()
         };
+    },
+    [ CredentialsLoginAction.type ]: () => {
+        return null;
     }
 });

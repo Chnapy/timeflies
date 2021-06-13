@@ -2,11 +2,11 @@ import { UIThemeProvider } from '@timeflies/app-ui';
 import { SCALE_MODES, settings } from 'pixi.js';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { BattleAssetsLoader } from './battle-page/assets-loader/view/battle-assets-loader';
 import { BattlePage } from './battle-page/battle-page';
-import { ConnectedSocketContextProvider } from './connected-socket/connected-socket-context-provider';
-import { NeedAuth } from './connected-socket/need-auth';
+import { ConnectedSocketContextProvider } from './connected-socket/view/connected-socket-context-provider';
+import { NeedAuth } from './connected-socket/view/need-auth';
 import { ErrorList } from './error-list/view/error-list';
 import './fonts-import.css';
 import { RoomListPage } from './room-list-page/view/room-list-page';
@@ -41,6 +41,10 @@ export const App: React.FC = () => {
                                     <NeedAuth>
                                         <BattlePage />
                                     </NeedAuth>
+                                </Route>
+
+                                <Route>
+                                    <Redirect to={routes.roomListPage().path}/>
                                 </Route>
                             </Switch>
 

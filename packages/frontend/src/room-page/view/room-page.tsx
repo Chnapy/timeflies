@@ -1,6 +1,6 @@
 import { Container, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { AppHeader } from '../../room-list-page/view/app-header';
+import { AppHeader } from '../../components/app-header';
 import { RoomContent } from './room-content';
 
 const useStyles = makeStyles(({ spacing }) => ({
@@ -10,6 +10,7 @@ const useStyles = makeStyles(({ spacing }) => ({
         height: '100vh'
     },
     container: {
+        position: 'relative',
         display: 'flex',
         flexGrow: 1,
         overflow: 'hidden',

@@ -1,11 +1,11 @@
 import { getSocketHelperCreator, SocketHelper } from '@timeflies/socket-client';
-import { SocketErrorMessage } from '@timeflies/socket-messages';
+import { MessageWithResponse, SocketErrorMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { getEnv } from '../env';
-import { ErrorListAddAction } from '../error-list/store/error-list-actions';
-import { CredentialsLoginAction } from '../login-page/store/credentials-actions';
-import { useGameSelector } from '../store/hooks/use-game-selector';
+import { getEnv } from '../../env';
+import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
+import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
+import { useGameSelector } from '../../store/hooks/use-game-selector';
 
 const getWsUrl = () => {
     const httpUrl = getEnv('REACT_APP_SERVER_URL');
@@ -22,12 +22,18 @@ export const useConnectedSocketHelper = () => {
     const getSocketHelper = (token: string) => {
         const socketHelper = createSocketHelper(token);
 
-        socketHelper.addCloseListener(() => {
-            dispatch(CredentialsLoginAction(null));
+        socketHelper.addCloseListener(event => {
+            if (!event.wasClean) {
+                dispatch(CredentialsLoginAction(null));
+            }
         });
 
         socketHelper.addMessageListener(messageList => {
             messageList.forEach(message => {
+                if ((message as MessageWithResponse).requestId) {
+                    return;
+                }
+
                 if (SocketErrorMessage.match(message)) {
                     dispatch(ErrorListAddAction({
                         code: message.payload.code

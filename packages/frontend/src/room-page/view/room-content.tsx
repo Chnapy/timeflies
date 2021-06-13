@@ -1,11 +1,12 @@
-import { Backdrop, Grid, makeStyles } from '@material-ui/core';
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { Grid, makeStyles } from '@material-ui/core';
 import { useSocketListeners } from '@timeflies/socket-client';
 import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomStateMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import useAsyncEffect from 'use-async-effect';
+import { LoadingBackdrop } from '../../components/loading-backdrop';
+import { NotFoundPanel } from '../../components/not-found-panel';
 import { routes } from '../../routes';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
 import { useSendRoomUpdate } from '../hooks/use-send-room-update';
@@ -34,11 +35,23 @@ export const RoomContent: React.FC = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const hasRoomState = useGameSelector(state => !!state.room);
+    const [ hasWrongId, setHasWrongId ] = React.useState(false);
 
     useAsyncEffect(async (isMounted) => {
-        await sendRoomUpdate(RoomPlayerJoinMessage({ roomId }), isMounted);
+        await sendRoomUpdate(
+            RoomPlayerJoinMessage({ roomId }),
+            isMounted,
+            ({ payload }, defaultFn) => {
+                if (payload.code === 400) {
+                    setHasWrongId(true);
+                    return;
+                }
 
-        await addSocketListeners({
+                defaultFn();
+            }
+        );
+
+        return await addSocketListeners({
             [ RoomStateMessage.action ]: ({ payload }: ReturnType<typeof RoomStateMessage>) => {
                 dispatch(RoomSetAction(payload));
             },
@@ -47,12 +60,22 @@ export const RoomContent: React.FC = () => {
                 history.push(routes.battlePage({ battleId: payload.battleId }).path);
             }
         });
-    }, []);
+    },
+        removeListeners => removeListeners && removeListeners(),
+        []);
+
+    if (hasWrongId) {
+        return <NotFoundPanel
+            title='Oops, there is no room here.'
+            reasons={[
+                'No more players in the room, so it does not exist anymore',
+                'URL is wrong, if you paste it from outside'
+            ]}
+        />;
+    }
 
     if (!hasRoomState) {
-        return <Backdrop open>
-            <CircularProgress color='inherit' />
-        </Backdrop>;
+        return <LoadingBackdrop />;
     }
 
     return <Grid container spacing={2}>

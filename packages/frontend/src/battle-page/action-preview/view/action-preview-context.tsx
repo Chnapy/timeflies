@@ -31,8 +31,12 @@ export const ActionPreviewContextProvider: React.FC = ({ children }) => {
     const promise = React.useMemo(() => getSpellEffectPreview(), [ getSpellEffectPreview ]);
     computePromiseRef.current = promise;
 
-    useAsyncEffect(async () => {
+    useAsyncEffect(async (isMounted) => {
         const spellEffectPreviewInfos = await promise;
+
+        if(!isMounted()) {
+            return;
+        }
 
         // avoid promise overlapping
         if (computePromiseRef.current !== promise) {
