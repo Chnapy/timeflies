@@ -55,6 +55,8 @@ export const getSocketHelperCreator = (serverUrl: string) => {
 
         startHeartbeatTimeout();
 
+        addListener('close', () => clearTimeout(heartbeatTimeout));
+
         return {
             url: socket.url,
             getReadyState: () => socket.readyState,

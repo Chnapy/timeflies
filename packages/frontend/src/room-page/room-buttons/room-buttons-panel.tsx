@@ -89,6 +89,10 @@ export const RoomButtonsPanel: React.FC = () => {
         setCurrentStep(step);
     };
 
+    if (currentStep === noIndex) {
+        return null;
+    }
+
     return (
         <Grid container direction='column' spacing={1}>
 
