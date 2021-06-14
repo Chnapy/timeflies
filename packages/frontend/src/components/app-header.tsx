@@ -1,11 +1,10 @@
-import { AppBar, Button, Grid, ListItemIcon, makeStyles, Menu, MenuItem, Toolbar } from '@material-ui/core';
+import { AppBar, Breadcrumbs, Button, Grid, Link, ListItemIcon, makeStyles, Menu, MenuItem, Toolbar } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import PersonIcon from '@material-ui/icons/Person';
 import { UIText } from '@timeflies/app-ui';
-import { switchUtil } from '@timeflies/common';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { Link as RouterLink, useHistory, useRouteMatch } from 'react-router-dom';
 import { CredentialsLoginAction } from '../login-page/store/credentials-actions';
 import { routes } from '../routes';
 import { useGameSelector } from '../store/hooks/use-game-selector';
@@ -40,10 +39,39 @@ export const AppHeader: React.FC = () => {
     const dispatch = useDispatch();
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
 
-    const title = switchUtil(routePath!, {
-        [ routes.roomListPage().path ]: 'Room list',
-        [ routes.roomPage({}).path ]: 'Room'
-    });
+    const routeList = [
+        {
+            route: routes.roomListPage(),
+            title: 'Room list'
+        },
+        {
+            route: routes.roomPage({}),
+            title: 'Room'
+        },
+        {
+            route: routes.battlePage({}),
+            title: 'Battle'
+        }
+    ];
+    const currentRouteIndex = routeList.findIndex(({ route }) => route.path === routePath);
+
+    const breadcrumbs = <Breadcrumbs>
+        {routeList
+            .slice(0, currentRouteIndex + 1)
+            .map(({ route, title }, i) => {
+                const isCurrent = i === currentRouteIndex;
+
+                if (isCurrent) {
+                    return (
+                        <UIText key={route.path} variant='body1' color='textPrimary'>{title}</UIText>
+                    );
+                }
+
+                return (
+                    <Link key={route.path} component={RouterLink} color='inherit' to={route.path}>{title}</Link>
+                );
+            })}
+    </Breadcrumbs>;
 
     const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
         setAnchorEl(event.currentTarget);
@@ -74,7 +102,7 @@ export const AppHeader: React.FC = () => {
                         </Grid>
 
                         <Grid item xs>
-                            <UIText variant='body1'>{title}</UIText>
+                            {breadcrumbs}
                         </Grid>
                     </Grid>
                     <Button className={classes.btn} onClick={handleClick} endIcon={<PersonIcon />}>
