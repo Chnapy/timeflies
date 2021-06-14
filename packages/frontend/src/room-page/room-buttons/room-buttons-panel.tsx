@@ -42,6 +42,11 @@ export const RoomButtonsPanel: React.FC = () => {
     const classes = useStyles();
     const playerId = useMyPlayerId();
     const placedCharactersStatus = useRoomSelector(state => {
+
+        if (Object.values(state.staticPlayerList).length < 2) {
+            return 'no-players';
+        }
+
         const playerCharacterList = Object.values(state.staticCharacterList)
             .filter(character => character.playerId === playerId);
 
@@ -61,6 +66,7 @@ export const RoomButtonsPanel: React.FC = () => {
     const getCurrentStep = React.useCallback(() => {
 
         return switchUtil(placedCharactersStatus, {
+            "no-players": noIndex,
             "no-characters": noIndex,
             "not-placed": placeCharacterIndex,
             "all-placed": playerReadyIndex

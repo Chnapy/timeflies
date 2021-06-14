@@ -1,6 +1,6 @@
 import { Grid, makeStyles } from '@material-ui/core';
-import { useSocketListeners } from '@timeflies/socket-client';
-import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomStateMessage } from '@timeflies/socket-messages';
+import { useSocketListeners, useSocketSend } from '@timeflies/socket-client';
+import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomStateMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -30,6 +30,7 @@ const useStyles = makeStyles(() => ({
 export const RoomContent: React.FC = () => {
     const classes = useStyles();
     const { roomId } = useRouteMatch(routes.roomPage({}))!.params as { roomId: string };
+    const send = useSocketSend();
     const sendRoomUpdate = useSendRoomUpdate();
     const addSocketListeners = useSocketListeners();
     const dispatch = useDispatch();
@@ -65,6 +66,7 @@ export const RoomContent: React.FC = () => {
                 removeListeners();
             }
             dispatch(RoomSetAction(null));
+            return send(RoomPlayerLeaveMessage({}));
         },
         []);
 
