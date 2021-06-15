@@ -5,6 +5,7 @@ import { createMessage } from '../../message';
 export type ChatNotifyMessageData = {
     message: string;
     playerId: PlayerId;
+    playerName: string;
     time: number;
 };
 

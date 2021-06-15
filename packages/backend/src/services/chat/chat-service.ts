@@ -21,23 +21,24 @@ export class ChatService extends Service {
             throw new SocketError(400, 'Chat send message received from future: ' + payload.time);
         }
 
+        const { playerName } = this.globalEntitiesNoServices.playerCredentialsMap.mapById[ currentPlayerId ];
+
+        const message = ChatNotifyMessage({
+            message: payload.message,
+            playerId: currentPlayerId,
+            playerName,
+            time: payload.time
+        });
+
         if (battle) {
             this.sendToEveryPlayersExcept(
-                ChatNotifyMessage({
-                    message: payload.message,
-                    playerId: currentPlayerId,
-                    time: payload.time
-                }),
+                message,
                 battle.staticPlayers,
                 currentPlayerId
             );
         } else if (room) {
             this.sendToEveryPlayersExcept(
-                ChatNotifyMessage({
-                    message: payload.message,
-                    playerId: currentPlayerId,
-                    time: payload.time
-                }),
+                message,
                 room.getRoomStateData().staticPlayerList,
                 currentPlayerId
             );

@@ -81,6 +81,7 @@ export const Default: React.FC = () => {
                     playerId: 'p3'
                 }
             },
+            playerDisconnectedList: [ 'p3' ],
             characterList: [ 'c1', 'c2', 'c3', 'c4', 'c5' ],
             currentTime: 12,
             serializableStateList: [ 12 ],

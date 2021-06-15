@@ -5,6 +5,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import useAsyncEffect from 'use-async-effect';
+import { ChatPanel } from '../../components/chat-panel/chat-panel';
 import { LoadingBackdrop } from '../../components/loading-backdrop';
 import { NotFoundPanel } from '../../components/not-found-panel';
 import { routes } from '../../routes';
@@ -17,6 +18,9 @@ import { RoomTeamList } from '../room-team/room-team-list';
 import { RoomSetAction } from '../store/room-actions';
 
 const useStyles = makeStyles(() => ({
+    leftColumn: {
+        height: '100%'
+    },
     teamListWrapper: {
         display: 'flex',
         height: '100%'
@@ -84,13 +88,17 @@ export const RoomContent: React.FC = () => {
         return <LoadingBackdrop />;
     }
 
-    return <Grid container spacing={2}>
+    return <Grid container wrap='nowrap' spacing={2}>
 
-        <Grid item>
-            <Grid container direction='column' alignItems='flex-start'>
+        <Grid item zeroMinWidth>
+            <Grid className={classes.leftColumn} container direction='column' alignItems='stretch' spacing={1}>
 
                 <Grid item>
                     <RoomMapPanel />
+                </Grid>
+
+                <Grid item xs>
+                    <ChatPanel stayFocused />
                 </Grid>
 
             </Grid>

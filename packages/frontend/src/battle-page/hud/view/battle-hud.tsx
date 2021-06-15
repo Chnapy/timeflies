@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
+import { ChatPanel } from '../../../components/chat-panel/chat-panel';
 import { BattleEndContextProvider } from '../battle-end-panel/battle-end-context';
 import { BattleEndPanel } from '../battle-end-panel/battle-end-panel';
 import { BattleFeedbackPool } from '../battle-feedbacks/view/battle-feedback-pool';
@@ -32,6 +33,17 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
         transform: 'translateX(-50%)',
         margin: spacing(1),
         width: '30%'
+    },
+    chatPanel: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 168 + spacing(1),
+        margin: spacing(1),
+        width: 150,
+        [ breakpoints.up('md') ]: {
+            bottom: 0
+        }
     }
 }));
 
@@ -50,6 +62,9 @@ export const BattleHud: React.FC = () => {
         </div>
         <div className={classes.timeGauge}>
             <TimeGaugePanelConnected />
+        </div>
+        <div className={classes.chatPanel}>
+            <ChatPanel onlyInputTouchable />
         </div>
 
         <BattleEndContextProvider>

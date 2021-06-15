@@ -3,6 +3,7 @@ import { useSocketSendWithResponse } from '@timeflies/socket-client';
 import { BattleSpellActionMessage, SocketErrorMessage } from '@timeflies/socket-messages';
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import { useDispatch } from 'react-redux';
+import { ErrorListAddAction } from '../../../error-list/store/error-list-actions';
 import { useComputeSpellEffect } from '../../action-preview/hooks/use-compute-spell-effect';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { BattleRollbackAction } from '../../tile-interactive/store/battle-state-actions';
@@ -50,7 +51,7 @@ export const useLaunchSpellAction = () => {
             request.then(response => {
 
                 if (SocketErrorMessage.match(response)) {
-                    // TODO handle error messages
+                    dispatch(ErrorListAddAction(response.payload));
                     return;
                 }
 
