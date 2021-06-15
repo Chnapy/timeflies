@@ -42,7 +42,7 @@ describe('# Socket cell', () => {
         const socketHelper = {
             socket,
             expectSendCalledWithMessages: (messages: (Message | MessageWithResponse)[]) =>
-                expect(socket.send).toHaveBeenCalledWith(JSON.stringify(messages)),
+                expect(socket.send).toHaveBeenCalledWith(JSON.stringify(messages), expect.any(Function)),
             triggerMessageListeners: (messages: Message[] | 'dirty-content') =>
                 Promise.all(
                     Array.from(socket._listeners.message.values()).map(fn => fn({
