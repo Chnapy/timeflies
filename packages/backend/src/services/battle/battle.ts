@@ -24,6 +24,8 @@ export type StaticState = {
     spells: { [ spellId in SpellId ]: StaticSpell };
 };
 
+type DisconnectedPlayers = { [ playerId in PlayerId ]?: number };
+
 export type CycleInfos = {
     turnsOrder: CharacterId[];
 };
@@ -39,7 +41,9 @@ export type Battle = {
     tiledMap: TiledMap;
     staticState: StaticState;
 
-    playerJoin: (playerId: PlayerId) => void;
+    disconnectedPlayers: DisconnectedPlayers;
+
+    playerJoin: (playerId: PlayerId) => Promise<void>;
     getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
     getCycleInfos: () => CycleInfos;
     getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
@@ -65,6 +69,8 @@ export const createBattle = (
 
     const stateStack: SerializableState[] = [ initialSerializableState ];
 
+    const disconnectedPlayers: DisconnectedPlayers = {};
+
     const cycleEngine = services.cycleBattleService.createCycleEngineOverlay({
         battleId,
         playerIdList,
@@ -72,7 +78,10 @@ export const createBattle = (
         charactersDurations: initialSerializableState.characters.actionTime
     });
 
-    const startBattle = () => {
+    const startBattle = async () => {
+        // let some time for client to setup listeners
+        await waitMs(1000);
+
         logger.info('Battle [' + battleId + '] start');
 
         return cycleEngine.start();
@@ -99,6 +108,8 @@ export const createBattle = (
 
         tiledMap,
         staticState,
+
+        disconnectedPlayers,
 
         getMapInfos: parseUrlMode => {
             const parseUrl = assetUrl[ parseUrlMode ];
@@ -135,11 +146,12 @@ export const createBattle = (
             }
         },
 
-        playerJoin: playerId => {
+        playerJoin: async playerId => {
             waitingPlayerList.delete(playerId);
+            delete disconnectedPlayers[ playerId ];
 
             if (!cycleEngine.isStarted() && waitingPlayerList.size === 0) {
-                return startBattle();
+                await startBattle();
             }
         },
     };

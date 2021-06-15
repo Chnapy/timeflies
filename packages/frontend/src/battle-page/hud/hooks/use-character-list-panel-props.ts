@@ -11,6 +11,7 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
     const staticCharacters = useBattleSelector(battleState => battleState.staticCharacters);
     const currentCharactersHealth = useCurrentEntities(({ characters }) => characters.health);
     const playingCharacterId = useBattleSelector(battleState => battleState.playingCharacterId);
+    const playerDisconnectedList = useBattleSelector(battleState => battleState.playerDisconnectedList);
 
     const getPlayerRelationFrom = usePlayerRelationFrom();
 
@@ -29,7 +30,8 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
             playerRelation,
             characterRole,
             health,
-            isPlaying: playingCharacterId === characterId
+            isPlaying: playingCharacterId === characterId,
+            isDisconnected: playerDisconnectedList.includes(playerId)
         };
         acc[ characterId ] = itemProps;
 

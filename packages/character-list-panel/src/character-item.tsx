@@ -1,9 +1,9 @@
 import { Grid, makeStyles } from '@material-ui/core';
+import LinkOffIcon from '@material-ui/icons/LinkOff';
 import { HealthGauge, UIText } from '@timeflies/app-ui';
 import { CharacterRole, CharacterUtils, PlayerRelation, switchUtil } from '@timeflies/common';
 import { CharacterAnimatedImage } from '@timeflies/sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
-import clsx from 'clsx';
 import React from 'react';
 
 export type CharacterItemProps = {
@@ -12,7 +12,8 @@ export type CharacterItemProps = {
     playerRelation: PlayerRelation;
     teamColor: string;
     health: number;
-    isPlaying: boolean;
+    isPlaying?: boolean;
+    isDisconnected?: boolean;
 };
 
 type CharacterItemExtraProps = {
@@ -27,7 +28,7 @@ const teamRectWidth = 4;
 const healthGaugeWidth = 8;
 const width = teamRectWidth + height + healthGaugeWidth;
 
-type StyleProps = Pick<CharacterItemProps, 'teamColor' | 'playerRelation' | 'isPlaying'> & {
+type StyleProps = Pick<CharacterItemProps, 'teamColor' | 'playerRelation' | 'isPlaying' | 'isDisconnected'> & {
     isAlive: boolean;
 };
 
@@ -35,9 +36,10 @@ const useStyles = makeStyles(({ palette }) => ({
     root: {
         width
     },
-    playerName: {
-        maxWidth: width,
-        textOverflow: 'clip'
+    disconnectIcon: {
+        width: 17,
+        height: 17,
+        verticalAlign: 'bottom'
     },
     content: ({ isPlaying }: StyleProps) => ({
         display: 'inline-flex',
@@ -62,8 +64,8 @@ const useStyles = makeStyles(({ palette }) => ({
         }),
         padding: (height - spriteSize) / 2
     }),
-    disabled: ({ isAlive }: StyleProps) => ({
-        opacity: isAlive ? 1 : 0.5
+    disabled: ({ isAlive, isDisconnected }: StyleProps) => ({
+        opacity: (isAlive && !isDisconnected) ? 1 : 0.5
     }),
     healthGauge: {
         width: healthGaugeWidth,
@@ -73,10 +75,10 @@ const useStyles = makeStyles(({ palette }) => ({
 }));
 
 export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProps> = ({
-    playerName, teamColor, playerRelation, characterRole, health, isPlaying, onMouseEnter, onMouseLeave, onClick
+    playerName, teamColor, playerRelation, characterRole, health, isPlaying, isDisconnected, onMouseEnter, onMouseLeave, onClick
 }) => {
     const isAlive = CharacterUtils.isAlive(health);
-    const classes = useStyles({ teamColor, playerRelation, isPlaying, isAlive });
+    const classes = useStyles({ teamColor, playerRelation, isPlaying, isAlive, isDisconnected });
 
     const state: SpritesheetsUtils.CharacterSpriteConfig = {
         role: characterRole,
@@ -91,8 +93,10 @@ export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProp
     return <Grid className={classes.root} container direction='column'>
 
         <Grid item>
-            <UIText className={clsx(classes.playerName, classes.disabled)} variant='body2' noWrap>
-                {playerName}
+            <UIText className={classes.disabled} variant='body2' noWrap>
+                {playerName} {isDisconnected && (
+                    <LinkOffIcon className={classes.disconnectIcon} />
+                )}
             </UIText>
         </Grid>
 

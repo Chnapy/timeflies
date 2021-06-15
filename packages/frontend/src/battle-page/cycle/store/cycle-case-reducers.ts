@@ -1,12 +1,13 @@
 import { ArrayUtils } from '@timeflies/common';
 import { GameCaseReducers } from '../../../store/game-case-reducers';
 import { isMyCharacterPlayingSelector } from '../../hooks/use-is-my-character-playing';
-import { assertBattleState } from '../../store/assert-battle-state';
 import { BattlePrepareTurnStartAction, BattleTurnEndAction } from './cycle-actions';
 
 export const cycleCaseReducers: GameCaseReducers<'battle'> = {
     [ BattlePrepareTurnStartAction.type ]: (state, { payload }: BattlePrepareTurnStartAction) => {
-        assertBattleState(state);
+        if (!state) {
+            return;
+        }
 
         const { roundIndex, turnIndex, characterId, startTime, myPlayerId } = payload;
 

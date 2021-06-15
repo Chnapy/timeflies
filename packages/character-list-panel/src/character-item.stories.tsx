@@ -40,7 +40,6 @@ export const Default: React.FC = () => {
                         playerRelation='me'
                         teamColor='#44FF44'
                         health={85}
-                        isPlaying={false}
                         {...extraProps}
                     />
 
@@ -50,7 +49,6 @@ export const Default: React.FC = () => {
                         playerRelation='ally'
                         teamColor='#44FF44'
                         health={65}
-                        isPlaying={false}
                         {...extraProps}
                     />
 
@@ -60,7 +58,6 @@ export const Default: React.FC = () => {
                         playerRelation='enemy'
                         teamColor='#FFFF44'
                         health={25}
-                        isPlaying={false}
                         {...extraProps}
                     />
 
@@ -70,7 +67,6 @@ export const Default: React.FC = () => {
                         playerRelation='me'
                         teamColor='#44FF44'
                         health={0}
-                        isPlaying={false}
                         {...extraProps}
                     />
 
@@ -111,6 +107,17 @@ export const Default: React.FC = () => {
                         teamColor='#44FF44'
                         health={0}
                         isPlaying
+                        {...extraProps}
+                    />
+
+                    <CharacterItem
+                        characterRole='tacka'
+                        playerName='boutoubou'
+                        playerRelation='ally'
+                        teamColor='#44FF44'
+                        health={80}
+                        isPlaying
+                        isDisconnected
                         {...extraProps}
                     />
 

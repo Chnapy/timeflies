@@ -29,12 +29,14 @@ export class CycleBattleService extends Service {
 
                 const socketCell = this.playerSocketMap[ playerId ];
 
-                socketCell.send(BattleTurnStartMessage({
-                    roundIndex,
-                    turnIndex,
-                    characterId,
-                    startTime
-                }));
+                if (socketCell) {
+                    socketCell.send(BattleTurnStartMessage({
+                        roundIndex,
+                        turnIndex,
+                        characterId,
+                        startTime
+                    }));
+                }
             });
         };
 
@@ -47,8 +49,10 @@ export class CycleBattleService extends Service {
 
                     logger.info('Battle [' + battleId + '] -', 'Cycle turn start', currentTurn);
                 },
-                turnEnd: ({ currentTurn }) => {
+                turnEnd: async ({ currentTurn }) => {
                     logger.info('Battle [' + battleId + '] -', 'Cycle turn end', currentTurn);
+
+                    await this.services.playerBattleService.checkDisconnectedPlayers(battleId);
 
                     if (cycleRunning) {
                         beforeTurnStart();

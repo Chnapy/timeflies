@@ -13,6 +13,7 @@ export type BattleState = {
 
     staticPlayers: { [ playerId in PlayerId ]: StaticPlayer };
     playerList: PlayerId[];
+    playerDisconnectedList: PlayerId[];
 
     // characters
 

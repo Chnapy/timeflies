@@ -5,7 +5,7 @@ import { GlobalEntitiesNoServices } from '../main/global-entities';
 import { AuthService } from './auth/auth-service';
 import { CycleBattleService } from './battle/cycle/cycle-battle-service';
 import { EndBattleService } from './battle/end-battle/end-battle-service';
-import { JoinBattleService } from './battle/join/join-battle-service';
+import { PlayerBattleService } from './battle/player/player-battle-service';
 import { SpellActionBattleService } from './battle/spell-action/spell-action-battle-service';
 import { ChatService } from './chat/chat-service';
 import { CreateRoomListService } from './room-list/create-room/create-room-list-service';
@@ -19,7 +19,7 @@ import { TeamRoomService } from './room/team/team-room-service';
 export type Services = ReturnType<typeof createServicesRaw>;
 
 const createServicesRaw = (globalEntitiesNoServices: GlobalEntitiesNoServices) => ({
-    joinBattleService: new JoinBattleService(globalEntitiesNoServices),
+    playerBattleService: new PlayerBattleService(globalEntitiesNoServices),
     cycleBattleService: new CycleBattleService(globalEntitiesNoServices),
     spellActionBattleService: new SpellActionBattleService(globalEntitiesNoServices),
     endBattleService: new EndBattleService(globalEntitiesNoServices),

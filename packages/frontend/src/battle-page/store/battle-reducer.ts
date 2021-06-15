@@ -1,7 +1,9 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { normalize } from '@timeflies/common';
+import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { GameState } from '../../store/game-state';
 import { cycleCaseReducers } from '../cycle/store/cycle-case-reducers';
+import { playerDisconnectCaseReducers } from '../player-disconnect/store/player-disconnect-case-reducers';
 import { spellSelectCaseReducers } from '../spell-select/store/spell-select-case-reducers';
 import { battleStateCaseReducers } from '../tile-interactive/store/battle-state-case-reducers';
 import { BattleLoadAction, BattleResetAction } from './battle-actions';
@@ -11,6 +13,7 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
     ...cycleCaseReducers,
     ...spellSelectCaseReducers,
     ...battleStateCaseReducers,
+    ...playerDisconnectCaseReducers,
     [ BattleLoadAction.type ]: (state, { payload }: BattleLoadAction): BattleState => {
         const {
             roomId, tiledMapInfos: mapInfos,
@@ -28,9 +31,10 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
             return { tiledMapInfos };
         };
 
-        const getPlayers = (): Pick<BattleState, 'staticPlayers' | 'playerList'> => ({
+        const getPlayers = (): Pick<BattleState, 'staticPlayers' | 'playerList' | 'playerDisconnectedList'> => ({
             staticPlayers: normalize(players, 'playerId'),
-            playerList: players.map(p => p.playerId)
+            playerList: players.map(p => p.playerId),
+            playerDisconnectedList: []
         });
 
         const getCharacters = (): Pick<BattleState, 'staticCharacters' | 'characterList'> => ({
@@ -97,6 +101,9 @@ export const battleReducer = createReducer<GameState[ 'battle' ]>(null, {
         };
     },
     [ BattleResetAction.type ]: () => {
+        return null;
+    },
+    [ CredentialsLoginAction.type ]: () => {
         return null;
     }
 });

@@ -70,10 +70,12 @@ export class SpellActionBattleService extends Service {
             .filter(player => player.playerId !== currentPlayerId)
             .map(player => this.playerSocketMap[ player.playerId ])
             .forEach(playerSocketCell => {
-                playerSocketCell.send(BattleNotifyMessage({
-                    spellAction,
-                    spellEffect: checkResult.spellEffect
-                }))
+                if (playerSocketCell) {
+                    playerSocketCell.send(BattleNotifyMessage({
+                        spellAction,
+                        spellEffect: checkResult.spellEffect
+                    }));
+                }
             });
 
         send(BattleSpellActionMessage.createResponse(requestId, { success: true }));

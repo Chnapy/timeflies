@@ -47,7 +47,6 @@ export const Default: React.FC = () => {
                         playerRelation: 'ally',
                         teamColor: '#44FF44',
                         health: 52,
-                        isPlaying: false
                     },
                     tutu: {
                         characterRole: 'vemo',
@@ -55,10 +54,17 @@ export const Default: React.FC = () => {
                         playerRelation: 'enemy',
                         teamColor: '#FFFF44',
                         health: 0,
-                        isPlaying: false
+                    },
+                    titi: {
+                        characterRole: 'tacka',
+                        playerName: 'chnapo',
+                        playerRelation: 'ally',
+                        teamColor: '#44FF44',
+                        health: 85,
+                        isDisconnected: true
                     }
                 }}
-                characterList={['toto', 'tata', 'tutu']}
+                characterList={[ 'toto', 'tata', 'tutu', 'titi' ]}
                 {...extraProps}
             />
         </AssetsWrapper>

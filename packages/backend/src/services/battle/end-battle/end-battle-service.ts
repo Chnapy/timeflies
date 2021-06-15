@@ -33,10 +33,12 @@ export class EndBattleService extends Service {
         playerIdList.forEach(playerId => {
             const socketCell = this.playerSocketMap[ playerId ];
 
-            socketCell.send(BattleEndMessage({
-                winnerTeamColor,
-                endTime
-            }));
+            if (socketCell) {
+                socketCell.send(BattleEndMessage({
+                    winnerTeamColor,
+                    endTime
+                }));
+            }
 
             delete this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ playerId ];
         });

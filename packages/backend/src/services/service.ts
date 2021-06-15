@@ -6,7 +6,7 @@ import { BattleId } from './battle/battle';
 import { RoomId } from './room/room';
 import { Services } from './services';
 
-export type PlayerSocketMap = { [ playerId in PlayerId ]: SocketCell };
+export type PlayerSocketMap = { [ playerId in PlayerId ]?: SocketCell };
 
 export abstract class Service {
 
@@ -72,7 +72,9 @@ export abstract class Service {
             .filter(player => player.playerId !== currentPlayerId)
             .forEach(player => {
                 const cell = this.playerSocketMap[ player.playerId ];
-                cell.send(message);
+                if (cell) {
+                    cell.send(message);
+                }
             });
     };
 

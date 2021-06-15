@@ -68,7 +68,11 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
         logger.logMessageSent(messageList);
         socket.send(JSON.stringify(
             messageList
-        ));
+        ), err => {
+            if (err) {
+                logger.error(err);
+            }
+        });
     };
 
     const sendError = (error: SocketError, requestId?: string) => {

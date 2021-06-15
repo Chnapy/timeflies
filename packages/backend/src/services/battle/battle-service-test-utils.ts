@@ -11,7 +11,26 @@ export const createFakeBattle = (): Battle => ({
         { playerId: 'p2' } as any,
         { playerId: 'p3' } as any
     ],
-    staticCharacters: [],
+    staticCharacters: [
+        {
+            characterId: 'c1',
+            playerId: 'p1',
+            characterRole: 'meti',
+            defaultSpellId: 's1'
+        },
+        {
+            characterId: 'c2',
+            playerId: 'p2',
+            characterRole: 'meti',
+            defaultSpellId: 's1'
+        },
+        {
+            characterId: 'c3',
+            playerId: 'p3',
+            characterRole: 'meti',
+            defaultSpellId: 's1'
+        }
+    ],
     staticSpells: [],
     staticState: {
         players: {
@@ -59,13 +78,14 @@ export const createFakeBattle = (): Battle => ({
             }
         }
     },
+    disconnectedPlayers: {},
     tiledMap: {
         layers: [ {
             name: 'obstacles',
             data: ArrayUtils.range(50)
         } as TiledLayer ]
     } as any,
-    playerJoin: jest.fn(),
+    playerJoin: jest.fn(async () => { }),
     getMapInfos: jest.fn(),
     getCycleInfos: jest.fn(),
     getCurrentState: jest.fn(() => {
