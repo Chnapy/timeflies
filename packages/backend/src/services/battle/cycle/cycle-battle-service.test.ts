@@ -13,6 +13,9 @@ describe('cycle battle service', () => {
             const battle = createFakeBattle();
 
             const service = new CycleBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
+            service.services = {
+                playerBattleService: { checkDisconnectedPlayers: jest.fn() }
+            } as any;
 
             const playerList = ArrayUtils.range(3).map(i => {
                 const socketCell = createFakeSocketCell();
