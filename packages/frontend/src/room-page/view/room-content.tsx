@@ -47,7 +47,7 @@ export const RoomContent: React.FC = () => {
             RoomPlayerJoinMessage({ roomId }),
             isMounted,
             ({ payload }, defaultFn) => {
-                if (payload.code === 400) {
+                if (payload.reason === 'bad-request') {
                     setHasWrongId(true);
                     return;
                 }

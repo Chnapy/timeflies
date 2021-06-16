@@ -1,12 +1,18 @@
 import Joi from 'joi';
 import { createMessage, Message, MessageWithResponse } from '../message';
 
-export type ErrorCode = 500 | 400 | 401 | 403;
-type ErrorPayload = { code: ErrorCode };
+export type ErrorReason =
+    | 'internal-error'
+    | 'bad-request'
+    | 'bad-server-state'
+    | 'token-invalid'
+    | 'token-expired';
 
-const SocketErrorMessageRaw = createMessage<ErrorPayload>('socket-error', Joi.object({
-    code: Joi.number()
-}));
+type ErrorPayload = {
+    reason: ErrorReason;
+};
+
+const SocketErrorMessageRaw = createMessage<ErrorPayload>('socket-error', Joi.any());
 
 export type SocketErrorMessage = Message<ErrorPayload> | MessageWithResponse<ErrorPayload>;
 export const SocketErrorMessage = Object.assign(

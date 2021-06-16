@@ -56,7 +56,7 @@ server.listen(port, () => {
             logger.error(err);
             socketCell.closeSocket(err instanceof SocketError
                 ? err
-                : new SocketError(500, (err as Error).stack ?? err + '')
+                : new SocketError('internal-error', (err as Error).stack ?? err + '')
             );
         }
     });

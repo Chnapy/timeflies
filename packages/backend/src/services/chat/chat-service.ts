@@ -14,11 +14,11 @@ export class ChatService extends Service {
         const room = this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
 
         if (!room && !battle) {
-            throw new SocketError(403, 'Player trying to send chat message outside of room or battle: ' + currentPlayerId);
+            throw new SocketError('bad-server-state', 'Player trying to send chat message outside of room or battle: ' + currentPlayerId);
         }
 
         if (payload.time > Date.now()) {
-            throw new SocketError(400, 'Chat send message received from future: ' + payload.time);
+            throw new SocketError('bad-request', 'Chat send message received from future: ' + payload.time);
         }
 
         const { playerName } = this.globalEntitiesNoServices.playerCredentialsMap.mapById[ currentPlayerId ];

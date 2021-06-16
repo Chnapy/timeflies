@@ -75,7 +75,7 @@ export const useLoginFormState = () => {
             logger.error(e);
 
             setLoading(false);
-            dispatch(ErrorListAddAction({ code: 500 }));
+            dispatch(ErrorListAddAction({ reason: 'internal-error' }));
         }
 
     }, [ loading, dispatch ]);

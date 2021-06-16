@@ -19,16 +19,16 @@ export class PlayerRoomService extends Service {
             const room = this.getRoomById(payload.roomId);
 
             if (room.isInBattle()) {
-                throw new SocketError(400, 'Cannot access room if it is in battle: ' + room.roomId);
+                throw new SocketError('bad-server-state', 'Cannot access room if it is in battle: ' + room.roomId);
             }
 
             if (this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ]) {
-                throw new SocketError(400, 'Cannot access room if player in battle: ' + room.roomId);
+                throw new SocketError('bad-server-state', 'Cannot access room if player in battle: ' + room.roomId);
             }
 
             if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]
                 && this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] !== room) {
-                throw new SocketError(400, 'Cannot access room if player in another room: ' + room.roomId);
+                throw new SocketError('bad-server-state', 'Cannot access room if player in another room: ' + room.roomId);
             }
 
             this.playerJoinToRoom(room, currentPlayerId);
@@ -67,11 +67,11 @@ export class PlayerRoomService extends Service {
                 .filter(({ playerId }) => playerId === currentPlayerId);
 
             if (!playerCharacterList.length) {
-                throw new SocketError(400, 'Player cannot be ready with no characters selected: ' + currentPlayerId);
+                throw new SocketError('bad-server-state', 'Player cannot be ready with no characters selected: ' + currentPlayerId);
             }
 
             if (playerCharacterList.some(character => character.placement === null)) {
-                throw new SocketError(400, 'Player cannot be ready with characters not placed: ' + currentPlayerId);
+                throw new SocketError('bad-server-state', 'Player cannot be ready with characters not placed: ' + currentPlayerId);
             }
 
             room.playerReady(currentPlayerId, payload.ready);

@@ -49,7 +49,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
         const { messageList, error } = extractMessagesFromEvent(event);
 
         if (error) {
-            sendError(new SocketError(400, error));
+            sendError(new SocketError('bad-request', error));
             return;
         }
 
@@ -76,7 +76,7 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
     };
 
     const sendError = (error: SocketError, requestId?: string) => {
-        send(SocketErrorMessage({ code: error.code }, requestId));
+        send(SocketErrorMessage({ reason: error.reason }, requestId));
     };
 
     const addMessageListener: SocketCell[ 'addMessageListener' ] = (messageCreator, listener) => {
@@ -88,14 +88,14 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                         try {
                             const check = messageCreator.schema.validate(message);
                             if (check.error) {
-                                throw new SocketError(400, check.error.stack ?? check.error + '');
+                                throw new SocketError('bad-request', check.error.stack ?? check.error + '');
                             }
 
                             await listener(message as any, send);
                         } catch (err) {
                             const socketError = err instanceof SocketError
                                 ? err
-                                : new SocketError(500, (err as Error).stack ?? err + '');
+                                : new SocketError('internal-error', (err as Error).stack ?? err + '');
 
                             logger.error(err);
 

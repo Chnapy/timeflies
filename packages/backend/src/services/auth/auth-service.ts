@@ -96,7 +96,7 @@ export class AuthService extends Service {
 
         // https://toto.com?token=abc
         if (!url) {
-            throw new SocketError(500, 'socket url is undefined');
+            throw new SocketError('internal-error', 'socket url is undefined');
         }
 
         const token = new URLSearchParams(
@@ -109,12 +109,12 @@ export class AuthService extends Service {
 
         const validateResult = socketQueryParamsSchema.validate(socketQueryParams);
         if (validateResult.error) {
-            throw new SocketError(401, validateResult.error.message);
+            throw new SocketError('bad-request', validateResult.error.message);
         }
 
         const playerCredentials = this.globalEntitiesNoServices.playerCredentialsMap.mapByToken[ token ];
         if (!playerCredentials) {
-            throw new SocketError(401, 'Player token is invalid');
+            throw new SocketError('token-invalid', 'Player token is invalid');
         }
 
         this.checkIfCredentialsExpired(playerCredentials.playerId);
@@ -134,7 +134,7 @@ export class AuthService extends Service {
         const playerCredentials = this.globalEntitiesNoServices.playerCredentialsMap.mapById[ playerId ];
 
         if (!this.isCredentialsValid(playerCredentials)) {
-            throw new SocketError(401, 'Player credentials expired');
+            throw new SocketError('token-expired', 'Player credentials expired');
         }
     };
 

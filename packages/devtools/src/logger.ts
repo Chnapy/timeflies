@@ -83,7 +83,7 @@ export const logger = {
         });
     },
     error: (err: Error) => {
-        if (!(err as any).code || (err as any).code === 500) {
+        if (!(err as any).reason || (err as any).reason === 'internal-error') {
             logFn({
                 level: 'error',
                 messages: [ err.stack ?? err + '' ]

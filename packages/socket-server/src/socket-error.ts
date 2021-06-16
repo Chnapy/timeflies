@@ -1,18 +1,18 @@
-import { ErrorCode } from '@timeflies/socket-messages';
+import { ErrorReason } from '@timeflies/socket-messages';
 
 export class SocketError extends Error {
 
-    readonly code: ErrorCode;
+    readonly reason: ErrorReason;
 
-    constructor(code: ErrorCode, message: string) {
-        super(`SocketError ${code}: ${message}`);
+    constructor(reason: ErrorReason, message: string) {
+        super(`SocketError ${reason}: ${message}`);
 
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, SocketError);
         }
         this.name = this.constructor.name;
 
-        this.code = code;
+        this.reason = reason;
 
         Object.setPrototypeOf(this, SocketError.prototype);
     }

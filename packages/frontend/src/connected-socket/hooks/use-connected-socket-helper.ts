@@ -1,9 +1,9 @@
 import { getSocketHelperCreator, SocketHelper } from '@timeflies/socket-client';
-import { MessageWithResponse, SocketErrorMessage } from '@timeflies/socket-messages';
+import { MessageWithResponse } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { getEnv } from '../../env';
-import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
+import { useDispatchMessageErrorIfAny } from '../../error-list/hooks/use-dispatch-error-if-any';
 import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
 
@@ -18,6 +18,7 @@ const createSocketHelper = getSocketHelperCreator(getWsUrl());
 export const useConnectedSocketHelper = () => {
     const credentialsToken = useGameSelector(state => state.credentials?.token);
     const dispatch = useDispatch();
+    const dispatchMessageErrorIfAny = useDispatchMessageErrorIfAny();
 
     const getSocketHelper = (token: string) => {
         const socketHelper = createSocketHelper(token);
@@ -34,11 +35,7 @@ export const useConnectedSocketHelper = () => {
                     return;
                 }
 
-                if (SocketErrorMessage.match(message)) {
-                    dispatch(ErrorListAddAction({
-                        code: message.payload.code
-                    }));
-                }
+                dispatchMessageErrorIfAny(message);
             });
         });
 

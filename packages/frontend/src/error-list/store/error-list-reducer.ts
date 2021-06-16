@@ -1,5 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { createId, switchUtil } from '@timeflies/common';
+import { ErrorReason } from '@timeflies/socket-messages';
+import { disconnectErrors } from '../../login-page/store/credentials-reducer';
 import { ErrorListAddAction, ErrorListRemoveAction } from './error-list-actions';
 
 export type ErrorItem = {
@@ -10,20 +12,27 @@ export type ErrorItem = {
 
 export type ErrorListMap = { [ id in string ]: ErrorItem };
 
+const ignoredErrorReasons: ErrorReason[] = [ ...disconnectErrors ];
+
 export const errorListReducer = createReducer<ErrorListMap>({}, {
     [ ErrorListAddAction.type ]: (state, { payload }: ErrorListAddAction) => {
 
-        const messageContent = switchUtil(payload.code, {
-            400: 'something wrong with data sent',
-            401: 'you need to login',
-            403: 'you don\'t have rights for this action',
-            500: 'an unknown error has occured'
+        if (ignoredErrorReasons.includes(payload.reason)) {
+            return;
+        }
+
+        const messageContent = switchUtil(payload.reason, {
+            'bad-request': 'something wrong with data sent',
+            'token-invalid': '',
+            'token-expired': '',
+            'bad-server-state': 'you cannot do this action',
+            'internal-error': 'an unknown error has occured'
         });
 
         const errorItem: ErrorItem = {
             id: createId(),
             time: Date.now(),
-            message: `Error ${payload.code}: ${messageContent}`
+            message: `Error ${payload.reason}: ${messageContent}`
         };
         state[ errorItem.id ] = errorItem;
     },

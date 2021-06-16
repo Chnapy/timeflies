@@ -33,7 +33,7 @@ export const BattlePage: React.FC = () => {
     useAsyncEffect(async (isMounted) => {
 
         const response = await sendWithResponse(BattleLoadMessage({ battleId }), isMounted, ({ payload }, dispatchError) => {
-            if (payload.code === 400) {
+            if (payload.reason === 'bad-request') {
                 setHasWrongId(true);
             } else {
                 dispatchError();

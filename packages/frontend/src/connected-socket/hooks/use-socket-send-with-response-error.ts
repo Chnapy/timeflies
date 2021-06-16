@@ -1,13 +1,12 @@
 import { useSocketSendWithResponse } from '@timeflies/socket-client';
 import { MessageWithResponseGetter, SocketErrorMessage } from '@timeflies/socket-messages';
-import { useDispatch } from 'react-redux';
-import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
+import { useDispatchMessageErrorIfAny } from '../../error-list/hooks/use-dispatch-error-if-any';
 
 type OnErrorFn = (socketErrorMessage: SocketErrorMessage, dispatchError: () => void) => void;
 
 export const useSocketSendWithResponseError = () => {
     const sendWithResponse = useSocketSendWithResponse();
-    const dispatch = useDispatch();
+    const dispatchMessageErrorIfAny = useDispatchMessageErrorIfAny();
 
     return async <G extends MessageWithResponseGetter<any, any>>(
         messageGetter: G,
@@ -17,12 +16,12 @@ export const useSocketSendWithResponseError = () => {
 
         const response = await sendWithResponse(messageGetter);
 
-        if(!isMounted()) {
+        if (!isMounted()) {
             return null;
         }
 
         if (SocketErrorMessage.match(response!)) {
-            const dispatchError = () => dispatch(ErrorListAddAction(response.payload));
+            const dispatchError = () => dispatchMessageErrorIfAny(response!);
             onError(response, dispatchError);
             return null;
         }
