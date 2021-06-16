@@ -19,6 +19,9 @@ const buttonSizes = {
 };
 
 const useStyles = makeStyles(({ spacing }) => ({
+    root: {
+        backdropFilter: 'blur(2px)'
+    },
     background: {
         position: 'absolute',
         left: 0,
@@ -83,7 +86,7 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
     };
 
     return (
-        <Box position='relative' display='inline-flex' p={2} zIndex={0}>
+        <Box className={classes.root} position='relative' display='inline-flex' p={2} zIndex={0}>
             <Paper className={classes.background} />
             {isMobile
                 ? getMobileContent()

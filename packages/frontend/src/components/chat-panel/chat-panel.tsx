@@ -14,31 +14,41 @@ type ChatPanelProps = {
     onlyInputTouchable?: boolean;
 };
 
+type StyleProps = Pick<ChatPanelProps, 'onlyInputTouchable'>;
+
 const useStyles = makeStyles(({ spacing }) => ({
-    root: ({ onlyInputTouchable }: Pick<ChatPanelProps, 'onlyInputTouchable'>) => ({
+    root: ({ onlyInputTouchable }: StyleProps) => ({
         height: '100%',
         pointerEvents: onlyInputTouchable ? 'none' : undefined
     }),
     messageWrapperParent: {
         position: 'relative'
     },
-    messageWrapper: {
+    messageWrapper: ({ onlyInputTouchable }: StyleProps) => ({
         maxHeight: '100%',
-        overflow: 'auto',
+        overflow: onlyInputTouchable ? 'hidden' : 'auto',
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
         padding: spacing(0, 1)
-    },
+    }),
     textField: {
+        "& > .MuiInputBase-root": {
+            paddingRight: 0
+        },
+
         '& input': {
             pointerEvents: 'all',
             paddingLeft: spacing(1),
-            paddingRight: spacing(1)
+            paddingRight: spacing(1),
+            paddingTop: 10,
+            paddingBottom: 10
         }
     }
 }));
+
+const maxNbrLines = 40;
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ stayFocused, onlyInputTouchable }) => {
     const classes = useStyles({ onlyInputTouchable });
@@ -53,10 +63,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ stayFocused, onlyInputTouc
     const addSocketlisteners = useSocketListeners();
 
     addLineRef.current = chatLine => {
-        const newList = [
+        const tempList = [
             ...chatLineList,
             chatLine
         ].sort((a, b) => a.time < b.time ? -1 : 1);
+        const newList = tempList.slice(Math.max(tempList.length - maxNbrLines, 0));
         setChatLineList(newList);
     };
 
@@ -100,13 +111,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ stayFocused, onlyInputTouc
         }
 
         const scrollBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
-        if (scrollBottom > 100) {
+        if (!onlyInputTouchable && scrollBottom > 100) {
             return;
         }
 
         wrapper.scrollTo({ behavior: 'smooth', top: 999999 });
 
-    }, [ lastLineTime ]);
+    }, [ lastLineTime, onlyInputTouchable ]);
 
     // focus input
     useHotkeysKey('enter', React.useCallback(() => {
@@ -133,8 +144,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ stayFocused, onlyInputTouc
             <TextField
                 ref={inputRef}
                 className={classes.textField}
+                variant='filled'
                 fullWidth
                 disabled={sending}
+                hiddenLabel
                 InputProps={{
                     endAdornment: sending
                         ? (
