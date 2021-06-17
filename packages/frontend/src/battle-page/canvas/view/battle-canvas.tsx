@@ -45,6 +45,7 @@ export const BattleCanvas: React.FC = () => {
                     barrierRender={children => {
                         return (
                             <Stage options={{
+                                backgroundAlpha: 0,
                                 resizeTo: rootRef.current!,
                             }}>
                                 {children}
