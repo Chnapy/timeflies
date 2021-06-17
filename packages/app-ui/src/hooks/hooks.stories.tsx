@@ -1,7 +1,7 @@
 import { Box } from '@material-ui/core';
 import { Meta } from '@storybook/react/types-6-0';
 import React from 'react';
-import { useHotkeys } from './use-hotkeys';
+import { useHotkeysCode } from './use-hotkeys';
 import { useIsMobile } from './use-is-mobile';
 
 export default {
@@ -10,10 +10,10 @@ export default {
 
 export const Default: React.FC = () => {
     const isMobile = useIsMobile();
-    useHotkeys('KeyQ', () => console.log('KeyQ'));
-    useHotkeys('KeyW', () => console.log('KeyW'));
-    useHotkeys('KeyE', () => console.log('KeyE'));
-    useHotkeys('KeyR', () => console.log('KeyR'));
+    useHotkeysCode('KeyQ', () => console.log('KeyQ'));
+    useHotkeysCode('KeyW', () => console.log('KeyW'));
+    useHotkeysCode('KeyE', () => console.log('KeyE'));
+    useHotkeysCode('KeyR', () => console.log('KeyR'));
 
     return (
         <Box p={2}>

@@ -3,6 +3,7 @@ import { Meta } from '@storybook/react/types-6-0';
 import { SocketContextProvider, SocketHelper } from '@timeflies/socket-client';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom';
 import { rootReducer } from '../../../store/root-reducer';
 import { BattleAssetsLoader } from '../../assets-loader/view/battle-assets-loader';
 import { BattleEndContext } from './battle-end-context';
@@ -24,8 +25,13 @@ export const Default: React.FC = () => {
     });
     const [ store ] = React.useState(() => {
         const preloadedState = rootReducer(undefined, { type: 'foo' });
+        preloadedState.credentials = {
+            playerId: 'p1',
+            playerName: 'chnapy',
+            token: '---'
+        };
         preloadedState.battle = {
-            myPlayerId: 'p1',
+            roomId: 'roomId',
             staticPlayers: {
                 p1: {
                     playerId: 'p1',
@@ -75,6 +81,7 @@ export const Default: React.FC = () => {
                     playerId: 'p3'
                 }
             },
+            playerDisconnectedList: [ 'p3' ],
             characterList: [ 'c1', 'c2', 'c3', 'c4', 'c5' ],
             currentTime: 12,
             serializableStateList: [ 12 ],
@@ -98,13 +105,15 @@ export const Default: React.FC = () => {
     return (
         <Provider store={store}>
             <SocketContextProvider value={socketHelper}>
-                <BattleEndContext.Provider value={{
-                    winnerTeamColor: '#FFD74A'
-                }}>
-                    <BattleAssetsLoader>
-                        <BattleEndPanel />
-                    </BattleAssetsLoader>
-                </BattleEndContext.Provider>
+                <MemoryRouter initialEntries={[ '/battle/battleId' ]}>
+                    <BattleEndContext.Provider value={{
+                        winnerTeamColor: '#FFD74A'
+                    }}>
+                        <BattleAssetsLoader>
+                            <BattleEndPanel />
+                        </BattleAssetsLoader>
+                    </BattleEndContext.Provider>
+                </MemoryRouter>
             </SocketContextProvider>
         </Provider>
     );

@@ -14,6 +14,9 @@ export type CharacterListPanelProps = {
 };
 
 const useStyles = makeStyles(() => ({
+    root: {
+        backdropFilter: 'blur(2px)'
+    },
     background: {
         position: 'absolute',
         left: 0,
@@ -31,7 +34,7 @@ export const CharacterListPanel: React.FC<CharacterListPanelProps> = ({
     const classes = useStyles();
 
     return (
-        <Box position='relative' display='inline-flex' p={2} zIndex={0}>
+        <Box className={classes.root} position='relative' display='inline-flex' p={2} zIndex={0}>
             <Paper className={classes.background} />
 
             <Grid container direction='column' spacing={1}>

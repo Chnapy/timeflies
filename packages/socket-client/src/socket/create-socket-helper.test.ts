@@ -68,6 +68,6 @@ describe('# create socket helper', () => {
             });
 
             expect(socket.send).toHaveBeenCalled();
-        })
+        });
     });
 });

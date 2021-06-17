@@ -1,3 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
+import { switchUtil } from './switchUtil';
 
-export const createId = () => uuidv4();
+export const createId = (length: 'long' | 'short' = 'long') => nanoid(switchUtil(length, {
+    'long': 21,
+    'short': 8
+}));

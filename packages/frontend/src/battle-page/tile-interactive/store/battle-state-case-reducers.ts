@@ -1,10 +1,11 @@
 import { GameCaseReducers } from '../../../store/game-case-reducers';
-import { assertBattleState } from '../../store/assert-battle-state';
 import { BattleCommitAction, BattleRollbackAction, BattleTimeUpdateAction } from './battle-state-actions';
 
 export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
     [ BattleTimeUpdateAction.type ]: (state, { payload }: BattleTimeUpdateAction) => {
-        assertBattleState(state);
+        if (!state) {
+            return;
+        }
 
         // handle case when a prepare-turn-start action is dispatched between commit & time-update action
         if (payload.currentTime > state.currentTime) {
@@ -12,7 +13,9 @@ export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
         }
     },
     [ BattleCommitAction.type ]: (state, { payload }: BattleCommitAction) => {
-        assertBattleState(state);
+        if (!state) {
+            return;
+        }
 
         const { spellAction, futureState, spellEffect } = payload;
 
@@ -26,7 +29,9 @@ export const battleStateCaseReducers: GameCaseReducers<'battle'> = {
         state.serializableStateList.push(futureState.time);
     },
     [ BattleRollbackAction.type ]: (state, { payload }: BattleRollbackAction) => {
-        assertBattleState(state);
+        if (!state) {
+            return;
+        }
 
         const { lastState } = payload;
 

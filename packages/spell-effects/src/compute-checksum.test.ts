@@ -32,7 +32,13 @@ describe('# compute checksum', () => {
                     actionTime: 234
                 },
                 bar: {
-                    health: 100
+                    toto: undefined, // should be ignored
+                    health: 100,
+                    tutu: undefined, // should be ignored
+                    asdr: undefined, // should be ignored
+                    gfoo: undefined, // should be ignored
+                    qsfhj: undefined, // should be ignored
+                    foo: 9
                 }
             } as any,
             spells: {} as any
@@ -43,7 +49,8 @@ describe('# compute checksum', () => {
             time: 123,
             characters: {
                 bar: {
-                    health: 100
+                    health: 100,
+                    foo: 9
                 },
                 foo: {
                     actionTime: 234

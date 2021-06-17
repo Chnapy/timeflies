@@ -28,6 +28,10 @@ export const CycleEngineProvider: React.FC = ({ children }) => {
 
     const [ cycleEngine ] = React.useState<CycleEngine>(createEngine);
 
+    React.useEffect(() => {
+        return () => { void cycleEngine.stop() };
+    }, [ cycleEngine ]);
+
     return <CycleEngineContext.Provider value={cycleEngine}>
         <CycleEngineLogic />
         {children}

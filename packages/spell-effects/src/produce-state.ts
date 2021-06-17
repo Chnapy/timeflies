@@ -1,4 +1,4 @@
-import { CharacterId, SerializableState, SpellRole } from '@timeflies/common';
+import { CharacterId, ObjectTyped, PlayerId, SerializableState, SpellRole } from '@timeflies/common';
 import produce from 'immer';
 import { computeChecksum } from './compute-checksum';
 import { computeRangeArea, ComputeRangeAreaParams } from './compute-range-area';
@@ -86,4 +86,27 @@ export const getSpellRangeArea = (spellRole: SpellRole, params: ComputeRangeArea
     const checkTileFn = getSpellRangeAreaFn(spellRole);
 
     return computeRangeArea(params, checkTileFn);
+};
+
+export const produceStateDisconnectedPlayers = (
+    state: Omit<SerializableState, 'checksum'>,
+    time: number,
+    removedPlayers: PlayerId[],
+    characterPlayerMap: { [ characterId in CharacterId ]: PlayerId }
+) => {
+    return produce(state as SerializableState, draft => {
+
+        const charactersHealth = ObjectTyped.entries(draft.characters.health)
+            .reduce<typeof draft.characters.health>((acc, [ characterId, health ]) => {
+                const playerId = characterPlayerMap[ characterId ];
+                const isRemovedPlayer = removedPlayers.includes(playerId);
+
+                acc[ characterId ] = isRemovedPlayer ? 0 : health;
+                return acc;
+            }, {});
+
+        draft.characters.health = charactersHealth;
+        draft.time = time;
+        draft.checksum = computeChecksum(draft);
+    });
 };

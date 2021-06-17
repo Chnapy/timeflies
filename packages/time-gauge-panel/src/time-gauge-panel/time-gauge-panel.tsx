@@ -17,21 +17,23 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
         right: 0,
         bottom: 0,
         top: 0,
-        opacity: 0.5
+        opacity: 0.5,
+        backgroundColor: palette.background.paper,
+        zIndex: -1
     },
     gaugesWrapper: {
         pointerEvents: 'all',
         position: 'relative',
-        backgroundColor: palette.background.paper,
-        padding: spacing(1)
+        padding: spacing(1),
+        backdropFilter: 'blur(2px)'
     },
     counterWrapper: {
         pointerEvents: 'all',
         position: 'relative',
-        backgroundColor: palette.background.paper,
         minWidth: 56,
         padding: spacing(1, 1.5),
-        textAlign: 'center'
+        textAlign: 'center',
+        backdropFilter: 'blur(2px)'
     },
     timeGaugeWrapper: {
         backgroundColor: palette.background.default,

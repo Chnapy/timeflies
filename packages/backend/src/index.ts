@@ -1,6 +1,6 @@
 import { logger } from '@timeflies/devtools';
 import { authEndpoint } from '@timeflies/socket-messages';
-import { createSocketCell, SocketError } from '@timeflies/socket-server';
+import { addSocketListenersLogger, createSocketCell, SocketError } from '@timeflies/socket-server';
 import { json, urlencoded } from 'body-parser';
 import cors from "cors";
 import express from 'express';
@@ -43,6 +43,10 @@ server.listen(port, () => {
 
     ws.on('connection', (socket, request) => {
 
+        socket.setMaxListeners(20); // fix console warning due to multiple services listeners
+
+        addSocketListenersLogger(socket);
+
         const socketCell = createSocketCell(socket);
         try {
             const playerId = globalEntities.services.authService.onSocketFirstConnect(socketCell, request);
@@ -52,7 +56,7 @@ server.listen(port, () => {
             logger.error(err);
             socketCell.closeSocket(err instanceof SocketError
                 ? err
-                : new SocketError(500, (err as Error).stack ?? err + '')
+                : new SocketError('internal-error', (err as Error).stack ?? err + '')
             );
         }
     });

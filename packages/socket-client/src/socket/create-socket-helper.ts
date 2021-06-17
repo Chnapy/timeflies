@@ -55,6 +55,8 @@ export const getSocketHelperCreator = (serverUrl: string) => {
 
         startHeartbeatTimeout();
 
+        addListener('close', () => clearTimeout(heartbeatTimeout));
+
         return {
             url: socket.url,
             getReadyState: () => socket.readyState,
@@ -64,10 +66,10 @@ export const getSocketHelperCreator = (serverUrl: string) => {
 
                 startHeartbeatTimeout();
             },
-            addOpenListener: (listener: () => void) => {
+            addOpenListener: (listener: (event: WebSocketEventMap[ 'open' ]) => void) => {
                 return addListener('open', listener);
             },
-            addCloseListener: (listener: () => void) => {
+            addCloseListener: (listener: (event: WebSocketEventMap[ 'close' ]) => void) => {
                 return addListener('close', listener);
             },
             addMessageListener: <M extends Message>(listener: (messageList: M[]) => void) => {

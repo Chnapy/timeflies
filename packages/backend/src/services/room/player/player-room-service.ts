@@ -1,3 +1,4 @@
+import { PlayerId } from '@timeflies/common';
 import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { Service } from '../../service';
@@ -18,30 +19,42 @@ export class PlayerRoomService extends Service {
             const room = this.getRoomById(payload.roomId);
 
             if (room.isInBattle()) {
-                throw new SocketError(400, 'Cannot access room if it is in battle: ' + room.roomId);
+                throw new SocketError('bad-server-state', 'Cannot access room if it is in battle: ' + room.roomId);
             }
 
             if (this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ]) {
-                throw new SocketError(400, 'Cannot access room if player in battle: ' + room.roomId);
+                throw new SocketError('bad-server-state', 'Cannot access room if player in battle: ' + room.roomId);
             }
 
-            if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]) {
-                throw new SocketError(400, 'Cannot access room if player in another room: ' + room.roomId);
+            if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]
+                && this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] !== room) {
+                throw new SocketError('bad-server-state', 'Cannot access room if player in another room: ' + room.roomId);
             }
 
-            room.playerJoin({
-                playerId: currentPlayerId,
-                playerName: 'name_' + currentPlayerId,
-                teamColor: null,
-                ready: false
-            });
+            this.playerJoinToRoom(room, currentPlayerId);
 
             send(RoomPlayerJoinMessage.createResponse(requestId, room.getRoomStateData()));
 
-            this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] = room;
-
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
+
+    playerJoinToRoom = (room: Room, currentPlayerId: PlayerId) => {
+
+        if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]) {
+            return;
+        }
+
+        const { playerName } = this.globalEntitiesNoServices.playerCredentialsMap.mapById[ currentPlayerId ];
+
+        room.playerJoin({
+            playerId: currentPlayerId,
+            playerName,
+            teamColor: null,
+            ready: false
+        });
+
+        this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] = room;
+    };
 
     private addRoomPlayerReadyMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerReadyMessage>(
         RoomPlayerReadyMessage, async ({ payload, requestId }, send) => {
@@ -54,11 +67,11 @@ export class PlayerRoomService extends Service {
                 .filter(({ playerId }) => playerId === currentPlayerId);
 
             if (!playerCharacterList.length) {
-                throw new SocketError(400, 'Player cannot be ready with no characters selected: ' + currentPlayerId);
+                throw new SocketError('bad-server-state', 'Player cannot be ready with no characters selected: ' + currentPlayerId);
             }
 
             if (playerCharacterList.some(character => character.placement === null)) {
-                throw new SocketError(400, 'Player cannot be ready with characters not placed: ' + currentPlayerId);
+                throw new SocketError('bad-server-state', 'Player cannot be ready with characters not placed: ' + currentPlayerId);
             }
 
             room.playerReady(currentPlayerId, payload.ready);
@@ -102,12 +115,19 @@ export class PlayerRoomService extends Service {
 
     private getPlayerLeaveFn = (currentPlayerId: string) => () => {
 
-        const room = this.getRoomByPlayerId(currentPlayerId);
+        const room = this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
+        if (!room) {
+            return;
+        }
 
         room.playerLeave(currentPlayerId);
 
         this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
 
         delete this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
+
+        if (room.getRoomStateData().staticPlayerList.length === 0) {
+            delete this.globalEntitiesNoServices.currentRoomMap.mapById[ room.roomId ];
+        }
     };
 }

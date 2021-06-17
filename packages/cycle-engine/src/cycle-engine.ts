@@ -118,7 +118,7 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
         };
 
         if (listeners.turnStart) {
-            listeners.turnStart({
+            await listeners.turnStart({
                 currentTurn: {
                     turnIndex,
                     characterIndex,
@@ -132,9 +132,9 @@ export const createCycleEngine = ({ charactersDurations, charactersList, listene
             });
         }
 
-        return promise.then(status => {
+        return promise.then(async status => {
             if (listeners.turnEnd) {
-                listeners.turnEnd({
+                await listeners.turnEnd({
                     currentTurn: {
                         turnIndex,
                         characterIndex,

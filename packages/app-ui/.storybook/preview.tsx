@@ -5,6 +5,7 @@ import { UIThemeProvider } from '../src/theme/ui-theme-provider';
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
+  layout: 'fullscreen',
   options: {
     showPanel: false
   }

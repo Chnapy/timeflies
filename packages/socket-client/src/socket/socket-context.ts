@@ -16,7 +16,7 @@ export const useSocketHelper = () => {
 
     return async () => {
         if ([ WebSocket.CLOSED, WebSocket.CLOSING ].includes(socketHelper.getReadyState())) {
-            throw new Error('socket closed or closing');
+            console.warn('socket closed or closing');
         }
 
         if (socketHelper.getReadyState() === WebSocket.CONNECTING) {

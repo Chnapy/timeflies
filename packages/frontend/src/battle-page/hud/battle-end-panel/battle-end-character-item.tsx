@@ -14,6 +14,7 @@ const noop = () => { };
 export const BattleEndCharacterItem: React.FC<BattleEndCharacterItemProps> = ({ characterId }) => {
     const { characterRole, playerId } = useBattleSelector(state => state.staticCharacters[ characterId ]);
     const { playerName, teamColor } = useBattleSelector(state => state.staticPlayers[ playerId ]);
+    const playerDisconnectedList = useBattleSelector(battleState => battleState.playerDisconnectedList);
     const health = useCurrentEntities(entities => entities.characters.health[ characterId ]);
     const getPlayerRelationFrom = usePlayerRelationFrom();
 
@@ -25,6 +26,7 @@ export const BattleEndCharacterItem: React.FC<BattleEndCharacterItemProps> = ({ 
             teamColor={teamColor}
             playerRelation={getPlayerRelationFrom(playerId)}
             isPlaying={false}
+            isDisconnected={playerDisconnectedList.includes(playerId)}
             health={health}
             onClick={noop}
             onMouseEnter={noop}

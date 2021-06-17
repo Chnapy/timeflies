@@ -48,7 +48,7 @@ export class EntityListGetRoomService extends Service {
                     duration: 800,
                     rangeArea: 10,
                     actionArea: 1,
-                    lineOfSight: false
+                    lineOfSight: true
                 }
             },
             {
@@ -90,7 +90,7 @@ export class EntityListGetRoomService extends Service {
                     duration: 1000,
                     rangeArea: 8,
                     actionArea: 1,
-                    lineOfSight: false
+                    lineOfSight: true
                 }
             },
             {

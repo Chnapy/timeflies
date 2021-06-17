@@ -40,6 +40,7 @@ describe('player room service', () => {
             room.getRoomStateData = jest.fn(() => ({
                 roomId: 'room',
                 mapInfos: null,
+                mapPlacementTiles: {},
                 playerAdminId: '',
                 teamColorList: [],
                 staticPlayerList: [],

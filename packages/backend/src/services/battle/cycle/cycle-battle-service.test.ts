@@ -13,6 +13,9 @@ describe('cycle battle service', () => {
             const battle = createFakeBattle();
 
             const service = new CycleBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
+            service.services = {
+                playerBattleService: { checkDisconnectedPlayers: jest.fn() }
+            } as any;
 
             const playerList = ArrayUtils.range(3).map(i => {
                 const socketCell = createFakeSocketCell();
@@ -42,7 +45,7 @@ describe('cycle battle service', () => {
             let listeners: CycleEngineListeners = null as any;
 
             const cycleEngineOverlay = service.createCycleEngineOverlay({
-                battleId: 'battleId',
+                battleId: 'battle',
                 playerIdList: playerList.map(p => p.playerId),
                 charactersList: [ 'c1', 'c2', 'c3' ],
                 charactersDurations: { c1: 100, c2: 100, c3: 100 }
@@ -205,7 +208,7 @@ describe('cycle battle service', () => {
                     turnIndex: 1
                 }));
 
-                listeners.turnEnd!({
+                await listeners.turnEnd!({
                     roundIndex: 3,
                     lastRoundTurn: false,
                     currentTurn: {

@@ -1,4 +1,4 @@
-import { CharacterId, PlayerId, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
+import { CharacterId, SerializableState, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
 import Joi from 'joi';
 import { createMessage } from '../../message';
 
@@ -13,7 +13,7 @@ type CycleInfos = {
 };
 
 export type BattleLoadData = {
-    myPlayerId: PlayerId;
+    roomId: string;
 
     tiledMapInfos: TiledMapInfos;
 

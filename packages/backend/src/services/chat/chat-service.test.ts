@@ -85,6 +85,7 @@ describe('chat service', () => {
                     expect(socketCell.send).toHaveBeenCalledWith(ChatNotifyMessage({
                         message: 'future',
                         playerId: 'p1',
+                        playerName: 'p-1',
                         time: 5
                     }));
                 }

@@ -4,9 +4,15 @@ import { Battle, BattleId } from '../services/battle/battle';
 import { Room, RoomId } from '../services/room/room';
 import { createServices, Services } from '../services/services';
 
+export type PlayerCredentialsTimed = PlayerCredentials & {
+    lastConnectedTime: number;
+    isOnline: boolean;
+};
+
 export type PlayerCredentialsMap = {
-    mapByToken: { [ token in string ]: PlayerCredentials };
-    mapByPlayerName: { [ playerName in string ]: PlayerCredentials };
+    mapById: { [ playerId in PlayerId ]: PlayerCredentialsTimed };
+    mapByToken: { [ token in string ]: PlayerCredentialsTimed };
+    mapByPlayerName: { [ playerName in string ]: PlayerCredentialsTimed };
 };
 
 type RoomMapById = { [ roomId in RoomId ]?: Room };
@@ -34,6 +40,7 @@ export type GlobalEntitiesNoServices = Omit<GlobalEntities, 'services'>;
 export const createGlobalEntities = (): GlobalEntities => {
     const globalEntitiesNoServices: GlobalEntitiesNoServices = {
         playerCredentialsMap: {
+            mapById: {},
             mapByToken: {},
             mapByPlayerName: {}
         },

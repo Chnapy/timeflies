@@ -1,35 +1,70 @@
+import { Container, makeStyles } from '@material-ui/core';
+import { BattleLoadMessage } from '@timeflies/socket-messages';
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import useAsyncEffect from 'use-async-effect';
+import { LoadingBackdrop } from '../components/loading-backdrop';
+import { NotFoundPanel } from '../components/not-found-panel';
+import { useSocketSendWithResponseError } from '../connected-socket/hooks/use-socket-send-with-response-error';
 import { useGameSelector } from '../store/hooks/use-game-selector';
-import { BattleAssetsLoader } from './assets-loader/view/battle-assets-loader';
 import { BattleView } from './battle-view';
-import { useBattleLoad } from './loading/hooks/use-battle-load';
-import { BattleLoading } from './loading/view/battle-loading';
+import { BattleLoadAction, BattleResetAction } from './store/battle-actions';
 
 type BattlePageParams = {
     battleId: string;
 };
 
+const useStyles = makeStyles(() => ({
+    wrongIdContainer: {
+        display: 'flex',
+        height: '100vh'
+    }
+}));
+
 export const BattlePage: React.FC = () => {
+    const classes = useStyles();
     const { battleId } = useParams<BattlePageParams>();
     const hasBattleData = useGameSelector(state => state.battle !== null);
+    const sendWithResponse = useSocketSendWithResponseError();
+    const dispatch = useDispatch();
+    const [ hasWrongId, setHasWrongId ] = React.useState(false);
 
-    const { isLoading, errorCode } = useBattleLoad(battleId);
+    useAsyncEffect(async (isMounted) => {
 
-    return (
-        <BattleAssetsLoader>
-            {hasBattleData
-                ? (
-                    <BattleView />
-                )
-                : (
-                    <div>
-                        <div>Battle page</div>
-                        <div>Battle ID: {battleId}</div>
-                        {isLoading && <BattleLoading />}
-                        {errorCode && <div>Error {errorCode}</div>}
-                    </div>
-                )}
-        </BattleAssetsLoader>
-    );
+        const response = await sendWithResponse(BattleLoadMessage({ battleId }), isMounted, ({ payload }, dispatchError) => {
+            if (payload.reason === 'bad-request') {
+                setHasWrongId(true);
+            } else {
+                dispatchError();
+            }
+        });
+        if (!response) {
+            return;
+        }
+
+        dispatch(BattleLoadAction(response.payload));
+    },
+        () => dispatch(BattleResetAction()),
+        []);
+
+    if (hasWrongId) {
+        return (
+            <Container className={classes.wrongIdContainer}>
+                <NotFoundPanel
+                    title='Oops, there is no battle here.'
+                    reasons={[
+                        'Battle is over',
+                        'URL is wrong, if you paste it from outside'
+                    ]}
+                />
+            </Container>
+        );
+    }
+
+    if (!hasBattleData) {
+        return <LoadingBackdrop />;
+    }
+
+    return <BattleView />;
 };

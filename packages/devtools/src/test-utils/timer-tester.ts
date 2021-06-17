@@ -65,7 +65,7 @@ const createTimerTester = () => {
             return promise;
         },
 
-        endTimer: async (...promises: Promise<any>[]) => {
+        endTimer: async (...promises: unknown[]) => {
             jest.runAllTimers();
             await Promise.all(promises);
         },

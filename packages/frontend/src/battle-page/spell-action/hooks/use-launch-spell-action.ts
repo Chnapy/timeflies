@@ -1,8 +1,9 @@
 import { SpellAction } from '@timeflies/common';
 import { useSocketSendWithResponse } from '@timeflies/socket-client';
-import { BattleSpellActionMessage, SocketErrorMessage } from '@timeflies/socket-messages';
+import { BattleSpellActionMessage } from '@timeflies/socket-messages';
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import { useDispatch } from 'react-redux';
+import { useDispatchMessageErrorIfAny } from '../../../error-list/hooks/use-dispatch-error-if-any';
 import { useComputeSpellEffect } from '../../action-preview/hooks/use-compute-spell-effect';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { BattleRollbackAction } from '../../tile-interactive/store/battle-state-actions';
@@ -12,6 +13,7 @@ export const useLaunchSpellAction = () => {
     const computeSpellEffect = useComputeSpellEffect();
     const sendWithResponse = useSocketSendWithResponse();
     const dispatch = useDispatch();
+    const dispatchMessageErrorIfAny = useDispatchMessageErrorIfAny();
     const dispatchNewState = useDispatchNewState();
     const turnStartTime = useBattleSelector(battle => battle.turnStartTime);
 
@@ -49,8 +51,7 @@ export const useLaunchSpellAction = () => {
             promise,
             request.then(response => {
 
-                if (SocketErrorMessage.match(response)) {
-                    // TODO handle error messages
+                if (dispatchMessageErrorIfAny(response)) {
                     return;
                 }
 

@@ -54,41 +54,12 @@ export const renderWithContext = function <V>(socketHelper: SocketHelper | null,
 };
 
 export function describeSocketFailures<V>(hook: UseSocketHook<V>, ...args: V[]) {
-    describe('fails if', () => {
-        it('socket not defined', async () => {
+    it('fails if socket not defined', async () => {
 
-            const result = renderWithContext(null, hook);
+        const result = renderWithContext(null, hook);
 
-            await expect(() => act(() =>
-                result.current(...args)
-            )).toThrowError();
-        });
-
-        const expectSocketWithState = (readyState: number) => {
-            const socketHelper = createFakeSocketHelper(readyState);
-
-            const result = renderWithContext(socketHelper, hook);
-
-            return {
-                toRejectError: async () => {
-                    expect(socketHelper.send).not.toHaveBeenCalled();
-                    expect(socketHelper.addMessageListener).not.toHaveBeenCalled();
-                    expect(socketHelper.addOpenListener).not.toHaveBeenCalled();
-                    expect(socketHelper.addCloseListener).not.toHaveBeenCalled();
-
-                    await expect(act(() =>
-                        result.current(...args)
-                    )).rejects.toBeDefined();
-                }
-            };
-        };
-
-        it('socket closed', async () => {
-            await expectSocketWithState(WebSocket.CLOSED).toRejectError();
-        });
-
-        it('socket closing', async () => {
-            await expectSocketWithState(WebSocket.CLOSING).toRejectError();
-        });
+        await expect(() => act(() =>
+            result.current(...args)
+        )).toThrowError();
     });
 };

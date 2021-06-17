@@ -1,11 +1,12 @@
 import { Grid, makeStyles } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { HealthGauge, UIText, VariableIcon, VariableValue } from '@timeflies/app-ui';
-import { CharacterId, PlayerRelation, switchUtil } from '@timeflies/common';
+import { CharacterId, getCharacterCategory, PlayerRelation, switchUtil } from '@timeflies/common';
 import { CharacterAnimatedImage } from '@timeflies/sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import { TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
+import { SpellCategoryLabel } from '../../../room-page/room-character-list/details-components';
 import { useCurrentEntities } from '../../hooks/use-entities';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
@@ -74,6 +75,8 @@ const InnerCharacterDetailsPanel: React.FC<InnerCharacterDetailsPanelProps> = Re
 
     const classes = useStyles({ teamColor, playerRelation });
 
+    const characterCategory = getCharacterCategory(characterRole);
+
     const state: SpritesheetsUtils.CharacterSpriteConfig = {
         role: characterRole,
         state: 'idle',
@@ -90,6 +93,7 @@ const InnerCharacterDetailsPanel: React.FC<InnerCharacterDetailsPanelProps> = Re
             <Grid item container justify='space-between' wrap='nowrap'>
                 <Grid item>
                     <UIText variant='h3'>{characterRole}</UIText>
+                    <SpellCategoryLabel category={characterCategory} variant='body1' gutterBottom />
                 </Grid>
 
                 <Grid item container direction='column' alignItems='flex-end'>

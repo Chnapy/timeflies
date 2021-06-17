@@ -18,6 +18,35 @@ import { createRoom } from './room';
 
 describe('room', () => {
 
+    let fsReadFileSpy: jest.SpyInstance;
+
+    beforeAll(() => {
+        fsReadFileSpy = jest.spyOn(fs, 'readFile')
+            .mockImplementation(((path: string, options: unknown, callback: (err: null, buffer: string) => void) => {
+                callback(
+                    null,
+                    JSON.stringify({
+                        width: 3,
+                        height: 3,
+                        layers: [
+                            {
+                                name: 'placement',
+                                data: [
+                                    1, 2, 3,
+                                    3, 1, 2,
+                                    2, 3, 1
+                                ]
+                            }
+                        ]
+                    } as TiledMap)
+                );
+            }) as any);
+    });
+
+    afterAll(() => {
+        fsReadFileSpy.mockRestore();
+    });
+
     const getRoom = () => createRoom({
         ...createFakeGlobalEntitiesNoService(),
         services: createServices(createFakeGlobalEntitiesNoService())
@@ -30,6 +59,7 @@ describe('room', () => {
             roomId: expect.any(String),
             playerAdminId: expect.any(String),
             mapInfos: expect.any(Object),
+            mapPlacementTiles: expect.any(Object),
             teamColorList: expect.any(Array),
             staticPlayerList: expect.any(Array),
             staticCharacterList: expect.any(Array)
@@ -208,10 +238,10 @@ describe('room', () => {
         expect(room.getRoomStateData().playerAdminId).toEqual('p2');
     });
 
-    it('mapSelect change map', () => {
+    it('mapSelect change map', async () => {
         const room = getRoom();
 
-        room.mapSelect({
+        await room.mapSelect({
             mapId: 'm1',
             name: 'm-1',
             nbrTeams: 3,
@@ -225,15 +255,23 @@ describe('room', () => {
             name: 'm-1',
             nbrTeams: 3,
             nbrTeamCharacters: 4,
-            schemaLink: 'foo',
+            schemaLink: 'https://host.com/static/foo',
             imagesLinks: {}
         });
     });
 
-    it('computeMapPlacementTiles and getMapPlacementTiles computes and gives map placement tiles', async () => {
+    it('mapSelect reset all characters position', async () => {
+
         const room = getRoom();
 
-        room.mapSelect({
+        room.characterSelect({
+            characterId: 'c1',
+            playerId: 'p1',
+            characterRole: 'tacka',
+            placement: createPosition(1, 1)
+        });
+
+        await room.mapSelect({
             mapId: 'm1',
             name: 'm-1',
             nbrTeams: 3,
@@ -242,32 +280,27 @@ describe('room', () => {
             imagesLinks: {}
         });
 
-        const { teamColorList } = room.getRoomStateData();
+        expect(room.getRoomStateData().staticCharacterList).toEqual([
+            expect.objectContaining({ placement: null })
+        ]);
+    });
 
-        const fsReadFileSpy = jest.spyOn(fs, 'readFile')
-            .mockImplementation(((path: string, options: unknown, callback: (err: null, buffer: string) => void) => {
-                callback(
-                    null,
-                    JSON.stringify({
-                        width: 3,
-                        height: 3,
-                        layers: [
-                            {
-                                name: 'placement',
-                                data: [
-                                    1, 2, 3,
-                                    3, 1, 2,
-                                    2, 3, 1
-                                ]
-                            }
-                        ]
-                    } as TiledMap)
-                );
-            }) as any);
+    it('mapSelect computes map placement tiles', async () => {
 
-        room.computeMapPlacementTiles();
+        const room = getRoom();
 
-        await expect(room.getMapPlacementTiles()).resolves.toEqual({
+        await room.mapSelect({
+            mapId: 'm1',
+            name: 'm-1',
+            nbrTeams: 3,
+            nbrTeamCharacters: 3,
+            schemaLink: 'foo',
+            imagesLinks: {}
+        });
+
+        const { teamColorList, mapPlacementTiles } = room.getRoomStateData();
+
+        expect(mapPlacementTiles).toEqual({
             [ teamColorList[ 0 ] ]: [
                 createPosition(0, 0),
                 createPosition(1, 1),
@@ -284,8 +317,6 @@ describe('room', () => {
                 createPosition(1, 2)
             ],
         });
-
-        fsReadFileSpy.mockRestore();
     });
 
     it('waitForBattle wait for some time', async () => {
@@ -301,7 +332,7 @@ describe('room', () => {
 
         const room = getRoom();
 
-        room.mapSelect({
+        await room.mapSelect({
             mapId: 'm1',
             name: 'm-1',
             nbrTeams: 3,
@@ -313,6 +344,41 @@ describe('room', () => {
         const battle = await room.createBattle();
 
         expect(battle).toEqual(expect.objectContaining({ battleId: expect.any(String) }));
+    });
+
+    it('removeBattle set players ready to false', async () => {
+        const room = getRoom();
+
+        room.playerJoin({
+            playerId: 'p1',
+            playerName: 'p-1',
+            ready: true,
+            teamColor: null
+        });
+
+        room.playerJoin({
+            playerId: 'p2',
+            playerName: 'p-2',
+            ready: true,
+            teamColor: null
+        });
+
+        room.removeBattle();
+
+        expect(room.getRoomStateData().staticPlayerList).toEqual<RoomStaticPlayer[]>([
+            {
+                playerId: 'p1',
+                playerName: 'p-1',
+                ready: false,
+                teamColor: null
+            },
+            {
+                playerId: 'p2',
+                playerName: 'p-2',
+                ready: false,
+                teamColor: null
+            }
+        ]);
     });
 
     it('playerJoin cancel battle waiting if any', async () => {

@@ -1,5 +1,5 @@
 import { logger } from '@timeflies/devtools';
-import { ExtractMessageFromCreator, extractMessagesFromEvent, Message, MessageCreator, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
+import { ExtractMessageFromCreator, extractMessagesFromEvent, Message, MessageCreator, MessageWithResponse, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
 import WebSocket from 'ws';
 import { SocketError } from './socket-error';
 
@@ -30,40 +30,57 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
 
     type ListenerType = 'message' | 'close';
 
-    const listeners: [ ListenerType, () => any ][] = [];
+    const listeners: { [ type in ListenerType ]: Set<(...args: any[]) => any> } = {
+        message: new Set(),
+        close: new Set()
+    };
+
+    socket.addEventListener('close', event => {
+        listeners.close.forEach(listener => {
+            listener(event);
+        });
+    });
+
+    socket.addEventListener('message', event => {
+        if (listeners.message.size === 0) {
+            return;
+        }
+
+        const { messageList, error } = extractMessagesFromEvent(event);
+
+        if (error) {
+            sendError(new SocketError('bad-request', error));
+            return;
+        }
+
+        listeners.message.forEach(listener => {
+            listener(messageList);
+        });
+    });
 
     const addListener = (type: ListenerType, listener: (...args: any[]) => any): RemoveListenerFn => {
-        listeners.push([ type, listener ]);
-        socket.addEventListener(type, listener);
+        listeners[ type ].add(listener);
 
-        return () => socket.removeEventListener(type, listener);
+        return () => listeners[ type ].delete(listener);
     };
 
     const send: SocketCell[ 'send' ] = (...messageList) => {
         logger.logMessageSent(messageList);
         socket.send(JSON.stringify(
             messageList
-        ));
+        ), err => {
+            if (err) {
+                logger.error(err);
+            }
+        });
     };
 
-    const sendError = (error: SocketError) => {
-        send(SocketErrorMessage({
-            code: error.code
-        }));
+    const sendError = (error: SocketError, requestId?: string) => {
+        send(SocketErrorMessage({ reason: error.reason }, requestId));
     };
 
     const addMessageListener: SocketCell[ 'addMessageListener' ] = (messageCreator, listener) => {
-        const rootListener = async (event: { data: unknown }) => {
-
-            const { messageList, error } = extractMessagesFromEvent(event);
-
-            if (error) {
-                sendError(new SocketError(400, error));
-                return;
-            }
-
-            logger.logMessageReceived(messageList);
-
+        const rootListener = async (messageList: Message<any>[]) => {
             await Promise.all(
                 messageList
                     .filter(messageCreator.match)
@@ -71,18 +88,18 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
                         try {
                             const check = messageCreator.schema.validate(message);
                             if (check.error) {
-                                throw new SocketError(400, check.error.stack ?? check.error + '');
+                                throw new SocketError('bad-request', check.error.stack ?? check.error + '');
                             }
 
                             await listener(message as any, send);
                         } catch (err) {
                             const socketError = err instanceof SocketError
                                 ? err
-                                : new SocketError(500, (err as Error).stack ?? err + '');
+                                : new SocketError('internal-error', (err as Error).stack ?? err + '');
 
                             logger.error(err);
 
-                            sendError(socketError);
+                            sendError(socketError, (message as MessageWithResponse<any>).requestId);
                         }
                     })
             );
@@ -96,8 +113,9 @@ export const createSocketCell = (socket: WebSocket): SocketCell => {
     };
 
     const clearAllListeners: SocketCell[ 'clearAllListeners' ] = () => {
-        listeners.forEach(([ type, listener ]) => socket.removeEventListener(type, listener));
-        listeners.splice(0, Infinity);
+        Object.values(listeners).forEach(listenerList => {
+            listenerList.clear();
+        });
     };
 
     const closeSocket: SocketCell[ 'closeSocket' ] = error => {

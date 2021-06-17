@@ -9,6 +9,8 @@ export type MapInfos = {
     imagesLinks: Record<string, string>;
 };
 
+export type MapPlacementTiles = { [ teamColor: string ]: Position[] };
+
 export type RoomStaticPlayer = Omit<StaticPlayer, 'teamColor'> & {
     teamColor: string | null;
     ready: boolean;
@@ -21,6 +23,7 @@ export type RoomStaticCharacter = Omit<StaticCharacter, 'defaultSpellId'> & {
 export type RoomStateData = {
     roomId: string;
     mapInfos: MapInfos | null;
+    mapPlacementTiles: MapPlacementTiles;
     playerAdminId: PlayerId;
     teamColorList: string[];
     staticPlayerList: RoomStaticPlayer[];

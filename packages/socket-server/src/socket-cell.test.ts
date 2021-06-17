@@ -1,4 +1,4 @@
-import { ErrorCode, Message, MessageWithResponse, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
+import { ErrorReason, Message, MessageWithResponse, MessageWithResponseCreator, SocketErrorMessage } from '@timeflies/socket-messages';
 import Joi from 'joi';
 import WebSocket from 'ws';
 import { createSocketCell } from './socket-cell';
@@ -42,7 +42,7 @@ describe('# Socket cell', () => {
         const socketHelper = {
             socket,
             expectSendCalledWithMessages: (messages: (Message | MessageWithResponse)[]) =>
-                expect(socket.send).toHaveBeenCalledWith(JSON.stringify(messages)),
+                expect(socket.send).toHaveBeenCalledWith(JSON.stringify(messages), expect.any(Function)),
             triggerMessageListeners: (messages: Message[] | 'dirty-content') =>
                 Promise.all(
                     Array.from(socket._listeners.message.values()).map(fn => fn({
@@ -103,7 +103,7 @@ describe('# Socket cell', () => {
             expect(listener).not.toHaveBeenCalled();
         });
 
-        const expectSendErrorMessage = (code: ErrorCode) => ({
+        const expectSendErrorMessage = (reason: ErrorReason) => ({
             with: async (listenerFn: () => void, messages: any) => {
                 const { socketHelper, cell } = createSocketAndCell();
 
@@ -117,21 +117,21 @@ describe('# Socket cell', () => {
 
                 await socketHelper.triggerMessageListeners(messages);
 
-                socketHelper.expectSendCalledWithMessages([ SocketErrorMessage({ code }) ]);
+                socketHelper.expectSendCalledWithMessages([ SocketErrorMessage({ reason }) ]);
             }
         })
 
         it('send error if listener throws socket error', async () => {
-            await expectSendErrorMessage(403).with(
+            await expectSendErrorMessage('bad-server-state').with(
                 () => {
-                    throw new SocketError(403, 'foo error');
+                    throw new SocketError('bad-server-state', 'foo error');
                 },
                 messages
             );
         });
 
-        it('send socket error 500 if listener throws error being not socket error', async () => {
-            await expectSendErrorMessage(500).with(
+        it('send socket error internal-error if listener throws error being not socket error', async () => {
+            await expectSendErrorMessage('internal-error').with(
                 () => {
                     throw new TypeError('unexpected error');
                 },
@@ -139,15 +139,15 @@ describe('# Socket cell', () => {
             );
         });
 
-        it('send socket error 400 if bad message list format', async () => {
-            await expectSendErrorMessage(400).with(
+        it('send socket error bad-request if bad message list format', async () => {
+            await expectSendErrorMessage('bad-request').with(
                 () => { },
                 'dirty-content'
             );
         });
 
-        it('send socket error 400 if bad message format', async () => {
-            await expectSendErrorMessage(400).with(
+        it('send socket error bad-request if bad message format', async () => {
+            await expectSendErrorMessage('bad-request').with(
                 () => { },
                 [ { ...messageFoo, payload: 42 } ]
             );
@@ -215,10 +215,10 @@ describe('# Socket cell', () => {
             const { socketHelper, cell } = createSocketAndCell();
 
             cell.closeSocket(
-                new SocketError(403, 'foo')
+                new SocketError('token-expired', 'foo')
             );
 
-            socketHelper.expectSendCalledWithMessages([ SocketErrorMessage({ code: 403 }) ]);
+            socketHelper.expectSendCalledWithMessages([ SocketErrorMessage({ reason: 'token-expired' }) ]);
         });
     });
 

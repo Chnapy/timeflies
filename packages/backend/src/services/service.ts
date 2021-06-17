@@ -6,7 +6,7 @@ import { BattleId } from './battle/battle';
 import { RoomId } from './room/room';
 import { Services } from './services';
 
-export type PlayerSocketMap = { [ playerId in PlayerId ]: SocketCell };
+export type PlayerSocketMap = { [ playerId in PlayerId ]?: SocketCell };
 
 export abstract class Service {
 
@@ -24,7 +24,7 @@ export abstract class Service {
     protected getRoomById = (roomId: RoomId) => {
         const room = this.globalEntitiesNoServices.currentRoomMap.mapById[ roomId ];
         if (!room) {
-            throw new SocketError(400, 'room id does not exist: ' + roomId);
+            throw new SocketError('bad-request', 'room id does not exist: ' + roomId);
         }
 
         return room;
@@ -33,7 +33,7 @@ export abstract class Service {
     protected getRoomByPlayerId = (playerId: PlayerId) => {
         const room = this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ playerId ];
         if (!room) {
-            throw new SocketError(400, 'player is not in room: ' + playerId);
+            throw new SocketError('bad-request', 'player is not in room: ' + playerId);
         }
 
         return room;
@@ -42,7 +42,7 @@ export abstract class Service {
     protected getBattleById = (battleId: BattleId) => {
         const battle = this.globalEntitiesNoServices.currentBattleMap.mapById[ battleId ];
         if (!battle) {
-            throw new SocketError(400, 'battle id does not exist: ' + battleId);
+            throw new SocketError('bad-request', 'battle id does not exist: ' + battleId);
         }
 
         return battle;
@@ -51,7 +51,7 @@ export abstract class Service {
     protected getBattleByPlayerId = (playerId: PlayerId) => {
         const battle = this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ playerId ];
         if (!battle) {
-            throw new SocketError(400, 'player is not in battle: ' + playerId);
+            throw new SocketError('bad-request', 'player is not in battle: ' + playerId);
         }
 
         return battle;
@@ -72,7 +72,9 @@ export abstract class Service {
             .filter(player => player.playerId !== currentPlayerId)
             .forEach(player => {
                 const cell = this.playerSocketMap[ player.playerId ];
-                cell.send(message);
+                if (cell) {
+                    cell.send(message);
+                }
             });
     };
 

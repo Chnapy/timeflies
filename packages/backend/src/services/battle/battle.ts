@@ -1,11 +1,20 @@
 import { ArrayUtils, CharacterId, createId, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
 import { TurnInfos } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
-import { MapInfos, RoomEntityListGetMessageData, RoomStateData } from '@timeflies/socket-messages';
+import { MapInfos, RoomEntityListGetMessageData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
 import type TiledMap from 'tiled-types';
 import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl, AssetUrl } from '../../utils/asset-url';
 import { getBattleStaticData } from './get-battle-static-data';
+
+export type BattlePayload = {
+    roomId: string;
+    entityListData: RoomEntityListGetMessageData;
+    staticPlayerList: RoomStaticPlayer[];
+    staticCharacterList: RoomStaticCharacter[];
+    mapInfos: MapInfos;
+    tiledMap: TiledMap;
+};
 
 export type BattleId = string;
 
@@ -15,12 +24,15 @@ export type StaticState = {
     spells: { [ spellId in SpellId ]: StaticSpell };
 };
 
+type DisconnectedPlayers = { [ playerId in PlayerId ]?: number };
+
 export type CycleInfos = {
     turnsOrder: CharacterId[];
 };
 
 export type Battle = {
     battleId: BattleId;
+    roomId: string;
 
     staticPlayers: StaticPlayer[];
     staticCharacters: StaticCharacter[];
@@ -29,7 +41,9 @@ export type Battle = {
     tiledMap: TiledMap;
     staticState: StaticState;
 
-    playerJoin: (playerId: PlayerId) => void;
+    disconnectedPlayers: DisconnectedPlayers;
+
+    playerJoin: (playerId: PlayerId) => Promise<void>;
     getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
     getCycleInfos: () => CycleInfos;
     getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
@@ -39,24 +53,23 @@ export type Battle = {
 
 export const createBattle = (
     { services }: GlobalEntities,
-    roomState: RoomStateData,
-    entityListData: RoomEntityListGetMessageData,
-    tiledMap: TiledMap,
+    battlePayload: BattlePayload,
     onBattleEnd: () => void
 ): Battle => {
-    const battleId = createId();
+    const battleId = createId('short');
 
-    const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(roomState, entityListData);
+    const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(battlePayload);
+    const { roomId, staticPlayerList, mapInfos, tiledMap } = battlePayload;
 
-    const playerIdList = roomState.staticPlayerList.map(player => player.playerId);
-
-    const rawMapInfos = roomState.mapInfos!;
+    const playerIdList = staticPlayerList.map(player => player.playerId);
 
     const waitingPlayerList = new Set(playerIdList);
 
     const turnsOrder = staticCharacters.map(character => character.characterId);
 
     const stateStack: SerializableState[] = [ initialSerializableState ];
+
+    const disconnectedPlayers: DisconnectedPlayers = {};
 
     const cycleEngine = services.cycleBattleService.createCycleEngineOverlay({
         battleId,
@@ -65,7 +78,10 @@ export const createBattle = (
         charactersDurations: initialSerializableState.characters.actionTime
     });
 
-    const startBattle = () => {
+    const startBattle = async () => {
+        // let some time for client to setup listeners
+        await waitMs(1000);
+
         logger.info('Battle [' + battleId + '] start');
 
         return cycleEngine.start();
@@ -84,6 +100,7 @@ export const createBattle = (
 
     return {
         battleId,
+        roomId,
 
         staticPlayers,
         staticCharacters,
@@ -92,13 +109,15 @@ export const createBattle = (
         tiledMap,
         staticState,
 
+        disconnectedPlayers,
+
         getMapInfos: parseUrlMode => {
             const parseUrl = assetUrl[ parseUrlMode ];
 
             return {
-                ...rawMapInfos,
-                schemaLink: parseUrl(rawMapInfos.schemaLink),
-                imagesLinks: ObjectTyped.entries(rawMapInfos.imagesLinks)
+                ...mapInfos,
+                schemaLink: parseUrl(mapInfos.schemaLink),
+                imagesLinks: ObjectTyped.entries(mapInfos.imagesLinks)
                     .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
                         acc[ key ] = parseUrl(value);
                         return acc;
@@ -127,11 +146,12 @@ export const createBattle = (
             }
         },
 
-        playerJoin: playerId => {
+        playerJoin: async playerId => {
             waitingPlayerList.delete(playerId);
+            delete disconnectedPlayers[ playerId ];
 
             if (!cycleEngine.isStarted() && waitingPlayerList.size === 0) {
-                return startBattle();
+                await startBattle();
             }
         },
     };

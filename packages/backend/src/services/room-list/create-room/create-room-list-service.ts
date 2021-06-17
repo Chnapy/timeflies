@@ -12,17 +12,19 @@ export class CreateRoomListService extends Service {
         RoomListCreateRoomMessage, ({ requestId }, send) => {
 
             if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]) {
-                throw new SocketError(400, 'Cannot create room if player already in another one.');
+                throw new SocketError('bad-server-state', 'Cannot create room if player already in another one.');
             }
 
             if (this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ]) {
-                throw new SocketError(400, 'Cannot create room if player in battle.');
+                throw new SocketError('bad-server-state', 'Cannot create room if player in battle.');
             }
 
             const room = createRoom({
                 ...this.globalEntitiesNoServices,
                 services: this.services
             });
+
+            this.services.playerRoomService.playerJoinToRoom(room, currentPlayerId);
 
             send(RoomListCreateRoomMessage.createResponse(requestId, { roomId: room.roomId }));
 

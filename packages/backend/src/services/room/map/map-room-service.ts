@@ -1,5 +1,7 @@
+import { ObjectTyped } from '@timeflies/common';
 import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
+import { assetUrl } from '../../../utils/asset-url';
 import { Service } from '../../service';
 
 export class MapRoomService extends Service {
@@ -11,7 +13,9 @@ export class MapRoomService extends Service {
     private addRoomMapListGetMessageListener = (socketCell: SocketCell) => socketCell.addMessageListener<typeof RoomMapListGetMessage>(
         RoomMapListGetMessage, ({ requestId }, send) => {
 
-            send(RoomMapListGetMessage.createResponse(requestId, getMapList()));
+            const mapList = getMapList().map(this.getMapInfosFrontend);
+
+            send(RoomMapListGetMessage.createResponse(requestId, mapList));
         });
 
     private addRoomMapSelectMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomMapSelectMessage>(
@@ -21,19 +25,19 @@ export class MapRoomService extends Service {
             const { playerAdminId, staticPlayerList } = room.getRoomStateData();
 
             if (playerAdminId !== currentPlayerId) {
-                throw new SocketError(403, 'Player is not room admin: ' + currentPlayerId);
+                throw new SocketError('bad-server-state', 'Player is not room admin: ' + currentPlayerId);
             }
 
             const staticPlayer = staticPlayerList.find(p => p.playerId === currentPlayerId)!;
             if (staticPlayer.ready) {
-                throw new SocketError(400, 'Cannot change team if player ready: ' + currentPlayerId);
+                throw new SocketError('bad-server-state', 'Cannot change team if player ready: ' + currentPlayerId);
             }
 
             const mapList = getMapList();
 
             const map = mapList.find(m => m.mapId === payload.mapId);
             if (!map) {
-                throw new SocketError(400, 'Wrong map id: ' + payload.mapId);
+                throw new SocketError('bad-request', 'Wrong map id: ' + payload.mapId);
             }
 
             await room.mapSelect(map);
@@ -42,6 +46,18 @@ export class MapRoomService extends Service {
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
+
+    getMapInfosFrontend = (mapInfos: MapInfos) => {
+        return {
+            ...mapInfos,
+            schemaLink: assetUrl.toFrontend(mapInfos.schemaLink),
+            imagesLinks: ObjectTyped.entries(mapInfos.imagesLinks)
+                .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
+                    acc[ key ] = assetUrl.toFrontend(value);
+                    return acc;
+                }, {})
+        };
+    };
 }
 
 // MOCKs

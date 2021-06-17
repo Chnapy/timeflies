@@ -1,6 +1,7 @@
 import { useSocketListeners } from '@timeflies/socket-client';
 import { BattleNotifyMessage } from '@timeflies/socket-messages';
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
+import React from 'react';
 import { useAsyncEffect } from 'use-async-effect';
 import { useFutureEntities } from '../../hooks/use-entities';
 import { useDispatchNewState } from './use-dispatch-new-state';
@@ -26,13 +27,15 @@ const useOnNotifyMessage = () => {
 
 export const useNotifyListener = () => {
     const socketListeners = useSocketListeners();
-    const onNotifyMessage = useOnNotifyMessage();
+
+    const notifyListenerRef = React.useRef<ReturnType<typeof useOnNotifyMessage>>();
+    notifyListenerRef.current = useOnNotifyMessage();
 
     useAsyncEffect(() => {
         return socketListeners({
-            [ BattleNotifyMessage.action ]: onNotifyMessage
+            [ BattleNotifyMessage.action ]: action => notifyListenerRef.current!(action)
         });
     },
-        removeListeners => removeListeners && removeListeners()
-    );
+        removeListeners => removeListeners && removeListeners(),
+        [ notifyListenerRef ]);
 };

@@ -1,4 +1,5 @@
 import { CharacterId, CharacterUtils } from '@timeflies/common';
+import { logger } from '@timeflies/devtools';
 import { Checker, CheckerParams } from '../checker';
 
 const getHelper = ({ context }: CheckerParams) => ({
@@ -16,6 +17,15 @@ export const checkCharacter: Checker = (params) => {
     const { spellAction, context } = params;
     const { characterId } = context.staticState.spells[ spellAction.spellId ] ?? {};
 
-    return isTurnCharacter(characterId)
-        && isCharacterAlive(characterId);
+    if(!isTurnCharacter(characterId)) {
+        logger.info('Spell check failed: not character turn.');
+        return false;
+    }
+    
+    if(!isCharacterAlive(characterId)) {
+        logger.info('Spell check failed: character not alive.');
+        return false;
+    }
+
+    return true;
 };

@@ -1,6 +1,9 @@
 import { Box, Dialog, Grid, makeStyles } from '@material-ui/core';
 import { UIText } from '@timeflies/app-ui';
 import React from 'react';
+import { ButtonLink } from '../../../components/button-link';
+import { useMyPlayerId } from '../../../login-page/hooks/use-my-player-id';
+import { routes } from '../../../routes';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { BattleEndCharacterItem } from './battle-end-character-item';
 import { useBattleEndContext } from './battle-end-context';
@@ -21,8 +24,10 @@ export const BattleEndPanel: React.FC = () => {
     const battleEndContext = useBattleEndContext();
     const open = battleEndContext !== null;
     const winnerTeamColor = battleEndContext?.winnerTeamColor;
-    const won = useBattleSelector(state => state.staticPlayers[ state.myPlayerId ].teamColor === winnerTeamColor);
+    const myPlayerId = useMyPlayerId();
+    const won = useBattleSelector(state => state.staticPlayers[ myPlayerId ].teamColor === winnerTeamColor);
 
+    const roomId = useBattleSelector(state => state.roomId);
     const characterList = useBattleSelector(state => state.characterList);
     const staticPlayers = useBattleSelector(state => state.staticPlayers);
     const staticCharacters = useBattleSelector(state => state.staticCharacters);
@@ -56,9 +61,7 @@ export const BattleEndPanel: React.FC = () => {
                         : 'You lost...'}
                 </UIText>
 
-                <UIText variant='body2'>
-                    Winners
-</UIText>
+                <UIText variant='body2'>Winners</UIText>
                 <Box className={classes.characterList}>
                     <Grid container spacing={2}>
                         {winners.map(characterId => (
@@ -71,9 +74,7 @@ export const BattleEndPanel: React.FC = () => {
                     </Grid>
                 </Box>
 
-                <UIText variant='body2'>
-                    Losers
-</UIText>
+                <UIText variant='body2'>Losers</UIText>
                 <Box className={classes.characterList}>
                     <Grid container spacing={2}>
                         {losers.map(characterId => (
@@ -85,6 +86,10 @@ export const BattleEndPanel: React.FC = () => {
                         ))}
                     </Grid>
                 </Box>
+
+                <ButtonLink to={routes.roomPage({ roomId }).path} fullWidth>
+                    back to room
+            </ButtonLink>
             </Box>
         </Dialog>
     );

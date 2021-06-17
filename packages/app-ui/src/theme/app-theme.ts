@@ -123,31 +123,10 @@ export const appTheme: Theme = createMuiTheme({
                     fontSize: '62.5%'
                 },
                 body: {
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 100 100'%3E%3Crect x='0' y='0' width='64' height='64' fill-opacity='0.01' fill='%23ffffff'/%3E%3C/svg%3E")`
                 }
             },
-        },
-
-        MuiInput: {
-            underline: {
-                '&::before': {
-                    borderWidth: 2
-                }
-            }
-        },
-
-        MuiFilledInput: {
-            underline: {
-                '&::before': {
-                    borderWidth: '2px !important'
-                }
-            }
-        },
-
-        MuiOutlinedInput: {
-            notchedOutline: {
-                borderWidth: 2
-            }
         },
 
         MuiTooltip: {
