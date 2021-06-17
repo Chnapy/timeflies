@@ -32,9 +32,10 @@ const useStyles = makeStyles(() => ({
     }),
     rootAnimated: {
         animationName: '$opacityAnim',
-        animationDuration: '400ms',
+        animationDuration: '250ms',
         animationIterationCount: 'infinite',
-        animationDirection: 'alternate'
+        animationDirection: 'alternate',
+        animationTimingFunction: 'steps(2, jump-none)'
     }
 }));
 

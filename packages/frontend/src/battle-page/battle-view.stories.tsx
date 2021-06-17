@@ -168,15 +168,15 @@ export const Default: React.FC = () => {
             },
             spellActionEffectList: [],
             spellActionEffects: {},
-            playingCharacterId: 'c1',
+            playingCharacterId: 'c3',
             roundIndex: 0,
-            selectedSpellId: null,
+            selectedSpellId: 's1',
             spellLists: {
                 c1: [ 's1', 's2', 's3', 's4' ], c2: [ 's2' ], c3: [ 's3' ], c4: [ 's4' ], c5: [ 's5' ]
             },
             turnIndex: 0,
-            turnStartTime: 1,
-            turnsOrder: []
+            turnStartTime: Date.now() + 4000,
+            turnsOrder: ['c1', 'c3']
         };
 
         return configureStore({
