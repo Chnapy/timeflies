@@ -87,6 +87,7 @@ export const useComputeSpellEffect = () => {
         };
     }, [
         futureState, rangeArea, spell, lastSpellActionEndTime,
-        staticCharacters, staticSpells, targetPosition, tiledMap, turnStartTime
+        staticPlayers, staticCharacters, staticSpells,
+        targetPosition, tiledMap, turnStartTime
     ]);
 };
