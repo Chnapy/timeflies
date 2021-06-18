@@ -19,8 +19,8 @@ export class EntityListGetRoomService extends Service {
                 characterRole: 'tacka',
                 defaultSpellRole: 'move',
                 variables: {
-                    health: 100,
-                    actionTime: 10000
+                    health: 120,
+                    actionTime: 10_000
                 }
             },
             {
@@ -28,15 +28,15 @@ export class EntityListGetRoomService extends Service {
                 defaultSpellRole: 'switch',
                 variables: {
                     health: 90,
-                    actionTime: 10000
+                    actionTime: 10_000
                 }
             },
             {
                 characterRole: 'meti',
                 defaultSpellRole: 'move',
                 variables: {
-                    health: 100,
-                    actionTime: 10000
+                    health: 90,
+                    actionTime: 10_000
                 }
             }
         ],
@@ -45,65 +45,130 @@ export class EntityListGetRoomService extends Service {
                 spellRole: 'move',
                 characterRole: 'tacka',
                 variables: {
-                    duration: 800,
+                    duration: 700,
                     rangeArea: 10,
-                    actionArea: 1,
+                    actionArea: 0,
                     lineOfSight: true
                 }
             },
             {
-                spellRole: 'simpleAttack',
+                spellRole: 'sword-sting',
                 characterRole: 'tacka',
                 variables: {
-                    duration: 1500,
-                    rangeArea: 5,
-                    actionArea: 1,
-                    lineOfSight: true,
-                    attack: 20
-                }
-            },
-            {
-                spellRole: 'switch',
-                characterRole: 'vemo',
-                variables: {
-                    duration: 800,
+                    duration: 2500,
                     rangeArea: 2,
-                    actionArea: 1,
-                    lineOfSight: false
+                    actionArea: 0,
+                    lineOfSight: true,
+                    attack: 10
                 }
             },
             {
-                spellRole: 'simpleAttack',
-                characterRole: 'vemo',
+                spellRole: 'side-attack',
+                characterRole: 'tacka',
                 variables: {
-                    duration: 1000,
-                    rangeArea: 4,
-                    actionArea: 1,
+                    duration: 3000,
+                    rangeArea: 1,
+                    actionArea: 0,
                     lineOfSight: true,
                     attack: 15
                 }
             },
             {
+                spellRole: 'blood-sharing',
+                characterRole: 'tacka',
+                variables: {
+                    duration: 2000,
+                    rangeArea: 0,
+                    actionArea: 2,
+                    lineOfSight: true,
+                    attack: 15
+                }
+            },
+
+            {
+                spellRole: 'switch',
+                characterRole: 'vemo',
+                variables: {
+                    duration: 1000,
+                    rangeArea: 1,
+                    actionArea: 0,
+                    lineOfSight: false
+                }
+            },
+            {
+                spellRole: 'treacherous-blow',
+                characterRole: 'vemo',
+                variables: {
+                    duration: 5000,
+                    rangeArea: 1,
+                    actionArea: 0,
+                    lineOfSight: true,
+                    attack: 20
+                }
+            },
+            {
+                spellRole: 'attraction',
+                characterRole: 'vemo',
+                variables: {
+                    duration: 3000,
+                    rangeArea: 6,
+                    actionArea: 0,
+                    lineOfSight: false
+                }
+            },
+            {
+                spellRole: 'distraction',
+                characterRole: 'vemo',
+                variables: {
+                    duration: 2000,
+                    rangeArea: 6,
+                    actionArea: 1,
+                    lineOfSight: false
+                }
+            },
+
+            {
                 spellRole: 'move',
                 characterRole: 'meti',
                 variables: {
-                    duration: 1000,
-                    rangeArea: 8,
-                    actionArea: 1,
+                    duration: 700,
+                    rangeArea: 10,
+                    actionArea: 0,
                     lineOfSight: true
                 }
             },
             {
-                spellRole: 'simpleAttack',
+                spellRole: 'slump',
+                characterRole: 'meti',
+                variables: {
+                    duration: 1000,
+                    rangeArea: 5,
+                    actionArea: 0,
+                    lineOfSight: true,
+                    attack: 5
+                }
+            },
+            {
+                spellRole: 'last-resort',
+                characterRole: 'meti',
+                variables: {
+                    duration: 5000,
+                    rangeArea: 2,
+                    actionArea: 0,
+                    lineOfSight: true,
+                    attack: 5
+                }
+            },
+            {
+                spellRole: 'motivation',
                 characterRole: 'meti',
                 variables: {
                     duration: 1000,
                     rangeArea: 4,
                     actionArea: 1,
-                    lineOfSight: true,
-                    attack: 10
+                    lineOfSight: true
                 }
-            },
+            }
         ]
     });
 }

@@ -1,5 +1,5 @@
 import { CharacterId, CharacterUtils, CharacterVariables, ObjectTyped, Position, SpellVariables } from '@timeflies/common';
-import { Area } from '@timeflies/tilemap-utils';
+import { Area, Tile } from '@timeflies/tilemap-utils';
 import { computeActionArea } from './compute-action-area';
 import { CheckTileFn } from './compute-range-area';
 import { SpellEffect, SpellEffectFnParams } from './spell-effects-params';
@@ -16,6 +16,10 @@ export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
         return _actionArea!;
     };
 
+    const getLauncher = () => getCharacterById(currentTurn.characterId);
+
+    const getCharacterTeamColor = (characterId: CharacterId) => staticState.players[ staticState.characters[ characterId ].playerId ].teamColor;
+
     const getCharacterById = (characterId: CharacterId) => ({
         ...staticState.characters[ characterId ],
         ...ObjectTyped.entries(state.characters)
@@ -23,8 +27,14 @@ export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
                 (acc[ variableName ] as any) = variableMap[ characterId ];
 
                 return acc;
-            }, {} as CharacterVariables)
+            }, {} as CharacterVariables),
+        getRelation: () => characterId === currentTurn.characterId
+            ? 'me'
+            : getCharacterTeamColor(characterId) === getCharacterTeamColor(currentTurn.characterId)
+                ? 'ally' : 'enemy'
     });
+
+    const isPositionOccupied = (position: Position) => Object.values(state.characters.position).some(characterPosition => characterPosition.id === position.id);
 
     const getHitCharacters = () => {
         const actionArea = getActionArea();
@@ -45,7 +55,7 @@ export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
         getActionArea,
         setActionArea: (actionArea: Position[]) => { _actionArea = actionArea },
         getBresenhamLine,
-        getLauncher: () => getCharacterById(currentTurn.characterId),
+        getLauncher,
         getDefaultDuration,
         getSpell: () => {
             const { spellId } = spellAction;
@@ -70,6 +80,11 @@ export const createSpellEffectHelper = (params: SpellEffectFnParams) => {
                 .map(([ characterId ]) => characterId);
         },
         targetPos: spellAction.targetPos,
+        isPositionAccessible: (position: Position) => {
+            const tileType = Tile.getTileTypeFromPosition(position, map.tiledMap);
+
+            return tileType === 'default' && !isPositionOccupied(position);
+        }
     };
 };
 export type SpellEffectHelper = ReturnType<typeof createSpellEffectHelper>;

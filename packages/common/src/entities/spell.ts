@@ -14,18 +14,21 @@ export const spellCategorySchema = spellCategoryList;
 const spellRoleMap = inferFn<{
     [ role in string ]: SpellCategory;
 }>()({
-    'move': 'placement',
     'simpleAttack': 'offensive',    // testing only
+
+    'move': 'placement',
+    'sword-sting': 'offensive',
+    'side-attack': 'offensive',
+    'blood-sharing': 'support',
+
     'switch': 'placement',
-    // | 'incitement'
-    // | 'treacherousBlow'
-    // | 'pressure'
-    // | 'healthSharing'
-    // | 'sacrificialGift'
-    // | 'attentionAttraction'
-    // | 'slump'
-    // | 'lastResort'
-    // | 'motivation'
+    'treacherous-blow': 'offensive',
+    'attraction': 'placement',
+    'distraction': 'placement',
+
+    'slump': 'offensive',
+    'last-resort': 'offensive',
+    'motivation': 'support'
 });
 
 export type SpellRole = typeof spellRoleList[ number ];

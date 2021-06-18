@@ -1,5 +1,8 @@
 import { SpellEffectItem } from '../spell-effects-fn';
 
+/**
+ * Move also in diagonal. If any other character, exchange position.
+ */
 export const switchEffect: SpellEffectItem = {
     rangeArea: (position, { playingCharacterId, charactersPositions }) => {
         const characterPosition = charactersPositions[ playingCharacterId ];
@@ -7,7 +10,7 @@ export const switchEffect: SpellEffectItem = {
         const dx = Math.abs(characterPosition.x - position.x);
         const dy = Math.abs(characterPosition.y - position.y);
 
-        return dx === dy;
+        return dx <= 1 && dy <= 1;
     },
     effect: async ({
         getLauncher, getHitCharactersAlive,

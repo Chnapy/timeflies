@@ -22,6 +22,7 @@ export const useComputeSpellEffect = () => {
         ? battle.staticSpells[ battle.selectedSpellId ]
         : null);
 
+    const staticPlayers = useBattleSelector(battle => battle.staticPlayers);
     const staticCharacters = useBattleSelector(battle => battle.staticCharacters);
     const staticSpells = useBattleSelector(battle => battle.staticSpells);
 
@@ -53,6 +54,7 @@ export const useComputeSpellEffect = () => {
             context: {
                 state: futureState,
                 staticState: {
+                    players: staticPlayers,
                     characters: staticCharacters,
                     spells: staticSpells
                 },
