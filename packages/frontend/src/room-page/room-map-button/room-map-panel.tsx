@@ -26,7 +26,7 @@ export const RoomMapPanel: React.FC = () => {
                 {mapInfos
                     ? <RoomMapButton mapInfos={mapInfos} disabled={disabled} onClick={onMapListOpen} />
                     : (isAdmin
-                        ? <UIButton onClick={onMapListOpen} disabled={disabled}>select map</UIButton>
+                        ? <UIButton onClick={onMapListOpen} disabled={disabled} fullWidth>select map</UIButton>
                         : <UIText variant='body2'>no map selected</UIText>)}
 
                 <RoomMapList open={mapListOpen} onClose={onMapListClose} />
