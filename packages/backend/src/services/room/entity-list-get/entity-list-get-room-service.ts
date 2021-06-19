@@ -20,7 +20,7 @@ export class EntityListGetRoomService extends Service {
                 defaultSpellRole: 'move',
                 variables: {
                     health: 120,
-                    actionTime: 10_000
+                    actionTime: 15_000
                 }
             },
             {
@@ -28,7 +28,7 @@ export class EntityListGetRoomService extends Service {
                 defaultSpellRole: 'switch',
                 variables: {
                     health: 90,
-                    actionTime: 10_000
+                    actionTime: 15_000
                 }
             },
             {
@@ -36,7 +36,7 @@ export class EntityListGetRoomService extends Service {
                 defaultSpellRole: 'move',
                 variables: {
                     health: 90,
-                    actionTime: 10_000
+                    actionTime: 15_000
                 }
             }
         ],
