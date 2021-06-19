@@ -57,7 +57,7 @@ const resourcesToAssetsMap = (loader: Loader, loaderMap: AssetsLoaderMap): Asset
 export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
     spritesheets, maps, children
 }) => {
-    const generateAssetsMap = (loader: Loader = Loader.shared) => resourcesToAssetsMap(loader, { spritesheets, maps });
+    const generateAssetsMap = React.useCallback((loader: Loader = Loader.shared) => resourcesToAssetsMap(loader, { spritesheets, maps }), [ spritesheets, maps ]);
     const [ assetsMap, setAssetsMap ] = React.useState<AssetsMap>(generateAssetsMap);
     const currentLoaderRef = React.useRef<Loader>();
 
@@ -92,7 +92,7 @@ export const AssetsLoader: React.FC<AssetsLoaderMap> = ({
             });
         }
 
-    }, [ spritesheets, maps ]);
+    }, [ spritesheets, maps, generateAssetsMap ]);
 
     return (
         <AssetsContext.Provider value={assetsMap}>

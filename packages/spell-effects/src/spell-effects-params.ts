@@ -1,4 +1,4 @@
-import { CharacterId, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellVariables, StaticCharacter, StaticSpell } from '@timeflies/common';
+import { CharacterId, CharacterVariables, PlayerId, Position, SerializableState, SpellAction, SpellId, SpellVariables, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
 import { TiledMap } from 'tiled-types';
 
 export type SpellEffectCharacters = {
@@ -23,7 +23,8 @@ export type TurnContext = {
 };
 
 export type StaticStatePartial = {
-    characters: { [ characterId in CharacterId ]: Pick<StaticCharacter, 'characterId' | 'characterRole'> };
+    players: { [ playerId in PlayerId ]: Pick<StaticPlayer, 'playerId' | 'teamColor'> };
+    characters: { [ characterId in CharacterId ]: Pick<StaticCharacter, 'characterId' | 'characterRole' | 'playerId'> };
     spells: { [ spellId in SpellId ]: Pick<StaticSpell, 'spellId' | 'characterId' | 'spellRole'> };
 };
 

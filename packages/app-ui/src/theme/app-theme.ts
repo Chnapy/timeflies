@@ -53,9 +53,9 @@ export const appTheme: Theme = createMuiTheme({
             position: ''
         },
         spellCategories: {
-            offensive: '#EB5757',
-            support: '#80CAFF',
-            placement: '#6FCF97'
+            offensive: '#ED5259',
+            support: '#7BCF5C',
+            placement: '#E38DD6'
         },
         timeItems: {
             tick: primary,
