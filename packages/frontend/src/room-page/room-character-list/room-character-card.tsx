@@ -7,6 +7,8 @@ import { SpritesheetsUtils } from '@timeflies/static-assets';
 import { TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
 import { DetailsPanelTemplate } from '../../battle-page/hud/details-panel/details-panel-template';
+import { CharacterDescription } from '../../components/character-description/character-description';
+import { CharacterName } from '../../components/character-description/character-name';
 import { SpellCategoryLabel } from './details-components';
 import { RoomSpellButton } from './room-spell-button';
 
@@ -56,13 +58,15 @@ export const RoomCharacterCard: React.FC<RoomCharacterCardProps> = React.memo(({
     const framesDurations = SpritesheetsUtils.getCharacterFramesDurations(state);
     const framesOrder = SpritesheetsUtils.getCharacterFramesOrder(state);
 
-    return <DetailsPanelTemplate width={200} onClick={onClick}>
+    return <DetailsPanelTemplate minWidth={200} maxWidth={200} onClick={onClick}>
         <Grid container direction='column' spacing={1}>
 
             <Grid item container justify='space-between' wrap='nowrap'>
                 <Grid item>
-                    <UIText variant='h3'>{character.characterRole}</UIText>
-                    <SpellCategoryLabel category={characterCategory} variant='body1' gutterBottom />
+                    <UIText variant='h3'>
+                        <CharacterName characterRole={character.characterRole} />
+                    </UIText>
+                    <SpellCategoryLabel category={characterCategory} variant='body1' />
                 </Grid>
 
                 <Grid item container direction='column' alignItems='flex-end'>
@@ -77,6 +81,12 @@ export const RoomCharacterCard: React.FC<RoomCharacterCardProps> = React.memo(({
                         />
                     </Grid>
                 </Grid>
+            </Grid>
+
+            <Grid item>
+                <UIText variant='body2'>
+                    <CharacterDescription characterRole={character.characterRole} />
+                </UIText>
             </Grid>
 
             <Grid item container spacing={1} alignItems='center' wrap='nowrap'>

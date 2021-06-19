@@ -1,9 +1,11 @@
 import { Grid, makeStyles } from '@material-ui/core';
 import { UIText, UITextProps, VariableIcon, VariableValue } from '@timeflies/app-ui';
-import { SpellVariableName, SpellVariables, SpellCategory, SpellRole, getSpellCategory, ObjectTyped } from '@timeflies/common';
+import { getSpellCategory, ObjectTyped, SpellCategory, SpellRole, SpellVariableName, SpellVariables } from '@timeflies/common';
 import { SpellButtonSimple } from '@timeflies/spell-button-panel';
 import React from 'react';
 import { DetailsPanelTemplate } from '../../battle-page/hud/details-panel/details-panel-template';
+import { SpellDescription } from '../../components/spell-description/spell-description';
+import { SpellName } from '../../components/spell-description/spell-name';
 
 const useDetailsVariableStyles = makeStyles(() => ({
     root: {
@@ -54,12 +56,14 @@ export const SpellDetailsPane: React.FC<SpellDetailsPanelProps> = ({
     const spellCategory = getSpellCategory(spellRole);
 
     return (
-        <DetailsPanelTemplate width={160} onClose={onClose}>
+        <DetailsPanelTemplate minWidth={160} maxWidth={210} onClose={onClose}>
             <Grid container direction='column' spacing={1}>
 
                 <Grid item container justify='space-between' spacing={1} wrap='nowrap'>
                     <Grid item>
-                        <UIText variant='h3'>{spellRole}</UIText>
+                        <UIText variant='h3'>
+                            <SpellName spellRole={spellRole} />
+                        </UIText>
                         <SpellCategoryLabel category={spellCategory} variant='body2' />
                     </Grid>
 
@@ -72,6 +76,12 @@ export const SpellDetailsPane: React.FC<SpellDetailsPanelProps> = ({
                             disabled={false}
                         />
                     </Grid>
+                </Grid>
+
+                <Grid item>
+                    <UIText variant='body2'>
+                        <SpellDescription spellRole={spellRole} spellVariables={spellVariables} />
+                    </UIText>
                 </Grid>
 
                 <Grid item container justify='space-between' spacing={1} alignItems='center'>

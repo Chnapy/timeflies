@@ -6,6 +6,8 @@ import { CharacterAnimatedImage } from '@timeflies/sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import { TimeGauge } from '@timeflies/time-gauge-panel';
 import React from 'react';
+import { CharacterDescription } from '../../../components/character-description/character-description';
+import { CharacterName } from '../../../components/character-description/character-name';
 import { SpellCategoryLabel } from '../../../room-page/room-character-list/details-components';
 import { useCurrentEntities } from '../../hooks/use-entities';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
@@ -87,12 +89,14 @@ const InnerCharacterDetailsPanel: React.FC<InnerCharacterDetailsPanelProps> = Re
 
     const framesDurations = SpritesheetsUtils.getCharacterFramesDurations(state);
 
-    return <DetailsPanelTemplate width={200} onClose={() => characterClick(null)}>
+    return <DetailsPanelTemplate minWidth={200} maxWidth={200} onClose={() => characterClick(null)}>
         <Grid container direction='column' spacing={1}>
 
             <Grid item container justify='space-between' wrap='nowrap'>
                 <Grid item>
-                    <UIText variant='h3'>{characterRole}</UIText>
+                    <UIText variant='h3'>
+                        <CharacterName characterRole={characterRole} />
+                    </UIText>
                     <SpellCategoryLabel category={characterCategory} variant='body1' gutterBottom />
                 </Grid>
 
@@ -122,6 +126,12 @@ const InnerCharacterDetailsPanel: React.FC<InnerCharacterDetailsPanelProps> = Re
                         </Grid>
                     </Grid>
                 </Grid>
+            </Grid>
+
+            <Grid item>
+                <UIText variant='body2'>
+                    <CharacterDescription characterRole={characterRole} />
+                </UIText>
             </Grid>
 
             <Grid item container spacing={1} alignItems='center' wrap='nowrap'>

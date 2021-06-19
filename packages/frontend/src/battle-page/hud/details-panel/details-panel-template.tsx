@@ -3,7 +3,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import React from 'react';
 
 type DetailsPanelTemplateProps = {
-    width: number;
+    minWidth: number;
+    maxWidth: number;
     onClick?: () => void;
     onClose?: () => void;
 };
@@ -27,12 +28,12 @@ const useStyles = makeStyles(({ palette }) => ({
     }
 }));
 
-export const DetailsPanelTemplate: React.FC<DetailsPanelTemplateProps> = ({ width, onClick, onClose, children }) => {
+export const DetailsPanelTemplate: React.FC<DetailsPanelTemplateProps> = ({ minWidth, maxWidth, onClick, onClose, children }) => {
     const classes = useStyles({ clickable: !!onClick });
 
     return <Paper className={classes.root}>
         {onClick && <CardActionArea className={classes.wrapper} onClick={onClick} />}
-        <Box minWidth={width} p={2}>
+        <Box minWidth={minWidth} maxWidth={maxWidth} p={2}>
             {children}
 
             {onClose && (
