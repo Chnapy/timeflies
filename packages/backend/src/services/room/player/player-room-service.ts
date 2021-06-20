@@ -18,10 +18,6 @@ export class PlayerRoomService extends Service {
 
             const room = this.getRoomById(payload.roomId);
 
-            if (room.isInBattle()) {
-                throw new SocketError('bad-server-state', 'Cannot access room if it is in battle: ' + room.roomId);
-            }
-
             if (this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ]) {
                 throw new SocketError('bad-server-state', 'Cannot access room if player in battle: ' + room.roomId);
             }
@@ -29,6 +25,11 @@ export class PlayerRoomService extends Service {
             if (this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ]
                 && this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] !== room) {
                 throw new SocketError('bad-server-state', 'Cannot access room if player in another room: ' + room.roomId);
+            }
+
+            const battleId = room.getCurrentBattleId();
+            if (battleId) {
+                return send(RoomPlayerJoinMessage.createResponse(requestId, { battleId }));
             }
 
             this.playerJoinToRoom(room, currentPlayerId);
@@ -50,7 +51,8 @@ export class PlayerRoomService extends Service {
             playerId: currentPlayerId,
             playerName,
             teamColor: null,
-            ready: false
+            ready: false,
+            type: 'spectator'
         });
 
         this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ] = room;
@@ -80,7 +82,9 @@ export class PlayerRoomService extends Service {
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
 
-            const everyPlayersReady = room.getRoomStateData().staticPlayerList.every(player => player.ready);
+            const everyPlayersReady = room.getRoomStateData().staticPlayerList
+                .filter(player => player.type === 'player')
+                .every(player => player.ready);
 
             if (everyPlayersReady) {
                 await this.startBattle(room);

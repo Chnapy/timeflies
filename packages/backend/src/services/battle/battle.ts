@@ -44,6 +44,7 @@ export type Battle = {
     disconnectedPlayers: DisconnectedPlayers;
 
     playerJoin: (playerId: PlayerId) => Promise<void>;
+    playerDisconnect: (playerId: PlayerId) => void;
     getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
     getCycleInfos: () => CycleInfos;
     getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
@@ -52,7 +53,7 @@ export type Battle = {
 };
 
 export const createBattle = (
-    { services }: GlobalEntities,
+    { services, playerCredentialsMap }: GlobalEntities,
     battlePayload: BattlePayload,
     onBattleEnd: () => void
 ): Battle => {
@@ -61,9 +62,11 @@ export const createBattle = (
     const { staticPlayers, staticCharacters, staticSpells, staticState, initialSerializableState } = getBattleStaticData(battlePayload);
     const { roomId, staticPlayerList, mapInfos, tiledMap } = battlePayload;
 
-    const playerIdList = staticPlayerList.map(player => player.playerId);
+    const playerIdList = new Set(staticPlayerList.map(player => player.playerId));
 
-    const waitingPlayerList = new Set(playerIdList);
+    const waitingPlayerList = new Set(staticPlayerList
+        .filter(player => player.type === 'player')
+        .map(player => player.playerId));
 
     const turnsOrder = staticCharacters.map(character => character.characterId);
 
@@ -96,6 +99,31 @@ export const createBattle = (
         logger.info('Battle [' + battleId + '] ended.');
 
         onBattleEnd();
+    };
+
+    const addSpectator = (playerId: PlayerId) => {
+
+        const player: StaticPlayer = {
+            playerId,
+            playerName: playerCredentialsMap.mapById[ playerId ].playerName,
+            teamColor: null,
+            type: 'spectator'
+        };
+
+        playerIdList.add(playerId);
+
+        staticPlayers.push(player);
+        staticState.players[ playerId ] = player;
+    };
+
+    const removeSpectator = (playerId: PlayerId) => {
+        playerIdList.delete(playerId);
+
+        staticPlayers.splice(
+            staticPlayers.findIndex(c => c.playerId === playerId),
+            1
+        );
+        delete staticState.players[ playerId ];
     };
 
     return {
@@ -147,11 +175,29 @@ export const createBattle = (
         },
 
         playerJoin: async playerId => {
-            waitingPlayerList.delete(playerId);
-            delete disconnectedPlayers[ playerId ];
 
-            if (!cycleEngine.isStarted() && waitingPlayerList.size === 0) {
-                await startBattle();
+            if (staticState.players[ playerId ]) {
+
+                waitingPlayerList.delete(playerId);
+                delete disconnectedPlayers[ playerId ];
+
+                if (!cycleEngine.isStarted() && waitingPlayerList.size === 0) {
+                    await startBattle();
+                }
+            } else {
+
+                addSpectator(playerId);
+            }
+        },
+
+        playerDisconnect: playerId => {
+
+            if (staticState.players[ playerId ].type === 'player') {
+                disconnectedPlayers[ playerId ] = Date.now();
+
+            } else {
+
+                removeSpectator(playerId);
             }
         },
     };

@@ -37,17 +37,20 @@ export const createFakeBattle = (): Battle => ({
             p1: {
                 playerId: 'p1',
                 playerName: 'p-1',
-                teamColor: '#FF0000'
+                teamColor: '#FF0000',
+                type: 'player'
             },
             p2: {
                 playerId: 'p2',
                 playerName: 'p-2',
-                teamColor: '#00FF00'
+                teamColor: '#00FF00',
+                type: 'player'
             },
             p3: {
                 playerId: 'p3',
                 playerName: 'p-3',
-                teamColor: '#0000FF'
+                teamColor: '#0000FF',
+                type: 'player'
             }
         },
         characters: {
@@ -86,6 +89,7 @@ export const createFakeBattle = (): Battle => ({
         } as TiledLayer ]
     } as any,
     playerJoin: jest.fn(async () => { }),
+    playerDisconnect: jest.fn(),
     getMapInfos: jest.fn(),
     getCycleInfos: jest.fn(),
     getCurrentState: jest.fn(() => {

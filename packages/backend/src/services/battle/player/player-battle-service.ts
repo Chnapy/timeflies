@@ -75,7 +75,7 @@ export class PlayerBattleService extends Service {
             return;
         }
 
-        battle.disconnectedPlayers[ currentPlayerId ] = Date.now();
+        battle.playerDisconnect(currentPlayerId);
 
         this.sendToEveryPlayersExcept(
             BattlePlayerDisconnectMessage({ playerId: currentPlayerId }),

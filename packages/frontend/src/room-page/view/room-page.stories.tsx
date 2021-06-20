@@ -163,19 +163,22 @@ export const Default: React.FC = () => {
                                     playerId: 'p1',
                                     playerName: 'chnapy',
                                     ready: false,
-                                    teamColor: '#0F0'
+                                    teamColor: '#0F0',
+                                    type: 'player'
                                 },
                                 {
                                     playerId: 'p2',
                                     playerName: 'yoshi2oeuf',
                                     ready: true,
-                                    teamColor: '#0F0'
+                                    teamColor: '#0F0',
+                                    type: 'player'
                                 },
                                 {
                                     playerId: 'p3',
                                     playerName: 'toto',
                                     ready: true,
-                                    teamColor: '#F00'
+                                    teamColor: '#F00',
+                                    type: 'player'
                                 }
                             ],
                             staticCharacterList: [

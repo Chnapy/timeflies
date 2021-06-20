@@ -19,13 +19,15 @@ describe('get battle static data', () => {
                 playerId: 'p1',
                 playerName: 'p-1',
                 ready: true,
-                teamColor: '#000'
+                teamColor: '#000',
+                type: 'player'
             },
             {
                 playerId: 'p2',
                 playerName: 'p-2',
                 ready: true,
-                teamColor: '#FFF'
+                teamColor: '#FFF',
+                type: 'player'
             }
         ],
         staticCharacterList: [
@@ -128,12 +130,14 @@ describe('get battle static data', () => {
             {
                 playerId: 'p1',
                 playerName: 'p-1',
-                teamColor: '#000'
+                teamColor: '#000',
+                type: 'player'
             },
             {
                 playerId: 'p2',
                 playerName: 'p-2',
-                teamColor: '#FFF'
+                teamColor: '#FFF',
+                type: 'player'
             }
         ]);
     });
@@ -198,12 +202,14 @@ describe('get battle static data', () => {
                 'p1': {
                     playerId: 'p1',
                     playerName: 'p-1',
-                    teamColor: '#000'
+                    teamColor: '#000',
+                    type: 'player'
                 },
                 'p2': {
                     playerId: 'p2',
                     playerName: 'p-2',
-                    teamColor: '#FFF'
+                    teamColor: '#FFF',
+                    type: 'player'
                 }
             },
             characters: {

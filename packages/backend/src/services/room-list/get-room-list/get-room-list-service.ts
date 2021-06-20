@@ -31,7 +31,7 @@ export class GetRoomListService extends Service {
                         playerId: playerAdminId,
                         playerName: playerAdminName
                     },
-                    state: room.isInBattle()
+                    state: room.getCurrentBattleId()
                         ? 'in-battle'
                         : 'open'
                 };

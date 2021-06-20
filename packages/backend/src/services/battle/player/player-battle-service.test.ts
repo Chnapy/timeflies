@@ -33,7 +33,7 @@ describe('player battle service', () => {
 
             socketCell.getDisconnectListener()!();
 
-            expect(battle.disconnectedPlayers).toEqual({ 'p1': timerTester.now() });
+            expect(battle.playerDisconnect).toHaveBeenCalledWith('p1');
         });
 
         it('send player disconnect message to other players', () => {

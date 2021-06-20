@@ -47,7 +47,7 @@ describe('map room service', () => {
             ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('throw error if player not master', async () => {
+        it('throw error if player not admin', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             room.getRoomStateData = jest.fn(() => ({
@@ -79,7 +79,8 @@ describe('map room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     teamColor: '#000',
-                    ready: true
+                    ready: true,
+                    type: 'player'
                 } ]
             }));
 

@@ -36,7 +36,8 @@ describe('team room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     teamColor: '#000',
-                    ready: true
+                    ready: true,
+                    type: 'player'
                 } ]
             }));
 

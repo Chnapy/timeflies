@@ -1,6 +1,6 @@
 import { Grid, makeStyles } from '@material-ui/core';
 import { useSocketListeners, useSocketSend } from '@timeflies/socket-client';
-import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomStateMessage } from '@timeflies/socket-messages';
+import { MessageWithResponseGetter, RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomStateData, RoomStateMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -44,7 +44,7 @@ export const RoomContent: React.FC = () => {
 
     useAsyncEffect(async (isMounted) => {
         await sendRoomUpdate(
-            RoomPlayerJoinMessage({ roomId }),
+            RoomPlayerJoinMessage({ roomId }) as MessageWithResponseGetter<any, RoomStateData>,
             isMounted,
             ({ payload }, defaultFn) => {
                 if (payload.reason === 'bad-request') {

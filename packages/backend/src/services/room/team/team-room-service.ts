@@ -19,8 +19,10 @@ export class TeamRoomService extends Service {
                 throw new SocketError('bad-server-state', 'Cannot change team if player ready: ' + currentPlayerId);
             }
 
-            if (!teamColorList.includes(payload.teamColor)) {
-                throw new SocketError('bad-request', 'Team color does not exist: ' + payload.teamColor);
+            if (payload.teamColor) {
+                if (!teamColorList.includes(payload.teamColor)) {
+                    throw new SocketError('bad-request', 'Team color does not exist: ' + payload.teamColor);
+                }
             }
 
             room.teamJoin(currentPlayerId, payload.teamColor);

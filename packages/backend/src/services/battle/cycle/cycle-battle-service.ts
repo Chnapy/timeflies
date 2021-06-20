@@ -7,7 +7,7 @@ import { BattleId } from '../battle';
 
 type GetCycleEngineProps = Pick<CycleEngineProps, 'charactersList' | 'charactersDurations'> & {
     battleId: BattleId;
-    playerIdList: PlayerId[];
+    playerIdList: Set<PlayerId>;
 };
 
 export class CycleBattleService extends Service {

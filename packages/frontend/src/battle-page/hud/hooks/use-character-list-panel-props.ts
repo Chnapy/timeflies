@@ -26,7 +26,7 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
 
         const itemProps: CharacterItemProps = {
             playerName,
-            teamColor,
+            teamColor: teamColor!,
             playerRelation,
             characterRole,
             health,

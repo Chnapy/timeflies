@@ -11,8 +11,7 @@ export type MapInfos = {
 
 export type MapPlacementTiles = { [ teamColor: string ]: Position[] };
 
-export type RoomStaticPlayer = Omit<StaticPlayer, 'teamColor'> & {
-    teamColor: string | null;
+export type RoomStaticPlayer = StaticPlayer & {
     ready: boolean;
 };
 
