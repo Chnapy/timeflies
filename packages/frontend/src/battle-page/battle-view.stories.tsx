@@ -36,8 +36,8 @@ export const Default: React.FC = () => {
     const [ store ] = React.useState(() => {
         const preloadedState = rootReducer(undefined, { type: 'foo' });
         preloadedState.credentials = {
-            playerId: 'p1',
-            playerName: 'chnapy',
+            playerId: 'p0',
+            playerName: 'foo',
             token: '---'
         };
 
@@ -66,6 +66,12 @@ export const Default: React.FC = () => {
                 schemaLink: 'fake/maps/map_dungeon.json'
             },
             staticPlayers: {
+                p0: {
+                    playerId: 'p0',
+                    playerName: 'foo',
+                    teamColor: null,
+                    type: 'spectator'
+                },
                 p1: {
                     playerId: 'p1',
                     playerName: 'chnapy',

@@ -88,7 +88,7 @@ export const createFakeBattle = (): Battle => ({
             data: ArrayUtils.range(50)
         } as TiledLayer ]
     } as any,
-    playerJoin: jest.fn(async () => { }),
+    playerJoin: jest.fn(),
     playerDisconnect: jest.fn(),
     getMapInfos: jest.fn(),
     getCycleInfos: jest.fn(),
@@ -118,5 +118,7 @@ export const createFakeBattle = (): Battle => ({
         characterId: 'c1',
         startTime: 1
     })),
-    addNewState: jest.fn()
+    addNewState: jest.fn(),
+    canStartBattle: jest.fn(() => false),
+    startBattle: jest.fn(async () => { })
 });

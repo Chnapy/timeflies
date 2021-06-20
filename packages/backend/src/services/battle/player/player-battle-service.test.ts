@@ -118,7 +118,7 @@ describe('player battle service', () => {
 
                 expect(battle.playerJoin).toHaveBeenCalledWith('p1');
 
-                expect(callOrder).toEqual([ 'response', 'playerJoin' ]);
+                expect(callOrder).toEqual([ 'playerJoin', 'response']);
             });
 
             it('add player to global battle map', async () => {

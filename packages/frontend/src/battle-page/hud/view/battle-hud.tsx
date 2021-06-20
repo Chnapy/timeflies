@@ -1,14 +1,18 @@
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import { ChatPanel } from '../../../components/chat-panel/chat-panel';
+import { useIsSpectator } from '../../hooks/use-is-spectator';
 import { BattleEndContextProvider } from '../battle-end-panel/battle-end-context';
 import { BattleEndPanel } from '../battle-end-panel/battle-end-panel';
 import { BattleFeedbackPool } from '../battle-feedbacks/view/battle-feedback-pool';
 import { BattleTurnAnnoucement } from '../battle-turn-annoucement/battle-turn-annoucement';
 import { CharacterHudPool } from '../character-hud/view/character-hud-pool';
+import { SpectatorPanel } from '../spectator-panel/spectator-panel';
 import { CharacterListPanelConnected } from './character-list-panel-connected';
 import { SpellButtonPanelConnected } from './spell-button-panel-connected';
 import { TimeGaugePanelConnected } from './time-gauge-panel-connected';
+
+type StyleProps = { isSpectator: boolean };
 
 const useStyles = makeStyles(({ breakpoints, spacing }) => ({
     characterList: {
@@ -27,25 +31,27 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
             transform: 'translateX(50%)'
         }
     },
-    timeGauge: {
+    timeGauge: ({ isSpectator }: StyleProps) => ({
         position: 'absolute',
         top: 0,
         left: '50%',
         transform: 'translateX(-50%)',
         margin: spacing(1),
-        width: '30%'
-    },
-    chatPanel: {
+        width: isSpectator ? undefined : '30%',
+        pointerEvents: 'none'
+    }),
+    chatPanel: ({ isSpectator }: StyleProps) => ({
         position: 'absolute',
         top: 0,
         right: 0,
-        bottom: 168 + spacing(1),
+        bottom: isSpectator ? 0 : 168 + spacing(1),
         margin: spacing(1),
         width: 150,
+        pointerEvents: 'none',
         [ breakpoints.up('md') ]: {
             bottom: 0
         }
-    },
+    }),
     turnAnnoucement: {
         position: 'absolute',
         top: '50%',
@@ -55,7 +61,8 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
 }));
 
 export const BattleHud: React.FC = () => {
-    const classes = useStyles();
+    const isSpectator = useIsSpectator();
+    const classes = useStyles({ isSpectator });
 
     return <>
         <CharacterHudPool />
@@ -64,12 +71,17 @@ export const BattleHud: React.FC = () => {
         <div className={classes.characterList}>
             <CharacterListPanelConnected />
         </div>
-        <div className={classes.spellButton}>
+
+        {!isSpectator && <div className={classes.spellButton}>
             <SpellButtonPanelConnected />
-        </div>
+        </div>}
+
         <div className={classes.timeGauge}>
-            <TimeGaugePanelConnected />
+            {isSpectator
+                ? <SpectatorPanel />
+                : <TimeGaugePanelConnected />}
         </div>
+
         <div className={classes.chatPanel}>
             <ChatPanel onlyInputTouchable />
         </div>

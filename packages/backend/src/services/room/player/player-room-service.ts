@@ -10,7 +10,7 @@ export class PlayerRoomService extends Service {
         this.addRoomPlayerReadyMessageListener(socketCell, currentPlayerId);
         this.addRoomPlayerLeaveMessageListener(socketCell, currentPlayerId);
 
-        socketCell.addDisconnectListener(this.getPlayerLeaveFn(currentPlayerId));
+        socketCell.addDisconnectListener(this.getPlayerLeaveFn(currentPlayerId, false));
     };
 
     private addRoomPlayerJoinMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerJoinMessage>(
@@ -115,12 +115,16 @@ export class PlayerRoomService extends Service {
     };
 
     private addRoomPlayerLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerLeaveMessage>(
-        RoomPlayerLeaveMessage, this.getPlayerLeaveFn(currentPlayerId));
+        RoomPlayerLeaveMessage, this.getPlayerLeaveFn(currentPlayerId, true));
 
-    private getPlayerLeaveFn = (currentPlayerId: string) => () => {
+    private getPlayerLeaveFn = (currentPlayerId: string, ignoreIfBattle: boolean) => () => {
 
         const room = this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
         if (!room) {
+            return;
+        }
+
+        if(ignoreIfBattle && room.getCurrentBattleId()) {
             return;
         }
 

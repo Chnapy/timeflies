@@ -43,13 +43,15 @@ export type Battle = {
 
     disconnectedPlayers: DisconnectedPlayers;
 
-    playerJoin: (playerId: PlayerId) => Promise<void>;
+    playerJoin: (playerId: PlayerId) => void;
     playerDisconnect: (playerId: PlayerId) => void;
     getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
     getCycleInfos: () => CycleInfos;
     getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
     getCurrentState: () => SerializableState;
     addNewState: (state: SerializableState, stateEndTime: number) => Promise<void>;
+    canStartBattle: () => boolean;
+    startBattle: () => Promise<void>;
 };
 
 export const createBattle = (
@@ -174,16 +176,12 @@ export const createBattle = (
             }
         },
 
-        playerJoin: async playerId => {
+        playerJoin: playerId => {
 
             if (staticState.players[ playerId ]) {
 
                 waitingPlayerList.delete(playerId);
                 delete disconnectedPlayers[ playerId ];
-
-                if (!cycleEngine.isStarted() && waitingPlayerList.size === 0) {
-                    await startBattle();
-                }
             } else {
 
                 addSpectator(playerId);
@@ -200,5 +198,9 @@ export const createBattle = (
                 removeSpectator(playerId);
             }
         },
+
+        canStartBattle: () => !cycleEngine.isStarted() && waitingPlayerList.size === 0,
+
+        startBattle,
     };
 };
