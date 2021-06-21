@@ -27,10 +27,11 @@ export const getBattleStaticData = ({
         }
     };
 
-    const staticPlayers = staticPlayerList.map(({ playerId, playerName, teamColor }): StaticPlayer => ({
+    const staticPlayers = staticPlayerList.map(({ playerId, playerName, teamColor, type }): StaticPlayer => ({
         playerId,
         playerName,
-        teamColor: teamColor!
+        teamColor,
+        type
     }));
 
     const staticCharacters: StaticCharacter[] = [];

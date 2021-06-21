@@ -95,9 +95,7 @@ export const RoomButtonsPanel: React.FC = () => {
         setCurrentStep(step);
     };
 
-    if (currentStep === noIndex) {
-        return null;
-    }
+    const showStepper = currentStep !== noIndex;
 
     return (
         <Grid container direction='column' spacing={1}>
@@ -112,7 +110,7 @@ export const RoomButtonsPanel: React.FC = () => {
                 </Paper>
             </Grid>}
 
-            <Grid item>
+            {showStepper && <Grid item>
                 <Stepper className={classes.stepper} activeStep={currentStep}>
 
                     {stepList.map(({ type, component: Component }, i) => {
@@ -144,7 +142,7 @@ export const RoomButtonsPanel: React.FC = () => {
                     })}
 
                 </Stepper>
-            </Grid>
+            </Grid>}
         </Grid>
     );
 };

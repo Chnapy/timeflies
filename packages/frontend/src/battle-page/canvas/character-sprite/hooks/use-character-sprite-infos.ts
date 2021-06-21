@@ -4,6 +4,7 @@ import { useAssetSpritesheet } from '@timeflies/assets-loader';
 import { CharacterId, colorStringToHex, switchUtil } from '@timeflies/common';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
 import { DisplayObjectProps } from 'react-pixi-fiber';
+import { useIsSpectator } from '../../../hooks/use-is-spectator';
 import { usePlayerRelationFrom } from '../../../hooks/use-player-relation-from';
 import { useBattleSelector } from '../../../store/hooks/use-battle-selector';
 
@@ -20,15 +21,18 @@ function removeUndefined<O>(o: O) {
 
 export const useCharacterSpriteInfos = (characterId: CharacterId) => {
     const { playerId } = useBattleSelector(battle => battle.staticCharacters[ characterId ]);
+    const teamColor = useBattleSelector(battle => battle.staticPlayers[ playerId ].teamColor);
     const isPlaying = useBattleSelector(battle => battle.playingCharacterId === characterId);
+    const isSpectator = useIsSpectator();
 
     const spritesheet = useAssetSpritesheet('entities')?.spritesheet;
 
     const getPlayerRelationFrom = usePlayerRelationFrom();
     const playerRelationsColors = useTheme().palette.playerRelations;
 
-    const outlineColor = colorStringToHex(
-        switchUtil(getPlayerRelationFrom(playerId), playerRelationsColors)
+    const outlineColor = colorStringToHex(isSpectator
+       ? teamColor!
+       : switchUtil(getPlayerRelationFrom(playerId), playerRelationsColors)
     );
 
     const outline: OutlineInfos = {

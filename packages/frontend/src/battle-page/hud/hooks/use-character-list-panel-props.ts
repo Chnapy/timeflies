@@ -1,5 +1,6 @@
 import { CharacterItemProps, CharacterListPanelProps } from '@timeflies/character-list-panel';
 import { useCurrentEntities } from '../../hooks/use-entities';
+import { useIsSpectator } from '../../hooks/use-is-spectator';
 import { usePlayerRelationFrom } from '../../hooks/use-player-relation-from';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { useDetailsLogic } from '../details-panel/details-context';
@@ -12,6 +13,7 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
     const currentCharactersHealth = useCurrentEntities(({ characters }) => characters.health);
     const playingCharacterId = useBattleSelector(battleState => battleState.playingCharacterId);
     const playerDisconnectedList = useBattleSelector(battleState => battleState.playerDisconnectedList);
+    const isSpectator = useIsSpectator();
 
     const getPlayerRelationFrom = usePlayerRelationFrom();
 
@@ -22,11 +24,11 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
         const { playerName, teamColor } = staticPlayers[ playerId ];
         const health = currentCharactersHealth[ characterId ];
 
-        const playerRelation = getPlayerRelationFrom(playerId);
+        const playerRelation = isSpectator ? 'me' : getPlayerRelationFrom(playerId);
 
         const itemProps: CharacterItemProps = {
             playerName,
-            teamColor,
+            teamColor: teamColor!,
             playerRelation,
             characterRole,
             health,

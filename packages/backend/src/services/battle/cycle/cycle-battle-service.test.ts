@@ -46,7 +46,7 @@ describe('cycle battle service', () => {
 
             const cycleEngineOverlay = service.createCycleEngineOverlay({
                 battleId: 'battle',
-                playerIdList: playerList.map(p => p.playerId),
+                playerIdList: new Set(playerList.map(p => p.playerId)),
                 charactersList: [ 'c1', 'c2', 'c3' ],
                 charactersDurations: { c1: 100, c2: 100, c3: 100 }
             }, ({ listeners: _listeners }) => {

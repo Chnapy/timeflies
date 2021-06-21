@@ -4,6 +4,7 @@ import React from 'react';
 import { ButtonLink } from '../../../components/button-link';
 import { useMyPlayerId } from '../../../login-page/hooks/use-my-player-id';
 import { routes } from '../../../routes';
+import { useIsSpectator } from '../../hooks/use-is-spectator';
 import { useBattleSelector } from '../../store/hooks/use-battle-selector';
 import { BattleEndCharacterItem } from './battle-end-character-item';
 import { useBattleEndContext } from './battle-end-context';
@@ -26,6 +27,7 @@ export const BattleEndPanel: React.FC = () => {
     const winnerTeamColor = battleEndContext?.winnerTeamColor;
     const myPlayerId = useMyPlayerId();
     const won = useBattleSelector(state => state.staticPlayers[ myPlayerId ].teamColor === winnerTeamColor);
+    const isSpectator = useIsSpectator();
 
     const roomId = useBattleSelector(state => state.roomId);
     const characterList = useBattleSelector(state => state.characterList);
@@ -56,9 +58,11 @@ export const BattleEndPanel: React.FC = () => {
 
                 <UIText variant='body1' align='center'>
                     Battle is over !<br />
-                    {won
-                        ? 'You won !'
-                        : 'You lost...'}
+                    {!isSpectator && (
+                        won
+                            ? 'You won !'
+                            : 'You lost...'
+                    )}
                 </UIText>
 
                 <UIText variant='body2'>Winners</UIText>

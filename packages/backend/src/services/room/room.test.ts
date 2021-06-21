@@ -73,14 +73,16 @@ describe('room', () => {
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         expect(room.getRoomStateData().staticPlayerList).toEqual<RoomStaticPlayer[]>([ {
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         } ]);
     });
 
@@ -91,14 +93,16 @@ describe('room', () => {
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.playerJoin({
             playerId: 'p2',
             playerName: 'p-2',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         expect(room.getRoomStateData().playerAdminId).toEqual('p1');
@@ -111,7 +115,8 @@ describe('room', () => {
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.playerReady('p1', true);
@@ -122,21 +127,23 @@ describe('room', () => {
         }) ]);
     });
 
-    it('teamJoin change player team', () => {
+    it('teamJoin change player team and player type', () => {
         const room = getRoom();
 
         room.playerJoin({
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'spectator'
         });
 
         room.teamJoin('p1', '#000');
 
         expect(room.getRoomStateData().staticPlayerList).toEqual([ expect.objectContaining<Partial<RoomStaticPlayer>>({
             playerId: 'p1',
-            teamColor: '#000'
+            teamColor: '#000',
+            type: 'player'
         }) ]);
     });
 
@@ -200,7 +207,8 @@ describe('room', () => {
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.characterSelect({
@@ -223,14 +231,16 @@ describe('room', () => {
             playerId: 'p1',
             playerName: 'p-1',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.playerJoin({
             playerId: 'p2',
             playerName: 'p-2',
             ready: false,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.playerLeave('p1');
@@ -353,14 +363,16 @@ describe('room', () => {
             playerId: 'p1',
             playerName: 'p-1',
             ready: true,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.playerJoin({
             playerId: 'p2',
             playerName: 'p-2',
             ready: true,
-            teamColor: null
+            teamColor: null,
+            type: 'player'
         });
 
         room.removeBattle();
@@ -370,13 +382,15 @@ describe('room', () => {
                 playerId: 'p1',
                 playerName: 'p-1',
                 ready: false,
-                teamColor: null
+                teamColor: null,
+                type: 'player'
             },
             {
                 playerId: 'p2',
                 playerName: 'p-2',
                 ready: false,
-                teamColor: null
+                teamColor: null,
+                type: 'player'
             }
         ]);
     });
@@ -390,7 +404,8 @@ describe('room', () => {
             playerId: 'p4',
             playerName: 'p-4',
             ready: false,
-            teamColor: ''
+            teamColor: '',
+            type: 'spectator'
         });
 
         const promiseState = await timerTester.waitTimer(promise);
@@ -400,6 +415,14 @@ describe('room', () => {
 
     it('playerLeave cancel battle launch if any', async () => {
         const room = getRoom();
+        
+        room.playerJoin({
+            playerId: 'p1',
+            playerName: 'p-1',
+            ready: true,
+            teamColor: '',
+            type: 'player'
+        });
 
         const promise = room.waitForBattle();
 
@@ -417,7 +440,8 @@ describe('room', () => {
             playerId: 'p1',
             playerName: '',
             ready: false,
-            teamColor: ''
+            teamColor: '',
+            type: 'player'
         });
 
         const promise = room.waitForBattle();

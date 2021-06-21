@@ -8,18 +8,19 @@ import useAsyncEffect from 'use-async-effect';
 import { ChatPanel } from '../../components/chat-panel/chat-panel';
 import { LoadingBackdrop } from '../../components/loading-backdrop';
 import { NotFoundPanel } from '../../components/not-found-panel';
+import { useSocketSendWithResponseError } from '../../connected-socket/hooks/use-socket-send-with-response-error';
 import { routes } from '../../routes';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
 import { useSendRoomUpdate } from '../hooks/use-send-room-update';
 import { RoomButtonsPanel } from '../room-buttons/room-buttons-panel';
 import { RoomMapPanel } from '../room-map-button/room-map-panel';
-import { RoomNoTeamPlayerList } from '../room-no-team-player-list/room-no-team-player-list';
+import { RoomSpectatorPlayerList } from '../room-spectator-player-list/room-spectator-player-list';
 import { RoomTeamList } from '../room-team/room-team-list';
 import { RoomSetAction } from '../store/room-actions';
 
 const useStyles = makeStyles(() => ({
     leftColumn: {
-        height: '100%'
+        display: 'flex'
     },
     teamListWrapper: {
         display: 'flex',
@@ -35,7 +36,7 @@ export const RoomContent: React.FC = () => {
     const classes = useStyles();
     const { roomId } = useRouteMatch(routes.roomPage({}))!.params as { roomId: string };
     const send = useSocketSend();
-    const sendRoomUpdate = useSendRoomUpdate();
+    const sendWithResponse = useSocketSendWithResponseError();
     const addSocketListeners = useSocketListeners();
     const dispatch = useDispatch();
     const history = useHistory();
@@ -43,18 +44,25 @@ export const RoomContent: React.FC = () => {
     const [ hasWrongId, setHasWrongId ] = React.useState(false);
 
     useAsyncEffect(async (isMounted) => {
-        await sendRoomUpdate(
-            RoomPlayerJoinMessage({ roomId }),
-            isMounted,
-            ({ payload }, defaultFn) => {
-                if (payload.reason === 'bad-request') {
-                    setHasWrongId(true);
-                    return;
-                }
-
-                defaultFn();
+        const response = await sendWithResponse(RoomPlayerJoinMessage({ roomId }), isMounted, ({ payload }, defaultFn) => {
+            if (payload.reason === 'bad-request') {
+                setHasWrongId(true);
+                return;
             }
-        );
+
+            defaultFn();
+        });
+        if (!response) {
+            return;
+        }
+
+        const { payload } = response;
+        if ('battleId' in payload) {
+            history.push(routes.battlePage({ battleId: payload.battleId }).path);
+            return;
+        } else {
+            dispatch(RoomSetAction(payload));
+        }
 
         return await addSocketListeners({
             [ RoomStateMessage.action ]: ({ payload }: ReturnType<typeof RoomStateMessage>) => {
@@ -90,8 +98,8 @@ export const RoomContent: React.FC = () => {
 
     return <Grid container wrap='nowrap' spacing={2}>
 
-        <Grid item zeroMinWidth>
-            <Grid className={classes.leftColumn} container direction='column' alignItems='stretch' spacing={1}>
+        <Grid className={classes.leftColumn} item zeroMinWidth>
+            <Grid container direction='column' alignItems='stretch' spacing={1}>
 
                 <Grid item>
                     <RoomMapPanel />
@@ -107,7 +115,7 @@ export const RoomContent: React.FC = () => {
         <Grid className={classes.teamListWrapper} item xs>
             <Grid container direction='column' wrap='nowrap' spacing={1}>
 
-                <RoomNoTeamPlayerList />
+                <RoomSpectatorPlayerList />
 
                 <Grid className={classes.teamList} item>
                     <RoomTeamList />

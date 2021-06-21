@@ -52,6 +52,8 @@ export class PlayerBattleService extends Service {
     private addBattleLoadMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleLoadMessage>(BattleLoadMessage, async ({ payload, requestId }, send) => {
         const battle = this.getBattleById(payload.battleId);
 
+        battle.playerJoin(currentPlayerId);
+
         const { roomId, staticPlayers, staticCharacters, staticSpells, getCurrentState, getMapInfos, getCycleInfos } = battle;
 
         send(BattleLoadMessage.createResponse(requestId, {
@@ -66,7 +68,9 @@ export class PlayerBattleService extends Service {
 
         this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ] = battle;
 
-        await battle.playerJoin(currentPlayerId);
+        if (battle.canStartBattle()) {
+            await battle.startBattle();
+        }
     });
 
     private getPlayerDisconnectFn = (currentPlayerId: PlayerId) => () => {
@@ -75,7 +79,7 @@ export class PlayerBattleService extends Service {
             return;
         }
 
-        battle.disconnectedPlayers[ currentPlayerId ] = Date.now();
+        battle.playerDisconnect(currentPlayerId);
 
         this.sendToEveryPlayersExcept(
             BattlePlayerDisconnectMessage({ playerId: currentPlayerId }),

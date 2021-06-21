@@ -83,20 +83,22 @@ describe('player room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('throw error if room in battle', () => {
+        it('answers with battleId if room in battle', async () => {
             const { socketCellP1, connectSocket, room } = getJoinEntities();
 
             connectSocket();
 
-            room.isInBattle = jest.fn(() => true);
+            room.getCurrentBattleId = jest.fn(() => 'battle');
+
+            connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
 
-            expect(() =>
-                listener(RoomPlayerJoinMessage({
-                    roomId: 'room'
-                }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
+            await listener(RoomPlayerJoinMessage({
+                roomId: 'room'
+            }).get(), socketCellP1.send);
+
+            expect(socketCellP1.send).toHaveBeenCalledWith(RoomPlayerJoinMessage.createResponse(expect.anything(), { battleId: 'battle' }))
         });
 
         it('throw error if player already in battle', () => {
@@ -286,19 +288,29 @@ describe('player room service', () => {
                         playerId: 'p1',
                         playerName: 'p1',
                         teamColor: null,
-                        ready: true
+                        ready: true,
+                        type: 'player'
                     },
                     {
                         playerId: 'p2',
                         playerName: 'p2',
                         teamColor: null,
-                        ready: true
+                        ready: true,
+                        type: 'player'
                     },
                     {
                         playerId: 'p3',
                         playerName: 'p3',
                         teamColor: null,
-                        ready: true
+                        ready: true,
+                        type: 'player'
+                    },
+                    {
+                        playerId: 'p4',
+                        playerName: 'p4',
+                        teamColor: null,
+                        ready: false,
+                        type: 'spectator'
                     }
                 ],
                 staticCharacterList: [ {
@@ -323,6 +335,21 @@ describe('player room service', () => {
     });
 
     describe('on player leave message', () => {
+
+        it('does nothing if battle running', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            room.playerLeave = jest.fn(room.playerLeave);
+            room.getCurrentBattleId = jest.fn(() => 'battle');
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
+
+            await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
+
+            expect(room.playerLeave).not.toHaveBeenCalled();
+        });
 
         it('leave player from room', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
@@ -378,6 +405,37 @@ describe('player room service', () => {
             expect(room.playerLeave).toHaveBeenCalledWith('p1');
             expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
             expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
+        });
+
+        it('apply player leave effects even if battle running', async () => {
+            const { socketCellP1, socketCellP2, connectSocket, room, globalEntities } = getEntities();
+
+            room.playerLeave = jest.fn(room.playerLeave);
+            room.getCurrentBattleId = jest.fn(() => 'battle');
+
+            connectSocket();
+
+            const disconnectListener = socketCellP1.getDisconnectListener()!;
+            disconnectListener();
+
+            expect(room.playerLeave).toHaveBeenCalledWith('p1');
+            expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
+            expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
+        });
+    });
+
+    describe('battle end', () => {
+        it('remove battle from room and global entities', async () => {
+            const { connectSocket, room, globalEntities, service } = getEntities();
+
+            globalEntities.currentBattleMap.mapById[ 'battle' ] = createFakeBattle();
+
+            (service as PlayerRoomService).onBattleEnd('room', 'battle');
+
+            connectSocket();
+
+            expect(room.removeBattle).toHaveBeenCalled();
+            expect(globalEntities.currentBattleMap.mapById[ 'battle' ]).toBeUndefined();
         });
     });
 });

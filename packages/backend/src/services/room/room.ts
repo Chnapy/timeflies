@@ -6,7 +6,7 @@ import type TiledMap from 'tiled-types';
 import util from 'util';
 import { GlobalEntities } from '../../main/global-entities';
 import { assetUrl } from '../../utils/asset-url';
-import { Battle, createBattle, BattlePayload } from '../battle/battle';
+import { Battle, BattleId, BattlePayload, createBattle } from '../battle/battle';
 
 export type RoomId = string;
 
@@ -18,7 +18,7 @@ export type Room = {
     playerJoin: (playerInfos: RoomStaticPlayer) => void;
     playerReady: (playerId: PlayerId, ready: boolean) => void;
     playerLeave: (playerId: PlayerId) => void;
-    teamJoin: (playerId: PlayerId, teamColor: string) => void;
+    teamJoin: (playerId: PlayerId, teamColor: string | null) => void;
     characterSelect: (staticCharacter: RoomStaticCharacter) => void;
     characterRemove: (characterId: CharacterId) => void;
     characterPlacement: (characterId: CharacterId, position: Position | null) => void;
@@ -26,7 +26,7 @@ export type Room = {
     waitForBattle: () => Promise<WaitCancelableState[ 'state' ]>;
     createBattle: () => Promise<Battle>;
     removeBattle: () => void;
-    isInBattle: () => boolean;
+    getCurrentBattleId: () => BattleId | null;
 };
 
 const allTeamColorList = [ '#3BA92A', '#FFD74A', '#A93B2A', '#3BA9A9' ];
@@ -117,7 +117,7 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
         playerJoin: playerInfos => {
             staticPlayerList.push(playerInfos);
 
-            if (staticPlayerList.length === 1) {
+            if (!playerAdminId) {
                 playerAdminId = playerInfos.playerId;
             }
 
@@ -132,23 +132,32 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
             }
         },
         playerLeave: playerId => {
+            const playerIndex = staticPlayerList.findIndex(c => c.playerId === playerId);
+            const player = staticPlayerList[ playerIndex ];
             staticPlayerList.splice(
-                staticPlayerList.findIndex(c => c.playerId === playerId),
+                playerIndex,
                 1
             );
             staticCharacterList = staticCharacterList.filter(character => character.playerId !== playerId);
 
-            if (playerId === playerAdminId) {
-                playerAdminId = staticPlayerList.length
-                    ? staticPlayerList[ 0 ].playerId
-                    : '';
-            }
+            if (player.type === 'player') {
+                if (playerId === playerAdminId) {
+                    playerAdminId = staticPlayerList.find(player => player.type === 'player')?.playerId ?? '';
+                }
 
-            battlePromiseCancel();
+                battlePromiseCancel();
+            }
         },
         teamJoin: (playerId, teamColor) => {
-            const player = staticPlayerList.find(p => p.playerId === playerId);
-            player!.teamColor = teamColor;
+            const player = staticPlayerList.find(p => p.playerId === playerId)!;
+            player.teamColor = teamColor;
+
+            if (teamColor) {
+                player.type = 'player';
+            } else {
+                player.type = 'spectator';
+                staticCharacterList = staticCharacterList.filter(character => character.playerId !== playerId);
+            }
         },
         characterSelect: staticCharacter => {
             staticCharacterList.push(staticCharacter);
@@ -198,6 +207,6 @@ export const createRoom = (globalEntities: GlobalEntities): Room => {
                 player.ready = false;
             });
         },
-        isInBattle: () => battle !== null
+        getCurrentBattleId: () => battle && battle.battleId
     };
 };

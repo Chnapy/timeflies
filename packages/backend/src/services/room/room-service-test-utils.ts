@@ -24,19 +24,22 @@ export const createFakeRoom = (): Room => ({
                 playerId: 'p1',
                 playerName: 'p1',
                 teamColor: null,
-                ready: false
+                ready: false,
+                type: 'player'
             },
             {
                 playerId: 'p2',
                 playerName: 'p2',
                 teamColor: null,
-                ready: false
+                ready: false,
+                type: 'player'
             },
             {
                 playerId: 'p3',
                 playerName: 'p3',
                 teamColor: null,
-                ready: false
+                ready: false,
+                type: 'player'
             }
         ],
         staticCharacterList: []
@@ -52,7 +55,7 @@ export const createFakeRoom = (): Room => ({
     waitForBattle: jest.fn(async () => 'completed'),
     createBattle: jest.fn(async () => createFakeBattle()),
     removeBattle: jest.fn(),
-    isInBattle: jest.fn(() => false)
+    getCurrentBattleId: jest.fn(() => null)
 });
 
 export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(serviceCreator: S) => {

@@ -49,12 +49,14 @@ export const Default: React.FC = () => {
                 p1: {
                     playerId: 'p1',
                     playerName: 'chnapy',
-                    teamColor: '#FFD74A'
+                    teamColor: '#FFD74A',
+                    type: 'player'
                 },
                 p2: {
                     playerId: 'p2',
                     playerName: 'yoshi2oeuf',
-                    teamColor: '#FFD74A'
+                    teamColor: '#FFD74A',
+                    type: 'player'
                 }
             },
             playerList: [ 'p1', 'p2', 'p3' ],

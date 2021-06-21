@@ -45,7 +45,7 @@ describe('end battle service', () => {
                 return { socketCell, playerId };
             });
 
-            service.onBattleEnd('#00FF00', 12, playerList.map(p => p.playerId));
+            service.onBattleEnd('#00FF00', 12, new Set(playerList.map(p => p.playerId)));
 
             for (const { socketCell } of playerList) {
                 expect(socketCell.send).toHaveBeenCalledWith(BattleEndMessage({
@@ -67,7 +67,7 @@ describe('end battle service', () => {
                 return { socketCell, playerId };
             });
 
-            service.onBattleEnd('#00FF00', 12, playerList.map(p => p.playerId));
+            service.onBattleEnd('#00FF00', 12, new Set(playerList.map(p => p.playerId)));
 
             for (const { playerId } of playerList) {
                 expect(globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ playerId ]).toBeUndefined();

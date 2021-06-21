@@ -11,7 +11,7 @@ export class EndBattleService extends Service {
         const teamHealthMap = ObjectTyped.entries(characters.health)
             .reduce<Record<string, number>>((acc, [ characterId, health ]) => {
                 const { playerId } = staticCharacters[ characterId ];
-                const { teamColor } = players[ playerId ];
+                const teamColor = players[ playerId ].teamColor!;
 
                 acc[ teamColor ] = (acc[ teamColor ] ?? 0) + health;
 
@@ -29,7 +29,7 @@ export class EndBattleService extends Service {
         return teamColorAliveList[ 0 ];
     };
 
-    onBattleEnd = (winnerTeamColor: string, endTime: number, playerIdList: PlayerId[]) => {
+    onBattleEnd = (winnerTeamColor: string, endTime: number, playerIdList: Set<PlayerId>) => {
         playerIdList.forEach(playerId => {
             const socketCell = this.playerSocketMap[ playerId ];
 

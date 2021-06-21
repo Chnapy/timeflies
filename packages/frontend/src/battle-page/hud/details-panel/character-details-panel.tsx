@@ -75,7 +75,7 @@ const InnerCharacterDetailsPanel: React.FC<InnerCharacterDetailsPanelProps> = Re
 
     const playerRelation = usePlayerRelationFrom()(playerId);
 
-    const classes = useStyles({ teamColor, playerRelation });
+    const classes = useStyles({ teamColor: teamColor!, playerRelation });
 
     const characterCategory = getCharacterCategory(characterRole);
 

@@ -37,7 +37,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     teamColor: '#000',
-                    ready: true
+                    ready: true,
+                    type: 'player'
                 } ]
             }));
 
@@ -61,7 +62,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     teamColor: null,
-                    ready: false
+                    ready: false,
+                    type: 'player'
                 } ]
             }));
 
@@ -93,7 +95,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     teamColor: '#000',
-                    ready: false
+                    ready: false,
+                    type: 'player'
                 } ],
                 staticCharacterList: [ {
                     characterId: 'c1',
@@ -124,13 +127,15 @@ describe('character room service', () => {
                         playerId: 'p1',
                         playerName: '',
                         teamColor: '#000',
-                        ready: false
+                        ready: false,
+                        type: 'player'
                     },
                     {
                         playerId: 'p2',
                         playerName: '',
                         teamColor: '#000',
-                        ready: false
+                        ready: false,
+                        type: 'player'
                     }
                 ]
             }));
@@ -160,7 +165,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     teamColor: '#000',
-                    ready: false
+                    ready: false,
+                    type: 'player'
                 } ]
             }));
 
@@ -221,7 +227,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     ready: true,
-                    teamColor: '#000'
+                    teamColor: '#000',
+                    type: 'player'
                 } ],
                 staticCharacterList: [ {
                     characterId: 'c1',
@@ -318,7 +325,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     ready: true,
-                    teamColor: '#000'
+                    teamColor: '#000',
+                    type: 'player'
                 } ],
                 staticCharacterList: [ {
                     characterId: 'c1',
@@ -349,7 +357,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     ready: false,
-                    teamColor: '#000'
+                    teamColor: '#000',
+                    type: 'player'
                 } ],
                 staticCharacterList: [ {
                     characterId: 'c1',
@@ -383,7 +392,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     ready: false,
-                    teamColor: '#000'
+                    teamColor: '#000',
+                    type: 'player'
                 } ],
                 staticCharacterList: [
                     {
@@ -426,13 +436,15 @@ describe('character room service', () => {
                         playerId: 'p1',
                         playerName: '',
                         ready: false,
-                        teamColor: '#000'
+                        teamColor: '#000',
+                        type: 'player'
                     },
                     {
                         playerId: 'p2',
                         playerName: '',
                         teamColor: '#000',
-                        ready: false
+                        ready: false,
+                        type: 'player'
                     }
                 ],
                 staticCharacterList: [
@@ -474,7 +486,8 @@ describe('character room service', () => {
                     playerId: 'p1',
                     playerName: '',
                     ready: false,
-                    teamColor: '#000'
+                    teamColor: '#000',
+                    type: 'player'
                 } ],
                 staticCharacterList: [
                     {
