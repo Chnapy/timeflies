@@ -1,6 +1,6 @@
 import { Container, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { AppHeader } from '../../components/app-header';
+import { AppHeader } from '../../components/app-header/app-header';
 import { RoomContent } from './room-content';
 
 const useStyles = makeStyles(({ spacing }) => ({
