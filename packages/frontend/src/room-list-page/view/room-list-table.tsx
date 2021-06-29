@@ -108,12 +108,8 @@ export const RoomListTable: React.FC = () => {
                         {roomList.map(({ roomId, playerAdmin, map, nbrPlayers, state }) => (
                             <TableRow
                                 key={roomId}
-                                className={state === 'open'
-                                    ? classes.rowClickable
-                                    : undefined}
-                                onClick={state === 'open'
-                                    ? getOnRoomSelect(roomId)
-                                    : undefined}
+                                className={classes.rowClickable}
+                                onClick={getOnRoomSelect(roomId)}
                             >
                                 <StyledTableBodyCell>{playerAdmin.playerName}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{map ? map.name : '-'}</StyledTableBodyCell>

@@ -1,6 +1,7 @@
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import { ChatPanel } from '../../../components/chat-panel/chat-panel';
+import { BattleHeader } from '../../battle-header/battle-header';
 import { useIsSpectator } from '../../hooks/use-is-spectator';
 import { BattleEndContextProvider } from '../battle-end-panel/battle-end-context';
 import { BattleEndPanel } from '../battle-end-panel/battle-end-panel';
@@ -33,7 +34,7 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
     },
     timeGauge: ({ isSpectator }: StyleProps) => ({
         position: 'absolute',
-        top: 0,
+        top: 28,
         left: '50%',
         transform: 'translateX(-50%)',
         margin: spacing(1),
@@ -42,7 +43,7 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
     }),
     chatPanel: ({ isSpectator }: StyleProps) => ({
         position: 'absolute',
-        top: 0,
+        top: 28,
         right: 0,
         bottom: isSpectator ? 0 : 168 + spacing(1),
         margin: spacing(1),
@@ -89,6 +90,8 @@ export const BattleHud: React.FC = () => {
         <div className={classes.turnAnnoucement}>
             <BattleTurnAnnoucement />
         </div>
+
+        <BattleHeader />
 
         <BattleEndContextProvider>
             <BattleEndPanel />
