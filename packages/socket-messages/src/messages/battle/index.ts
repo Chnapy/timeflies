@@ -1,4 +1,5 @@
 export * from './battle-end-message';
+export * from './battle-leave-message';
 export * from './battle-load-message';
 export * from './battle-notify-message';
 export * from './battle-player-disconnect-message';

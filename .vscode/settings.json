@@ -2,7 +2,8 @@
   "eslint.packageManager": "yarn",
   "eslint.workingDirectories": [
     {
-      "pattern": "./packages/*/"
+      "pattern": "./packages/*/",
+      "changeProcessCWD": true
     }
   ],
   "search.exclude": {

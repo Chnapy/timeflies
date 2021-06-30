@@ -159,7 +159,7 @@ describe('player battle service', () => {
                 'p3': timerTester.now() - 29_000
             };
 
-            await service.checkDisconnectedPlayers(battle.battleId);
+            await service.checkLeavedAndDisconnectedPlayers(battle.battleId);
 
             expect(battle.disconnectedPlayers).toEqual({
                 'p3': timerTester.now() - 29_000
@@ -188,7 +188,7 @@ describe('player battle service', () => {
                 }, {})
             );
 
-            await service.checkDisconnectedPlayers(battle.battleId);
+            await service.checkLeavedAndDisconnectedPlayers(battle.battleId);
 
             expect(battle.addNewState).toHaveBeenCalledWith(expectedState, timerTester.now());
         });
@@ -207,7 +207,7 @@ describe('player battle service', () => {
                 'p2': timerTester.now() - 31_000
             };
 
-            await service.checkDisconnectedPlayers(battle.battleId);
+            await service.checkLeavedAndDisconnectedPlayers(battle.battleId);
 
             expect(socketCellP1.send).toHaveBeenCalledWith(BattlePlayerDisconnectRemoveMessage({
                 playersToRemove: [ 'p2' ],

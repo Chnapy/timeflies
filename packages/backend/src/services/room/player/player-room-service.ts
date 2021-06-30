@@ -1,5 +1,5 @@
 import { PlayerId } from '@timeflies/common';
-import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage } from '@timeflies/socket-messages';
+import { BattleLeaveMessage, RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { Service } from '../../service';
 import { Room } from '../room';
@@ -9,6 +9,7 @@ export class PlayerRoomService extends Service {
         this.addRoomPlayerJoinMessageListener(socketCell, currentPlayerId);
         this.addRoomPlayerReadyMessageListener(socketCell, currentPlayerId);
         this.addRoomPlayerLeaveMessageListener(socketCell, currentPlayerId);
+        this.addBattleLeaveMessageListener(socketCell, currentPlayerId);
 
         socketCell.addDisconnectListener(this.getPlayerLeaveFn(currentPlayerId, false));
     };
@@ -114,8 +115,11 @@ export class PlayerRoomService extends Service {
         delete this.globalEntitiesNoServices.currentBattleMap.mapById[ battleId ];
     };
 
-    private addRoomPlayerLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomPlayerLeaveMessage>(
+    private addRoomPlayerLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener(
         RoomPlayerLeaveMessage, this.getPlayerLeaveFn(currentPlayerId, true));
+
+    private addBattleLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener(
+        BattleLeaveMessage, this.getPlayerLeaveFn(currentPlayerId, false));
 
     private getPlayerLeaveFn = (currentPlayerId: string, ignoreIfBattle: boolean) => () => {
 
@@ -124,7 +128,7 @@ export class PlayerRoomService extends Service {
             return;
         }
 
-        if(ignoreIfBattle && room.getCurrentBattleId()) {
+        if (ignoreIfBattle && room.getCurrentBattleId()) {
             return;
         }
 

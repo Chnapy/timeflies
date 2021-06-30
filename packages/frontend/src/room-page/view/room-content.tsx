@@ -11,7 +11,6 @@ import { NotFoundPanel } from '../../components/not-found-panel';
 import { useSocketSendWithResponseError } from '../../connected-socket/hooks/use-socket-send-with-response-error';
 import { routes } from '../../routes';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
-import { useSendRoomUpdate } from '../hooks/use-send-room-update';
 import { RoomButtonsPanel } from '../room-buttons/room-buttons-panel';
 import { RoomMapPanel } from '../room-map-button/room-map-panel';
 import { RoomSpectatorPlayerList } from '../room-spectator-player-list/room-spectator-player-list';

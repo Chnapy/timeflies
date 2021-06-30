@@ -14,7 +14,7 @@ describe('cycle battle service', () => {
 
             const service = new CycleBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
             service.services = {
-                playerBattleService: { checkDisconnectedPlayers: jest.fn() }
+                playerBattleService: { checkLeavedAndDisconnectedPlayers: jest.fn() }
             } as any;
 
             const playerList = ArrayUtils.range(3).map(i => {
