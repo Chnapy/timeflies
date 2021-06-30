@@ -3,10 +3,10 @@ import React from 'react';
 import { ChatPanel } from '../../../components/chat-panel/chat-panel';
 import { BattleHeader } from '../../battle-header/battle-header';
 import { useIsSpectator } from '../../hooks/use-is-spectator';
+import { BattleAnnouncementList } from '../battle-announcement-list/battle-announcement-list';
 import { BattleEndContextProvider } from '../battle-end-panel/battle-end-context';
 import { BattleEndPanel } from '../battle-end-panel/battle-end-panel';
 import { BattleFeedbackPool } from '../battle-feedbacks/view/battle-feedback-pool';
-import { BattleTurnAnnoucement } from '../battle-turn-annoucement/battle-turn-annoucement';
 import { CharacterHudPool } from '../character-hud/view/character-hud-pool';
 import { SpectatorPanel } from '../spectator-panel/spectator-panel';
 import { CharacterListPanelConnected } from './character-list-panel-connected';
@@ -37,7 +37,7 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
         top: 28,
         left: '50%',
         transform: 'translateX(-50%)',
-        margin: spacing(1),
+        margin: spacing(1, 0),
         width: isSpectator ? undefined : '30%',
         pointerEvents: 'none'
     }),
@@ -53,11 +53,12 @@ const useStyles = makeStyles(({ breakpoints, spacing }) => ({
             bottom: 0
         }
     }),
-    turnAnnoucement: {
+    announcementList: {
         position: 'absolute',
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none'
     }
 }));
 
@@ -87,8 +88,8 @@ export const BattleHud: React.FC = () => {
             <ChatPanel onlyInputTouchable />
         </div>
 
-        <div className={classes.turnAnnoucement}>
-            <BattleTurnAnnoucement />
+        <div className={classes.announcementList}>
+            <BattleAnnouncementList />
         </div>
 
         <BattleHeader />

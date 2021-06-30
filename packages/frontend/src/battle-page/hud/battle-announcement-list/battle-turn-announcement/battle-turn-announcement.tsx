@@ -2,10 +2,11 @@ import { makeStyles } from '@material-ui/core';
 import { UIText, useCadencedTime } from '@timeflies/app-ui';
 import clsx from 'clsx';
 import React from 'react';
-import { useIsMyCharacterPlaying } from '../../hooks/use-is-my-character-playing';
-import { useBattleSelector } from '../../store/hooks/use-battle-selector';
+import { useIsMyCharacterPlaying } from '../../../hooks/use-is-my-character-playing';
+import { useBattleSelector } from '../../../store/hooks/use-battle-selector';
+import { BattleAnnouncement } from '../battle-announcement';
 
-const useStyles = makeStyles(({ palette, spacing }) => ({
+const useStyles = makeStyles(() => ({
     "@keyframes fadeLow": {
         from: {
             opacity: 0.75
@@ -22,24 +23,7 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
             opacity: 1
         }
     },
-    root: {
-        position: 'relative',
-        display: 'inline-block',
-        pointerEvents: 'none',
-        backdropFilter: 'blur(2px)'
-    },
-    background: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        backgroundColor: palette.background.paper,
-        opacity: 0.5,
-        zIndex: -1
-    },
     content: {
-        padding: spacing(1, 2),
         animationDuration: '250ms',
         animationIterationCount: 'infinite',
         animationDirection: 'alternate',
@@ -57,7 +41,7 @@ const nbrRoundZeros = 3;
 const roundNbr = 10 ** nbrRoundZeros;
 const round = (value: number) => Math.ceil(value / roundNbr) * roundNbr;
 
-export const BattleTurnAnnoucement: React.FC = () => {
+export const BattleTurnAnnouncement: React.FC = () => {
     const classes = useStyles();
     const turnStartTime = useBattleSelector(battle => battle.turnStartTime);
     const isMyCharacterPlaying = useIsMyCharacterPlaying();
@@ -105,8 +89,7 @@ export const BattleTurnAnnoucement: React.FC = () => {
         return null;
     }
 
-    return <div className={classes.root}>
-        <div className={classes.background} />
+    return <BattleAnnouncement>
         {getContent()}
-    </div>;
+    </BattleAnnouncement>;
 };

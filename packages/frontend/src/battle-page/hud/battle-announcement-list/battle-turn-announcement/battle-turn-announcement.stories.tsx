@@ -4,11 +4,11 @@ import { Meta } from '@storybook/react/types-6-0';
 import { createPosition, SerializableState } from '@timeflies/common';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { rootReducer } from '../../../store/root-reducer';
-import { BattleTurnAnnoucement } from './battle-turn-annoucement';
+import { rootReducer } from '../../../../store/root-reducer';
+import { BattleTurnAnnouncement } from './battle-turn-announcement';
 
 export default {
-    title: 'UI/Turn annoucement',
+    title: 'UI/Turn announcement',
 } as Meta;
 
 export const Default: React.FC = () => {
@@ -122,7 +122,7 @@ export const Default: React.FC = () => {
             <Provider store={store1}>
                 <Box p={2}>
 
-                    <BattleTurnAnnoucement />
+                    <BattleTurnAnnouncement />
 
                 </Box>
             </Provider>
@@ -130,7 +130,7 @@ export const Default: React.FC = () => {
             <Provider store={store2}>
                 <Box p={2}>
 
-                    <BattleTurnAnnoucement />
+                    <BattleTurnAnnouncement />
 
                 </Box>
             </Provider>
