@@ -82,6 +82,7 @@ export const createFakeBattle = (): Battle => ({
         }
     },
     disconnectedPlayers: {},
+    leavedPlayers: new Set(),
     tiledMap: {
         layers: [ {
             name: 'obstacles',
@@ -89,6 +90,7 @@ export const createFakeBattle = (): Battle => ({
         } as TiledLayer ]
     } as any,
     playerJoin: jest.fn(),
+    playerLeave: jest.fn(),
     playerDisconnect: jest.fn(),
     getMapInfos: jest.fn(),
     getCycleInfos: jest.fn(),
@@ -120,5 +122,6 @@ export const createFakeBattle = (): Battle => ({
     })),
     addNewState: jest.fn(),
     canStartBattle: jest.fn(() => false),
-    startBattle: jest.fn(async () => { })
+    startBattle: jest.fn(async () => { }),
+    
 });

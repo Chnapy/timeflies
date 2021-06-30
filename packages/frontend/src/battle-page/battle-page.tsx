@@ -1,5 +1,6 @@
 import { Container, makeStyles } from '@material-ui/core';
-import { BattleLoadMessage } from '@timeflies/socket-messages';
+import { useSocketSend } from '@timeflies/socket-client';
+import { BattleLeaveMessage, BattleLoadMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -26,6 +27,7 @@ export const BattlePage: React.FC = () => {
     const classes = useStyles();
     const { battleId } = useParams<BattlePageParams>();
     const hasBattleData = useGameSelector(state => state.battle !== null);
+    const send = useSocketSend();
     const sendWithResponse = useSocketSendWithResponseError();
     const dispatch = useDispatch();
     const [ hasWrongId, setHasWrongId ] = React.useState(false);
@@ -45,7 +47,11 @@ export const BattlePage: React.FC = () => {
 
         dispatch(BattleLoadAction(response.payload));
     },
-        () => dispatch(BattleResetAction()),
+        () => {
+            dispatch(BattleResetAction());
+
+            return send(BattleLeaveMessage({}));
+        },
         []);
 
     if (hasWrongId) {

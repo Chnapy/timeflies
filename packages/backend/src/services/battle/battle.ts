@@ -42,8 +42,10 @@ export type Battle = {
     staticState: StaticState;
 
     disconnectedPlayers: DisconnectedPlayers;
+    leavedPlayers: Set<PlayerId>;
 
     playerJoin: (playerId: PlayerId) => void;
+    playerLeave: (playerId: PlayerId) => void;
     playerDisconnect: (playerId: PlayerId) => void;
     getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
     getCycleInfos: () => CycleInfos;
@@ -75,6 +77,7 @@ export const createBattle = (
     const stateStack: SerializableState[] = [ initialSerializableState ];
 
     const disconnectedPlayers: DisconnectedPlayers = {};
+    const leavedPlayers = new Set<PlayerId>();
 
     const cycleEngine = services.cycleBattleService.createCycleEngineOverlay({
         battleId,
@@ -140,6 +143,7 @@ export const createBattle = (
         staticState,
 
         disconnectedPlayers,
+        leavedPlayers,
 
         getMapInfos: parseUrlMode => {
             const parseUrl = assetUrl[ parseUrlMode ];
@@ -181,10 +185,23 @@ export const createBattle = (
             if (staticState.players[ playerId ]) {
 
                 waitingPlayerList.delete(playerId);
+
+                leavedPlayers.delete(playerId);
                 delete disconnectedPlayers[ playerId ];
             } else {
 
                 addSpectator(playerId);
+            }
+        },
+
+        playerLeave: playerId => {
+
+            if (staticState.players[ playerId ].type === 'player') {
+                leavedPlayers.add(playerId);
+
+            } else {
+
+                removeSpectator(playerId);
             }
         },
 

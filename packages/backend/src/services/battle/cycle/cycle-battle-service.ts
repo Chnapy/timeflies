@@ -52,7 +52,7 @@ export class CycleBattleService extends Service {
                 turnEnd: async ({ currentTurn }) => {
                     logger.info('Battle [' + battleId + '] -', 'Cycle turn end', currentTurn);
 
-                    await this.services.playerBattleService.checkDisconnectedPlayers(battleId);
+                    await this.services.playerBattleService.checkLeavedAndDisconnectedPlayers(battleId);
 
                     if (cycleRunning) {
                         beforeTurnStart();
