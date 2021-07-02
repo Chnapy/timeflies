@@ -12,16 +12,16 @@ export const textureFromIdGetter = ({ mapSheet, mapTexture }: {
 
         const tilesetTexture = mapTexture[ tileset.name ];
 
-        const texture = tilesetTexture.clone();
-
         const idIndex = id - tileset.firstgid;
         const { x, y } = Tile.getWorldPositionFromTilePosition(
-            Tile.getTilePositionFromIndex(idIndex, mapSheet),
+            Tile.getTilePositionFromTileset(idIndex, tileset),
             tileset
         );
 
-        texture.frame = new PIXI.Rectangle(x, y, tileset.tilewidth, tileset.tileheight);
-        texture.updateUvs();
+        const texture = new PIXI.Texture(
+            tilesetTexture.baseTexture,
+            new PIXI.Rectangle(x, y, tileset.tilewidth, tileset.tileheight)
+        );
         texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
         return texture;

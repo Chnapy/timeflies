@@ -7,8 +7,14 @@ export module Tile {
     export type TileType = 'default' | 'obstacle';
 
     export const getTilePositionFromIndex = (index: number, { width }: Pick<TiledMap, 'width'>): Position => {
-        var y = Number.parseInt(index / width + '');
+        var y = Math.floor(index / width);
         var x = (index % width);
+        return createPosition(x, y);
+    };
+
+    export const getTilePositionFromTileset = (tileId: number, { columns }: Pick<TiledTileset, 'columns'>): Position => {
+        var y = Math.floor(tileId / columns);
+        var x = (tileId % columns);
         return createPosition(x, y);
     };
 
@@ -31,7 +37,7 @@ export module Tile {
     };
 
     export const getTileAnimation = (tileId: number, { tiles = [] }: Pick<TiledTileset, 'tiles'>): TiledFrame[] | null => {
-        const tileAnimation = tiles[ tileId - 1 ]?.animation;
+        const tileAnimation = tiles.find(tile => tile.id === tileId - 1)?.animation;
 
         if (!tileAnimation?.length) {
             return null;
