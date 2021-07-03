@@ -51,7 +51,7 @@ const InnerDemo: React.FC = () => {
       loader.add([
         {
           name: 'map_json',
-          url: 'fake/maps/map_dungeon.json'
+          url: 'fake/maps/1-map_dungeon.json'
         },
         {
           name: 'map_img',
@@ -85,10 +85,12 @@ const InnerDemo: React.FC = () => {
             tilesCurrentAction={{ '11:9': true, '10:9': true, '12:9': true }}
           >
             {{
-              [ pos.id ]: <Sprite
-                texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
-                x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
-              />
+              [ pos.id ]: [
+                <Sprite
+                  texture={PIXI.Texture.from('https://i.imgur.com/IaUrttj.png')}
+                  x={pos.x * tilesize} y={pos.y * tilesize} width={tilesize} height={tilesize}
+                />
+              ]
             }}
           </TilemapComponent>
           <Sprite

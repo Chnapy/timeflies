@@ -90,7 +90,7 @@ export class EntityListGetRoomService extends Service {
                 characterRole: 'vemo',
                 variables: {
                     duration: 1000,
-                    rangeArea: 1,
+                    rangeArea: 2,
                     actionArea: 0,
                     lineOfSight: false
                 }

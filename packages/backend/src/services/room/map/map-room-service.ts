@@ -68,7 +68,7 @@ const getMapList = (): MapInfos[] => [
         name: 'Dungeon',
         nbrTeams: 3,
         nbrTeamCharacters: 4,
-        schemaLink: '/maps/map_dungeon.json',
+        schemaLink: '/maps/1-map_dungeon.json',
         imagesLinks: {
             "tiles_dungeon_v1.1": '/maps/map_dungeon.png'
         }

@@ -1,4 +1,4 @@
-import { Grid } from '@material-ui/core';
+import { Grid, makeStyles } from '@material-ui/core';
 import { CharacterListPanel } from '@timeflies/character-list-panel';
 import React from 'react';
 import { CharacterDetailsPanel } from '../details-panel/character-details-panel';
@@ -15,20 +15,38 @@ export const InnerCharacterListPanel: React.FC = () => {
     );
 };
 
-export const CharacterListPanelConnected: React.FC = () => (
-    <DetailsContextProvider>
-        <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item>
-                <InnerCharacterListPanel />
-            </Grid>
+const useStyles = makeStyles(() => ({
+    gridContainer: {
+        height: '100%'
+    },
+    gridItemCharacterList: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        height: '100%'
+    },
+    gridItemClickable: {
+        pointerEvents: 'all'
+    }
+}));
 
-            <Grid item>
-                <CharacterDetailsPanel />
-            </Grid>
+export const CharacterListPanelConnected: React.FC = () => {
+    const classes = useStyles();
 
-            <Grid item>
-                <SpellDetailsPanel />
+    return (
+        <DetailsContextProvider>
+            <Grid className={classes.gridContainer} container alignItems='flex-end' spacing={1}>
+                <Grid className={classes.gridItemCharacterList} item>
+                    <InnerCharacterListPanel />
+                </Grid>
+
+                <Grid className={classes.gridItemClickable} item>
+                    <CharacterDetailsPanel />
+                </Grid>
+
+                <Grid className={classes.gridItemClickable} item>
+                    <SpellDetailsPanel />
+                </Grid>
             </Grid>
-        </Grid>
-    </DetailsContextProvider>
-);
+        </DetailsContextProvider>
+    );
+};

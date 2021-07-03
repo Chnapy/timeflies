@@ -13,9 +13,11 @@ export type CharacterListPanelProps = {
     onClick: (characterId: CharacterId) => void;
 };
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ spacing }) => ({
     root: {
-        backdropFilter: 'blur(2px)'
+        maxHeight: '100%',
+        backdropFilter: 'blur(2px)',
+        pointerEvents: 'all'
     },
     background: {
         position: 'absolute',
@@ -25,6 +27,11 @@ const useStyles = makeStyles(() => ({
         top: 0,
         opacity: 0.5,
         zIndex: -1
+    },
+    content: {
+        padding: spacing(2),
+        overflowY: 'auto',
+        overflowX: 'hidden'
     }
 }));
 
@@ -34,21 +41,23 @@ export const CharacterListPanel: React.FC<CharacterListPanelProps> = ({
     const classes = useStyles();
 
     return (
-        <Box className={classes.root} position='relative' display='inline-flex' p={2} zIndex={0}>
+        <Box className={classes.root} position='relative' display='inline-flex' zIndex={0}>
             <Paper className={classes.background} />
 
-            <Grid container direction='column' spacing={1}>
-                {characterList.map(characterId => (
-                    <Grid key={characterId} item>
-                        <CharacterItem
-                            {...characterMap[ characterId ]}
-                            onMouseEnter={() => onMouseEnter(characterId)}
-                            onMouseLeave={onMouseLeave}
-                            onClick={() => onClick(characterId)}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
+            <div className={classes.content}>
+                <Grid container direction='column' wrap='nowrap' spacing={1}>
+                    {characterList.map(characterId => (
+                        <Grid key={characterId} item>
+                            <CharacterItem
+                                {...characterMap[ characterId ]}
+                                onMouseEnter={() => onMouseEnter(characterId)}
+                                onMouseLeave={onMouseLeave}
+                                onClick={() => onClick(characterId)}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            </div>
         </Box>
     );
 };
