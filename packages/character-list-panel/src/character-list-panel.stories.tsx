@@ -62,9 +62,17 @@ export const Default: React.FC = () => {
                         teamColor: '#44FF44',
                         health: 85,
                         isDisconnected: true
+                    },
+                    tyty: {
+                        characterRole: 'tacka',
+                        playerName: 'chnapo',
+                        playerRelation: 'ally',
+                        teamColor: '#44FF44',
+                        health: 85,
+                        isDisconnected: true
                     }
                 }}
-                characterList={[ 'toto', 'tata', 'tutu', 'titi' ]}
+                characterList={[ 'toto', 'tata', 'tutu', 'titi', 'tyty' ]}
                 {...extraProps}
             />
         </AssetsWrapper>

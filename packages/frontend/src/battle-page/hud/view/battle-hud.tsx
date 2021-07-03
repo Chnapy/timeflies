@@ -18,9 +18,13 @@ type StyleProps = { isSpectator: boolean };
 const useStyles = makeStyles(({ breakpoints, spacing }) => ({
     characterList: {
         position: 'absolute',
+        top: 20,
         left: 0,
         bottom: 0,
-        margin: spacing(1)
+        display: 'flex',
+        alignItems: 'flex-end',
+        padding: spacing(1),
+        pointerEvents: 'none'
     },
     spellButton: {
         position: 'absolute',

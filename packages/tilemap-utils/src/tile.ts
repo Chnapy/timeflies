@@ -7,14 +7,14 @@ export module Tile {
     export type TileType = 'default' | 'obstacle';
 
     export const getTilePositionFromIndex = (index: number, { width }: Pick<TiledMap, 'width'>): Position => {
-        var y = Math.floor(index / width);
-        var x = (index % width);
+        const y = Math.floor(index / width);
+        const x = (index % width);
         return createPosition(x, y);
     };
 
     export const getTilePositionFromTileset = (tileId: number, { columns }: Pick<TiledTileset, 'columns'>): Position => {
-        var y = Math.floor(tileId / columns);
-        var x = (tileId % columns);
+        const y = Math.floor(tileId / columns);
+        const x = (tileId % columns);
         return createPosition(x, y);
     };
 
