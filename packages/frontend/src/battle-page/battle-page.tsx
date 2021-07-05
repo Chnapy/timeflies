@@ -5,6 +5,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import useAsyncEffect from 'use-async-effect';
+import { usePlayMusic } from '../audio-engine/hooks/use-music';
 import { LoadingBackdrop } from '../components/loading-backdrop';
 import { NotFoundPanel } from '../components/not-found-panel';
 import { useSocketSendWithResponseError } from '../connected-socket/hooks/use-socket-send-with-response-error';
@@ -25,6 +26,7 @@ const useStyles = makeStyles(() => ({
 
 export const BattlePage: React.FC = () => {
     const classes = useStyles();
+    usePlayMusic('battle');
     const { battleId } = useParams<BattlePageParams>();
     const hasBattleData = useGameSelector(state => state.battle !== null);
     const send = useSocketSend();

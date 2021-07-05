@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { BattleAssetsLoader } from './battle-page/assets-loader/view/battle-assets-loader';
 import { BattlePage } from './battle-page/battle-page';
+import { OptionsContextProvider } from './components/options/options-context';
 import { ConnectedSocketContextProvider } from './connected-socket/view/connected-socket-context-provider';
 import { NeedAuth } from './connected-socket/view/need-auth';
 import { ErrorList } from './error-list/view/error-list';
@@ -26,29 +27,31 @@ export const App: React.FC = () => {
                 <ConnectedSocketContextProvider>
                     <BrowserRouter>
                         <BattleAssetsLoader>
-                            <Switch>
-                                <Route {...routes.roomListPage()}>
-                                    <NeedAuth>
-                                        <RoomListPage />
-                                    </NeedAuth>
-                                </Route>
-                                <Route {...routes.roomPage({})}>
-                                    <NeedAuth>
-                                        <RoomPage />
-                                    </NeedAuth>
-                                </Route>
-                                <Route {...routes.battlePage({})}>
-                                    <NeedAuth>
-                                        <BattlePage />
-                                    </NeedAuth>
-                                </Route>
+                            <OptionsContextProvider>
+                                <Switch>
+                                    <Route {...routes.roomListPage()}>
+                                        <NeedAuth>
+                                            <RoomListPage />
+                                        </NeedAuth>
+                                    </Route>
+                                    <Route {...routes.roomPage({})}>
+                                        <NeedAuth>
+                                            <RoomPage />
+                                        </NeedAuth>
+                                    </Route>
+                                    <Route {...routes.battlePage({})}>
+                                        <NeedAuth>
+                                            <BattlePage />
+                                        </NeedAuth>
+                                    </Route>
 
-                                <Route>
-                                    <Redirect to={routes.roomListPage().path}/>
-                                </Route>
-                            </Switch>
+                                    <Route>
+                                        <Redirect to={routes.roomListPage().path} />
+                                    </Route>
+                                </Switch>
 
-                            <ErrorList />
+                                <ErrorList />
+                            </OptionsContextProvider>
                         </BattleAssetsLoader>
                     </BrowserRouter>
                 </ConnectedSocketContextProvider>

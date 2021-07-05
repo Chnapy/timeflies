@@ -5,9 +5,10 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import { UIButton, UIText, useIsMobile } from '@timeflies/app-ui';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { UserButton } from '../../components/app-header/user-button';
+import { OptionsButton } from '../../components/options/options-button';
 import { routes } from '../../routes';
 import { useIsSpectator } from '../hooks/use-is-spectator';
-import { UserButton } from '../../components/app-header/user-button';
 
 type StyleProps = { minified: boolean };
 
@@ -71,10 +72,14 @@ export const BattleHeader: React.FC = () => {
                         </Grid>
 
                         <Grid item xs>
-                            <Grid container justify='flex-end'>
+                            <Grid container justify='flex-end' spacing={1}>
 
                                 <Grid className={classes.ifExpanded} item>
                                     <UserButton />
+                                </Grid>
+
+                                <Grid className={classes.ifExpanded} item>
+                                    <OptionsButton />
                                 </Grid>
 
                                 {isMobile && (

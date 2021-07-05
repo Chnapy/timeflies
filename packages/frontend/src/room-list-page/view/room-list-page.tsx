@@ -1,5 +1,6 @@
 import { Container, makeStyles } from '@material-ui/core';
 import React from 'react';
+import { usePlayMusic } from '../../audio-engine/hooks/use-music';
 import { AppHeader } from '../../components/app-header/app-header';
 import { RoomListTable } from './room-list-table';
 
@@ -20,6 +21,7 @@ const useStyles = makeStyles(() => ({
 
 export const RoomListPage: React.FC = () => {
     const classes = useStyles();
+    usePlayMusic('menu');
 
     return <div className={classes.root}>
         <AppHeader />
