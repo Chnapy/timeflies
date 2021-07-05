@@ -34,8 +34,14 @@ MusicVolumeContext.displayName = 'MusicVolumeContext';
 const MusicVolumeDispatchContext = React.createContext<React.Dispatch<number>>(undefined as any);
 MusicVolumeDispatchContext.displayName = 'MusicVolumeDispatchContext';
 
+const MusicCurrentContext = React.createContext<Assets.MusicKey | null>(null);
+MusicCurrentContext.displayName = 'MusicCurrentContext';
+
+const MusicCurrentDispatchContext = React.createContext<React.Dispatch<Assets.MusicKey>>(undefined as any);
+MusicCurrentDispatchContext.displayName = 'MusicCurrentDispatchContext';
+
 const enableMusicContext = (): MusicContextValue | null => {
-    if (new AudioContext().state !== 'running') {
+    if (![ audioContext.state, new AudioContext().state ].includes('running')) {
         return null;
     }
 
@@ -61,6 +67,7 @@ const enableMusicContext = (): MusicContextValue | null => {
 export const MusicContextProvider: React.FC = ({ children }) => {
     const [ musicValue, musicDispatch ] = React.useState(enableMusicContext);
     const [ musicVolumeValue, musicVolumeDispatch ] = React.useState<number>(initialMusicVolume);
+    const [ musicCurrentValue, musicCurrentDispatch ] = React.useState<Assets.MusicKey | null>(null);
 
     React.useEffect(() => {
         unlockAudioContext();
@@ -72,13 +79,17 @@ export const MusicContextProvider: React.FC = ({ children }) => {
 
     return <MusicContext.Provider value={musicValue}>
 
-            <MusicVolumeContext.Provider value={musicVolumeValue}>
-                <MusicVolumeDispatchContext.Provider value={musicVolumeDispatch}>
+        <MusicVolumeContext.Provider value={musicVolumeValue}>
+            <MusicVolumeDispatchContext.Provider value={musicVolumeDispatch}>
+                <MusicCurrentContext.Provider value={musicCurrentValue}>
+                    <MusicCurrentDispatchContext.Provider value={musicCurrentDispatch}>
 
-                    {children}
+                        {children}
 
-                </MusicVolumeDispatchContext.Provider>
-            </MusicVolumeContext.Provider>
+                    </MusicCurrentDispatchContext.Provider>
+                </MusicCurrentContext.Provider>
+            </MusicVolumeDispatchContext.Provider>
+        </MusicVolumeContext.Provider>
 
     </MusicContext.Provider>;
 };
@@ -97,3 +108,7 @@ export const useMusicVolumeDispatch = () => {
         dispatch(volume);
     };
 };
+
+export const useMusicCurrentContext = () => React.useContext(MusicCurrentContext);
+
+export const useMusicCurrentDispatch = () => React.useContext(MusicCurrentDispatchContext);

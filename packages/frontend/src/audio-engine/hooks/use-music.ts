@@ -1,12 +1,12 @@
 import { Assets } from '@timeflies/static-assets';
-import { Howler } from 'howler';
 import React from 'react';
-import { useMusicContext } from '../view/music-context';
+import { useMusicContext, useMusicCurrentContext, useMusicCurrentDispatch } from '../view/music-context';
 
 
 export const useMusic = () => {
     const musicContext = useMusicContext();
-    const [ currentMusic, setCurrentMusic ] = React.useState<Assets.MusicKey | null>(null);
+    const currentMusic = useMusicCurrentContext();
+    const dispatchCurrentMusic = useMusicCurrentDispatch();
 
     return React.useCallback((musicKey: Assets.MusicKey) => {
 
@@ -14,13 +14,22 @@ export const useMusic = () => {
             return;
         }
 
-        Howler.stop();
+        const prevMusic = currentMusic && musicContext[ currentMusic ];
+        const nextMusic = musicContext[ musicKey ];
 
-        musicContext[ musicKey ].play();
-        musicContext[ musicKey ].fade(0, 1, 500);
+        if (prevMusic) {
+            prevMusic.fade(1, 0, 1000);
+            prevMusic.once('fade', () => {
+                prevMusic.pause();
+            });
+        }
 
-        setCurrentMusic(musicKey);
-    }, [ musicContext, currentMusic ]);
+        nextMusic.volume(1);
+        nextMusic.play();
+        nextMusic.fade(0, 1, 1000);
+
+        dispatchCurrentMusic(musicKey);
+    }, [ musicContext, currentMusic, dispatchCurrentMusic ]);
 };
 
 export const usePlayMusic = (musicKey: Assets.MusicKey) => {
