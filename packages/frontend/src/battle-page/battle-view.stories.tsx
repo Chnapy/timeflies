@@ -6,9 +6,10 @@ import { ChatSendMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
+import { OptionsContextProvider } from '../components/options/options-context';
 import { rootReducer } from '../store/root-reducer';
 import { BattleAssetsLoader } from './assets-loader/view/battle-assets-loader';
-import { BattleView } from './battle-view';
+import { BattlePage } from './battle-page';
 
 export default {
     title: 'Battle page',
@@ -213,7 +214,7 @@ export const Default: React.FC = () => {
             roundIndex: 0,
             selectedSpellId: null,
             spellLists: {
-                c1: [ 's1a', 's1b', 's1c', 's1d' ], c2: [  's2a', 's2b', 's2c', 's2d' ], c3: [ 's3a', 's3b', 's3c', 's3d' ], c4: [ 's4' ], c5: [ 's5' ]
+                c1: [ 's1a', 's1b', 's1c', 's1d' ], c2: [ 's2a', 's2b', 's2c', 's2d' ], c3: [ 's3a', 's3b', 's3c', 's3d' ], c4: [ 's4' ], c5: [ 's5' ]
             },
             turnIndex: 0,
             turnStartTime: Date.now() + 4000,
@@ -230,11 +231,13 @@ export const Default: React.FC = () => {
         <Provider store={store}>
             <SocketContextProvider value={socketHelper}>
                 <MemoryRouter initialEntries={[ '/battle/battleId' ]}>
-                    <BattleAssetsLoader>
+                    <OptionsContextProvider>
+                        <BattleAssetsLoader>
 
-                        <BattleView />
+                            <BattlePage />
 
-                    </BattleAssetsLoader>
+                        </BattleAssetsLoader>
+                    </OptionsContextProvider>
                 </MemoryRouter>
             </SocketContextProvider>
         </Provider>
