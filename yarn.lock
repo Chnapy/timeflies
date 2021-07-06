@@ -4641,6 +4641,7 @@ __metadata:
     "@timeflies/tilemap-component": "workspace:packages/tilemap-component"
     "@timeflies/tilemap-utils": "workspace:packages/tilemap-utils"
     "@timeflies/time-gauge-panel": "workspace:packages/time-gauge-panel"
+    "@types/howler": 2.2.2
     "@types/jest": ^26.0.23
     "@types/node": ^15.0.3
     "@types/react": ^17.0.5
@@ -4652,6 +4653,7 @@ __metadata:
     clsx: ^1.1.1
     cors: ^2.8.5
     express: ^4.17.1
+    howler: 2.2.3
     joi: ^17.4.0
     pixi-viewport: 4.31.0
     pixi.js: ^6.0.4
@@ -5204,6 +5206,13 @@ __metadata:
     "@types/react": "*"
     hoist-non-react-statics: ^3.3.0
   checksum: 16ab4c45d4920fa378c8be76554b10061247fc04d2c8af11bdb7d520b3967e9c06d7ad5efd9b0f1657fbc4d095f62c6e1325f03b9141eb1ef2c8095b96fd42f8
+  languageName: node
+  linkType: hard
+
+"@types/howler@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@types/howler@npm:2.2.2"
+  checksum: 0c0bb18de26f2d5346f731a966cc9a203994cdac26db7e67085dc957a89fbcb35c0ac7ca02fade86af556192c85d1e16d122e41db2a8466118c12eb112215b0a
   languageName: node
   linkType: hard
 
@@ -12379,6 +12388,13 @@ fsevents@^1.2.7:
   version: 3.8.3
   resolution: "hotkeys-js@npm:3.8.3"
   checksum: 82a313b372845358dd45299c5f0873b08fbf05342f91606a58859acf4b95a60860d2a139a2fa589f2d001420e5196c9d00b6db28cce9dbe5b36e3b19c3ec0be0
+  languageName: node
+  linkType: hard
+
+"howler@npm:2.2.3":
+  version: 2.2.3
+  resolution: "howler@npm:2.2.3"
+  checksum: c08460522558c6aa0e7ea9a6d45eb20d147dde1037144db921139aab40d03814dae671c02ab45abb8e115c8798cedaa0208c49b19affa5e3b95f027ac1e71b60
   languageName: node
   linkType: hard
 

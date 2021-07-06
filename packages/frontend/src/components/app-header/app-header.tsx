@@ -2,8 +2,9 @@ import { AppBar, Breadcrumbs, Grid, Link, makeStyles, Toolbar } from '@material-
 import { UIText } from '@timeflies/app-ui';
 import React from 'react';
 import { Link as RouterLink, useHistory, useRouteMatch } from 'react-router-dom';
-import { UserButton } from './user-button';
 import { routes } from '../../routes';
+import { OptionsButton } from '../options/options-button';
+import { UserButton } from './user-button';
 
 const useStyles = makeStyles(({ palette }) => ({
     root: {
@@ -78,7 +79,17 @@ export const AppHeader: React.FC = () => {
                     </Grid>
                 </Grid>
 
-                <UserButton />
+                <div>
+                    <Grid container wrap='nowrap' spacing={1}>
+                        <Grid item>
+                            <UserButton />
+                        </Grid>
+
+                        <Grid item>
+                            <OptionsButton />
+                        </Grid>
+                    </Grid>
+                </div>
             </Toolbar>
         </AppBar>
     );

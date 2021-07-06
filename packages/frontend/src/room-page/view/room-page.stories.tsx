@@ -8,6 +8,7 @@ import { Assets } from '@timeflies/static-assets';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Switch } from 'react-router-dom';
+import { OptionsContextProvider } from '../../components/options/options-context';
 import { ErrorList } from '../../error-list/view/error-list';
 import { routes } from '../../routes';
 import { rootReducer } from '../../store/root-reducer';
@@ -234,20 +235,23 @@ export const Default: React.FC = () => {
             <SocketContextProvider value={socketHelper}>
                 <AssetsLoader spritesheets={Assets.spritesheets} maps={{}}>
                     <MemoryRouter initialEntries={[ '/room/foo' ]}>
+                        <OptionsContextProvider>
 
-                        <Switch>
-                            <Route>
-                                <RoomPage />
-                            </Route>
-                            <Route {...routes.roomListPage()}>
-                                <div>Room-list page</div>
-                            </Route>
-                            <Route {...routes.battlePage({})}>
-                                <div>Battle page</div>
-                            </Route>
-                        </Switch>
+                            <Switch>
+                                <Route>
+                                    <RoomPage />
+                                </Route>
+                                <Route {...routes.roomListPage()}>
+                                    <div>Room-list page</div>
+                                </Route>
+                                <Route {...routes.battlePage({})}>
+                                    <div>Battle page</div>
+                                </Route>
+                            </Switch>
 
-                        <ErrorList />
+                            <ErrorList />
+
+                        </OptionsContextProvider>
                     </MemoryRouter>
                 </AssetsLoader>
             </SocketContextProvider>

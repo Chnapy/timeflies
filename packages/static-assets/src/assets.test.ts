@@ -6,10 +6,13 @@ import { Assets } from './assets';
 import { SpritesheetsUtils } from './spritesheets-utils';
 
 const readFile = util.promisify(fs.readFile);
+const access = util.promisify(fs.access);
 
 describe('# assets', () => {
 
-    const loadAsset = (assetPath: string) => readFile(path.join(__dirname, '..', 'public' + assetPath), 'utf-8');
+    const resolvePath = (assetPath: string) => path.join(__dirname, '..', 'public' + assetPath);
+    const loadAsset = (assetPath: string) => readFile(resolvePath(assetPath), 'utf-8');
+    const checkAssetAccess = (assetPath: string) => access(resolvePath(assetPath));
 
     const loadSpritesheetEntities = async () => JSON.parse(await loadAsset(Assets.spritesheets.entities)) as {
         frames: unknown;
@@ -40,7 +43,7 @@ describe('# assets', () => {
 
         for (const characterRole of characterRoleList) {
             for (const characterSpriteState of SpritesheetsUtils.characterSpriteStateList) {
-                for (const orientation of ['top', 'bottom', 'right'] as Orientation[]) {
+                for (const orientation of [ 'top', 'bottom', 'right' ] as Orientation[]) {
 
                     expect(schema.animations).toHaveProperty(
                         [ SpritesheetsUtils.getCharacterAnimationPath({
@@ -53,5 +56,13 @@ describe('# assets', () => {
                 }
             }
         }
+    });
+
+    it('check if all musics are presents', async () => {
+
+        return Promise.all(Object.values(Assets.musics)
+            .flatMap(musicList => musicList
+                .flatMap(musicPaths => musicPaths.map(checkAssetAccess))
+            ));
     });
 });
