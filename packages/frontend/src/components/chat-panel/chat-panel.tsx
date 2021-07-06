@@ -148,6 +148,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ stayFocused, onlyInputTouc
                 fullWidth
                 disabled={sending}
                 hiddenLabel
+                placeholder='press enter to focus'
                 InputProps={{
                     endAdornment: sending
                         ? (

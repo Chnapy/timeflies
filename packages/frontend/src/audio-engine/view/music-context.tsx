@@ -20,7 +20,13 @@ const unlockAudioContext = () => {
     events.forEach(e => document.body.addEventListener(e, unlock, false));
 };
 
-type MusicContextValue = { [ key in Assets.MusicKey ]: Howl };
+type MusicContextValue = { [ key in Assets.MusicKey ]: Howl[] };
+
+type MusicCurrent = {
+    musicKey: Assets.MusicKey;
+    index: number;
+    history: { [ key in Assets.MusicKey ]: number };
+};
 
 const MusicContext = React.createContext<MusicContextValue | null>(null);
 MusicContext.displayName = 'MusicContext';
@@ -34,10 +40,10 @@ MusicVolumeContext.displayName = 'MusicVolumeContext';
 const MusicVolumeDispatchContext = React.createContext<React.Dispatch<number>>(undefined as any);
 MusicVolumeDispatchContext.displayName = 'MusicVolumeDispatchContext';
 
-const MusicCurrentContext = React.createContext<Assets.MusicKey | null>(null);
+const MusicCurrentContext = React.createContext<MusicCurrent | null>(null);
 MusicCurrentContext.displayName = 'MusicCurrentContext';
 
-const MusicCurrentDispatchContext = React.createContext<React.Dispatch<Assets.MusicKey>>(undefined as any);
+const MusicCurrentDispatchContext = React.createContext<React.Dispatch<Omit<MusicCurrent, 'history'>>>(undefined as any);
 MusicCurrentDispatchContext.displayName = 'MusicCurrentDispatchContext';
 
 const enableMusicContext = (): MusicContextValue | null => {
@@ -46,15 +52,15 @@ const enableMusicContext = (): MusicContextValue | null => {
     }
 
     const musicMap = ObjectTyped.entries(Assets.musics)
-        .reduce((acc, [ key, musicPaths ]) => {
+        .reduce((acc, [ key, musicList ]) => {
 
-            const sound = new Howl({
+            const musics = musicList.map(musicPaths => new Howl({
                 src: musicPaths,
                 html5: true,
                 loop: true
-            });
+            }));
 
-            acc[ key ] = sound;
+            acc[ key ] = musics;
 
             return acc;
         }, {} as MusicContextValue);
@@ -67,7 +73,22 @@ const enableMusicContext = (): MusicContextValue | null => {
 export const MusicContextProvider: React.FC = ({ children }) => {
     const [ musicValue, musicDispatch ] = React.useState(enableMusicContext);
     const [ musicVolumeValue, musicVolumeDispatch ] = React.useState<number>(initialMusicVolume);
-    const [ musicCurrentValue, musicCurrentDispatch ] = React.useState<Assets.MusicKey | null>(null);
+
+    const [ musicCurrentValue, musicCurrentDispatch ] = React.useReducer((prevMusicCurrent: MusicCurrent | null, nextMusicCurrent: Omit<MusicCurrent, 'history'>) => {
+        if (!nextMusicCurrent) {
+            return null;
+        }
+
+        return {
+            ...nextMusicCurrent,
+            history: {
+                menu: -1,
+                battle: -1,
+                ...prevMusicCurrent?.history,
+                [ nextMusicCurrent.musicKey ]: nextMusicCurrent.index
+            }
+        };
+    }, null);
 
     React.useEffect(() => {
         unlockAudioContext();
@@ -81,6 +102,7 @@ export const MusicContextProvider: React.FC = ({ children }) => {
 
         <MusicVolumeContext.Provider value={musicVolumeValue}>
             <MusicVolumeDispatchContext.Provider value={musicVolumeDispatch}>
+
                 <MusicCurrentContext.Provider value={musicCurrentValue}>
                     <MusicCurrentDispatchContext.Provider value={musicCurrentDispatch}>
 
@@ -88,6 +110,7 @@ export const MusicContextProvider: React.FC = ({ children }) => {
 
                     </MusicCurrentDispatchContext.Provider>
                 </MusicCurrentContext.Provider>
+
             </MusicVolumeDispatchContext.Provider>
         </MusicVolumeContext.Provider>
 

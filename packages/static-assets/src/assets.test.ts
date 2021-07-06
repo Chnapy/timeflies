@@ -61,7 +61,8 @@ describe('# assets', () => {
     it('check if all musics are presents', async () => {
 
         return Promise.all(Object.values(Assets.musics)
-            .flatMap(musicPaths => musicPaths.map(checkAssetAccess))
-        );
+            .flatMap(musicList => musicList
+                .flatMap(musicPaths => musicPaths.map(checkAssetAccess))
+            ));
     });
 });

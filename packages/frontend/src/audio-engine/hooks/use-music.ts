@@ -10,12 +10,16 @@ export const useMusic = () => {
 
     return React.useCallback((musicKey: Assets.MusicKey) => {
 
-        if (!musicContext || musicKey === currentMusic) {
+        if (!musicContext || musicKey === currentMusic?.musicKey) {
             return;
         }
 
-        const prevMusic = currentMusic && musicContext[ currentMusic ];
-        const nextMusic = musicContext[ musicKey ];
+        const prevMusic = currentMusic && musicContext[ currentMusic.musicKey ][ currentMusic.index ];
+
+        const prevIndex = currentMusic?.history[ musicKey ] ?? -1;
+        const nextIndex = (prevIndex + 1) % Assets.musics[ musicKey ].length;
+
+        const nextMusic = musicContext[ musicKey ][ nextIndex ];
 
         if (prevMusic) {
             prevMusic.fade(1, 0, 1000);
@@ -28,7 +32,7 @@ export const useMusic = () => {
         nextMusic.play();
         nextMusic.fade(0, 1, 1000);
 
-        dispatchCurrentMusic(musicKey);
+        dispatchCurrentMusic({ musicKey, index: nextIndex });
     }, [ musicContext, currentMusic, dispatchCurrentMusic ]);
 };
 

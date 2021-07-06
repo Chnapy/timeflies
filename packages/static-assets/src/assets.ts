@@ -10,8 +10,14 @@ export module Assets {
         .map(ext => `/static/audio/musics/${musicFolderName}/${musicFolderName}.${ext}`);
 
     export const musics = {
-        menu: getMusicPathList('Ludum Dare 30 - Track 7'),
-        battle: getMusicPathList('Ludum Dare 30 - Track 2')
+        menu: [
+            getMusicPathList('Ludum Dare 30 - Track 7'),
+            getMusicPathList('Ludum Dare 28 - Track 3'),
+        ],
+        battle: [
+            getMusicPathList('Ludum Dare 30 - Track 2'),
+            getMusicPathList('Ludum Dare 30 - Track 9'),
+        ]
     };
 
     export type MusicKey = keyof typeof musics;
