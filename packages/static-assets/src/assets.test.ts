@@ -65,4 +65,12 @@ describe('# assets', () => {
                 .flatMap(musicPaths => musicPaths.map(checkAssetAccess))
             ));
     });
+
+    it('check if all sounds are presents', async () => {
+
+        return Promise.all(Object.values(Assets.sounds)
+            .flatMap(soundList => soundList
+                .flatMap(soundPaths => soundPaths.map(checkAssetAccess))
+            ));
+    });
 });
