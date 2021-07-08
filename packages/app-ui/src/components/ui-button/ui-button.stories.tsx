@@ -1,7 +1,7 @@
 import { Box } from '@material-ui/core';
 import { Meta } from '@storybook/react/types-6-0';
 import React from 'react';
-import { SoundContextProvider } from '../../audio-engine';
+import { AudioContextProvider } from '../../audio-engine';
 import { UIButton } from './ui-button';
 
 export default {
@@ -11,7 +11,7 @@ export default {
 export const Default: React.FC = () => {
 
     return (
-        <SoundContextProvider>
+        <AudioContextProvider>
             <Box p={2}>
 
                 <div>
@@ -31,6 +31,6 @@ export const Default: React.FC = () => {
                 </div>
 
             </Box>
-        </SoundContextProvider>
+        </AudioContextProvider>
     );
 };

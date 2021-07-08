@@ -65,6 +65,8 @@ export const createAudioContext = <A extends AudioAssets>({
     const AudioCurrentDispatchContext = React.createContext<React.Dispatch<Omit<AudioCurrent, 'history'>>>(undefined as any);
     AudioCurrentDispatchContext.displayName = `${contextsNamePrefix}CurrentDispatchContext`;
 
+    const contextList = [ AudioContext, AudioVolumeContext, AudioVolumeDispatchContext, AudioCurrentContext, AudioCurrentDispatchContext ];
+
     const applyAudioVolume = (audioContext: AudioContextValue, volume: number) => Object.values<Howl[]>(audioContext)
         .forEach(audioList => audioList
             .forEach(audio => audio.volume(volume))
@@ -181,6 +183,7 @@ export const createAudioContext = <A extends AudioAssets>({
 
     return {
         AudioContextProvider,
+        contextList,
         useAudioContext,
         useAudioVolumeContext,
         useAudioVolumeDispatch,

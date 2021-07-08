@@ -1,5 +1,5 @@
 import { Box, Dialog, Grid, makeStyles } from '@material-ui/core';
-import { UIText, useMusic } from '@timeflies/app-ui';
+import { UIText, useMusic, useSound } from '@timeflies/app-ui';
 import React from 'react';
 import { ButtonLink } from '../../../components/button-link';
 import { useMyPlayerId } from '../../../login-page/hooks/use-my-player-id';
@@ -23,6 +23,7 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
 export const BattleEndPanel: React.FC = () => {
     const classes = useStyles();
     const playMusic = useMusic();
+    const playSound = useSound();
     const battleEndContext = useBattleEndContext();
     const open = battleEndContext !== null;
     const winnerTeamColor = battleEndContext?.winnerTeamColor;
@@ -51,9 +52,12 @@ export const BattleEndPanel: React.FC = () => {
 
     React.useEffect(() => {
         if (open) {
+
+            playSound(won ? 'battleWin' : 'battleLose');
+
             playMusic('menu');
         }
-    }, [ open, playMusic ]);
+    }, [ open, won, playSound, playMusic ]);
 
     return (
         <Dialog

@@ -36,7 +36,7 @@ export module Assets {
         characterWalkSlime: getSoundPathList('character-walk-slime', ArrayUtils.range(10).map(i => `slime${i + 1}`)),
         error: getSoundPathList('error', [ 'error_001' ]),
         roomReady: getSoundPathList('room-ready', [ 'switch_003' ]),
-        spellLaunch: getSoundPathList('spell-launch', [ 'tick_002' ]),
+        spellLaunch: getSoundPathList('spell-launch', [ 'drop_001' ]),
         spellLaunchDenied: getSoundPathList('spell-launch-denied', [ 'back_002' ]),
         spellLaunchInterrupt: getSoundPathList('spell-launch-interrupt', [ 'back_004' ]),
         turnEnd: getSoundPathList('turn-end', [ 'MENU B_Back' ]),

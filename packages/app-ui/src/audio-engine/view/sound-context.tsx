@@ -3,6 +3,7 @@ import { createAudioContext } from '../utils/create-audio-context';
 
 const {
     AudioContextProvider: SoundContextProvider,
+    contextList: soundContextList,
     useAudioContext: useSoundContext,
     useAudioVolumeContext: useSoundVolumeContext,
     useAudioVolumeDispatch: useSoundVolumeDispatch,
@@ -18,6 +19,7 @@ const {
 
 export {
     SoundContextProvider,
+    soundContextList,
     useSoundContext,
     useSoundVolumeContext,
     useSoundVolumeDispatch,
