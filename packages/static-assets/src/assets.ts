@@ -32,7 +32,7 @@ export module Assets {
         buttonClick: getSoundPathList('button-click', [ 'click3' ]),
         characterAttackSword: getSoundPathList('character-attack-sword', [ 'swing', 'swing2', 'swing3' ]),
         characterHit: getSoundPathList('character-hit', [ 'HIT_SHORT_04', 'HIT_SLAP_07' ]),
-        characterWalkNormal: getSoundPathList('character-walk-normal', ArrayUtils.range(10).map(i => `footstep0${i}`)),
+        characterWalkNormal: getSoundPathList('character-walk-normal', ArrayUtils.range(5).map(i => `footstep_concrete_00${i}`)),
         characterWalkSlime: getSoundPathList('character-walk-slime', ArrayUtils.range(10).map(i => `slime${i + 1}`)),
         error: getSoundPathList('error', [ 'error_001' ]),
         roomReady: getSoundPathList('room-ready', [ 'switch_003' ]),

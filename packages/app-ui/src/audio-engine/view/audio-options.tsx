@@ -1,6 +1,7 @@
 import { makeStyles, Slider, Table, TableCell, TableRow } from '@material-ui/core';
 import React from 'react';
 import { UIText } from '../../components/ui-text/ui-text';
+import { useSound } from '../hooks/use-sound';
 import { useMusicContext, useMusicVolumeContext, useMusicVolumeDispatch } from './music-context';
 import { useSoundContext, useSoundVolumeContext, useSoundVolumeDispatch } from './sound-context';
 
@@ -21,6 +22,7 @@ const useStyles = makeStyles(({ spacing }) => ({
 
 export const AudioOptions: React.FC = () => {
     const classes = useStyles();
+    const playSound = useSound();
 
     const hasMusicContext = !!useMusicContext();
     const musicVolume = useMusicVolumeContext();
@@ -44,6 +46,15 @@ export const AudioOptions: React.FC = () => {
             setVolume: setSoundVolume
         },
     ];
+
+    const previousSoundVolume = React.useRef<number>();
+    React.useEffect(() => {
+        if (previousSoundVolume.current !== soundVolume) {
+            playSound('buttonClick');
+        }
+
+        previousSoundVolume.current = soundVolume;
+    }, [ soundVolume, playSound ]);
 
     return <>
         <UIText variant='h4'>Audio</UIText>

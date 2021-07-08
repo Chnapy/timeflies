@@ -13,7 +13,7 @@ const {
 } = createAudioContext({
     contextsNamePrefix: 'Sound',
     storageAudioVolumeKeyPrefix: 'sound',
-    defaultAudioVolume: 0.75,
+    defaultAudioVolume: 0.4,
     assets: Assets.sounds
 });
 

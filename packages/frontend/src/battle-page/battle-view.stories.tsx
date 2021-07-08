@@ -210,7 +210,7 @@ export const Default: React.FC = () => {
             },
             spellActionEffectList: [],
             spellActionEffects: {},
-            playingCharacterId: 'c3',
+            playingCharacterId: 'c1',
             roundIndex: 0,
             selectedSpellId: null,
             spellLists: {
