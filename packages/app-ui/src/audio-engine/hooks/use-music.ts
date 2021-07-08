@@ -1,39 +1,39 @@
 import { Assets } from '@timeflies/static-assets';
 import React from 'react';
-import { useMusicContext, useMusicCurrentContext, useMusicCurrentDispatch } from '../view/music-context';
+import { getNextMusic, useMusicContext, useMusicCurrentContext, useMusicCurrentDispatch, useMusicVolumeContext } from '../view/music-context';
 
 
 export const useMusic = () => {
     const musicContext = useMusicContext();
     const currentMusic = useMusicCurrentContext();
     const dispatchCurrentMusic = useMusicCurrentDispatch();
+    const musicVolume = useMusicVolumeContext();
 
     const fnRef = React.useRef<(musicKey: Assets.MusicKey) => void>();
-    fnRef.current = (musicKey: Assets.MusicKey) => {
-        if (!musicContext || musicKey === currentMusic?.musicKey) {
+    fnRef.current = musicKey => {
+        if (!musicContext || musicKey === currentMusic?.currentKey) {
             return;
         }
 
-        const prevMusic = currentMusic && musicContext[ currentMusic.musicKey ][ currentMusic.index ];
-        console.log('M', musicKey, currentMusic?.musicKey, currentMusic?.index, prevMusic)
+        const prevMusic = currentMusic && musicContext[ currentMusic.currentKey ][ currentMusic.index ];
 
-        const prevIndex = currentMusic?.history[ musicKey ] ?? -1;
-        const nextIndex = (prevIndex + 1) % Assets.musics[ musicKey ].length;
-
-        const nextMusic = musicContext[ musicKey ][ nextIndex ];
+        const {
+            nextIndex,
+            nextAudio: nextMusic
+        } = getNextMusic(musicContext, currentMusic, musicKey, Assets.musics);
 
         if (prevMusic) {
-            prevMusic.fade(1, 0, 1000);
+            prevMusic.fade(musicVolume, 0, 1000);
             prevMusic.once('fade', () => {
                 prevMusic.pause();
             });
         }
 
-        nextMusic.volume(1);
+        nextMusic.volume(musicVolume);
         nextMusic.play();
-        nextMusic.fade(0, 1, 1000);
+        nextMusic.fade(0, musicVolume, 1000);
 
-        dispatchCurrentMusic({ musicKey, index: nextIndex });
+        dispatchCurrentMusic({ currentKey: musicKey, index: nextIndex });
     };
 
     // avoid unecessary music playing (causing infinite loop)

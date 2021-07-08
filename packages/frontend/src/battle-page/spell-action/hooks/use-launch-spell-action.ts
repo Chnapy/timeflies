@@ -1,3 +1,4 @@
+import { useSound } from '@timeflies/app-ui';
 import { SpellAction } from '@timeflies/common';
 import { useSocketSendWithResponse } from '@timeflies/socket-client';
 import { BattleSpellActionMessage } from '@timeflies/socket-messages';
@@ -10,6 +11,7 @@ import { BattleRollbackAction } from '../../tile-interactive/store/battle-state-
 import { useDispatchNewState } from './use-dispatch-new-state';
 
 export const useLaunchSpellAction = () => {
+    const playSound = useSound();
     const computeSpellEffect = useComputeSpellEffect();
     const sendWithResponse = useSocketSendWithResponse();
     const dispatch = useDispatch();
@@ -19,14 +21,18 @@ export const useLaunchSpellAction = () => {
 
     return async () => {
         if (turnStartTime > Date.now()) {
+            playSound('spellLaunchDenied');
             return;
         }
 
         // compute again, because time values may have changed
         const spellEffectInfos = await computeSpellEffect();
         if (!spellEffectInfos) {
+            playSound('spellLaunchDenied');
             return;
         }
+
+        playSound('spellLaunch');
 
         const { spellEffect, spellEffectParams } = spellEffectInfos;
         const futureState = produceStateFromSpellEffect(
@@ -57,6 +63,9 @@ export const useLaunchSpellAction = () => {
 
                 if (!response.payload.success) {
                     cancel();
+
+                    playSound('spellLaunchInterrupt');
+
                     dispatch(BattleRollbackAction({
                         lastState: response.payload.lastState
                     }));

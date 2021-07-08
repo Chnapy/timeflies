@@ -1,6 +1,6 @@
 import { Container, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { usePlayMusic } from '../../audio-engine/hooks/use-music';
+import { usePlayMusic } from '@timeflies/app-ui';
 import { AppHeader } from '../../components/app-header/app-header';
 import { RoomListTable } from './room-list-table';
 

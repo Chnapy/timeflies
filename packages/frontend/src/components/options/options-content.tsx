@@ -1,5 +1,5 @@
 import React from 'react';
-import { AudioOptions } from '../../audio-engine/view/audio-options';
+import { AudioOptions } from '@timeflies/app-ui';
 
 export const OptionsContent: React.FC = () => {
 

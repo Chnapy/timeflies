@@ -31,8 +31,8 @@ export const useCharacterSpriteInfos = (characterId: CharacterId) => {
     const playerRelationsColors = useTheme().palette.playerRelations;
 
     const outlineColor = colorStringToHex(isSpectator
-       ? teamColor!
-       : switchUtil(getPlayerRelationFrom(playerId), playerRelationsColors)
+        ? teamColor!
+        : switchUtil(getPlayerRelationFrom(playerId), playerRelationsColors)
     );
 
     const outline: OutlineInfos = {

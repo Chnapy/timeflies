@@ -1,6 +1,7 @@
 import { Box } from '@material-ui/core';
 import { Meta } from '@storybook/react/types-6-0';
 import React from 'react';
+import { AudioContextProvider } from '../../audio-engine';
 import { UIButton } from './ui-button';
 
 export default {
@@ -10,32 +11,26 @@ export default {
 export const Default: React.FC = () => {
 
     return (
-        <Box p={2}>
+        <AudioContextProvider>
+            <Box p={2}>
 
-            <div>
-                <UIButton>
-                    create room
-        </UIButton>
-            </div>
+                <div>
+                    <UIButton>create room</UIButton>
+                </div>
 
-            <div>
-                <UIButton variant='primary'>
-                    play
-        </UIButton>
-            </div>
+                <div>
+                    <UIButton variant='primary'>play</UIButton>
+                </div>
 
-            <div>
-                <UIButton disabled>
-                    create room
-        </UIButton>
-            </div>
+                <div>
+                    <UIButton disabled>create room</UIButton>
+                </div>
 
-            <div>
-                <UIButton variant='primary' disabled>
-                    play
-        </UIButton>
-            </div>
+                <div>
+                    <UIButton variant='primary' disabled>play</UIButton>
+                </div>
 
-        </Box>
+            </Box>
+        </AudioContextProvider>
     );
 };

@@ -2,6 +2,7 @@ import { Backdrop, Button, ButtonProps, fade, makeStyles, PropTypes } from '@mat
 import CircularProgress from "@material-ui/core/CircularProgress";
 import clsx from 'clsx';
 import React from 'react';
+import { useSound } from '../../audio-engine';
 import { UIText } from '../ui-text/ui-text';
 
 export type UIButtonProps = Omit<ButtonProps, 'variant' | 'color'> & {
@@ -37,6 +38,7 @@ const useStyles = makeStyles(({ palette }) => ({
 
 export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', className, onClick, disabled, loading: controlledLoading, children, ...rest }) => {
     const classes = useStyles();
+    const playSound = useSound();
     const isMountedRef = React.useRef(true);
     const [ loading, setLoading ] = React.useState(false);
 
@@ -50,6 +52,8 @@ export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', class
     }, []);
 
     const onClickWrapper: typeof onClick = (...args) => {
+        playSound('buttonClick');
+
         if (!onClick) {
             return;
         }

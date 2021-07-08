@@ -1,7 +1,7 @@
 import { Box, Grid, makeStyles, Paper, Step, StepButton, Stepper } from '@material-ui/core';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import { UIButtonProps, UIText } from '@timeflies/app-ui';
+import { UIButtonProps, UIText, useSound } from '@timeflies/app-ui';
 import { switchUtil } from '@timeflies/common';
 import React from 'react';
 import { useMyPlayerId } from '../../login-page/hooks/use-my-player-id';
@@ -40,6 +40,7 @@ const playerReadyIndex = 1;
 
 export const RoomButtonsPanel: React.FC = () => {
     const classes = useStyles();
+    const playSound = useSound();
     const playerId = useMyPlayerId();
     const placedCharactersStatus = useRoomSelector(state => {
 
@@ -90,6 +91,12 @@ export const RoomButtonsPanel: React.FC = () => {
     React.useEffect(() => {
         setCurrentStep(getCurrentStep);
     }, [ lastCompleteStep, getCurrentStep ]);
+
+    React.useEffect(() => {
+        if (roomReady) {
+            playSound('roomReady');
+        }
+    }, [ playSound, roomReady ]);
 
     const getOnPreviousStepClick = (step: number) => () => {
         setCurrentStep(step);

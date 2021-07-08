@@ -13,7 +13,9 @@
     "@material-ui/lab": "^4.0.0-alpha.50",
     "@timeflies/common": "*",
     "@timeflies/sprite-image": "*",
+    "@timeflies/static-assets": "*",
     "clsx": "*",
+    "howler": "*",
     "react": "^17.0.1"
   },
   "devDependencies": {
@@ -33,10 +35,12 @@
     "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/sprite-image": "workspace:packages/sprite-image",
     "@timeflies/static-assets": "workspace:packages/static-assets",
+    "@types/howler": "2.2.3",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.0.3",
     "@types/react": "^17.0.5",
     "clsx": "^1.1.1",
+    "howler": "2.2.3",
     "pixi.js": "^6.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

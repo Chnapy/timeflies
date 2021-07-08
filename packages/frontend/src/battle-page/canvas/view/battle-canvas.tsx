@@ -1,5 +1,5 @@
 import { makeStyles, ThemeProvider } from '@material-ui/core';
-import { appTheme } from '@timeflies/app-ui';
+import { appTheme, audioContextList } from '@timeflies/app-ui';
 import { AssetsContext } from '@timeflies/assets-loader';
 import { ContextBridge } from '@timeflies/context-bridge';
 import { SocketContext } from '@timeflies/socket-client';
@@ -34,6 +34,7 @@ export const BattleCanvas: React.FC = () => {
                         SocketContext,
                         ReactReduxContext,
                         AssetsContext,
+                        ...audioContextList,
                         CycleEngineContext,
                         TileHoverContext,
                         TileHoverDispatchContext,

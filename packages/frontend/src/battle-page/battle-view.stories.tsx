@@ -37,7 +37,7 @@ export const Default: React.FC = () => {
     const [ store ] = React.useState(() => {
         const preloadedState = rootReducer(undefined, { type: 'foo' });
         preloadedState.credentials = {
-            playerId: 'p0',
+            playerId: 'p1',
             playerName: 'foo',
             token: '---'
         };
@@ -210,7 +210,7 @@ export const Default: React.FC = () => {
             },
             spellActionEffectList: [],
             spellActionEffects: {},
-            playingCharacterId: 'c3',
+            playingCharacterId: 'c1',
             roundIndex: 0,
             selectedSpellId: null,
             spellLists: {

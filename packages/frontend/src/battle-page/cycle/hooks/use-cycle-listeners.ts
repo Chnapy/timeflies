@@ -1,3 +1,4 @@
+import { useSound } from '@timeflies/app-ui';
 import { CycleEngineListeners } from '@timeflies/cycle-engine';
 import { useSocketListeners } from '@timeflies/socket-client';
 import { BattleEndMessage, BattleTurnStartMessage } from '@timeflies/socket-messages';
@@ -41,9 +42,14 @@ export const useCycleMessageListeners = () => {
 
 export const useCycleEngineListeners = () => {
     const dispatch = useDispatch();
+    const playSound = useSound();
 
     return (): CycleEngineListeners => ({
+        turnStart: () => {
+            playSound('turnStart');
+        },
         turnEnd: () => {
+            playSound('turnEnd');
             dispatch(BattleTurnEndAction());
         }
     });
