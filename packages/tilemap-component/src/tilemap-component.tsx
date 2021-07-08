@@ -26,6 +26,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({
     };
 
     const backgroundLayer = Layer.getTilelayer('background', mapSheet);
+    const backgroundExtraLayerList = Layer.getBackgroundExtraLayers(mapSheet);
     const obstaclesLayer = Layer.getTilelayer('obstacles', mapSheet);
     const foregroundLayerList = Layer.getForegroundLayers(mapSheet);
 
@@ -42,6 +43,8 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({
         interactive: true
     });
 
+    const backgroundExtras = backgroundExtraLayerList.map(layer => renderLayer({ layer }));
+
     const obstaclesAndEntities = renderLayer({
         layer: obstaclesLayer,
         characters: children
@@ -52,6 +55,7 @@ export const TilemapComponent: React.FC<TilemapComponentProps> = ({
     return <Container interactive mouseout={() => onTileMouseHover(null)}>
 
         {background}
+        {backgroundExtras}
 
         <TilemapTilesStates
             backgroundLayer={backgroundLayer}

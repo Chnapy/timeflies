@@ -7,7 +7,11 @@ export module Layer {
         background: 'background',
         obstacles: 'obstacles'
     };
-    const backLayerList = Object.values(layerNamesMap);
+
+    const extraLayerPrefixMap = {
+        backgroundExtra: 'background-',
+        foreground: 'foreground-'
+    };
 
     export type LayerName = keyof typeof layerNamesMap;
 
@@ -16,10 +20,14 @@ export module Layer {
     };
 
     export const getTilelayer = (name: LayerName, { layers }: Pick<TiledMap, 'layers'>): TiledLayerTilelayer => {
-        return layers.find((layer): layer is TiledLayerTilelayer => layer.name === layerNamesMap[name])!;
+        return layers.find((layer): layer is TiledLayerTilelayer => layer.name === layerNamesMap[ name ])!;
+    };
+
+    export const getBackgroundExtraLayers = ({ layers }: Pick<TiledMap, 'layers'>) => {
+        return layers.filter((layer): layer is TiledLayerTilelayer => layer.name.startsWith(extraLayerPrefixMap.backgroundExtra));
     };
 
     export const getForegroundLayers = ({ layers }: Pick<TiledMap, 'layers'>) => {
-        return layers.filter((layer): layer is TiledLayerTilelayer => !backLayerList.includes(layer.name));
+        return layers.filter((layer): layer is TiledLayerTilelayer => layer.name.startsWith(extraLayerPrefixMap.foreground));
     };
 }
