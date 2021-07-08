@@ -1,7 +1,6 @@
 import { Container, Grid, makeStyles } from '@material-ui/core';
-import { UIText } from '@timeflies/app-ui';
+import { UIText, usePlayMusic } from '@timeflies/app-ui';
 import React from 'react';
-import { usePlayMusic } from '../../audio-engine/hooks/use-music';
 import { OptionsButton } from '../../components/options/options-button';
 import { LoginForm } from './login-form';
 

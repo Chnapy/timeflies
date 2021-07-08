@@ -4366,10 +4366,12 @@ __metadata:
     "@timeflies/devtools": "workspace:packages/devtools"
     "@timeflies/sprite-image": "workspace:packages/sprite-image"
     "@timeflies/static-assets": "workspace:packages/static-assets"
+    "@types/howler": 2.2.3
     "@types/jest": ^26.0.23
     "@types/node": ^15.0.3
     "@types/react": ^17.0.5
     clsx: ^1.1.1
+    howler: 2.2.3
     pixi.js: ^6.0.4
     react: ^17.0.2
     react-dom: ^17.0.2
@@ -4382,7 +4384,9 @@ __metadata:
     "@material-ui/lab": ^4.0.0-alpha.50
     "@timeflies/common": "*"
     "@timeflies/sprite-image": "*"
+    "@timeflies/static-assets": "*"
     clsx: "*"
+    howler: "*"
     react: ^17.0.1
   languageName: unknown
   linkType: soft
@@ -5213,6 +5217,13 @@ __metadata:
   version: 2.2.2
   resolution: "@types/howler@npm:2.2.2"
   checksum: 0c0bb18de26f2d5346f731a966cc9a203994cdac26db7e67085dc957a89fbcb35c0ac7ca02fade86af556192c85d1e16d122e41db2a8466118c12eb112215b0a
+  languageName: node
+  linkType: hard
+
+"@types/howler@npm:2.2.3":
+  version: 2.2.3
+  resolution: "@types/howler@npm:2.2.3"
+  checksum: b6e2cc94c10ad25136980d62fe24ab1c0206f61306ce5d7e27fb45df9b27f01d24c3a8e11330550474c888c9e623483786d17207be3f4d5bd9a9cc10f1857e1f
   languageName: node
   linkType: hard
 

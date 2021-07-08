@@ -1,7 +1,6 @@
 import { Box, Dialog, Grid, makeStyles } from '@material-ui/core';
-import { UIText } from '@timeflies/app-ui';
+import { UIText, useMusic } from '@timeflies/app-ui';
 import React from 'react';
-import { useMusic } from '../../../audio-engine/hooks/use-music';
 import { ButtonLink } from '../../../components/button-link';
 import { useMyPlayerId } from '../../../login-page/hooks/use-my-player-id';
 import { routes } from '../../../routes';
