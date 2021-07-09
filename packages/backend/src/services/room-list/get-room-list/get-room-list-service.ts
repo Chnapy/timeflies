@@ -16,7 +16,7 @@ export class GetRoomListService extends Service {
 
             const listData = roomList.map((room): RoomInfos => {
 
-                const { mapInfos, staticPlayerList, playerAdminId } = room.getRoomStateData();
+                const { mapInfos, staticPlayerList, playerAdminId } = room;
 
                 const playerAdminName = staticPlayerList.find(player => player.playerId === playerAdminId)!.playerName;
 
@@ -31,7 +31,7 @@ export class GetRoomListService extends Service {
                         playerId: playerAdminId,
                         playerName: playerAdminName
                     },
-                    state: room.getCurrentBattleId()
+                    state: room.battle
                         ? 'in-battle'
                         : 'open'
                 };

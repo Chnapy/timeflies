@@ -5,14 +5,6 @@ import { getBattleStaticData } from './get-battle-static-data';
 
 describe('get battle static data', () => {
 
-    beforeEach(() => {
-        timerTester.beforeTest();
-    });
-
-    afterEach(() => {
-        timerTester.afterTest();
-    });
-
     const battlePayload: Pick<BattlePayload, 'staticPlayerList' | 'staticCharacterList' | 'entityListData'> = {
         staticPlayerList: [
             {

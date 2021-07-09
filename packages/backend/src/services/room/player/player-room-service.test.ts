@@ -1,8 +1,11 @@
 import { createPosition } from '@timeflies/common';
-import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage, RoomStateMessage } from '@timeflies/socket-messages';
-import { SocketError } from '@timeflies/socket-server';
+import { timerTester } from '@timeflies/devtools';
+import { RoomBattleStartMessage, RoomPlayerJoinMessage, RoomPlayerLeaveMessage, RoomPlayerReadyMessage, RoomStateMessage, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
+import { SocketCell, SocketError } from '@timeflies/socket-server';
+import { GlobalEntitiesNoServices } from '../../../main/global-entities';
 import { Battle } from '../../battle/battle';
 import { createFakeBattle } from '../../battle/battle-service-test-utils';
+import { Room } from '../room';
 import { createFakeRoom, getFakeRoomEntities } from '../room-service-test-utils';
 import { PlayerRoomService } from './player-room-service';
 
@@ -35,60 +38,12 @@ describe('player room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it.skip('throw error if no map selected', () => {
-            const { socketCellP1, connectSocket, room } = getJoinEntities();
-            room.getRoomStateData = jest.fn(() => ({
-                roomId: 'room',
-                mapInfos: null,
-                mapPlacementTiles: {},
-                playerAdminId: '',
-                teamColorList: [],
-                staticPlayerList: [],
-                staticCharacterList: []
-            }));
-
-            connectSocket();
-
-            const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
-
-            expect(() =>
-                listener(RoomPlayerJoinMessage({
-                    roomId: 'room'
-                }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
-        });
-
-        it.skip('throw error if map maximum players reached (nbr characters total)', () => {
-            const { socketCellP1, connectSocket, room } = getJoinEntities();
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                mapInfos: {
-                    mapId: '',
-                    name: '',
-                    nbrTeams: 3,
-                    nbrTeamCharacters: 1,
-                    schemaLink: '',
-                    imagesLinks: {}
-                }
-            }));
-
-            connectSocket();
-
-            const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
-
-            expect(() =>
-                listener(RoomPlayerJoinMessage({
-                    roomId: 'room'
-                }).get(), socketCellP1.send)
-            ).toThrowError(SocketError);
-        });
-
         it('answers with battleId if room in battle', async () => {
             const { socketCellP1, connectSocket, room } = getJoinEntities();
 
             connectSocket();
 
-            room.getCurrentBattleId = jest.fn(() => 'battle');
+            room.battle = createFakeBattle();
 
             connectSocket();
 
@@ -133,27 +88,46 @@ describe('player room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('answers with room state, and send update to other players', async () => {
-            const { socketCellP1, connectSocket, expectPlayersAnswers } = getJoinEntities();
-
-            connectSocket();
-
-            const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
-
-            await listener(RoomPlayerJoinMessage({
-                roomId: 'room'
-            }).get(), socketCellP1.send);
-
-            expectPlayersAnswers(RoomPlayerJoinMessage);
-        });
-
-        it('join player to room, before answering', async () => {
+        it('join player to room', async () => {
             const { socketCellP1, connectSocket, room } = getJoinEntities();
 
-            const callOrder: string[] = [];
+            connectSocket();
 
-            socketCellP1.send = jest.fn(message => callOrder.push(message.action));
-            room.playerJoin = jest.fn(() => callOrder.push('player-join'));
+            const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
+
+            room.staticPlayerList = [];
+
+            await listener(RoomPlayerJoinMessage({
+                roomId: 'room'
+            }).get(), socketCellP1.send);
+
+            expect(room.staticPlayerList).toEqual<RoomStaticPlayer[]>([ {
+                playerId: 'p1',
+                playerName: 'p-1',
+                ready: false,
+                teamColor: null,
+                type: 'spectator'
+            } ]);
+        });
+
+        it('set player admin if first joined', async () => {
+            const { socketCellP1, connectSocket, room } = getJoinEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
+
+            room.staticPlayerList = [];
+
+            await listener(RoomPlayerJoinMessage({
+                roomId: 'room'
+            }).get(), socketCellP1.send);
+
+            expect(room.playerAdminId).toEqual('p1');
+        });
+
+        it('cancel battle launch if any', async () => {
+            const { socketCellP1, connectSocket, room } = getJoinEntities();
 
             connectSocket();
 
@@ -163,7 +137,7 @@ describe('player room service', () => {
                 roomId: 'room'
             }).get(), socketCellP1.send);
 
-            expect(callOrder).toEqual([ 'player-join', RoomPlayerJoinMessage.action ]);
+            expect(room.cancelBattleLaunch).toHaveBeenCalled();
         });
 
         it('add player to global room map', async () => {
@@ -178,6 +152,20 @@ describe('player room service', () => {
             }).get(), socketCellP1.send);
 
             expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBe(room);
+        });
+
+        it('answers with room state, and send update to other players', async () => {
+            const { socketCellP1, connectSocket, expectPlayersAnswers } = getJoinEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
+
+            await listener(RoomPlayerJoinMessage({
+                roomId: 'room'
+            }).get(), socketCellP1.send);
+
+            expectPlayersAnswers(RoomPlayerJoinMessage);
         });
     });
 
@@ -204,15 +192,12 @@ describe('player room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
 
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                staticCharacterList: [ {
-                    characterId: 'c1',
-                    characterRole: 'tacka',
-                    playerId: 'p1',
-                    placement: null
-                } ]
-            }));
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: null
+            } ];
 
             await expect(
                 listener(RoomPlayerReadyMessage({
@@ -221,57 +206,56 @@ describe('player room service', () => {
             ).rejects.toBeInstanceOf(SocketError);
         });
 
-        it('answers with room state, and send update to other players', async () => {
-            const { socketCellP1, connectSocket, room, expectPlayersAnswers } = getEntities();
-
-            connectSocket();
-
-            const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
-
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                staticCharacterList: [ {
-                    characterId: 'c1',
-                    characterRole: 'tacka',
-                    playerId: 'p1',
-                    placement: createPosition(1, 1)
-                } ]
-            }));
-
-            await listener(RoomPlayerReadyMessage({
-                ready: true
-            }).get(), socketCellP1.send);
-
-            expectPlayersAnswers(RoomPlayerReadyMessage);
-        });
-
-        it('join player to room, before answering', async () => {
+        it('set player ready', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
-            const callOrder: string[] = [];
-
-            socketCellP1.send = jest.fn(message => callOrder.push(message.action));
-            room.playerReady = jest.fn(() => callOrder.push('player-ready'));
-
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
 
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                staticCharacterList: [ {
-                    characterId: 'c1',
-                    characterRole: 'tacka',
-                    playerId: 'p1',
-                    placement: createPosition(1, 1)
-                } ]
-            }));
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: createPosition(1, 1)
+            } ];
 
             await listener(RoomPlayerReadyMessage({
                 ready: true
             }).get(), socketCellP1.send);
 
-            expect(callOrder).toEqual([ 'player-ready', RoomPlayerReadyMessage.action ]);
+            expect(room.staticPlayerList).toContainEqual(expect.objectContaining<Partial<RoomStaticPlayer>>({
+                playerId: 'p1',
+                ready: true
+            }));
+        });
+
+        it('if undo ready cancel battle launch if any', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
+
+            room.staticPlayerList = [ {
+                playerId: 'p1',
+                playerName: '',
+                ready: true,
+                teamColor: '#FFF',
+                type: 'player'
+            } ];
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: createPosition(1, 1)
+            } ];
+
+            await listener(RoomPlayerReadyMessage({
+                ready: false
+            }).get(), socketCellP1.send);
+
+            expect(room.cancelBattleLaunch).toHaveBeenCalled();
         });
 
         it('launch battle after some time when every players are ready', async () => {
@@ -281,56 +265,74 @@ describe('player room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
 
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                staticPlayerList: [
-                    {
-                        playerId: 'p1',
-                        playerName: 'p1',
-                        teamColor: null,
-                        ready: true,
-                        type: 'player'
-                    },
-                    {
-                        playerId: 'p2',
-                        playerName: 'p2',
-                        teamColor: null,
-                        ready: true,
-                        type: 'player'
-                    },
-                    {
-                        playerId: 'p3',
-                        playerName: 'p3',
-                        teamColor: null,
-                        ready: true,
-                        type: 'player'
-                    },
-                    {
-                        playerId: 'p4',
-                        playerName: 'p4',
-                        teamColor: null,
-                        ready: false,
-                        type: 'spectator'
-                    }
-                ],
-                staticCharacterList: [ {
-                    characterId: 'c1',
-                    characterRole: 'tacka',
+            room.staticPlayerList = [
+                {
                     playerId: 'p1',
-                    placement: createPosition(1, 1)
-                } ]
-            }));
+                    playerName: 'p1',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p2',
+                    playerName: 'p2',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p3',
+                    playerName: 'p3',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p4',
+                    playerName: 'p4',
+                    teamColor: null,
+                    ready: false,
+                    type: 'spectator'
+                }
+            ];
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: createPosition(1, 1)
+            } ];
 
-            room.waitForBattle = jest.fn(async () => 'completed');
-            room.createBattle = jest.fn(async () => createFakeBattle());
+            await timerTester.endTimer(
+                listener(RoomPlayerReadyMessage({
+                    ready: true
+                }).get(), socketCellP1.send)
+            );
+
+            expectEveryPlayersReceived(RoomBattleStartMessage({ battleId: expect.any(String) }));
+
+            expect(room.battle).toMatchObject<Partial<Battle>>({ battleId: expect.any(String) });
+            expect(globalEntities.currentBattleMap.mapById[ room.battle!.battleId ]).toBe(room.battle);
+        });
+
+        it('answers with room state, and send update to other players', async () => {
+            const { socketCellP1, connectSocket, room, expectPlayersAnswers } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
+
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: createPosition(1, 1)
+            } ];
 
             await listener(RoomPlayerReadyMessage({
                 ready: true
             }).get(), socketCellP1.send);
 
-            expectEveryPlayersReceived(RoomBattleStartMessage({ battleId: 'battle' }));
-
-            expect(globalEntities.currentBattleMap.mapById[ 'battle' ]).toMatchObject<Partial<Battle>>({ battleId: 'battle' });
+            expectPlayersAnswers(RoomPlayerReadyMessage);
         });
     });
 
@@ -339,8 +341,7 @@ describe('player room service', () => {
         it('does nothing if battle running', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
-            room.playerLeave = jest.fn(room.playerLeave);
-            room.getCurrentBattleId = jest.fn(() => 'battle');
+            room.battle = createFakeBattle();
 
             connectSocket();
 
@@ -348,25 +349,91 @@ describe('player room service', () => {
 
             await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
 
-            expect(room.playerLeave).not.toHaveBeenCalled();
+            expect(room.staticPlayerList).toContainEqual(expect.objectContaining<Partial<RoomStaticPlayer>>({
+                playerId: 'p1'
+            }));
         });
 
         it('leave player from room', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
-            room.playerLeave = jest.fn(room.playerLeave);
-
             connectSocket();
 
             const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
 
             await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
 
-            expect(room.playerLeave).toHaveBeenCalledWith('p1');
+            expect(room.staticPlayerList).not.toContainEqual(expect.objectContaining<Partial<RoomStaticPlayer>>({
+                playerId: 'p1'
+            }));
         });
 
-        it('send update to other players', async () => {
-            const { socketCellP1, socketCellP2, connectSocket, room } = getEntities();
+        it('remove player characters from room', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
+
+            room.staticCharacterList = [
+                {
+                    characterId: 'c1',
+                    characterRole: 'tacka',
+                    placement: null,
+                    playerId: 'p1'
+                },
+                {
+                    characterId: 'c2',
+                    characterRole: 'tacka',
+                    placement: null,
+                    playerId: 'p2'
+                }
+            ];
+
+            await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
+
+            expect(room.staticCharacterList).toEqual<RoomStaticCharacter[]>([
+                {
+                    characterId: 'c2',
+                    characterRole: 'tacka',
+                    placement: null,
+                    playerId: 'p2'
+                }
+            ]);
+        });
+
+        it('change player admin if leaved', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
+
+            room.staticPlayerList = [
+                {
+                    playerId: 'p1',
+                    playerName: '',
+                    ready: false,
+                    teamColor: null,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p2',
+                    playerName: '',
+                    ready: false,
+                    teamColor: null,
+                    type: 'player'
+                }
+            ];
+            room.playerAdminId = 'p1';
+
+            await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
+
+            expect(room.playerAdminId).toEqual('p2');
+        });
+
+        it('cancel battle launch if any', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
 
             connectSocket();
 
@@ -374,7 +441,7 @@ describe('player room service', () => {
 
             await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
 
-            expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
+            expect(room.cancelBattleLaunch).toHaveBeenCalled();
         });
 
         it('remove player from global room map', async () => {
@@ -388,39 +455,102 @@ describe('player room service', () => {
 
             expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
         });
+
+        it('send update to other players', async () => {
+            const { socketCellP1, socketCellP2, getRoomStateData, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerLeaveMessage);
+
+            await listener(RoomPlayerLeaveMessage({}), socketCellP1.send);
+
+            expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(getRoomStateData(room)));
+        });
     });
 
     describe('on player disconnect', () => {
 
+        const initRoom = (room: Room) => {
+            room.staticPlayerList = [
+                {
+                    playerId: 'p1',
+                    playerName: '',
+                    ready: false,
+                    teamColor: null,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p2',
+                    playerName: '',
+                    ready: false,
+                    teamColor: null,
+                    type: 'player'
+                }
+            ];
+            room.playerAdminId = 'p1';
+            room.staticCharacterList = [
+                {
+                    characterId: 'c1',
+                    characterRole: 'tacka',
+                    placement: null,
+                    playerId: 'p1'
+                },
+                {
+                    characterId: 'c2',
+                    characterRole: 'tacka',
+                    placement: null,
+                    playerId: 'p2'
+                }
+            ];
+        };
+
+        const expectLeaveRoomEffects = (room: Room, socketCellP2: SocketCell, globalEntities: GlobalEntitiesNoServices) => {
+            const { getRoomStateData } = getEntities();
+
+            expect(room.staticPlayerList).not.toContainEqual(expect.objectContaining<Partial<RoomStaticPlayer>>({
+                playerId: 'p1'
+            }));
+            expect(room.staticCharacterList).toEqual<RoomStaticCharacter[]>([
+                {
+                    characterId: 'c2',
+                    characterRole: 'tacka',
+                    placement: null,
+                    playerId: 'p2'
+                }
+            ]);
+            expect(room.playerAdminId).toEqual('p2');
+            expect(room.cancelBattleLaunch).toHaveBeenCalled();
+
+            expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(getRoomStateData(room)));
+            expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
+        };
+
         it('apply player leave effects', async () => {
             const { socketCellP1, socketCellP2, connectSocket, room, globalEntities } = getEntities();
 
-            room.playerLeave = jest.fn(room.playerLeave);
+            initRoom(room);
 
             connectSocket();
 
             const disconnectListener = socketCellP1.getDisconnectListener()!;
             disconnectListener();
 
-            expect(room.playerLeave).toHaveBeenCalledWith('p1');
-            expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
-            expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
+            expectLeaveRoomEffects(room, socketCellP2, globalEntities);
         });
 
         it('apply player leave effects even if battle running', async () => {
             const { socketCellP1, socketCellP2, connectSocket, room, globalEntities } = getEntities();
 
-            room.playerLeave = jest.fn(room.playerLeave);
-            room.getCurrentBattleId = jest.fn(() => 'battle');
+            initRoom(room);
+            room.battle = createFakeBattle();
 
             connectSocket();
 
             const disconnectListener = socketCellP1.getDisconnectListener()!;
             disconnectListener();
 
-            expect(room.playerLeave).toHaveBeenCalledWith('p1');
-            expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
-            expect(globalEntities.currentRoomMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
+            expectLeaveRoomEffects(room, socketCellP2, globalEntities);
         });
     });
 
@@ -429,12 +559,27 @@ describe('player room service', () => {
             const { connectSocket, room, globalEntities, service } = getEntities();
 
             globalEntities.currentBattleMap.mapById[ 'battle' ] = createFakeBattle();
+            room.battle = createFakeBattle();
+            room.staticPlayerList = [ {
+                playerId: 'p1',
+                playerName: '',
+                ready: true,
+                teamColor: '#FFF',
+                type: 'player'
+            } ];
 
-            (service as PlayerRoomService).onBattleEnd('room', 'battle');
+            service.onBattleEnd('room', 'battle');
 
             connectSocket();
 
-            expect(room.removeBattle).toHaveBeenCalled();
+            expect(room.battle).toEqual(null);
+            expect(room.staticPlayerList).toEqual<RoomStaticPlayer[]>([ {
+                playerId: 'p1',
+                playerName: '',
+                ready: false,
+                teamColor: '#FFF',
+                type: 'player'
+            } ]);
             expect(globalEntities.currentBattleMap.mapById[ 'battle' ]).toBeUndefined();
         });
     });

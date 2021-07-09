@@ -28,7 +28,7 @@ describe('all services', () => {
 
     it('contains all services', async () => {
         const servicesPathList = (await getFilesFrom('./src/services'))
-            .filter(path => path.endsWith('-service.ts'))
+            .filter(path => path.endsWith('-service.ts') && !path.endsWith('abstract-service.ts'))
             .map(path => path.replace(/\\/g, '/'))
         // .map(path => ArrayUtils.last(path.split('/')));
 

@@ -7,10 +7,6 @@ import { PlayerBattleService } from './player-battle-service';
 
 describe('player battle service', () => {
 
-    beforeEach(() => timerTester.beforeTest());
-
-    afterEach(() => timerTester.afterTest());
-
     describe('on player disconnect', () => {
 
         it('does nothing if not in battle', () => {

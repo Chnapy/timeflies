@@ -1,5 +1,5 @@
 import { PlayerId } from '@timeflies/common';
-import { Message, RoomStateMessage } from '@timeflies/socket-messages';
+import { Message } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
 import { GlobalEntitiesNoServices } from '../main/global-entities';
 import { BattleId } from './battle/battle';
@@ -55,16 +55,6 @@ export abstract class Service {
         }
 
         return battle;
-    };
-
-    protected sendRoomStateToEveryPlayersExcept = (currentPlayerId: PlayerId) => {
-        const room = this.getRoomByPlayerId(currentPlayerId);
-
-        this.sendToEveryPlayersExcept(
-            RoomStateMessage(room.getRoomStateData()),
-            room.getRoomStateData().staticPlayerList,
-            currentPlayerId
-        );
     };
 
     protected sendToEveryPlayersExcept = <M extends Message<any>>(message: M, playerList: { playerId: PlayerId }[], currentPlayerId?: PlayerId) => {

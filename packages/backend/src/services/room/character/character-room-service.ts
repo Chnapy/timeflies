@@ -1,9 +1,9 @@
 import { createId } from '@timeflies/common';
 import { RoomCharacterPlacementMessage, RoomCharacterRemoveMessage, RoomCharacterSelectMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
-import { Service } from '../../service';
+import { RoomAbstractService } from '../room-abstract-service';
 
-export class CharacterRoomService extends Service {
+export class CharacterRoomService extends RoomAbstractService {
     protected afterSocketConnect = (socketCell: SocketCell, currentPlayerId: string) => {
         this.addRoomCharacterSelectMessageListener(socketCell, currentPlayerId);
         this.addRoomCharacterRemoveMessageListener(socketCell, currentPlayerId);
@@ -15,7 +15,7 @@ export class CharacterRoomService extends Service {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 
-            const { mapInfos, staticPlayerList, staticCharacterList } = room.getRoomStateData();
+            const { mapInfos, staticPlayerList, staticCharacterList } = room;
 
             const currentPlayer = staticPlayerList.find(p => p.playerId === currentPlayerId)!;
             if (currentPlayer.ready) {
@@ -40,14 +40,14 @@ export class CharacterRoomService extends Service {
                 throw new SocketError('bad-server-state', 'Cannot select character if team is full');
             }
 
-            room.characterSelect({
+            staticCharacterList.push({
                 characterId: createId(),
                 playerId: currentPlayerId,
                 characterRole: payload.characterRole,
                 placement: null
             });
 
-            send(RoomCharacterSelectMessage.createResponse(requestId, room.getRoomStateData()));
+            send(RoomCharacterSelectMessage.createResponse(requestId, this.getRoomStateData(room)));
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
@@ -57,26 +57,31 @@ export class CharacterRoomService extends Service {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 
-            const { staticPlayerList, staticCharacterList } = room.getRoomStateData();
+            const { staticPlayerList, staticCharacterList } = room;
 
             const currentPlayer = staticPlayerList.find(p => p.playerId === currentPlayerId)!;
             if (currentPlayer.ready) {
                 throw new SocketError('bad-server-state', 'Cannot remove character if player ready: ' + currentPlayerId);
             }
 
-            const character = staticCharacterList.find(character => character.characterId === payload.characterId);
+            const { characterId } = payload;
+
+            const character = staticCharacterList.find(character => character.characterId === characterId);
 
             if (!character) {
-                throw new SocketError('bad-request', 'Wrong character id: ' + payload.characterId);
+                throw new SocketError('bad-request', 'Wrong character id: ' + characterId);
             }
 
             if (character.playerId !== currentPlayerId) {
-                throw new SocketError('bad-request', 'Cannot remove character of other players: ' + payload.characterId);
+                throw new SocketError('bad-request', 'Cannot remove character of other players: ' + characterId);
             }
 
-            room.characterRemove(payload.characterId);
+            staticCharacterList.splice(
+                staticCharacterList.findIndex(c => c.characterId === characterId),
+                1
+            );
 
-            send(RoomCharacterRemoveMessage.createResponse(requestId, room.getRoomStateData()));
+            send(RoomCharacterRemoveMessage.createResponse(requestId, this.getRoomStateData(room)));
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
@@ -86,37 +91,39 @@ export class CharacterRoomService extends Service {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 
-            const { staticPlayerList, staticCharacterList, mapPlacementTiles } = room.getRoomStateData();
+            const { staticPlayerList, staticCharacterList, mapPlacementTiles } = room;
 
             const currentPlayer = staticPlayerList.find(p => p.playerId === currentPlayerId)!;
             if (currentPlayer.ready) {
                 throw new SocketError('bad-server-state', 'Cannot place character if player ready: ' + currentPlayerId);
             }
 
-            const character = staticCharacterList.find(character => character.characterId === payload.characterId);
+            const { characterId, position } = payload;
+
+            const character = staticCharacterList.find(character => character.characterId === characterId);
 
             if (!character) {
-                throw new SocketError('bad-request', 'Wrong character id: ' + payload.characterId);
+                throw new SocketError('bad-request', 'Wrong character id: ' + characterId);
             }
 
             if (character.playerId !== currentPlayerId) {
-                throw new SocketError('bad-request', 'Cannot place character of other players: ' + payload.characterId);
+                throw new SocketError('bad-request', 'Cannot place character of other players: ' + characterId);
             }
 
-            if (payload.position) {
-                if (staticCharacterList.some(({ placement }) => placement?.id === payload.position!.id)) {
-                    throw new SocketError('bad-request', 'Position occupied by other character: ' + payload.position.id);
+            if (position) {
+                if (staticCharacterList.some(({ placement }) => placement?.id === position.id)) {
+                    throw new SocketError('bad-request', 'Position occupied by other character: ' + position.id);
                 }
 
                 const placementTiles = mapPlacementTiles[ currentPlayer.teamColor! ];
-                if (!placementTiles.some(tile => tile.id === payload.position!.id)) {
-                    throw new SocketError('bad-request', 'Position not in placement tiles: ' + payload.position.id);
+                if (!placementTiles.some(tile => tile.id === position.id)) {
+                    throw new SocketError('bad-request', 'Position not in placement tiles: ' + position.id);
                 }
             }
 
-            room.characterPlacement(payload.characterId, payload.position);
+            character.placement = position;
 
-            send(RoomCharacterPlacementMessage.createResponse(requestId, room.getRoomStateData()));
+            send(RoomCharacterPlacementMessage.createResponse(requestId, this.getRoomStateData(room)));
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
