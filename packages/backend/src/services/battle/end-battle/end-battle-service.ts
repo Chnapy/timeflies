@@ -1,10 +1,10 @@
 import { ObjectTyped, SerializableState } from '@timeflies/common';
 import { logger } from '@timeflies/devtools';
 import { BattleEndMessage } from '@timeflies/socket-messages';
-import { Service } from '../../service';
 import { Battle, StaticState } from '../battle';
+import { BattleAbstractService } from '../battle-abstract-service';
 
-export class EndBattleService extends Service {
+export class EndBattleService extends BattleAbstractService {
     afterSocketConnect = () => { };
 
     isBattleEnded = ({ characters }: Pick<SerializableState, 'characters'>, { players, characters: staticCharacters }: Pick<StaticState, 'players' | 'characters'>): string | null => {
