@@ -1,7 +1,7 @@
-import { ArrayUtils } from '@timeflies/common';
 import { CycleEngine, CycleEngineListeners, TurnInfos } from '@timeflies/cycle-engine';
 import { BattleTurnStartMessage } from '@timeflies/socket-messages';
 import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../../service-test-utils';
+import { createServices } from '../../services';
 import { createFakeBattle } from '../battle-service-test-utils';
 import { CycleBattleService } from './cycle-battle-service';
 
@@ -12,177 +12,145 @@ describe('cycle battle service', () => {
         const getCycleEngineOverlay = () => {
             const battle = createFakeBattle();
 
-            const service = new CycleBattleService(createFakeGlobalEntitiesNoService(undefined, battle));
-            service.services = {
-                playerBattleService: { checkLeavedAndDisconnectedPlayers: jest.fn() }
-            } as any;
+            const globalEntities = createFakeGlobalEntitiesNoService(undefined, battle);
+            const service = new CycleBattleService(globalEntities);
+            service.services = createServices(globalEntities);
 
-            const playerList = ArrayUtils.range(3).map(i => {
+            const playerList = battle.staticPlayers.map(({ playerId }) => {
                 const socketCell = createFakeSocketCell();
-                const playerId = 'p' + i;
-
                 service.onSocketConnect(socketCell, playerId);
 
                 return { socketCell, playerId };
             });
 
-            const cycleEngine: CycleEngine = {
+            const expectedCycleEngine: CycleEngine = {
                 start: jest.fn(),
                 stop: jest.fn(),
-                isStarted: jest.fn(),
+                isStarted: jest.fn(() => false),
                 disableCharacters: jest.fn(),
-                getNextTurnInfos: jest.fn(() => ({
-                    characterId: 'c1',
-                    roundIndex: 0,
-                    turnIndex: 0,
-                    startTime: 12
-                })),
-                startNextTurn: jest.fn(),
+                getNextTurnInfos: jest.fn(() => ({ characterId: 'c1', roundIndex: 0, startTime: Date.now(), turnIndex: 0 })),
                 setCharacterDuration: jest.fn(),
-                setTurnsOrder: jest.fn()
+                setTurnsOrder: jest.fn(),
+                startNextTurn: jest.fn(async () => { }),
             };
 
-            let listeners: CycleEngineListeners = null as any;
-
-            const cycleEngineOverlay = service.createCycleEngineOverlay({
-                battleId: 'battle',
-                playerIdList: new Set(playerList.map(p => p.playerId)),
-                charactersList: [ 'c1', 'c2', 'c3' ],
-                charactersDurations: { c1: 100, c2: 100, c3: 100 }
-            }, ({ listeners: _listeners }) => {
-                listeners = _listeners;
-                return cycleEngine;
-            });
-
-            return { cycleEngineOverlay, cycleEngine, listeners, playerList };
+            return { battle, service, playerList, expectedCycleEngine };
         };
 
-        describe('isStarted()', () => {
-            it('gives cycle engine state', () => {
-                const { cycleEngineOverlay, cycleEngine } = getCycleEngineOverlay();
-
-                cycleEngine.isStarted = jest.fn(() => 'foo' as any);
-                expect(cycleEngineOverlay.isStarted()).toEqual('foo');
-            });
-        });
-
-        describe('start()', () => {
+        describe('start cycle', () => {
 
             it('start cycle engine', async () => {
-                const { cycleEngineOverlay, cycleEngine } = getCycleEngineOverlay();
+                const { battle, service } = getCycleEngineOverlay();
 
-                await cycleEngineOverlay.start();
+                await service.start(battle);
 
-                expect(cycleEngine.start).toHaveBeenCalled();
+                expect(battle.cycleEngine.start).toHaveBeenCalled();
             });
 
             it('send turn infos to every players', async () => {
-                const { cycleEngineOverlay, cycleEngine, playerList } = getCycleEngineOverlay();
+                const { battle, service, playerList } = getCycleEngineOverlay();
 
-                cycleEngine.getNextTurnInfos = jest.fn(() => ({
-                    characterId: 'c1',
-                    roundIndex: 0,
-                    turnIndex: 0,
-                    startTime: 12
-                }));
-
-                await cycleEngineOverlay.start();
+                await service.start(battle);
 
                 for (const { socketCell } of playerList) {
                     expect(socketCell.send).toHaveBeenCalledWith(BattleTurnStartMessage({
-                        characterId: 'c1',
-                        roundIndex: 0,
-                        turnIndex: 0,
-                        startTime: 12
+                        characterId: 'c1', roundIndex: 0, startTime: Date.now(), turnIndex: 0
                     }));
                 }
             });
 
-            it('set running as true', async () => {
-                const { cycleEngineOverlay } = getCycleEngineOverlay();
+            it('set battle running as true', async () => {
+                const { battle, service } = getCycleEngineOverlay();
 
-                await cycleEngineOverlay.start();
+                await service.start(battle);
 
-                expect(cycleEngineOverlay.isRunning()).toEqual(true);
+                expect(battle.cycleRunning).toEqual(true);
             });
         });
 
-        describe('stop()', () => {
+        describe('stop cycle', () => {
 
             it('stop cycle engine', async () => {
-                const { cycleEngineOverlay, cycleEngine } = getCycleEngineOverlay();
+                const { service, battle } = getCycleEngineOverlay();
 
-                await cycleEngineOverlay.start();
-                await cycleEngineOverlay.stop();
+                await service.start(battle);
+                await service.stop(battle);
 
-                expect(cycleEngine.stop).toHaveBeenCalled();
+                expect(battle.cycleEngine.stop).toHaveBeenCalled();
             });
 
             it('set running as false', async () => {
-                const { cycleEngineOverlay } = getCycleEngineOverlay();
+                const { service, battle } = getCycleEngineOverlay();
 
-                await cycleEngineOverlay.start();
-                await cycleEngineOverlay.stop();
+                await service.start(battle);
+                await service.stop(battle);
 
-                expect(cycleEngineOverlay.isRunning()).toEqual(false);
+                expect(battle.cycleRunning).toEqual(false);
             });
         });
 
-        describe('getCurrentTurnInfos()', () => {
-            it('gives turn infos of last turn start', async () => {
-                const { cycleEngineOverlay, listeners } = getCycleEngineOverlay();
+        it('set battle turn infos of last turn start', async () => {
+            const { battle, service, expectedCycleEngine } = getCycleEngineOverlay();
 
-                listeners.turnStart!({
-                    roundIndex: 3,
-                    lastRoundTurn: false,
-                    currentTurn: {
-                        characterId: 'c2',
-                        characterIndex: 2,
-                        duration: 12,
-                        endTime: 45,
-                        startTime: 8,
-                        turnIndex: 1
-                    }
-                });
+            let listeners: CycleEngineListeners = null as any;
+            const cycleEngine = service.createCycleEngine(battle, params => {
+                listeners = params.listeners;
 
-                expect(cycleEngineOverlay.getCurrentTurnInfos()).toEqual<TurnInfos>({
+                return expectedCycleEngine;
+            });
+
+            expect(cycleEngine).toBe(expectedCycleEngine);
+
+            listeners.turnStart!({
+                roundIndex: 3,
+                lastRoundTurn: false,
+                currentTurn: {
                     characterId: 'c2',
                     characterIndex: 2,
                     duration: 12,
                     endTime: 45,
                     startTime: 8,
                     turnIndex: 1
-                });
+                }
+            });
 
-                listeners.turnStart!({
-                    roundIndex: 3,
-                    lastRoundTurn: false,
-                    currentTurn: {
-                        characterId: 'c3',
-                        characterIndex: 3,
-                        duration: 89,
-                        endTime: 87,
-                        startTime: 105,
-                        turnIndex: 2
-                    }
-                });
+            expect(battle.currentTurnInfos).toEqual<TurnInfos>({
+                characterId: 'c2',
+                characterIndex: 2,
+                duration: 12,
+                endTime: 45,
+                startTime: 8,
+                turnIndex: 1
+            });
 
-                expect(cycleEngineOverlay.getCurrentTurnInfos()).toEqual<TurnInfos>({
+            listeners.turnStart!({
+                roundIndex: 3,
+                lastRoundTurn: false,
+                currentTurn: {
                     characterId: 'c3',
                     characterIndex: 3,
                     duration: 89,
                     endTime: 87,
                     startTime: 105,
                     turnIndex: 2
-                });
+                }
+            });
+
+            expect(battle.currentTurnInfos).toEqual<TurnInfos>({
+                characterId: 'c3',
+                characterIndex: 3,
+                duration: 89,
+                endTime: 87,
+                startTime: 105,
+                turnIndex: 2
             });
         });
 
-        describe('onNewState()', () => {
+        describe('on new state', () => {
             it('disable all dead characters', async () => {
-                const { cycleEngineOverlay, cycleEngine } = getCycleEngineOverlay();
+                const { battle, service } = getCycleEngineOverlay();
 
-                cycleEngineOverlay.onNewState({
+                service.onNewState(battle, {
                     characters: {
                         health: { c1: 0, c2: 5, c3: 0 },
                         actionTime: {},
@@ -191,33 +159,39 @@ describe('cycle battle service', () => {
                     }
                 });
 
-                expect(cycleEngine.disableCharacters).toHaveBeenCalledWith([ 'c1', 'c3' ]);
+                expect(battle.cycleEngine.disableCharacters).toHaveBeenCalledWith([ 'c1', 'c3' ]);
             });
         });
 
         describe('on turn end', () => {
             it('before next turn, send turn start infos to every players', async () => {
-                const { cycleEngineOverlay, cycleEngine, listeners, playerList } = getCycleEngineOverlay();
+                const { battle, service, playerList, expectedCycleEngine } = getCycleEngineOverlay();
 
-                await cycleEngineOverlay.start();
+                let listeners: CycleEngineListeners = null as any;
+                battle.cycleEngine = service.createCycleEngine(battle, params => {
+                    listeners = params.listeners;
 
-                cycleEngine.getNextTurnInfos = jest.fn(() => ({
+                    return expectedCycleEngine;
+                });
+
+                battle.cycleRunning = true;
+                battle.cycleEngine.getNextTurnInfos = () => ({
                     characterId: 'c2',
                     roundIndex: 3,
                     startTime: 8,
                     turnIndex: 1
-                }));
+                });
 
                 await listeners.turnEnd!({
                     roundIndex: 3,
                     lastRoundTurn: false,
                     currentTurn: {
                         characterId: 'c2',
+                        startTime: 8,
+                        turnIndex: 1,
                         characterIndex: 2,
                         duration: 12,
                         endTime: 45,
-                        startTime: 8,
-                        turnIndex: 1,
                         endTimeDelta: 8
                     }
                 });

@@ -1,10 +1,9 @@
-import { ArrayUtils, CharacterId, createId, ObjectTyped, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell, waitMs } from '@timeflies/common';
-import { TurnInfos } from '@timeflies/cycle-engine';
-import { logger } from '@timeflies/devtools';
+import { CharacterId, createId, PlayerId, SerializableState, SpellId, StaticCharacter, StaticPlayer, StaticSpell } from '@timeflies/common';
+import { CycleEngine, TurnInfos } from '@timeflies/cycle-engine';
 import { MapInfos, RoomEntityListGetMessageData, RoomStaticCharacter, RoomStaticPlayer } from '@timeflies/socket-messages';
 import type TiledMap from 'tiled-types';
 import { GlobalEntities } from '../../main/global-entities';
-import { assetUrl, AssetUrl } from '../../utils/asset-url';
+import { PartialCycleBattle } from './cycle/cycle-battle-service';
 import { getBattleStaticData } from './get-battle-static-data';
 
 export type BattlePayload = {
@@ -34,30 +33,31 @@ export type Battle = {
     battleId: BattleId;
     roomId: string;
 
+    playerIdList: Set<PlayerId>;
     staticPlayers: StaticPlayer[];
     staticCharacters: StaticCharacter[];
     staticSpells: StaticSpell[];
 
+    mapInfos: MapInfos;
     tiledMap: TiledMap;
     staticState: StaticState;
 
+    waitingPlayerList: Set<PlayerId>;
     disconnectedPlayers: DisconnectedPlayers;
     leavedPlayers: Set<PlayerId>;
 
-    playerJoin: (playerId: PlayerId) => void;
-    playerLeave: (playerId: PlayerId) => void;
-    playerDisconnect: (playerId: PlayerId) => void;
-    getMapInfos: (parseUrlMode: keyof AssetUrl) => MapInfos;
-    getCycleInfos: () => CycleInfos;
-    getCurrentTurnInfos: () => Pick<TurnInfos, 'characterId' | 'startTime'> | null;
-    getCurrentState: () => SerializableState;
-    addNewState: (state: SerializableState, stateEndTime: number) => Promise<void>;
-    canStartBattle: () => boolean;
-    startBattle: () => Promise<void>;
+    stateStack: SerializableState[];
+
+    cycleEngine: CycleEngine;
+    cycleInfos: CycleInfos;
+    cycleRunning: boolean;
+    currentTurnInfos: Pick<TurnInfos, 'characterId' | 'startTime'> | null;
+
+    onBattleEnd: () => void;
 };
 
 export const createBattle = (
-    { services, playerCredentialsMap }: GlobalEntities,
+    { services }: GlobalEntities,
     battlePayload: BattlePayload,
     onBattleEnd: () => void
 ): Battle => {
@@ -79,145 +79,36 @@ export const createBattle = (
     const disconnectedPlayers: DisconnectedPlayers = {};
     const leavedPlayers = new Set<PlayerId>();
 
-    const cycleEngine = services.cycleBattleService.createCycleEngineOverlay({
+    const partialBattle: PartialCycleBattle = {
         battleId,
         playerIdList,
-        charactersList: turnsOrder,
-        charactersDurations: initialSerializableState.characters.actionTime
-    });
-
-    const startBattle = async () => {
-        // let some time for client to setup listeners
-        await waitMs(1000);
-
-        logger.info('Battle [' + battleId + '] start');
-
-        return cycleEngine.start();
+        stateStack,
+        cycleInfos: { turnsOrder },
+        currentTurnInfos: null,
+        cycleRunning: false
     };
 
-    const battleEnd = async (winnerTeamColor: string, stateEndTime: number) => {
-        logger.info('Battle [' + battleId + '] ending...');
+    const cycleEngine = services.cycleBattleService.createCycleEngine(partialBattle);
 
-        await cycleEngine.stop();
-
-        services.endBattleService.onBattleEnd(winnerTeamColor, stateEndTime, playerIdList);
-        logger.info('Battle [' + battleId + '] ended.');
-
-        onBattleEnd();
-    };
-
-    const addSpectator = (playerId: PlayerId) => {
-
-        const player: StaticPlayer = {
-            playerId,
-            playerName: playerCredentialsMap.mapById[ playerId ].playerName,
-            teamColor: null,
-            type: 'spectator'
-        };
-
-        playerIdList.add(playerId);
-
-        staticPlayers.push(player);
-        staticState.players[ playerId ] = player;
-    };
-
-    const removeSpectator = (playerId: PlayerId) => {
-        playerIdList.delete(playerId);
-
-        staticPlayers.splice(
-            staticPlayers.findIndex(c => c.playerId === playerId),
-            1
-        );
-        delete staticState.players[ playerId ];
-    };
-
-    return {
-        battleId,
+    const partialBattleOthers: Omit<Battle, keyof PartialCycleBattle> = {
         roomId,
 
         staticPlayers,
         staticCharacters,
         staticSpells,
 
+        mapInfos,
         tiledMap,
         staticState,
 
+        waitingPlayerList,
         disconnectedPlayers,
         leavedPlayers,
 
-        getMapInfos: parseUrlMode => {
-            const parseUrl = assetUrl[ parseUrlMode ];
+        cycleEngine,
 
-            return {
-                ...mapInfos,
-                schemaLink: parseUrl(mapInfos.schemaLink),
-                imagesLinks: ObjectTyped.entries(mapInfos.imagesLinks)
-                    .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
-                        acc[ key ] = parseUrl(value);
-                        return acc;
-                    }, {})
-            };
-        },
-
-        getCycleInfos: () => ({ turnsOrder }),
-
-        getCurrentTurnInfos: () => cycleEngine.getCurrentTurnInfos(),
-
-        getCurrentState: () => ArrayUtils.last(stateStack)!,
-
-        addNewState: async (state, stateEndTime) => {
-            stateStack.push(state);
-
-            // wait current spell action to end
-            const timeBeforeEnd = stateEndTime - Date.now();
-            await waitMs(timeBeforeEnd);
-
-            cycleEngine.onNewState(state);
-
-            const winnerTeamColor = services.endBattleService.isBattleEnded(state, staticState);
-            if (winnerTeamColor) {
-                await battleEnd(winnerTeamColor, stateEndTime);
-            }
-        },
-
-        playerJoin: playerId => {
-
-            if (staticState.players[ playerId ]) {
-
-                waitingPlayerList.delete(playerId);
-
-                leavedPlayers.delete(playerId);
-                delete disconnectedPlayers[ playerId ];
-            } else {
-
-                addSpectator(playerId);
-            }
-        },
-
-        playerLeave: playerId => {
-
-            if (staticState.players[ playerId ].type === 'player') {
-                leavedPlayers.add(playerId);
-
-            } else {
-
-                removeSpectator(playerId);
-            }
-        },
-
-        playerDisconnect: playerId => {
-
-            if (staticState.players[ playerId ].type === 'player') {
-                disconnectedPlayers[ playerId ] = Date.now();
-
-            } else {
-
-                removeSpectator(playerId);
-            }
-        },
-
-        canStartBattle: () => !cycleEngine.isStarted() && waitingPlayerList.size === 0,
-
-        startBattle,
+        onBattleEnd,
     };
+
+    return Object.assign(partialBattle, partialBattleOthers);
 };

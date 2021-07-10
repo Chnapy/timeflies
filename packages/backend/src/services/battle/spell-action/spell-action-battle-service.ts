@@ -3,9 +3,9 @@ import { BattleNotifyMessage, BattleSpellActionMessage } from '@timeflies/socket
 import { SocketCell } from '@timeflies/socket-server';
 import { CheckSpellParams, spellActionCheck } from '@timeflies/spell-checker';
 import { getSpellRangeArea } from '@timeflies/spell-effects';
-import { Service } from '../../service';
+import { BattleAbstractService } from '../battle-abstract-service';
 
-export class SpellActionBattleService extends Service {
+export class SpellActionBattleService extends BattleAbstractService {
     afterSocketConnect = (socketCell: SocketCell, currentPlayerId: PlayerId) => {
         this.addBattleSpellActionMessageListener(socketCell, currentPlayerId);
     };
@@ -13,11 +13,11 @@ export class SpellActionBattleService extends Service {
     private addBattleSpellActionMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleSpellActionMessage>(BattleSpellActionMessage, async ({ payload, requestId }, send) => {
         const battle = this.getBattleByPlayerId(currentPlayerId);
 
-        const { tiledMap, staticState, getCurrentTurnInfos, getCurrentState } = battle;
+        const { tiledMap, staticState, currentTurnInfos } = battle;
         const { spellAction } = payload;
 
-        const lastState = getCurrentState();
-        const turnInfos = getCurrentTurnInfos()!;
+        const lastState = this.getCurrentState(battle);
+        const turnInfos = currentTurnInfos!;
 
         const staticSpell = staticState.spells[ spellAction.spellId ];
 
@@ -80,6 +80,6 @@ export class SpellActionBattleService extends Service {
 
         send(BattleSpellActionMessage.createResponse(requestId, { success: true }));
 
-        return battle.addNewState(checkResult.newState, stateEndTime);
+        return this.addNewState(battle, checkResult.newState, stateEndTime);
     });
 }

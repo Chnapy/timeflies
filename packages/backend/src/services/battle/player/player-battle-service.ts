@@ -1,11 +1,12 @@
-import { CharacterId, PlayerId } from '@timeflies/common';
+import { CharacterId, PlayerId, StaticPlayer, waitMs } from '@timeflies/common';
+import { logger } from '@timeflies/devtools';
 import { BattleLeaveMessage, BattleLoadMessage, BattlePlayerDisconnectMessage, BattlePlayerDisconnectRemoveMessage } from '@timeflies/socket-messages';
 import { SocketCell } from '@timeflies/socket-server';
 import { produceStateDisconnectedPlayers } from '@timeflies/spell-effects';
-import { Service } from '../../service';
-import { BattleId } from '../battle';
+import { Battle, BattleId } from '../battle';
+import { BattleAbstractService } from '../battle-abstract-service';
 
-export class PlayerBattleService extends Service {
+export class PlayerBattleService extends BattleAbstractService {
     afterSocketConnect = (socketCell: SocketCell, currentPlayerId: PlayerId) => {
         this.addBattleLoadMessageListener(socketCell, currentPlayerId);
         this.addBattleLeaveMessageListener(socketCell, currentPlayerId);
@@ -33,7 +34,7 @@ export class PlayerBattleService extends Service {
 
         // add new state
         const newState = produceStateDisconnectedPlayers(
-            battle.getCurrentState(),
+            this.getCurrentState(battle),
             Date.now(),
             playersToRemove,
             battle.staticCharacters.reduce<{ [ characterId in CharacterId ]: PlayerId }>((acc, { characterId, playerId }) => {
@@ -42,7 +43,7 @@ export class PlayerBattleService extends Service {
             }, {})
         );
 
-        await battle.addNewState(newState, Date.now());
+        await this.addNewState(battle, newState, Date.now());
 
         // send removed players
         this.sendToEveryPlayersExcept(
@@ -57,26 +58,61 @@ export class PlayerBattleService extends Service {
     private addBattleLoadMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleLoadMessage>(BattleLoadMessage, async ({ payload, requestId }, send) => {
         const battle = this.getBattleById(payload.battleId);
 
-        battle.playerJoin(currentPlayerId);
+        if (battle.staticState.players[ currentPlayerId ]) {
 
-        const { roomId, staticPlayers, staticCharacters, staticSpells, getCurrentState, getMapInfos, getCycleInfos } = battle;
+            battle.waitingPlayerList.delete(currentPlayerId);
+
+            battle.leavedPlayers.delete(currentPlayerId);
+            delete battle.disconnectedPlayers[ currentPlayerId ];
+        } else {
+
+            this.addSpectator(battle, currentPlayerId);
+        }
+
+        const { roomId, staticPlayers, staticCharacters, staticSpells, cycleInfos } = battle;
 
         send(BattleLoadMessage.createResponse(requestId, {
             roomId,
-            tiledMapInfos: getMapInfos('toFrontend'),
+            tiledMapInfos: this.getMapInfosFrontend(battle),
             staticPlayers,
             staticCharacters,
             staticSpells,
-            initialSerializableState: getCurrentState(),
-            cycleInfos: getCycleInfos()
+            initialSerializableState: this.getCurrentState(battle),
+            cycleInfos
         }));
 
         this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ] = battle;
 
-        if (battle.canStartBattle()) {
-            await battle.startBattle();
+        if (this.canStartBattle(battle)) {
+            await this.startBattle(battle);
         }
     });
+
+    private canStartBattle = ({ cycleEngine, waitingPlayerList }: Battle) => !cycleEngine.isStarted() && waitingPlayerList.size === 0;
+
+    private startBattle = async (battle: Battle) => {
+        // let some time for client to setup listeners
+        await waitMs(1000);
+
+        logger.info('Battle [' + battle.battleId + '] start');
+
+        return this.services.cycleBattleService.start(battle);
+    };
+
+    private addSpectator = ({ playerIdList, staticPlayers, staticState }: Battle, playerId: PlayerId) => {
+
+        const player: StaticPlayer = {
+            playerId,
+            playerName: this.globalEntitiesNoServices.playerCredentialsMap.mapById[ playerId ].playerName,
+            teamColor: null,
+            type: 'spectator'
+        };
+
+        playerIdList.add(playerId);
+
+        staticPlayers.push(player);
+        staticState.players[ playerId ] = player;
+    };
 
     private addBattleLeaveMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener(BattleLeaveMessage, async (message, send) => {
         const battle = this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ];
@@ -86,7 +122,13 @@ export class PlayerBattleService extends Service {
 
         delete this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ currentPlayerId ];
 
-        battle.playerLeave(currentPlayerId);
+        if (battle.staticState.players[ currentPlayerId ].type === 'player') {
+            battle.leavedPlayers.add(currentPlayerId);
+
+        } else {
+
+            this.removeSpectator(battle, currentPlayerId);
+        }
     });
 
     private getPlayerDisconnectFn = (currentPlayerId: PlayerId) => () => {
@@ -95,12 +137,28 @@ export class PlayerBattleService extends Service {
             return;
         }
 
-        battle.playerDisconnect(currentPlayerId);
+        if (battle.staticState.players[ currentPlayerId ].type === 'player') {
+            battle.disconnectedPlayers[ currentPlayerId ] = Date.now();
+
+        } else {
+
+            this.removeSpectator(battle, currentPlayerId);
+        }
 
         this.sendToEveryPlayersExcept(
             BattlePlayerDisconnectMessage({ playerId: currentPlayerId }),
             battle.staticPlayers,
             currentPlayerId
         );
+    };
+
+    private removeSpectator = ({ playerIdList, staticPlayers, staticState }: Battle, playerId: PlayerId) => {
+        playerIdList.delete(playerId);
+
+        staticPlayers.splice(
+            staticPlayers.findIndex(c => c.playerId === playerId),
+            1
+        );
+        delete staticState.players[ playerId ];
     };
 }

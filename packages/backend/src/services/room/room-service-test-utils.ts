@@ -50,19 +50,6 @@ export const createFakeRoom = (): Room => ({
     battle: null,
 
     cancelBattleLaunch: jest.fn()
-
-    // playerJoin: jest.fn(),
-    // playerReady: jest.fn(),
-    // playerLeave: jest.fn(),
-    // teamJoin: jest.fn(),
-    // mapSelect: jest.fn(async () => {}),
-    // characterSelect: jest.fn(),
-    // characterRemove: jest.fn(),
-    // characterPlacement: jest.fn(),
-    // waitForBattle: jest.fn(async () => 'completed'),
-    // createBattle: jest.fn(async () => createFakeBattle()),
-    // removeBattle: jest.fn(),
-    // getCurrentBattleId: jest.fn(() => null)
 });
 
 export const getFakeRoomEntities = <S extends Service>(serviceCreator: { new(...args: any[]): S }) => {
