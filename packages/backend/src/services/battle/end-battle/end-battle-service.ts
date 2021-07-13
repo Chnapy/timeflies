@@ -1,9 +1,10 @@
-import { ObjectTyped, PlayerId, SerializableState } from '@timeflies/common';
+import { ObjectTyped, SerializableState } from '@timeflies/common';
+import { logger } from '@timeflies/devtools';
 import { BattleEndMessage } from '@timeflies/socket-messages';
-import { Service } from '../../service';
-import { StaticState } from '../battle';
+import { Battle, StaticState } from '../battle';
+import { BattleAbstractService } from '../battle-abstract-service';
 
-export class EndBattleService extends Service {
+export class EndBattleService extends BattleAbstractService {
     afterSocketConnect = () => { };
 
     isBattleEnded = ({ characters }: Pick<SerializableState, 'characters'>, { players, characters: staticCharacters }: Pick<StaticState, 'players' | 'characters'>): string | null => {
@@ -29,7 +30,13 @@ export class EndBattleService extends Service {
         return teamColorAliveList[ 0 ];
     };
 
-    onBattleEnd = (winnerTeamColor: string, endTime: number, playerIdList: Set<PlayerId>) => {
+    onBattleEnd = async (battle: Battle, winnerTeamColor: string, endTime: number) => {
+        const { battleId, playerIdList, onBattleEnd } = battle;
+
+        logger.info('Battle [' + battleId + '] ending...');
+
+        await this.services.cycleBattleService.stop(battle);
+
         playerIdList.forEach(playerId => {
             const socketCell = this.playerSocketMap[ playerId ];
 
@@ -42,5 +49,9 @@ export class EndBattleService extends Service {
 
             delete this.globalEntitiesNoServices.currentBattleMap.mapByPlayerId[ playerId ];
         });
+
+        logger.info('Battle [' + battleId + '] ended.');
+
+        onBattleEnd();
     };
 }

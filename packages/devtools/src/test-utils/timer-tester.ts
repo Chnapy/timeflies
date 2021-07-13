@@ -57,7 +57,7 @@ const createTimerTester = () => {
             }
         },
 
-        waitTimer: async (promise: Promise<any>) => {
+        waitTimer: async (promise: unknown) => {
             for (let i = 0; i < 3; i++) {
                 await advance(Infinity);
                 await triggerPromises();

@@ -39,7 +39,7 @@ export class ChatService extends Service {
         } else if (room) {
             this.sendToEveryPlayersExcept(
                 message,
-                room.getRoomStateData().staticPlayerList,
+                room.staticPlayerList,
                 currentPlayerId
             );
         }

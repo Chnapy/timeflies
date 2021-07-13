@@ -1,10 +1,14 @@
 import { ObjectTyped } from '@timeflies/common';
-import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
+import { MapInfos, MapPlacementTiles, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
 import { SocketCell, SocketError } from '@timeflies/socket-server';
+import { Layer, Tile } from '@timeflies/tilemap-utils';
+import fs from 'fs';
+import type { TiledMap } from 'tiled-types';
+import util from 'util';
 import { assetUrl } from '../../../utils/asset-url';
-import { Service } from '../../service';
+import { RoomAbstractService } from '../room-abstract-service';
 
-export class MapRoomService extends Service {
+export class MapRoomService extends RoomAbstractService {
     protected afterSocketConnect = (socketCell: SocketCell, currentPlayerId: string) => {
         this.addRoomMapListGetMessageListener(socketCell);
         this.addRoomMapSelectMessageListener(socketCell, currentPlayerId);
@@ -22,7 +26,7 @@ export class MapRoomService extends Service {
         RoomMapSelectMessage, async ({ payload, requestId }, send) => {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
-            const { playerAdminId, staticPlayerList } = room.getRoomStateData();
+            const { playerAdminId, staticPlayerList } = this.getRoomStateData(room);
 
             if (playerAdminId !== currentPlayerId) {
                 throw new SocketError('bad-server-state', 'Player is not room admin: ' + currentPlayerId);
@@ -35,17 +39,52 @@ export class MapRoomService extends Service {
 
             const mapList = getMapList();
 
-            const map = mapList.find(m => m.mapId === payload.mapId);
-            if (!map) {
+            const mapInfos = mapList.find(m => m.mapId === payload.mapId);
+            if (!mapInfos) {
                 throw new SocketError('bad-request', 'Wrong map id: ' + payload.mapId);
             }
 
-            await room.mapSelect(map);
+            room.mapInfos = mapInfos;
+            room.staticCharacterList.forEach(character => {
+                character.placement = null;
+            });
+            room.teamColorList = this.services.teamRoomService.getRoomTeamColorList(room);
+            room.tiledMap = await this.loadTiledMap(mapInfos);
+            room.mapPlacementTiles = await this.computeMapPlacementTiles(room.tiledMap, room.teamColorList);
 
-            send(RoomMapSelectMessage.createResponse(requestId, room.getRoomStateData()));
+            send(RoomMapSelectMessage.createResponse(requestId, this.getRoomStateData(room)));
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
         });
+
+    private loadTiledMap = async (mapInfos: MapInfos): Promise<TiledMap> => {
+        const readFile = util.promisify(fs.readFile);
+
+        const tiledMapRaw = await readFile(assetUrl.toBackend(mapInfos.schemaLink), 'utf-8');
+        const tiledMap: TiledMap = JSON.parse(tiledMapRaw);
+
+        return tiledMap;
+    };
+
+    private computeMapPlacementTiles = async (tiledMap: TiledMap, teamColorList: string[]): Promise<MapPlacementTiles> => {
+        const placementLayer = Layer.getTilelayer('placement', tiledMap);
+        const tilePositionsMap: MapPlacementTiles = {};
+
+        (placementLayer.data as number[]).forEach((tileId, index) => {
+            if (tileId) {
+                tilePositionsMap[ tileId ] = tilePositionsMap[ tileId ] ?? [];
+                tilePositionsMap[ tileId ].push(Tile.getTilePositionFromIndex(index, tiledMap));
+            }
+        });
+
+        return ObjectTyped.entries(tilePositionsMap)
+            .reduce<MapPlacementTiles>((acc, [ tileId, positionList ], index) => {
+
+                acc[ teamColorList[ index ] ] = positionList;
+
+                return acc;
+            }, {});
+    };
 
     getMapInfosFrontend = (mapInfos: MapInfos) => {
         return {

@@ -1,51 +1,24 @@
-import { CharacterUtils, ObjectTyped, PlayerId, SerializableState } from '@timeflies/common';
-import { createCycleEngine as _createCycleEngine, CycleEngineProps, TurnInfos } from '@timeflies/cycle-engine';
+import { CharacterUtils, ObjectTyped, SerializableState } from '@timeflies/common';
+import { createCycleEngine as _createCycleEngine, CycleEngine } from '@timeflies/cycle-engine';
 import { logger } from '@timeflies/devtools';
 import { BattleTurnStartMessage } from '@timeflies/socket-messages';
-import { Service } from '../../service';
-import { BattleId } from '../battle';
+import { Battle } from '../battle';
+import { BattleAbstractService } from '../battle-abstract-service';
 
-type GetCycleEngineProps = Pick<CycleEngineProps, 'charactersList' | 'charactersDurations'> & {
-    battleId: BattleId;
-    playerIdList: Set<PlayerId>;
-};
+export type PartialCycleBattle = Pick<Battle, 'battleId' | 'playerIdList' | 'cycleInfos' | 'stateStack' | 'currentTurnInfos' | 'cycleRunning'>;
 
-export class CycleBattleService extends Service {
+export class CycleBattleService extends BattleAbstractService {
     afterSocketConnect = () => { };
 
-    createCycleEngineOverlay = ({
-        battleId,
-        charactersList,
-        charactersDurations,
-        playerIdList
-    }: GetCycleEngineProps, createCycleEngine = _createCycleEngine) => {
-        let cycleRunning = false;
-        let currentTurnInfos: TurnInfos | null = null;
+    createCycleEngine = (battle: PartialCycleBattle, createEngine = _createCycleEngine) => {
+        const { battleId, cycleInfos } = battle;
 
-        const beforeTurnStart = () => {
-            const { roundIndex, turnIndex, characterId, startTime } = cycleEngine.getNextTurnInfos();
-
-            playerIdList.forEach(playerId => {
-
-                const socketCell = this.playerSocketMap[ playerId ];
-
-                if (socketCell) {
-                    socketCell.send(BattleTurnStartMessage({
-                        roundIndex,
-                        turnIndex,
-                        characterId,
-                        startTime
-                    }));
-                }
-            });
-        };
-
-        const cycleEngine = createCycleEngine({
-            charactersList,
-            charactersDurations,
+        const cycleEngine = createEngine({
+            charactersList:cycleInfos.turnsOrder,
+            charactersDurations: this.getCurrentState(battle).characters.actionTime,
             listeners: {
                 turnStart: ({ currentTurn }) => {
-                    currentTurnInfos = currentTurn;
+                    battle.currentTurnInfos = currentTurn;
 
                     logger.info('Battle [' + battleId + '] -', 'Cycle turn start', currentTurn);
                 },
@@ -54,51 +27,65 @@ export class CycleBattleService extends Service {
 
                     await this.services.playerBattleService.checkLeavedAndDisconnectedPlayers(battleId);
 
-                    if (cycleRunning) {
-                        beforeTurnStart();
+                    if (battle.cycleRunning) {
+                        this.beforeTurnStart(battle, cycleEngine);
                         return cycleEngine.startNextTurn();
                     }
                 }
             }
         });
+        return cycleEngine;
+    };
 
-        const start = () => {
-            logger.info('Battle [' + battleId + '] -', 'Cycle start');
+    private beforeTurnStart = ({ playerIdList }: Pick<Battle, 'playerIdList'>, cycleEngine: CycleEngine) => {
+        const { roundIndex, turnIndex, characterId, startTime } = cycleEngine.getNextTurnInfos();
 
-            const promise = cycleEngine.start();
+        playerIdList.forEach(playerId => {
 
-            cycleRunning = true;
+            const socketCell = this.playerSocketMap[ playerId ];
 
-            beforeTurnStart();
+            if (socketCell) {
+                socketCell.send(BattleTurnStartMessage({
+                    roundIndex,
+                    turnIndex,
+                    characterId,
+                    startTime
+                }));
+            }
+        });
+    };
 
-            return promise;
-        };
+    start = (battle: Battle) => {
+        const { battleId, cycleEngine } = battle;
 
-        const stop = async () => {
-            logger.info('Battle [' + battleId + '] -', 'Cycle ending...');
+        logger.info('Battle [' + battleId + '] -', 'Cycle start');
 
-            await cycleEngine.stop();
+        const promise = cycleEngine.start();
 
-            cycleRunning = false;
+        battle.cycleRunning = true;
 
-            logger.info('Battle [' + battleId + '] -', 'Cycle ended.');
-        };
+        this.beforeTurnStart(battle, cycleEngine);
 
-        const onNewState = ({ characters }: Pick<SerializableState, 'characters'>) => {
-            const deadCharactersIds = ObjectTyped.entries(characters.health)
-                .filter(([ characterId, health ]) => !CharacterUtils.isAlive(health))
-                .map(([ characterId ]) => characterId);
+        return promise;
+    };
 
-            cycleEngine.disableCharacters(deadCharactersIds);
-        };
+    stop = async (battle: Battle) => {
+        const { battleId, cycleEngine } = battle;
 
-        return {
-            start,
-            stop,
-            onNewState,
-            isStarted: () => cycleEngine.isStarted(),
-            isRunning: () => cycleRunning,
-            getCurrentTurnInfos: () => currentTurnInfos
-        };
+        logger.info('Battle [' + battleId + '] -', 'Cycle ending...');
+
+        await cycleEngine.stop();
+
+        battle.cycleRunning = false;
+
+        logger.info('Battle [' + battleId + '] -', 'Cycle ended.');
+    };
+
+    onNewState = ({ cycleEngine }: Battle, { characters }: Pick<SerializableState, 'characters'>) => {
+        const deadCharactersIds = ObjectTyped.entries(characters.health)
+            .filter(([ characterId, health ]) => !CharacterUtils.isAlive(health))
+            .map(([ characterId ]) => characterId);
+
+        cycleEngine.disableCharacters(deadCharactersIds);
     };
 };

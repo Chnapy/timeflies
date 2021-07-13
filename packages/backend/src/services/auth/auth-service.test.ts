@@ -8,14 +8,6 @@ import { AuthService } from './auth-service';
 
 describe('auth service', () => {
 
-    beforeEach(() => {
-        timerTester.beforeTest();
-    });
-
-    afterEach(() => {
-        timerTester.afterTest();
-    });
-
     const getEntities = () => {
         const globalEntities = createFakeGlobalEntitiesNoService();
         const service = new AuthService(globalEntities);

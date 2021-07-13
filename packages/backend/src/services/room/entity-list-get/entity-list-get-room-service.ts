@@ -1,8 +1,8 @@
 import { RoomEntityListGetMessage, RoomEntityListGetMessageData } from '@timeflies/socket-messages';
 import { SocketCell } from '@timeflies/socket-server';
-import { Service } from '../../service';
+import { RoomAbstractService } from '../room-abstract-service';
 
-export class EntityListGetRoomService extends Service {
+export class EntityListGetRoomService extends RoomAbstractService {
     protected afterSocketConnect = (socketCell: SocketCell) => {
         this.addRoomMapSelectMessageListener(socketCell);
     };

@@ -19,10 +19,7 @@ export class CreateRoomListService extends Service {
                 throw new SocketError('bad-server-state', 'Cannot create room if player in battle.');
             }
 
-            const room = createRoom({
-                ...this.globalEntitiesNoServices,
-                services: this.services
-            });
+            const room = createRoom();
 
             this.services.playerRoomService.playerJoinToRoom(room, currentPlayerId);
 

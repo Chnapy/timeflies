@@ -1,70 +1,65 @@
-import { Message, MessageWithResponseCreator, RoomStateMessage } from '@timeflies/socket-messages';
-import { createFakeBattle } from '../battle/battle-service-test-utils';
+import { ObjectTyped } from '@timeflies/common';
+import { MapInfos, Message, MessageWithResponseCreator, RoomStateData, RoomStateMessage } from '@timeflies/socket-messages';
+import { assetUrl } from '../../utils/asset-url';
 import { Service } from '../service';
 import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../service-test-utils';
+import { createServices } from '../services';
 import { Room } from './room';
 
 export const createFakeRoom = (): Room => ({
     roomId: 'room',
-    getRoomStateData: jest.fn(() => ({
-        roomId: 'room',
-        mapInfos: {
-            mapId: 'm1',
-            name: 'm1',
-            nbrTeams: 3,
-            nbrTeamCharacters: 4,
-            schemaLink: '',
-            imagesLinks: {}
+
+    mapInfos: {
+        mapId: 'm1',
+        name: 'm1',
+        nbrTeams: 3,
+        nbrTeamCharacters: 4,
+        schemaLink: '',
+        imagesLinks: {}
+    },
+    teamColorList: [ '#FFF', '#000' ],
+    playerAdminId: 'p1',
+    staticPlayerList: [
+        {
+            playerId: 'p1',
+            playerName: 'p1',
+            teamColor: null,
+            ready: false,
+            type: 'player'
         },
-        mapPlacementTiles: {},
-        playerAdminId: 'p1',
-        teamColorList: [ '#FFF', '#000' ],
-        staticPlayerList: [
-            {
-                playerId: 'p1',
-                playerName: 'p1',
-                teamColor: null,
-                ready: false,
-                type: 'player'
-            },
-            {
-                playerId: 'p2',
-                playerName: 'p2',
-                teamColor: null,
-                ready: false,
-                type: 'player'
-            },
-            {
-                playerId: 'p3',
-                playerName: 'p3',
-                teamColor: null,
-                ready: false,
-                type: 'player'
-            }
-        ],
-        staticCharacterList: []
-    })),
-    playerJoin: jest.fn(),
-    playerReady: jest.fn(),
-    playerLeave: jest.fn(),
-    teamJoin: jest.fn(),
-    mapSelect: jest.fn(async () => {}),
-    characterSelect: jest.fn(),
-    characterRemove: jest.fn(),
-    characterPlacement: jest.fn(),
-    waitForBattle: jest.fn(async () => 'completed'),
-    createBattle: jest.fn(async () => createFakeBattle()),
-    removeBattle: jest.fn(),
-    getCurrentBattleId: jest.fn(() => null)
+        {
+            playerId: 'p2',
+            playerName: 'p2',
+            teamColor: null,
+            ready: false,
+            type: 'player'
+        },
+        {
+            playerId: 'p3',
+            playerName: 'p3',
+            teamColor: null,
+            ready: false,
+            type: 'player'
+        }
+    ],
+    staticCharacterList: [],
+
+    tiledMap: null,
+    mapPlacementTiles: {},
+
+    battle: null,
+
+    cancelBattleLaunch: jest.fn()
 });
 
-export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(serviceCreator: S) => {
+export const getFakeRoomEntities = <S extends Service>(serviceCreator: { new(...args: any[]): S }) => {
     const socketCellP1 = createFakeSocketCell();
     const socketCellP2 = createFakeSocketCell();
     const socketCellP3 = createFakeSocketCell();
     const room = createFakeRoom();
     const globalEntities = createFakeGlobalEntitiesNoService(room);
     const service = new serviceCreator(globalEntities);
+    service.services = createServices(globalEntities);
 
     const connectSocket = () => {
         service.onSocketConnect(socketCellP1, 'p1');
@@ -72,10 +67,31 @@ export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(
         service.onSocketConnect(socketCellP3, 'p3');
     };
 
-    const expectPlayersAnswers = <M extends MessageWithResponseCreator<any, any>>(messageCreator: M) => {
-        expect(socketCellP1.send).toHaveBeenCalledWith(messageCreator.createResponse(expect.anything(), room.getRoomStateData()));
-        expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
-        expect(socketCellP1.send).not.toHaveBeenCalledWith(RoomStateMessage(room.getRoomStateData()));
+    const getRoomStateData = ({
+        roomId,
+        mapInfos,
+        teamColorList,
+        playerAdminId,
+        staticPlayerList,
+        staticCharacterList,
+        mapPlacementTiles
+    }: Room): RoomStateData => ({
+        roomId, teamColorList, playerAdminId, staticPlayerList, staticCharacterList, mapPlacementTiles,
+        mapInfos: {
+            ...mapInfos!,
+            schemaLink: assetUrl.toFrontend(mapInfos!.schemaLink),
+            imagesLinks: ObjectTyped.entries(mapInfos!.imagesLinks)
+                .reduce<MapInfos[ 'imagesLinks' ]>((acc, [ key, value ]) => {
+                    acc[ key ] = assetUrl.toFrontend(value);
+                    return acc;
+                }, {})
+        }
+    });
+
+    const expectPlayersAnswers = <M extends MessageWithResponseCreator<any, any>>(messageCreator: M, roomStateData: RoomStateData = getRoomStateData(room)) => {
+        expect(socketCellP1.send).toHaveBeenCalledWith(messageCreator.createResponse(expect.anything(), roomStateData));
+        expect(socketCellP2.send).toHaveBeenCalledWith(RoomStateMessage(roomStateData));
+        expect(socketCellP1.send).not.toHaveBeenCalledWith(RoomStateMessage(roomStateData));
     };
 
     const expectEveryPlayersReceived = <M extends Message<any>>(message: M) => {
@@ -84,5 +100,5 @@ export const getFakeRoomEntities = <S extends { new(...args: any[]): Service }>(
         expect(socketCellP3.send).toHaveBeenCalledWith(message);
     };
 
-    return { socketCellP1, socketCellP2, room, globalEntities, service, connectSocket, expectPlayersAnswers, expectEveryPlayersReceived };
+    return { socketCellP1, socketCellP2, room, globalEntities, service, getRoomStateData, connectSocket, expectPlayersAnswers, expectEveryPlayersReceived };
 };

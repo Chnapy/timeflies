@@ -1,6 +1,7 @@
-import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
+import { createPosition } from '@timeflies/common';
+import { MapInfos, MapPlacementTiles, RoomMapListGetMessage, RoomMapSelectMessage, RoomStaticCharacter } from '@timeflies/socket-messages';
 import { SocketError } from '@timeflies/socket-server';
-import { createFakeRoom, getFakeRoomEntities } from '../room-service-test-utils';
+import { getFakeRoomEntities } from '../room-service-test-utils';
 import { MapRoomService } from './map-room-service';
 
 describe('map room service', () => {
@@ -50,10 +51,7 @@ describe('map room service', () => {
         it('throw error if player not admin', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                playerAdminId: 'p2'
-            }));
+            room.playerAdminId = 'p2';
 
             connectSocket();
 
@@ -73,22 +71,104 @@ describe('map room service', () => {
 
             const listener = socketCellP1.getFirstListener(RoomMapSelectMessage);
 
-            room.getRoomStateData = jest.fn(() => ({
-                ...createFakeRoom().getRoomStateData(),
-                staticPlayerList: [ {
-                    playerId: 'p1',
-                    playerName: '',
-                    teamColor: '#000',
-                    ready: true,
-                    type: 'player'
-                } ]
-            }));
+            room.staticPlayerList = [ {
+                playerId: 'p1',
+                playerName: '',
+                teamColor: '#000',
+                ready: true,
+                type: 'player'
+            } ];
 
             await expect(
                 listener(RoomMapSelectMessage({
                     mapId: 'm1'
                 }).get(), socketCellP1.send)
             ).rejects.toBeInstanceOf(SocketError);
+        });
+
+        it('set map infos', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomMapSelectMessage);
+
+            await listener(RoomMapSelectMessage({
+                mapId: 'm1'
+            }).get(), socketCellP1.send);
+
+            expect(room.mapInfos).toEqual<MapInfos>({
+                mapId: 'm1',
+                name: 'Dungeon',
+                nbrTeams: 3,
+                nbrTeamCharacters: 4,
+                schemaLink: '/maps/1-map_dungeon.json',
+                imagesLinks: {
+                    "tiles_dungeon_v1.1": '/maps/map_dungeon.png'
+                }
+            });
+        });
+
+        it('reset characters placement', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomMapSelectMessage);
+
+            room.staticCharacterList = [
+                {
+                    characterId: 'c1',
+                    characterRole: 'tacka',
+                    playerId: 'p1',
+                    placement: createPosition(1, 1)
+                }
+            ];
+
+            await listener(RoomMapSelectMessage({
+                mapId: 'm1'
+            }).get(), socketCellP1.send);
+
+            expect(room.staticCharacterList).toEqual<RoomStaticCharacter[]>([
+                {
+                    characterId: 'c1',
+                    characterRole: 'tacka',
+                    playerId: 'p1',
+                    placement: null
+                }
+            ]);
+        });
+
+        it('set tiled map', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomMapSelectMessage);
+
+            await listener(RoomMapSelectMessage({
+                mapId: 'm1'
+            }).get(), socketCellP1.send);
+
+            expect(room.tiledMap).toMatchObject({ layers: expect.any(Array) });
+        });
+
+        it('set map placement tiles', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomMapSelectMessage);
+
+            await listener(RoomMapSelectMessage({
+                mapId: 'm1'
+            }).get(), socketCellP1.send);
+
+            expect(room.mapPlacementTiles).toEqual<MapPlacementTiles>({
+                '#3BA92A': expect.any(Array),
+                '#A93B2A': expect.any(Array),
+                '#FFD74A': expect.any(Array)
+            });
         });
 
         it('answers with room state, and send update to other players', async () => {
@@ -103,30 +183,6 @@ describe('map room service', () => {
             }).get(), socketCellP1.send);
 
             expectPlayersAnswers(RoomMapSelectMessage);
-        });
-
-        it('map select, before answering', async () => {
-            const { socketCellP1, connectSocket, room } = getEntities();
-
-            const callOrder: string[] = [];
-
-            socketCellP1.send = jest.fn(message => callOrder.push(message.action));
-            room.mapSelect = jest.fn(async () => { callOrder.push('map-select'); });
-
-            connectSocket();
-
-            const listener = socketCellP1.getFirstListener(RoomMapSelectMessage);
-
-            await listener(RoomMapSelectMessage({
-                mapId: 'm1'
-            }).get(), socketCellP1.send);
-
-            expect(room.mapSelect).toHaveBeenCalledWith(
-                expect.objectContaining<Partial<MapInfos>>({
-                    mapId: 'm1'
-                })
-            );
-            expect(callOrder).toEqual([ 'map-select', RoomMapSelectMessage.action ]);
         });
     });
 });

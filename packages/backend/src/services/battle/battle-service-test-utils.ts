@@ -6,6 +6,8 @@ import { Battle } from './battle';
 export const createFakeBattle = (): Battle => ({
     battleId: 'battle',
     roomId: 'room',
+    playerIdList: new Set([ 'p1', 'p2', 'p3' ]),
+    waitingPlayerList: new Set(),
     staticPlayers: [
         { playerId: 'p1' } as any,
         { playerId: 'p2' } as any,
@@ -83,45 +85,63 @@ export const createFakeBattle = (): Battle => ({
     },
     disconnectedPlayers: {},
     leavedPlayers: new Set(),
+
+    mapInfos: {
+        mapId: 'm1',
+        name: '',
+        schemaLink: '',
+        imagesLinks: {},
+        nbrTeams: 2,
+        nbrTeamCharacters: 2
+    },
     tiledMap: {
         layers: [ {
             name: 'obstacles',
             data: ArrayUtils.range(50)
         } as TiledLayer ]
     } as any,
-    playerJoin: jest.fn(),
-    playerLeave: jest.fn(),
-    playerDisconnect: jest.fn(),
-    getMapInfos: jest.fn(),
-    getCycleInfos: jest.fn(),
-    getCurrentState: jest.fn(() => {
 
-        const state: SerializableState = {
-            checksum: '',
-            time: 1,
-            characters: {
-                health: { c1: 100, c2: 100, c3: 100 },
-                position: { c1: createPosition(0, 0) },
-                actionTime: { c1: 1000 },
-                orientation: { c1: 'bottom' }
-            },
-            spells: {
-                rangeArea: { s1: 500 },
-                actionArea: { s1: 1 },
-                lineOfSight: { s1: false },
-                duration: { s1: 1 },
-                attack: { s1: 10 }
-            }
-        };
-        state.checksum = computeChecksum(state);
-        return state;
-    }),
-    getCurrentTurnInfos: jest.fn(() => ({
+    stateStack: [
+        (() => {
+
+            const state: SerializableState = {
+                checksum: '',
+                time: 1,
+                characters: {
+                    health: { c1: 100, c2: 100, c3: 100 },
+                    position: { c1: createPosition(0, 0) },
+                    actionTime: { c1: 1000 },
+                    orientation: { c1: 'bottom' }
+                },
+                spells: {
+                    rangeArea: { s1: 500 },
+                    actionArea: { s1: 1 },
+                    lineOfSight: { s1: false },
+                    duration: { s1: 1 },
+                    attack: { s1: 10 }
+                }
+            };
+            state.checksum = computeChecksum(state);
+            return state;
+        })()
+    ],
+
+    cycleEngine: {
+        start: jest.fn(),
+        stop: jest.fn(),
+        isStarted: jest.fn(() => false),
+        disableCharacters: jest.fn(),
+        getNextTurnInfos: jest.fn(() => ({ characterId: 'c1', roundIndex: 0, startTime: Date.now(), turnIndex: 0 })),
+        setCharacterDuration: jest.fn(),
+        setTurnsOrder: jest.fn(),
+        startNextTurn: jest.fn(async () => { }),
+    },
+    cycleRunning: false,
+    cycleInfos: { turnsOrder: [ 'c1', 'c2', 'c3' ] },
+    currentTurnInfos: {
         characterId: 'c1',
         startTime: 1
-    })),
-    addNewState: jest.fn(),
-    canStartBattle: jest.fn(() => false),
-    startBattle: jest.fn(async () => { }),
+    },
     
+    onBattleEnd: jest.fn()
 });
