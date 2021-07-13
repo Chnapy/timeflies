@@ -205,6 +205,37 @@ describe('cycle battle service', () => {
                     }));
                 }
             });
+
+            it('do not play next turn if battle not running', async () => {
+                const { battle, service, playerList, expectedCycleEngine } = getCycleEngineOverlay();
+
+                let listeners: CycleEngineListeners = null as any;
+                battle.cycleEngine = service.createCycleEngine(battle, params => {
+                    listeners = params.listeners;
+
+                    return expectedCycleEngine;
+                });
+
+                battle.cycleRunning = false;
+
+                await listeners.turnEnd!({
+                    roundIndex: 3,
+                    lastRoundTurn: false,
+                    currentTurn: {
+                        characterId: 'c2',
+                        startTime: 8,
+                        turnIndex: 1,
+                        characterIndex: 2,
+                        duration: 12,
+                        endTime: 45,
+                        endTimeDelta: 8
+                    }
+                });
+
+                for (const { socketCell } of playerList) {
+                    expect(socketCell.send).not.toHaveBeenCalledWith(BattleTurnStartMessage(expect.anything()));
+                }
+            });
         });
     });
 });

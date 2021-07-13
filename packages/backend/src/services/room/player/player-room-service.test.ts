@@ -118,6 +118,7 @@ describe('player room service', () => {
             const listener = socketCellP1.getFirstListener(RoomPlayerJoinMessage);
 
             room.staticPlayerList = [];
+            room.playerAdminId = '';
 
             await listener(RoomPlayerJoinMessage({
                 roomId: 'room'
@@ -312,6 +313,120 @@ describe('player room service', () => {
 
             expect(room.battle).toMatchObject<Partial<Battle>>({ battleId: expect.any(String) });
             expect(globalEntities.currentBattleMap.mapById[ room.battle!.battleId ]).toBe(room.battle);
+        });
+
+        it('gives room end callback to new battle', async () => {
+
+            const { socketCellP1, connectSocket, room, service } = getEntities();
+            service.services.playerRoomService = service;
+
+            service.onBattleEnd = jest.fn();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
+
+            room.staticPlayerList = [
+                {
+                    playerId: 'p1',
+                    playerName: 'p1',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p2',
+                    playerName: 'p2',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p3',
+                    playerName: 'p3',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p4',
+                    playerName: 'p4',
+                    teamColor: null,
+                    ready: false,
+                    type: 'spectator'
+                }
+            ];
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: createPosition(1, 1)
+            } ];
+
+            await timerTester.endTimer(
+                listener(RoomPlayerReadyMessage({
+                    ready: true
+                }).get(), socketCellP1.send)
+            );
+
+            room.battle!.onBattleEnd();
+
+            expect(service.onBattleEnd).toHaveBeenCalled();
+        });
+
+        it('do not start battle if launch canceled', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
+
+            room.staticPlayerList = [
+                {
+                    playerId: 'p1',
+                    playerName: 'p1',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p2',
+                    playerName: 'p2',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p3',
+                    playerName: 'p3',
+                    teamColor: null,
+                    ready: true,
+                    type: 'player'
+                },
+                {
+                    playerId: 'p4',
+                    playerName: 'p4',
+                    teamColor: null,
+                    ready: false,
+                    type: 'spectator'
+                }
+            ];
+            room.staticCharacterList = [ {
+                characterId: 'c1',
+                characterRole: 'tacka',
+                playerId: 'p1',
+                placement: createPosition(1, 1)
+            } ];
+
+            const promise = listener(RoomPlayerReadyMessage({
+                ready: true
+            }).get(), socketCellP1.send);
+
+            room.cancelBattleLaunch();
+
+            await timerTester.endTimer(promise);
+
+            expect(room.battle).toBeNull();
         });
 
         it('answers with room state, and send update to other players', async () => {

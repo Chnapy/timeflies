@@ -71,9 +71,15 @@ export class PlayerBattleService extends BattleAbstractService {
 
         const { roomId, staticPlayers, staticCharacters, staticSpells, cycleInfos } = battle;
 
+        const mapInfosFrontend = this.getMapInfosFrontend(battle);
+
         send(BattleLoadMessage.createResponse(requestId, {
             roomId,
-            tiledMapInfos: this.getMapInfosFrontend(battle),
+            tiledMapInfos: {
+                name: mapInfosFrontend.name,
+                schemaLink: mapInfosFrontend.schemaLink,
+                imagesLinks: mapInfosFrontend.imagesLinks
+            },
             staticPlayers,
             staticCharacters,
             staticSpells,

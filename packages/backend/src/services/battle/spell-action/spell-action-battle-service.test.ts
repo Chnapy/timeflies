@@ -230,6 +230,27 @@ describe('spell action battle service', () => {
                     BattleSpellActionMessage.action
                 ]);
             });
+
+            it('trigger battle end if any', async () => {
+
+                const { service, spellActionListener, battle, socketCell } = getDefaultEntities();
+
+                service.services.endBattleService.isBattleEnded = () => '#FFF';
+
+                await timerTester.waitTimer(
+                    spellActionListener(BattleSpellActionMessage({
+                        spellAction: {
+                            checksum: battle.stateStack[ 0 ].checksum,
+                            spellId: 's1',
+                            duration: 1,
+                            launchTime: 1,
+                            targetPos: createPosition(0, 0)
+                        }
+                    }).get(), socketCell.send)
+                );
+
+                expect(battle.onBattleEnd).toHaveBeenCalled();
+            });
         });
     });
 

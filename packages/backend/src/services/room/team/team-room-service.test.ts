@@ -45,7 +45,7 @@ describe('team room service', () => {
             ).toThrowError(SocketError);
         });
 
-        it('join team', async () => {
+        it('join team as player', async () => {
             const { socketCellP1, connectSocket, room } = getEntities();
 
             connectSocket();
@@ -56,7 +56,25 @@ describe('team room service', () => {
                 teamColor: '#FFF'
             }).get(), socketCellP1.send);
 
-            expect(room.staticPlayerList.find(p => p.playerId === 'p1')!.teamColor).toEqual('#FFF');
+            const player = room.staticPlayerList.find(p => p.playerId === 'p1')!;
+            expect(player.teamColor).toEqual('#FFF');
+            expect(player.type).toEqual('player');
+        });
+
+        it('join team as spectator', async () => {
+            const { socketCellP1, connectSocket, room } = getEntities();
+
+            connectSocket();
+
+            const listener = socketCellP1.getFirstListener(RoomTeamJoinMessage);
+
+            await listener(RoomTeamJoinMessage({
+                teamColor: null
+            }).get(), socketCellP1.send);
+
+            const player = room.staticPlayerList.find(p => p.playerId === 'p1')!;
+            expect(player.teamColor).toEqual(null);
+            expect(player.type).toEqual('spectator');
         });
 
         it('answers with room state, and send update to other players', async () => {

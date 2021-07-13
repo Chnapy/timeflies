@@ -426,6 +426,18 @@ describe('character room service', () => {
                 characterRole: 'tacka',
                 placement: createPosition(1, 1)
             } ]);
+
+            await listener(RoomCharacterPlacementMessage({
+                characterId: 'c1',
+                position: null
+            }).get(), socketCellP1.send);
+
+            expect(room.staticCharacterList).toEqual<RoomStaticCharacter[]>([ {
+                characterId: 'c1',
+                playerId: 'p1',
+                characterRole: 'tacka',
+                placement: null
+            } ]);
         });
 
         it('answers with room state, and send update to other players', async () => {

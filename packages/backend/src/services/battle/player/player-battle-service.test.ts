@@ -1,10 +1,10 @@
 import { ArrayUtils } from '@timeflies/common';
 import { timerTester } from '@timeflies/devtools';
-import { BattleLoadMessage, BattlePlayerDisconnectMessage, BattlePlayerDisconnectRemoveMessage } from '@timeflies/socket-messages';
+import { BattleLeaveMessage, BattleLoadMessage, BattlePlayerDisconnectMessage, BattlePlayerDisconnectRemoveMessage } from '@timeflies/socket-messages';
 import { produceStateDisconnectedPlayers } from '@timeflies/spell-effects';
+import { assetUrl } from '../../../utils/asset-url';
 import { createFakeGlobalEntitiesNoService, createFakeSocketCell } from '../../service-test-utils';
 import { createServices } from '../../services';
-import { BattleAbstractService } from '../battle-abstract-service';
 import { createFakeBattle } from '../battle-service-test-utils';
 import { PlayerBattleService } from './player-battle-service';
 
@@ -59,6 +59,29 @@ describe('player battle service', () => {
             socketCellP1.getDisconnectListener()!();
 
             expect(socketCellP2.send).toHaveBeenCalledWith(BattlePlayerDisconnectMessage({ playerId: 'p1' }))
+        });
+
+        it('remove spectator if any', () => {
+            const { battle, socketCellP1, connect } = getEntities();
+
+            battle.staticPlayers = [
+                {
+                    playerId: 'p1',
+                    playerName: '',
+                    teamColor: '#FFF',
+                    type: 'spectator'
+                }
+            ];
+            battle.playerIdList = new Set([ 'p1' ]);
+            battle.staticState.players[ 'p1' ] = battle.staticPlayers[ 0 ];
+
+            connect();
+
+            socketCellP1.getDisconnectListener()!();
+
+            expect(battle.staticPlayers).toEqual([]);
+            expect(battle.playerIdList.size).toEqual(0);
+            expect(battle.staticState.players[ 'p1' ]).toBeUndefined();
         });
     });
 
@@ -121,6 +144,8 @@ describe('player battle service', () => {
 
                 const listener = socketCellP1.getFirstListener(BattleLoadMessage);
 
+                battle.mapInfos.imagesLinks = { 'foo': 'bar' }
+
                 await timerTester.endTimer(listener(BattleLoadMessage({
                     battleId: 'battle'
                 }).get(), socketCellP1.send));
@@ -132,9 +157,159 @@ describe('player battle service', () => {
                     staticPlayers: battle.staticPlayers,
                     staticSpells: battle.staticSpells,
                     cycleInfos: battle.cycleInfos,
-                    tiledMapInfos: BattleAbstractService.getMapInfosFrontend(battle)
+                    tiledMapInfos: {
+                        name: '',
+                        schemaLink: assetUrl.toFrontend(''),
+                        imagesLinks: { 'foo': assetUrl.toFrontend('bar') }
+                    }
                 }));
             });
+
+            it('add spectator if any', async () => {
+                const { battle, socketCellP1, connect } = getEntities();
+
+                battle.staticPlayers = [];
+                battle.playerIdList = new Set();
+                delete battle.staticState.players[ 'p1' ];
+
+                connect();
+
+                const listener = socketCellP1.getFirstListener(BattleLoadMessage);
+
+                await timerTester.endTimer(listener(BattleLoadMessage({
+                    battleId: 'battle'
+                }).get(), socketCellP1.send));
+
+                expect(battle.staticPlayers).toEqual([
+                    {
+                        playerId: 'p1',
+                        playerName: 'p-1',
+                        teamColor: null,
+                        type: 'spectator'
+                    }
+                ]);
+                expect(battle.playerIdList.has('p1')).toBeTruthy();
+                expect(battle.staticState.players[ 'p1' ]).toEqual({
+                    playerId: 'p1',
+                    playerName: 'p-1',
+                    teamColor: null,
+                    type: 'spectator'
+                });
+            });
+
+            it('do not start battle if waiting players not present', async () => {
+                const { battle, socketCellP1, connect } = getEntities();
+
+                battle.waitingPlayerList = new Set([ 'p1', 'p2' ]);
+
+                connect();
+
+                const listener = socketCellP1.getFirstListener(BattleLoadMessage);
+
+                await timerTester.endTimer(listener(BattleLoadMessage({
+                    battleId: 'battle'
+                }).get(), socketCellP1.send));
+
+                expect(battle.cycleRunning).toBe(false);
+            });
+
+            it('do not start battle if cycle engine already launched', async () => {
+                const { battle, socketCellP1, connect } = getEntities();
+
+                battle.cycleEngine.isStarted = () => true;
+
+                connect();
+
+                const listener = socketCellP1.getFirstListener(BattleLoadMessage);
+
+                await timerTester.endTimer(listener(BattleLoadMessage({
+                    battleId: 'battle'
+                }).get(), socketCellP1.send));
+
+                expect(battle.cycleRunning).toBe(false);
+            });
+
+            it('start battle otherwise', async () => {
+                const { battle, socketCellP1, connect } = getEntities();
+
+                battle.waitingPlayerList = new Set([ 'p1' ]);
+                battle.cycleEngine.isStarted = () => false;
+
+                connect();
+
+                const listener = socketCellP1.getFirstListener(BattleLoadMessage);
+
+                await timerTester.endTimer(listener(BattleLoadMessage({
+                    battleId: 'battle'
+                }).get(), socketCellP1.send));
+
+                expect(battle.cycleRunning).toBe(true);
+            });
+        });
+    });
+
+    describe('on battle leave message', () => {
+
+        it('does nothing if no battle', async () => {
+            const { socketCellP1, connect, globalEntities } = getEntities();
+
+            globalEntities.currentBattleMap.mapById = {};
+            globalEntities.currentBattleMap.mapByPlayerId = {};
+
+            connect();
+
+            const listener = socketCellP1.getFirstListener(BattleLeaveMessage);
+
+            await expect(listener(BattleLeaveMessage({}), socketCellP1.send)).resolves.toBeUndefined();
+        });
+
+        it('remove player from global map', async () => {
+            const { socketCellP1, connect, globalEntities } = getEntities();
+
+            connect();
+
+            const listener = socketCellP1.getFirstListener(BattleLeaveMessage);
+
+            await listener(BattleLeaveMessage({}), socketCellP1.send);
+
+            expect(globalEntities.currentBattleMap.mapByPlayerId[ 'p1' ]).toBeUndefined();
+        });
+
+        it('add player to leaved players', async () => {
+            const { socketCellP1, connect, battle } = getEntities();
+
+            connect();
+
+            const listener = socketCellP1.getFirstListener(BattleLeaveMessage);
+
+            await listener(BattleLeaveMessage({}), socketCellP1.send);
+
+            expect(battle.leavedPlayers.has('p1')).toBeTruthy();
+        });
+
+        it('remove spectator if any', async () => {
+            const { battle, socketCellP1, connect } = getEntities();
+
+            battle.staticPlayers = [
+                {
+                    playerId: 'p1',
+                    playerName: '',
+                    teamColor: '#FFF',
+                    type: 'spectator'
+                }
+            ];
+            battle.playerIdList = new Set([ 'p1' ]);
+            battle.staticState.players[ 'p1' ] = battle.staticPlayers[ 0 ];
+
+            connect();
+
+            const listener = socketCellP1.getFirstListener(BattleLeaveMessage);
+
+            await listener(BattleLeaveMessage({}), socketCellP1.send);
+
+            expect(battle.staticPlayers).toEqual([]);
+            expect(battle.playerIdList.size).toEqual(0);
+            expect(battle.staticState.players[ 'p1' ]).toBeUndefined();
         });
     });
 
