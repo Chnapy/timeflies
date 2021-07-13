@@ -10,6 +10,7 @@ import { SpellActionBattleService } from './battle/spell-action/spell-action-bat
 import { ChatService } from './chat/chat-service';
 import { CreateRoomListService } from './room-list/create-room/create-room-list-service';
 import { GetRoomListService } from './room-list/get-room-list/get-room-list-service';
+import { AiRoomService } from './room/ai/ai-room-service';
 import { CharacterRoomService } from './room/character/character-room-service';
 import { EntityListGetRoomService } from './room/entity-list-get/entity-list-get-room-service';
 import { MapRoomService } from './room/map/map-room-service';
@@ -28,6 +29,7 @@ const createServicesRaw = (globalEntitiesNoServices: GlobalEntitiesNoServices) =
     mapRoomService: new MapRoomService(globalEntitiesNoServices),
     teamRoomService: new TeamRoomService(globalEntitiesNoServices),
     characterRoomService: new CharacterRoomService(globalEntitiesNoServices),
+    aiRoomService: new AiRoomService(globalEntitiesNoServices),
     entityListGetRoomService: new EntityListGetRoomService(globalEntitiesNoServices),
     getRoomListService: new GetRoomListService(globalEntitiesNoServices),
     createRoomListService: new CreateRoomListService(globalEntitiesNoServices),

@@ -13,6 +13,8 @@ export class CharacterRoomService extends RoomAbstractService {
     private addRoomCharacterSelectMessageListener = (socketCell: SocketCell, currentPlayerId: string) => socketCell.addMessageListener<typeof RoomCharacterSelectMessage>(
         RoomCharacterSelectMessage, ({ payload, requestId }, send) => {
 
+            const { aiPlayerId, characterRole } = payload;
+
             const room = this.getRoomByPlayerId(currentPlayerId);
 
             const { mapInfos, staticPlayerList, staticCharacterList } = room;
@@ -22,9 +24,26 @@ export class CharacterRoomService extends RoomAbstractService {
                 throw new SocketError('bad-server-state', 'Cannot select character if player ready: ' + currentPlayerId);
             }
 
-            if (!currentPlayer.teamColor) {
-                throw new SocketError('bad-server-state', 'Cannot select character if player not in team: ' + currentPlayerId);
+            if (aiPlayerId) {
+
+                const player = staticPlayerList.find(p => p.playerId === aiPlayerId);
+
+                if (player?.type !== 'ai') {
+                    throw new SocketError('bad-request', 'Wrong non-AI player id: ' + aiPlayerId);
+                }
+
+                if (room.playerAdminId !== currentPlayerId) {
+                    throw new SocketError('bad-server-state', 'Cannot select AI character if player not admin: ' + currentPlayerId);
+                }
+
+            } else {
+
+                if (!currentPlayer.teamColor) {
+                    throw new SocketError('bad-server-state', 'Cannot select character if player not in team: ' + currentPlayerId);
+                }
             }
+
+            const playerId = aiPlayerId ?? currentPlayerId;
 
             const nbrTeamCharacters = staticCharacterList
                 .filter(({ playerId }) => staticPlayerList.some(staticPlayer =>
@@ -42,8 +61,8 @@ export class CharacterRoomService extends RoomAbstractService {
 
             staticCharacterList.push({
                 characterId: createId(),
-                playerId: currentPlayerId,
-                characterRole: payload.characterRole,
+                playerId,
+                characterRole,
                 placement: null
             });
 
@@ -72,8 +91,18 @@ export class CharacterRoomService extends RoomAbstractService {
                 throw new SocketError('bad-request', 'Wrong character id: ' + characterId);
             }
 
-            if (character.playerId !== currentPlayerId) {
-                throw new SocketError('bad-request', 'Cannot remove character of other players: ' + characterId);
+            const player = staticPlayerList.find(p => p.playerId === character.playerId)!;
+
+            if (player.type === 'ai') {
+
+                if (room.playerAdminId !== currentPlayerId) {
+                    throw new SocketError('bad-server-state', 'Cannot remove AI character if player not admin: ' + currentPlayerId);
+                }
+            } else {
+
+                if (character.playerId !== currentPlayerId) {
+                    throw new SocketError('bad-request', 'Cannot remove character of other players: ' + characterId);
+                }
             }
 
             staticCharacterList.splice(
@@ -106,8 +135,18 @@ export class CharacterRoomService extends RoomAbstractService {
                 throw new SocketError('bad-request', 'Wrong character id: ' + characterId);
             }
 
-            if (character.playerId !== currentPlayerId) {
-                throw new SocketError('bad-request', 'Cannot place character of other players: ' + characterId);
+            const player = staticPlayerList.find(p => p.playerId === character.playerId)!;
+
+            if (player.type === 'ai') {
+
+                if (room.playerAdminId !== currentPlayerId) {
+                    throw new SocketError('bad-server-state', 'Cannot place AI character if player not admin: ' + currentPlayerId);
+                }
+            } else {
+
+                if (character.playerId !== currentPlayerId) {
+                    throw new SocketError('bad-request', 'Cannot place character of other players: ' + characterId);
+                }
             }
 
             if (position) {

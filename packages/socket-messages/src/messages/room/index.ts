@@ -1,3 +1,5 @@
+export * from './room-ai-add-message';
+export * from './room-ai-remove-message';
 export * from './room-battle-start-message';
 export * from './room-character-placement-message';
 export * from './room-character-remove-message';
