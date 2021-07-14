@@ -71,7 +71,7 @@ export class PlayerRoomService extends RoomAbstractService {
 
             const room = this.getRoomByPlayerId(currentPlayerId);
 
-            const { staticPlayerList, staticCharacterList } = room;
+            const { staticPlayerList, staticCharacterList, playerAdminId } = room;
 
             const playerCharacterList = staticCharacterList
                 .filter(({ playerId }) => playerId === currentPlayerId);
@@ -80,7 +80,14 @@ export class PlayerRoomService extends RoomAbstractService {
                 throw new SocketError('bad-server-state', 'Player cannot be ready with no characters selected: ' + currentPlayerId);
             }
 
-            if (playerCharacterList.some(character => character.placement === null)) {
+            const aiPlayerIdList = staticPlayerList
+                .filter(p => p.type === 'ai')
+                .map(p => p.playerId);
+            const aiCharacterList = playerAdminId === currentPlayerId
+                ? staticCharacterList.filter(({ playerId }) => aiPlayerIdList.includes(playerId))
+                : [];
+
+            if ([ ...playerCharacterList, ...aiCharacterList ].some(character => character.placement === null)) {
                 throw new SocketError('bad-server-state', 'Player cannot be ready with characters not placed: ' + currentPlayerId);
             }
 
@@ -95,9 +102,11 @@ export class PlayerRoomService extends RoomAbstractService {
 
             this.sendRoomStateToEveryPlayersExcept(currentPlayerId);
 
-            const everyPlayersReady = staticPlayerList
-                .filter(player => player.type === 'player')
-                .every(player => player.ready);
+            const realPlayerList = staticPlayerList
+                .filter(player => player.type === 'player');
+
+            const everyPlayersReady = realPlayerList.length > 1
+                && realPlayerList.every(player => player.ready);
 
             if (everyPlayersReady) {
                 await this.startBattle(room);

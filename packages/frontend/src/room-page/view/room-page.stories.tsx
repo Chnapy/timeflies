@@ -164,37 +164,37 @@ export const Default: React.FC = () => {
                                     playerId: 'p1',
                                     playerName: 'chnapy',
                                     ready: false,
-                                    teamColor: null,
-                                    type: 'spectator'
+                                    teamColor: '#F00',
+                                    type: 'player'
                                 },
                                 {
                                     playerId: 'p2',
                                     playerName: 'yoshi2oeuf',
-                                    ready: true,
+                                    ready: false,
                                     teamColor: '#0F0',
-                                    type: 'player'
+                                    type: 'ai'
                                 },
                                 {
                                     playerId: 'p3',
                                     playerName: 'toto',
-                                    ready: true,
+                                    ready: false,
                                     teamColor: '#F00',
                                     type: 'player'
                                 }
                             ],
                             staticCharacterList: [
-                                // {
-                                //     characterId: 'c1',
-                                //     playerId: 'p1',
-                                //     characterRole: 'tacka',
-                                //     placement: createPosition(8, 9)
-                                // },
-                                // {
-                                //     characterId: 'c2',
-                                //     playerId: 'p1',
-                                //     characterRole: 'vemo',
-                                //     placement: createPosition(9, 8)
-                                // },
+                                {
+                                    characterId: 'c1',
+                                    playerId: 'p1',
+                                    characterRole: 'tacka',
+                                    placement: null//createPosition(8, 9)
+                                },
+                                {
+                                    characterId: 'c2',
+                                    playerId: 'p1',
+                                    characterRole: 'vemo',
+                                    placement: null//createPosition(9, 8)
+                                },
                                 // {
                                 //     characterId: 'c3',
                                 //     playerId: 'p1',

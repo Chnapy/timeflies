@@ -12,13 +12,18 @@ type RoomCharacterProps = {
 
 export const RoomCharacter: React.FC<RoomCharacterProps> = ({ characterId }) => {
     const myPlayerId = useMyPlayerId();
-    const isMyCharacter = useRoomSelector(state => state.staticCharacterList[ characterId ].playerId === myPlayerId);
+    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
     const isReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
+    const isMyCharacterOrAI = useRoomSelector(state => {
+        const { playerId } = state.staticCharacterList[ characterId ];
+        return playerId === myPlayerId
+            || (isAdmin && state.staticPlayerList[ playerId ].type === 'ai');
+    });
 
     const sendRoomUpdate = useSendRoomUpdate();
     const onRemove = () => sendRoomUpdate(RoomCharacterRemoveMessage({ characterId }));
 
-    const sizingProps = isMyCharacter
+    const sizingProps = isMyCharacterOrAI
         ? {}
         : {
             size: 24,
@@ -30,7 +35,7 @@ export const RoomCharacter: React.FC<RoomCharacterProps> = ({ characterId }) => 
         <RoomCharacterButton
             characterId={characterId}
             {...sizingProps}
-            disabled={!isMyCharacter || isReady}
+            disabled={!isMyCharacterOrAI || isReady}
             onClick={onRemove}
         />
     );

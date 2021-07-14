@@ -24,9 +24,11 @@ export class CharacterRoomService extends RoomAbstractService {
                 throw new SocketError('bad-server-state', 'Cannot select character if player ready: ' + currentPlayerId);
             }
 
-            if (aiPlayerId) {
+            const player = aiPlayerId
+                ? staticPlayerList.find(p => p.playerId === aiPlayerId)!
+                : currentPlayer;
 
-                const player = staticPlayerList.find(p => p.playerId === aiPlayerId);
+            if (aiPlayerId) {
 
                 if (player?.type !== 'ai') {
                     throw new SocketError('bad-request', 'Wrong non-AI player id: ' + aiPlayerId);
@@ -47,7 +49,7 @@ export class CharacterRoomService extends RoomAbstractService {
 
             const nbrTeamCharacters = staticCharacterList
                 .filter(({ playerId }) => staticPlayerList.some(staticPlayer =>
-                    staticPlayer.teamColor === currentPlayer.teamColor
+                    staticPlayer.teamColor === player.teamColor
                     && playerId === staticPlayer.playerId
                 ))
                 .reduce((sum, c) => {
@@ -154,7 +156,7 @@ export class CharacterRoomService extends RoomAbstractService {
                     throw new SocketError('bad-request', 'Position occupied by other character: ' + position.id);
                 }
 
-                const placementTiles = mapPlacementTiles[ currentPlayer.teamColor! ];
+                const placementTiles = mapPlacementTiles[ player.teamColor! ];
                 if (!placementTiles.some(tile => tile.id === position.id)) {
                     throw new SocketError('bad-request', 'Position not in placement tiles: ' + position.id);
                 }

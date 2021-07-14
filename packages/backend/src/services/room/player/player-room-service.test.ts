@@ -449,6 +449,54 @@ describe('player room service', () => {
 
             expectPlayersAnswers(RoomPlayerReadyMessage);
         });
+
+        describe('AI', () => {
+
+            it('throw error if player admin and some AI characters not placed', async () => {
+                const { socketCellP1, connectSocket, room } = getEntities();
+
+                connectSocket();
+
+                const listener = socketCellP1.getFirstListener(RoomPlayerReadyMessage);
+
+                room.staticPlayerList = [
+                    {
+                        playerId: 'p1',
+                        playerName: 'p1',
+                        teamColor: '#FFF',
+                        ready: false,
+                        type: 'player'
+                    },
+                    {
+                        playerId: 'p2',
+                        playerName: 'p2',
+                        teamColor: '#FFF',
+                        ready: false,
+                        type: 'ai'
+                    }
+                ];
+                room.staticCharacterList = [
+                    {
+                        characterId: 'c1',
+                        characterRole: 'tacka',
+                        playerId: 'p1',
+                        placement: createPosition(1, 1)
+                    },
+                    {
+                        characterId: 'c2',
+                        characterRole: 'tacka',
+                        playerId: 'p2',
+                        placement: null
+                    }
+                ];
+
+                await expect(
+                    listener(RoomPlayerReadyMessage({
+                        ready: true
+                    }).get(), socketCellP1.send)
+                ).rejects.toBeInstanceOf(SocketError);
+            });
+        });
     });
 
     describe('on player leave message', () => {

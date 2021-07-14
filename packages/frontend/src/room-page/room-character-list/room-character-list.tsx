@@ -1,16 +1,17 @@
 import { Dialog, Grid, IconButton, makeStyles } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { UIText } from '@timeflies/app-ui';
-import { CharacterRole } from '@timeflies/common';
+import { CharacterRole, PlayerId } from '@timeflies/common';
 import { RoomCharacterSelectMessage, RoomEntityListGetMessage, RoomEntityListGetMessageData } from '@timeflies/socket-messages';
 import React from 'react';
 import useAsyncEffect from 'use-async-effect';
 import { useSocketSendWithResponseError } from '../../connected-socket/hooks/use-socket-send-with-response-error';
+import { useMyPlayerId } from '../../login-page/hooks/use-my-player-id';
 import { useSendRoomUpdate } from '../hooks/use-send-room-update';
 import { RoomCharacterCard } from './room-character-card';
 
 type RoomCharacterListProps = {
-    open: boolean;
+    playerId: PlayerId | null;
     onClose: () => void;
 };
 
@@ -35,11 +36,15 @@ const useStyles = makeStyles(({ spacing }) => ({
 
 const emptyList: RoomEntityListGetMessageData = { characterList: [], spellList: [] };
 
-export const RoomCharacterList: React.FC<RoomCharacterListProps> = ({ open, onClose }) => {
+export const RoomCharacterList: React.FC<RoomCharacterListProps> = ({ playerId, onClose }) => {
     const classes = useStyles();
     const sendWithResponse = useSocketSendWithResponseError();
     const sendRoomUpdate = useSendRoomUpdate();
     const [ entityList, setEntityList ] = React.useState<RoomEntityListGetMessageData>(emptyList);
+    const myPlayerId = useMyPlayerId();
+
+    const open = !!playerId;
+    const aiPlayerId = playerId === myPlayerId ? null : playerId;
 
     useAsyncEffect(async (isMounted) => {
         if (!open) {
@@ -56,7 +61,10 @@ export const RoomCharacterList: React.FC<RoomCharacterListProps> = ({ open, onCl
     }, [ open ]);
 
     const getCharacterSelect = (characterRole: CharacterRole) => async () => {
-        await sendRoomUpdate(RoomCharacterSelectMessage({ characterRole }));
+        await sendRoomUpdate(RoomCharacterSelectMessage({
+            aiPlayerId,
+            characterRole
+        }));
         onClose();
     };
 

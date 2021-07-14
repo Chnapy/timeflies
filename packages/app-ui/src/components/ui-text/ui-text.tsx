@@ -19,7 +19,9 @@ const useStyles = makeStyles(({ typography }) => ({
     }
 }));
 
-export const UIText: React.FC<UITextProps> = ({ variant, ...rest }) => {
+export const UIText: React.FC<UITextProps> = React.forwardRef(({ variant, ...propsRest }, ref) => {
+
+    const rest = { ...propsRest, ref };
 
     const classes = useStyles();
 
@@ -28,4 +30,4 @@ export const UIText: React.FC<UITextProps> = ({ variant, ...rest }) => {
     }
 
     return <Typography variant={variant} {...rest} />;
-};
+});

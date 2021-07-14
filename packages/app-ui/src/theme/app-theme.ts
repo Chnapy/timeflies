@@ -133,6 +133,9 @@ export const appTheme: Theme = createMuiTheme({
             tooltip: {
                 backgroundColor: bgDark,
                 fontSize: '1rem'
+            },
+            arrow: {
+                color: bgDark
             }
         }
     }

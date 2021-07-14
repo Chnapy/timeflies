@@ -1,7 +1,8 @@
 import { Grid, makeStyles, Paper } from '@material-ui/core';
 import { UIButton } from '@timeflies/app-ui';
+import { PlayerId } from '@timeflies/common';
 import { ObjectTyped } from '@timeflies/common';
-import { RoomTeamJoinMessage } from '@timeflies/socket-messages';
+import { RoomAiAddMessage, RoomTeamJoinMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import { useMyPlayerId } from '../../login-page/hooks/use-my-player-id';
 import { useRoomSelector } from '../hooks/use-room-selector';
@@ -10,7 +11,7 @@ import { RoomTeamPlayerLine } from './room-team-player-line';
 
 export type RoomTeamProps = {
     teamColor: string;
-    onCharacterListOpen: () => void;
+    onCharacterListOpen: (playerId: PlayerId) => void;
 };
 
 const useStyles = makeStyles(({ spacing }) => ({
@@ -28,12 +29,15 @@ export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor, onChar
 
     const sendRoomUpdate = useSendRoomUpdate();
     const myPlayerId = useMyPlayerId();
+    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
     const isReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
     const isMyTeam = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].teamColor === teamColor);
     const staticPlayerList = useRoomSelector(state => state.staticPlayerList);
     const playerIdList = ObjectTyped.entries(staticPlayerList)
         .filter(([ playerId, player ]) => player.teamColor === teamColor)
         .map(([ playerId ]) => playerId);
+
+    const onAIAdd = () => sendRoomUpdate(RoomAiAddMessage({ teamColor }));
 
     const onTeamJoin = () => sendRoomUpdate(RoomTeamJoinMessage({ teamColor }));
 
@@ -46,16 +50,20 @@ export const RoomTeam: React.FC<RoomTeamProps> = React.memo(({ teamColor, onChar
                         <RoomTeamPlayerLine
                             key={playerId}
                             playerId={playerId}
-                            onCharacterListOpen={onCharacterListOpen}
+                            onCharacterListOpen={() => onCharacterListOpen(playerId)}
                         />
                     </Grid>
                 ))}
 
+                {isAdmin && !isReady && (
+                    <Grid item>
+                        <UIButton onClick={onAIAdd} fullWidth size='small'>add AI</UIButton>
+                    </Grid>
+                )}
+
                 {!isMyTeam && !isReady && (
                     <Grid item>
-                        <UIButton onClick={onTeamJoin} fullWidth>
-                            join
-                </UIButton>
+                        <UIButton onClick={onTeamJoin} fullWidth>join</UIButton>
                     </Grid>
                 )}
             </Grid>
