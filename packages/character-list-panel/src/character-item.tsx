@@ -72,6 +72,9 @@ const useStyles = makeStyles(({ palette }) => ({
         width: healthGaugeWidth,
         padding: 2,
         backgroundColor: palette.background.default
+    },
+    tooltipPopper: {
+        zIndex: 0
     }
 }));
 
@@ -95,6 +98,7 @@ export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProp
 
         <Grid item>
             <Tooltip
+                classes={{ popper: classes.tooltipPopper }}
                 open={isAI}
                 arrow
                 title={<UIText variant='body2'>AI</UIText>}

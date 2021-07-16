@@ -44,7 +44,6 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
     const mapPlacementTiles = useRoomSelector(state => state.mapPlacementTiles);
     const teamColorList = useRoomSelector(state => state.teamColorList);
     const myPlayerId = useMyPlayerId();
-    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
     const myTeamColor = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].teamColor);
     const staticCharacterList = useRoomSelector(state => state.staticCharacterList);
     const characterList = Object.values(staticCharacterList);
@@ -65,7 +64,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
     const selectedCharacterTeamColor = selectedCharacterId ? staticPlayerList[ staticCharacterList[ selectedCharacterId ].playerId ].teamColor : null;
 
     const canManipulateCharacter = (character: Pick<RoomStaticCharacter, 'playerId'>) => character.playerId === myPlayerId
-        || (isAdmin && aiPlayerIdList.includes(character.playerId));
+        || aiPlayerIdList.includes(character.playerId);
 
     const charactersToPlace = characterList.filter(character => canManipulateCharacter(character) && !character.placement);
 

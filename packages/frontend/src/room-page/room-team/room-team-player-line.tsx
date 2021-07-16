@@ -35,6 +35,9 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
     },
     addBtnIcon: {
         verticalAlign: 'text-bottom'
+    },
+    tooltipPopper: {
+        zIndex: 0
     }
 }));
 
@@ -42,7 +45,6 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
     const classes = useStyles();
     const myPlayerId = useMyPlayerId();
     const playerName = useRoomSelector(state => state.staticPlayerList[ playerId ].playerName);
-    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
     const isAI = useRoomSelector(state => state.staticPlayerList[ playerId ].type === 'ai');
     const isReady = useRoomSelector(state => state.staticPlayerList[ playerId ].ready);
     const staticCharacterList = useRoomSelector(state => state.staticCharacterList);
@@ -51,7 +53,7 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
 
     const isMyPlayer = myPlayerId === playerId;
 
-    const isMyPlayerOrAI = isMyPlayer || (isAI && isAdmin)
+    const isMyPlayerOrAI = isMyPlayer || isAI;
 
     const characterIdList = ObjectTyped.entries(staticCharacterList)
         .filter(([ characterId, character ]) => character.playerId === playerId)
@@ -64,6 +66,7 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
             <Grid item container spacing={1}>
                 <Grid item>
                     <Tooltip
+                        classes={{ popper: classes.tooltipPopper }}
                         open={isAI}
                         arrow
                         title={<UIText variant='body2'>AI</UIText>}
@@ -75,7 +78,7 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
                 {isReady && <Grid item>
                     <CheckCircleOutlineIcon className={classes.readyIcon} />
                 </Grid>}
-                {isAI && isAdmin && <Grid item container xs justify='flex-end'>
+                {isAI && !isMyPlayerReady && <Grid item container xs justify='flex-end'>
                     <IconButton onClick={onAIRemove} size='small'>
                         <CloseIcon fontSize='inherit' />
                     </IconButton>

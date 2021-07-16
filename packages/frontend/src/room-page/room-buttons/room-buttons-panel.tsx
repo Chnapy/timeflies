@@ -42,27 +42,23 @@ export const RoomButtonsPanel: React.FC = () => {
     const classes = useStyles();
     const playSound = useSound();
     const myPlayerId = useMyPlayerId();
-    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
     const placedCharactersStatus = useRoomSelector(state => {
 
-        if (Object.values(state.staticPlayerList)
-            .filter(p => p.type !== 'ai')
-            .length < 2) {
+        if (Object.values(state.staticPlayerList).length < 2) {
             return 'no-players';
         }
 
         const playerCharacterList = Object.values(state.staticCharacterList)
             .filter(character => character.playerId === myPlayerId);
-        const aiCharacterListIfAdmin = isAdmin
-            ? Object.values(state.staticCharacterList)
-                .filter(character => state.staticPlayerList[ character.playerId ].type === 'ai')
-            : [];
+        const aiCharacterList = Object.values(state.staticCharacterList)
+                .filter(character => state.staticPlayerList[ character.playerId ].type === 'ai');
+        const playerAndAICharacterList = [ ...playerCharacterList, ...aiCharacterList ];
 
-        if (playerCharacterList.length === 0) {
+        if (!playerCharacterList.length || !aiCharacterList.length) {
             return 'no-characters';
         }
 
-        if ([ ...playerCharacterList, ...aiCharacterListIfAdmin ].every(character => character.placement !== null)) {
+        if (playerAndAICharacterList.every(character => character.placement !== null)) {
             return 'all-placed';
         }
 

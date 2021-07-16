@@ -12,12 +12,10 @@ type RoomCharacterProps = {
 
 export const RoomCharacter: React.FC<RoomCharacterProps> = ({ characterId }) => {
     const myPlayerId = useMyPlayerId();
-    const isAdmin = useRoomSelector(state => state.playerAdminId === myPlayerId);
     const isReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
     const isMyCharacterOrAI = useRoomSelector(state => {
         const { playerId } = state.staticCharacterList[ characterId ];
-        return playerId === myPlayerId
-            || (isAdmin && state.staticPlayerList[ playerId ].type === 'ai');
+        return playerId === myPlayerId || state.staticPlayerList[ playerId ].type === 'ai';
     });
 
     const sendRoomUpdate = useSendRoomUpdate();

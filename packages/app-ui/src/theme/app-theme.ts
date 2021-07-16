@@ -136,9 +136,6 @@ export const appTheme: Theme = createMuiTheme({
             },
             arrow: {
                 color: bgDark
-            },
-            popper: {
-                zIndex: 0
             }
         }
     }
