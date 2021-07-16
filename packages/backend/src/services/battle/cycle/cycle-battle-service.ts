@@ -5,7 +5,7 @@ import { BattleTurnStartMessage } from '@timeflies/socket-messages';
 import { Battle } from '../battle';
 import { BattleAbstractService } from '../battle-abstract-service';
 
-export type PartialCycleBattle = Pick<Battle, 'battleId' | 'playerIdList' | 'cycleInfos' | 'stateStack' | 'currentTurnInfos' | 'cycleRunning'>;
+export type PartialCycleBattle = Pick<Battle, 'battleId' | 'cycleInfos' | 'stateStack'>;
 
 export class CycleBattleService extends BattleAbstractService {
     afterSocketConnect = () => { };
@@ -14,21 +14,30 @@ export class CycleBattleService extends BattleAbstractService {
         const { battleId, cycleInfos } = battle;
 
         const cycleEngine = createEngine({
-            charactersList:cycleInfos.turnsOrder,
+            charactersList: cycleInfos.turnsOrder,
             charactersDurations: this.getCurrentState(battle).characters.actionTime,
             listeners: {
                 turnStart: ({ currentTurn }) => {
-                    battle.currentTurnInfos = currentTurn;
+                    const fullBattle = this.getBattleById(battleId);
+                    fullBattle.currentTurnInfos = currentTurn;
 
                     logger.info('Battle [' + battleId + '] -', 'Cycle turn start', currentTurn);
+
+                    const { characterId } = fullBattle.currentTurnInfos;
+                    const { players, characters } = fullBattle.staticState;
+                    const isAI = players[ characters[ characterId ].playerId ].type === 'ai';
+                    if (isAI) {
+                        return this.services.aiBattleService.executeTurn(fullBattle, characterId);
+                    }
                 },
                 turnEnd: async ({ currentTurn }) => {
+                    const fullBattle = this.getBattleById(battleId);
                     logger.info('Battle [' + battleId + '] -', 'Cycle turn end', currentTurn);
 
                     await this.services.playerBattleService.checkLeavedAndDisconnectedPlayers(battleId);
 
-                    if (battle.cycleRunning) {
-                        this.beforeTurnStart(battle, cycleEngine);
+                    if (fullBattle.cycleRunning) {
+                        this.beforeTurnStart(fullBattle, cycleEngine);
                         return cycleEngine.startNextTurn();
                     }
                 }

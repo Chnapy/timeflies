@@ -51,7 +51,7 @@ export module Tile {
 
     const getTileIdFromPosition = ({ data, width }: TiledLayerTilelayer, { x, y }: Position): number => {
         const index = x + y * width;
-        return (data as number[])[ index ];
+        return (data as number[])[ index ] ?? 0;
     };
 
     const hasTileFromLayer = (layer: TiledLayerTilelayer, position: Position): boolean => {

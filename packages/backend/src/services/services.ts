@@ -3,6 +3,7 @@ import { createSocketCell } from '@timeflies/socket-server';
 import WebSocket from 'ws';
 import { GlobalEntitiesNoServices } from '../main/global-entities';
 import { AuthService } from './auth/auth-service';
+import { AIBattleService } from './battle/ai/ai-battle-service';
 import { CycleBattleService } from './battle/cycle/cycle-battle-service';
 import { EndBattleService } from './battle/end-battle/end-battle-service';
 import { PlayerBattleService } from './battle/player/player-battle-service';
@@ -24,6 +25,7 @@ const createServicesRaw = (globalEntitiesNoServices: GlobalEntitiesNoServices) =
     cycleBattleService: new CycleBattleService(globalEntitiesNoServices),
     spellActionBattleService: new SpellActionBattleService(globalEntitiesNoServices),
     endBattleService: new EndBattleService(globalEntitiesNoServices),
+    aiBattleService: new AIBattleService(globalEntitiesNoServices),
     chatService: new ChatService(globalEntitiesNoServices),
     playerRoomService: new PlayerRoomService(globalEntitiesNoServices),
     mapRoomService: new MapRoomService(globalEntitiesNoServices),

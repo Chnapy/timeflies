@@ -9,6 +9,9 @@ const pathfinder = Area.getPathfinderInstance();
 const getEmptyEffect = (): Partial<SpellEffect> => ({ actionArea: [] });
 
 export const moveEffect: SpellEffectItem = {
+    rangeArea: (position, { charactersPositions }) => {
+        return Object.values(charactersPositions).every(pos => pos.id !== position.id);
+    },
     effect: async (helper) => {
 
         // compute path, which is specific for 'move' spell

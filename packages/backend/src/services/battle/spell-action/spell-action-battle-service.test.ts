@@ -118,7 +118,7 @@ describe('spell action battle service', () => {
                             tiledMap: battle.tiledMap,
                             rangeArea: 500,
                             lineOfSight: false,
-                            characterList: [ 'c1', 'c2', 'c3' ],
+                            characterList: [ 'c1', 'c2', 'c3', 'c4' ],
                             charactersPositions,
                             playingCharacterId: 'c1'
                         })
@@ -132,10 +132,10 @@ describe('spell action battle service', () => {
                     spellId: 's1',
                     duration: 1,
                     launchTime: 1,
-                    targetPos: createPosition(0, 0)
+                    targetPos: createPosition(20, 20)
                 };
 
-                const checkResult = await spellActionCheck({ spellAction, context });
+                const checkResult = await spellActionCheck({ spellAction, context, doChecksum: true });
 
                 if (!checkResult.success) {
                     throw new Error('check result false');
@@ -161,7 +161,7 @@ describe('spell action battle service', () => {
                             spellId: 's1',
                             duration: 1,
                             launchTime: 1,
-                            targetPos: createPosition(0, 0)
+                            targetPos: createPosition(20, 20)
                         }
                     }).get(), socketCell.send)
                 );
@@ -180,7 +180,7 @@ describe('spell action battle service', () => {
                     spellId: 's1',
                     duration: 1,
                     launchTime: 1,
-                    targetPos: createPosition(0, 0)
+                    targetPos: createPosition(20, 20)
                 };
 
                 await timerTester.waitTimer(
@@ -202,35 +202,6 @@ describe('spell action battle service', () => {
                 expect(socketCellP1.send).not.toHaveBeenCalledWith(BattleNotifyMessage(expect.anything()));
             });
 
-            it('send messages in correct order: notify, then response', async () => {
-
-                const { spellActionListener, battle, socketCell, socketCellP2 } = getDefaultEntities();
-
-                const callOrder: string[] = [];
-
-                socketCell.send = jest.fn(message => callOrder.push(message.action));
-                socketCellP2.send = jest.fn(message => callOrder.push(message.action));
-
-                const spellAction: SpellAction = {
-                    checksum: battle.stateStack[ 0 ].checksum,
-                    spellId: 's1',
-                    duration: 1,
-                    launchTime: 1,
-                    targetPos: createPosition(0, 0)
-                };
-
-                await timerTester.waitTimer(
-                    spellActionListener(BattleSpellActionMessage({
-                        spellAction
-                    }).get(), socketCell.send)
-                );
-
-                expect(callOrder).toEqual([
-                    BattleNotifyMessage.action,
-                    BattleSpellActionMessage.action
-                ]);
-            });
-
             it('trigger battle end if any', async () => {
 
                 const { service, spellActionListener, battle, socketCell } = getDefaultEntities();
@@ -244,7 +215,7 @@ describe('spell action battle service', () => {
                             spellId: 's1',
                             duration: 1,
                             launchTime: 1,
-                            targetPos: createPosition(0, 0)
+                            targetPos: createPosition(20, 20)
                         }
                     }).get(), socketCell.send)
                 );

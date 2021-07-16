@@ -41,11 +41,13 @@ describe('end battle service', () => {
         it('send end-battle message to every players', async () => {
             const { battle, service } = getEntities();
 
-            const playerList = battle.staticPlayers.map(({ playerId }) => {
-                const socketCell = createFakeSocketCell();
-                service.onSocketConnect(socketCell, playerId);
-                return { socketCell, playerId };
-            });
+            const playerList = battle.staticPlayers
+                .filter(p => p.type !== 'ai')
+                .map(({ playerId }) => {
+                    const socketCell = createFakeSocketCell();
+                    service.onSocketConnect(socketCell, playerId);
+                    return { socketCell, playerId };
+                });
 
             await service.onBattleEnd(battle, '#00FF00', 12);
 

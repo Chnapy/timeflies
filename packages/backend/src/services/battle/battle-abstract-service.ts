@@ -21,10 +21,14 @@ export abstract class BattleAbstractService extends Service {
 
     protected getCurrentState = ({ stateStack }: Pick<Battle, 'stateStack'>) => ArrayUtils.last(stateStack)!;
 
-    protected addNewState = async (battle: Battle, state: SerializableState, stateEndTime: number) => {
-        const { stateStack, staticState } = battle;
-        
+    protected addNewStateToBattle = (battle: Battle, state: SerializableState) => {
+        const { stateStack } = battle;
+
         stateStack.push(state);
+    };
+
+    protected addNewStateToCycleAndCheckBattleEnd = async (battle: Battle, state: SerializableState, stateEndTime: number) => {
+        const { staticState } = battle;
 
         // wait current spell action to end
         const timeBeforeEnd = stateEndTime - Date.now();
@@ -36,5 +40,12 @@ export abstract class BattleAbstractService extends Service {
         if (winnerTeamColor) {
             await this.services.endBattleService.onBattleEnd(battle, winnerTeamColor, stateEndTime);
         }
+    };
+
+    protected addNewState = async (battle: Battle, state: SerializableState, stateEndTime: number) => {
+
+        this.addNewStateToBattle(battle, state);
+
+        await this.addNewStateToCycleAndCheckBattleEnd(battle, state, stateEndTime);
     };
 }

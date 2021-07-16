@@ -35,9 +35,6 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
     },
     addBtnIcon: {
         verticalAlign: 'text-bottom'
-    },
-    tooltipPopper: {
-        zIndex: 0
     }
 }));
 
@@ -67,7 +64,6 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
             <Grid item container spacing={1}>
                 <Grid item>
                     <Tooltip
-                        classes={{ popper: classes.tooltipPopper }}
                         open={isAI}
                         arrow
                         title={<UIText variant='body2'>AI</UIText>}

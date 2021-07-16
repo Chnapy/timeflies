@@ -81,11 +81,8 @@ export const createBattle = (
 
     const partialBattle: PartialCycleBattle = {
         battleId,
-        playerIdList,
         stateStack,
-        cycleInfos: { turnsOrder },
-        currentTurnInfos: null,
-        cycleRunning: false
+        cycleInfos: { turnsOrder }
     };
 
     const cycleEngine = services.cycleBattleService.createCycleEngine(partialBattle);
@@ -93,6 +90,7 @@ export const createBattle = (
     const partialBattleOthers: Omit<Battle, keyof PartialCycleBattle> = {
         roomId,
 
+        playerIdList,
         staticPlayers,
         staticCharacters,
         staticSpells,
@@ -106,6 +104,8 @@ export const createBattle = (
         leavedPlayers,
 
         cycleEngine,
+        currentTurnInfos: null,
+        cycleRunning: false,
 
         onBattleEnd,
     };
