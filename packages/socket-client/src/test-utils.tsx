@@ -8,7 +8,7 @@ type SocketHelperTestable = SocketHelper & {
     listeners: { [ type in 'open' | 'message' | 'close' | 'error' ]: Set<(...args: any[]) => void> };
 };
 
-type UseSocketHook<V> = () => (...args: V[]) => Promise<any>;
+type UseSocketHook<V extends any[]> = () => (...args: V) => Promise<any>;
 
 export const createFakeSocketHelper = (readyState: number): SocketHelperTestable => {
 
@@ -45,7 +45,7 @@ export const createFakeSocketHelper = (readyState: number): SocketHelperTestable
     };
 };
 
-export const renderWithContext = function <V>(socketHelper: SocketHelper | null, hook: UseSocketHook<V>) {
+export const renderWithContext = function <V extends any[]>(socketHelper: SocketHelper | null, hook: UseSocketHook<V>) {
     const { result } = renderHook(hook, {
         wrapper: ({ children }) => <SocketContextProvider value={socketHelper}>{children}</SocketContextProvider>
     });
@@ -53,7 +53,7 @@ export const renderWithContext = function <V>(socketHelper: SocketHelper | null,
     return result;
 };
 
-export function describeSocketFailures<V>(hook: UseSocketHook<V>, ...args: V[]) {
+export function describeSocketFailures<V extends any[]>(hook: UseSocketHook<V>, ...args: V) {
     it('fails if socket not defined', async () => {
 
         const result = renderWithContext(null, hook);
