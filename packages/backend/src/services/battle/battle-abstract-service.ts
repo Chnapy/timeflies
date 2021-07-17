@@ -19,6 +19,8 @@ export abstract class BattleAbstractService extends Service {
     };
     protected getMapInfosFrontend = BattleAbstractService.getMapInfosFrontend;
 
+    protected getInitialState = ({ stateStack }: Pick<Battle, 'stateStack'>) => stateStack[ 0 ];
+
     protected getCurrentState = ({ stateStack }: Pick<Battle, 'stateStack'>) => ArrayUtils.last(stateStack)!;
 
     protected addNewStateToBattle = (battle: Battle, state: SerializableState) => {
