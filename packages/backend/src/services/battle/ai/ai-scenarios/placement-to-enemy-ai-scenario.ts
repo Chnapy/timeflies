@@ -5,9 +5,9 @@ import { createAIScenario } from '../ai-scenario';
  *  move to closest tile [target=enemy] (max distance 3)
  */
 export const placementToEnemyAIScenario = createAIScenario(async ({
-    battle, currentCharacter, staticSpells, currentState, stateEndTime, enemyList,
+    battle, currentCharacter, staticSpells, getCurrentState, stateEndTime, enemyList,
     utils,
-    applySpellAction
+    simulateSpellAction
 }) => {
     for (const { spellId } of staticSpells.placement) {
 
@@ -19,11 +19,11 @@ export const placementToEnemyAIScenario = createAIScenario(async ({
         }
 
         if (spellRole === 'move') {
-            const turnEndTime = battle.currentTurnInfos!.startTime + currentState.characters.actionTime[ currentCharacter.characterId ];
+            const turnEndTime = battle.currentTurnInfos!.startTime + getCurrentState().characters.actionTime[ currentCharacter.characterId ];
             const remainingTime = turnEndTime - stateEndTime;
 
             const maxDistance = Math.min(
-                Math.floor(remainingTime / currentState.spells.duration[ spellId ]),
+                Math.floor(remainingTime / getCurrentState().spells.duration[ spellId ]),
                 3
             );
 
@@ -33,9 +33,11 @@ export const placementToEnemyAIScenario = createAIScenario(async ({
             });
 
             for (const { pos: targetPos, distanceFromLauncher } of potentialTargets) {
-                const success = await applySpellAction(spellId, targetPos, distanceFromLauncher);
-
-                if (success) {
+                const simulateSuccess = await simulateSpellAction(spellId, targetPos, {
+                    multiplyDurationBy: distanceFromLauncher
+                });
+                if (simulateSuccess) {
+                    simulateSuccess.execute();
                     return true;
                 }
             }
@@ -46,9 +48,9 @@ export const placementToEnemyAIScenario = createAIScenario(async ({
             });
 
             for (const { pos: targetPos } of potentialTargets) {
-                const success = await applySpellAction(spellId, targetPos);
-
-                if (success) {
+                const simulateSuccess = await simulateSpellAction(spellId, targetPos);
+                if (simulateSuccess) {
+                    simulateSuccess.execute();
                     return true;
                 }
             }

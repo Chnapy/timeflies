@@ -43,7 +43,7 @@ export class PlayerBattleService extends BattleAbstractService {
             }, {})
         );
 
-        await this.addNewState(battle, newState, Date.now());
+        await this.services.spellActionBattleService.addNewState(battle, newState, Date.now());
 
         // send removed players
         this.sendToEveryPlayersExcept(

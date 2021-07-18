@@ -1,7 +1,7 @@
-import { CharacterUtils, ObjectTyped, PlayerId, SpellAction } from '@timeflies/common';
+import { CharacterUtils, ObjectTyped, PlayerId, SerializableState, SpellAction, waitMs } from '@timeflies/common';
 import { BattleNotifyMessage, BattleSpellActionMessage } from '@timeflies/socket-messages';
 import { SocketCell } from '@timeflies/socket-server';
-import { CheckSpellActionResult, CheckSpellParams, spellActionCheck } from '@timeflies/spell-checker';
+import { CheckSpellParams, spellActionCheck } from '@timeflies/spell-checker';
 import { getSpellRangeArea } from '@timeflies/spell-effects';
 import { Battle } from '../battle';
 import { BattleAbstractService } from '../battle-abstract-service';
@@ -11,13 +11,12 @@ export class SpellActionBattleService extends BattleAbstractService {
         this.addBattleSpellActionMessageListener(socketCell, currentPlayerId);
     };
 
-    onSpellAction = async (
+    simulateSpellAction = async (
         battle: Battle,
-        { playerId, spellAction, checkChecksum, afterSpellActionCheck = () => { } }: {
+        { playerId, spellAction, checkChecksum }: {
             playerId: PlayerId;
             spellAction: SpellAction;
             checkChecksum: boolean;
-            afterSpellActionCheck?: (checkResult: CheckSpellActionResult) => void;
         }) => {
         const { tiledMap, staticState, currentTurnInfos } = battle;
 
@@ -57,26 +56,38 @@ export class SpellActionBattleService extends BattleAbstractService {
             staticState
         };
 
-        const checkResult = await spellActionCheck({
+        return await spellActionCheck({
             spellAction,
             context,
             doChecksum: checkChecksum
         });
+    };
 
-        if (!checkResult.success) {
-            afterSpellActionCheck(checkResult);
-            return false;
+    addNewState = async (battle: Battle, state: SerializableState, stateEndTime: number, afterAddingStateToBattle?: () => void) => {
+        const { stateStack, staticState } = battle;
+
+        stateStack.push(state);
+
+        if (afterAddingStateToBattle) {
+            afterAddingStateToBattle();
         }
 
-        this.addNewStateToBattle(battle, checkResult.newState);
-        
-        afterSpellActionCheck(checkResult);
+        // wait current spell action to end
+        const timeBeforeEnd = stateEndTime - Date.now();
+        await waitMs(timeBeforeEnd);
 
+        this.services.cycleBattleService.onNewState(battle, state);
+
+        const winnerTeamColor = this.services.endBattleService.isBattleEnded(state, staticState);
+        if (winnerTeamColor) {
+            await this.services.endBattleService.onBattleEnd(battle, winnerTeamColor, stateEndTime);
+        }
+    };
+
+    addNewStateWithSpellAction = async (battle: Battle, state: SerializableState, spellAction: SpellAction, afterAddingStateToBattle?: () => void) => {
         const stateEndTime = spellAction.launchTime + spellAction.duration;
 
-        await this.addNewStateToCycleAndCheckBattleEnd(battle, checkResult.newState, stateEndTime);
-
-        return true;
+        await this.addNewState(battle, state, stateEndTime, afterAddingStateToBattle);
     };
 
     private addBattleSpellActionMessageListener = (socketCell: SocketCell, currentPlayerId: PlayerId) => socketCell.addMessageListener<typeof BattleSpellActionMessage>(BattleSpellActionMessage, async ({ payload, requestId }, send) => {
@@ -86,34 +97,34 @@ export class SpellActionBattleService extends BattleAbstractService {
 
         const lastState = this.getCurrentState(battle);
 
-        await this.onSpellAction(battle, {
+        const checkResult = await this.simulateSpellAction(battle, {
             playerId: currentPlayerId,
             spellAction,
             checkChecksum: true,
-            afterSpellActionCheck: checkResult => {
+        });
 
-                if (checkResult.success) {
-                    send(BattleSpellActionMessage.createResponse(requestId, { success: true }));
+        if (!checkResult.success) {
+            send(BattleSpellActionMessage.createResponse(requestId, {
+                success: false,
+                lastState
+            }));
+            return;
+        }
 
-                    battle.staticPlayers
-                        .filter(player => player.playerId !== currentPlayerId)
-                        .map(player => this.playerSocketMap[ player.playerId ])
-                        .forEach(playerSocketCell => {
-                            if (playerSocketCell) {
-                                playerSocketCell.send(BattleNotifyMessage({
-                                    spellAction,
-                                    spellEffect: checkResult.spellEffect
-                                }));
-                            }
-                        });
-                } else {
+        await this.addNewStateWithSpellAction(battle, checkResult.newState, spellAction, () => {
+            send(BattleSpellActionMessage.createResponse(requestId, { success: true }));
 
-                    send(BattleSpellActionMessage.createResponse(requestId, {
-                        success: false,
-                        lastState
-                    }));
-                }
-            }
+            battle.staticPlayers
+                .filter(player => player.playerId !== currentPlayerId)
+                .map(player => this.playerSocketMap[ player.playerId ])
+                .forEach(playerSocketCell => {
+                    if (playerSocketCell) {
+                        playerSocketCell.send(BattleNotifyMessage({
+                            spellAction,
+                            spellEffect: checkResult.spellEffect
+                        }));
+                    }
+                });
         });
     });
 }

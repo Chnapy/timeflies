@@ -5,11 +5,11 @@ import { createAIScenario } from '../ai-scenario';
  *  execute
  */
 export const supportAllyOnceAIScenario = createAIScenario(async ({
-    staticSpells, currentState,
+    staticSpells, getCurrentState,
     allyList,
     nbrScenarioUses,
     utils,
-    applySpellAction
+    simulateSpellAction
 }) => {
     if (nbrScenarioUses) {
         return false;
@@ -23,11 +23,11 @@ export const supportAllyOnceAIScenario = createAIScenario(async ({
             const target = utils.getCharacterWithLowestHealth(targetList);
             if (target) {
 
-                const targetPos = currentState.characters.position[ target.characterId ];
+                const targetPos = getCurrentState().characters.position[ target.characterId ];
 
-                const success = await applySpellAction(spellId, targetPos);
-
-                if (success) {
+                const simulateSuccess = await simulateSpellAction(spellId, targetPos);
+                if (simulateSuccess) {
+                    simulateSuccess.execute();
                     return true;
                 }
             }

@@ -7,48 +7,48 @@ export type AIScenarioUtils = ReturnType<typeof createAIScenarioUtils>;
 
 type CreateAIScenarioUtilsProps = {
     battle: Battle;
-    initialState: SerializableState;
-    currentState: SerializableState;
+    getInitialState: () => SerializableState;
+    getCurrentState: () => SerializableState;
     currentCharacterId: CharacterId;
 };
 
-export const createAIScenarioUtils = ({ battle, initialState, currentState, currentCharacterId }: CreateAIScenarioUtilsProps) => {
+export const getDistanceBetween = (from: Position, to: Position) => Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
+
+export const createAIScenarioUtils = ({ battle, getInitialState, getCurrentState, currentCharacterId }: CreateAIScenarioUtilsProps) => {
 
     const getTargetableList = (characterList: StaticCharacter[], spellId: SpellId) => {
         const { spellRole } = battle.staticState.spells[ spellId ];
 
         const rangeArea = getSpellRangeArea(spellRole, {
             characterList: battle.staticCharacters.map(c => c.characterId),
-            charactersPositions: currentState.characters.position,
-            lineOfSight: currentState.spells.lineOfSight[ spellId ],
+            charactersPositions: getCurrentState().characters.position,
+            lineOfSight: getCurrentState().spells.lineOfSight[ spellId ],
             playingCharacterId: currentCharacterId,
-            rangeArea: currentState.spells.rangeArea[ spellId ],
+            rangeArea: getCurrentState().spells.rangeArea[ spellId ],
             tiledMap: battle.tiledMap
         });
 
         return characterList.filter(({ characterId }) => {
-            const characterPosition = currentState.characters.position[ characterId ];
+            const characterPosition = getCurrentState().characters.position[ characterId ];
             return rangeArea.some(p => p.id === characterPosition.id);
         });
     };
 
     const getCharacterWithLowestHealth = (characterList: StaticCharacter[]): StaticCharacter | null => {
-        const healthMap = currentState.characters.health;
+        const healthMap = getCurrentState().characters.health;
         return [ ...characterList ].sort((a, b) =>
             healthMap[ a.characterId ] < healthMap[ b.characterId ] ? -1 : 1
         )[ 0 ] ?? null;
     };
 
-    const getDistanceBetween = (from: Position, to: Position) => Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
-
     const getClosestCharacterListFromList = (characterList: StaticCharacter[]): StaticCharacter[] => {
-        const pos = currentState.characters.position[ currentCharacterId ];
+        const pos = getCurrentState().characters.position[ currentCharacterId ];
 
         return [ ...characterList ].sort((a, b) => {
-            const aPos = currentState.characters.position[ a.characterId ];
+            const aPos = getCurrentState().characters.position[ a.characterId ];
             const aDistance = getDistanceBetween(pos, aPos);
 
-            const bPos = currentState.characters.position[ b.characterId ];
+            const bPos = getCurrentState().characters.position[ b.characterId ];
             const bDistance = getDistanceBetween(pos, bPos);
 
             return aDistance < bDistance ? -1 : 1;
@@ -61,15 +61,15 @@ export const createAIScenarioUtils = ({ battle, initialState, currentState, curr
     } = {}) => {
         const { spellRole } = battle.staticState.spells[ spellId ];
 
-        const currentCharacterPos = currentState.characters.position[ currentCharacterId ];
-        const targetPos = currentState.characters.position[ target.characterId ];
+        const currentCharacterPos = getCurrentState().characters.position[ currentCharacterId ];
+        const targetPos = getCurrentState().characters.position[ target.characterId ];
 
         const rangeArea = getSpellRangeArea(spellRole, {
             characterList: battle.staticCharacters.map(c => c.characterId),
-            charactersPositions: currentState.characters.position,
-            lineOfSight: currentState.spells.lineOfSight[ spellId ],
+            charactersPositions: getCurrentState().characters.position,
+            lineOfSight: getCurrentState().spells.lineOfSight[ spellId ],
             playingCharacterId: currentCharacterId,
-            rangeArea: currentState.spells.rangeArea[ spellId ],
+            rangeArea: getCurrentState().spells.rangeArea[ spellId ],
             tiledMap: battle.tiledMap
         })
             .map(pos => ({
@@ -86,8 +86,8 @@ export const createAIScenarioUtils = ({ battle, initialState, currentState, curr
     };
 
     const getStateVariablePercent = (selector: (state: SerializableState) => number) => {
-        const initialValue = selector(initialState);
-        const currentValue = selector(currentState);
+        const initialValue = selector(getInitialState());
+        const currentValue = selector(getCurrentState());
         return currentValue / initialValue;
     };
 

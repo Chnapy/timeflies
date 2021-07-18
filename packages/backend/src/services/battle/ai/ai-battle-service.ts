@@ -1,38 +1,22 @@
-import { CharacterId, CharacterUtils, getSpellCategory, Position, SpellAction, SpellId, StaticCharacter, switchUtil } from '@timeflies/common';
-import { BattleNotifyMessage, Message } from '@timeflies/socket-messages';
+import { CharacterId, CharacterUtils, getSpellCategory, SpellAction, StaticCharacter, switchUtil } from '@timeflies/common';
+import { logger } from '@timeflies/devtools';
+import { BattleNotifyMessage } from '@timeflies/socket-messages';
 import { Battle } from '../battle';
 import { BattleAbstractService } from '../battle-abstract-service';
-import { AIScenarioProps } from './ai-scenario';
+import { AIScenarioProps, Simulation } from './ai-scenario';
 import { createAIScenarioUtils } from './ai-scenario-utils';
 import { offensiveToEnemyAIScenario } from './ai-scenarios/offensive-to-enemy-ai-scenario';
 import { offensiveToEnemyLowLifeAIScenario } from './ai-scenarios/offensive-to-enemy-low-life-ai-scenario';
-import { placementToAllyLowLifeAIScenario } from './ai-scenarios/placement-to-ally-low-life-ai-scenario';
 import { placementToEnemyAIScenario } from './ai-scenarios/placement-to-enemy-ai-scenario';
 import { supportAllyOnceAIScenario } from './ai-scenarios/support-ally-once-ai-scenario';
+import { supportAndPlacementToAllyLowLifeAIScenario } from './ai-scenarios/support-and-placement-to-ally-low-life-ai-scenario';
 
 
-/**
- * Use of scenarios: 
- * If one fail, try next one
- * Scenario fails if conditions not respected, cannot be done, or launcher die.
- * 
- * 2- [offensive] if enemy low life (<30%) targetable
- *  execute
- * 3- [support] if ally targetable & no support spell used before
- *  execute
- * 4- [placement] if ally low life (<30%) somewhere
- *  move to closest tile [target=ally] (max distance 3)
- * 5- [offensive] if enemy targetable
- *  execute
- * 6- [placement] if enemy somewhere
- *  move to closest tile [target=enemy] (max distance 3)
- * 
- */
 const AIScenarioList = [
 
     offensiveToEnemyLowLifeAIScenario,
+    supportAndPlacementToAllyLowLifeAIScenario,
     supportAllyOnceAIScenario,
-    placementToAllyLowLifeAIScenario,
     offensiveToEnemyAIScenario,
     placementToEnemyAIScenario
 
@@ -41,26 +25,83 @@ const AIScenarioList = [
 export class AIBattleService extends BattleAbstractService {
     afterSocketConnect = () => { };
 
-    executeTurn = async (battle: Battle, currentCharacterId: CharacterId) => {
+    executeTurn = async (battle: Battle, currentCharacterId: CharacterId, { scenarioList }: {
+        scenarioList: typeof AIScenarioList;
+    } = { scenarioList: AIScenarioList }) => {
 
         const character = battle.staticState.characters[ currentCharacterId ];
         const player = battle.staticState.players[ character.playerId ];
 
         const spells = battle.staticSpells.filter(s => s.characterId === currentCharacterId);
 
-        const messageList: Message[] = [];
-
+        let simulationList: Simulation[] = [];
         let stateEndTime = battle.currentTurnInfos!.startTime;
 
-        const scenariosUsesMap = AIScenarioList.map(() => 0);
+        const scenariosUsesMap = scenarioList.map(() => 0);
+
+        const getTempStateStack = () => [
+            ...battle.stateStack,
+            ...simulationList.map(s => s.state)
+        ];
+
+        const simulateSpellAction: AIScenarioProps[ 'simulateSpellAction' ] = async (spellId, targetPos, {
+            multiplyDurationBy = 1
+        } = {}) => {
+            const battleWithTempStateStack: Battle = {
+                ...battle,
+                stateStack: getTempStateStack()
+            };
+
+            const spellAction: SpellAction = {
+                checksum: '',
+                spellId,
+                duration: this.getCurrentState(battleWithTempStateStack).spells.duration[ spellId ] * multiplyDurationBy,
+                launchTime: stateEndTime,
+                targetPos
+            };
+
+            const checkResult = await this.services.spellActionBattleService.simulateSpellAction(battleWithTempStateStack, {
+                playerId: player.playerId,
+                spellAction,
+                checkChecksum: false
+            });
+
+            if (!checkResult.success) {
+                return null;
+            }
+
+            const simulation: Simulation = {
+                spellAction,
+                state: checkResult.newState,
+                spellEffect: checkResult.spellEffect
+            };
+
+            return {
+                simulation,
+                execute: () => {
+                    simulationList.push(simulation);
+
+                    stateEndTime = spellAction.launchTime + spellAction.duration;
+                }
+            };
+        };
 
         const getScenarioProps = (nbrScenarioUses: number): AIScenarioProps => {
 
-            const initialState = this.getInitialState(battle);
-            const currentState = this.getCurrentState(battle);
+            const battleWithTempStateStack: Battle = {
+                ...battle,
+                stateStack: getTempStateStack()
+            };
+
+            const getInitialState = () => this.getInitialState({
+                stateStack: getTempStateStack()
+            });
+            const getCurrentState = () => this.getCurrentState({
+                stateStack: getTempStateStack()
+            });
 
             const getCharacterList = (relation: 'enemy' | 'ally') => {
-                const { staticCharacters, staticState } = battle;
+                const { staticCharacters, staticState } = battleWithTempStateStack;
 
                 const filterFn = switchUtil(relation, {
                     enemy: ({ playerId }: StaticCharacter) => staticState.players[ playerId ].teamColor !== player.teamColor,
@@ -69,62 +110,26 @@ export class AIBattleService extends BattleAbstractService {
                 });
 
                 return staticCharacters.filter(c => filterFn(c)
-                    && CharacterUtils.isAlive(currentState.characters.health[ c.characterId ]));
-            };
-
-            const applySpellAction = async (spellId: SpellId, targetPos: Position, multiplyDuration = 1) => {
-                const spellAction: SpellAction = {
-                    checksum: '',
-                    spellId,
-                    duration: currentState.spells.duration[ spellId ] * multiplyDuration,
-                    launchTime: stateEndTime,
-                    targetPos
-                };
-
-                const success = await new Promise<boolean>(resolve => {
-                    void this.services.spellActionBattleService.onSpellAction(battle, {
-                        playerId: player.playerId,
-                        spellAction,
-                        checkChecksum: false,
-                        afterSpellActionCheck: checkResult => {
-                            if (checkResult.success) {
-                                messageList.push(
-                                    BattleNotifyMessage({
-                                        spellAction,
-                                        spellEffect: checkResult.spellEffect
-                                    })
-                                );
-                            }
-
-                            resolve(checkResult.success);
-                        }
-                    });
-                });
-
-                if (success) {
-                    stateEndTime = spellAction.launchTime + spellAction.duration;
-                }
-
-                return success;
+                    && CharacterUtils.isAlive(getCurrentState().characters.health[ c.characterId ]));
             };
 
             const utils = createAIScenarioUtils({
-                battle,
-                initialState,
-                currentState,
+                battle: battleWithTempStateStack,
+                getInitialState,
+                getCurrentState,
                 currentCharacterId
             });
 
             return {
-                battle,
+                battle: battleWithTempStateStack,
                 currentCharacter: battle.staticState.characters[ currentCharacterId ],
                 staticSpells: {
                     offensive: spells.filter(s => getSpellCategory(s.spellRole) === 'offensive'),
                     support: spells.filter(s => getSpellCategory(s.spellRole) === 'support'),
                     placement: spells.filter(s => getSpellCategory(s.spellRole) === 'placement'),
                 },
-                initialState,
-                currentState,
+                getInitialState,
+                getCurrentState,
                 stateEndTime,
                 enemyList: getCharacterList('enemy'),
                 allyList: getCharacterList('ally'),
@@ -132,31 +137,56 @@ export class AIBattleService extends BattleAbstractService {
                 nbrScenarioUses,
                 utils,
 
-                applySpellAction
+                simulateSpellAction
             };
         };
 
         const runEveryScenarios = async () => {
-            for (let i = 0; i < AIScenarioList.length; i++) {
-                const scenario = AIScenarioList[ i ];
+            for (let i = 0; i < scenarioList.length; i++) {
+                const scenario = scenarioList[ i ];
+
+                const previousStateEndTime = stateEndTime;
+                const previousSimulationList = [ ...simulationList ];
 
                 const scenarioProps = getScenarioProps(scenariosUsesMap[ i ]);
 
                 const success = await scenario(scenarioProps);
                 scenariosUsesMap[ i ]++;
 
+                if (scenariosUsesMap[ i ] > 40) {
+                    logger.error(new Error('AI infinite loop detected in scenario runs, i=' + i));
+                    return;
+                }
+
                 if (success) {
                     await runEveryScenarios();
                     return;
+                } else {
+                    stateEndTime = previousStateEndTime;
+                    simulationList = [ ...previousSimulationList ];
                 }
             }
         };
 
         await runEveryScenarios();
 
-        if (!messageList.length) {
+        if (!simulationList.length) {
             return;
         }
+
+        const messageAndPromiseList = simulationList.map(({ spellAction, state, spellEffect }) => {
+
+            const notifyMessage = BattleNotifyMessage({
+                spellAction,
+                spellEffect
+            });
+
+            const promise = this.services.spellActionBattleService.addNewStateWithSpellAction(battle, state, spellAction);
+
+            return { notifyMessage, promise };
+        });
+
+        const messageList = messageAndPromiseList.map(({ notifyMessage }) => notifyMessage);
 
         battle.staticPlayers
             .filter(p => p.playerId !== player.playerId)
@@ -166,5 +196,7 @@ export class AIBattleService extends BattleAbstractService {
                     playerSocketCell.send(...messageList);
                 }
             });
+
+        await Promise.all(messageAndPromiseList.map(({ promise }) => promise));
     };
 };

@@ -5,10 +5,10 @@ import { createAIScenario } from '../ai-scenario';
  *  execute
  */
 export const offensiveToEnemyLowLifeAIScenario = createAIScenario(async ({
-    staticSpells, currentState,
+    staticSpells, getCurrentState,
     enemyList,
     utils,
-    applySpellAction
+    simulateSpellAction
 }) => {
     for (const { spellId } of staticSpells.offensive) {
 
@@ -21,11 +21,11 @@ export const offensiveToEnemyLowLifeAIScenario = createAIScenario(async ({
                 const healthPercent = utils.getStateVariablePercent(state => state.characters.health[ target.characterId ]);
                 if (healthPercent < 0.33) {
 
-                    const targetPos = currentState.characters.position[ target.characterId ];
+                    const targetPos = getCurrentState().characters.position[ target.characterId ];
 
-                    const success = await applySpellAction(spellId, targetPos);
-
-                    if (success) {
+                    const simulateSuccess = await simulateSpellAction(spellId, targetPos);
+                    if (simulateSuccess) {
+                        simulateSuccess.execute();
                         return true;
                     }
 
