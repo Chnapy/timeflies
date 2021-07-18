@@ -8,14 +8,15 @@ import { checkPlayer } from './checkers/check-player';
 import { checkTime } from './checkers/check-time';
 
 const checkers: readonly Checker[] = [
-    checkChecksum,
     checkPlayer,
     checkCharacter,
     checkTime,
     checkMap
 ];
 
-export type CheckSpellParams = Pick<CheckerParams, 'spellAction' | 'context'>;
+export type CheckSpellParams = Pick<CheckerParams, 'spellAction' | 'context'> & {
+    doChecksum: boolean;
+};
 
 export type CheckSpellActionResult =
     | {
@@ -28,7 +29,7 @@ export type CheckSpellActionResult =
     };
 
 export const spellActionCheck = async (params: CheckSpellParams): Promise<CheckSpellActionResult> => {
-    const { spellAction, context } = params;
+    const { spellAction, context, doChecksum } = params;
 
     const { spellRole } = context.staticState.spells[ spellAction.spellId ];
 
@@ -43,12 +44,16 @@ export const spellActionCheck = async (params: CheckSpellParams): Promise<CheckS
         spellAction.launchTime
     );
 
+    const everyCheckers = doChecksum
+        ? [ checkChecksum, ...checkers ]
+        : checkers;
+
     const checkerParams: CheckerParams = {
         ...params,
         newState
     };
 
-    const checked = checkers.every(check => check(checkerParams));
+    const checked = everyCheckers.every(check => check(checkerParams));
 
     return checked
         ? {

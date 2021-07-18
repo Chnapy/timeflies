@@ -36,7 +36,9 @@ const useStyles = makeStyles(({ palette }) => ({
     }
 }));
 
-export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', className, onClick, disabled, loading: controlledLoading, children, ...rest }) => {
+export const UIButton: React.FC<UIButtonProps> = React.forwardRef(({
+    variant = 'secondary', className, onClick, disabled, loading: controlledLoading, children, ...rest
+}, ref) => {
     const classes = useStyles();
     const playSound = useSound();
     const isMountedRef = React.useRef(true);
@@ -71,6 +73,7 @@ export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', class
 
     return (
         <Button
+            ref={ref}
             className={clsx(classes.root, className)}
             classes={{ containedSecondary: classes.btnSecondary }}
             variant='contained'
@@ -89,4 +92,4 @@ export const UIButton: React.FC<UIButtonProps> = ({ variant = 'secondary', class
             </UIText>
         </Button>
     );
-};
+});

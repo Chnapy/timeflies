@@ -8,7 +8,7 @@ export const playerRelationList = [ 'me', 'ally', 'enemy' ] as const;
 export const playerRelationSchema = playerRelationList;
 
 export type PlayerType = typeof playerTypeList[ number ];
-export const playerTypeList = [ 'player', 'spectator' ] as const;
+export const playerTypeList = [ 'player', 'spectator', 'ai' ] as const;
 export const playerTypeSchema = playerTypeList;
 
 export type StaticPlayer = {

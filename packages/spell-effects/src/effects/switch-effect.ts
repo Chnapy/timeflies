@@ -6,6 +6,9 @@ import { SpellEffectItem } from '../spell-effects-fn';
 export const switchEffect: SpellEffectItem = {
     rangeArea: (position, { playingCharacterId, charactersPositions }) => {
         const characterPosition = charactersPositions[ playingCharacterId ];
+        if(characterPosition.id === position.id) {
+            return false;
+        }
 
         const dx = Math.abs(characterPosition.x - position.x);
         const dy = Math.abs(characterPosition.y - position.y);

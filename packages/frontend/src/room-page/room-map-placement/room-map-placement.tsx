@@ -3,7 +3,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { appTheme, UIText } from '@timeflies/app-ui';
 import { AssetsLoader, AssetsLoaderMap, useAssetMap } from '@timeflies/assets-loader';
 import { CharacterId, Position } from '@timeflies/common';
-import { RoomCharacterPlacementMessage } from '@timeflies/socket-messages';
+import { RoomCharacterPlacementMessage, RoomStaticCharacter } from '@timeflies/socket-messages';
 import { Assets } from '@timeflies/static-assets';
 import { TilemapComponent } from '@timeflies/tilemap-component';
 import React from 'react';
@@ -45,7 +45,12 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
     const teamColorList = useRoomSelector(state => state.teamColorList);
     const myPlayerId = useMyPlayerId();
     const myTeamColor = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].teamColor);
-    const characterList = useRoomSelector(state => Object.values(state.staticCharacterList));
+    const staticCharacterList = useRoomSelector(state => state.staticCharacterList);
+    const characterList = Object.values(staticCharacterList);
+    const staticPlayerList = useRoomSelector(state => state.staticPlayerList);
+    const aiPlayerIdList = Object.values(staticPlayerList)
+        .filter(p => p.type === 'ai')
+        .map(p => p.playerId);
     const [ selectedCharacterId, setSelectedCharacterId ] = React.useState<CharacterId | null>(null);
 
     const mapAssets = useAssetMap(mapInfos.name);
@@ -55,9 +60,13 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
 
     const { schema } = mapAssets;
 
-    const charactersToPlace = characterList.filter(character =>
-        character.playerId === myPlayerId && !character.placement
-    );
+    const isSelectedCharacterAI = !!selectedCharacterId && staticPlayerList[ staticCharacterList[ selectedCharacterId ].playerId ].type === 'ai';
+    const selectedCharacterTeamColor = selectedCharacterId ? staticPlayerList[ staticCharacterList[ selectedCharacterId ].playerId ].teamColor : null;
+
+    const canManipulateCharacter = (character: Pick<RoomStaticCharacter, 'playerId'>) => character.playerId === myPlayerId
+        || aiPlayerIdList.includes(character.playerId);
+
+    const charactersToPlace = characterList.filter(character => canManipulateCharacter(character) && !character.placement);
 
     const getPlacementSelect = (characterId: CharacterId, position: Position | null) => async () => {
         await sendRoomUpdate(RoomCharacterPlacementMessage({
@@ -83,9 +92,10 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
             const y = position.y * tileRealSize;
 
             const presentCharacter = characterList.find(character => character.placement?.id === position.id);
-            const canRemove = presentCharacter?.playerId === myPlayerId;
+            const targeteableTile = isSelectedCharacterAI ? teamColor === selectedCharacterTeamColor : isMyTeam;
+            const canRemove = presentCharacter && canManipulateCharacter(presentCharacter);
             const canAdd = !!selectedCharacterId
-                && isMyTeam
+                && targeteableTile
                 && !presentCharacter;
 
             const onClick = selectedCharacterId
@@ -100,7 +110,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
                     x={x}
                     y={y}
                     size={tileRealSize}
-                    showIcon={isMyTeam}
+                    showIcon={targeteableTile}
                     teamColor={teamColor}
                     characterId={presentCharacter?.characterId}
                     onClick={onClick}
@@ -128,7 +138,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
                                         <Grid key={characterId} item>
                                             <RoomCharacterButton
                                                 characterId={characterId}
-                                                showOutline={characterId === selectedCharacterId}
+                                                focus={characterId === selectedCharacterId}
                                                 onClick={() => setSelectedCharacterId(characterId)}
                                                 size={44}
                                             />

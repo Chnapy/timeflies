@@ -1,4 +1,4 @@
-import { Grid, makeStyles } from '@material-ui/core';
+import { Grid, makeStyles, Tooltip } from '@material-ui/core';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
 import { HealthGauge, UIText } from '@timeflies/app-ui';
 import { CharacterRole, CharacterUtils, PlayerRelation, switchUtil } from '@timeflies/common';
@@ -12,6 +12,7 @@ export type CharacterItemProps = {
     playerRelation: PlayerRelation;
     teamColor: string;
     health: number;
+    isAI?: boolean;
     isPlaying?: boolean;
     isDisconnected?: boolean;
 };
@@ -71,11 +72,14 @@ const useStyles = makeStyles(({ palette }) => ({
         width: healthGaugeWidth,
         padding: 2,
         backgroundColor: palette.background.default
+    },
+    tooltipPopper: {
+        zIndex: 0
     }
 }));
 
 export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProps> = ({
-    playerName, teamColor, playerRelation, characterRole, health, isPlaying, isDisconnected, onMouseEnter, onMouseLeave, onClick
+    playerName, teamColor, playerRelation, characterRole, health, isAI, isPlaying, isDisconnected, onMouseEnter, onMouseLeave, onClick
 }) => {
     const isAlive = CharacterUtils.isAlive(health);
     const classes = useStyles({ teamColor, playerRelation, isPlaying, isAlive, isDisconnected });
@@ -93,11 +97,19 @@ export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProp
     return <Grid className={classes.root} container direction='column'>
 
         <Grid item>
-            <UIText className={classes.disabled} variant='body2' noWrap>
-                {playerName} {isDisconnected && (
-                    <LinkOffIcon className={classes.disconnectIcon} />
-                )}
-            </UIText>
+            <Tooltip
+                classes={{ popper: classes.tooltipPopper }}
+                open={isAI}
+                arrow
+                title={<UIText variant='body2'>AI</UIText>}
+                placement="right"
+            >
+                <UIText className={classes.disabled} variant='body2' noWrap>
+                    {playerName} {isDisconnected && (
+                        <LinkOffIcon className={classes.disconnectIcon} />
+                    )}
+                </UIText>
+            </Tooltip>
         </Grid>
 
         <Grid item>

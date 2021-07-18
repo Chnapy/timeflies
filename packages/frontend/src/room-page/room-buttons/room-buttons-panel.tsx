@@ -41,7 +41,7 @@ const playerReadyIndex = 1;
 export const RoomButtonsPanel: React.FC = () => {
     const classes = useStyles();
     const playSound = useSound();
-    const playerId = useMyPlayerId();
+    const myPlayerId = useMyPlayerId();
     const placedCharactersStatus = useRoomSelector(state => {
 
         if (Object.values(state.staticPlayerList).length < 2) {
@@ -49,19 +49,22 @@ export const RoomButtonsPanel: React.FC = () => {
         }
 
         const playerCharacterList = Object.values(state.staticCharacterList)
-            .filter(character => character.playerId === playerId);
+            .filter(character => character.playerId === myPlayerId);
+        const aiCharacterList = Object.values(state.staticCharacterList)
+                .filter(character => state.staticPlayerList[ character.playerId ].type === 'ai');
+        const playerAndAICharacterList = [ ...playerCharacterList, ...aiCharacterList ];
 
-        if (playerCharacterList.length === 0) {
+        if (!playerCharacterList.length || !aiCharacterList.length) {
             return 'no-characters';
         }
 
-        if (playerCharacterList.every(character => character.placement !== null)) {
+        if (playerAndAICharacterList.every(character => character.placement !== null)) {
             return 'all-placed';
         }
 
         return 'not-placed';
     });
-    const playerReady = useRoomSelector(state => state.staticPlayerList[ playerId ].ready);
+    const playerReady = useRoomSelector(state => state.staticPlayerList[ myPlayerId ].ready);
     const roomReady = useIsRoomReady();
 
     const getCurrentStep = React.useCallback(() => {

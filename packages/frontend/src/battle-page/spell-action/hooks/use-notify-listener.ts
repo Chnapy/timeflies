@@ -2,26 +2,42 @@ import { useSocketListeners } from '@timeflies/socket-client';
 import { BattleNotifyMessage } from '@timeflies/socket-messages';
 import { produceStateFromSpellEffect } from '@timeflies/spell-effects';
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { batchActions } from 'redux-batched-actions';
 import { useAsyncEffect } from 'use-async-effect';
 import { useFutureEntities } from '../../hooks/use-entities';
 import { useDispatchNewState } from './use-dispatch-new-state';
 
 const useOnNotifyMessage = () => {
-    const lastState = useFutureEntities(state => state);
+    const firstLastState = useFutureEntities(state => state);
+    const dispatch = useDispatch();
     const dispatchNewState = useDispatchNewState();
 
-    return async ({ payload }: ReturnType<typeof BattleNotifyMessage>) => {
-        const { spellAction, spellEffect } = payload;
+    return async (messageList: ReturnType<typeof BattleNotifyMessage>[]) => {
+        let lastState = firstLastState;
 
-        const futureState = produceStateFromSpellEffect(
-            spellEffect,
-            lastState,
-            spellAction.launchTime
-        );
+        const actionAndPromiseList = messageList.map(({ payload }) => {
+            const { spellAction, spellEffect } = payload;
 
-        const { promise } = dispatchNewState(spellEffect, futureState, spellAction);
+            const futureState = produceStateFromSpellEffect(
+                spellEffect,
+                lastState,
+                spellAction.launchTime
+            );
+            lastState = futureState;
 
-        await promise;
+            const { commitAction, promise } = dispatchNewState(spellEffect, futureState, spellAction, {
+                ignoreCommitDispatch: true
+            });
+
+            return { promise, commitAction };
+        });
+
+        dispatch(batchActions(
+            actionAndPromiseList.map(({ commitAction }) => commitAction)
+        ));
+
+        await Promise.all(actionAndPromiseList.map(({ promise }) => promise));
     };
 };
 
@@ -32,8 +48,8 @@ export const useNotifyListener = () => {
     notifyListenerRef.current = useOnNotifyMessage();
 
     useAsyncEffect(() => {
-        return socketListeners({
-            [ BattleNotifyMessage.action ]: action => notifyListenerRef.current!(action)
+        return socketListeners({}, {
+            [ BattleNotifyMessage.action ]: messageList => notifyListenerRef.current!(messageList)
         });
     },
         removeListeners => removeListeners && removeListeners(),

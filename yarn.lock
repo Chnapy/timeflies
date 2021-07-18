@@ -4668,6 +4668,7 @@ __metadata:
     react-router-dom: ^5.2.0
     react-scripts: 4.0.3
     redux: ^4.1.0
+    redux-batched-actions: 0.5.0
     redux-logger: ^3.0.6
     reselect: ^4.0.0
     tiled-types: ^1.3.0
@@ -19167,6 +19168,15 @@ fsevents@^1.2.7:
     indent-string: ^4.0.0
     strip-indent: ^3.0.0
   checksum: 78c8aa0a1076f47e0e198bfc8a9aa7d4ae3163c6951bd5de1015e47661bba62ea36573337bbeb4b309b48cc71954edbe43ae4aa3163db1996a781b757c5c47d7
+  languageName: node
+  linkType: hard
+
+"redux-batched-actions@npm:0.5.0":
+  version: 0.5.0
+  resolution: "redux-batched-actions@npm:0.5.0"
+  peerDependencies:
+    redux: ">=1.0.0"
+  checksum: 73be3e803e80f4c3027eec83985b4aa9d7a5b42c3a74e7755d611d4eaba36b7f1ff12d7475294c06535aada41708630c8060c40b2148d85f754ca8e00983340f
   languageName: node
   linkType: hard
 

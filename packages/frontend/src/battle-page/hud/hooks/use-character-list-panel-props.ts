@@ -21,7 +21,7 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
 
     const characterMap = characterList.reduce<CharacterListPanelProps[ 'characterMap' ]>((acc, characterId) => {
         const { characterRole, playerId } = staticCharacters[ characterId ];
-        const { playerName, teamColor } = staticPlayers[ playerId ];
+        const { playerName, teamColor, type } = staticPlayers[ playerId ];
         const health = currentCharactersHealth[ characterId ];
 
         const playerRelation = isSpectator ? 'me' : getPlayerRelationFrom(playerId);
@@ -32,6 +32,7 @@ export const useCharacterListPanelProps = (): CharacterListPanelProps => {
             playerRelation,
             characterRole,
             health,
+            isAI: type === 'ai',
             isPlaying: playingCharacterId === characterId,
             isDisconnected: playerDisconnectedList.includes(playerId)
         };
