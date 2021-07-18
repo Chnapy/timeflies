@@ -208,8 +208,57 @@ export const Default: React.FC = () => {
             serializableStates: {
                 12: initialSerializableState
             },
-            spellActionEffectList: [],
-            spellActionEffects: {},
+            spellActionEffectList: [ Date.now() - 10, Date.now() + 90000, Date.now() + 90001 ],
+            spellActionEffects: {
+                [ Date.now() - 10 ]: {
+                    spellAction: {
+                        checksum: '',
+                        duration: 10000,
+                        launchTime: Date.now() - 10,
+                        spellId: 's1a',
+                        targetPos: createPosition(5, 5)
+                    },
+                    spellEffect: {
+                        actionArea: [],
+                        duration: 10000,
+                        characters: {
+                            c1: { health: -30 }
+                        }
+                    }
+                },
+                [ Date.now() + 90000 ]: {
+                    spellAction: {
+                        checksum: '',
+                        duration: 10000,
+                        launchTime: Date.now() + 90000,
+                        spellId: 's1a',
+                        targetPos: createPosition(6, 6)
+                    },
+                    spellEffect: {
+                        actionArea: [],
+                        duration: 10000,
+                        characters: {
+                            c1: { health: -30 }
+                        }
+                    }
+                },
+                [ Date.now() + 90001 ]: {
+                    spellAction: {
+                        checksum: '',
+                        duration: 10000,
+                        launchTime: Date.now() + 90001,
+                        spellId: 's1a',
+                        targetPos: createPosition(6, 6)
+                    },
+                    spellEffect: {
+                        actionArea: [],
+                        duration: 10000,
+                        characters: {
+                            c1: { health: -30 }
+                        }
+                    }
+                },
+            },
             playingCharacterId: 'c1',
             roundIndex: 0,
             selectedSpellId: null,
