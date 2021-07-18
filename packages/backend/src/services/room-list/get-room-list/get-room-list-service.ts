@@ -12,7 +12,7 @@ export class GetRoomListService extends Service {
         RoomListGetListMessage, ({ requestId }, send) => {
 
             const roomList = Object.values(this.globalEntitiesNoServices.currentRoomMap.mapById)
-            .filter((room): room is Room => !!room);
+                .filter((room): room is Room => !!room);
 
             const listData = roomList.map((room): RoomInfos => {
 
@@ -26,7 +26,9 @@ export class GetRoomListService extends Service {
                         mapId: mapInfos.mapId,
                         name: mapInfos.name
                     },
-                    nbrPlayers: staticPlayerList.length,
+                    nbrPlayers: staticPlayerList
+                        .filter(player => player.type !== 'ai')
+                        .length,
                     playerAdmin: {
                         playerId: playerAdminId,
                         playerName: playerAdminName

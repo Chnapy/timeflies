@@ -192,7 +192,9 @@ export class PlayerRoomService extends RoomAbstractService {
 
         delete this.globalEntitiesNoServices.currentRoomMap.mapByPlayerId[ currentPlayerId ];
 
-        if (room.staticPlayerList.length === 0) {
+        if (room.staticPlayerList
+            .filter(player => player.type !== 'ai')
+            .length === 0) {
             delete this.globalEntitiesNoServices.currentRoomMap.mapById[ room.roomId ];
         }
     };
