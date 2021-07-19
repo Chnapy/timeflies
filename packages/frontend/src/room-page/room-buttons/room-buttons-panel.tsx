@@ -1,7 +1,7 @@
 import { Box, Grid, makeStyles, Paper, Step, StepButton, Stepper } from '@material-ui/core';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import { UIButtonProps, UIText, useSound } from '@timeflies/app-ui';
+import { UIButtonProps, UIText, useSound, useWithSound } from '@timeflies/app-ui';
 import { switchUtil } from '@timeflies/common';
 import React from 'react';
 import { useMyPlayerId } from '../../login-page/hooks/use-my-player-id';
@@ -40,6 +40,7 @@ const playerReadyIndex = 1;
 
 export const RoomButtonsPanel: React.FC = () => {
     const classes = useStyles();
+    const withSound = useWithSound('buttonClick');
     const playSound = useSound();
     const myPlayerId = useMyPlayerId();
     const placedCharactersStatus = useRoomSelector(state => {
@@ -51,7 +52,7 @@ export const RoomButtonsPanel: React.FC = () => {
         const playerCharacterList = Object.values(state.staticCharacterList)
             .filter(character => character.playerId === myPlayerId);
         const aiCharacterList = Object.values(state.staticCharacterList)
-                .filter(character => state.staticPlayerList[ character.playerId ].type === 'ai');
+            .filter(character => state.staticPlayerList[ character.playerId ].type === 'ai');
         const playerAndAICharacterList = [ ...playerCharacterList, ...aiCharacterList ];
 
         if (!playerCharacterList.length || !aiCharacterList.length) {
@@ -142,7 +143,7 @@ export const RoomButtonsPanel: React.FC = () => {
                                     : (
                                         <StepButton
                                             className={iconButtonDisabled ? classes.iconButtonDisabled : undefined}
-                                            onClick={getOnPreviousStepClick(i)}
+                                            onClick={withSound(getOnPreviousStepClick(i))}
                                             icon={icon}
                                             disabled={iconButtonDisabled}
                                         />

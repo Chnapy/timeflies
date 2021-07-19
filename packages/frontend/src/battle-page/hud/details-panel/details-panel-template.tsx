@@ -1,5 +1,6 @@
 import { Box, CardActionArea, IconButton, makeStyles, Paper } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import { useWithSound } from '@timeflies/app-ui';
 import React from 'react';
 
 type DetailsPanelTemplateProps = {
@@ -30,14 +31,15 @@ const useStyles = makeStyles(({ palette }) => ({
 
 export const DetailsPanelTemplate: React.FC<DetailsPanelTemplateProps> = ({ minWidth, maxWidth, onClick, onClose, children }) => {
     const classes = useStyles({ clickable: !!onClick });
+    const withSound = useWithSound('buttonClick');
 
     return <Paper className={classes.root}>
-        {onClick && <CardActionArea className={classes.wrapper} onClick={onClick} />}
+        {onClick && <CardActionArea className={classes.wrapper} onClick={withSound(onClick)} />}
         <Box minWidth={minWidth} maxWidth={maxWidth} p={2}>
             {children}
 
             {onClose && (
-                <IconButton className={classes.closeBtn} size='small' onClick={onClose}>
+                <IconButton className={classes.closeBtn} size='small' onClick={withSound(onClose)}>
                     <CloseIcon fontSize='inherit' />
                 </IconButton>
             )}

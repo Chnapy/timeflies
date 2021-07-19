@@ -1,6 +1,6 @@
 import { Grid, makeStyles, Tooltip } from '@material-ui/core';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
-import { HealthGauge, UIText } from '@timeflies/app-ui';
+import { HealthGauge, UIText, useWithSound } from '@timeflies/app-ui';
 import { CharacterRole, CharacterUtils, PlayerRelation, switchUtil } from '@timeflies/common';
 import { CharacterAnimatedImage } from '@timeflies/sprite-image';
 import { SpritesheetsUtils } from '@timeflies/static-assets';
@@ -83,6 +83,7 @@ export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProp
 }) => {
     const isAlive = CharacterUtils.isAlive(health);
     const classes = useStyles({ teamColor, playerRelation, isPlaying, isAlive, isDisconnected });
+    const withSound = useWithSound('buttonClick');
 
     const state: SpritesheetsUtils.CharacterSpriteConfig = {
         role: characterRole,
@@ -117,7 +118,7 @@ export const CharacterItem: React.FC<CharacterItemProps & CharacterItemExtraProp
                 className={classes.content}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
-                onClick={onClick}
+                onClick={withSound(onClick)}
             >
                 <div className={classes.teamRect} />
 

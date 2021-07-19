@@ -1,5 +1,5 @@
 import { Box, lighten, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
-import { UIButton, UIText } from '@timeflies/app-ui';
+import { UIButton, UIText, useWithSound } from '@timeflies/app-ui';
 import { waitMs } from '@timeflies/common';
 import { RoomInfos, RoomListCreateRoomMessage, RoomListGetListMessage } from '@timeflies/socket-messages';
 import React from 'react';
@@ -56,6 +56,7 @@ const StyledTableBodyCell: React.FC = ({ children }) => (
 
 export const RoomListTable: React.FC = () => {
     const classes = useStyles();
+    const withSound = useWithSound('buttonClick');
     const [ roomList, setRoomList ] = React.useState<RoomInfos[]>([]);
     const history = useHistory();
     const sendWithResponse = useSocketSendWithResponseError();
@@ -109,7 +110,7 @@ export const RoomListTable: React.FC = () => {
                             <TableRow
                                 key={roomId}
                                 className={classes.rowClickable}
-                                onClick={getOnRoomSelect(roomId)}
+                                onClick={withSound(getOnRoomSelect(roomId))}
                             >
                                 <StyledTableBodyCell>{playerAdmin.playerName}</StyledTableBodyCell>
                                 <StyledTableBodyCell>{map ? map.name : '-'}</StyledTableBodyCell>

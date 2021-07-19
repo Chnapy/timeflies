@@ -2,7 +2,7 @@ import { AppBar, Dialog, DialogActions, DialogTitle, Grid, IconButton, makeStyle
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
-import { UIButton, UIText, useIsMobile } from '@timeflies/app-ui';
+import { UIButton, UIText, useIsMobile, useWithSound } from '@timeflies/app-ui';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { UserButton } from '../../components/app-header/user-button';
@@ -31,6 +31,7 @@ const useStyles = makeStyles(({ spacing }) => ({
 
 export const BattleHeader: React.FC = () => {
     const isMobile = useIsMobile();
+    const withSound = useWithSound('buttonClick');
     const [ minified, setMinified ] = React.useState(isMobile);
     const [ onConfirm, setOnConfirm ] = React.useState<(() => void) | undefined>();
 
@@ -62,7 +63,7 @@ export const BattleHeader: React.FC = () => {
                 <Toolbar className={classes.toolbar} disableGutters>
                     <Grid container alignItems='center' spacing={1}>
                         <Grid className={classes.ifExpanded} item xs>
-                            <IconButton size='small' color="inherit" onClick={handleBack}>
+                            <IconButton size='small' color="inherit" onClick={withSound(handleBack)}>
                                 <ArrowBackIcon />
                             </IconButton>
                         </Grid>
@@ -84,7 +85,7 @@ export const BattleHeader: React.FC = () => {
 
                                 {isMobile && (
                                     <Grid item>
-                                        <IconButton size='small' color="inherit" onClick={toggleMinified}>
+                                        <IconButton size='small' color="inherit" onClick={withSound(toggleMinified)}>
                                             {minified
                                                 ? <KeyboardArrowLeftIcon />
                                                 : <KeyboardArrowRightIcon />}
@@ -98,11 +99,11 @@ export const BattleHeader: React.FC = () => {
                 </Toolbar>
             </AppBar>
 
-            <Dialog open={!!onConfirm} onClose={closeConfirm}>
+            <Dialog open={!!onConfirm} onClose={withSound(closeConfirm)}>
                 <DialogTitle>Leave battle ?</DialogTitle>
                 <DialogActions>
-                    <UIButton onClick={onConfirm}>yes</UIButton>
-                    <UIButton onClick={closeConfirm}>no</UIButton>
+                    <UIButton onClick={withSound(onConfirm)}>yes</UIButton>
+                    <UIButton onClick={withSound(closeConfirm)}>no</UIButton>
                 </DialogActions>
             </Dialog>
         </>
