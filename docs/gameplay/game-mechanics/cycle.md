@@ -2,16 +2,16 @@
 
 Each battle follows a game loop with each character playing after the other: they play **turns**.
 
-There is characters turns, but also **global turns**. A global turn contains all the characters turns.
-When all these characters turns end, the global turn ends too and another one starts.
+There is characters turns, but also **rounds**. A round contains all the characters turns.
+When all these characters turns end, the round ends too and another one starts.
 
 Imagine a battle with two characters: *Tomato* and *Ketchup*.
 
 This gives us that:
-1. First global turn
+1. First round
     1. Tomato turn
     2. Ketchup turn
-2. Second global turn
+2. Second round
     1. Tomato turn
     2. Ketchup turn
 3. etc
