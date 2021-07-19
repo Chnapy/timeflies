@@ -76,4 +76,4 @@ export abstract class Service {
 
         this.afterSocketConnect(socketCell, currentPlayerId);
     };
-};
+}

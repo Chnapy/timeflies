@@ -62,4 +62,4 @@ export function describeSocketFailures<V extends any[]>(hook: UseSocketHook<V>, 
             result.current(...args)
         )).toThrowError();
     });
-};
+}

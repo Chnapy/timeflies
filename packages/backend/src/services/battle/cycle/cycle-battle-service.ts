@@ -97,4 +97,4 @@ export class CycleBattleService extends BattleAbstractService {
 
         cycleEngine.disableCharacters(deadCharactersIds);
     };
-};
+}

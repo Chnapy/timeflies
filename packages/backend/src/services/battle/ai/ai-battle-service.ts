@@ -199,4 +199,4 @@ export class AIBattleService extends BattleAbstractService {
 
         await Promise.all(messageAndPromiseList.map(({ promise }) => promise));
     };
-};
+}

@@ -42,4 +42,4 @@ export function useCadencedTime<V>(memo: (time: number) => V) {
     }, [ getMemoValue, value ]);
 
     return value;
-};
+}
