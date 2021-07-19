@@ -8,8 +8,7 @@
   },
   "author": "Chnapy <richardhaddad@hotmail.fr>",
   "workspaces": [
-    "packages/!(back|front|shared)",
-    "packages/!(back|front|shared)"
+    "packages/*"
   ],
   "scripts": {
     "p:start": "cd $INIT_CWD && tsc -w",
