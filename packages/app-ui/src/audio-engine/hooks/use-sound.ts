@@ -28,3 +28,20 @@ export const useSound = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     return React.useCallback((musicKey: Assets.SoundKey) => fnRef.current!(musicKey), [ fnRef, soundContext ]);
 };
+
+export const useWithSound = (soundKey: Assets.SoundKey) => {
+    const playSound = useSound();
+
+    return React.useCallback(<F>(fn: F) => {
+
+        if (typeof fn !== 'function') {
+            return fn;
+        }
+
+        return ((...args: unknown[]) => {
+            playSound(soundKey);
+
+            return fn(...args);
+        }) as unknown as F;
+    }, [ soundKey, playSound ]);
+};

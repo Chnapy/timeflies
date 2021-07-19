@@ -1,6 +1,6 @@
 import { Dialog, Grid, IconButton, makeStyles } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { UIText } from '@timeflies/app-ui';
+import { UIText, useWithSound } from '@timeflies/app-ui';
 import { MapInfos, RoomMapListGetMessage, RoomMapSelectMessage } from '@timeflies/socket-messages';
 import React from 'react';
 import useAsyncEffect from 'use-async-effect';
@@ -37,6 +37,7 @@ const emptyArray: MapInfos[] = [];
 
 export const RoomMapList: React.FC<RoomMapListProps> = ({ open, onClose }) => {
     const classes = useStyles();
+    const withSound = useWithSound('buttonClick');
     const sendWithResponse = useSocketSendWithResponseError();
     const sendRoomUpdate = useSendRoomUpdate();
     const selectedMapId = useRoomSelector(state => state.mapInfos?.mapId);
@@ -62,12 +63,12 @@ export const RoomMapList: React.FC<RoomMapListProps> = ({ open, onClose }) => {
     };
 
     return (
-        <Dialog classes={{ paper: classes.root }} fullScreen open={open} onClose={onClose}>
+        <Dialog classes={{ paper: classes.root }} fullScreen open={open} onClose={withSound(onClose)}>
             <Grid className={classes.content} container direction='column' spacing={2}>
 
                 <Grid className={classes.header} item>
                     <UIText variant='h3'>Map select</UIText>
-                    <IconButton onClick={onClose}>
+                    <IconButton onClick={withSound(onClose)}>
                         <CloseIcon />
                     </IconButton>
                 </Grid>

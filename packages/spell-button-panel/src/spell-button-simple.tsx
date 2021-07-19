@@ -1,6 +1,6 @@
 import { ButtonBase, makeStyles } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { SpellIcon } from '@timeflies/app-ui';
+import { SpellIcon, useWithSound } from '@timeflies/app-ui';
 import { SpellRole } from '@timeflies/common';
 import React from 'react';
 
@@ -52,11 +52,12 @@ export const SpellButtonSimple: React.FC<SpellButtonSimpleProps> = ({
     spellRole, imageSize, selected, disabled, padding, onClick, onMouseEnter, onMouseLeave
 }) => {
     const classes = useStyles({ selected, clickable: !!onClick });
+    const withSound = useWithSound('buttonClick');
 
     return (
         <ButtonBase
             className={classes.root}
-            onClick={onClick}
+            onClick={withSound(onClick)}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             onPointerDown={onMouseEnter}

@@ -1,7 +1,7 @@
 import { CardActionArea, Grid, ListItemIcon, makeStyles, Menu, MenuItem } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import PersonIcon from '@material-ui/icons/Person';
-import { UIText } from '@timeflies/app-ui';
+import { UIText, useWithSound } from '@timeflies/app-ui';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -22,6 +22,7 @@ const useStyles = makeStyles(({ spacing }) => ({
 
 export const UserButton: React.FC = () => {
     const classes = useStyles();
+    const withSound = useWithSound('buttonClick');
     const history = useHistory();
     const playerName = useGameSelector(state => state.credentials?.playerName);
 
@@ -43,7 +44,7 @@ export const UserButton: React.FC = () => {
     };
 
     return <>
-        <CardActionArea className={classes.root} onClick={handleClick}>
+        <CardActionArea className={classes.root} onClick={withSound(handleClick)}>
             <Grid container alignItems='center' wrap='nowrap' spacing={1}>
                 <Grid item>
                     <UIText variant='body1'>{playerName}</UIText>
@@ -69,7 +70,7 @@ export const UserButton: React.FC = () => {
                 horizontal: 'right',
             }}
         >
-            <MenuItem onClick={handleLogout}>
+            <MenuItem onClick={withSound(handleLogout)}>
                 <ListItemIcon>
                     <ExitToAppIcon />
                 </ListItemIcon>

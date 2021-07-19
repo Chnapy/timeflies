@@ -2,7 +2,7 @@ import { Grid, IconButton, makeStyles, Tooltip } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CloseIcon from '@material-ui/icons/Close';
-import { UIButton, UIText } from '@timeflies/app-ui';
+import { UIButton, UIText, useWithSound } from '@timeflies/app-ui';
 import { ObjectTyped, PlayerId } from '@timeflies/common';
 import { RoomAiRemoveMessage } from '@timeflies/socket-messages';
 import React from 'react';
@@ -43,6 +43,7 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
 
 export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId, onCharacterListOpen }) => {
     const classes = useStyles();
+    const withSound = useWithSound('buttonClick');
     const myPlayerId = useMyPlayerId();
     const playerName = useRoomSelector(state => state.staticPlayerList[ playerId ].playerName);
     const isAI = useRoomSelector(state => state.staticPlayerList[ playerId ].type === 'ai');
@@ -79,7 +80,7 @@ export const RoomTeamPlayerLine: React.FC<RoomTeamPlayerLineProps> = ({ playerId
                     <CheckCircleOutlineIcon className={classes.readyIcon} />
                 </Grid>}
                 {isAI && !isMyPlayerReady && <Grid item container xs justify='flex-end'>
-                    <IconButton onClick={onAIRemove} size='small'>
+                    <IconButton onClick={withSound(onAIRemove)} size='small'>
                         <CloseIcon fontSize='inherit' />
                     </IconButton>
                 </Grid>}

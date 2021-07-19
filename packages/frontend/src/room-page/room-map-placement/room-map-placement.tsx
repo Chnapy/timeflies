@@ -1,6 +1,6 @@
 import { Box, Dialog, Grid, IconButton, makeStyles, ThemeProvider } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { appTheme, UIText } from '@timeflies/app-ui';
+import { appTheme, UIText, useWithSound } from '@timeflies/app-ui';
 import { AssetsLoader, AssetsLoaderMap, useAssetMap } from '@timeflies/assets-loader';
 import { CharacterId, Position } from '@timeflies/common';
 import { RoomCharacterPlacementMessage, RoomStaticCharacter } from '@timeflies/socket-messages';
@@ -39,6 +39,7 @@ const useStyles = makeStyles(({ spacing }) => ({
 
 const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose }) => {
     const classes = useStyles();
+    const withSound = useWithSound('buttonClick');
     const sendRoomUpdate = useSendRoomUpdate();
     const mapInfos = useRoomSelector(state => state.mapInfos!);
     const mapPlacementTiles = useRoomSelector(state => state.mapPlacementTiles);
@@ -122,7 +123,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
     });
 
     return (
-        <Dialog classes={{ paper: classes.root }} fullScreen open={open} onClose={onClose}>
+        <Dialog classes={{ paper: classes.root }} fullScreen open={open} onClose={withSound(onClose)}>
             <Grid className={classes.content} container direction='column' wrap='nowrap' spacing={2}>
 
                 <Grid item>
@@ -145,7 +146,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
                                         </Grid>
                                     ))}
                                     <Grid item>
-                                        <IconButton onClick={onClose}>
+                                        <IconButton onClick={withSound(onClose)}>
                                             <CloseIcon />
                                         </IconButton>
                                     </Grid>
