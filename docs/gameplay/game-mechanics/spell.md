@@ -39,7 +39,7 @@ When a spell is selected to be launched the range area is shown around the chara
 Player can then click on one of available tiles to launch the spell. At this moment action area show up on tiles around targeted tile, all characters in this area receive spell effects.
 
 To launch a spell, some conditions should be respected:
-- target tile should be in range area (this area may be virtually infinite)
+- target tile should be in range area
 - it should remains at least the spell duration as turn time
 - it should be character turn
 

@@ -10,6 +10,3 @@ Let imagine a map with these properties:
 - Number of characters by team: 4
 
 With these properties we have 12 placement tiles (3 * 4).
-
-A player can put its first character on any available placement tile.
-After that he should put its others characters on placement tiles of the same team, others cannot be used.

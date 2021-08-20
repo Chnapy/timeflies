@@ -1,7 +1,6 @@
 # Character
 
-A character is the most powerful entity of the game.
-It is controlled by a player during its turns.
+A character is controlled by a player during its turns.
 
 Characters can be very different depending of there **roles**, representing all the **attributes** of the entity, but also its **spells**. In other words, its way of playing.
 
