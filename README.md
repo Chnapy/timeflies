@@ -18,19 +18,20 @@ This game can be played on any modern browser (= chrome or firefox please).
 
 ## Bulk features
 
-- Wonderful sounds & musics
-- Use of splendid Tiled-created map
-- Smart AI who can beat you
-- Battle can be watched as spectator
-- The best gameplay you ever saw (or not)
-- Rich HUD with lot of infos
-- Amazing sprite animations
-- Best pathfinding in the town
-- You can chat with other players (incredible !)
-- Room & battle links can be shared
-- Mobile devices compatible !
-- Handle some keyboard shortcuts
-- Amazing characters & spells
+- :musical_note: Wonderful sounds & musics
+- :triangular_ruler: Use of splendid Tiled-created map
+- :robot: Smart AI who can beat you
+- :eyes: Battle can be watched as spectator
+- :video_game: The best gameplay you ever saw (or not)
+- :computer: Rich HUD with lot of infos
+- :runner: Amazing sprite animations
+- :beginner: Best pathfinding in the town
+- :speech_balloon: You can chat with other players (incredible !)
+- :link: Room & battle links can be shared
+- :iphone: Mobile devices compatible !
+- :one: Handle some keyboard shortcuts
+- :sparkles: Amazing characters & spells
+- :exclamation: Handle player disconnection
 
 ## :game_die: Gameplay
 
@@ -48,3 +49,8 @@ You can see all the mockups on [Figma](https://www.figma.com/file/Y23sbARnRD2ZXG
   - [RPG Dungeon Tileset](https://pita.itch.io/rpg-dungeon-tileset) and [RPG Monster Pack](https://pita.itch.io/rpg-monster-pack) 
   (tileset and characters spritesheets) by [Pita](https://pita.itch.io/),
 
+- [Skill icons set](https://quintino-pixels.itch.io/free-pixel-art-skill-icons-pack) (spells icons) by [Quintino](https://quintino-pixels.itch.io/),
+
+- [Music loop bundle](https://tallbeard.itch.io/music-loop-bundle) (musics) by [Abstraction Music](https://www.abstractionmusic.com),
+
+- [Kenney sounds packs](https://www.kenney.nl/assets?q=audio) (sounds) by [Kenney](https://www.kenney.nl/)
