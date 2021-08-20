@@ -1,7 +1,8 @@
 import { Container, makeStyles } from '@material-ui/core';
-import React from 'react';
 import { usePlayMusic } from '@timeflies/app-ui';
+import React from 'react';
 import { AppHeader } from '../../components/app-header/app-header';
+import { FirstTimeModal } from './first-time-modal';
 import { RoomListTable } from './room-list-table';
 
 const useStyles = makeStyles(() => ({
@@ -29,5 +30,7 @@ export const RoomListPage: React.FC = () => {
         <Container className={classes.container} maxWidth='sm'>
             <RoomListTable />
         </Container>
+
+        <FirstTimeModal />
     </div>;
 };

@@ -1,4 +1,4 @@
-import { makeStyles, Slider, Table, TableCell, TableRow } from '@material-ui/core';
+import { makeStyles, Slider, Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import React from 'react';
 import { UIText } from '../../components/ui-text/ui-text';
 import { useSound } from '../hooks/use-sound';
@@ -60,32 +60,34 @@ export const AudioOptions: React.FC = () => {
         <UIText variant='h4'>Audio</UIText>
 
         <Table>
-            {volumeLines.map(({ name, hasContext, volume, setVolume }) => (
-                <TableRow key={name}>
-                    <TableCell className={classes.labelCell} size='small'>
-                        <UIText variant='body1'>{name}</UIText>
-                    </TableCell>
+            <TableBody>
+                {volumeLines.map(({ name, hasContext, volume, setVolume }) => (
+                    <TableRow key={name}>
+                        <TableCell className={classes.labelCell} size='small'>
+                            <UIText variant='body1'>{name}</UIText>
+                        </TableCell>
 
-                    <TableCell className={classes.sliderCell}>
-                        {hasContext
-                            ? <Slider
-                                className={classes.slider}
-                                min={0}
-                                max={1}
-                                step={0.1}
-                                value={volume}
-                                onChange={(e, value) => {
-                                    if (value === volume) {
-                                        return;
-                                    }
+                        <TableCell className={classes.sliderCell}>
+                            {hasContext
+                                ? <Slider
+                                    className={classes.slider}
+                                    min={0}
+                                    max={1}
+                                    step={0.1}
+                                    value={volume}
+                                    onChange={(e, value) => {
+                                        if (value === volume) {
+                                            return;
+                                        }
 
-                                    setVolume(value as number);
-                                }}
-                            />
-                            : <UIText variant='body2'>click anywhere to enable</UIText>}
-                    </TableCell>
-                </TableRow>
-            ))}
+                                        setVolume(value as number);
+                                    }}
+                                />
+                                : <UIText variant='body2'>click anywhere to enable</UIText>}
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
         </Table>
 
     </>;
