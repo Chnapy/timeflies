@@ -3,6 +3,7 @@ import { useIsMobile } from '@timeflies/app-ui';
 import { SpellId } from '@timeflies/common';
 import clsx from 'clsx';
 import React from 'react';
+import { KeyboardShortcutsHelper } from './keyboard-shortcuts-helper';
 import { SpellButton, SpellButtonProps } from './spell-button';
 
 export type SpellButtonPanelProps = {
@@ -20,6 +21,7 @@ const buttonSizes = {
 
 const useStyles = makeStyles(({ spacing }) => ({
     root: {
+        position: 'relative',
         backdropFilter: 'blur(2px)'
     },
     background: {
@@ -34,6 +36,13 @@ const useStyles = makeStyles(({ spacing }) => ({
     mobileFirstButton: {
         marginBottom: -spacing(1),
         marginRight: (buttonSizes.main - buttonSizes.secondary) - spacing(1)
+    },
+    shortcutsHelperWrapper: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        transform: 'translateY(-100%)'
     }
 }));
 
@@ -87,6 +96,11 @@ export const SpellButtonPanel: React.FC<SpellButtonPanelProps> = ({
 
     return (
         <Box className={classes.root} position='relative' display='inline-flex' p={2} zIndex={0}>
+
+            <div className={classes.shortcutsHelperWrapper}>
+                <KeyboardShortcutsHelper />
+            </div>
+
             <Paper className={classes.background} />
             {isMobile
                 ? getMobileContent()
