@@ -23,7 +23,7 @@ const useStyles = makeStyles(({ palette }) => ({
     }
 }));
 
-const hotkeysCodes = [ 'KeyQ', 'KeyW', 'KeyE', 'KeyR' ];
+const hotkeysCodes = [ 'Digit1', 'Digit2', 'Digit3', 'Digit4' ];
 
 const noop = () => { };
 
