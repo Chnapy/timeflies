@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Timeflies",
+  "name": "Timeflies",
+  "description": "Timeflies is a free multiplayer tactical-RPG game, with a time-based gameplay.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,10 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#181818",
+  "background_color": "#181818",
+  "categories": [
+    "games"
+  ],
+  "orientation": "landscape"
 }
