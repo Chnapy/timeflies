@@ -84,5 +84,8 @@
       "unplugged": true
     }
   },
-  "license": "MIT"
+  "license": "MIT",
+  "cacheDirectories": [
+    ".yarn/cache"
+  ]
 }
