@@ -8,8 +8,8 @@
     "start": "PORT=40510 HOST_URL=http://localhost:40510 JWT_PRIVATE_KEY=foo ts-node src/index.ts",
     "pick-cache": "cp -rdpu ../../.yarn/cache/ .cache/",
     "leave-cache": "cp -rdpn .cache/ ../../.yarn/cache/",
-    "heroku-postbuild": "yarn p:build-recursive && yarn pick-cache",
-    "heroku-serve": "yarn leave-cache && yarn serve",
+    "heroku-postbuild": "yarn p:build-recursive",
+    "heroku-serve": "yarn serve",
     "serve": "yarn node lib/index.js"
   },
   "dependencies": {
