@@ -7,6 +7,7 @@
   "scripts": {
     "start": "yarn copy-assets && react-scripts start",
     "build": "yarn copy-assets && react-scripts build",
+    "build-all": "yarn p:build-recursive && yarn build",
     "test": "react-scripts test",
     "copy-assets": "rm -rf public/static && yarn p:copyfiles -E -u 4 \"../static-assets/public/static/**/*\" \"public/static\"",
     "mock-server": "tsc mock-server/index.ts && yarn node mock-server/index.js"

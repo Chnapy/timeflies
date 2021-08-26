@@ -6,7 +6,7 @@
 <h1 align="center">Timeflies</h1>
 
 <h6 align="center">
-    <a href="https://timeflies.fr"><b>PLAY</b></a>
+    <a href="https://timeflies.fr" target="_blank"><b>PLAY</b></a>
 </h6>
 
 Timeflies is a web multiplayer tactical-RPG.
