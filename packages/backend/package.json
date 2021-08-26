@@ -6,10 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "start": "PORT=40510 HOST_URL=http://localhost:40510 JWT_PRIVATE_KEY=foo ts-node src/index.ts",
-    "pick-cache": "cp -rdpu ../../.yarn/cache/ .cache/",
-    "leave-cache": "cp -rdpn .cache/ ../../.yarn/cache/",
-    "heroku-postbuild": "yarn p:build-recursive",
-    "heroku-serve": "yarn serve",
+    "build-all": "yarn p:build-recursive",
     "serve": "yarn node lib/index.js"
   },
   "dependencies": {
