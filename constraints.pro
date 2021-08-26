@@ -5,8 +5,8 @@
 % All packages must have a "MIT" license field
 gen_enforced_field(WorkspaceCwd, 'license', 'MIT').
 
-% All packages must have a engines.node field of >=12
-gen_enforced_field(WorkspaceCwd, 'engines.node', '>=12').
+% All packages must have a engines.node field of ^12
+gen_enforced_field(WorkspaceCwd, 'engines.node', '^12').
 gen_enforced_field(WorkspaceCwd, 'engineStrict', true).
 
 % All packages must work with the GitHub Package Registry

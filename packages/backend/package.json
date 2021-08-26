@@ -7,11 +7,12 @@
   "scripts": {
     "start": "PORT=40510 HOST_URL=http://localhost:40510 JWT_PRIVATE_KEY=foo ts-node src/index.ts",
     "build-all": "yarn p:build-recursive",
-    "serve": "node lib/index.js"
+    "serve": "yarn node lib/index.js"
   },
   "dependencies": {
     "@timeflies/common": "workspace:packages/common",
     "@timeflies/cycle-engine": "workspace:packages/cycle-engine",
+    "@timeflies/devtools": "workspace:packages/devtools",
     "@timeflies/socket-messages": "workspace:packages/socket-messages",
     "@timeflies/socket-server": "workspace:packages/socket-server",
     "@timeflies/spell-checker": "workspace:packages/spell-checker",
@@ -26,7 +27,6 @@
     "ws": "7.4.5"
   },
   "devDependencies": {
-    "@timeflies/devtools": "workspace:packages/devtools",
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.10",
     "@types/express": "^4.17.11",
@@ -39,7 +39,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": ">=12"
+    "node": "^12"
   },
   "repository": {
     "directory": "packages/backend",
