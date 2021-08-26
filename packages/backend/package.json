@@ -39,7 +39,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": ">=12"
+    "node": "^12"
   },
   "repository": {
     "directory": "packages/backend",
