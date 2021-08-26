@@ -1,1 +1,1 @@
-web: yarn && yarn workspace @timeflies/backend serve
+web: yarn workspace @timeflies/backend serve
