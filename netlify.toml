@@ -11,7 +11,7 @@
   publish = "packages/frontend/build"
 
   # Default build command.
-  command = "yarn workspace @timeflies/frontend p:build-recursive"
+  command = "yarn workspace @timeflies/frontend build-all"
 
   # Directory with the serverless Lambda functions to deploy to AWS.
   # functions = "project/functions/"
