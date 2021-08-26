@@ -26,6 +26,7 @@
     "p:copyfiles": "cd $INIT_CWD && copyfiles",
     "foreach-check-all": "yarn workspaces foreach -v --exclude '**/timeflies' run p:check-all",
     "foreach-build-all": "yarn workspaces foreach -v --exclude '**/timeflies' run p:build-recursive",
+    "netlify-yarnrc-workaround": "bash scripts/generate-old-yarnrc.sh",
     "heroku-postbuild": "yarn workspace @timeflies/shared run build && yarn workspace @timeflies/back run build"
   },
   "devDependencies": {
