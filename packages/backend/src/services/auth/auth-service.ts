@@ -36,7 +36,7 @@ export class AuthService extends Service {
     };
 
     httpAuthRoute: RequestHandler<never, AuthResponseBody, AuthRequestBody> = (request, response, next) => {
-logger.info('AUTh RECEIVED');
+
         const validateResult = authRequestBodySchema.validate(request.body);
         if (validateResult.error) {
             response
