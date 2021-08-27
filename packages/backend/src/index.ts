@@ -4,6 +4,7 @@ import { addSocketListenersLogger, createSocketCell, SocketError } from '@timefl
 import { json, urlencoded } from 'body-parser';
 import cors from "cors";
 import express from 'express';
+import http from 'http';
 import https from 'https';
 import WebSocket from 'ws';
 import { config } from './main/config';
@@ -20,8 +21,16 @@ const isLocalhost = getEnv('HOST_URL').includes('://localhost');
 
 const app = express();
 
+// TODO do not hardcode
+const origin = isLocalhost
+    ? [ 'https://localhost:3000' ]
+    : [ 'https://timeflies.fr', 'https://timeflies-game.herokuapp.com' ];
+
 app.use(
-    cors({ allowedHeaders: '*' }),
+    cors({
+        origin,
+        allowedHeaders: '*'
+    }),
     urlencoded({ extended: false }),
     json()
 );
@@ -32,14 +41,14 @@ const globalEntities = createGlobalEntities();
 
 app.post(authEndpoint, globalEntities.services.authService.httpAuthRoute);
 
-const serverOptions: https.ServerOptions = isLocalhost
-    ? {
+const server = isLocalhost
+    // https in localhost to simulate Heroku https
+    ? https.createServer({
         key: readFileSync('../../localhost-key.pem'),
         cert: readFileSync('../../localhost.pem')
-    }
-    : {};
-
-const server = https.createServer(serverOptions, app);
+    }, app)
+    // Heroku do not need https server (it causes errors)
+    : http.createServer(app);
 
 // Websocket
 
