@@ -34,6 +34,9 @@ const useStyles = makeStyles(({ spacing }) => ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start'
+    },
+    canvas: {
+        pointerEvents: 'none'
     }
 }));
 
@@ -159,7 +162,7 @@ const InnerRoomMapPlacement: React.FC<RoomMapPlacementProps> = ({ open, onClose 
                 <Grid className={classes.list} item>
 
                     <Box position='relative'>
-                        <Stage options={stageSize} scale={stageScale}>
+                        <Stage className={classes.canvas} options={stageSize} scale={stageScale}>
                             <ThemeProvider theme={appTheme}>
 
                                 <TilemapComponent

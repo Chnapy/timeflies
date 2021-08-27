@@ -11,7 +11,7 @@ const unlockAudioContext = () => {
     const events = [ "touchstart", "touchend", "mousedown", "keydown" ];
 
     const unlock = () => {
-        audioContext.resume().then(clean);
+        audioContext.resume().finally(clean);
     };
 
     const clean = () => events.forEach(e => document.body.removeEventListener(e, unlock));
