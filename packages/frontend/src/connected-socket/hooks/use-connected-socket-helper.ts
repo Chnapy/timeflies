@@ -7,13 +7,7 @@ import { useDispatchMessageErrorIfAny } from '../../error-list/hooks/use-dispatc
 import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
 
-const getWsUrl = () => {
-    const httpUrl = getEnv('REACT_APP_SERVER_URL');
-    const cutStartIndex = httpUrl.indexOf('://') + 3;
-    return 'ws://' + httpUrl.substr(cutStartIndex);
-};
-
-const createSocketHelper = getSocketHelperCreator(getWsUrl());
+const createSocketHelper = getSocketHelperCreator(getEnv('REACT_APP_SERVER_URL'));
 
 export const useConnectedSocketHelper = () => {
     const credentialsToken = useGameSelector(state => state.credentials?.token);

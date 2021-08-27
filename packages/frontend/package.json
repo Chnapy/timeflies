@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "start": "yarn copy-assets && react-scripts start",
+    "start": "yarn copy-assets && HTTPS=true SSL_CRT_FILE=../../localhost.pem SSL_KEY_FILE=../../localhost-key.pem react-scripts start",
     "build": "yarn copy-assets && react-scripts build",
     "build-all": "yarn p:build-recursive && yarn build",
     "test": "react-scripts test",

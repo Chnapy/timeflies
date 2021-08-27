@@ -4,14 +4,17 @@ import { addSocketListenersLogger, createSocketCell, SocketError } from '@timefl
 import { json, urlencoded } from 'body-parser';
 import cors from "cors";
 import express from 'express';
-import http from 'http';
+import https from 'https';
 import WebSocket from 'ws';
 import { config } from './main/config';
 import { createGlobalEntities } from './main/global-entities';
 import { onAllServicesSocketConnect } from './services/services';
 import { getEnv } from './utils/env';
+import { readFileSync } from 'fs';
 
 const port = Number(getEnv('PORT'));
+
+const isLocalhost = getEnv('HOST_URL').includes('://localhost');
 
 // Express
 
@@ -29,7 +32,14 @@ const globalEntities = createGlobalEntities();
 
 app.post(authEndpoint, globalEntities.services.authService.httpAuthRoute);
 
-const server = http.createServer(app);
+const serverOptions: https.ServerOptions = isLocalhost
+    ? {
+        key: readFileSync('../../localhost-key.pem'),
+        cert: readFileSync('../../localhost.pem')
+    }
+    : {};
+
+const server = https.createServer(serverOptions, app);
 
 // Websocket
 

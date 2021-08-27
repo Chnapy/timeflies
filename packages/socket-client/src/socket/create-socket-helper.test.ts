@@ -30,9 +30,9 @@ describe('# create socket helper', () => {
     it('connect to correct endpoint', () => {
         mockWebSocket();
 
-        const socketHelper = getSocketHelperCreator('http://myendpoint.foo.bar/toto')('my_token');
+        const socketHelper = getSocketHelperCreator('https://myendpoint.foo.bar/toto')('my_token');
 
-        expect(socketHelper.url).toEqual('ws://myendpoint.foo.bar/toto?token=my_token');
+        expect(socketHelper.url).toEqual('wss://myendpoint.foo.bar/toto?token=my_token');
     });
 
     describe('hearbeat timeout loop', () => {

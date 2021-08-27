@@ -2,25 +2,19 @@ import { extractMessagesFromEvent, heartbeatMessageValue, Message } from '@timef
 
 export type SocketHelper = ReturnType<ReturnType<typeof getSocketHelperCreator>>;
 
-const createEndpoint = (protocol: 'http' | 'ws', url: string) => {
-
-    const isHttps = url.startsWith('https');
+const createEndpoint = (protocol: 'https' | 'wss', url: string) => {
 
     const startIndex = url.indexOf('://');
     if (startIndex !== -1) {
         url = url.substr(startIndex + 3);
     }
 
-    const prefix = isHttps
-        ? protocol + 's'
-        : protocol;
-
-    return `${prefix}://${url}`;
+    return `${protocol}://${url}`;
 };
 
 
 const createAuthenticatedEndpoint = (token: string, serverUrl: string): string => {
-    const baseEndpoint = createEndpoint('ws', serverUrl);
+    const baseEndpoint = createEndpoint('wss', serverUrl);
 
     const url = new URL(baseEndpoint);
     url.searchParams.set('token', token);
