@@ -71,7 +71,7 @@ export const RoomCharacterList: React.FC<RoomCharacterListProps> = ({ playerId, 
 
     return (
         <Dialog classes={{ paper: classes.root }} fullScreen open={open} onClose={withSound(onClose)}>
-            <Grid className={classes.content} container direction='column' spacing={2}>
+            <Grid className={classes.content} container direction='column' wrap='nowrap' spacing={2}>
 
                 <Grid className={classes.header} item>
                     <UIText variant='h3'>Character select</UIText>

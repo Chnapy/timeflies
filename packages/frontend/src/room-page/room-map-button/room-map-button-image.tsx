@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@material-ui/core';
+import { makeStyles, ThemeProvider } from '@material-ui/core';
 import { appTheme } from '@timeflies/app-ui';
 import { AssetsLoader, AssetsLoaderMap, useAssetMap } from '@timeflies/assets-loader';
 import { MapInfos } from '@timeflies/socket-messages';
@@ -13,14 +13,22 @@ type RoomMapButtonImageProps = {
     height: number;
 };
 
+const useStyles = makeStyles(() => ({
+    root: {
+        pointerEvents: 'none'
+    }
+}));
+
 export const RoomMapButtonImage: React.FC<RoomMapButtonImageProps> = React.memo(({ mapInfos, width, height }) => {
+    const classes = useStyles();
+
     const assetsLoaderProps = React.useMemo<AssetsLoaderMap>(() => ({
         spritesheets: {},
         maps: { [ mapInfos.name ]: mapInfos.schemaLink }
     }), [ mapInfos ]);
 
     return (
-        <Stage options={{ width, height, backgroundAlpha: 0 }}>
+        <Stage className={classes.root} options={{ width, height, backgroundAlpha: 0 }}>
             <ThemeProvider theme={appTheme}>
                 <AssetsLoader {...assetsLoaderProps}>
                     <RoomMapButtonImageInner mapName={mapInfos.name} width={width} height={height} />

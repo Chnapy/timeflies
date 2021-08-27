@@ -1,3 +1,4 @@
+import { makeStyles } from '@material-ui/core';
 import { AnimatedComplexSpriteProps, AnimatedComplexSpriteReact } from '@timeflies/animated-complex-sprite';
 import { useAssetSpritesheet } from '@timeflies/assets-loader';
 import React from 'react';
@@ -9,20 +10,30 @@ export type CharacterAnimatedImageProps = Omit<AnimatedComplexSpriteProps, 'spri
     fallback?: React.ReactNode;
 };
 
+const useStyles = makeStyles(() => ({
+    root: {
+        pointerEvents: 'none'
+    }
+}));
+
 export const CharacterAnimatedImage: React.FC<CharacterAnimatedImageProps> = ({
     size, scale, fallback, ...spriteProps
 }) => {
+    const classes = useStyles();
     const asset = useAssetSpritesheet('entities');
 
     if (!asset) {
         return <>{fallback}</>;
     }
 
-    return <Stage options={{
-        width: size,
-        height: size,
-        backgroundAlpha: 0
-    }}>
+    return <Stage
+        className={classes.root}
+        options={{
+            width: size,
+            height: size,
+            backgroundAlpha: 0,
+        }}
+    >
         <AnimatedComplexSpriteReact
             spritesheet={asset.spritesheet}
             {...spriteProps}
