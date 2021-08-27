@@ -20,8 +20,16 @@ const isLocalhost = getEnv('HOST_URL').includes('://localhost');
 
 const app = express();
 
+// TODO do not hardcode
+const origin = isLocalhost
+    ? [ 'https://localhost:3000' ]
+    : [ 'https://timeflies.fr', 'https://timeflies-game.herokuapp.com' ];
+
 app.use(
-    cors({ allowedHeaders: '*' }),
+    cors({
+        origin,
+        allowedHeaders: '*'
+    }),
     urlencoded({ extended: false }),
     json()
 );
