@@ -14,6 +14,7 @@ This game can be played on any modern browser (= chrome or firefox please).
 
 ![Code quality](https://www.code-inspector.com/project/23679/score/svg)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/249b0bb9-e394-4f23-a7d0-eafbc965b744/deploy-status)](https://app.netlify.com/sites/timeflies-game/deploys)
+![Heroku](https://pyheroku-badge.herokuapp.com/?app=timeflies-game)
 
 ## Bulk features
 
