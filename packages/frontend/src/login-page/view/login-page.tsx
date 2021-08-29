@@ -3,6 +3,7 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import { UIText, usePlayMusic } from '@timeflies/app-ui';
 import React from 'react';
 import { OptionsButton } from '../../components/options/options-button';
+import { useOrientationLockSetter } from '../../components/orientation-lock/orientation-lock-context';
 import { LoginForm } from './login-form';
 
 const useStyles = makeStyles(({ spacing }) => ({
@@ -33,6 +34,7 @@ const useStyles = makeStyles(({ spacing }) => ({
 export const LoginPage: React.FC = () => {
     const classes = useStyles();
     usePlayMusic('menu');
+    useOrientationLockSetter(false);
 
     return <Container className={classes.root} maxWidth='xs'>
 

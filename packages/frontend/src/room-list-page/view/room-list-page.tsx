@@ -2,6 +2,7 @@ import { Container, makeStyles } from '@material-ui/core';
 import { usePlayMusic } from '@timeflies/app-ui';
 import React from 'react';
 import { AppHeader } from '../../components/app-header/app-header';
+import { useOrientationLockSetter } from '../../components/orientation-lock/orientation-lock-context';
 import { FirstTimeModal } from './first-time-modal';
 import { RoomListTable } from './room-list-table';
 
@@ -23,6 +24,7 @@ const useStyles = makeStyles(() => ({
 export const RoomListPage: React.FC = () => {
     const classes = useStyles();
     usePlayMusic('menu');
+    useOrientationLockSetter(false);
 
     return <div className={classes.root}>
         <AppHeader />
