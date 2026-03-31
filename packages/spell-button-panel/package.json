@@ -4,7 +4,6 @@
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {},
   "peerDependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
@@ -48,7 +47,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": "^12"
+    "node": "^22.18"
   },
   "repository": {
     "directory": "packages/spell-button-panel",

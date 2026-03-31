@@ -7,10 +7,7 @@ import { IncomingMessage } from 'http';
 import { JWT } from 'jose';
 import { URL, URLSearchParams } from 'url';
 import { PlayerCredentialsTimed } from '../../main/global-entities';
-import { getEnv } from '../../utils/env';
 import { Service } from '../service';
-
-const privateKey = getEnv('JWT_PRIVATE_KEY');
 
 export class AuthService extends Service {
     protected afterSocketConnect = () => { };
@@ -72,7 +69,7 @@ export class AuthService extends Service {
             playerName
         };
 
-        const token = JWT.sign(tokenPayload, privateKey, { algorithm: 'HS256' });
+        const token = JWT.sign(tokenPayload, 'none', { algorithm: 'HS256' });
 
         const playerCredentials: PlayerCredentials = {
             playerId,

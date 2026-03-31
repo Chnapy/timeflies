@@ -4,7 +4,6 @@
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {},
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/node": "^15.0.3",
@@ -12,7 +11,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": "^12"
+    "node": "^22.18"
   },
   "repository": {
     "directory": "packages/devtools",

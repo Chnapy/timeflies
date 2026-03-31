@@ -10,7 +10,7 @@ import { CredentialsLoginAction } from '../store/credentials-actions';
 
 const authUrl = new URL(
     authEndpoint,
-    getEnv('REACT_APP_SERVER_URL')
+    getEnv('VITE_SERVER_URL')
 ).href;
 
 const playerNameInputName = 'playerName';

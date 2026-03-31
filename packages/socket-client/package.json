@@ -4,7 +4,6 @@
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "scripts": {},
   "peerDependencies": {
     "@timeflies/common": "*",
     "@timeflies/socket-messages": "*",
@@ -24,7 +23,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": "^12"
+    "node": "^22.18"
   },
   "repository": {
     "directory": "packages/socket-client",

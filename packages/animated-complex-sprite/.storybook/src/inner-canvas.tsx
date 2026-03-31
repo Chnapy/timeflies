@@ -52,7 +52,7 @@ export const InnerCanvas: React.FC<CanvasProps> = ({ run, state, outline, pos })
   React.useEffect(() => {
     if (!spritesheetRes) {
       loader
-        .add(name, path.join(process.env.PUBLIC_URL, 'static', 'spritesheets', 'spritesheet-entities.json'))
+        .add(name, path.join(import.meta.env.PUBLIC_URL, 'static', 'spritesheets', 'spritesheet-entities.json'))
         .load((l, resources) => {
           setSpritesheetRes(resources[ name ]);
         });

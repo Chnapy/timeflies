@@ -9,7 +9,7 @@ export const createStoreManager = () => {
             ...getDefaultMiddleware()
         ];
 
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.NODE_ENV === 'development') {
             const logger = createLogger({
                 collapsed: true
             });

@@ -7,7 +7,7 @@ import { useDispatchMessageErrorIfAny } from '../../error-list/hooks/use-dispatc
 import { CredentialsLoginAction } from '../../login-page/store/credentials-actions';
 import { useGameSelector } from '../../store/hooks/use-game-selector';
 
-const createSocketHelper = getSocketHelperCreator(getEnv('REACT_APP_SERVER_URL'));
+const createSocketHelper = getSocketHelperCreator(getEnv('VITE_SERVER_URL'));
 
 export const useConnectedSocketHelper = () => {
     const credentialsToken = useGameSelector(state => state.credentials?.token);

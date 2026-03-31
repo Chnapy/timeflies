@@ -8,7 +8,7 @@ describe('asset url', () => {
     });
 
     it('to frontend', () => {
-        expect(assetUrl.toFrontend('foo/bar')).toEqual('https://host.com/static/foo/bar');
-        expect(assetUrl.toFrontend('/foo/bar')).toEqual('https://host.com/static/foo/bar');
+        expect(assetUrl.toFrontend('foo/bar')).toEqual('http://host.com/static/foo/bar');
+        expect(assetUrl.toFrontend('/foo/bar')).toEqual('http://host.com/static/foo/bar');
     });
 });
