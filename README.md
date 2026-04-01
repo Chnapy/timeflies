@@ -5,16 +5,14 @@
 
 <h1 align="center">Timeflies</h1>
 
-<h6 align="center">
-    <a href="https://timeflies.fr"><b>PLAY</b></a>
-</h6>
+<!-- <h6 align="center">
+    <a href=""><b>PLAY</b></a>
+</h6> -->
+
+> Project aborted since 2021
 
 Timeflies is a web multiplayer tactical-RPG.
 This game can be played on any modern browser (= chrome or firefox please).
-
-![Code quality](https://www.code-inspector.com/project/23679/score/svg)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/249b0bb9-e394-4f23-a7d0-eafbc965b744/deploy-status)](https://app.netlify.com/sites/timeflies-game/deploys)
-![Heroku](https://pyheroku-badge.herokuapp.com/?app=timeflies-game)
 
 ## Bulk features
 

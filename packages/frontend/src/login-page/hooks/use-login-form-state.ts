@@ -9,8 +9,8 @@ import { ErrorListAddAction } from '../../error-list/store/error-list-actions';
 import { CredentialsLoginAction } from '../store/credentials-actions';
 
 const authUrl = new URL(
-    authEndpoint,
-    getEnv('REACT_APP_SERVER_URL')
+    getEnv('REACT_APP_SERVER_URL') + authEndpoint,
+    window.location.href
 ).href;
 
 const playerNameInputName = 'playerName';

@@ -17,13 +17,13 @@ app.use('/public', express.static('mock-server/public'));
 const server = http.createServer(app);
 
 const port = 40510;
-const wss = new WebSocketServer({ server });
+const ws = new WebSocketServer({ server });
 
 console.log('Mock server started');
 
 server.listen(port, () => {
     console.log('server listening address', server.address());
-    console.log('ws listening address', wss.address());
+    console.log('ws listening address', ws.address());
 });
 
 const turnsOrder = [ 'c2', 'c1', 'c3' ];
@@ -173,7 +173,7 @@ const battleLoadData: BattleLoadData = {
 
 const sendAll = action => {
     console.log('sendAll: %s', JSON.stringify(action));
-    wss.clients.forEach(ws => {
+    ws.clients.forEach(ws => {
         ws.send(JSON.stringify([ action ]));
     });
 };
@@ -194,7 +194,7 @@ const sendAllNextTurnInfos = () => setTimeout(() =>
         BattleTurnStartMessage(cycleEngine.getNextTurnInfos())
     ), 1000);
 
-wss.on('connection', function (ws) {
+ws.on('connection', function (ws) {
 
     const startTime = Date.now() + 5000;
 
