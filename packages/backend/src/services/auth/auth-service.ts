@@ -10,8 +10,6 @@ import { PlayerCredentialsTimed } from '../../main/global-entities';
 import { getEnv } from '../../utils/env';
 import { Service } from '../service';
 
-const privateKey = getEnv('JWT_PRIVATE_KEY');
-
 export class AuthService extends Service {
     protected afterSocketConnect = () => { };
 
@@ -72,7 +70,7 @@ export class AuthService extends Service {
             playerName
         };
 
-        const token = JWT.sign(tokenPayload, privateKey, { algorithm: 'HS256' });
+        const token = JWT.sign(tokenPayload, 'none', { algorithm: 'HS256' });
 
         const playerCredentials: PlayerCredentials = {
             playerId,
@@ -100,9 +98,9 @@ export class AuthService extends Service {
         }
 
         const token = new URLSearchParams(
-            url.startsWith('/?')  // localhost
-                ? url.substring(2)
-                : new URL(url).search
+            url.startsWith('http')
+                ? new URL(url).search
+                : new URL(url, 'http://localhost').search
         ).get('token')!;
 
         const socketQueryParams: SocketQueryParams = { token };

@@ -1,5 +1,5 @@
 
-const requiredKeys = [ 'REACT_APP_SERVER_URL' ] as const;
+const requiredKeys = [ 'REACT_APP_SERVER_URL', 'REACT_APP_WS_URL' ] as const;
 
 console.table(requiredKeys.reduce<Record<string, any>>((acc, key) => {
     acc[ key ] = process.env[ key ];
