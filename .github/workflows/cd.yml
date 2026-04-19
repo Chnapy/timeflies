@@ -1,0 +1,27 @@
+name: Deploy Docker image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker build
+        run: docker build . --target monolith -t registry.chnapy.dev/timeflies
+
+      - name: Configure Wireguard VPN
+        if: env.WG_CONFIG
+        env:
+          WG_CONFIG: ${{ secrets.WG_CONFIG }}
+        run: |
+          sudo apt install wireguard resolvconf
+          echo "${{ secrets.WG_CONFIG }}" > /tmp/wg0.conf
+          sudo chmod 600 /tmp/wg0.conf
+          sudo wg-quick up /tmp/wg0.conf
+
+      - name: Docker push
+        run: docker push registry.chnapy.dev/timeflies

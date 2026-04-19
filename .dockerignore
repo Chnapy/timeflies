@@ -17,3 +17,8 @@ packages/*/build
 **/.env.test
 **/.eslintcache
 **/*.log
+
+# for image size
+**/*.wav
+**/*.mp3
+**/*.map

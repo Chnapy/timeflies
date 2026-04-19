@@ -7,7 +7,7 @@ export module Assets {
 
     export type SpritesheetKey = keyof typeof spritesheets;
 
-    const getMusicPathList = (musicFolderName: string) => [ 'ogg', 'wav', 'mp3' ]
+    const getMusicPathList = (musicFolderName: string) => [ 'ogg' /*, 'wav', 'mp3' */ ]
         .map(ext => `/static/audio/musics/${musicFolderName}/${musicFolderName}.${ext}`);
 
     export const musics = {

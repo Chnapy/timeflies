@@ -1,24 +1,4 @@
-# monolith: backend & frontend
-FROM alpine:3.23 AS monolith
-
-LABEL org.opencontainers.image.title="Timeflies" \
-  org.opencontainers.image.description="Web multiplayer game - tactical-RPG." \
-  org.opencontainers.image.url="https://github.com/Chnapy/timeflies" \
-  org.opencontainers.image.source="https://github.com/Chnapy/timeflies" \
-  org.opencontainers.image.version="0.0.1" \
-  org.opencontainers.image.licenses="MIT" \
-  org.opencontainers.image.vendor="Timeflies" \
-  org.opencontainers.image.authors="Richard Haddad" \
-  org.opencontainers.image.base.name="alpine:3.23"
-
-RUN apk add --no-cache \
-  nginx \
-  supervisor \
-  curl tar xz \
-  && curl -fsSL https://unofficial-builds.nodejs.org/download/release/v12.22.12/node-v12.22.12-linux-x64-musl.tar.xz | \
-   tar -xJ -C /usr/local --strip-components=1 \
-  && apk del curl tar xz \
-  && rm -rf /var/cache/apk/*
+FROM node:12.12.0-alpine AS builder
 
 WORKDIR /app
 
@@ -39,6 +19,7 @@ RUN yarn -v && yarn install
 COPY babel.config.js tsconfig.json ./
 
 RUN yarn workspace @timeflies/backend p:build-recursive
+RUN yarn workspace @timeflies/backend build
 
 RUN yarn workspace @timeflies/frontend p:build-recursive
 
@@ -47,6 +28,33 @@ ENV REACT_APP_SERVER_URL=/api
 ENV REACT_APP_WS_URL=/ws
 
 RUN yarn workspace @timeflies/frontend build
+
+RUN rm -rf ./.yarn/cache ./node_modules
+
+# monolith: backend & frontend
+FROM node:12.12.0-alpine AS monolith
+
+LABEL org.opencontainers.image.title="Timeflies" \
+  org.opencontainers.image.description="Web multiplayer game - tactical-RPG." \
+  org.opencontainers.image.url="https://github.com/Chnapy/timeflies" \
+  org.opencontainers.image.source="https://github.com/Chnapy/timeflies" \
+  org.opencontainers.image.version="0.0.1" \
+  org.opencontainers.image.licenses="MIT" \
+  org.opencontainers.image.vendor="Timeflies" \
+  org.opencontainers.image.authors="Richard Haddad" \
+  org.opencontainers.image.base.name="node:12.12.0-alpine"
+
+RUN apk add --no-cache \
+  nginx \
+  supervisor \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+RUN node --version && npm --version
+
+COPY --from=builder /app/packages/backend/build ./backend
+COPY --from=builder /app/packages/frontend/build ./frontend
 
 # setup logs folders
 RUN mkdir -p /var/log/supervisord /var/log/nginx /var/run/nginx \
