@@ -9,7 +9,11 @@ const createEndpoint = (protocol: 'http' | 'ws', url: string) => {
         url = url.substr(startIndex + 3);
     }
 
-    return `${protocol}://${url}`;
+    const secure = window.origin.startsWith('https')
+        ? 's'
+        : '';
+
+    return `${protocol}${secure}://${url}`;
 };
 
 
