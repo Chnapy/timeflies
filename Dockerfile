@@ -54,6 +54,7 @@ WORKDIR /app
 RUN node --version && npm --version
 
 COPY --from=builder /app/packages/backend/build ./backend
+COPY ./packages/backend/static ./backend/static
 COPY --from=builder /app/packages/frontend/build ./frontend
 
 # setup logs folders
