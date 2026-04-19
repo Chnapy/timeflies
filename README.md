@@ -5,9 +5,9 @@
 
 <h1 align="center">Timeflies</h1>
 
-<!-- <h6 align="center">
-    <a href=""><b>PLAY</b></a>
-</h6> -->
+<h6 align="center">
+    <a href="http://timeflies.chnapy.dev"><b>PLAY</b></a>
+</h6>
 
 > Project aborted since 2021
 
